@@ -111,6 +111,15 @@ test("the Bob matrix consumes the package's pinned Hermes public headers", async
   assert.match(workflow, /path: defold\/defold_hermes\/include/u);
 });
 
+test("pushes run only the cheap consumer half while artifact-dispatched runs require target archives", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
+  const local = workflow.slice(workflow.indexOf("  local:"), workflow.indexOf("  extension-headers:"));
+  assert.match(local, /if \[ "\$\{\{ github\.event_name \}\}" != push \]; then[\s\S]*stages\+=\(--stage target-archives\)/u);
+  assert.match(local, /--stage policy[\s\S]*--stage host-tools[\s\S]*--stage scaffold[\s\S]*--stage generate/u);
+  assert.match(workflow, /extension-headers:[\s\S]*if: github\.event_name != 'push'/u);
+  assert.match(workflow, /bob:[\s\S]*if: github\.event_name != 'push'/u);
+});
+
 test("Bob consumes the generated project's target artifact instead of rebuilding a host-native package", async () => {
   const wrapper = await readFile(new URL("../scripts/bob.sh", import.meta.url), "utf8");
   assert.match(wrapper, /check-project-native-artifact\.mjs" "\$project_root" "\$bundle_target"/u);

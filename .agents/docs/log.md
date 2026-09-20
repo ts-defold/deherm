@@ -1,5 +1,14 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Push smoke no longer races target artifact publication
+
+* **The end-to-end workflow now matches its documented split**: its Bob and
+  header jobs already skipped `push`, but the local push lane still requested
+  `target-archives`, so changing the workflow during a native fingerprint build
+  produced a predictable red run. Pushes now prove the published policy, host
+  tools, scaffold, and generation only. Scheduled, manual, and native-artifact-
+  dispatched runs additionally pull every target archive and execute Bob.
+
 ## 2026-09-20 - Policy engine evidence waits for its exact native input
 
 * **The policy/native-artifact race is now explicit and bounded**: run

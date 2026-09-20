@@ -97,9 +97,19 @@ jobs:
 
       - name: Policy, published tools, scaffold and generate
         run: |
-          node scripts/check-end-to-end.mjs \
-            --stage policy --stage host-tools --stage target-archives \
-            --stage scaffold --stage generate
+          stages=(
+            --stage policy
+            --stage host-tools
+            --stage scaffold
+            --stage generate
+          )
+          # A push is the cheap consumer half. A new native fingerprint may be
+          # publishing concurrently, so only the artifact-dispatched/manual/
+          # scheduled run may require the target archive and launch Bob.
+          if [ "${{ github.event_name }}" != push ]; then
+            stages+=(--stage target-archives)
+          fi
+          node scripts/check-end-to-end.mjs "${stages[@]}"
 
   # The npm package's prepack contract stages the public Hermes and JSI headers
   # from the pinned Hermes revision. They are deliberately not committed: the
