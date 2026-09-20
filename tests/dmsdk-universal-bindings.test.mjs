@@ -209,6 +209,11 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
   assert.deepEqual(JSON.parse(committedPlan), corpus.report);
   assert.equal(committedProduction, generated.source);
   assert.equal(committedVerification, generated.verificationSource);
+  for (const source of [generated.source, generated.verificationSource]) {
+    assert.match(source,
+      /#if defined\(__linux__\) && !defined\(ANDROID\)\n#define Font DehermX11Font\n#include <GL\/glx\.h>\n#undef Font\n#endif/u,
+      "a native-graphics materialization must isolate Xlib's global Font typedef");
+  }
   assert.doesNotMatch(helperSource, /dmsdk:[^"'\s]+@/, "the corpus helper must not own declaration IDs");
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-ready-census-"));
   try {
@@ -364,6 +369,8 @@ test("usage materializer compiles, links, and runs direct, function-template, co
     },
   ];
   const generated = materializeDmSdkUsages(usages, { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+  assert.doesNotMatch(generated.source, /GL\/glx\.h/u,
+    "materializations without the native-graphics header must not acquire a GLX dependency");
   assert.equal(generated.manifest.length, usages.length);
   assert.equal(generated.verification.vectorCount, usages.length);
   assert.equal(generated.verification.vectors.length, usages.length);

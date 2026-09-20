@@ -546,6 +546,24 @@ function expectedResultCheck(plan, result = "result") {
   return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_ADDRESS && ${result}.payload==${expectedPayload}`;
 }
 
+/**
+ * Defold's Linux native-graphics header includes Xlib, whose global `Font`
+ * typedef collides with Defold's own opaque `Font` declaration when a generated
+ * materialization contains both API families. Prime the GLX include guard
+ * under a private spelling before the independently authoritative Defold
+ * headers are combined. The native-graphics header already requires GLX on
+ * this target; this adds no dependency and changes no declaration that a
+ * generated wrapper calls.
+ */
+function renderPlatformHeaderPrelude(includes) {
+  if (!includes.has("#include <dmsdk/graphics/graphics_native.h>")) return "";
+  return "#if defined(__linux__) && !defined(ANDROID)\n" +
+    "#define Font DehermX11Font\n" +
+    "#include <GL/glx.h>\n" +
+    "#undef Font\n" +
+    "#endif\n";
+}
+
 export function materializeDmSdkUsages(usages, options = {}) {
   const recipes = options.recipes;
   if (!Array.isArray(recipes) || !recipes.length) {
@@ -933,7 +951,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
         ` if(${exactFailuresName}(${id})!=UINT32_C(0))return ${exactFailureName}("arguments",UINT32_C(${index}),${id});\n` +
         ` if(!(${expectedResultCheck(plan, resultName)}))return ${exactFailureName}("result",UINT32_C(${index}),${id});`;
     }).join("\n") + "\n return 0;\n}";
-  const preamble = `${[...includes].sort().join("\n")}\n` +
+  const preamble = `${renderPlatformHeaderPrelude(includes)}${[...includes].sort().join("\n")}\n` +
     "[[maybe_unused]] static int deherm_dmsdk_address_fits(uint64_t value){return sizeof(uintptr_t)>=sizeof(uint64_t)||value<=UINTPTR_MAX;}\n" +
     "[[maybe_unused]] static int64_t deherm_dmsdk_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}\n" +
     "[[maybe_unused]] static double deherm_dmsdk_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}\n" +

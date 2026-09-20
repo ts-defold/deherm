@@ -178,6 +178,17 @@ Complete pointee fixtures use the source type's actual alignment; incomplete
 and `void` pointees never form `alignof` expressions. This is exact bridge
 evidence, not execution of Defold implementation semantics.
 
+The declaration-only census deliberately combines every ready Defold header in
+one generated translation unit. On Linux that exposed an otherwise independent
+global-name collision: Xlib's `Font` typedef, included by
+`graphics_native.h`, conflicts with Defold's opaque `Font` declaration. When a
+materialization includes the native-graphics header, the compiler now primes
+the GLX include guard while spelling only Xlib's typedef as
+`DehermX11Font`, then restores the preprocessor state before including the
+authoritative Defold headers. No generated wrapper names or calls that Xlib
+type, so this is a target-scoped header-composition repair rather than an ABI
+translation. Materializations without native graphics do not acquire GLX.
+
 The arbitrary-extension C-header lane follows the same rule. Function identity
 is derived from module, native symbol, ordered native parameter spellings, and
 native result spelling plus the variadic call form, so inserting lines in a

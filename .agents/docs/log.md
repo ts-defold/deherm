@@ -23,8 +23,16 @@ Defold implementation-semantic evidence.
 
 The policy workflow's Linux engine lane also installs `libgl-dev`; the pinned
 SDK's `graphics_native.h` requires `GL/glx.h` even for the generated headless
-exact-call census. Host-parity now carries the regenerated target-conditional
-report that was stale after the preceding SDK import change.
+exact-call census. Reproducing that census in a Linux container exposed Xlib's
+global `Font` typedef colliding with Defold's own opaque `Font` when all 486
+ready calls share one generated translation unit. The materializer now primes
+GLX's include guard with only the Xlib typedef renamed, then includes Defold's
+authoritative headers normally. The canonical 486-call test compiles and runs
+13/13 tests in the Linux container, while a focused assertion proves non-native-
+graphics materializations do not acquire GLX. This is generated bridge
+compile/runtime evidence against recording callees, not engine-semantic
+evidence. Host-parity now carries the regenerated target-conditional report
+that was stale after the preceding SDK import change.
 
 ## 2026-09-20 - Host parity installs the exact SDK support input
 
