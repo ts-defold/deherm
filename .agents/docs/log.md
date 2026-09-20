@@ -1,5 +1,22 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Published Windows archive inspection rejected a false green
+
+* **The release bytes overruled the packaging job**: after
+  `libs-18b534020b9a` reported a green Windows build, the published
+  `hermes-x86_64-win32.tar.gz` was downloaded and its COFF table enumerated;
+  `zip.c.obj` was still present. The run is therefore not accepted as Windows
+  link evidence.
+
+* **The reproduced cause was shell pipeline semantics, not the member name**:
+  `set -o pipefail` combined with `llvm-ar t | grep -q` let the early match close
+  the pipe, made `llvm-ar` exit on SIGPIPE, and turned the successful match into
+  a false condition. The packagers now capture and validate the complete member
+  and symbol tables before acting. The regression fixture emits more than a pipe
+  buffer after `zip.c.obj`, so the former false-negative path is exercised.
+  The corrected recipe rotates the native family to `libs-f8d8d7e4c0ad`; only
+  direct inspection plus the subsequent Windows Bob link may accept it.
+
 ## 2026-09-20 - Push smoke no longer races target artifact publication
 
 * **The end-to-end workflow now matches its documented split**: its Bob and

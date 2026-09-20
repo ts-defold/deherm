@@ -58,17 +58,20 @@ if [[ "$lib_name" == llvm-lib* ]]; then
     exit 1
   fi
   MSYS2_ARG_CONV_EXCL="/OUT:" "$lib_tool" "/OUT:$lib_output" "${members[@]}"
-  if "$ar_tool" t "$output" | grep -qE '^zip\.c\.obj/?$'; then
+  archive_members="$("$ar_tool" t "$output")"
+  if grep -E '^zip\.c\.obj/?$' <<< "$archive_members" >/dev/null; then
     "$ar_tool" d "$output" zip.c.obj
   fi
-  if "$ar_tool" t "$output" | grep -qE '^zip\.c\.obj/?$'; then
+  archive_members="$("$ar_tool" t "$output")"
+  if grep -E '^zip\.c\.obj/?$' <<< "$archive_members" >/dev/null; then
     echo "package-msvc: unable to remove zip.c.obj from $output" >&2
     exit 1
   fi
 else
   MSYS2_ARG_CONV_EXCL="/OUT:;/REMOVE:" "$lib_tool" \
     "/OUT:$lib_output" "/REMOVE:zip.c.obj" "${members[@]}"
-  if MSYS2_ARG_CONV_EXCL="/LIST" "$lib_tool" "/LIST" "$lib_output" | grep -qE '(^|[\\/])zip\.c\.obj$'; then
+  archive_members="$(MSYS2_ARG_CONV_EXCL="/LIST" "$lib_tool" "/LIST" "$lib_output")"
+  if grep -E '(^|[\\/])zip\.c\.obj$' <<< "$archive_members" >/dev/null; then
     echo "package-msvc: unable to remove zip.c.obj from $output" >&2
     exit 1
   fi

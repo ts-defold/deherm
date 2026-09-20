@@ -265,7 +265,16 @@ test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
     editor,
     [
       "#!/usr/bin/env bash",
-      "if [[ \"$1\" == t ]]; then [[ -f \"$REMOVED\" ]] || printf 'zip.c.obj\\n'; exit 0; fi",
+      "if [[ \"$1\" == t ]]; then",
+      "  if [[ ! -f \"$REMOVED\" ]]; then",
+      "    printf 'zip.c.obj\\n'",
+      // More than a pipe buffer after the early match: with `set -o pipefail`,
+      // the old `llvm-ar t | grep -q` check killed the producer with SIGPIPE and
+      // treated the match as false. The packager must consume the whole table.
+      "    for ((i=0; i<10000; i++)); do printf 'tail-%05d.obj\\n' \"$i\"; done",
+      "  fi",
+      "  exit 0",
+      "fi",
       "printf '%s\\n' \"$@\" > \"$AR_CAPTURE\"",
       "touch \"$REMOVED\""
     ].join("\n") + "\n"

@@ -34,13 +34,19 @@ cp "$vm_archive" "$temporary/hermes.a"
 # unused member produces duplicate global symbols when Extender force-loads
 # extension archives. Removing it is only safe while nothing references it, so
 # prove that before removing rather than assuming it.
-if "$ar_tool" -t "$temporary/hermes.a" | grep -q '^zip\.c\.o$'; then
-  if "$nm_tool" "$temporary/hermes.a" 2>/dev/null | grep -qE ' U _?zip_'; then
+archive_members="$("$ar_tool" -t "$temporary/hermes.a")"
+if grep -E '^zip\.c\.o$' <<< "$archive_members" >/dev/null; then
+  if ! undefined_symbols="$("$nm_tool" "$temporary/hermes.a" 2>/dev/null)"; then
+    echo "package-posix: unable to inspect Hermes VM references before stripping zip.c.o." >&2
+    exit 1
+  fi
+  if grep -E ' U _?zip_' <<< "$undefined_symbols" >/dev/null; then
     echo "package-posix: Hermes VM now references zip symbols; refusing to strip zip.c.o." >&2
     exit 1
   fi
   "$ar_tool" -d "$temporary/hermes.a" zip.c.o
-  if "$ar_tool" -t "$temporary/hermes.a" | grep -q '^zip\.c\.o$'; then
+  archive_members="$("$ar_tool" -t "$temporary/hermes.a")"
+  if grep -E '^zip\.c\.o$' <<< "$archive_members" >/dev/null; then
     echo "package-posix: unable to remove unused zip.c.o from the packaged Hermes VM archive." >&2
     exit 1
   fi
