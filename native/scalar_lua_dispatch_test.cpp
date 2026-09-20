@@ -172,7 +172,7 @@ void RegisterMocks(lua_State* state) {
 
   const luaL_Reg sysFunctions[] = {
     {"get_config_boolean", MockGetConfigBoolean},
-    {"set_render_enable", MockSetRenderEnable},
+    {"set_render_enabled", MockSetRenderEnable},
     {nullptr, nullptr}
   };
   luaL_register(state, "sys", sysFunctions);

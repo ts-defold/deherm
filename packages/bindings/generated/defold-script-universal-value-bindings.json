@@ -1007,9 +1007,9 @@
     }
   },
   "inputHashes": {
-    "projection": "7ab843d19f8099f3781777ebfbf55a7fa6332314ccf935a01dd83433cecf81bd",
+    "projection": "f8241dbffcd0d96c439a78f0da8a8a43643fe4ce09e22f67e8e113350536eeb9",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "classification": "0cd7365088e2c06d07586b7b4aa410377ec301489beaeed34ce75971dffe878d",
+    "classification": "eb89f55b5e91fd17e2d54dd4983ce1f75163d12bc938f663d5679c0d4c166bb7",
     "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
     "layouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c"
   },
@@ -1027,12 +1027,12 @@
   ],
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp": "12f6c0b24ac8e1734077d47ba814329d8a1c36f3535dd1e24d839648901b2be4",
-    "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": "a0a641664adeeb3250407be3cab9e2dabb06ba5675b86ce0a234997677bcd709",
+    "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": "3d67ae9523c9f3d9571ac4b633dcc843bdadd1dc65d4dec64948430490386447",
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": "4e6b3204a8cc7bb76ade0e451c6e39555432ff199ac3756bf5f87d1df98585d1",
-    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "0abab41bd9c1f35a301853533efd8e9d60e156e63467800ac1772fff28ae7ba3",
+    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "eb60e95f6670d26df741e609bf0f6715d490f4400e37834e19209bca5ff70842",
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": "ab423b90ed7c9166abb5a9ef238ac0d37a1e951fc03d2dc7d17836406b86cb0e",
     "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "ff8844fdada79d445b1f3c8c083c85ff01bcc3fee496a5a0a3fbd790093177a6",
-    "packages/sdk/src/generated/script/universal-value-bindings.ts": "b1e342fe7b53d485e4eff9831c83fa7992553aac05be6c8982ac1666c0ba66d3",
+    "packages/sdk/src/generated/script/universal-value-bindings.ts": "d26d083ebb0caed7f60d2d0fe62842f31384488975315e3430cb1aae05c96ff7",
     "packages/sdk/src/generated/script/browser-target-support.ts": "4de2ba390aef3354cbdd498617ce92820975a99077d26ce116a43fed4532e9c8",
     "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
     "defold/defold_hermes/lib/web/generated_script_universal_value.js": "6e0bba955d31d3073907a9c1a941f3d7bdc63a0065702bb2da56eb8f896f8730"
@@ -5641,7 +5641,7 @@
       "modulePath": [
         "sys"
       ],
-      "member": "set_render_enable",
+      "member": "set_render_enabled",
       "loweringFamily": "scalar",
       "minimumArgumentCount": 1,
       "maximumArgumentCount": 1,
@@ -6780,9 +6780,7 @@
     {
       "id": "script:hash_to_hex",
       "stableId": 754452606,
-      "modulePath": [
-        "builtins"
-      ],
+      "modulePath": [],
       "member": "hash_to_hex",
       "loweringFamily": "defold-value",
       "minimumArgumentCount": 1,
@@ -22306,9 +22304,7 @@
     {
       "id": "script:hash",
       "stableId": 2845099200,
-      "modulePath": [
-        "builtins"
-      ],
+      "modulePath": [],
       "member": "hash",
       "loweringFamily": "defold-value",
       "minimumArgumentCount": 1,
@@ -23501,9 +23497,7 @@
     {
       "id": "script:pprint",
       "stableId": 2977240615,
-      "modulePath": [
-        "builtins"
-      ],
+      "modulePath": [],
       "member": "pprint",
       "loweringFamily": "dynamic-values",
       "minimumArgumentCount": 0,

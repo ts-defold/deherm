@@ -134,6 +134,20 @@ generation evidence to runtime evidence.
 
 # Built instrument
 
+This instrument is a targeted bridge-regression tool, not the definition of
+whether a Defold API exists or may ship. CI's completeness contract is the
+generated null/recording smoke census: every documented route retains an
+emission lane, and generated tests verify stable-ID selection, exact ABI
+layout, argument order, result decoding, and bounded lifetime behavior. Defold
+remains authoritative for the implementation's gameplay semantics.
+
+Missing a GUI scene, render script, audio device, interactive input, physics
+world, or destructive fixture is therefore a coverage note about this
+instrument, never an `unverified` annotation on the public TypeScript API. The
+Playwright HTML5/Wasm smoke and this native headless smoke remain useful
+cross-boundary sentinels. A heavyweight all-context local engine is optional,
+infrequent diagnostic work and is deliberately non-gating.
+
 `native/headless_conformance_driver.cpp` is that harness for this project. It
 links the déherm native extension against the pinned Defold SDK archives with
 the null backends the `headless` appmanifest selects, owns `main`, calls

@@ -11,6 +11,7 @@ import { buildUniversalDmSdkBindings } from "../scripts/generate-dmsdk-universal
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json");
+const sdkIrPath = path.join(root, "packages/bindings/generated/defold-sdk-ir.json");
 const compiler = process.env.CXX || "clang++";
 const policyCatalog = Object.freeze({
   sourceHashes: Object.freeze({ catalog: dmSdkUniversalCatalogSha256 }),
@@ -28,7 +29,10 @@ function recipe(report, symbol, predicate = () => true) {
 }
 
 test("universal dmSDK recipes cover every declaration and every target", async () => {
-  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  const [report, sdkIr] = await Promise.all([
+    readFile(reportPath, "utf8").then(JSON.parse),
+    readFile(sdkIrPath, "utf8").then(JSON.parse),
+  ]);
   assert.deepEqual(report.coverage, {
     declarations: 1361,
     recipes: 1361,
@@ -43,6 +47,11 @@ test("universal dmSDK recipes cover every declaration and every target", async (
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
   assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, 1361);
+  assert.deepEqual(
+    report.recipes.map(({ declarationId }) => declarationId).sort(),
+    sdkIr.declarations.filter(({ disposition }) => disposition === "generated-raw-call").map(({ id }) => id).sort(),
+    "the universal catalog must cover the source-derived public runtime declaration set, not only another generated catalog",
+  );
   for (const item of report.recipes) {
     assert.equal(item.fallback.state, "materializable");
     assert.equal(item.fallback.silentOmissionAllowed, false);
@@ -109,7 +118,7 @@ test("universal dmSDK runtime bridge is generated, catalog-authenticated, and di
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-universal-jsi-"));
   try {
     run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      `-I${path.join(root, "defold/defold_hermes/include")}`, `-I${path.join(root, "upstream/hermes/API")}`,
+      `-I${path.join(root, "defold/defold_hermes/include")}`, `-I${path.join(root, "upstream/hermes/API/jsi")}`,
       "-c", "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp", "-o", path.join(output, "jsi.o")]);
   } finally {
     await rm(output, { recursive: true, force: true });

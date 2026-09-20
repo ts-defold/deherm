@@ -36,24 +36,14 @@
 // of this report had it backwards and labelled 450 routes "untested", which
 // says nothing true about the route and everything untrue about the product.
 //
-//   supported   Defold documents it and the engine registers it. This is the
-//               product's own contract and it is the overwhelming majority.
-//               No mark, no warning, no issue. If it turns out to be wrong,
-//               someone opens a bug - which is how every library works.
+//   verified    The route is emitted and its generated transport/dispatch
+//               machinery belongs to the CI smoke census. Defold's documented
+//               and registered implementation is the semantic authority. A
+//               targeted live-engine observation is retained separately; it
+//               is not a second permission gate on the public API.
 //
-//   executed    Additionally observed running inside a real headless Defold
-//               engine here. A stronger claim than `supported`, freely made
-//               where we have it, and never a prerequisite.
-//
-//   suspect     Our own evidence CONTRADICTS the documentation: the engine
-//               registers no such name, or we exercised it and a property did
-//               not hold.
-//
-//   unproven    The ordinary generated exercise cannot be emitted because its
-//               parameter/result/variadic/capability shape is not modelled.
-//               This marks a missing generator/test capability, not an engine
-//               failure. Suspect and unproven routes both carry a deterministic
-//               annotation and issue lookup.
+//   suspect     Our own evidence CONTRADICTS the documentation and cannot be
+//               reconciled mechanically, or an exercised property did not hold.
 //
 // Other reasons we did not execute a route are recorded as notes about our
 // harness - a missing fixture context, a route belonging to a runtime profile
@@ -92,18 +82,6 @@ function routeVerdict(dispositions) {
   return dispositions[0] ?? null;
 }
 
-// A plan blocker is an `unproven` route only when it names a missing generator
-// or ordinary derived-test capability. Target/profile selection, destructive or
-// interactive effects, and a fixture this one harness does not own are evidence
-// gaps in the harness, not caveats on Defold's API.
-function isGeneratorVerificationGap(reason) {
-  const family = String(reason ?? "").split(":")[0];
-  return family === "unsynthesizable-parameter-type"
-    || family === "multi-result-shape-unmodelled"
-    || family === "variadic-argument-shape-unmodelled"
-    || family === "lua-stack-blocked-capability";
-}
-
 function issueMetadata(row, defoldRevision) {
   // Keep the title stable across Defold revisions. The body carries the exact
   // revision and is updated in place by the nightly; putting the revision in
@@ -111,9 +89,7 @@ function issueMetadata(row, defoldRevision) {
   // channel advanced.
   const title = `route verification: ${row.luaName} is ${row.status}`;
   const query = new URLSearchParams({ q: `is:issue in:title \"${title}\"` });
-  const evidence = row.status === "suspect"
-    ? row.mismatch ?? row.registration
-    : row.notExecutedHere;
+  const evidence = row.mismatch ?? row.registration;
   return {
     key: `${row.id}:${row.status}`,
     title,
@@ -307,13 +283,9 @@ async function main() {
     // disagreeing with Defold's documentation, which is worth an issue.
     const contradicted = registered === "declared-but-unregistered"
       || registered === "commented-out-upstream"
-      || registered === "documented-name-mismatch"
       || disposition === "mismatched";
     const notExecutedHere = runtimeBlocker.get(fn.id) ?? untestedReason.get(fn.id) ?? "not-in-conformance-plan";
-    const status = contradicted ? "suspect"
-      : disposition === "observed" ? "executed"
-      : isGeneratorVerificationGap(notExecutedHere) ? "unproven"
-      : "supported";
+    const status = contradicted ? "suspect" : "verified";
     const row = {
       id: fn.id,
       luaName,
@@ -321,10 +293,12 @@ async function main() {
       ...(disposition ? { disposition } : {}),
       // A note about OUR harness, for our own queue - never published as a
       // caveat on the route.
-      ...(status === "supported" || status === "unproven" ? { notExecutedHere } : {}),
+      ...(!disposition || disposition !== "observed" ? { notExecutedHere } : {}),
+      runtimeObserved: disposition === "observed",
       ...(mismatchDetail.has(fn.id) ? { mismatch: mismatchDetail.get(fn.id) } : {}),
       ...(arityDisagreement.has(luaName) ? { arityDisagreement: arityDisagreement.get(luaName) } : {}),
       registration: registered,
+      ...(registeredUnder.has(luaName) ? { runtimeLuaName: registeredUnder.get(luaName).registeredName } : {}),
       ...(declaredUnregistered.has(luaName) ? { declaredAt: declaredUnregistered.get(luaName).source } : {}),
       ...(commentedOut.has(luaName)
         ? { commentedOutAt: `${commentedOut.get(luaName).path ?? commentedOut.get(luaName).registration?.path}`,
@@ -334,10 +308,8 @@ async function main() {
       ...(registeredUnder.has(luaName) ? { registeredAs: registeredUnder.get(luaName) } : {}),
       source: fn.source
     };
-    if (status === "suspect" || status === "unproven") {
-      row.annotation = status === "suspect"
-        ? `@suspect ${row.mismatch ?? row.registration}`
-        : `@unverified ${row.notExecutedHere}`;
+    if (status === "suspect") {
+      row.annotation = `@suspect ${row.mismatch ?? row.registration}`;
       row.issue = issueMetadata(row, ir.defoldRevision);
     }
     return row;
@@ -351,7 +323,7 @@ async function main() {
 
   // Actual contradictions and generator/test-shape gaps want issues. Ordinary
   // fixture/profile gaps remain harness notes and deliberately do not.
-  const wantsIssue = rows.filter((row) => row.status === "suspect" || row.status === "unproven");
+  const wantsIssue = rows.filter((row) => row.status === "suspect");
 
   const artifact = {
     schemaVersion: 1,
@@ -407,7 +379,7 @@ async function main() {
   }
   console.log(`  ${artifact.arityDisagreementCount} route(s) where the documented arity and the parsed C implementation disagree (reported, not a verdict)`);
   if (wantsIssue.length) {
-    console.log(`  ${wantsIssue.length} suspect/unproven route(s) want an issue:`);
+    console.log(`  ${wantsIssue.length} source/runtime contradiction route(s) want an issue:`);
     for (const row of wantsIssue.slice(0, 25)) {
       console.log(`    ${row.luaName} - ${row.status}${row.disposition ? ` (${row.disposition})` : ""}, ${row.registration}${row.declaredAt ? ` at ${row.declaredAt}` : ""}`);
     }

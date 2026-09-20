@@ -33,3 +33,17 @@ and Hermes runtime integration for Defold.
   native families; passing metadata tests alone is not runtime evidence.
 - Preserve unrelated user changes and keep target-specific capability gaps
   explicit in the canonical lowering plan and `.agents/docs/`.
+
+## Human authorship and agent provenance
+
+- Git commits are authored and committed only as
+  `Justin Walsh <contact.me@thejustinwalsh.com>` and must carry his configured
+  SSH signature.
+- Never add an AI system, model, vendor, or agent through `Co-Authored-By`,
+  `Signed-Off-By`, `Authored-By`, or any equivalent Git attribution trailer.
+  Agents hold no authorship, ownership, copyright, or contributor claim.
+- Agent provenance is permitted in the Open Knowledge Format `generated.by`
+  metadata under `.agents/docs/`. That metadata records which tool produced a
+  knowledge artifact; it is not Git authorship or a legal contribution claim.
+- Run `node scripts/check-commit-provenance.mjs` before pushing. Do not bypass a
+  provenance failure by changing or weakening this policy.

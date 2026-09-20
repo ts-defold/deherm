@@ -12,20 +12,20 @@
     "conformance": "not-claimed"
   },
   "inputHashes": {
-    "scriptProjection": "7ab843d19f8099f3781777ebfbf55a7fa6332314ccf935a01dd83433cecf81bd",
-    "scriptScalarDispatch": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d",
-    "scriptValueBindings": "fb76b3c56345d38463c65d1644fcdfc47c70fd779152897eae7cb5502345c021",
+    "scriptProjection": "f8241dbffcd0d96c439a78f0da8a8a43643fe4ce09e22f67e8e113350536eeb9",
+    "scriptScalarDispatch": "ec01d55f6d135721399bb37c65e89aa5b388c9f9c4a0401b387c4818f73c267b",
+    "scriptValueBindings": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9",
     "scriptFixedTuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "scriptDynamicValues": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "scriptValueTail": "b779a6ae47e27d7c04517974f6907009c74b5e5764e7355410622b07dd91cda7",
-    "scriptOverloadDispatch": "8cbc942aa9bbae6ff4ee8eec8982c767810c92cf118952ad382334ac8c68761c",
-    "scriptTableRecords": "ee596d2a8fd77c0b5a37cf2eca41059f5439c35e0866cb03f4e9181837a9571f",
+    "scriptValueTail": "737c828a0f4e529bf09217f60ea828961dd4757e319a85a8feb44bd7ffe88de0",
+    "scriptOverloadDispatch": "010e8b3200e8aa55895bbf8e84a72a6a7a9e43c4c6f4a3033cd3f6c46ff3627a",
+    "scriptTableRecords": "afbee9f90267792486b54b7a17532df7aa0107f74c73ae51cfdc657cdfa19ec7",
     "scriptCallbackLifecycle": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "scriptCopiedValueBlockers": "e566aacdeef63899975d2c90f04e0009edce83e166f2a358b978180ac57bb98c",
-    "scriptOpaqueRecordBlockers": "3e943b8df5a247ad63d303eaef5ffb73f676ee70eaae0546aada88ab1d5e4239",
+    "scriptCopiedValueBlockers": "92c76dd887afb27f325a05a025b7b2997daf44306052fcb03ccd47f30aa832a0",
+    "scriptOpaqueRecordBlockers": "eb2fdc541f5270f5830c8467aecc83409420a0ea18aa61de519d02130ced56d5",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "79932ffd5e3149ed2a7618d410cf29078db762d8b459dbb65d1f3f9d0c50928a",
-    "scriptUniversalValue": "e0dcf26225b39a5e72c0ecab5144f1f88201af97adde20ede713b4ca6e59376e",
+    "scriptHandleLowering": "5c767e7f0d11cd13c56079b992a54814f88788de823d8e1b221f8baf74ced43d",
+    "scriptUniversalValue": "127a1ac3f1ed0edf7ece38696feab15b20bfafa89316f87ca7276751f9a63fb2",
     "defoldValueLayouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
     "dmsdkProjection": "492fc0a14d65270fb510caad4050bdf77ff48b9fa17c00f74e88e11d17dc3dd0",
     "dmsdkUniversal": "7da597ce8d428c30e57e1e1713cfae11824347bef10af1f9d039693c936f9ed0",
@@ -48,20 +48,20 @@
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
   "inputCanonicalHashes": {
-    "scriptProjection": "fb0a22ca80baf5b2f300e2a00a14fba79f424af4e0f7f7a2ab2ddeaa66d59c10",
-    "scriptScalarDispatch": "098ac76471ecf7ef73d3cfdfaebcece8ac69198ae753e4bd99ad1ceee6f546cc",
-    "scriptValueBindings": "71ac3ae558ef9568e31f31c028b2b07f9fbc9edc8018518f25869ef00beea0ba",
+    "scriptProjection": "e6536bfb04d312fb7abbb69d2131397440b821d10074c73e80527e0581158eaa",
+    "scriptScalarDispatch": "0c2ec5b561bfb41c071ca9f00cd999310eb1b48f4f444714fea5ed888c6b8859",
+    "scriptValueBindings": "8b6102c70db2b5a1dfb6a65511a96eb928ea36cad8fcba12fdf47fdd2cfe8efe",
     "scriptFixedTuples": "985cc2541d2fd278c59bfc0f0aa5f0083b5a94073ff3a7b6f83cd315ecdf9628",
     "scriptDynamicValues": "b987ff960b43ae0fc45d3a6d7002e2b54eca98fc26c35a421d8e7fcc74416326",
-    "scriptValueTail": "eef7946b777e2ed64190afcf45600f41c4d26f91f116523e4739d09fc3c60332",
-    "scriptOverloadDispatch": "899e4b965a856214d4886de1aaec0569155f4ef0700221b9949d914ff665c40e",
-    "scriptTableRecords": "6351bb6314345942e262b970d19720b3351cd73534618509ee2094d24d684949",
+    "scriptValueTail": "bbcbb448866e62b010714f02fc15978cddd50b8bd2172df1cdff288e1b2b0304",
+    "scriptOverloadDispatch": "68f9f75029e58402fd9d2bd1b4b11e292195f959eb80b69d7a2a10ea2e03c090",
+    "scriptTableRecords": "cf503851949b66d63e6eb8c2376c9de5e8dfbe3e0b470bf659427ba6d3826a85",
     "scriptCallbackLifecycle": "ae1ea85b129434f31fd28655f78177ead8eab7d8d2e4ea39d19fc8f915b9c1df",
-    "scriptCopiedValueBlockers": "135772fac4e6783c8fed5b9d8895b9f4c6a31bd7edb33faf9799809c2ece7796",
-    "scriptOpaqueRecordBlockers": "9ffb60e98d95136d7869bf0fb4b8fcc648e9e23744d67d2fc2adaccae7e271b6",
+    "scriptCopiedValueBlockers": "ce0c577165559d3ab3e0591a79e47d41520610e85dfa4819bffbec56ff90d361",
+    "scriptOpaqueRecordBlockers": "567dc9ffd40c14980ada92740dd391f506fe026e4ef896e41efad631679b38c0",
     "scriptUrlAddress": "0c30abae7994fb4f4ba13e53958732c2f5ec4814e3669afeabe379d6180f258f",
-    "scriptHandleLowering": "291e51cfba7d5e328cb8bbe76404ba40b1dca8b3ae93a9bd2dcb103f317ebb19",
-    "scriptUniversalValue": "81b17480fdff6d1d082b296221efd2dde6ac5ba6b783d87d7eefcff8505cbfb2",
+    "scriptHandleLowering": "3d898c10f5b2b2882c70d64c93e4b205dcb4a38ba1f489121ead443a3b9dda71",
+    "scriptUniversalValue": "74b69fd1ba6d3153188c565ab328caf7d5237e9070ba2edc31361c13ae1b4e6a",
     "defoldValueLayouts": "e7dfbb78eec1c3fbd432080161989576915d554668f0d8b009fe420167325d29",
     "dmsdkProjection": "7edc2391443c87931a727e089a416173323115d6d71c4e3bf3071cdd6a9b3b88",
     "dmsdkUniversal": "4ee16410578107e319dd0db745f87f8e5c926f185c0120a2eededa67b0a737c1",
@@ -26348,16 +26348,6 @@
           "rule": "generated:script-universal-value",
           "decision": "bounded-recursive-captured-lua-adapter"
         }
-      },
-      {
-        "context-policy": {
-          "rule": "generated:script-universal-value",
-          "decision": "bounded-recursive-captured-lua-adapter"
-        },
-        "registration:registered-under-a-different-name": {
-          "rule": "generated:script-universal-value",
-          "decision": "bounded-recursive-captured-lua-adapter"
-        }
       }
     ],
     "unresolvedTokenSets": [
@@ -28386,10 +28376,6 @@
         "context-policy",
         "policy:copied-defold-value-record",
         "policy:font-resource-and-hash-resolution"
-      ],
-      [
-        "context-policy",
-        "registration:registered-under-a-different-name"
       ],
       [
         "callback-lifetime-policy",
@@ -465808,7 +465794,7 @@
       "shapeKinds": [
         "scalar"
       ],
-      "unresolvedTokenSet": 265,
+      "unresolvedTokenSet": 239,
       "sourceState": {
         "loweringFamily": "scalar",
         "accountingCategory": "executable-stable-id"
@@ -465820,34 +465806,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 265
+          "unresolvedTokenSet": 239
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 390,
           "blockerSet": 0,
-          "resolvedTokenSet": 39,
+          "resolvedTokenSet": 13,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 390,
           "blockerSet": 0,
-          "resolvedTokenSet": 39,
+          "resolvedTokenSet": 13,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 390,
           "blockerSet": 0,
-          "resolvedTokenSet": 39,
+          "resolvedTokenSet": 13,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 390,
           "blockerSet": 0,
-          "resolvedTokenSet": 39,
+          "resolvedTokenSet": 13,
           "unresolvedTokenSet": 0
         }
       }
@@ -466701,7 +466687,7 @@
         "named",
         "scalar"
       ],
-      "unresolvedTokenSet": 266,
+      "unresolvedTokenSet": 265,
       "sourceState": {
         "loweringFamily": "separate-module",
         "accountingCategory": "separate-module"
@@ -466713,35 +466699,35 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 266
+          "unresolvedTokenSet": 265
         },
         "dynamicHermesJsi": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 129,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 266
+          "unresolvedTokenSet": 265
         },
         "staticHermesCAbi": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 129,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 266
+          "unresolvedTokenSet": 265
         },
         "luaStack": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 129,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 266
+          "unresolvedTokenSet": 265
         },
         "browserWasmHost": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 129,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 266
+          "unresolvedTokenSet": 265
         }
       }
     },
@@ -471743,5 +471729,5 @@
       }
     }
   ],
-  "planSha256": "27aa2a19a91704c2eace5be1c0a4e361e1b58ea614f2aad8c3e5c7c8d5dafbc8"
+  "planSha256": "f54a583869ef3fb0050755e363238cc9d5d8886a9157e81f69fc874d4993c8b0"
 }

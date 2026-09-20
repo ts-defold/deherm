@@ -63,12 +63,12 @@ test("authenticated policy materializes the complete generated SDK without a Def
   for (const relative of Object.keys(first.descriptor.sdk)) {
     const actual = await readFile(path.join(outputRoot, "sdk", "generated", relative));
     const expected = oldPipelineFixture.files[relative];
-    assert.ok(expected, `${relative} is absent from the independent old-pipeline fixture`);
+    assert.ok(expected, `${relative} is absent from the frozen source-pipeline golden`);
     assert.equal(actual.length, expected.bytes, `${relative} byte count drifted from the old pipeline`);
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_434_070, snapshots: 78_171 },
+  assert.deepEqual(bytesByMode, { rendered: 3_434_005, snapshots: 78_171 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));

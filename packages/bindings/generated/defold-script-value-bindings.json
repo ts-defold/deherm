@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "7a55f2845f3c44c9e87b293b589fcaf9351576f9987488827b1ff666bfe31b32",
+  "inputSha256": "b8d0c069dae11317200994c4abf65dec1b82288a29ca24330dd9e87a647116c6",
   "sourceEvidence": [
     {
       "path": "upstream/defold/engine/script/src/script_vmath.cpp",

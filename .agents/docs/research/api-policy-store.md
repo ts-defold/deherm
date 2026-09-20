@@ -30,15 +30,15 @@ the source-derived Lua registration surface and the resource declaration schema
 toolchain pins from `build_tools/sdk.py`.
 
 For the pinned revision `7f0f554f41f9dce1e0ddff99bf08200657d1ee05` the policy is
-**85 subtrees - 52 namespaces, four cross-cutting roots, twelve compiler
-documents, and 17 compatibility-source objects - in 28.29 MB**, under policy
-root `9149470ec631bc4e84a2724c955d64d8f130601a106719403565ed1b0dfc1ecd`.
+**83 subtrees - 52 namespaces, four cross-cutting roots, twelve compiler
+documents, and 15 compatibility-source objects - in 28.29 MB**, under policy
+root `c17e74a7f2fa46858961e248d2acd776bff7e985b1e4e005998148e70302e8a5`.
 
-`@compiler` is now an 11,727-byte versioned manifest. Its semantic documents
+`@compiler` is now an 11,691-byte versioned manifest. Its semantic documents
 and temporary compatibility sources are separate content-addressed objects, so
 they can be shared and the manifest can eventually drive lazy fetching. The
-installed compiler locally renders eleven script/dmSDK TypeScript files
-and checks their hashes; the other 17 files remain visibly tagged authenticated
+installed compiler locally renders thirteen script/dmSDK TypeScript files
+and checks their hashes; the other 15 files remain visibly tagged authenticated
 compatibility sources. This split fixes the ownership and object-size boundary,
 but not total transfer cost: the 10.21 MB lowering plan is still referenced
 derived output and must move behind package code once normalized recipe facts

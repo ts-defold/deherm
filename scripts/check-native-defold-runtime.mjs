@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -16,6 +17,7 @@ const probeReportPath = resolve(root, "packages/bindings/generated/defold-script
 const valueProbeReportPath = resolve(root, "packages/bindings/generated/defold-script-value-real-engine-probes.json");
 const valueBindingReportPath = resolve(root, "packages/bindings/generated/defold-script-value-bindings.json");
 const evidencePath = resolve(root, ".agents/docs/data/native-defold-runtime.log");
+const evidenceManifestPath = resolve(root, "packages/bindings/probes/defold-script-real-engine-matrix.json");
 const timeoutMs = Number.parseInt(process.env.DEFOLD_HERMES_RUNTIME_TIMEOUT_MS ?? "15000", 10);
 const arguments_ = new Set(process.argv.slice(2));
 for (const argument of arguments_) {
@@ -148,6 +150,19 @@ const result = await new Promise((resolveResult, rejectResult) => {
 console.log("native-defold-runtime:ok");
 for (const marker of result) console.log(marker);
 if (arguments_.has("--record-evidence")) {
-  await writeFile(evidencePath, `${result.join("\n")}\n`);
+  const evidence = `${result.join("\n")}\n`;
+  const evidenceManifest = JSON.parse(await readFile(evidenceManifestPath, "utf8"));
+  const relativeEvidencePath = ".agents/docs/data/native-defold-runtime.log";
+  const observations = evidenceManifest.observations.filter(
+    (observation) => observation.artifact?.path === relativeEvidencePath
+  );
+  if (observations.length !== 1) {
+    throw new Error(`Expected exactly one observation for ${relativeEvidencePath}, found ${observations.length}`);
+  }
+  await writeFile(evidencePath, evidence);
+  observations[0].artifact.sha256 = createHash("sha256").update(evidence).digest("hex");
+  observations[0].observedAt = new Date().toISOString();
+  await writeFile(evidenceManifestPath, `${JSON.stringify(evidenceManifest, null, 2)}\n`);
   console.log(`native-defold-runtime:evidence:${evidencePath}`);
+  console.log(`native-defold-runtime:manifest:${evidenceManifestPath}`);
 }

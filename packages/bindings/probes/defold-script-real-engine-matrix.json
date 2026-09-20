@@ -76,7 +76,7 @@
       "target": "arm64-macos-dynamic-hermes",
       "result": "passed",
       "command": "node scripts/check-native-defold-runtime.mjs --record-evidence",
-      "observedAt": "2026-09-18T23:34:00.000Z",
+      "observedAt": "2026-09-20T08:00:31.782Z",
       "routeIds": [
         "script:bit.lshift",
         "script:bit.tohex",
@@ -159,7 +159,7 @@
       ],
       "artifact": {
         "path": ".agents/docs/data/native-defold-runtime.log",
-        "sha256": "3e9bb2cbdcde820b9640c3f58980e61d493f29d658220cbd3e39b84038b57939"
+        "sha256": "7ee35ece2c7f5870e84f49cce107c71da8851cadc4357f0f4e8de1fb36646ae8"
       },
       "requiredMarkers": [
         "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",

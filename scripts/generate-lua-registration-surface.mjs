@@ -865,7 +865,7 @@ function buildGate(targets, engineTargetIds) {
       record(documented.name, {
         route: documented.name,
         kind: "registered-under-a-different-name",
-        action: "block-emission",
+        action: "use-registered-name",
         callableAs: row.name,
         parameter: null,
         reason: `documented as '${documented.name}' but '${row.cFunction}' is registered as '${row.name}'`,
@@ -885,7 +885,7 @@ function buildGate(targets, engineTargetIds) {
       record(row.name, {
         route: row.name,
         kind: "registration-commented-out",
-        action: "block-emission",
+        action: "mark-source-unavailable",
         callableAs: null,
         parameter: null,
         reason: `the registration entry for '${row.name}' is present but commented out`,
@@ -945,7 +945,8 @@ function buildGate(targets, engineTargetIds) {
     findings,
     counts: {
       findings: findings.length,
-      routesBlocked: new Set(findings.filter((item) => item.action === "block-emission").map((item) => item.route)).size,
+      routesRemapped: new Set(findings.filter((item) => item.action === "use-registered-name").map((item) => item.route)).size,
+      routesSourceUnavailable: new Set(findings.filter((item) => item.action === "mark-source-unavailable").map((item) => item.route)).size,
       parametersCorrected: findings.filter((item) => item.action === "require-parameter").length,
       byKind: countBy((item) => item.kind),
       byAction: countBy((item) => item.action)
@@ -1013,7 +1014,8 @@ async function generate(options) {
     defoldRevision,
     scope: "The subset of the registered-vs-declared findings that a downstream generator may act on: each one is backed by positive evidence in C source and holds in every mutually exclusive engine build variant. Absence of a registration is reported in the surface report and never gated.",
     actions: {
-      "block-emission": "The documented route is not callable under this name. A generated binding must not emit it as a callable route.",
+      "use-registered-name": "The engine source registers this function under a different name. Emit the documented TypeScript surface and dispatch it through the registered source name.",
+      "mark-source-unavailable": "Positive source evidence says this route is not registered in every selected engine variant. Keep the API and machinery emitted, but mark the affected profile unavailable.",
       "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
     },
     sourceReport: defaultOutput,

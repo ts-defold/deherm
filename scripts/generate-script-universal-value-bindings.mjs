@@ -889,7 +889,7 @@ function renderCSource(rows) {
   const shapeIndex = new Map(shapes.map((token, index) => [token, index]));
   const profileShapeRows = shapeTokens.map((token) => `  UINT16_C(${shapeIndex.get(token)}),`).join("\n");
   const profileNameRows = rows.map((row) =>
-    `  ${quote(`deherm.typed-native.${row.modulePath.join(".")}.${row.member}`)},`).join("\n");
+    `  ${quote(`deherm.typed-native.${row.id.slice("script:".length)}`)},`).join("\n");
   const profileShapeNameRows = shapes.map((token) => `  ${quote(token)},`).join("\n");
   const profileTables = [
     "#if DEHERM_PROFILE_ENABLED",
@@ -2268,6 +2268,8 @@ export function generateUniversalValueBindings(inputs) {
       stableId: row.stableId,
       modulePath: row.modulePath,
       member: row.member,
+      runtimeModulePath: row.runtimeModulePath,
+      runtimeMember: row.runtimeMember,
       loweringFamily: row.loweringFamily,
       contextToken: row.context.token,
       parameters: row.signature.parameters,

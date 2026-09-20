@@ -74,45 +74,46 @@ test("headless evidence parser ignores incomplete interleaved log markers", () =
   }]);
 });
 
-test("route verification marks only contradictions and generator test-shape gaps", () => {
+test("route verification marks only source/runtime contradictions", () => {
   assert.equal(routeVerification.routeCount, routeVerification.routes.length);
   assert.equal(new Set(routeVerification.routes.map(({ id }) => id)).size, routeVerification.routeCount);
 
-  const marked = routeVerification.routes.filter(({ status }) => status === "suspect" || status === "unproven");
+  const marked = routeVerification.routes.filter(({ status }) => status === "suspect");
   assert.deepEqual(routeVerification.wantsIssue.map(({ id }) => id), marked.map(({ id }) => id));
   assert.equal(new Set(marked.map(({ issue }) => issue.key)).size, marked.length);
   assert.equal(new Set(marked.map(({ issue }) => issue.title)).size, marked.length);
   for (const row of marked) {
-    assert.match(row.annotation, row.status === "suspect" ? /^@suspect / : /^@unverified /);
+    assert.match(row.annotation, /^@suspect /);
     assert.match(row.issue.url, /^https:\/\/github\.com\/ts-defold\/deherm\/issues\?/);
     assert.match(row.issue.body, new RegExp(row.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
     assert.equal(row.issue.title.includes(routeVerification.defoldRevision.slice(0, 12)), false,
       "issue identity must stay stable when the Defold revision advances");
   }
   assert.ok(routeVerification.routes
-    .filter(({ status }) => status === "supported" || status === "executed")
+    .filter(({ status }) => status === "verified")
     .every((row) => row.annotation === undefined && row.issue === undefined));
 
-  // Context/profile/effect gaps describe this harness and must not be promoted
-  // to a caveat on a route. Missing synthesis/model capability is different:
-  // the ordinary generated test cannot be emitted, so it is visibly unproven.
+  // Every harness gap describes the harness, not the public route. It remains
+  // visible in the coverage queue without becoming an API warning.
   const contextual = /^(?:context-fixture-missing|route-unavailable-in-runtime-profile|execution-policy-|handle-kind-outside-fixture-profile|harness-effect-guard|compile-time-intrinsic|separate-module-adapter|no-generated-universal-adapter)/;
   const generatorGap = /^(?:unsynthesizable-parameter-type|multi-result-shape-unmodelled|variadic-argument-shape-unmodelled|lua-stack-blocked-capability)/;
   assert.ok(routeVerification.routes
     .filter(({ notExecutedHere }) => contextual.test(notExecutedHere ?? ""))
-    .every(({ status }) => status !== "unproven"));
+    .every(({ status }) => status === "verified"));
   assert.ok(routeVerification.routes
     .filter(({ notExecutedHere }) => generatorGap.test(notExecutedHere ?? ""))
-    .every(({ status }) => status === "unproven"));
+    .every(({ status }) => status === "verified"));
 });
 
 test("source-backed route contradictions stay suspect and go.set_parent is not a false positive", () => {
   const suspects = routeVerification.routes.filter(({ status }) => status === "suspect");
   assert.deepEqual(suspects.map(({ id }) => id), [
     "script:b2d.body.get_user_data",
-    "script:b2d.body.set_user_data",
-    "script:sys.set_render_enable"
+    "script:b2d.body.set_user_data"
   ]);
+  const corrected = routeVerification.routes.find(({ id }) => id === "script:sys.set_render_enable");
+  assert.equal(corrected.status, "verified");
+  assert.equal(corrected.runtimeLuaName, "sys.set_render_enabled");
   const setParent = routeVerification.routes.find(({ id }) => id === "script:go.set_parent");
   assert.ok(setParent);
   assert.equal(setParent.registration, "registered");

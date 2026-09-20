@@ -19,8 +19,11 @@
       "builder": "macos-native",
       "status": "vendored",
       "library": "defold/defold_hermes/lib/arm64-osx/libhermes.a",
-      "sha256": "becf8dcd973056b4c4694ed8159d0a1928b7ec9200b67e7e549af0e0be0f35c9",
-      "bytes": 10729000
+      "sha256": "a080814bc38d2d4cffb9d05c017896c09760cb423e1c9014f2b43e7473abdc9e",
+      "bytes": 10745416,
+      "debugLibrary": "defold/defold_hermes/lib/arm64-osx/libhermes.debug.a",
+      "debugSha256": "9950b8fc17ca01be4a31e812ccc67e72b5bc7e6f18f2192655328cd6417ae398",
+      "debugBytes": 12324816
     },
     "x86_64-osx": {
       "host": {
@@ -37,8 +40,13 @@
         "architecture": "x64"
       },
       "builder": "docker-linux-amd64",
-      "status": "required-missing",
-      "library": "defold/defold_hermes/lib/x86_64-linux/libhermes.a"
+      "status": "vendored",
+      "library": "defold/defold_hermes/lib/x86_64-linux/libhermes.a",
+      "sha256": "7a57a83de837cfcc68cf28b31da6905692e9eb1976c9c6183de5c0b3962ec854",
+      "bytes": 59591394,
+      "debugLibrary": "defold/defold_hermes/lib/x86_64-linux/libhermes.debug.a",
+      "debugSha256": "88ccc434595fe8a6f7fc6345968eba84fa637b7af5a7dddd3d7c19ca79128289",
+      "debugBytes": 61810566
     },
     "arm64-linux": {
       "host": {

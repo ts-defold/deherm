@@ -293,7 +293,7 @@ constexpr const char* kMembers[] = {
   "scope_begin",
   "lshift",
   "tobit",
-  "set_render_enable",
+  "set_render_enabled",
   "get_connectivity",
   "set_blend_equation_separate",
   "get_window_height",

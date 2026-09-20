@@ -108,3 +108,9 @@ test("Bob consumes the generated project's target artifact instead of rebuilding
   assert.match(wrapper, /resolve-defold-platform\.mjs/u);
   assert.doesNotMatch(wrapper, /package:defold/u);
 });
+
+test("Bob rejects macOS's executable Java stub before selecting a real JDK", async () => {
+  const wrapper = await readFile(new URL("../scripts/bob.sh", import.meta.url), "utf8");
+  assert.match(wrapper, /"\$candidate" -version >\/dev\/null 2>&1/u);
+  assert.match(wrapper, /\/opt\/homebrew\/opt\/openjdk@25\/bin\/java/u);
+});

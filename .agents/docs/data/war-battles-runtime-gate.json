@@ -13,10 +13,10 @@
       "sha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049"
     },
     "packages/bindings/generated/defold-script-scalar-dispatch.json": {
-      "sha256": "f46487b5ee36cb44f4c0fe36bb5ab2313d363e0214ba96db48eff5930392a48d"
+      "sha256": "ec01d55f6d135721399bb37c65e89aa5b388c9f9c4a0401b387c4818f73c267b"
     },
     "packages/bindings/generated/defold-script-value-bindings.json": {
-      "sha256": "fb76b3c56345d38463c65d1644fcdfc47c70fd779152897eae7cb5502345c021"
+      "sha256": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9"
     },
     "tests/fixtures/war-battles/.deherm/generated/components/manifest.json": {
       "sha256": "4b4b7a84d0544f5aece58983e5e907494f89599b1dd511b24f8450e3e4ecb64c"

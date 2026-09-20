@@ -1920,7 +1920,7 @@ export const scriptUniversalValueBindings = [
     "modulePath": [
       "sys"
     ],
-    "member": "set_render_enable",
+    "member": "set_render_enabled",
     "loweringFamily": "scalar",
     "minimumArgumentCount": 1,
     "maximumArgumentCount": 1,
@@ -2377,9 +2377,7 @@ export const scriptUniversalValueBindings = [
   {
     "id": "script:hash_to_hex",
     "stableId": 754452606,
-    "modulePath": [
-      "builtins"
-    ],
+    "modulePath": [],
     "member": "hash_to_hex",
     "loweringFamily": "defold-value",
     "minimumArgumentCount": 1,
@@ -8733,9 +8731,7 @@ export const scriptUniversalValueBindings = [
   {
     "id": "script:hash",
     "stableId": 2845099200,
-    "modulePath": [
-      "builtins"
-    ],
+    "modulePath": [],
     "member": "hash",
     "loweringFamily": "defold-value",
     "minimumArgumentCount": 1,
@@ -9212,9 +9208,7 @@ export const scriptUniversalValueBindings = [
   {
     "id": "script:pprint",
     "stableId": 2977240615,
-    "modulePath": [
-      "builtins"
-    ],
+    "modulePath": [],
     "member": "pprint",
     "loweringFamily": "dynamic-values",
     "minimumArgumentCount": 0,

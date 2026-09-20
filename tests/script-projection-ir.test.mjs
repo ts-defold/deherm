@@ -95,6 +95,16 @@ test("carries normalized effects, profiles, targets, and explicit semantic holes
   assert.ok(generated.semanticHoleCounts["context-policy"] > 0);
 });
 
+test("uses the source-registered Lua spelling without suppressing the documented API", () => {
+  const route = generated.rows.find(({ id }) => id === "script:sys.set_render_enable");
+  assert.equal(route.rawName, "sys.set_render_enable");
+  assert.equal(route.runtimeRawName, "sys.set_render_enabled");
+  assert.deepEqual(route.runtimeModulePath, ["sys"]);
+  assert.equal(route.runtimeMember, "set_render_enabled");
+  assert.equal(route.registration.token, "registration-corrected");
+  assert.equal(route.generation.semanticHoles.some((hole) => hole.startsWith("registration:")), false);
+});
+
 test("rejects omitted, duplicated, foreign, and stale route inputs", () => {
   const omitted = structuredClone(inputs);
   omitted.patterns = replaceJson(omitted.patterns, (value) => {

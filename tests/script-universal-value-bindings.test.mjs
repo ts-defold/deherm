@@ -64,14 +64,19 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const descriptors = await readFile(path.join(root, "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp"), "utf8");
   const dispatcher = await readFile(path.join(root, "defold/defold_hermes/src/generated_script_universal_value_capi.cpp"), "utf8");
+  assert.doesNotMatch(dispatcher, /deherm\.typed-native\.\./,
+    "global routes must retain a stable non-empty profiling identity");
 
   // The operation descriptor publishes the contract; the dispatcher allocates a
   // stack frame from it. Both are generated, so the only thing worth asserting
   // is that they are still the same numbers - a frame narrower than the
   // descriptor would reject calls the descriptor accepts.
-  const declared = [...descriptors.matchAll(/^ {2}\{0x[0-9a-f]{8}u, "([^"]+)", "[^"]*", "[^"]*", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
-    .map(([, id, , maximumArgumentCount, , maximumResultCount, , resultSemanticKind, inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena]) => ({
+  const declared = [...descriptors.matchAll(/^ {2}\{0x([0-9a-f]{8})u, "([^"]+)", "([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
+    .map(([, stableId, id, modulePath, member, , maximumArgumentCount, , maximumResultCount, , resultSemanticKind, inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena]) => ({
       id,
+      stableId: Number.parseInt(stableId, 16),
+      modulePath,
+      member,
       resultSemanticKind: Number(resultSemanticKind),
       maximumArgumentCount: Number(maximumArgumentCount),
       maximumResultCount: Number(maximumResultCount),
@@ -82,6 +87,15 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
     }));
   assert.equal(declared.length, report.candidateCount);
   assert.deepEqual(declared.map(({ id }) => id), report.bindings.map(({ id }) => id));
+  for (let index = 0; index < declared.length; ++index) {
+    const operation = declared[index];
+    const binding = report.bindings[index];
+    assert.equal(operation.stableId, binding.stableId, binding.id);
+    assert.equal(operation.modulePath, binding.modulePath.join("."), binding.id);
+    assert.equal(operation.member, binding.member, binding.id);
+  }
+  const corrected = declared.find(({ id }) => id === "script:sys.set_render_enable");
+  assert.deepEqual([corrected.modulePath, corrected.member], ["sys", "set_render_enabled"]);
 
   // A route whose declared result is a rooted borrowed handle captures it into
   // the same generation-checked registry the handle-lowering table uses, so a

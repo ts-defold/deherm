@@ -33,6 +33,16 @@ test("source-validated bit.tohex optionality is explicit", async () => {
   assert.match(binding.semanticOverride.sourceSha256, /^[a-f0-9]{64}$/);
 });
 
+test("scalar lookup follows source-registered names without changing documented identity", async () => {
+  const report = JSON.parse(await readFile(new URL(
+    "packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));
+  const binding = report.bindings.find((entry) => entry.id === "script:sys.set_render_enable");
+  assert.ok(binding);
+  assert.equal(binding.rawName, "sys.set_render_enable");
+  assert.equal(binding.modulePath, "sys");
+  assert.equal(binding.member, "set_render_enabled");
+});
+
 test("descriptor report keeps allocation and coverage claims bounded", async () => {
   const report = JSON.parse(await readFile(new URL(
     "packages/bindings/generated/defold-script-scalar-dispatch.json", root), "utf8"));

@@ -70,7 +70,7 @@ toolchain artifacts rather than Defold API policy.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now an **11,727-byte manifest**, not a
+The authenticated `@compiler` subtree is now an **11,691-byte manifest**, not a
 21 MB container. It references twelve independently content-addressed semantic
 documents and 15 independently content-addressed compatibility sources. This
 keeps each document shareable and makes the remaining migration debt
@@ -150,17 +150,21 @@ revision-bearing source from leaking indirectly through its digest.
 # Proven properties
 
 `tests/policy-surface-materializer.test.mjs` materializes into a fresh temporary
-directory and compares all 28 SDK files against immutable size/SHA-256 evidence
-captured from the pre-materializer checkout-backed pipeline at commit
-`fd2e6c30af4c9fc9e71b38dc73c010666ca13aba`. The fixture is not rewritten by
-normal generation, so the proof no longer compares a pipeline with the tree it
-just generated. Thirteen files (3,434,070 bytes) are locally rendered; 15 files
+directory and compares all 28 SDK files against size/SHA-256 evidence captured
+from a frozen checkout-backed source-pipeline golden. Normal generation never
+rewrites that fixture. Some source-pipeline and materializer emitters are
+shared, so this is a regression oracle for accidental byte drift, not an
+implementation-independent equivalence proof. A deliberate semantic change first regenerates
+`packages/sdk/src/generated` through the source pipeline and then runs
+`scripts/capture-policy-surface-old-pipeline.mjs --update`; the capture command
+has a check-only default and records the Defold revision plus an aggregate tree
+digest. Thirteen files (3,434,005 bytes) are locally rendered; 15 files
 (78,171 bytes) remain authenticated compatibility sources, and the test names
 all 15 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
 no Defold checkout.
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 11,727
+The `<5 MB` compiler-object budget is enforced; the current manifest is 11,691
 bytes. This is a structural transfer boundary, not yet a total-size victory.
 The 10.21 MB canonical lowering plan is still a referenced derived output and
 must be rebuilt locally from normalized recipe facts. The 15 support-source

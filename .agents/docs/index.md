@@ -33,7 +33,9 @@ okf_version: "0.2"
 * [Layered API policy cache](decisions/layered-api-policy-cache.md) - Source-derived Lua surfaces extracted once, shipped and committed as hash-keyed policies, reparsed only on mismatch.
 * [Policy surface materialization](decisions/policy-surface-materialization.md) - Exact package/policy/project ownership and the clean-machine path from an authenticated policy to generated SDK code.
 * [Policy and realizer ownership boundary](decisions/policy-realizer-boundary.md) - Stable package recipes, complete revision-owned Defold data, exact capability compatibility, and the no-per-engine npm-release invariant.
-* [Generate, report, never gate](decisions/generate-report-never-gate.md) - Every documented route is emitted; one that cannot be verified ships marked unverified with a generated test, an issue and a doc annotation, because a refusal tells a user nothing and costs hand-written code at every Defold release.
+* [Generate, report, never gate](decisions/generate-report-never-gate.md) - Every documented route is emitted; CI verifies generated bridge machinery, while only positive source/runtime contradictions become suspect issues.
+* [Generated binding verification](decisions/generated-binding-verification.md) - Exact symbol, signature, ABI layout, argument/result ordering, bounds, and lifetime tests are generated beside each binding; Defold remains authoritative for implementation semantics.
+* [Commit and agent provenance](decisions/commit-and-agent-provenance.md) - Git commits have one signed human author; agent names are permitted only as operational provenance in the agent knowledge base.
 * [Continuous policy publication](decisions/continuous-policy-publication.md) - One nightly graph discovers every tracked Defold revision, generates the complete policy with conservative fallbacks, gathers parity and real-engine evidence, reports gaps, and publishes directly to the website without a review-PR gate.
 * [Revision-parametric derivation](decisions/revision-parametric-derivation.md) - Deriving a revision other than the pinned one happens in a scratch workspace, with the committed surface proven untouched and every reviewed input audited against that revision first.
 * [Target-directed dmSDK parse](decisions/target-directed-dmsdk-parse.md) - The declaration inventory is taken under a declared platform-neutral clang triple and a digest-pinned sysroot, so Linux and macOS derive the same policy root.
@@ -44,6 +46,7 @@ okf_version: "0.2"
 * [Math and shader language tools](decisions/math-and-shader-language-tools.md) - Directive-scoped operator syntax, math IR, backend selection, TypeGPU, and VS Code semantics.
 * [Upstream contribution policy](upstream-contributions.md) - Evidence and quality gates for focused Static Hermes and Defold pull requests.
 * [War Battles TypeScript showcase](roadmap/war-battles-showcase.md) - Post-binding-gate port and 32-player multiplayer expansion plan.
+* [Ordered execution goal](roadmap/next-execution-goal.md) - Complete next-task sequence from exact-call verification through policy realization, all-target delivery, tooling, War Battles, and reserved frontiers.
 
 ## Research
 

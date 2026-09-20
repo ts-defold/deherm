@@ -12,6 +12,7 @@ import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
 const root = new URL("../", import.meta.url);
 const patternsUrl = new URL("packages/bindings/generated/defold-script-binding-patterns.json", root);
 const irUrl = new URL("packages/bindings/generated/defold-script-api-ir.json", root);
+const registrationGateUrl = new URL("packages/bindings/generated/defold-lua-registration-gate.json", root);
 const reportUrl = new URL("packages/bindings/generated/defold-script-scalar-dispatch.json", root);
 const headerUrl = new URL("defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp", root);
 const sourceUrl = new URL("defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp", root);
@@ -54,9 +55,32 @@ function cppString(value) {
   return JSON.stringify(value);
 }
 
-function makeOutputs(patternsText, irText, validatedOverrides) {
+function runtimeLookups(gate, defoldRevision) {
+  if (gate.defoldRevision !== defoldRevision) {
+    throw new Error("Lua registration gate revision is stale against the script IR");
+  }
+  const result = new Map();
+  for (const finding of gate.findings ?? []) {
+    if (finding.action !== "use-registered-name") continue;
+    if (typeof finding.route !== "string" || typeof finding.callableAs !== "string") {
+      throw new Error("Lua registration name correction must name both route and callableAs");
+    }
+    if (result.has(finding.route)) throw new Error(`Duplicate Lua registration name correction for ${finding.route}`);
+    const segments = finding.callableAs.split(".");
+    const member = segments.pop();
+    if (!member || segments.length === 0) {
+      throw new Error(`${finding.route}: registered-name correction is not a qualified Lua route`);
+    }
+    result.set(finding.route, { modulePath: segments.join("."), member });
+  }
+  return result;
+}
+
+function makeOutputs(patternsText, irText, registrationGateText, validatedOverrides) {
   const patterns = JSON.parse(patternsText);
   const ir = JSON.parse(irText);
+  const registrationGate = JSON.parse(registrationGateText);
+  const correctedLookups = runtimeLookups(registrationGate, ir.defoldRevision);
   const functions = new Map(ir.functions.map((entry) => [entry.id, entry]));
   const registry = typeRegistry(ir);
   const ids = new Map();
@@ -72,6 +96,10 @@ function makeOutputs(patternsText, irText, validatedOverrides) {
       ids.set(stableId, pattern.id);
       const override = validatedOverrides.get(pattern.id);
       if (override) usedOverrides.add(pattern.id);
+      const lookup = correctedLookups.get(fn.rawName) ?? {
+        modulePath: fn.modulePath.join("."),
+        member: fn.member,
+      };
       const parameters = fn.parameters.map((parameter) => {
         const lowered = resolveCodec(parameter.rawType, registry);
         if (lowered.nullable) throw new Error(`Nullable scalar input needs an explicit policy: ${pattern.id}`);
@@ -95,8 +123,8 @@ function makeOutputs(patternsText, irText, validatedOverrides) {
         stableId,
         enumName: pascal(fn.rawName),
         rawName: fn.rawName,
-        modulePath: fn.modulePath.join("."),
-        member: fn.member,
+        modulePath: lookup.modulePath,
+        member: lookup.member,
         source: fn.source,
         line: fn.line,
         parameters,
@@ -128,7 +156,7 @@ function makeOutputs(patternsText, irText, validatedOverrides) {
   const maxArguments = Math.max(...bindings.map((binding) => binding.maximumArgumentCount));
   const overrideEvidence = [...validatedOverrides.entries()];
   const inputHash = createHash("sha256")
-    .update(patternsText).update("\0").update(irText).update("\0")
+    .update(patternsText).update("\0").update(irText).update("\0").update(registrationGateText).update("\0")
     .update(JSON.stringify(overrideEvidence)).digest("hex");
   const report = {
     schemaVersion: 1,
@@ -160,12 +188,13 @@ async function main(argv = process.argv.slice(2)) {
   const unknown = argv.filter((argument) => argument !== "--check");
   if (unknown.length) throw new Error(`Unknown argument: ${unknown[0]}`);
   const check = argv.includes("--check");
-  const [patternsText, irText] = await Promise.all([
+  const [patternsText, irText, registrationGateText] = await Promise.all([
     readFile(patternsUrl, "utf8"),
-    readFile(irUrl, "utf8")
+    readFile(irUrl, "utf8"),
+    readFile(registrationGateUrl, "utf8")
   ]);
   const validatedOverrides = await loadScriptSemanticOverrides(root);
-  const outputs = makeOutputs(patternsText, irText, validatedOverrides);
+  const outputs = makeOutputs(patternsText, irText, registrationGateText, validatedOverrides);
   const targets = [
     [reportUrl, outputs.report],
     [headerUrl, outputs.header],

@@ -478,12 +478,12 @@ test("the gate carries only findings with positive source evidence in every engi
     report.targets[id].declaredButUnregistered.map((row) => row.name)));
   for (const finding of gate.findings) {
     assert.ok(gatedKinds.has(finding.kind), finding.kind);
-    assert.ok(["block-emission", "require-parameter"].includes(finding.action), finding.action);
+    assert.ok(["use-registered-name", "mark-source-unavailable", "require-parameter"].includes(finding.action), finding.action);
     // Every finding must be witnessed independently by each engine variant, so a
     // route that differs only between mutually exclusive builds never gates.
     assert.equal(finding.evidence.length, gate.engineTargets.length, finding.route);
     assert.deepEqual([...finding.evidence].map((item) => item.target).sort(), gate.engineTargets);
-    if (finding.action === "block-emission") {
+    if (finding.action === "use-registered-name" || finding.action === "mark-source-unavailable") {
       assert.ok(declaredNames.has(finding.route), `${finding.route} must be documented but unregistered`);
     } else {
       assert.ok(finding.parameter?.index > 0);

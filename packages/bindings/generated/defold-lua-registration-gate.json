@@ -4,7 +4,8 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "The subset of the registered-vs-declared findings that a downstream generator may act on: each one is backed by positive evidence in C source and holds in every mutually exclusive engine build variant. Absence of a registration is reported in the surface report and never gated.",
   "actions": {
-    "block-emission": "The documented route is not callable under this name. A generated binding must not emit it as a callable route.",
+    "use-registered-name": "The engine source registers this function under a different name. Emit the documented TypeScript surface and dispatch it through the registered source name.",
+    "mark-source-unavailable": "Positive source evidence says this route is not registered in every selected engine variant. Keep the API and machinery emitted, but mark the affected profile unavailable.",
     "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
   },
   "sourceReport": "packages/bindings/generated/defold-lua-registration-surface.json",
@@ -15,15 +16,16 @@
   ],
   "counts": {
     "findings": 11,
-    "routesBlocked": 1,
+    "routesRemapped": 1,
+    "routesSourceUnavailable": 0,
     "parametersCorrected": 10,
     "byKind": {
       "documented-optional-slot-required-by-c": 10,
       "registered-under-a-different-name": 1
     },
     "byAction": {
-      "block-emission": 1,
-      "require-parameter": 10
+      "require-parameter": 10,
+      "use-registered-name": 1
     }
   },
   "findings": [
@@ -313,7 +315,7 @@
     {
       "route": "sys.set_render_enable",
       "kind": "registered-under-a-different-name",
-      "action": "block-emission",
+      "action": "use-registered-name",
       "callableAs": "sys.set_render_enabled",
       "parameter": null,
       "reason": "documented as 'sys.set_render_enable' but 'EngineSys_SetRenderEnabled' is registered as 'sys.set_render_enabled'",

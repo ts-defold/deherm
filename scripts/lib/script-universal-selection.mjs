@@ -113,8 +113,10 @@ export function selectUniversalRoutes(routes, policy) {
     selected.push({
       id: route.id,
       stableId,
-      modulePath: route.modulePath,
-      member: route.member,
+      // Public TypeScript identity remains derived from the documented route;
+      // Lua lookup follows the registered C-source spelling when they differ.
+      modulePath: route.runtimeModulePath ?? route.modulePath,
+      member: route.runtimeMember ?? route.member,
       loweringFamily: route.loweringFamily,
       minimumArgumentCount,
       maximumArgumentCount,

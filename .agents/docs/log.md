@@ -1,8 +1,86 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Closed the source-name correction through the real engine
+
+* **The documented/runtime spelling mismatch is now structural**: the generated
+  public route remains `script:sys.set_render_enable`, while scalar and
+  universal Lua dispatch resolve the source-registered
+  `sys.set_render_enabled`. The scalar native census registers only the source
+  spelling, exercises all 90 scalar rows, and observes zero Lua allocator or
+  C++ allocations after warmup. The 915-row portable universal C ABI also
+  passes recursive/reentrant, cycle, pool-exhaustion, and idempotent-release
+  probes with zero warm C++ allocations; its Static Hermes provider compiles
+  through the pinned frontend. These are exact bridge-contract results, not a
+  claim that every Defold gameplay context ran.
+
+* **The rotated engine evidence was recorded rather than copied forward**: a
+  freshly built arm64-macOS Defold 1.14.0 bundle loaded the dynamic Hermes
+  bytecode and completed the current scalar/value probe set with clean final
+  lifecycle markers. The evidence registry now pins that exact log digest and
+  probe-set fingerprint. It runtime-verifies 32 instrumented route scenarios;
+  the remaining routes retain their generated CI verification lanes without a
+  false live-engine claim.
+
+* **Review findings changed code and evidence wording**: the scalar remap bypass,
+  executable-but-unusable macOS Java stub, unpinned/stale public-header staging,
+  double-dot typed-native profile name, and signature-header-only provenance
+  check were reproduced and fixed. The source-pipeline SDK fixture is now
+  described as a frozen regression golden because it shares some emitters with
+  policy realization; it is not presented as an implementation-independent
+  oracle. Every one of the 211 pre-wave commits verifies cryptographically
+  against the confined human signer file.
+
+## 2026-09-20 - Separated human Git authorship from agent provenance
+
+* **Git contribution identity is human-only while OKF provenance remains
+  useful**: every Git commit must use Justin Walsh's configured identity and
+  SSH signature, and AI attribution trailers are forbidden. Agent/model names
+  remain permitted in `.agents/docs` `generated.by` metadata because those
+  fields tell later agents which tool produced a knowledge artifact; they are
+  explicitly not authorship, ownership, copyright, or contributor claims. A
+  repository check and push workflow enforce the Git boundary.
+
+## 2026-09-20 - Closed the focused package and reconstruction failures
+
+* **The three focused failures now have owned fixes instead of bypasses**: the
+  dmSDK JSI compile probe uses Hermes' real `API/jsi` public include root; the
+  npm prepack path stages pinned Hermes/JSI public headers independently of the
+  local archive build and still requires the published native archive; and the
+  frozen source-pipeline SDK golden has an explicit check/update command.
+  Its normal mode is read-only, while `--update` captures only the
+  checkout-backed source-pipeline tree, its Defold revision, and aggregate
+  digest. All eleven focused dmSDK, materializer, package, scaffold, typecheck,
+  and one-shot development tests pass. This proves packaging and reconstruction
+  byte-regression coverage; shared emitters mean it is not an
+  implementation-independent equivalence proof or additional engine-runtime
+  evidence.
+
+## 2026-09-20 - GitHub issues are the external roadmap ledger
+
+* **Every execution wave now owns issue reconciliation**: the existing open
+  issues are mapped to roadmap waves, duplicates are consolidated, evidence is
+  posted as work lands, and issues close only when their stated acceptance
+  criteria are actually satisfied. Completed issues do not remain open as
+  reminders, while broad issues are not closed from a representative proof.
+
+## 2026-09-20 - Locked generated verification and the ordered goal
+
+* **The verification boundary and backlog are now canonical**: déherm verifies
+  its generated bridge contract, while Defold is authoritative for
+  implementation/game semantics. The completion matrix and handoff no longer
+  require bespoke live-engine scenarios per API. Every concrete emitted call
+  instead receives a same-IR verification twin for exact identity,
+  symbol/signature, ABI layout, argument/result ordering, bounds, and lifetime;
+  native headless and Playwright remain integration sentinels. The ordered goal
+  now runs from closing the dirty verification wave through exact-call
+  completion, policy-only realization, cross-platform delivery, installed
+  tooling, public ergonomics, War Battles, and reserved frontiers.
+
 ## 2026-09-20
 
-* **Two more support snapshots became compiler emitters, and scaffolding stopped consulting an output for revision truth**: `@deherm/compiler` now reconstructs `script/browser-target-support.ts` and `dmsdk/scalar.ts` from already-authenticated semantic documents. Both are byte-identical to the frozen old-pipeline fixture (567 and 6,007 bytes), moving the materialized SDK to thirteen locally rendered files / 3,434,070 bytes and reducing compatibility debt to fifteen named files / 78,171 bytes. The resealed policy root is `ae7e6c2bd882`, with 83 objects and 28.29 MB of referenced objects; the 10.21 MB lowering plan remains the dominant derived input. Separately, a new project scaffold now takes its offline default Defold revision from the packaged policy index instead of the generated script IR, and a focused index-only fixture proves the IR can be absent. These are materialization and provenance proofs, not new runtime evidence.
+* **API verification now ends at the bridge contract instead of requiring a fantasy all-world engine**: every one of the 926 documented Lua routes must retain generated machinery in exactly one lane (915 universal runtime dispatch entries, eight component-property compile-time intrinsics, and three specialized timer bridges), and every one of the 1,361 runtime dmSDK declarations must retain a materializable universal recipe with silent omission forbidden. CI's null/recording proof checks stable-ID selection, exact ABI layout, ordered arguments, result decoding, bounds, and lifetime behavior; Defold remains authoritative for gameplay semantics. Missing GUI/render/audio/physics fixtures are a private harness queue and no longer create `unverified` API annotations or issues. Positive source/runtime contradictions remain `suspect`. The mechanically reconcilable mismatch now follows the engine: documented `sys.set_render_enable` dispatches through registered `sys.set_render_enabled` while retaining documentation provenance. Playwright HTML5/Wasm and native headless runs remain integration sentinels, not 926 separate permission gates.
+
+* **Two more support snapshots became compiler emitters, and scaffolding stopped consulting an output for revision truth**: `@deherm/compiler` now reconstructs `script/browser-target-support.ts` and `dmsdk/scalar.ts` from already-authenticated semantic documents. Both match the frozen source-pipeline golden byte-for-byte (567 and 6,007 bytes), moving the materialized SDK to thirteen locally rendered files / 3,434,005 bytes after the source-authoritative route correction and reducing compatibility debt to fifteen named files / 78,171 bytes. The current resealed policy root is `c17e74a7f2fa`, with 83 objects and 28.29 MB of referenced objects; the 10.21 MB lowering plan remains the dominant derived input. Separately, a new project scaffold now takes its offline default Defold revision from the packaged policy index instead of the generated script IR, and a focused index-only fixture proves the IR can be absent. The frozen golden catches accidental byte drift but shares some emitters with the materializer; it is not implementation-independent or new runtime evidence.
 
 * **Four large SDK snapshots became compiler-owned emitters**: `@deherm/compiler` now renders script handle metadata, script universal-value metadata, dmSDK universal metadata, and the browser dmSDK arena directly from three authenticated semantic documents already present in the policy. Old-pipeline equivalence remains byte-for-byte. The local-emitter share moved from seven files / 2,513,290 bytes to eleven files / 3,427,496 bytes; snapshot debt fell from 21 files / 998,951 bytes to 17 files / 84,745 bytes without adding policy inputs. The policy now has 85 subtrees, 28.29 MB, root `9149470ec631`, and an 11,727-byte compiler manifest. The 10.21 MB lowering plan remains the dominant derived object: its existing generator requires 11.10 MB of declared inputs, so invoking it unchanged would substitute a larger derived-input bundle rather than produce the compact recipe boundary the decision requires.
 

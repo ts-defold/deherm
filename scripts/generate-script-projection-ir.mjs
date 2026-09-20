@@ -291,21 +291,35 @@ function buildRegistrationGate(gate, defoldRevision) {
   return { sourceReportSha256: gate.sourceReportSha256, byRoute };
 }
 
-// Apply the gate to one route. A `block-emission` finding means the documented
-// name is not callable, which is a semantic hole rather than a signature to
-// emit. A `require-parameter` finding corrects the declared optionality of one
-// slot, because the C body refuses its omission on every path.
+// Apply source-derived corrections without suppressing the documented API.
+// Verification never grants permission to emit: every documented route keeps
+// its generated TypeScript signature and transport machinery. A name mismatch
+// changes only the Lua lookup used at runtime; a positively absent source route
+// is carried as availability evidence, not erased from the SDK.
 function applyRegistrationGate(gate, fn, parameters) {
   const findings = gate.byRoute.get(fn.rawName) ?? [];
   if (!findings.length) {
-    return { registration: { token: "registration-verified", sourceReportSha256: gate.sourceReportSha256, findings: [] }, holes: [] };
+    return {
+      registration: { token: "registration-verified", sourceReportSha256: gate.sourceReportSha256, findings: [] },
+      runtimeRawName: fn.rawName,
+      holes: []
+    };
   }
   const holes = [];
   const applied = [];
+  let runtimeRawName = fn.rawName;
   for (const finding of findings) {
-    if (finding.action === "block-emission") {
+    if (finding.action === "use-registered-name") {
+      if (typeof finding.callableAs !== "string" || !finding.callableAs.includes(".")) {
+        throw new Error(`${fn.rawName}: registered-name correction has no qualified callableAs`);
+      }
+      runtimeRawName = finding.callableAs;
+      applied.push({ kind: finding.kind, action: finding.action, parameter: null, callableAs: finding.callableAs, reason: finding.reason });
+      continue;
+    }
+    if (finding.action === "mark-source-unavailable") {
       holes.push(`registration:${finding.kind}`);
-      applied.push({ kind: finding.kind, action: finding.action, parameter: null, callableAs: finding.callableAs ?? null, reason: finding.reason });
+      applied.push({ kind: finding.kind, action: finding.action, parameter: null, callableAs: null, reason: finding.reason });
       continue;
     }
     if (finding.action === "require-parameter") {
@@ -323,10 +337,11 @@ function applyRegistrationGate(gate, fn, parameters) {
   }
   return {
     registration: {
-      token: holes.length ? "registration-blocked" : "registration-corrected",
+      token: holes.length ? "registration-source-unavailable" : "registration-corrected",
       sourceReportSha256: gate.sourceReportSha256,
       findings: applied
     },
+    runtimeRawName,
     holes
   };
 }
@@ -458,8 +473,11 @@ export function generateScriptProjectionIr(textInputs) {
       sourceType: parameter.rawType
     }));
     // The C source outranks the declaration: a slot the body refuses to default
-    // is corrected here, and a name the engine never registers is blocked.
+    // is corrected here, and a differently registered name becomes the runtime
+    // lookup without suppressing the documented public route.
     const gated = applyRegistrationGate(registrationGate, fn, parameters);
+    const runtimeSegments = gated.runtimeRawName.split(".");
+    const runtimeMember = runtimeSegments.pop();
     const returns = fn.returns.map((rawType, index) => ({
       index,
       value: parseValueShape(rawType, pattern.returnCodecs[index]?.codecs ?? []),
@@ -509,6 +527,9 @@ export function generateScriptProjectionIr(textInputs) {
       rawName: fn.rawName,
       modulePath: fn.modulePath,
       member: fn.member,
+      runtimeRawName: gated.runtimeRawName,
+      runtimeModulePath: runtimeSegments,
+      runtimeMember,
       source: { path: fn.source, line: fn.line },
       loweringFamily: pattern.loweringFamily,
       signature: {

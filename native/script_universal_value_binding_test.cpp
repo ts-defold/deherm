@@ -7,9 +7,18 @@ using namespace defold_hermes;
 
 namespace {
 bool useMinimumResults = false;
+const universal_value::Operation* expectedOperation = nullptr;
 universal_value::DispatchStatus invoke(
     void*, const universal_value::Operation& operation,
     ScriptCallFrame* frame, char*, size_t) noexcept {
+  assert(expectedOperation == &operation);
+  assert(frame->stableId == operation.stableId);
+  assert(frame->argumentCount >= operation.minimumArgumentCount);
+  assert(frame->argumentCount <= operation.maximumArgumentCount);
+  for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+    assert(frame->arguments[index].tag == ScriptValueTag::kNumber);
+    assert(frame->arguments[index].number == static_cast<double>(index + 1));
+  }
   frame->resultCount = useMinimumResults
       ? operation.minimumResultCount : operation.maximumResultCount;
   for (uint8_t index = 0; index < frame->resultCount; ++index) {
@@ -29,19 +38,28 @@ int main() {
   assert(universal_value::find(rows[0].stableId) == &rows[0]);
   assert(universal_value::find(0) == nullptr);
 
-  ScriptValue arguments[8]{};
-  ScriptValue results[8]{};
+  ScriptValue arguments[universal_value::kMaximumArgumentCount]{};
+  ScriptValue results[universal_value::kMaximumResultCount]{};
+  for (size_t index = 0; index < universal_value::kMaximumArgumentCount; ++index) {
+    arguments[index].tag = ScriptValueTag::kNumber;
+    arguments[index].number = static_cast<double>(index + 1);
+  }
   char error[160]{};
   ScriptCallFrame frame{};
-  frame.stableId = rows[0].stableId;
   frame.arguments = arguments;
-  frame.argumentCount = rows[0].minimumArgumentCount;
   frame.results = results;
-  frame.resultCapacity = 8;
+  frame.resultCapacity = universal_value::kMaximumResultCount;
   universal_value::LuaApi api{nullptr, invoke};
-  assert(universal_value::dispatch(&frame, error, sizeof(error), &api) ==
-      universal_value::DispatchStatus::kSuccess);
-  assert(frame.resultCount == rows[0].resultCount);
+  // Every emitted route crosses the dispatcher. New generated routes join this
+  // census automatically; there is no per-function test list to maintain.
+  for (size_t index = 0; index < universal_value::kOperationCount; ++index) {
+    expectedOperation = &rows[index];
+    frame.stableId = rows[index].stableId;
+    frame.argumentCount = rows[index].minimumArgumentCount;
+    assert(universal_value::dispatch(&frame, error, sizeof(error), &api) ==
+        universal_value::DispatchStatus::kSuccess);
+    assert(frame.resultCount == rows[index].resultCount);
+  }
 
   const universal_value::Operation* variable = nullptr;
   for (size_t index = 0; index < universal_value::kOperationCount; ++index) {
@@ -52,6 +70,7 @@ int main() {
   }
   assert(variable);
   useMinimumResults = true;
+  expectedOperation = variable;
   frame.stableId = variable->stableId;
   frame.argumentCount = variable->minimumArgumentCount;
   assert(universal_value::dispatch(&frame, error, sizeof(error), &api) ==
@@ -60,6 +79,7 @@ int main() {
   useMinimumResults = false;
 
   frame.stableId = rows[0].stableId;
+  expectedOperation = &rows[0];
   frame.argumentCount = static_cast<uint32_t>(rows[0].maximumArgumentCount) + 1;
   assert(universal_value::dispatch(&frame, error, sizeof(error), &api) ==
       universal_value::DispatchStatus::kError);

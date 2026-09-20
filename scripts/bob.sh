@@ -6,17 +6,20 @@ bob_jar="$repo_root/build/tooling/bob.jar"
 action="${1:-build}"
 shift || true
 
-# JAVA_HOME, then whatever is on PATH, then the Homebrew location. PATH used to
-# be missing from that list, so this script could only run on a Mac with
-# Homebrew's openjdk@25 - which is not where a Linux CI runner's JDK lives.
-java_bin="${JAVA_HOME:+$JAVA_HOME/bin/java}"
-if [[ -z "$java_bin" || ! -x "$java_bin" ]]; then
-  java_bin="$(command -v java || true)"
-fi
-if [[ -z "$java_bin" || ! -x "$java_bin" ]]; then
-  java_bin="/opt/homebrew/opt/openjdk@25/bin/java"
-fi
-if [[ ! -x "$java_bin" ]]; then
+# JAVA_HOME, then whatever is on PATH, then the Homebrew location. macOS ships
+# an executable /usr/bin/java launcher even when no JDK is installed, so an
+# executable bit alone is not proof that the candidate can run Bob.
+java_bin=""
+for candidate in \
+  "${JAVA_HOME:+$JAVA_HOME/bin/java}" \
+  "$(command -v java || true)" \
+  "/opt/homebrew/opt/openjdk@25/bin/java"; do
+  if [[ -n "$candidate" && -x "$candidate" ]] && "$candidate" -version >/dev/null 2>&1; then
+    java_bin="$candidate"
+    break
+  fi
+done
+if [[ -z "$java_bin" ]]; then
   echo "A JDK is required. Set JAVA_HOME, put java on PATH, or install Homebrew openjdk@25." >&2
   exit 1
 fi
