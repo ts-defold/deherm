@@ -1031,7 +1031,7 @@
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": "4e6b3204a8cc7bb76ade0e451c6e39555432ff199ac3756bf5f87d1df98585d1",
     "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": "0abab41bd9c1f35a301853533efd8e9d60e156e63467800ac1772fff28ae7ba3",
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": "ab423b90ed7c9166abb5a9ef238ac0d37a1e951fc03d2dc7d17836406b86cb0e",
-    "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "d0f6c13c8dcda6e800db098369b4e47b576f2d30ec7298f134e3206c3d14bc9c",
+    "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": "ff8844fdada79d445b1f3c8c083c85ff01bcc3fee496a5a0a3fbd790093177a6",
     "packages/sdk/src/generated/script/universal-value-bindings.ts": "b1e342fe7b53d485e4eff9831c83fa7992553aac05be6c8982ac1666c0ba66d3",
     "packages/sdk/src/generated/script/browser-target-support.ts": "4de2ba390aef3354cbdd498617ce92820975a99077d26ce116a43fed4532e9c8",
     "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",

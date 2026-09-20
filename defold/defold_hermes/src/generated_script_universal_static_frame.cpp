@@ -4,6 +4,8 @@
 
 #include <array>
 #include <cstring>
+#include <memory>
+#include <new>
 
 struct DehermScriptUniversalStaticFrame {
   bool used = false;
@@ -47,7 +49,12 @@ static_assert(sizeof(float) * DEHERM_DEFOLD_MATRIX4_STORAGE_ELEMENTS == DEHERM_D
     "Static Hermes Matrix4 scratch drifted from the pinned dmVMath::Matrix4 layout");
 
 namespace {
-thread_local std::array<DehermScriptUniversalStaticFrame, DEHERM_SCRIPT_STATIC_FRAME_REENTRANCY> frames{};
+using StaticFramePool = std::array<DehermScriptUniversalStaticFrame, DEHERM_SCRIPT_STATIC_FRAME_REENTRANCY>;
+// Keep only the pool owner in static TLS. Embedding the complete ~368 KiB pool
+// there makes glibc count it against every pthread's requested stack, including
+// Defold's 128 KiB AsyncLoad thread, so pthread_create rejects that otherwise
+// valid engine thread with EINVAL before any Hermes route can execute.
+thread_local std::unique_ptr<StaticFramePool> frames;
 constexpr uint32_t invalid = UINT32_MAX;
 
 DehermScriptUniversalValue* add(DehermScriptUniversalStaticFrame* frame, uint32_t* index) noexcept {
@@ -63,11 +70,13 @@ const DehermScriptUniversalValue* value(const DehermScriptUniversalStaticFrame* 
 }
 
 extern "C" DehermScriptUniversalStaticFrame* deherm_script_static_frame_acquire(void) {
-  for (auto& frame : frames) if (!frame.used) { frame.used = true; deherm_script_static_frame_reset(&frame); return &frame; }
+  if (!frames) frames.reset(new (std::nothrow) StaticFramePool{});
+  if (!frames) return nullptr;
+  for (auto& frame : *frames) if (!frame.used) { frame.used = true; deherm_script_static_frame_reset(&frame); return &frame; }
   return nullptr;
 }
 extern "C" uint32_t deherm_script_static_frame_bytes(void) { return static_cast<uint32_t>(sizeof(DehermScriptUniversalStaticFrame)); }
-extern "C" uint32_t deherm_script_static_frame_pool_bytes(void) { return static_cast<uint32_t>(sizeof(frames)); }
+extern "C" uint32_t deherm_script_static_frame_pool_bytes(void) { return static_cast<uint32_t>(sizeof(StaticFramePool)); }
 extern "C" void deherm_script_static_frame_release(DehermScriptUniversalStaticFrame* frame) { if (frame) { deherm_script_static_frame_reset(frame); frame->used = false; } }
 extern "C" void deherm_script_static_frame_reset(DehermScriptUniversalStaticFrame* frame) {
   if (!frame) return;

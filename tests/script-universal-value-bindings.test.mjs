@@ -147,6 +147,13 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
 });
 
 test("portable C ABI compiles as C, runs recursive/reentrant native behavior, and stays allocation-free when warm", async () => {
+  const staticFrameSource = await readFile(
+    path.join(root, "defold/defold_hermes/src/generated_script_universal_static_frame.cpp"),
+    "utf8"
+  );
+  assert.match(staticFrameSource, /thread_local std::unique_ptr<StaticFramePool> frames/u);
+  assert.doesNotMatch(staticFrameSource, /thread_local std::array<DehermScriptUniversalStaticFrame/u,
+    "the bounded frame pool must not inflate every Defold pthread's static TLS allocation");
   const temporary = await mkdtemp(path.join(tmpdir(), "deherm-universal-value-capi-"));
   try {
     const cProbe = path.join(temporary, "probe.c");
