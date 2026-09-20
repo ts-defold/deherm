@@ -21,8 +21,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "cb586c79ecaedb404cb022ca6806b56a6f0ea811e120fcffb70e025f4867bcdb",
-      "generator": "sha256:60777cd2f163ff0f6e5304dd94367075fdc485ef5c9fa25d179f459522e0b045",
+      "policyRoot": "9149470ec631bc4e84a2724c955d64d8f130601a106719403565ed1b0dfc1ecd",
+      "generator": "sha256:cf198d49a0e706fb024f89f32268618a8486e59c98a09d40f5a4088f4a4973de",
       "realizer": {
         "minimumPackageVersion": "0.0.0",
         "requiredCapabilities": [
@@ -32,13 +32,17 @@
           "policy.compiler-surface.references.v1",
           "policy.content-addressed-graph.v1",
           "sdk.compatibility-source.copy.v1",
+          "sdk.dmsdk.browser-arena.render.v1",
           "sdk.dmsdk.index.render.v1",
           "sdk.dmsdk.runtime.render.v1",
           "sdk.dmsdk.types.render.v1",
+          "sdk.dmsdk.universal.render.v1",
+          "sdk.script.handle-lowering.render.v1",
           "sdk.script.index.render.v1",
           "sdk.script.modules.render.v1",
           "sdk.script.runtime.render.v1",
-          "sdk.script.types.render.v1"
+          "sdk.script.types.render.v1",
+          "sdk.script.universal-value.render.v1"
         ]
       }
     }
