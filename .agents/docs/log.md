@@ -1,5 +1,19 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Bound policy-site handshakes to the resolved revision
+
+* **The clean consumer now validates each published revision against its own
+  policy facts**: the nightly stable/beta/alpha run rebuilt each policy
+  handshake correctly, then compared all three to the checkout's last-generated
+  profile and failed when alpha did not equal stable. The site-resolution smoke
+  now reconstructs and checks revision-independent fields against that
+  revision's `@profiles` subtree, binds only `defoldRevision` and
+  `catalogSha256` at resolution, and rejects malformed or undeclared binding
+  fields. A two-revision regression proves distinct profile facts remain
+  distinct instead of being compared through checkout state. This is policy
+  reconstruction evidence; the next scheduled/dispatch run remains the CI
+  proof for the full multi-channel graph.
+
 ## 2026-09-20 - Closed the 915 + 8 + 3 generated script-call partition
 
 * **Compiler intrinsics and specialized timers now have generated verification

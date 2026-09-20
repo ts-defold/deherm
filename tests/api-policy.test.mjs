@@ -26,6 +26,7 @@ import {
 } from "../packages/compiler/src/api-policy.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
+import { validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import { buildShippedIndex, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 
@@ -90,6 +91,43 @@ test("published smoke waits for the exact derived entries at the configured site
   assert.deepEqual(missingPublishedEntries(expected, {
     entries: [{ defoldRevision: "a", policyRoot: "wrong", generator: "gen-a" }]
   }), expected.entries);
+});
+
+test("policy handshakes bind each resolved revision to its own profile facts", () => {
+  const profilesFor = (routeCount) => ({
+    catalogRecipe: {
+      profileOrder: ["default-legacy-bullet"],
+      profileFields: ["features", "capabilityBits", "routeSetSha256"]
+    },
+    profiles: {
+      "default-legacy-bullet": {
+        boundAtResolution: ["defoldRevision", "catalogSha256"],
+        features: ["core"],
+        runtimeHandshake: {
+          schema: "deherm.script-route-capabilities/v1",
+          profileId: "default-legacy-bullet",
+          capabilityBits: 1,
+          routeCount,
+          routeSetSha256: String(routeCount).padStart(64, "0")
+        }
+      }
+    }
+  });
+  const stable = validateRebuiltHandshake({
+    profiles: profilesFor(26),
+    revision: "a".repeat(40),
+    profileId: "default-legacy-bullet"
+  });
+  const alpha = validateRebuiltHandshake({
+    profiles: profilesFor(27),
+    revision: "b".repeat(40),
+    profileId: "default-legacy-bullet"
+  });
+  assert.equal(stable.defoldRevision, "a".repeat(40));
+  assert.equal(stable.routeCount, 26);
+  assert.equal(alpha.defoldRevision, "b".repeat(40));
+  assert.equal(alpha.routeCount, 27);
+  assert.notEqual(stable.catalogSha256, alpha.catalogSha256);
 });
 
 // A deliberately tiny stand-in for the generated state, so the structural

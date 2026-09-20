@@ -25,14 +25,12 @@ import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+import { pathToFileURL } from "node:url";
 
 import { hashBytes } from "../packages/compiler/src/api-policy.mjs";
 import { releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
 import { buildPolicySite } from "./build-policy-site.mjs";
 import { readSiteConfig, shippedIndexPath } from "./generate-api-policy.mjs";
-
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 function serve(directory) {
   const tampered = new Map();
@@ -193,6 +191,28 @@ export function rebuildHandshake({ profiles, revision, profileId }) {
   return { ...profiles.profiles[profileId].runtimeHandshake, defoldRevision: revision, catalogSha256 };
 }
 
+export function validateRebuiltHandshake({ profiles, revision, profileId }) {
+  const handshake = rebuildHandshake({ profiles, revision, profileId });
+  const profile = profiles.profiles[profileId];
+  if (!profile) throw new Error(`policy profiles carry no ${profileId}`);
+  for (const [field, expected] of Object.entries(profile.runtimeHandshake)) {
+    if (handshake[field] !== expected) {
+      throw new Error(`rebuilt handshake ${field} ${handshake[field]} != policy profile ${expected}`);
+    }
+  }
+  if (handshake.defoldRevision !== revision) {
+    throw new Error(`rebuilt handshake revision ${handshake.defoldRevision} != resolved ${revision}`);
+  }
+  if (!/^[a-f0-9]{64}$/.test(handshake.catalogSha256)) {
+    throw new Error(`rebuilt handshake catalog hash is invalid: ${handshake.catalogSha256}`);
+  }
+  const rebound = new Set(profile.boundAtResolution ?? []);
+  if (rebound.size !== 2 || !rebound.has("defoldRevision") || !rebound.has("catalogSha256")) {
+    throw new Error("policy profile does not declare the two revision-bound handshake fields");
+  }
+  return handshake;
+}
+
 async function main() {
   const site = await readSiteConfig();
   const output = await mkdtemp(path.join(tmpdir(), "deherm-policy-site-"));
@@ -227,20 +247,12 @@ async function main() {
       lines.push(`  gui: ${gui.script.functions.length} declared routes, ` +
         `${Object.values(gui.registration).reduce((total, target) => total + target.routes.length, 0)} registered route records`);
 
-      const handshake = rebuildHandshake({
+      const handshake = validateRebuiltHandshake({
         profiles: subtrees["@profiles"],
         revision,
         profileId: "default-legacy-bullet"
       });
-      const original = JSON.parse(
-        await readFile(path.join(root, "packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8")
-      ).profiles["default-legacy-bullet"].runtimeHandshake;
-      for (const field of Object.keys(original)) {
-        if (handshake[field] !== original[field]) {
-          throw new Error(`rebuilt handshake ${field} ${handshake[field]} != generated ${original[field]}`);
-        }
-      }
-      lines.push(`  rebuilt runtime handshake for default-legacy-bullet matches the generated profile ` +
+      lines.push(`  rebuilt runtime handshake for default-legacy-bullet matches its policy profile ` +
         `(catalogSha256 ${handshake.catalogSha256.slice(0, 12)})`);
     }
 
