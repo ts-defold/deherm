@@ -17,6 +17,13 @@ platforms:
             flags: ["-std=c++17", "-fexceptions"]
     x86_64-win32:
         context:
+            # Hermes' Windows backend deliberately uses the ICU C ABI shipped
+            # by Windows 10. The static Hermes archive carries references to
+            # that ABI, while these two Windows SDK import libraries carry the
+            # definitions. Keep the legacy split libraries rather than the
+            # newer umbrella `icu`: they are what upstream Hermes requests and
+            # remain available on the broader Windows 10 version range.
+            libs: ["icuuc", "icuin"]
             flags: ["-std=c++17", "-fexceptions"]
     arm64-ios:
         context:

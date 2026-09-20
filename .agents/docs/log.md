@@ -1,5 +1,21 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Windows system ICU is linked at the Defold extension boundary
+
+* **The post-CRT Windows failure was a missing final-link dependency, not a
+  contaminated archive**: the successful `windows (0)` artifact log first
+  found Linux ICU headers while configuring the native host tools, but the
+  Windows target probe could not find a target `ICU_LIBRARY`, selected Hermes'
+  `Using Windows 10 built-in ICU` fallback, defined `USE_WIN10_ICU`, and
+  compiled `PlatformUnicodeICU.cpp` through `external/icu_decls`. Direct COFF
+  inspection agrees: the published target object imports the unversioned ICU C
+  ABI. The subsequent Bob link contained neither `-licuuc` nor `-licuin` and
+  failed on exactly those imports. The Windows extension manifest now supplies
+  both Windows SDK import libraries, matching upstream Hermes and Microsoft's
+  documented legacy system-ICU contract. A focused manifest test protects the
+  final-link dependency. This is static and build-log evidence; the next
+  Windows Bob run remains the integration proof.
+
 ## 2026-09-20 - Windows archives now match Defold's static CRT contract
 
 * **The duplicate ZIP object was real but not the only Windows incompatibility**:

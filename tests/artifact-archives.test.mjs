@@ -18,6 +18,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
+import { parse as parseYaml } from "yaml";
 
 import { extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
 import {
@@ -395,6 +396,17 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
     "utf8"
   );
   assert.match(nativeBuild, /-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded/);
+});
+
+test("the Windows extension links Hermes' system ICU import libraries", async () => {
+  const manifest = parseYaml(
+    await readFile(path.join(repositoryRoot, "defold/defold_hermes/ext.manifest"), "utf8")
+  );
+  assert.deepEqual(
+    manifest.platforms?.["x86_64-win32"]?.context?.libs,
+    ["icuuc", "icuin"],
+    "Hermes' Windows 10 ICU backend leaves these symbols for the final Defold link"
+  );
 });
 
 test("the Linux target archive keeps the glibc 2.35 compatibility floor", async () => {
