@@ -8,7 +8,6 @@
 namespace defold_hermes::lua_bridge::scalar {
 namespace {
 
-constexpr size_t kMissingIndex = static_cast<size_t>(-1);
 constexpr int64_t kMaxExactLuaInteger = 9007199254740991LL;
 
 class StackRestore {
@@ -159,7 +158,8 @@ void Dispatcher::detachInstance() noexcept {
   instanceRef_ = LUA_NOREF;
 }
 
-size_t Dispatcher::findDenseIndex(uint32_t stableId) const noexcept {
+bool findDenseIndex(uint32_t stableId, size_t* outDenseIndex) noexcept {
+  if (!outDenseIndex) return false;
   const auto& table = generated::tables();
   size_t first = 0;
   size_t count = table.bindingCount;
@@ -173,7 +173,9 @@ size_t Dispatcher::findDenseIndex(uint32_t stableId) const noexcept {
       count = step;
     }
   }
-  return first < table.bindingCount && table.stableIds[first] == stableId ? first : kMissingIndex;
+  if (first >= table.bindingCount || table.stableIds[first] != stableId) return false;
+  *outDenseIndex = first;
+  return true;
 }
 
 bool Dispatcher::pushModulePath(const char* path) noexcept {
@@ -202,8 +204,17 @@ bool Dispatcher::pushModulePath(const char* path) noexcept {
 
 bool Dispatcher::bind(uint32_t stableId) noexcept {
   if (!state_) return fail("scalar Lua dispatcher is not initialized");
-  const size_t denseIndex = findDenseIndex(stableId);
-  if (denseIndex == kMissingIndex) return fail("unknown stable scalar binding id");
+  size_t denseIndex = 0;
+  if (!findDenseIndex(stableId, &denseIndex)) return fail("unknown stable scalar binding id");
+  return bindDense(denseIndex);
+}
+
+bool Dispatcher::bindDense(size_t denseIndex) noexcept {
+  if (!state_) return fail("scalar Lua dispatcher is not initialized");
+  const auto& table = generated::tables();
+  if (denseIndex >= table.bindingCount || denseIndex >= functionRefs_.size()) {
+    return fail("unknown dense scalar binding index");
+  }
   if (functionRefs_[denseIndex] != LUA_NOREF && functionRefs_[denseIndex] != LUA_REFNIL) {
     error_[0] = '\0';
     return true;
@@ -213,7 +224,6 @@ bool Dispatcher::bind(uint32_t stableId) noexcept {
   error_[0] = '\0';
   const int baseTop = lua_gettop(state_);
   StackRestore restore(state_, baseTop);
-  const auto& table = generated::tables();
   if (!pushModulePath(table.modulePaths[denseIndex])) {
     if (error_[0] == '\0') fail("Lua module is unavailable for scalar binding");
     return false;
@@ -227,8 +237,12 @@ bool Dispatcher::bind(uint32_t stableId) noexcept {
 }
 
 bool Dispatcher::isBound(uint32_t stableId) const noexcept {
-  const size_t denseIndex = findDenseIndex(stableId);
-  return denseIndex != kMissingIndex &&
+  size_t denseIndex = 0;
+  return findDenseIndex(stableId, &denseIndex) && isBoundDense(denseIndex);
+}
+
+bool Dispatcher::isBoundDense(size_t denseIndex) const noexcept {
+  return denseIndex < generated::tables().bindingCount && denseIndex < functionRefs_.size() &&
       functionRefs_[denseIndex] != LUA_NOREF && functionRefs_[denseIndex] != LUA_REFNIL;
 }
 
@@ -346,15 +360,26 @@ bool Dispatcher::dispatch(
     binding::Span<const ScalarInput> arguments,
     ScalarOutput* output) noexcept {
   if (!state_) return fail("scalar Lua dispatcher is not initialized");
+  size_t denseIndex = 0;
+  if (!findDenseIndex(stableId, &denseIndex)) return fail("unknown stable scalar binding id");
+  return dispatchDense(denseIndex, arguments, output);
+}
+
+bool Dispatcher::dispatchDense(
+    size_t denseIndex,
+    binding::Span<const ScalarInput> arguments,
+    ScalarOutput* output) noexcept {
+  if (!state_) return fail("scalar Lua dispatcher is not initialized");
+  const auto& table = generated::tables();
+  if (denseIndex >= table.bindingCount || denseIndex >= functionRefs_.size()) {
+    return fail("unknown dense scalar binding index");
+  }
   if (!reserveStack(arguments.size + 3)) return false;
-  const size_t denseIndex = findDenseIndex(stableId);
-  if (denseIndex == kMissingIndex) return fail("unknown stable scalar binding id");
   const int reference = functionRefs_[denseIndex];
   if (reference == LUA_NOREF || reference == LUA_REFNIL) {
     return fail("scalar Lua binding was not bound during initialization");
   }
   if (!validateArguments(denseIndex, arguments)) return false;
-  const auto& table = generated::tables();
   const ScalarCodec resultCodec = table.resultCodecs[denseIndex];
   if (resultCodec != ScalarCodec::kNone && !output) {
     return fail("scalar Lua binding requires result storage");

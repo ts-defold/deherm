@@ -1,5 +1,22 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Scalar Lua calls resolve sparse IDs once
+
+* **The repeated lookup claim was reproduced and removed without changing the
+  ABI**: a warmed scalar call searched the same 90-entry stable-ID table in the
+  adapter, `isBound`, and `dispatch`; the first call also searched in `bind`.
+  One shared binary search now resolves the adapter's sparse FNV ID once and
+  bounds-checked dense-index methods carry it through binding and dispatch.
+  Independent selectors for the earlier adapter families remain unchanged.
+  The named methods remain portable when `size_t == uint32_t` on 32-bit targets.
+  Comparable release runs improved from 261.6 to 259.9 ns/call. Controls put the
+  remaining lookup at 4.4 ns and the complete adapter/dense-Dispatcher gap at
+  51.3 ns, which does not isolate defensive validation. Therefore validation,
+  family ordering, and the constexpr sorted table stay unchanged; no hash table
+  was introduced. Focused runtime and ASan/UBSan tests pass with zero warmed Lua
+  allocator calls and zero C++ allocations. These are host-harness performance,
+  allocation, and sanitizer observations, not packaged-engine/device evidence.
+
 ## 2026-09-20 - Windows system ICU is linked at the Defold extension boundary
 
 * **The post-CRT Windows failure was a missing final-link dependency, not a

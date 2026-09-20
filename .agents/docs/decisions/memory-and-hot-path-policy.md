@@ -77,9 +77,11 @@ bound, arena generation counter, and stale-handle rejection unchanged.
 
 # Data-oriented dispatch
 
-Bindings use stable dense numeric IDs. Hot metadata is stored in compact arrays
-of codec, arity, flags, and entrypoint data. Human-readable names, source paths,
-and documentation are cold metadata used by diagnostics and tooling. Temporary
+Bindings expose stable sparse numeric IDs and resolve them once into dense
+indices. Hot metadata is stored in compact arrays of codec, arity, flags, and
+entrypoint data, and downstream stages reuse the resolved dense index instead
+of repeating sparse-ID lookup. Human-readable names, source paths, and
+documentation are cold metadata used by diagnostics and tooling. Temporary
 arguments/results are laid out contiguously in call order. Long-lived objects
 use structure-of-arrays pools where lookup and release touch only the fields
 required by that operation.

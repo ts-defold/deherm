@@ -119,6 +119,23 @@ no game-object instance context.
 
 All figures nanoseconds per call.
 
+## Scalar adapter lookup control
+
+The harness now also measures `script:render.set_viewport` through the scalar
+`ScriptAdapter`, which the semantic-handle shape sweep does not enter. This
+exposed and then verified consolidation of three searches of the same scalar
+descriptor table into one; selectors for earlier adapter families remain.
+On the same release-build protocol, the comparable before/after means were
+261.6 and 259.9 ns/call. A later control batch measured the post-change adapter
+at 258.6 ns/call, its already-resolved dense Dispatcher at 207.4 ns/call, and
+the remaining binary lookup over all 90 stable IDs at 4.4 ns/call.
+
+The lookup is therefore real but small. The sorted constexpr table remains;
+neither a dynamic hash table nor a generated minimal-perfect hash is warranted.
+The 51.3 ns adapter/dense gap deliberately is not attributed to duplicate
+validation because it also includes every earlier family probe, conversion,
+arena staging, and the adapter's complete boundary checks.
+
 | Transport | ns/call | Note |
 | --- | ---: | --- |
 | `c-abi-native` (82 borrowed-handle bindings) | 4.0 | stub provider; framing and validation only |

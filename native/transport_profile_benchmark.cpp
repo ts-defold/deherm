@@ -91,6 +91,7 @@ void expect(bool condition, const char* message) { if (!condition) die(message);
 
 int gInstanceKey = 0;
 uint64_t gLuaCalls = 0;
+uint64_t gScalarLuaCalls = 0;
 
 void GetInstance(lua_State* state) {
   lua_pushlightuserdata(state, &gInstanceKey);
@@ -149,6 +150,19 @@ int MockRoute(lua_State* state) {
   else if (codec.mask & handle::kQuaternion) dmScript::PushQuat(state, dmVMath::Quat(0, 0, 0, 1));
   else return luaL_error(state, "no mock result codec");
   return 1;
+}
+
+int MockScalarSetViewport(lua_State* state) {
+  for (int index = 1; index <= 4; ++index) (void)luaL_checknumber(state, index);
+  ++gScalarLuaCalls;
+  return 0;
+}
+
+void installScalarRoute(lua_State* state) {
+  ensureModule(state, "render");
+  lua_pushcfunction(state, MockScalarSetViewport);
+  lua_setfield(state, -2, "set_viewport");
+  lua_pop(state, 1);
 }
 
 void installRoutes(lua_State* state, const handle::RuntimeProfile& profile) {
@@ -403,6 +417,7 @@ int main() {
   lua_State* state = luaL_newstate();
   expect(state != nullptr, "Lua state creation failed");
   installRoutes(state, *profile);
+  installScalarRoute(state);
   int instance = 0;
   lua_pushlightuserdata(state, &instance);
   SetInstance(state);
@@ -413,6 +428,52 @@ int main() {
   lua_pushlightuserdata(state, &instance);
   expect(adapter.captureInstance(-1), adapter.lastError());
   lua_pop(state, 1);
+
+  // The scalar ScriptAdapter lane is measured separately because the generic
+  // handle-route sweep below does not enter it. This is the production chain:
+  // family selection, stable-id lookup, ScriptValue conversion, Dispatcher,
+  // protected Lua call, and result restoration.
+  FrameState scalarFrame{};
+  scalarFrame.frame.stableId = static_cast<uint32_t>(scalar::generated::BindingId::RenderSetViewport);
+  scalarFrame.frame.arguments = scalarFrame.arguments.data();
+  scalarFrame.frame.argumentCount = 4;
+  for (uint32_t index = 0; index < scalarFrame.frame.argumentCount; ++index) {
+    scalarFrame.arguments[index].tag = ScriptValueTag::kNumber;
+    scalarFrame.arguments[index].number = static_cast<double>(index + 1);
+  }
+  expect(adapter.dispatch(&scalarFrame.frame), adapter.lastError());
+  const Timing scalarLua = measure([&] {
+    (void)adapter.dispatch(&scalarFrame.frame);
+  });
+  report("lua-scalar", "4arg-0res", "script:render.set_viewport", scalarLua);
+
+  size_t scalarDenseIndex = 0;
+  expect(scalar::findDenseIndex(scalarFrame.frame.stableId, &scalarDenseIndex),
+      "scalar benchmark route did not resolve to a dense index");
+  std::array<scalar::ScalarInput, 4> scalarInputs{};
+  for (size_t index = 0; index < scalarInputs.size(); ++index) {
+    scalarInputs[index] = scalar::ScalarInput::integerValue(static_cast<int64_t>(index + 1));
+  }
+  const Timing scalarDense = measure([&] {
+    (void)adapter.dispatcher().dispatchDense(
+        scalarDenseIndex, {scalarInputs.data(), scalarInputs.size()});
+  });
+  report("lua-scalar-dense", "4arg-0res", "script:render.set_viewport", scalarDense);
+  constexpr uint64_t kCallsPerMeasurement = kWarmup + kRepeats * kIterations;
+  expect(gScalarLuaCalls == 1 + 2 * kCallsPerMeasurement,
+      "scalar benchmark dispatch did not reach its Lua target on every call");
+
+  const auto& scalarTables = scalar::generated::tables();
+  size_t lookupCursor = 0;
+  volatile size_t lookupSink = 0;
+  const Timing scalarLookup = measure([&] {
+    size_t resolved = 0;
+    (void)scalar::findDenseIndex(scalarTables.stableIds[lookupCursor], &resolved);
+    lookupSink = resolved;
+    if (++lookupCursor == scalarTables.bindingCount) lookupCursor = 0;
+  });
+  (void)lookupSink;
+  report("scalar-id-lookup", "90-entry-table", "generated:scalar", scalarLookup);
 
   // One captured semantic handle per kind, plus a raw registry reference to the
   // same userdata so the baseline can push it without touching the registry.
@@ -617,6 +678,8 @@ int main() {
 #endif
 
   std::printf("transport-profile:lua-target-calls=%llu\n", static_cast<unsigned long long>(gLuaCalls));
+  std::printf("transport-profile:scalar-lua-target-calls=%llu\n",
+      static_cast<unsigned long long>(gScalarLuaCalls));
   adapter.shutdown();
   lua_close(state);
   std::puts("transport-profile:ok");

@@ -213,6 +213,16 @@ void TestDescriptors() {
   for (size_t index = 1; index < tables.bindingCount; ++index) {
     Expect(tables.stableIds[index - 1] < tables.stableIds[index], "stable IDs are not sorted or unique");
   }
+  size_t denseIndex = tables.bindingCount;
+  Expect(scalar::findDenseIndex(Id(generated::BindingId::RenderSetViewport), &denseIndex),
+      "stable scalar ID did not resolve");
+  Expect(denseIndex < tables.bindingCount &&
+      tables.stableIds[denseIndex] == Id(generated::BindingId::RenderSetViewport),
+      "stable scalar ID resolved to the wrong dense index");
+  Expect(!scalar::findDenseIndex(UINT32_C(0), &denseIndex),
+      "unknown stable scalar ID unexpectedly resolved");
+  Expect(!scalar::findDenseIndex(Id(generated::BindingId::RenderSetViewport), nullptr),
+      "null dense-index output unexpectedly succeeded");
 }
 
 }  // namespace
@@ -248,11 +258,21 @@ int main() {
   lua_pushlightuserdata(state, &gPreviousInstance);
   MockSetInstance(state);
   Expect(dispatcher.initialize(state, 16, {MockGetInstance, MockSetInstance}), dispatcher.lastError());
+  const size_t invalidDenseIndex = scalar::generated::tables().bindingCount;
+  Expect(!dispatcher.isBoundDense(invalidDenseIndex), "out-of-range dense index was reported bound");
+  Expect(!dispatcher.bindDense(invalidDenseIndex), "out-of-range dense bind unexpectedly succeeded");
+  Expect(!dispatcher.dispatchDense(invalidDenseIndex, {}),
+      "out-of-range dense dispatch unexpectedly succeeded");
   lua_pushlightuserdata(state, &gCapturedInstance);
   Expect(dispatcher.captureInstance(-1), dispatcher.lastError());
   lua_pop(state, 1);
   gExpectedInstance = &gCapturedInstance;
-  Expect(dispatcher.bind(Id(generated::BindingId::RenderSetViewport)), dispatcher.lastError());
+  size_t viewportDenseIndex = 0;
+  Expect(scalar::findDenseIndex(
+      Id(generated::BindingId::RenderSetViewport), &viewportDenseIndex),
+      "viewport stable ID did not resolve for dense binding");
+  Expect(dispatcher.bindDense(viewportDenseIndex), dispatcher.lastError());
+  Expect(dispatcher.isBoundDense(viewportDenseIndex), "dense viewport binding was not retained");
   Expect(dispatcher.bind(Id(generated::BindingId::RenderGetHeight)), dispatcher.lastError());
   Expect(dispatcher.bind(Id(generated::BindingId::SysGetConfigBoolean)), dispatcher.lastError());
   Expect(dispatcher.bind(Id(generated::BindingId::SysSetRenderEnable)), dispatcher.lastError());

@@ -84,6 +84,9 @@ namespace generated {
 const ScalarBindingTables& tables() noexcept;
 }
 
+/** Resolve a sparse stable binding ID through the generated sorted table. */
+bool findDenseIndex(uint32_t stableId, size_t* outDenseIndex) noexcept;
+
 struct InstanceApi {
   // get pushes the current instance. set consumes the instance at stack top.
   void (*get)(lua_State* state) = nullptr;
@@ -119,8 +122,18 @@ class Dispatcher {
   bool bind(uint32_t stableId) noexcept;
   bool isBound(uint32_t stableId) const noexcept;
 
+  // Dense-index entry points let a family selector reuse the lookup it already
+  // performed. They remain bounds checked and fail closed; the distinct names
+  // are required because size_t and uint32_t are the same type on 32-bit hosts.
+  bool bindDense(size_t denseIndex) noexcept;
+  bool isBoundDense(size_t denseIndex) const noexcept;
+
   bool dispatch(
       uint32_t stableId,
+      binding::Span<const ScalarInput> arguments,
+      ScalarOutput* output = nullptr) noexcept;
+  bool dispatchDense(
+      size_t denseIndex,
       binding::Span<const ScalarInput> arguments,
       ScalarOutput* output = nullptr) noexcept;
 
@@ -128,7 +141,6 @@ class Dispatcher {
   const DispatchStats& stats() const noexcept { return stats_; }
 
  private:
-  size_t findDenseIndex(uint32_t stableId) const noexcept;
   bool pushModulePath(const char* path) noexcept;
   bool reserveStack(size_t slots) noexcept;
   bool validateArguments(size_t denseIndex, binding::Span<const ScalarInput> arguments) noexcept;

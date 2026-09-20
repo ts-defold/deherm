@@ -99,6 +99,46 @@ Defold function may allocate internally. String results are copied into a
 caller-provided bounded buffer before stack restoration; the bridge never
 returns a pointer into a popped Lua value.
 
+## Stable-ID lookup consolidation
+
+Source inspection reproduced three searches of the same 90-entry scalar table
+on a warmed scalar call: the adapter's scalar-family gate,
+`Dispatcher::isBound`, and `Dispatcher::dispatch`; an unbound first call also
+searched in `Dispatcher::bind`. Both files carried their own implementation of
+that search. Independent selectors for the families probed before the scalar
+fallback are outside this count and remain unchanged.
+
+There is now one shared `findDenseIndex` implementation. The adapter resolves
+the sparse stable ID once and carries that dense index through bounds-checked
+bind/status/dispatch entry points. Direct Dispatcher callers retain stable-ID
+entry points that each perform one lookup. No generated descriptor was edited,
+no allocation or mutable lookup table was added, and every dense entry point
+checks the table bound before indexing.
+
+The production `ScriptAdapter` path was added to the existing release transport
+benchmark. On this Apple M4 host, with 20,000 warmups and nine repeats of
+100,000 four-integer `render.set_viewport` calls, three whole-binary runs gave:
+
+| State | Best-of-nine ns/call runs | Mean |
+| --- | --- | ---: |
+| three steady-state searches | 260.3, 261.8, 262.8 | 261.6 |
+| one steady-state search | 259.3, 259.0, 261.3 | 259.9 |
+
+This is a measured 1.8 ns/call (0.7%) reduction on this host, not a device or
+engine-wide performance claim. Follow-up controls measured the complete adapter
+at 258.6 ns/call, direct dense Dispatcher entry at 207.4 ns/call, and the
+remaining lookup across all 90 IDs at 4.4 ns/call. The adapter/dense difference
+is an upper bound containing family probes, ScriptValue conversion, arena work,
+and outer validation—not evidence that the Dispatcher's defensive validation is
+expensive. Therefore argument revalidation stays, the family order stays, and
+no perfect/dynamic hash is introduced.
+
+`test:scalar-lua-runtime` still reports zero warmed Lua allocator calls, zero
+C++ allocations, balanced stack/instance restoration, and zero Lua live bytes
+after shutdown. `test:scalar-lua-sanitize` executes the same family under
+ASan/UBSan with no finding. This sanitizer result covers the host harness only;
+it is not whole-engine or device leak evidence.
+
 ## Remaining blockers before engine-validated 90/90
 
 1. Generate usage-selected bind lists per bundle and target. HTML5-only and

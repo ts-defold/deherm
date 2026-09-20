@@ -138,24 +138,6 @@ void writeError(char* error, size_t capacity, const char* message) noexcept {
   if (error && capacity) std::snprintf(error, capacity, "%s", message ? message : "Structured Lua call failed");
 }
 
-bool findDenseIndex(uint32_t stableId, size_t* outDenseIndex) noexcept {
-  const auto& table = generated::tables();
-  size_t first = 0;
-  size_t count = table.bindingCount;
-  while (count != 0) {
-    const size_t step = count / 2;
-    const size_t index = first + step;
-    if (table.stableIds[index] < stableId) {
-      first = index + 1;
-      count -= step + 1;
-    } else {
-      count = step;
-    }
-  }
-  if (first >= table.bindingCount || table.stableIds[first] != stableId) return false;
-  *outDenseIndex = first;
-  return true;
-}
 }
 
 ScriptAdapter::ScriptAdapter() : luaHandles_(kLuaHandleCapacity) {
@@ -500,15 +482,15 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
     }
   }
 
-  if (!dispatcher_.isBound(frame->stableId) && !dispatcher_.bind(frame->stableId)) return false;
+  if (!dispatcher_.isBoundDense(denseIndex) && !dispatcher_.bindDense(denseIndex)) return false;
   const ScalarCodec resultCodec = table.resultCodecs[denseIndex];
   ScalarOutput output;
   if (resultCodec == ScalarCodec::kString) {
     output.stringData = frame->stringScratch;
     output.stringCapacity = frame->stringScratchCapacity;
   }
-  if (!dispatcher_.dispatch(
-          frame->stableId,
+  if (!dispatcher_.dispatchDense(
+          denseIndex,
           {arguments.data, arguments.size},
           resultCodec == ScalarCodec::kNone ? nullptr : &output)) {
     return false;

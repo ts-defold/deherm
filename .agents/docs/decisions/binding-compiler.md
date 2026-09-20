@@ -114,6 +114,29 @@ lifetime permits. This keeps the HTML5 path independent of Embind.
   generation computes a transitive type/layout/callback dependency closure
   from the used-symbol manifest before native dead stripping.
 
+The captured-Lua scalar family exposes sparse, stable 32-bit FNV-1a IDs but
+stores its hot descriptors by dense index. After the preceding family probes
+decline the call, `ScriptAdapter` performs one lookup in the scalar family's
+sorted descriptor table, then passes the resolved dense index through
+bounds-checked `isBoundDense`, `bindDense`, and `dispatchDense` entry points.
+Those earlier families retain their independent selectors; this change removes
+only repeated searches of the same scalar table. The stable-ID Dispatcher entry
+points delegate to the same one shared lookup for direct callers. The dense
+entry points have distinct names, not `uint32_t`/`size_t` overloads, because
+those types alias on 32-bit Wasm and mobile targets.
+
+The 90-entry sorted constexpr table remains the accepted lookup structure. A
+dynamic hash table is forbidden on this path: it would add storage, state, and
+collision behavior to an allocation-free deterministic boundary. A generated
+minimal-perfect hash remains technically possible, but the measured remaining
+lookup is 4.4 ns against a 258.6 ns complete scalar adapter call on the current
+host, so it is not justified. The Dispatcher also retains its independent
+arity/tag/string validation. The 51.3 ns gap between the full adapter and a
+dense Dispatcher call includes the six preceding family probes, conversion,
+arena work, and outer validation and does not isolate redundant validation;
+removing the inner check would weaken direct-caller safety without measured
+evidence.
+
 The initial arm64 macOS release-build harness performs one million generated
 JSI-to-C-ABI scalar calls. Its first observed run measured 26.6 ns per native
 call versus 20.6 ns per pure JavaScript addition in the same Hermes runtime.
