@@ -313,5 +313,10 @@ test("a recorded runtime report never claims more than the plan permits", async 
       assert.equal(result.mismatchedPropertyCount, 0, result.id);
       assert.ok(result.observedPropertyCount > 0, result.id);
     }
+    if (result.outcome === "engine-fault" && "diagnostics" in result.engine) {
+      assert.ok(Array.isArray(result.engine.diagnostics), result.id);
+      assert.ok(result.engine.diagnostics.length <= 32, result.id);
+      assert.equal(result.engine.diagnostics.some((line) => line.includes(root.pathname)), false, result.id);
+    }
   }
 });

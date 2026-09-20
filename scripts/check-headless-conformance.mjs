@@ -183,8 +183,17 @@ async function runDriver(projectFile, remaining) {
 // leaving every symbol, marker and verdict intact.
 function normalizeEvidence(transcript) {
   return transcript
+    .replaceAll(repoRoot, "<repo>/")
     .replace(/(Log server started on port )\d+/g, "$1<ephemeral>")
     .replace(/0x[0-9a-f]{8,16}/g, "0x<address>");
+}
+
+function diagnosticLines(transcript) {
+  return normalizeEvidence(transcript)
+    .split("\n")
+    .map((line) => line.trimEnd())
+    .filter((line) => line && !line.startsWith("headless-conformance:case-"))
+    .slice(-32);
 }
 
 export async function checkHeadlessConformance({ skipBuild = false } = {}) {
@@ -217,7 +226,8 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
   // losing every later contract to one crash.
   while (remaining.length > 0) {
     const result = await runDriver(projectFile, remaining);
-    transcripts.push(result.transcript);
+    const normalizedTranscript = normalizeEvidence(result.transcript);
+    transcripts.push(normalizedTranscript);
     const parsed = parseTranscript(result.transcript);
     observations.push(...parsed.observations);
     // The census runs on the index object, which every driver invocation loads,
@@ -237,7 +247,11 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
       // faulted. This is the evidence only a real engine can produce.
       crashFrames: parsed.crashFrames
         .filter((name) => !name.startsWith("_ZN7dmCrash") && name !== "_sigtramp")
-        .slice(0, 8)
+        .slice(0, 8),
+      // A signal without the engine's own preceding diagnostic is not enough
+      // to debug CI. Keep only the normalized tail for this process; the full
+      // normalized transcript is written as a separate evidence artifact.
+      diagnostics: diagnosticLines(result.transcript)
     });
     remaining = unfinished.filter((fixture) => fixture.id !== faulted);
   }
@@ -389,6 +403,9 @@ async function main(argv = process.argv.slice(2)) {
       `headless-conformance:engine-fault:${contract.id}:${contract.engine.signal ?? "unknown"}:` +
       `${(contract.engine.crashFrames ?? [])[0] ?? "unattributed"}`
     );
+    for (const line of contract.engine.diagnostics ?? []) {
+      console.log(`headless-conformance:diagnostic:${contract.id}:${line}`);
+    }
   }
   for (const [key, value] of Object.entries(report.propertySummary).sort()) {
     console.log(`headless-conformance:property:${key}=${value}`);

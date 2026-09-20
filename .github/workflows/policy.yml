@@ -325,6 +325,7 @@ jobs:
           path: |
             packages/bindings/generated/defold-route-verification.json
             packages/bindings/generated/defold-headless-conformance-report.json
+            .agents/docs/data/headless-conformance.log
           if-no-files-found: ignore
       - name: Open or update per-route verification issues
         if: >-
