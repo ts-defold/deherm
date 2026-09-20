@@ -1011,7 +1011,7 @@
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
     "classification": "0cd7365088e2c06d07586b7b4aa410377ec301489beaeed34ce75971dffe878d",
     "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
-    "layouts": "1af3bd85aafa17ba19e3faf53b63f846510aec26e4432d556e791aa94e4afde3"
+    "layouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c"
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp",

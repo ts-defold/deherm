@@ -70,29 +70,95 @@ toolchain artifacts rather than Defold API policy.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree carries eleven semantic documents and an
-SDK manifest. `packages/generator/src/policy/surface-materializer.mjs` restores
-the selected revision, regenerates the core script and dmSDK TypeScript files
-from IR, verifies their policy SHA-256 values, writes the remaining support
-files from explicitly labelled authenticated compatibility snapshots, and
-records a revision-keyed `surface.json` descriptor.
+The authenticated `@compiler` subtree is now an **11,853-byte manifest**, not a
+21 MB container. It references twelve independently content-addressed semantic
+documents and 21 independently content-addressed compatibility sources. This
+keeps each document shareable and makes the remaining migration debt
+enumerable; it does not pretend the referenced bytes have disappeared. The
+complete policy remains 29.29 MB until the lowering-plan and support-source
+emitters below replace those objects.
+
+`packages/compiler/src/policy-surface-materializer.mjs` owns the public
+realization contract. It restores the selected revision, resolves and validates
+the manifest's authenticated references, regenerates seven core script and
+dmSDK TypeScript files from IR, verifies their policy SHA-256 values, writes the
+remaining support files from explicitly labelled authenticated compatibility
+sources, and records a revision-keyed `surface.json` descriptor. The repository
+generator owns extraction and policy production; it no longer owns consumer
+emission.
 
 The compatibility snapshots are migration debt, not a claim that generated
 source belongs in the final policy schema. Each becomes package-side emitter
 code as its generator is extracted. The mode is recorded per file so local
 generation and authenticated materialization cannot be conflated.
 
+## Compiler document inventory
+
+The manifest references these revision-derived documents. “Copied” means the
+consumer currently materializes the document unchanged; it is not a claim that
+the document is a minimal policy input.
+
+| Document | Compact bytes | Current role | Required steady-state change |
+| --- | ---: | --- | --- |
+| `defold-binding-lowering-plan.json` | 10,214,303 | copied derived aggregate | rebuild from normalized lowering recipes |
+| `defold-dmsdk-universal-bindings.json` | 2,985,651 | copied recipe catalog | normalize catalog facts and emit locally |
+| `defold-sdk-ir.json` | 2,706,350 | source-derived dmSDK semantics | retain as policy facts or normalize without loss |
+| `defold-script-api-ir.json` | 1,350,464 | source-derived script semantics | retain as policy facts or normalize without loss |
+| `defold-script-route-availability-profiles.json` | 1,221,105 | copied derived profile product | rebuild from profile facts |
+| `defold-script-handle-lowering.json` | 773,592 | emitter consumes only `handleKinds` | retain the 12,350-byte fact slice; rebuild the rest |
+| `defold-script-api-accounting.json` | 742,371 | copied evidence report | keep in evidence/reporting, not realization input |
+| `defold-script-universal-value-bindings.json` | 564,298 | copied recipe catalog | normalize and emit locally |
+| `defold-dmsdk-scalar-thunks.json` | 80,331 | copied recipe catalog | normalize and emit locally |
+| `defold-script-scalar-dispatch.json` | 50,068 | copied dispatch product | rebuild from route facts |
+| `defold-value-layouts.json` | 8,074 | ABI/layout facts | retain as policy facts |
+| `defold-binding-lowering-plan.sentinel.json` | 6,415 | copied output cache metadata | regenerate locally beside the plan |
+
+The existing seven SDK renderers consume only the two primary IR documents and
+`handleKinds`, 4,069,164 compact bytes in total. That measured cut—not an
+assumption about the old 21 MB blob—shows that the current locally rendered SDK
+can be driven by less than 5 MB of policy facts. The other documents remain available because
+`deherm generate` still consumes them; deleting them before their local recipe
+emitters exist would create a smaller policy that cannot build a game.
+
+# The SDK manifest
+
+`@compiler.sdk` is a versioned `deherm.policy.sdk-manifest`. Its `entries` map
+is keyed by a confined POSIX-relative `.ts` output path. Each entry carries:
+
+* `mode`: `render-and-verify` or the temporary
+  `authenticated-compatibility-source` migration mode;
+* `sha256`: the digest of revision-abstracted output bytes;
+* `recipe`: the exact package capability that realizes the entry;
+* `inputs`: the compiler-document names consumed by a local renderer; and
+* `sourceObject` only for a compatibility source, naming its independently
+  authenticated policy object.
+
+The companion compiler-document manifest maps each confined `.json` name to
+one authenticated object and repeats the selected recipe. The materializer
+rejects unsafe paths, absent objects, kind/name mismatches, unknown recipes,
+stale parallel recipe entries, undeclared inputs, source objects on locally
+rendered files, and output digests that do not match. `assertNoRevisionLeak`
+walks every sealed object, including both manifests and every referenced SDK
+source. Policy production additionally requires snapshot digests to be
+computed after replacing the Defold SHA with `${DEFOLD_REVISION}`, preventing a
+revision-bearing source from leaking indirectly through its digest.
+
 # Proven properties
 
 `tests/policy-surface-materializer.test.mjs` materializes into a fresh temporary
-directory and compares all 28 SDK files byte-for-byte with the canonical tree.
-Seven core files are locally rendered from IR. The test then repeats the same
-operation and requires zero writes, proving keyed idempotence. The materializer
-does not invoke a parser or read a Defold checkout.
+directory and compares all 28 SDK files against immutable size/SHA-256 evidence
+captured from the pre-materializer checkout-backed pipeline at commit
+`fd2e6c30af4c9fc9e71b38dc73c010666ca13aba`. The fixture is not rewritten by
+normal generation, so the proof no longer compares a pipeline with the tree it
+just generated. Seven files (2,513,290 bytes) are locally rendered; 21 files
+(998,951 bytes) remain authenticated compatibility sources, and the test names
+all 21 so migration debt cannot change silently. A second pass requires zero
+writes, proving keyed idempotence. The materializer invokes no parser and reads
+no Defold checkout.
 
-The current compiler object is 21 MB and the complete policy is 29.26 MB. This
-is an intentionally correctness-first compatibility cut. The 15 MB canonical
-lowering plan is itself derived output and must next be rebuilt locally from
-smaller policy recipes; support-source snapshots must likewise be replaced by
-their package emitters. Those changes reduce transfer size without changing the
-consumer contract.
+The `<5 MB` compiler-object budget is enforced; the current manifest is 11,853
+bytes. This is a structural transfer boundary, not yet a total-size victory.
+The 10.21 MB canonical lowering plan is still a referenced derived output and
+must be rebuilt locally from normalized recipe facts. The 21 support-source
+objects must likewise be replaced by compiler-owned emitters. Those changes
+will reduce total transfer size without changing the consumer contract.

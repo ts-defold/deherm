@@ -13,7 +13,7 @@ export function runContract(report: Report): boolean {
     route: "script:sprite.play_flipbook",
     arity: "required",
     call: sprite.playFlipbook as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"literal","value":"deherm_conformance"}, {"kind":"literal","value":"deherm_conformance"}],
+    args: [{"kind":"literal","value":"/deherm_conformance"}, {"kind":"literal","value":"/deherm_conformance"}],
     providers,
     minimumResultCount: 0,
     maximumResultCount: 0,

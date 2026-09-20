@@ -1,7 +1,9 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { generateComponentProxies } from "../../packages/compiler/src/component-proxy-generator.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
 import { publicScriptRootName } from "../../packages/compiler/src/script-public-api-policy.mjs";
 
@@ -116,6 +118,21 @@ function validateCompileTimeProperty(manifest, rocketProxy) {
 
 export async function buildWarBattlesRuntimeGate(repositoryRoot) {
   const root = path.resolve(repositoryRoot);
+  const fixtureProjectRoot = path.join(root, "tests/fixtures/war-battles");
+  const componentOutputRoot = await mkdtemp(path.join(tmpdir(), "deherm-war-battles-gate-"));
+  let componentManifestText;
+  try {
+    await generateComponentProxies({
+      projectRoot: fixtureProjectRoot,
+      outputRoot: componentOutputRoot
+    });
+    componentManifestText = await readFile(
+      path.join(componentOutputRoot, ".deherm/generated/components/manifest.json"),
+      "utf8"
+    );
+  } finally {
+    await rm(componentOutputRoot, { recursive: true, force: true });
+  }
   const relativePaths = {
     inventory: ".agents/docs/data/war-battles-api-usage.json",
     ir: "packages/bindings/generated/defold-script-api-ir.json",
@@ -131,7 +148,13 @@ export async function buildWarBattlesRuntimeGate(repositoryRoot) {
   ];
   const entries = await Promise.all(
     [...Object.entries(relativePaths), ...sourcePaths.map((file) => [file, file])]
-      .map(async ([key, file]) => [key, file, await readFile(path.join(root, file), "utf8")])
+      .map(async ([key, file]) => [
+        key,
+        file,
+        key === "componentManifest"
+          ? componentManifestText
+          : await readFile(path.join(root, file), "utf8")
+      ])
   );
   const texts = new Map(entries.map(([key, , text]) => [key, text]));
   const inventory = parseJson(texts.get("inventory"), relativePaths.inventory);

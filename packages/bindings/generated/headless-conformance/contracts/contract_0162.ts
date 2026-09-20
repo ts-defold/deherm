@@ -45,7 +45,7 @@ export function runContract(report: Report): boolean {
     route: "script:resource.set",
     arity: "required",
     call: resource.set as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"literal","value":"deherm_conformance"}, {"kind":"handle","handleKind":"buffer-data","ordinal":0}],
+    args: [{"kind":"literal","value":"/deherm_conformance"}, {"kind":"handle","handleKind":"buffer-data","ordinal":0}],
     providers,
     minimumResultCount: 0,
     maximumResultCount: 0,

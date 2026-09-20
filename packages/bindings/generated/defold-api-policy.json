@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:bd8248913aaede5b86c0e5c30ad1772b845d7438fb291c1edb712b70b2221174",
+  "generator": "sha256:60777cd2f163ff0f6e5304dd94367075fdc485ef5c9fa25d179f459522e0b045",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "1067a0ba49574ad4fbc344b9aeb9f23f812c78478099ab9d393d72a605f3a61b",
+  "policyRoot": "cb586c79ecaedb404cb022ca6806b56a6f0ea811e120fcffb70e025f4867bcdb",
   "layoutVersion": "v1",
   "counts": {
-    "subtrees": 56,
+    "subtrees": 89,
     "namespaces": 52,
-    "objectBytes": 29275337,
+    "objectBytes": 29285277,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,8 +54,140 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "f90eba949235cb87de96cc95d65fc577c9e3b19964a213a142c15bfc477fcf56",
-      "bytes": 21790896
+      "hash": "a298eb55c0ffdedfb4f3b18ab9b8c3b6ada47fa12bdf769c03d40d343faaad30",
+      "bytes": 11853
+    },
+    "@compiler:document:defold-binding-lowering-plan.json": {
+      "hash": "3c1628e2bbec9db93cc6a2437c06a0e780f7e088449f2778f0b74e9f618e6872",
+      "bytes": 10214482
+    },
+    "@compiler:document:defold-binding-lowering-plan.sentinel.json": {
+      "hash": "c4a3370efdfeac0af78c546542129c6bef80bd1ddd56995800fa2ce4f07a5c29",
+      "bytes": 6612
+    },
+    "@compiler:document:defold-dmsdk-scalar-thunks.json": {
+      "hash": "a21aead810317c8d6756830688462a97294c772e26c6c555aa21e98e36f20c9d",
+      "bytes": 80506
+    },
+    "@compiler:document:defold-dmsdk-universal-bindings.json": {
+      "hash": "c549924d567d41f198ca73e993869957d1a147003c3ffbc98e53774125c100b1",
+      "bytes": 2985836
+    },
+    "@compiler:document:defold-script-api-accounting.json": {
+      "hash": "265cdf754e711f2da7895552f3996fb4d19a97872d17e858cdffa39ef2ad3005",
+      "bytes": 742550
+    },
+    "@compiler:document:defold-script-api-ir.json": {
+      "hash": "3ffc0a20b6d5ce104845f465e3c605c0920394ad7103844024d6d4bb1a4b3e36",
+      "bytes": 1350616
+    },
+    "@compiler:document:defold-script-handle-lowering.json": {
+      "hash": "d9e9407406ecfa28308c99a4753dfbb40589305b55cd099d5fe9d7645719313e",
+      "bytes": 773773
+    },
+    "@compiler:document:defold-script-route-availability-profiles.json": {
+      "hash": "d63a84449c0f41a4fd846b1ccbf00f19cfae29737f26667b5eef540070c6906c",
+      "bytes": 1221310
+    },
+    "@compiler:document:defold-script-scalar-dispatch.json": {
+      "hash": "568d1968fc0b339248c0d5231699676decdaad9aa933287efb2b6ef5fbaedce3",
+      "bytes": 50249
+    },
+    "@compiler:document:defold-script-universal-value-bindings.json": {
+      "hash": "31c454f77b6e32213161e554e807ff0c28f22bed2f803281bd54e042169b256d",
+      "bytes": 564497
+    },
+    "@compiler:document:defold-sdk-ir.json": {
+      "hash": "daf81bbcd7c83c70c9b949fb8980b8aefbec200cdf6cd906f10bde35610d13f6",
+      "bytes": 2706497
+    },
+    "@compiler:document:defold-value-layouts.json": {
+      "hash": "9423a09d6ab1caf30e5c154dba0c821b22423449f31a72a22c72d472f63a0877",
+      "bytes": 8237
+    },
+    "@compiler:sdk:dmsdk/borrowed-handle.ts": {
+      "hash": "24dc599b196e5360972fa11e0ddb45fa34abc940fd4403ff7cae7d306e5bb474",
+      "bytes": 29259
+    },
+    "@compiler:sdk:dmsdk/browser-arena.ts": {
+      "hash": "a5d9fb5aadc101e2f301d85747947561123b8a98779dec4dad7905e3df053a98",
+      "bytes": 5718
+    },
+    "@compiler:sdk:dmsdk/cstring-value.ts": {
+      "hash": "e3747d1f1bfc61d6d00c1e528b04060fae9051ff4e2e7439640c6fe4c98b18c3",
+      "bytes": 4973
+    },
+    "@compiler:sdk:dmsdk/enum-value.ts": {
+      "hash": "064e21cb97c6045d1e55dc92fe46586ba4a81072034d6946ef646c54fbe2cd56",
+      "bytes": 2882
+    },
+    "@compiler:sdk:dmsdk/named-scalar.ts": {
+      "hash": "1e33d2c1638c5c63076c4058f12cbcaef9a8ff37caef68d0a263ede4f9a9bdec",
+      "bytes": 329
+    },
+    "@compiler:sdk:dmsdk/scalar.ts": {
+      "hash": "09d42c6eb7068765e074afb5d230645c4f45b60a98cc406daa404826481229e4",
+      "bytes": 6326
+    },
+    "@compiler:sdk:dmsdk/scratch-scalar-out.ts": {
+      "hash": "2a55876f6db24ca4316e1efca5417c2b27403bd73834858c32c03930ccb042a7",
+      "bytes": 5500
+    },
+    "@compiler:sdk:dmsdk/universal.ts": {
+      "hash": "5dcb52f117b39cedb3b374e4bc12c131d6d92fe991b7bb295c6a23a80922d8ce",
+      "bytes": 152484
+    },
+    "@compiler:sdk:script/browser-target-support.ts": {
+      "hash": "050cd30abc726d29346f5e8f1f01d86e43d5b04a928768ac1e0e50e6d5222e25",
+      "bytes": 759
+    },
+    "@compiler:sdk:script/callback-lifecycle.ts": {
+      "hash": "9f73c6a2a353a987344b691d84644ccd60f79346c7891bee10ebf2b5cf181e6d",
+      "bytes": 13227
+    },
+    "@compiler:sdk:script/copied-value-record-blockers.ts": {
+      "hash": "cadaaf1e1780e922d3966004f9ee3131c7a1198655df413dac763374ddf87855",
+      "bytes": 1905
+    },
+    "@compiler:sdk:script/dynamic-values.ts": {
+      "hash": "b6861501804d3d1ee5de4c06409868bc5f458c565573013e697c0a8f07e0c6a3",
+      "bytes": 3322
+    },
+    "@compiler:sdk:script/fixed-tuple-target-support.ts": {
+      "hash": "c27b2ecd0d8661f77702a4358c6feceeb23e9be8cc23c9e49ddcda94a5f397f6",
+      "bytes": 1911
+    },
+    "@compiler:sdk:script/handle-lowering.ts": {
+      "hash": "843174da2e564dd0e03e5e0d77b5d8fe82aeb86aa7474a068f50880497011087",
+      "bytes": 480591
+    },
+    "@compiler:sdk:script/opaque-record-blockers.ts": {
+      "hash": "f4b740bb2888bc309eb4b2c77cf4647f524957c212155f1448e182f3c504a975",
+      "bytes": 856
+    },
+    "@compiler:sdk:script/overload-dispatch-target-support.ts": {
+      "hash": "b8bcf4bd97e4a440c75565303ec4a7dd7460f4e4fe287ab2bf287f4447975d62",
+      "bytes": 9213
+    },
+    "@compiler:sdk:script/table-record-bindings.ts": {
+      "hash": "311efc6da4bbe9d69de7d1de9e071bb0e868366609eab8f138484631e1ef2163",
+      "bytes": 2848
+    },
+    "@compiler:sdk:script/universal-value-bindings.ts": {
+      "hash": "3d84374f508dd16e47e49e6403934cdb0814281c2810c3639c09e51e62d65e05",
+      "bytes": 352776
+    },
+    "@compiler:sdk:script/url-target-support.ts": {
+      "hash": "42a74ea8a9ad98877170cc9b458b2d1dcd95f6f9d118285bb66ad0f6eeeca2d2",
+      "bytes": 1180
+    },
+    "@compiler:sdk:script/value-tail-target-support.ts": {
+      "hash": "9ad5c4cc98924d90dd9779a1a9723e4b80a3a38f45a65323426031ef269fad96",
+      "bytes": 7300
+    },
+    "@compiler:sdk:script/value-target-support.ts": {
+      "hash": "9421b11bff99b7e0438f560f7cd679c0c34bf3652f31202d2d2a78a610af9b8f",
+      "bytes": 459
     },
     "@profiles": {
       "hash": "0d037a7ee80b998cd25261c7f8890745da3f0436728d36c8b28db098afda2440",

@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../packages/generator/src/policy/api-policy.mjs";
+import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../packages/compiler/src/api-policy.mjs";
 import { resolvePublishedPolicy } from "../packages/cli/src/policy-client.mjs";
 
 const revision = "1".repeat(40);

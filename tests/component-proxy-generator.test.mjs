@@ -320,13 +320,19 @@ test("War Battles sources type-check against the shipped component API and proxi
     "--pretty", "false"
   ], { cwd: process.cwd(), encoding: "utf8" });
   assert.equal(checked.status, 0, `${checked.stdout}\n${checked.stderr}`);
+  const outputRoot = await temporaryProject("deherm-war-battles-proxies-");
   const generated = await generateComponentProxies({
     projectRoot: warBattlesRoot,
-    outputRoot: warBattlesRoot,
-    check: true
+    outputRoot
   });
-  assert.equal(generated.stale.length, 0);
   assert.equal(generated.manifest.components.length, 3);
+  for (const component of generated.manifest.components) {
+    assert.equal(
+      await readFile(path.join(outputRoot, component.proxy), "utf8"),
+      await readFile(path.join(warBattlesRoot, component.proxy), "utf8"),
+      component.proxy
+    );
+  }
 });
 
 test("check mode is a strict freshness gate and normal generation repairs marked outputs", async () => {

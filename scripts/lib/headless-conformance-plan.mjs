@@ -36,7 +36,12 @@ const SCALAR_INHABITANTS = Object.freeze({
   number: 0,
   integer: 0,
   boolean: false,
-  string: "deherm_conformance"
+  // A leading slash is valid for ordinary Defold string consumers and is
+  // required by every API that interprets a string as a resource path. The
+  // old relative inhabitant made resource probes emit dozens of
+  // "Resource path is not absolute" diagnostics: evidence about a malformed
+  // harness argument, not about the generated binding.
+  string: "/deherm_conformance"
 });
 
 /** Raw parameter types that name a component address rather than a plain string. */

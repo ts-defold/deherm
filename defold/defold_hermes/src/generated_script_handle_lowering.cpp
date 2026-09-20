@@ -2759,7 +2759,7 @@ int CapturedLuaRouter::ProtectedDispatch(lua_State* state) {
   return 0;
 }
 
-bool CapturedLuaRouter::dispatchUnsafe(DispatchContext& context) noexcept {
+bool CapturedLuaRouter::dispatchUnsafe(DispatchContext& context) {
   const Route& route = *context.route;
   ScriptCallFrame* frame = context.frame;
   if (!bind(route, context.error, context.errorCapacity)) return false;

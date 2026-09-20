@@ -30,17 +30,19 @@ the source-derived Lua registration surface and the resource declaration schema
 toolchain pins from `build_tools/sdk.py`.
 
 For the pinned revision `7f0f554f41f9dce1e0ddff99bf08200657d1ee05` the policy is
-**56 subtrees - 52 namespaces plus `@shared`, `@profiles`, `@toolchain` and
-`@compiler` - in 29.26 MB**, under policy root
-`85409076d94b0882a1464b2b8189ea54adb3fa1ca5174f1e6a6609bdb70da226`.
+**89 subtrees - 52 namespaces, four cross-cutting roots, twelve compiler
+documents, and 21 compatibility-source objects - in 29.29 MB**, under policy
+root `cb586c79ecaedb404cb022ca6806b56a6f0ea811e120fcffb70e025f4867bcdb`.
 
-`@compiler` is the correctness-first local-materialization cut. It contains the
-semantic documents consumed by project generation and an SDK manifest. The
-installed compiler locally renders the core script/dmSDK TypeScript files and
-checks their hashes; support files whose emitters are not yet package modules
-are visibly tagged authenticated compatibility sources. The 21 MB object is
-not the intended steady-state size: the 15 MB lowering plan is derived and will
-move back behind package code once its smaller recipe inputs are normalized.
+`@compiler` is now an 11,853-byte versioned manifest. Its semantic documents
+and temporary compatibility sources are separate content-addressed objects, so
+they can be shared and the manifest can eventually drive lazy fetching. The
+installed compiler locally renders the seven core script/dmSDK TypeScript files
+and checks their hashes; the other 21 files remain visibly tagged authenticated
+compatibility sources. This split fixes the ownership and object-size boundary,
+but not total transfer cost: the 10.21 MB lowering plan is still referenced
+derived output and must move behind package code once normalized recipe facts
+can reproduce it.
 
 The policy/package dependency points in one direction. Policy objects carry all
 Defold-defined vocabulary and the exact recipe data selected from it. The npm
@@ -62,7 +64,9 @@ first policy was written rather than recovered afterwards with a delta format.
 | shared | `@shared` | what no single namespace owns: global types (`hash`, `url`, `vector3`), lifecycle callback shapes, dmSDK opaque and unresolved types, the resource declaration schema, and every parser refusal, which is attributed to a C file rather than to a namespace |
 | profiles | `@profiles` | the cross-namespace profile and feature definitions, the handshake contract, and the recipe for rebuilding the revision-keyed catalog digest |
 | toolchain | `@toolchain` | Defold's own pins, under Defold's own symbol names |
-| compiler | `@compiler` | Semantic generator documents plus the transition manifest used to reconstruct and verify the complete local SDK surface |
+| compiler manifest | `@compiler` | Versioned document/SDK manifests, recipe capabilities, input relationships, digests, and authenticated object references |
+| compiler document | `@compiler:document:<name>` | One revision-derived semantic or transition document referenced by the compiler manifest |
+| compatibility source | `@compiler:sdk:<path>` | One temporary authenticated TypeScript source snapshot whose compiler emitter has not yet been extracted |
 
 Namespace attribution is structural, never a name list: a script route takes the
 first segment of its Lua module path, a declared type is attributed to a module

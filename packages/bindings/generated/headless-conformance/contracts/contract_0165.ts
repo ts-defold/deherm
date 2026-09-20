@@ -13,7 +13,7 @@ export function runContract(report: Report): boolean {
     route: "script:buffer.get_stream",
     arity: "required",
     call: buffer.getStream as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"handle","handleKind":"buffer-data","ordinal":0}, {"kind":"literal","value":"deherm_conformance"}],
+    args: [{"kind":"handle","handleKind":"buffer-data","ordinal":0}, {"kind":"literal","value":"/deherm_conformance"}],
     providers,
     minimumResultCount: 1,
     maximumResultCount: 1,

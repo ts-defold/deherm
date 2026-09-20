@@ -252,6 +252,15 @@ test("generation is order-independent, provenance-pinned, and byte deterministic
   });
 });
 
+test("protected Lua dispatch permits LuaJIT errors to reach lua_cpcall", () => {
+  const { header, source } = renderArtifacts(generated);
+  assert.match(header, /bool dispatchUnsafe\(DispatchContext& context\);/);
+  assert.doesNotMatch(header, /bool dispatchUnsafe\(DispatchContext& context\) noexcept;/);
+  assert.match(source, /bool CapturedLuaRouter::dispatchUnsafe\(DispatchContext& context\) \{/);
+  assert.doesNotMatch(source, /bool CapturedLuaRouter::dispatchUnsafe\(DispatchContext& context\) noexcept/);
+  assert.match(source, /lua_cpcall\(state_,ProtectedDispatch,&dispatchContext\)/);
+});
+
 test("regeneration is locale-independent and uses code-unit ordering", async () => {
   const generatorSource = await readFile(new URL("../scripts/generate-script-handle-lowering.mjs", import.meta.url), "utf8");
   assert.doesNotMatch(generatorSource, /localeCompare/);

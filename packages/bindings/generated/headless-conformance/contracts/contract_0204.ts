@@ -13,7 +13,7 @@ export function runContract(report: Report): boolean {
     route: "script:msg.post",
     arity: "required",
     call: msg.post as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"literal","value":"deherm_conformance"}, {"kind":"literal","value":"deherm_conformance"}],
+    args: [{"kind":"literal","value":"/deherm_conformance"}, {"kind":"literal","value":"/deherm_conformance"}],
     providers,
     minimumResultCount: 0,
     maximumResultCount: 0,

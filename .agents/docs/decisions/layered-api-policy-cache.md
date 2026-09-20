@@ -481,11 +481,10 @@ published after it by fetching `v1/index/<sha>.json` directly.
 The policy cache and the generated-surface cache are intentionally distinct.
 The policy is source-derived API evidence; the surface additionally contains
 the revision-specific TypeScript SDK and executable lowering products consumed
-by `deherm generate`. `deherm policy` makes the former available today. Until
-the deterministic policy-to-surface materializer is wired into generation,
-`deherm generate` still requires a complete packaged/user/project surface and
-will report `defold-surface-not-cached` rather than pretending that a cached
-policy alone is executable glue.
+by `deherm generate`. `deherm policy` now authenticates the policy and invokes
+the compiler-owned deterministic materializer into the user surface cache. A
+remote machine therefore needs the npm realizer plus the policy, not a Defold
+checkout, `ref-doc.zip`, or a previously generated SDK tree.
 
 `packages/cli/src/defold-surface.mjs` resolves layer 0 by Defold revision
 alone, across three roots, stopping at the first that holds a complete surface
@@ -505,10 +504,11 @@ why it did not answer. It never falls through to a different revision's
 surface, because that is exactly the defect: signatures that compile and are
 wrong.
 
-Producing a surface for a new revision reads that revision's
-`engine/share/ref-doc.zip` and engine source tree, so it needs network access
-and is a separate explicit step - never something `deherm generate` does on its
-own. A revision already in a cache regenerates entirely offline.
+Producing the **policy** for a new revision still reads that revision's source
+and reference documentation in the derivation workflow. Producing a local
+**surface from a published policy** does not: `deherm policy` fetches the
+content-addressed closure and realizes it locally. A cached revision regenerates
+entirely offline.
 
 ## The two roots, kept apart
 
@@ -576,5 +576,25 @@ Three details the implementation had to settle that this document left open:
   so cross-cutting content (`@shared`, `@profiles`, `@toolchain`) cannot collide
   with a namespace.
 
-Layers 1 to 3 - extension policies keyed by archive content hash, and the
-Murmur2-64A keys that decide whether to reparse - remain future work.
+# Open items
+
+This decision remains **proposed** because the implemented layer 0 does not yet
+complete the layered cache:
+
+* Layers 1–3 (curated extension policies, project-local policies, and
+  source-to-layer-2 derivation) are not implemented.
+* Public headers and native sources are currently named in the project Merkle
+  tree but not content-digested. Same-path byte edits must move `nativeRoot`
+  before extension caching is sound.
+* The compiler manifest names the document/source objects a materializer needs,
+  but the client still eagerly downloads the entire policy closure. A future
+  layout may fetch the manifest first and then only its required subtrees.
+* The 10.21 MB canonical lowering plan and 21 TypeScript compatibility sources
+  remain referenced derived objects. Compiler-owned recipe emitters must replace
+  them before the policy is a compact result rather than a correctness-first
+  transition artifact.
+* A project-cache population command is still needed; today `deherm policy`
+  writes the shared user cache and project cache is read-only.
+
+Layer 0's content-addressed publication and materialization are implemented and
+tested, but accepting the whole layered-cache decision waits on those items.

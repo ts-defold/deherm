@@ -40,6 +40,13 @@ const TICK_BUDGET = 8;
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
+/** The native host that actually linked and executed the evidence driver. */
+export function executionTarget(platform = process.platform, architecture = process.arch) {
+  const architectures = { arm64: "arm64", x64: "x86_64" };
+  const platforms = { darwin: "macos", linux: "linux", win32: "win32" };
+  return `${architectures[architecture] ?? architecture}-${platforms[platform] ?? platform}`;
+}
+
 function javaExecutable() {
   const fromEnvironment = process.env.JAVA_HOME ? path.join(process.env.JAVA_HOME, "bin/java") : null;
   return fromEnvironment ?? "/opt/homebrew/opt/openjdk@25/bin/java";
@@ -343,7 +350,13 @@ export async function checkHeadlessConformance({ skipBuild = false } = {}) {
   const report = {
     schemaVersion: 1,
     defoldRevision: plan.defoldRevision,
+    // `target` is the binding/availability target the deterministic plan was
+    // generated for. `executionTarget` is separate because CI may execute that
+    // plan in a host-native driver (for example x86_64 Linux) while its API
+    // availability projection is the arm64 macOS native surface. Conflating
+    // them made Linux evidence claim it had run on macOS.
     target: plan.target,
+    executionTarget: executionTarget(),
     variant: plan.variant,
     runtimeProfile: plan.runtimeProfile,
     detectedRuntimeProfiles: [...detectedProfiles].sort(),

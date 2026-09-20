@@ -361,7 +361,8 @@ async function main() {
       runtime: report.evidenceBoundary ?? null,
       runtimeCurrent: runtimeEvidenceCurrent,
       ...(!runtimeEvidenceCurrent ? { runtimeNotApplied: "report revision/plan digest/inputs/target/profile do not match the current generated plan" } : {}),
-      runtimeTarget: report.target ?? null,
+      planTarget: report.target ?? null,
+      runtimeTarget: report.executionTarget ?? report.target ?? null,
       runtimeProfile: report.runtimeProfile ?? null,
       registrationTargets: Object.values(registration.targets ?? {}).map((target) => target.id)
     },

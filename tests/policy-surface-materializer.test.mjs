@@ -1,13 +1,21 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { materializePolicySurface } from "../packages/generator/src/policy/surface-materializer.mjs";
+import { materializePolicySurface } from "../packages/compiler/src/policy-surface-materializer.mjs";
 import { derivePolicy } from "../scripts/generate-api-policy.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
+const oldPipelineFixture = JSON.parse(await readFile(path.join(
+  repositoryRoot, "tests", "fixtures", "policy-surface-old-pipeline", "manifest.json"
+), "utf8"));
+
+function sha256(bytes) {
+  return createHash("sha256").update(bytes).digest("hex");
+}
 
 async function currentResolvedPolicy() {
   const derived = await derivePolicy();
@@ -30,13 +38,38 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.equal(first.descriptor.documents.length, 12);
   assert.equal(Object.keys(first.descriptor.sdk).length, 28);
 
+  const compiler = policy.objects.get("@compiler");
+  assert.ok(Buffer.byteLength(JSON.stringify(compiler.value)) < 5_000_000,
+    "the compiler manifest must stay below the 5 MB transfer budget");
+
+  const rendered = Object.entries(first.descriptor.sdk)
+    .filter(([, record]) => record.mode === "render-and-verify").map(([name]) => name).sort();
+  const snapshots = Object.entries(first.descriptor.sdk)
+    .filter(([, record]) => record.mode === "authenticated-compatibility-source").map(([name]) => name).sort();
+  assert.equal(rendered.length, 7);
+  assert.deepEqual(snapshots, [
+    "dmsdk/borrowed-handle.ts", "dmsdk/browser-arena.ts", "dmsdk/cstring-value.ts",
+    "dmsdk/enum-value.ts", "dmsdk/named-scalar.ts", "dmsdk/scalar.ts",
+    "dmsdk/scratch-scalar-out.ts", "dmsdk/universal.ts", "script/browser-target-support.ts",
+    "script/callback-lifecycle.ts", "script/copied-value-record-blockers.ts",
+    "script/dynamic-values.ts", "script/fixed-tuple-target-support.ts", "script/handle-lowering.ts",
+    "script/opaque-record-blockers.ts", "script/overload-dispatch-target-support.ts",
+    "script/table-record-bindings.ts", "script/universal-value-bindings.ts",
+    "script/url-target-support.ts", "script/value-tail-target-support.ts",
+    "script/value-target-support.ts"
+  ]);
+  const bytesByMode = { rendered: 0, snapshots: 0 };
+
   for (const relative of Object.keys(first.descriptor.sdk)) {
-    const [actual, expected] = await Promise.all([
-      readFile(path.join(outputRoot, "sdk", "generated", relative)),
-      readFile(path.join(repositoryRoot, "packages", "sdk", "src", "generated", relative))
-    ]);
-    assert.deepEqual(actual, expected, `${relative} did not materialize byte-for-byte`);
+    const actual = await readFile(path.join(outputRoot, "sdk", "generated", relative));
+    const expected = oldPipelineFixture.files[relative];
+    assert.ok(expected, `${relative} is absent from the independent old-pipeline fixture`);
+    assert.equal(actual.length, expected.bytes, `${relative} byte count drifted from the old pipeline`);
+    assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
+    bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
+  assert.deepEqual(bytesByMode, { rendered: 2_513_290, snapshots: 998_951 },
+    "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));
   assert.equal(scriptIr.defoldRevision, policy.revision);

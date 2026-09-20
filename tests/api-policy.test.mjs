@@ -23,7 +23,7 @@ import {
   scriptNamespaceOfTypeName,
   sealObject,
   serializeObject
-} from "../packages/generator/src/policy/api-policy.mjs";
+} from "../packages/compiler/src/api-policy.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { buildShippedIndex, generatorRevision } from "../scripts/generate-api-policy.mjs";
@@ -266,6 +266,7 @@ test("policy roots carry only the realization capabilities their payload uses", 
   assert.deepEqual(policy.root.realizer, {
     minimumPackageVersion: "0.0.0",
     requiredCapabilities: [
+      "policy.compiler-surface.references.v1",
       "policy.content-addressed-graph.v1",
       "sdk.compatibility-source.copy.v1",
       "sdk.dmsdk.types.render.v1",
@@ -352,6 +353,29 @@ test("no policy object may carry the Defold revision", () => {
   assert.throws(
     () => assertNoRevisionLeak({ rootBytes: bad.rootBytes, objects: bad.objects, revision }),
     /carries the Defold revision/
+  );
+});
+
+test("SDK manifest snapshots must hash revision-abstracted bytes", () => {
+  const revision = "a".repeat(40);
+  const compilerSurface = {
+    documents: {},
+    sdk: {
+      "script/example.ts": {
+        mode: "authenticated-compatibility-source",
+        source: `export const revision = ${JSON.stringify(revision)};\n`,
+        sha256: hashBytes(`export const revision = ${JSON.stringify(revision)};\n`),
+        inputs: []
+      }
+    },
+    realizationRecipes: {
+      documents: {},
+      sdk: { "script/example.ts": "sdk.compatibility-source.copy.v1" }
+    }
+  };
+  assert.throws(
+    () => buildPolicy(fixture({ compilerSurface })),
+    /digest is not over revision-abstracted source bytes/
   );
 });
 

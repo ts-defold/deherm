@@ -37,8 +37,8 @@
       "default": "./packages/compiler/src/native-extension-generator.mjs"
     },
     "./compiler/policy-surface-materializer": {
-      "import": "./packages/generator/src/policy/surface-materializer.mjs",
-      "default": "./packages/generator/src/policy/surface-materializer.mjs"
+      "import": "./packages/compiler/src/policy-surface-materializer.mjs",
+      "default": "./packages/compiler/src/policy-surface-materializer.mjs"
     },
     "./dev/runtime-diagnostics": {
       "import": "./packages/cli/src/dev/runtime-diagnostics.mjs",

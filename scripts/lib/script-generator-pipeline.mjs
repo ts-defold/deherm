@@ -4,7 +4,8 @@
 
 export const scriptGeneratorSources = Object.freeze([
   "scripts/import-defold-script-api.py",
-  "packages/generator/src/sdk/script-sdk.mjs",
+  "scripts/generate-script-sdk.mjs",
+  "packages/compiler/src/sdk/script-sdk.mjs",
   "scripts/classify-script-bindings.mjs",
   "scripts/generate-script-binding-descriptors.mjs",
   "scripts/generate-script-callback-lifecycle.mjs",
@@ -45,7 +46,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/lib/revision-audit.mjs",
   "scripts/lib/script-lifecycle-callbacks.mjs",
   "scripts/lib/documented-route-duplication.mjs",
-  "packages/cli/src/names.mjs"
+  "packages/compiler/src/names.mjs"
 ]);
 
 export const scriptPinnedInputs = Object.freeze([
@@ -307,10 +308,10 @@ export const apiPolicyGenerator = Object.freeze({
   sources: Object.freeze([
     "scripts/generate-api-policy.mjs",
     "packages/generator/src/policy/generate-api-policy.mjs",
-    "packages/generator/src/sdk/script-sdk.mjs",
-    "packages/generator/src/sdk/dmsdk-sdk.mjs",
-    "packages/generator/src/policy/api-policy.mjs",
-    "packages/generator/src/policy/surface-materializer.mjs",
+    "packages/compiler/src/sdk/script-sdk.mjs",
+    "packages/compiler/src/sdk/dmsdk-sdk.mjs",
+    "packages/compiler/src/api-policy.mjs",
+    "packages/compiler/src/policy-surface-materializer.mjs",
     "packages/compiler/src/defold-toolchain-pins.mjs"
   ]),
   pinnedInputs: Object.freeze([

@@ -82,7 +82,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   }])));
   const { materializePolicySurface } = await import(pathToFileURL(path.join(
     packageRoot,
-    "packages", "generator", "src", "policy", "surface-materializer.mjs"
+    "packages", "compiler", "src", "policy-surface-materializer.mjs"
   )));
   const packedSurfaceRoot = path.join(root, "packed-surface");
   const materialized = await materializePolicySurface({

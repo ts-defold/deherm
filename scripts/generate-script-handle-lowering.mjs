@@ -417,7 +417,9 @@ class CapturedLuaRouter {
   static int ProtectedCaptureInstance(lua_State* state);
   static int ProtectedCaptureHandle(lua_State* state);
   bool captureHandleUnsafe(int stackIndex, SemanticHandleKind kind, ScriptValue* output) noexcept;
-  bool dispatchUnsafe(DispatchContext& context) noexcept;
+  // LuaJIT implements Lua errors with an unwind on native targets. This body is
+  // entered by lua_cpcall, so it must allow that unwind to reach the protector.
+  bool dispatchUnsafe(DispatchContext& context);
   bool bind(const Route& route, char* error, size_t capacity) noexcept;
   bool push(const ScriptValue& value, const ValueCodec& codec, ScriptCallFrame* frame,
       char* error, size_t capacity) noexcept;
@@ -972,7 +974,7 @@ int CapturedLuaRouter::ProtectedDispatch(lua_State* state) {
   return 0;
 }
 
-bool CapturedLuaRouter::dispatchUnsafe(DispatchContext& context) noexcept {
+bool CapturedLuaRouter::dispatchUnsafe(DispatchContext& context) {
   const Route& route = *context.route;
   ScriptCallFrame* frame = context.frame;
   if (!bind(route, context.error, context.errorCapacity)) return false;

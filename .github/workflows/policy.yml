@@ -342,8 +342,10 @@ jobs:
           # run could not derive the current evidence artifact.
           node scripts/generate-route-verification.mjs --check || exit 0
           existing="$RUNNER_TEMP/route-verification-issues.json"
+          wanted="$RUNNER_TEMP/route-verification-wanted.json"
           gh issue list --state all --limit 1000 --search 'in:title "route verification:"' \
             --json number,title,state,body,url > "$existing"
+          jq '[.wantsIssue[].issue.title]' "$report" > "$wanted"
           jq -c '.wantsIssue[]' "$report" | while IFS= read -r row; do
             title="$(jq -r '.issue.title' <<< "$row")"
             body="$(jq -r '.issue.body' <<< "$row")"
@@ -357,10 +359,19 @@ jobs:
             if [ "$state" = CLOSED ]; then gh issue reopen "$number"; fi
             if [ "$current" != "$body" ]; then gh issue edit "$number" --body "$body"; fi
           done
-      - name: Open or update the real-engine evidence issue
+          # The report is authoritative for this revision. Do not leave a stale
+          # warning open after its route becomes supported/executed or is
+          # removed by Defold.
+          jq -c '.[] | select(.state == "OPEN")' "$existing" | while IFS= read -r row; do
+            number="$(jq -r '.number' <<< "$row")"
+            title="$(jq -r '.title' <<< "$row")"
+            if jq -e --arg title "$title" 'index($title) != null' "$wanted" >/dev/null; then continue; fi
+            gh issue comment "$number" --body "Automated route verification no longer marks this route suspect or unproven."
+            gh issue close "$number" --reason completed
+          done
+      - name: Reconcile the real-engine evidence issue
         if: >-
           always() &&
-          steps.engine.outcome != 'success' &&
           github.repository == 'ts-defold/deherm' &&
           github.ref == 'refs/heads/main'
         env:
@@ -371,8 +382,20 @@ jobs:
           revision="$(sed -n 's/^DEFOLD_REV=//p' upstream.lock)"
           title="policy: real-engine evidence unavailable for $revision"
           body="The policy was generated and remains published, but the real-engine evidence lane did not complete successfully for \`$revision\`.\n\nRun: $RUN_URL"
-          number="$(gh issue list --state open --search "in:title $title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" 2>/dev/null | head -n1 || true)"
-          if [ -n "$number" ]; then gh issue comment "$number" --body "$body"; else gh issue create --title "$title" --body "$body"; fi
+          issue="$(gh issue list --state all --search "in:title $title" --json number,title,state --jq ".[] | select(.title == \"$title\")" 2>/dev/null | head -n1 || true)"
+          number="$(jq -r '.number // empty' <<< "$issue")"
+          state="$(jq -r '.state // empty' <<< "$issue")"
+          if [ "${{ steps.engine.outcome }}" != success ]; then
+            if [ -n "$number" ]; then
+              if [ "$state" = CLOSED ]; then gh issue reopen "$number"; fi
+              gh issue comment "$number" --body "$body"
+            else
+              gh issue create --title "$title" --body "$body"
+            fi
+          elif [ -n "$number" ] && [ "$state" = OPEN ]; then
+            gh issue comment "$number" --body "Real-engine evidence is available again.\n\nRun: $RUN_URL"
+            gh issue close "$number" --reason completed
+          fi
       - name: Enforce engine-lane infrastructure health
         if: always() && steps.engine.outcome != 'success'
         run: |

@@ -36,6 +36,7 @@ import {
   assertNoRevisionLeak,
   buildIndexEntry,
   buildPolicy,
+  DEFOLD_REVISION_TOKEN,
   hashBytes,
   indexPath,
   objectPath,
@@ -92,6 +93,16 @@ const locallyRenderedSdkRecipes = Object.freeze({
   "dmsdk/types.ts": "sdk.dmsdk.types.render.v1",
   "dmsdk/runtime.ts": "sdk.dmsdk.runtime.render.v1",
   "dmsdk/index.ts": "sdk.dmsdk.index.render.v1"
+});
+
+const locallyRenderedSdkInputs = Object.freeze({
+  "script/types.ts": Object.freeze(["defold-script-api-ir.json", "defold-script-handle-lowering.json"]),
+  "script/modules.ts": Object.freeze(["defold-script-api-ir.json"]),
+  "script/runtime.ts": Object.freeze([]),
+  "script/index.ts": Object.freeze(["defold-script-api-ir.json"]),
+  "dmsdk/types.ts": Object.freeze(["defold-sdk-ir.json"]),
+  "dmsdk/runtime.ts": Object.freeze(["defold-sdk-ir.json"]),
+  "dmsdk/index.ts": Object.freeze([])
 });
 
 const compilerDocumentRecipes = Object.freeze({
@@ -321,10 +332,12 @@ export async function derivePolicy(options = {}) {
     ]))),
     sdk: Object.fromEntries(await Promise.all(compilerSurfaceSdkSources.map(async (relative) => {
       const source = await readFile(path.join(root, "packages", "sdk", "src", "generated", relative), "utf8");
+      const canonicalSource = source.split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
       return [relative, {
         mode: locallyRenderedSdkSources.has(relative) ? "render-and-verify" : "authenticated-compatibility-source",
-        sha256: createHash("sha256").update(source).digest("hex"),
-        source: locallyRenderedSdkSources.has(relative) ? undefined : source
+        sha256: createHash("sha256").update(canonicalSource).digest("hex"),
+        inputs: locallyRenderedSdkInputs[relative] ?? [],
+        source: locallyRenderedSdkSources.has(relative) ? undefined : canonicalSource
       }];
     }))),
     realizationRecipes: {

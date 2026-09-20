@@ -77,6 +77,14 @@ test("a contract without a fixture fails closed with machine-readable blockers",
   );
 });
 
+test("string inhabitants are valid absolute Defold resource paths", () => {
+  const resourceContract = plan.contracts.find((contract) =>
+    contract.exercises?.some(({ routeId }) => routeId === "script:resource.load"));
+  assert.ok(resourceContract);
+  const exercise = resourceContract.exercises.find(({ routeId }) => routeId === "script:resource.load");
+  assert.deepEqual(exercise.arguments, [{ kind: "literal", value: "/deherm_conformance" }]);
+});
+
 test("properties are selected by the contract record, never by route identity", () => {
   const contracts = documents.loweringPlan.value.tables.contracts;
   for (const contract of plan.contracts) {

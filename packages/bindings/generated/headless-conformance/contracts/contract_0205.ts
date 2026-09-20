@@ -13,7 +13,7 @@ export function runContract(report: Report): boolean {
     route: "script:particlefx.play",
     arity: "required",
     call: particlefx.play as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"literal","value":"deherm_conformance"}],
+    args: [{"kind":"literal","value":"/deherm_conformance"}],
     providers,
     minimumResultCount: 0,
     maximumResultCount: 0,

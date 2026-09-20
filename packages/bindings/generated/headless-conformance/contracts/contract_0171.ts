@@ -493,7 +493,7 @@ export function runContract(report: Report): boolean {
     route: "script:bullet3d.constraint.set_slider_motor",
     arity: "required",
     call: bullet3d.constraint.setSliderMotor as unknown as (...args: readonly unknown[]) => unknown,
-    args: [{"kind":"handle","handleKind":"bullet-constraint","ordinal":0}, {"kind":"literal","value":"deherm_conformance"}, {"kind":"literal","value":false}, {"kind":"literal","value":0}, {"kind":"literal","value":0}],
+    args: [{"kind":"handle","handleKind":"bullet-constraint","ordinal":0}, {"kind":"literal","value":"/deherm_conformance"}, {"kind":"literal","value":false}, {"kind":"literal","value":0}, {"kind":"literal","value":0}],
     providers,
     minimumResultCount: 0,
     maximumResultCount: 0,

@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 import { validateNativeValueProbeReport } from "../scripts/lib/native-runtime-probe-report.mjs";
-import { parseTranscript } from "../scripts/check-headless-conformance.mjs";
+import { executionTarget, parseTranscript } from "../scripts/check-headless-conformance.mjs";
 import { runtimeEvidenceMatchesPlan } from "../scripts/generate-route-verification.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -22,6 +22,12 @@ const routeVerification = JSON.parse(await readFile(
 ));
 const policyWorkflow = await readFile(new URL(".github/workflows/policy.yml", root), "utf8");
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
+
+test("headless reports distinguish the execution host from the planned API target", () => {
+  assert.equal(executionTarget("linux", "x64"), "x86_64-linux");
+  assert.equal(executionTarget("darwin", "arm64"), "arm64-macos");
+  assert.equal(executionTarget("win32", "x64"), "x86_64-win32");
+});
 
 test("native runtime accepts complete emitted and planned-only value dispositions", () => {
   const instrumented = validateNativeValueProbeReport(report, bindings);
@@ -136,7 +142,7 @@ test("route verification never carries runtime observations across a changed pla
 
 test("the policy workflow materializes the issue links emitted for marked routes", () => {
   const start = policyWorkflow.indexOf("      - name: Open or update per-route verification issues");
-  const end = policyWorkflow.indexOf("      - name: Open or update the real-engine evidence issue", start);
+  const end = policyWorkflow.indexOf("      - name: Reconcile the real-engine evidence issue", start);
   assert.ok(start >= 0 && end > start);
   const step = policyWorkflow.slice(start, end);
   assert.match(step, /if:\s*>-[\s\S]*always\(\)[\s\S]*refs\/heads\/main/u);
@@ -145,4 +151,16 @@ test("the policy workflow materializes the issue links emitted for marked routes
   assert.match(step, /gh issue create --title/u);
   assert.match(step, /gh issue reopen/u);
   assert.match(step, /gh issue edit/u);
+  assert.match(step, /gh issue close/u);
+});
+
+test("the policy workflow closes stale real-engine evidence issues after recovery", () => {
+  const start = policyWorkflow.indexOf("      - name: Reconcile the real-engine evidence issue");
+  const end = policyWorkflow.indexOf("      - name: Enforce engine-lane infrastructure health", start);
+  assert.ok(start >= 0 && end > start);
+  const step = policyWorkflow.slice(start, end);
+  assert.match(step, /if:\s*>-[\s\S]*always\(\)[\s\S]*refs\/heads\/main/u);
+  assert.match(step, /steps\.engine\.outcome.*!= success/u);
+  assert.match(step, /gh issue reopen/u);
+  assert.match(step, /gh issue close/u);
 });

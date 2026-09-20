@@ -11,7 +11,7 @@ import { pathToFileURL } from "node:url";
 
 import { buildResourceNamespaceClassification } from "../packages/compiler/src/resource-namespace-classification.mjs";
 import { publicScriptModulePath } from "../packages/compiler/src/script-public-api-policy.mjs";
-import { safeParameterIdentifier } from "../packages/cli/src/names.mjs";
+import { safeParameterIdentifier } from "../packages/compiler/src/names.mjs";
 
 const root = new URL("../", import.meta.url);
 const urls = {

@@ -18,13 +18,13 @@ export function resolve(handleKind: string, ordinal: number): unknown {
 }
 export const providers: Readonly<Record<string, Provider>> = {
   "buffer-data": (ordinal: number): unknown => {
-    const argument0: unknown = "deherm_conformance";
+    const argument0: unknown = "/deherm_conformance";
     return (resource.getBuffer as unknown as (...args: readonly unknown[]) => unknown)(argument0);
   },
   "buffer-stream": (ordinal: number): unknown => {
     const argument0: unknown = resolve("buffer-data", ordinal);
     if (argument0 === undefined) return undefined;
-    const argument1: unknown = "deherm_conformance";
+    const argument1: unknown = "/deherm_conformance";
     return (buffer.getStream as unknown as (...args: readonly unknown[]) => unknown)(argument0, argument1);
   },
   "bullet-constraint": (ordinal: number): unknown => {
@@ -49,7 +49,7 @@ export const providers: Readonly<Record<string, Provider>> = {
   },
   "resource-declaration": (ordinal: number): unknown => {
     const argument0: unknown = address(ordinal);
-    const argument1: unknown = "deherm_conformance";
+    const argument1: unknown = "/deherm_conformance";
     return (go.get as unknown as (...args: readonly unknown[]) => unknown)(argument0, argument1);
   },
 };

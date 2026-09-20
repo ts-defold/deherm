@@ -9,8 +9,8 @@ import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../../generator/src/policy/api-policy.mjs";
-import { materializePolicySurface } from "../../generator/src/policy/surface-materializer.mjs";
+import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../../compiler/src/api-policy.mjs";
+import { materializePolicySurface } from "../../compiler/src/policy-surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 

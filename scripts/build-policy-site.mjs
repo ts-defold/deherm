@@ -27,7 +27,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes } from "../packages/generator/src/policy/api-policy.mjs";
+import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes } from "../packages/compiler/src/api-policy.mjs";
 import { buildArtifactReferences, readSiteConfig, readStore, shippedIndexPath, storeRoot } from "./generate-api-policy.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
