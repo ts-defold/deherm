@@ -158,6 +158,17 @@
   implementation-independent equivalence proof or additional engine-runtime
   evidence.
 
+## 2026-09-20 - Joined package header staging to the native end-to-end matrix
+
+* **The scheduled Bob matrix now assembles the same pinned public-header input
+  as npm prepack**: the failing run compiled the raw Git extension tree, where
+  `include/hermes` and `include/jsi` are intentionally ignored, and every native
+  target failed before linking on `jsi/jsi.h`. A single prerequisite job now
+  checks out the pinned Hermes revision, runs the package-owned header stager,
+  and shares that exact header tree with every target job. This closes the
+  checkout/package assembly mismatch; it does not by itself prove any target
+  ABI until the full hosted Extender matrix passes.
+
 ## 2026-09-20 - GitHub issues are the external roadmap ledger
 
 * **Every execution wave now owns issue reconciliation**: the existing open

@@ -101,6 +101,16 @@ test("the Bob matrix prints and preserves the target's Extender failure log", as
   assert.match(workflow, /build\/end-to-end\/project\/build\/\$\{\{ matrix\.target \}\}\/log\.txt/u);
 });
 
+test("the Bob matrix consumes the package's pinned Hermes public headers", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
+  assert.match(workflow, /extension-headers:/u);
+  assert.match(workflow, /bootstrap-upstreams\.sh hermes/u);
+  assert.match(workflow, /stage-hermes-public-headers\.mjs/u);
+  assert.match(workflow, /name: pinned-hermes-public-headers/u);
+  assert.match(workflow, /needs: \[local, extension-headers\]/u);
+  assert.match(workflow, /path: defold\/defold_hermes\/include/u);
+});
+
 test("Bob consumes the generated project's target artifact instead of rebuilding a host-native package", async () => {
   const wrapper = await readFile(new URL("../scripts/bob.sh", import.meta.url), "utf8");
   assert.match(wrapper, /check-project-native-artifact\.mjs" "\$project_root" "\$bundle_target"/u);

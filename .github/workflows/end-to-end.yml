@@ -101,13 +101,37 @@ jobs:
             --stage policy --stage host-tools --stage target-archives \
             --stage scaffold --stage generate
 
+  # The npm package's prepack contract stages the public Hermes and JSI headers
+  # from the pinned Hermes revision. They are deliberately not committed: the
+  # package, not the Git checkout, is the distributable extension. The Bob
+  # matrix operates from a checkout, so materialize that same package input
+  # once and share it with every target instead of cloning Hermes ten times.
+  extension-headers:
+    needs: local
+    if: github.event_name != 'push'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: '22' }
+      - run: bash scripts/bootstrap-upstreams.sh hermes
+      - run: node scripts/stage-hermes-public-headers.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pinned-hermes-public-headers
+          path: |
+            defold/defold_hermes/include/hermes
+            defold/defold_hermes/include/jsi
+          if-no-files-found: error
+          retention-days: 1
+
   # One target, one job. Extender compiles the generated bindings and the whole
   # extension with that target's real toolchain, so a green job here is the
   # statement that what we generate compiles for that target AND that Bob can
   # build the game with it. There is no separate "does it compile" check,
   # because a separate one would compile with something other than what ships.
   bob:
-    needs: local
+    needs: [local, extension-headers]
     if: github.event_name != 'push'
     name: bob ${{ matrix.target }}
     runs-on: ubuntu-24.04
@@ -124,6 +148,10 @@ jobs:
         with: { distribution: temurin, java-version: '25' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: ./scripts/bootstrap-bob.sh
+      - uses: actions/download-artifact@v4
+        with:
+          name: pinned-hermes-public-headers
+          path: defold/defold_hermes/include
 
       - name: Build for ${{ matrix.target }}
         env:
