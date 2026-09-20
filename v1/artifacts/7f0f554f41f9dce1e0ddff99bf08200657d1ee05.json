@@ -39,8 +39,8 @@
       }
     },
     "dehermc": {
-      "tag": "tools-42cb0a61b431",
-      "fingerprint": "42cb0a61b4318fa9ae03d808527a56c950e193a3bb40a808b3737a430c5c85d0",
+      "tag": "tools-3f8fdf0e9ace",
+      "fingerprint": "3f8fdf0e9aceeffd8a5d343066382e9a17922c50c72a1feeed56583820f47d8e",
       "indexedBy": "host",
       "summary": "dehermc, déherm's TypeScript transform compiler, per user host",
       "assets": {
