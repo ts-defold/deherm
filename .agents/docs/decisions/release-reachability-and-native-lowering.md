@@ -107,9 +107,14 @@ calling the bridge; declaration identity is compiler metadata, not a different
 runtime symbol namespace.
 
 Reachability identity and usage specialization are separate steps. Against the
-current catalog, 59 of 1,361 recipes are universal-ready from declaration
-identity alone and 1,302 still need generated specialization. Within that
-second group, 45 preferred-adapter candidates have native wrappers but no
+current catalog, 320 of 1,361 recipes are universal-ready from declaration
+identity alone and 1,041 still need generated specialization. Record-layout
+requirements are path-sensitive: a record transported by value needs its ABI
+layout, while a record that appears only behind a pointer, reference, handle,
+callback, or opaque identity does not. That structural rule removed a false
+layout gate from 261 recipes without weakening pointer lifetime, nullability,
+or address validation. Within the specialization-required group, 45
+preferred-adapter candidates have native wrappers but no
 generated universal-bridge route, and 103 provider-boundary/private candidates
 lack a production provider or public registration path. The remainder need
 call-site facts already named by their recipes, such as receiver C++ type,

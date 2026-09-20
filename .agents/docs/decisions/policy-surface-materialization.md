@@ -158,7 +158,7 @@ implementation-independent equivalence proof. A deliberate semantic change first
 `packages/sdk/src/generated` through the source pipeline and then runs
 `scripts/capture-policy-surface-old-pipeline.mjs --update`; the capture command
 has a check-only default and records the Defold revision plus an aggregate tree
-digest. Thirteen files (3,434,005 bytes) are locally rendered; 15 files
+digest. Thirteen files (3,748,718 bytes) are locally rendered; 15 files
 (78,171 bytes) remain authenticated compatibility sources, and the test names
 all 15 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads

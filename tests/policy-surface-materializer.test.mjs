@@ -68,7 +68,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_434_005, snapshots: 78_171 },
+  assert.deepEqual(bytesByMode, { rendered: 3_748_718, snapshots: 78_171 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));

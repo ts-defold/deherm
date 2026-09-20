@@ -1373,7 +1373,7 @@ void* g_context = nullptr;
 
 extern "C" {
 uint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(1361); }
-const char* deherm_dmsdk_universal_catalog_sha256(void) { return "24d64831b99c1576d7c1ee318a3c31a905def758fcdd919048d86d81530b295c"; }
+const char* deherm_dmsdk_universal_catalog_sha256(void) { return "3f1c1ff779bd6575c7679eb07a4b6fc92ed092e5925c200ad615298cb34ff9fc"; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {
   return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;

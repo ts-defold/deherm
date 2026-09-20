@@ -183,9 +183,9 @@ The two `luasocket` routes that manufacture captured Lua closures fail closed.
 
 Every one of the 1,361 runtime dmSDK declarations has a deterministic universal
 recipe and stable ID. Release checking resolves every authored call to its
-exact recipe. `deherm materialize-dmsdk` currently turns the 59
+exact recipe. `deherm materialize-dmsdk` currently turns the 320
 declaration-only universal-ready shapes into tree-shakeable C++ thunks; the
-other 1,302 remain visible and receive source-located specialization diagnostics
+other 1,041 remain visible and receive source-located specialization diagnostics
 instead of being silently omitted. It reads the revision-matched catalog materialized at
 `.deherm/ir/dmsdk-universal-bindings.json`; `--catalog` can name that policy
 document explicitly. The package ships the catalog-free algorithm, not a

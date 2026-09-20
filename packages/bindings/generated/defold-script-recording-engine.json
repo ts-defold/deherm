@@ -3,13 +3,13 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "1bc621114e129a153c5ef131dba637bf8b75f4ccb4fad42ac757a8ea4ac2183e",
+  "planSha256": "f1b199b28aee6ab9dda35e93ba83a55a8f6852e2155a107a3334680d39dbfa80",
   "planFallback": null,
   "inputHashes": {
     "projection": "f8241dbffcd0d96c439a78f0da8a8a43643fe4ce09e22f67e8e113350536eeb9",
     "universal": "127a1ac3f1ed0edf7ece38696feab15b20bfafa89316f87ca7276751f9a63fb2",
     "handleLowering": "5c767e7f0d11cd13c56079b992a54814f88788de823d8e1b221f8baf74ced43d",
-    "loweringPlan": "e9a54a38b1432036ce15744ccd542afa311194af7fa59190d3d7c187d90d90fd"
+    "loweringPlan": "01ed5dcc93d27daa4dc7edbe09487e1f4001e80a889ae8fa9bac550c4a65230b"
   },
   "planInputDrift": [],
   "transports": {
@@ -57479,11 +57479,11 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "44d17d4e0d1e342ae0c97cbb6ba521ef436d165471329232b6262bed5a8247a4",
+    "header": "493e0f0d0cd9001e1316da0a28178901f2d632a8621dc3290776002c3fb9593d",
     "tables": "a92bc128f6e1d64148ff7faf9d4c1762978660f6142cc67cd52567b33681f0c8",
     "provider": "9ce2e8a0ed8fd8b3e42702c5ea746bb20b0806c602ec4e618db1fd2aa26173be",
     "driver": "bbe58abba9260aaecd329fd2883fb352d6dd56cb62f785e3da7968407181964f",
     "driverJs": "37f08b380634f43b606c6582b0510eaa8b694fd41c3de85731c4c1e02e0ebf0d",
-    "expectedTrace": "e2bf764cd7b5d23bef1f5da61dcdf5d1c7dfac044d53bced0ade25c2996be561"
+    "expectedTrace": "59af064380284b59c4ed2125cac62f52ec26cf58fdda73d4eb196cefb8ed28ba"
   }
 }

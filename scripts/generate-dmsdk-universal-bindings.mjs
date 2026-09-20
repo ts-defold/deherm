@@ -72,6 +72,22 @@ function nodeKinds(node) {
   return [...kinds].sort();
 }
 
+function carriesRecordByValue(node, behindIndirection = false) {
+  if (!node || typeof node !== "object") return false;
+  if (["record", "template-record"].includes(node.kind)) return !behindIndirection;
+  const nextBehindIndirection = behindIndirection ||
+    ["pointer", "reference", "handle", "callback", "opaque"].includes(node.kind);
+  for (const key of ["to", "target", "representation", "element", "result"]) {
+    if (carriesRecordByValue(node[key], nextBehindIndirection)) return true;
+  }
+  for (const key of ["parameters", "arguments"]) {
+    for (const child of node[key] ?? []) {
+      if (carriesRecordByValue(child, nextBehindIndirection)) return true;
+    }
+  }
+  return false;
+}
+
 function includePath(header) {
   const marker = "/dmsdk/";
   const index = header.lastIndexOf(marker);
@@ -113,7 +129,7 @@ function requirementFor(node) {
   const kinds = nodeKinds(node);
   const requirements = [];
   if (kinds.includes("unknown")) requirements.push("native-type-substitution");
-  if (kinds.some((kind) => ["record", "template-record"].includes(kind))) requirements.push("record-layout");
+  if (carriesRecordByValue(node)) requirements.push("record-layout");
   if (kinds.includes("template") || kinds.includes("type-parameter")) requirements.push("template-arguments");
   if (kinds.includes("variadic")) requirements.push("typed-nonvariadic-facade");
   if (kinds.includes("callback")) requirements.push("callback-trampoline");

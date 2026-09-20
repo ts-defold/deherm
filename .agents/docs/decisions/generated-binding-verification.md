@@ -144,8 +144,8 @@ generated callable type at those escape sites and records a source-located
 unresolved call until a mechanically modeled indirect-call contract exists.
 
 The checker manifest proves total declaration selection and classifies the
-executable lowering at the call site. Of the current 1,361 recipes, 59 are
-universal-ready from declaration identity alone and 1,302 require generated
+executable lowering at the call site. Of the current 1,361 recipes, 320 are
+universal-ready from declaration identity alone and 1,041 require generated
 specialization. The latter includes 148 preferred-adapter candidates: 45 have
 real native wrappers but no generated route from the universal bridge, while
 103 are provider-boundary/private rows without a production provider or public

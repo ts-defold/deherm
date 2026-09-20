@@ -74,6 +74,13 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     assert.equal(item.targets.browserWasm.embind, false);
     assert.ok(item.targets.cAbi.path && item.targets.dynamicHermes.path && item.targets.staticHermes.path && item.targets.typescript.path);
   }
+  const opaqueHandle = recipe(report, "ConfigFileGetFloat");
+  assert.ok(!opaqueHandle.abi.parameters[0].requirements.includes("record-layout"));
+  assert.ok(!opaqueHandle.fallback.requirements.includes("record-layout"));
+  assert.ok(opaqueHandle.abi.parameters[0].requirements.includes("pointer-lifetime"));
+  const copiedRecord = recipe(report, "dmSocket::Connect");
+  assert.ok(copiedRecord.abi.parameters[1].requirements.includes("record-layout"));
+  assert.ok(copiedRecord.fallback.requirements.includes("record-layout"));
 });
 
 test("universal dmSDK artifacts regenerate byte-for-byte", async () => {
@@ -481,9 +488,6 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
     {
       declarationId: pointerHandle.declarationId,
       wrapper: "verify_pointer_handle",
-      acknowledgements: {
-        recordLayout: { reason: "exercise opaque pointer-handle transport", evidence: "generated driver uses an aligned identity token and never dereferences it" },
-      },
     },
     {
       declarationId: reference.declarationId,
@@ -614,12 +618,7 @@ test("usage materializer fails closed on catalog drift, unsafe bypass, arity ove
     },
   }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /wire fixture.*record/);
 
-  const configUsage = {
-    declarationId: configFloat.declarationId,
-    acknowledgements: {
-      recordLayout: { reason: "opaque handle fixture", evidence: "digest-precondition test" },
-    },
-  };
+  const configUsage = { declarationId: configFloat.declarationId };
   const nonNull = materializeDmSdkUsages([configUsage], {
     catalog: policyCatalog,
     catalogSha256: dmSdkUniversalCatalogSha256,
