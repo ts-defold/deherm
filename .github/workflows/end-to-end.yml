@@ -123,7 +123,7 @@ jobs:
             defold/defold_hermes/include/hermes
             defold/defold_hermes/include/jsi
           if-no-files-found: error
-          retention-days: 1
+          retention-days: 7
 
   # One target, one job. Extender compiles the generated bindings and the whole
   # extension with that target's real toolchain, so a green job here is the

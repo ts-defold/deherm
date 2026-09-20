@@ -36,13 +36,41 @@ fi
 # use it. Defold force-loads both extension archives and its own zip.lib, so the
 # duplicate member must be removed here just as package-posix.sh removes zip.c.o.
 #
+# MSVC lib.exe supports /REMOVE, but LLVM's deliberately lib.exe-compatible
+# llvm-lib does not implement that option. The Defold Extender image uses
+# llvm-lib, so merge first and delete the member with llvm-ar there. A native
+# Visual Studio build keeps the single lib.exe invocation. Both paths list the
+# result and fail closed if zip.c.obj survived.
+#
 # Under Git Bash, MSYS2 mistakes MSVC's `/OUT:` and `/REMOVE:` options for POSIX
 # paths and rewrites the tokens. Convert only the output value ourselves, then
-# exempt both option prefixes; member paths remain eligible for normal conversion.
+# exempt the option prefixes; member paths remain eligible for normal conversion.
 lib_output="$output"
 if command -v cygpath >/dev/null 2>&1; then
   lib_output="$(cygpath -w "$output")"
 fi
-MSYS2_ARG_CONV_EXCL="/OUT:;/REMOVE:" "$lib_tool" \
-  "/OUT:$lib_output" "/REMOVE:zip.c.obj" "${members[@]}"
+
+lib_name="$(basename "$lib_tool" | tr '[:upper:]' '[:lower:]')"
+if [[ "$lib_name" == llvm-lib* ]]; then
+  ar_tool="${AR_TOOL:-llvm-ar}"
+  if ! command -v "$ar_tool" >/dev/null 2>&1; then
+    echo "package-msvc: $lib_tool requires llvm-ar to remove zip.c.obj" >&2
+    exit 1
+  fi
+  MSYS2_ARG_CONV_EXCL="/OUT:" "$lib_tool" "/OUT:$lib_output" "${members[@]}"
+  if "$ar_tool" t "$output" | grep -qE '^zip\.c\.obj/?$'; then
+    "$ar_tool" d "$output" zip.c.obj
+  fi
+  if "$ar_tool" t "$output" | grep -qE '^zip\.c\.obj/?$'; then
+    echo "package-msvc: unable to remove zip.c.obj from $output" >&2
+    exit 1
+  fi
+else
+  MSYS2_ARG_CONV_EXCL="/OUT:;/REMOVE:" "$lib_tool" \
+    "/OUT:$lib_output" "/REMOVE:zip.c.obj" "${members[@]}"
+  if MSYS2_ARG_CONV_EXCL="/LIST" "$lib_tool" "/LIST" "$lib_output" | grep -qE '(^|[\\/])zip\.c\.obj$'; then
+    echo "package-msvc: unable to remove zip.c.obj from $output" >&2
+    exit 1
+  fi
+fi
 echo "package-msvc: wrote $output from ${#members[@]} library file(s)"

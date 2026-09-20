@@ -196,7 +196,7 @@ test("package-archive.sh is an input to every family, because it decides the pub
   }
 });
 
-test("the Windows archiver protects options and removes Hermes' duplicate zip member", async (t) => {
+test("native MSVC packaging protects options and removes Hermes' duplicate zip member", async (t) => {
   const directory = await scratch(t);
   const build = path.join(directory, "build");
   const tools = path.join(directory, "bin");
@@ -212,7 +212,7 @@ test("the Windows archiver protects options and removes Hermes' duplicate zip me
   await writeFile(cygpath, "#!/usr/bin/env bash\nprintf 'C:\\\\native\\\\hermes.lib\\n'\n");
   await writeFile(
     archiver,
-    "#!/usr/bin/env bash\nprintf '%s\\n' \"$MSYS2_ARG_CONV_EXCL\" \"$@\" > \"$CAPTURE\"\n"
+    "#!/usr/bin/env bash\nif [[ \"$1\" == /LIST ]]; then exit 0; fi\nprintf '%s\\n' \"$MSYS2_ARG_CONV_EXCL\" \"$@\" > \"$CAPTURE\"\n"
   );
   await chmod(cygpath, 0o755);
   await chmod(archiver, 0o755);
@@ -238,6 +238,65 @@ test("the Windows archiver protects options and removes Hermes' duplicate zip me
     path.join(build, "lib", "hermesvm_a.lib"),
     path.join(build, "jsi", "jsi.lib")
   ]);
+});
+
+test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
+  const directory = await scratch(t);
+  const build = path.join(directory, "build");
+  const tools = path.join(directory, "bin");
+  const libCapture = path.join(directory, "lib-argv.txt");
+  const arCapture = path.join(directory, "ar-argv.txt");
+  const removed = path.join(directory, "removed");
+  await mkdir(path.join(build, "lib"), { recursive: true });
+  await mkdir(path.join(build, "jsi"), { recursive: true });
+  await mkdir(tools, { recursive: true });
+  await writeFile(path.join(build, "lib", "hermesvm_a.lib"), "hermes");
+  await writeFile(path.join(build, "jsi", "jsi.lib"), "jsi");
+
+  const cygpath = path.join(tools, "cygpath");
+  const archiver = path.join(tools, "llvm-lib");
+  const editor = path.join(tools, "llvm-ar");
+  await writeFile(cygpath, "#!/usr/bin/env bash\nprintf 'C:\\\\native\\\\hermes.lib\\n'\n");
+  await writeFile(
+    archiver,
+    "#!/usr/bin/env bash\nprintf '%s\\n' \"$MSYS2_ARG_CONV_EXCL\" \"$@\" > \"$LIB_CAPTURE\"\n"
+  );
+  await writeFile(
+    editor,
+    [
+      "#!/usr/bin/env bash",
+      "if [[ \"$1\" == t ]]; then [[ -f \"$REMOVED\" ]] || printf 'zip.c.obj\\n'; exit 0; fi",
+      "printf '%s\\n' \"$@\" > \"$AR_CAPTURE\"",
+      "touch \"$REMOVED\""
+    ].join("\n") + "\n"
+  );
+  await Promise.all([chmod(cygpath, 0o755), chmod(archiver, 0o755), chmod(editor, 0o755)]);
+
+  const output = path.join(directory, "hermes.lib");
+  await execFileAsync("bash", [
+    path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"),
+    build,
+    output
+  ], {
+    env: {
+      ...process.env,
+      AR_CAPTURE: arCapture,
+      AR_TOOL: editor,
+      LIB_CAPTURE: libCapture,
+      LIB_TOOL: archiver,
+      PATH: `${tools}:${process.env.PATH}`,
+      REMOVED: removed
+    }
+  });
+
+  const libArgs = (await readFile(libCapture, "utf8")).trimEnd().split("\n");
+  assert.equal(libArgs[0], "/OUT:");
+  assert.equal(libArgs[1], "/OUT:C:\\native\\hermes.lib");
+  assert.deepEqual(libArgs.slice(2), [
+    path.join(build, "lib", "hermesvm_a.lib"),
+    path.join(build, "jsi", "jsi.lib")
+  ]);
+  assert.deepEqual((await readFile(arCapture, "utf8")).trimEnd().split("\n"), ["d", output, "zip.c.obj"]);
 });
 
 test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () => {
@@ -278,6 +337,8 @@ test("the Linux target archive keeps the glibc 2.35 compatibility floor", async 
   );
   assert.match(dockerfile, /^FROM ubuntu:22\.04$/mu);
   assert.doesNotMatch(dockerfile, /^FROM ubuntu:24\.04$/mu);
+  assert.equal((dockerfile.match(/nm -u \/out\/libhermes(?:\.debug)?\.a/g) ?? []).length, 2);
+  assert.equal((dockerfile.match(/grep -Eq '\(__isoc23_\|\[\[:space:\]\]arc4random\$\)'/g) ?? []).length, 2);
 });
 
 test("the POSIX packager merges explicit static runtime dependencies", async (t) => {

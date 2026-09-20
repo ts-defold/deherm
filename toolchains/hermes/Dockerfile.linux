@@ -78,7 +78,9 @@ RUN cmake -S /src/hermes -B /work/build -G Ninja \
     ICU_I18N="$(find /usr/lib -type f -name libicui18n.a -print -quit)" && \
     test -n "${ICU_I18N}" && ICU_LIBDIR="$(dirname "${ICU_I18N}")" && \
     package-posix /work/build /out/libhermes.a \
-      "${ICU_LIBDIR}/libicui18n.a" "${ICU_LIBDIR}/libicuuc.a" "${ICU_LIBDIR}/libicudata.a"
+      "${ICU_LIBDIR}/libicui18n.a" "${ICU_LIBDIR}/libicuuc.a" "${ICU_LIBDIR}/libicudata.a" && \
+    nm -u /out/libhermes.a > /tmp/hermes-release.undefined && \
+    ! grep -Eq '(__isoc23_|[[:space:]]arc4random$)' /tmp/hermes-release.undefined
 
 # The development library: identical but for the debugger, in its own build
 # tree so neither variant can pick up the other's objects.
@@ -97,7 +99,9 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
     ICU_I18N="$(find /usr/lib -type f -name libicui18n.a -print -quit)" && \
     test -n "${ICU_I18N}" && ICU_LIBDIR="$(dirname "${ICU_I18N}")" && \
     package-posix /work/build-debug /out/libhermes.debug.a \
-      "${ICU_LIBDIR}/libicui18n.a" "${ICU_LIBDIR}/libicuuc.a" "${ICU_LIBDIR}/libicudata.a"
+      "${ICU_LIBDIR}/libicui18n.a" "${ICU_LIBDIR}/libicuuc.a" "${ICU_LIBDIR}/libicudata.a" && \
+    nm -u /out/libhermes.debug.a > /tmp/hermes-debug.undefined && \
+    ! grep -Eq '(__isoc23_|[[:space:]]arc4random$)' /tmp/hermes-debug.undefined
 
 # One reproducible archive, named for the family rather than the target: the
 # workflow uploads it under `hermes-<target>.tar.gz`, and renaming a file does

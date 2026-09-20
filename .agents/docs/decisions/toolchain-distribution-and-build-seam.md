@@ -60,6 +60,14 @@ vendored under `defold/defold_hermes/lib/<target>/` and ships in the npm
 package, because Bob uploads it to Extender for whichever platform is being
 bundled.
 
+The same archive rule is enforced per object format. POSIX recipes use `ar -d`;
+native MSVC uses `lib.exe /REMOVE`; Defold's Linux-hosted Windows Extender image
+uses `llvm-lib` to merge and `llvm-ar d` to delete because upstream `llvm-lib`
+does not implement `/REMOVE`. Every path lists the finished archive and fails
+if the duplicate member remains. Linux target archives are built at the glibc
+2.35 floor and their release and debugger variants are rejected during the
+image build if `nm -u` finds `__isoc23_*` or `arc4random` imports.
+
 It is therefore indexed by **Defold target**, never by the user's host. A user
 on macOS bundling for Android needs the Android archive and none of their own.
 

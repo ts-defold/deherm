@@ -1,5 +1,27 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Native archive ABI guards corrected before republishing
+
+* **Windows duplicate-symbol packaging now follows the archiver actually in
+  use**: the real published COFF archive names the conflicting member
+  `zip.c.obj`, but inspection of LLVM's `llvm-lib` option table proved that it
+  does not implement MSVC's `/REMOVE`. The Extender-image path now merges with
+  `llvm-lib`, deletes with `llvm-ar`, and verifies the member is absent; native
+  Visual Studio builds retain `lib.exe /REMOVE` plus a `/LIST` verification.
+  Mocked argument/operation tests cover both paths. This is packaging evidence;
+  the next Windows Bob link remains the end-to-end proof.
+
+* **Linux compatibility is now asserted on the bytes, not inferred from the
+  Docker base alone**: both produced archives run through `nm -u` and fail the
+  build if they import `__isoc23_*` or `arc4random`, in addition to retaining
+  the Ubuntu 22.04/glibc 2.35 build floor. The artifact recipe change rotates
+  the native family to `libs-18b534020b9a`.
+
+* **Retryable end-to-end prerequisites are retained for seven days**: the
+  pinned public-header artifact now survives GitHub's failed-job rerun window
+  instead of disappearing after one day. It is still an ephemeral workflow
+  prerequisite, not a release-distribution mechanism.
+
 ## 2026-09-20 - Generated native exact-call drivers for dmSDK and extensions
 
 * **Concrete dmSDK usages now bring their own executable native proof**: the
