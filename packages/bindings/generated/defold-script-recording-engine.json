@@ -7,11 +7,18 @@
   "planFallback": null,
   "inputHashes": {
     "projection": "7ab843d19f8099f3781777ebfbf55a7fa6332314ccf935a01dd83433cecf81bd",
-    "universal": "c127645fcc2d0b5e148b9ae890c89863b461c4c402657525afa79ad8cd0457f1",
+    "universal": "731bd1ad8cc03fcac81c5f7158ebf002f06fb2ae7b3166940bea9ea45d33b64b",
     "handleLowering": "79932ffd5e3149ed2a7618d410cf29078db762d8b459dbb65d1f3f9d0c50928a",
     "loweringPlan": "5e06a2693ab6b8761e56c3e4e79123c59a9f1a1201fe5e32be18131dc6a7c7ca"
   },
-  "planInputDrift": [],
+  "planInputDrift": [
+    {
+      "input": "universal",
+      "planInput": "scriptUniversalValue",
+      "planSha256": "c127645fcc2d0b5e148b9ae890c89863b461c4c402657525afa79ad8cd0457f1",
+      "observedSha256": "731bd1ad8cc03fcac81c5f7158ebf002f06fb2ae7b3166940bea9ea45d33b64b"
+    }
+  ],
   "transports": {
     "drivable": [
       "jsi",
