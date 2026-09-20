@@ -140,6 +140,8 @@ test("dynamic Hermes JSI runner executes exact dmSDK vectors through the product
       "-DDLIB_LOG_DOMAIN=\"deherm\"",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
       "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
+      "-isystem", path.join(root, "upstream/hermes/API"),
+      "-isystem", path.join(root, "upstream/hermes/API/jsi"),
       "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
       "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp",
       harness,

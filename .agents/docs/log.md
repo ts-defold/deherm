@@ -62,6 +62,13 @@
   an unrelated 404 while preserving strict rejection of actual page, Wasm, and
   console failures.
 
+* **The real-Hermes exact runner names its source-header prerequisites**: the
+  first clean Linux policy run correctly refused a host-dependent compile that
+  had found `jsi/jsi.h` through the local machine's environment. The runner now
+  passes the pinned Hermes `API` and `API/jsi` roots explicitly alongside the
+  packaged `libhermes.a`. Missing headers therefore fail as a reproducible
+  bootstrap defect instead of being hidden by a developer workstation.
+
 ## 2026-09-20 - Bound policy-site handshakes to the resolved revision
 
 * **The clean consumer now validates each published revision against its own

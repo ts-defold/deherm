@@ -94,6 +94,8 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
 
 ## 2. Finish policy-only local realization
 
+Public ledger: [#93 Shrink published Defold policies to source-derived recipe facts](https://github.com/ts-defold/deherm/issues/93), [#94 Add lazy policy transfer and writable project surface caches](https://github.com/ts-defold/deherm/issues/94), and [#95 Use OS-native user cache roots with a safe migration path](https://github.com/ts-defold/deherm/issues/95).
+
 1. Replace the remaining fifteen SDK compatibility snapshots with
    compiler-owned pure emitters from primary IR and compact recipe facts.
 2. Replace the 10.21 MB lowering-plan object with a compact revision recipe and
@@ -109,6 +111,8 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
 
 ## 3. Close cross-platform build and publication delivery
 
+Public ledger: [#97 Close cross-platform artifact publication and clean consumer delivery](https://github.com/ts-defold/deherm/issues/97) and [#102 Evaluate tmikov/hermes-x as the pinned Hermes upstream](https://github.com/ts-defold/deherm/issues/102).
+
 1. Keep one ordered policy graph: discover, derive on Linux, run exact-call and
    engine sentinels, validate Linux/macOS/Windows parity, publish, then smoke a
    clean consumer.
@@ -123,6 +127,8 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
 
 ## 4. Finish the installed developer experience
 
+Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and profiling](https://github.com/ts-defold/deherm/issues/96).
+
 1. Make `npx deherm` enter the TUI, discover `game.project`, or offer a scaffold
    when absent, entirely from the published npm package.
 2. Default dev mode watches, incrementally compiles, builds when necessary,
@@ -136,6 +142,8 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
 
 ## 5. Finish public API ergonomics and project integration
 
+Public ledger: [#100 Finish idiomatic TypeScript API ergonomics and extension ingestion](https://github.com/ts-defold/deherm/issues/100).
+
 1. Preserve contextual `DefoldHash` literals; runtime-hash only dynamic data.
 2. Finish the public `defold` namespace migration and remove leaked `builtins`
    without changing stable ABI identities.
@@ -148,6 +156,8 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
 
 ## 6. Dogfood the finished system in War Battles
 
+Public ledger: [#99 Ship playable War Battles across native, Static Hermes, and browser](https://github.com/ts-defold/deherm/issues/99).
+
 1. Make the tutorial-faithful game playable with real tutorial art, correctly
    sliced/anchored animation, tint/material effects, input, GUI, audio,
    collisions, scoring, restart, and bots—all in public-package TypeScript.
@@ -159,6 +169,8 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
    persistence, soak tests, and local Docker orchestration.
 
 ## 7. Reserved frontiers after the core/product gate
+
+Public ledger: [#103 React or Preact GUI](https://github.com/ts-defold/deherm/issues/103), [#101 TypeGPU and `use math`](https://github.com/ts-defold/deherm/issues/101), [#98 strict Static Hermes extension authoring](https://github.com/ts-defold/deherm/issues/98), [#105 TurboModule/Nitro/JSI modules](https://github.com/ts-defold/deherm/issues/105), and [#104 focused upstream Static Hermes fixes](https://github.com/ts-defold/deherm/issues/104).
 
 1. React or Preact hooks over Defold GUI with a custom reconciler and measured
    Yoga/Clay choice.
