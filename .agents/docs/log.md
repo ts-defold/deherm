@@ -1,5 +1,28 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Cross-platform policy and Bob delivery are green
+
+* **The Windows ICU change is now integrated evidence, not a manifest
+  inference**: end-to-end run
+  [`35516412770`](https://github.com/ts-defold/deherm/actions/runs/35516412770)
+  completed green for local clean-package generation, extension headers, and
+  every Bob row: arm64/armv7/x86_64 Android, arm64 device/simulator iOS,
+  arm64/x86_64 macOS, x86_64 Windows, arm64/x86_64 Linux, and wasm-web. The
+  Windows row proves Defold's final link consumes the system ICU import
+  libraries from the extension manifest. This run proves those exact published
+  archives can build the extension; it does not independently prove gameplay.
+
+* **The ordered policy graph is also terminal green**: run
+  [`35516395101`](https://github.com/ts-defold/deherm/actions/runs/35516395101)
+  discovered revisions, generated the complete store, compiled/linked/ran in
+  Defold, reproduced Linux canonical bytes on Windows and macOS, published the
+  website, then resolved the published policy into a clean generated project.
+  Provenance run
+  [`35516395090`](https://github.com/ts-defold/deherm/actions/runs/35516395090)
+  separately accepted the signed human-authored history. Issue #97 remains open
+  until its broader fingerprint/cache/download/consumer acceptance is
+  reconciled after the preceding exact-call and policy-realization waves.
+
 ## 2026-09-20 - Scalar Lua calls resolve sparse IDs once
 
 * **The repeated lookup claim was reproduced and removed without changing the
