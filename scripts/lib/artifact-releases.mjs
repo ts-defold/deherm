@@ -49,7 +49,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { serializeObject } from "../../packages/compiler/src/api-policy.mjs";
+import { serializeObject } from "../../packages/generator/src/policy/api-policy.mjs";
 
 export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 

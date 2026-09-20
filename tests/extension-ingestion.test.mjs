@@ -15,9 +15,14 @@ import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr, generateExtensionTypes, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr as compileProjectBindingIr, generateExtensionTypes as renderExtensionTypes, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 import { inspectDefoldProject } from "../packages/cli/src/project.mjs";
 import { fixtureRoot, materializeIngestionProject, readExtensionLock } from "./fixtures/defold-extension-ingestion/materialize.mjs";
+
+const defoldValueLayouts = JSON.parse(
+  await readFile(path.resolve("packages/bindings/generated/defold-value-layouts.json"), "utf8"));
+const buildProjectBindingIr = (inventory) => compileProjectBindingIr(inventory, defoldValueLayouts);
+const generateExtensionTypes = (inventory) => renderExtensionTypes(inventory, defoldValueLayouts);
 
 /** Builds a binding IR from declarations without touching the filesystem. */
 function projectDeclarations(...declarations) {

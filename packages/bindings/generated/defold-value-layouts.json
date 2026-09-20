@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "Fixed-layout Defold script value types derived from the pinned dmSDK headers, reviewed opaque classifications, and generated conservative opaque fallbacks for revision-specific names. Conservative entries remain usable through the universal value transport but are excluded from transparent typed-native lowering until specialized layout evidence exists. Layout only; this is not compile, link, runtime, or conformance evidence.",
-  "policySha256": "134b506a020dd65dbd14fd4406c5e570cbebbd2bfdfe6d498fe0d4684297850c",
+  "policySha256": "cd6f271e34db062c46d40686fea1ae2009ce8ba9bcaf8487c1f89ea6f05a2848",
   "sourceSha256": {
     "hash": {
       "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
@@ -48,7 +48,8 @@
       "evidence": {
         "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
         "declaration": "dmhash_t"
-      }
+      },
+      "typescriptType": "DefoldHash"
     },
     "matrix4": {
       "transport": "float-arena",
@@ -66,7 +67,8 @@
         "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
         "line": 102,
         "declaration": "Matrix4"
-      }
+      },
+      "typescriptType": "Matrix4"
     },
     "quaternion": {
       "transport": "float-lanes",
@@ -80,7 +82,8 @@
         "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
         "line": 77,
         "declaration": "Quat"
-      }
+      },
+      "typescriptType": "Quaternion"
     },
     "url": {
       "transport": "u64-lane-quad",
@@ -112,7 +115,8 @@
         "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/message.h",
         "declaration": "URL",
         "line": 72
-      }
+      },
+      "typescriptType": "DefoldUrl"
     },
     "vector3": {
       "transport": "float-lanes",
@@ -126,7 +130,8 @@
         "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
         "line": 47,
         "declaration": "Vector3"
-      }
+      },
+      "typescriptType": "Vector3"
     },
     "vector4": {
       "transport": "float-lanes",
@@ -140,7 +145,8 @@
         "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h",
         "line": 62,
         "declaration": "Vector4"
-      }
+      },
+      "typescriptType": "Vector4"
     }
   },
   "opaque": {

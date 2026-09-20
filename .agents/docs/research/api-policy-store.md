@@ -42,6 +42,14 @@ are visibly tagged authenticated compatibility sources. The 21 MB object is
 not the intended steady-state size: the 15 MB lowering plan is derived and will
 move back behind package code once its smaller recipe inputs are normalized.
 
+The policy/package dependency points in one direction. Policy objects carry all
+Defold-defined vocabulary and the exact recipe data selected from it. The npm
+package carries reusable parsers, recipe interpreters, emitters, and runtime
+shapes. Each index entry advertises the minimum package version and exact
+realizer capabilities needed, allowing the CLI to reject an old installation
+before downloading the large root/object closure. Ordinary new Defold revisions
+therefore publish policy only; they do not require an npm release.
+
 # The structure is the decision
 
 The root hashes subtrees; it is not a blob with a hash on it. That is what makes

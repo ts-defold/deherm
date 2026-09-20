@@ -191,6 +191,9 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
     const builder = transportBuilders[entry.transport];
     assert(builder, `${name}: unsupported transparent transport ${entry.transport}`);
     const layout = builder(sources, entry);
+    assert(typeof entry.typescriptType === "string" && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(entry.typescriptType),
+      `${name}: transparent policy must declare a TypeScript type identifier`);
+    layout.typescriptType = entry.typescriptType;
     layout.evidence = { ...layout.evidence, file: sourcePaths[layout.evidence.file] ?? layout.evidence.file };
     transparent[name] = layout;
   }

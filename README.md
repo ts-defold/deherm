@@ -181,7 +181,10 @@ The two `luasocket` routes that manufacture captured Lua closures fail closed.
 Every one of the 1,361 runtime dmSDK declarations has a deterministic universal
 recipe and stable ID. `deherm materialize-dmsdk` turns a project's reachable
 recipe selection into tree-shakeable C++ thunks; specialized generated adapters
-remain preferred. This is a complete generation path, not a claim that all
+remain preferred. It reads the revision-matched catalog materialized at
+`.deherm/ir/dmsdk-universal-bindings.json`; `--catalog` can name that policy
+document explicitly. The package ships the catalog-free algorithm, not a
+Defold-version catalog. This is a complete generation path, not a claim that all
 native engine implementations have already been linked and behavior-tested.
 The pinned arm64 macOS Defold engine currently proves selected generated calls,
 a packaged TypeScript GUI component, and a transactional Dynamic-Hermes

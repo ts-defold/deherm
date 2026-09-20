@@ -39,6 +39,7 @@ Options:
   --bob <path>       Bob jar interrogated for the project's engine SHA when nothing else names it
   --output <path>    Conformance harness output directory
   --usage <path>     dmSDK usage document for materialize-dmsdk
+  --catalog <path>   Resolved dmSDK policy catalog (defaults to project .deherm/ir)
   --header <path>    Public C header for generate-extension-api
   --module <name>    C symbol prefix/module name for generate-extension-api
   --plan <path>      Conformance plan used by the report command
@@ -120,6 +121,7 @@ export function parseArguments(argv) {
     else if (value === "--bob") options.bob = args.shift();
     else if (value === "--output") options.output = args.shift();
     else if (value === "--usage") options.usage = args.shift();
+    else if (value === "--catalog") options.catalog = args.shift();
     else if (value === "--header") options.header = args.shift();
     else if (value === "--module") options.module = args.shift();
     else if (value === "--plan") options.plan = args.shift();
@@ -350,6 +352,8 @@ export async function run(argv = process.argv.slice(2)) {
     const result = await materializeDmSdkUsageFile({
       usage: options.usage,
       output: options.output,
+      catalog: options.catalog,
+      project: options.project,
       check: options.check,
     });
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));

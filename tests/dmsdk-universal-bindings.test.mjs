@@ -6,12 +6,16 @@ import path from "node:path";
 import test from "node:test";
 
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
-import { dmSdkUniversalCatalogSha256 } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
+import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 import { buildUniversalDmSdkBindings } from "../scripts/generate-dmsdk-universal-bindings.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json");
 const compiler = process.env.CXX || "clang++";
+const policyCatalog = Object.freeze({
+  sourceHashes: Object.freeze({ catalog: dmSdkUniversalCatalogSha256 }),
+  recipes: dmSdkUniversalRecipes
+});
 
 function run(command, args) {
   return execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe" });
@@ -178,7 +182,7 @@ test("usage materializer compiles, links, and runs direct, function-template, co
       resultShape: { kind: "scalar", name: "i32" },
     },
   ];
-  const generated = materializeDmSdkUsages(usages, { catalogSha256: dmSdkUniversalCatalogSha256 });
+  const generated = materializeDmSdkUsages(usages, { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
   assert.equal(generated.manifest.length, usages.length);
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-materialized-"));
   try {
@@ -273,7 +277,7 @@ test("usage materializer normalizes JavaScript numeric cells for f32 arguments a
     declarationId: cosine.declarationId,
     wrapper: "wrap_cosine",
     acknowledgements: { generatedAdapterBypass: { reason: "exercise universal fallback", evidence: "source assertions verify f64 normalization" } },
-  }], { catalogSha256: dmSdkUniversalCatalogSha256 });
+  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
   assert.match(generated.source, /static_cast<float>\(deherm_dmsdk_unpack_f64\(arguments\[0\]\.payload\)\)/);
   assert.match(generated.source, /const double normalized = static_cast<double>\(value\)/);
   assert.doesNotMatch(generated.source, /deherm_dmsdk_unpack_f32/);
@@ -282,10 +286,10 @@ test("usage materializer normalizes JavaScript numeric cells for f32 arguments a
 test("usage materializer fails closed on catalog drift, unsafe bypass, arity overrides, and scalar narrowing", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const toNetwork = recipe(report, "dmEndian::ToNetwork", (item) => item.abi.parameters[0]?.nativeType === "uint32_t");
-  assert.throws(() => materializeDmSdkUsages([], {}), /catalog identity mismatch/);
-  assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId }], { catalogSha256: dmSdkUniversalCatalogSha256 }), /generatedAdapterBypass/);
-  assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, parameters: [], acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalogSha256: dmSdkUniversalCatalogSha256 }), /override parameters only/);
-  const generated = materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalogSha256: dmSdkUniversalCatalogSha256 });
+  assert.throws(() => materializeDmSdkUsages([], {}), /requires a resolved policy catalog/);
+  assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /generatedAdapterBypass/);
+  assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, parameters: [], acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /override parameters only/);
+  const generated = materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
   assert.match(generated.source, /payload <= UINT32_MAX/);
   assert.equal(generated.catalogSha256, dmSdkUniversalCatalogSha256);
 });

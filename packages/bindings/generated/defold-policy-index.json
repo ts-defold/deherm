@@ -21,8 +21,25 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "85409076d94b0882a1464b2b8189ea54adb3fa1ca5174f1e6a6609bdb70da226",
-      "generator": "sha256:0e87e8c6ccd4f7e1591d732a8031539c1c5dc1f75105420483dae1850aeb0cc3"
+      "policyRoot": "1067a0ba49574ad4fbc344b9aeb9f23f812c78478099ab9d393d72a605f3a61b",
+      "generator": "sha256:bd8248913aaede5b86c0e5c30ad1772b845d7438fb291c1edb712b70b2221174",
+      "realizer": {
+        "minimumPackageVersion": "0.0.0",
+        "requiredCapabilities": [
+          "policy.compiler-document.copy-json.v1",
+          "policy.compiler-document.defold-value-layouts.v1",
+          "policy.compiler-document.dmsdk-universal.v1",
+          "policy.content-addressed-graph.v1",
+          "sdk.compatibility-source.copy.v1",
+          "sdk.dmsdk.index.render.v1",
+          "sdk.dmsdk.runtime.render.v1",
+          "sdk.dmsdk.types.render.v1",
+          "sdk.script.index.render.v1",
+          "sdk.script.modules.render.v1",
+          "sdk.script.runtime.render.v1",
+          "sdk.script.types.render.v1"
+        ]
+      }
     }
   ]
 }

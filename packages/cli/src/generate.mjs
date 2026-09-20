@@ -35,24 +35,25 @@ const generatedContextExportNames = new Set(["projectExtensions"]);
 // instead of degrading every vmath-shaped parameter to `unknown`. Value types
 // that have a layout but no TypeScript projection fail this module at load
 // time rather than silently losing their shape.
-const defoldValueLayouts = require("../../bindings/generated/defold-value-layouts.json");
-const defoldValueTypeScriptNames = new Map([
-  ["hash", "DefoldHash"],
-  ["matrix4", "Matrix4"],
-  ["quaternion", "Quaternion"],
-  ["url", "DefoldUrl"],
-  ["vector3", "Vector3"],
-  ["vector4", "Vector4"]
-]);
-const transparentDefoldValueTypes = new Map(Object.keys(defoldValueLayouts.transparent).sort(compareCodeUnits).map((name) => {
-  const ts = defoldValueTypeScriptNames.get(name);
-  if (!ts) throw new Error(`Transparent Defold value type '${name}' has no TypeScript projection in the extension lane`);
-  return [name, ts];
-}));
-const opaqueDefoldValueTypes = new Set(Object.keys(defoldValueLayouts.opaque));
-// Imported into every generated extension declaration file so a resolved value
-// type renders as the same TypeScript type the core SDK emits.
-const defoldValueTypeImports = ["Matrix4", "Quaternion", "Vector3", "Vector4"];
+export function createDefoldValueTypeCatalog(layouts) {
+  if (!layouts || layouts.schemaVersion !== 1 || !layouts.transparent || !layouts.opaque) {
+    throw new Error("Resolved Defold surface has no supported value-layout catalog");
+  }
+  const transparent = new Map(Object.keys(layouts.transparent).sort(compareCodeUnits).map((name) => {
+    const typeName = layouts.transparent[name]?.typescriptType;
+    if (typeof typeName !== "string" || !/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(typeName)) {
+      throw new Error(`Transparent Defold value type '${name}' has no policy-defined TypeScript projection`);
+    }
+    return [name.toLowerCase(), typeName];
+  }));
+  return Object.freeze({
+    transparent,
+    opaque: new Set(Object.keys(layouts.opaque).map((name) => name.toLowerCase())),
+    imports: [...new Set(transparent.values())]
+      .filter((name) => name !== "DefoldHash" && name !== "DefoldUrl")
+      .sort(compareCodeUnits)
+  });
+}
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -180,21 +181,21 @@ function declaredName(rawName, fallback) {
   return { name: value, optional: false, spelling: "plain" };
 }
 
-function normalizeType(value) {
+function normalizeType(value, valueTypes) {
   if (Array.isArray(value?.type)) {
     // YAML sequence unions: `type: [vector3, vector4]`. The Defold editor joins
     // the same sequence with `|`, so it is an alternation, not a tuple.
     const raw = value.type.map((entry) => typeof entry === "string" ? entry.trim() : String(entry)).join("|");
     if (!value.type.length) return { kind: "unprojectable", code: "empty-type-union", raw };
-    return unionType(value.type.map((entry) => normalizeType(typeof entry === "string" ? entry : { ...value, type: entry })), raw);
+    return unionType(value.type.map((entry) => normalizeType(typeof entry === "string" ? entry : { ...value, type: entry }, valueTypes)), raw);
   }
-  if (typeof value === "string") return normalizeNamedType(value, value);
+  if (typeof value === "string") return normalizeNamedType(value, value, valueTypes);
   if (typeof value?.type !== "string") {
     return { kind: "unprojectable", code: "missing-type", raw: null };
   }
   const raw = value.type;
   if (raw.includes("|")) {
-    return unionType(raw.split("|").map((part) => normalizeType({ ...value, type: part.trim() })), raw);
+    return unionType(raw.split("|").map((part) => normalizeType({ ...value, type: part.trim() }, valueTypes)), raw);
   }
   const nested = raw.trim().toLowerCase() === "table" ? nestedDeclarations(value) : null;
   if (nested) {
@@ -207,7 +208,7 @@ function normalizeType(value) {
           optional: declared.optional || field?.optional === true,
           type: declared.blocker
             ? { kind: "unprojectable", code: declared.blocker, raw: typeof field?.name === "string" ? field.name : null }
-            : normalizeType(field)
+            : normalizeType(field, valueTypes)
         };
         if (declared.spelling !== "plain") entry.nameSpelling = declared.spelling;
         return entry;
@@ -215,10 +216,10 @@ function normalizeType(value) {
       raw
     };
   }
-  return normalizeNamedType(raw, raw);
+  return normalizeNamedType(raw, raw, valueTypes);
 }
 
-function normalizeNamedType(raw, original) {
+function normalizeNamedType(raw, original, valueTypes) {
   const name = raw.trim().toLowerCase();
   switch (name) {
     case "bool":
@@ -237,9 +238,9 @@ function normalizeNamedType(raw, original) {
     case "any": return { kind: "unknown", raw: original };
     default: break;
   }
-  const transparent = transparentDefoldValueTypes.get(name);
+  const transparent = valueTypes.transparent.get(name);
   if (transparent) return { kind: "defold-value", name, ts: transparent, raw: original };
-  if (opaqueDefoldValueTypes.has(name)) {
+  if (valueTypes.opaque.has(name)) {
     return { kind: "unprojectable", code: `opaque-defold-value-type:${name}`, raw: original };
   }
   return { kind: "unprojectable", code: `unresolved-named-type:${raw.trim()}`, raw: original };
@@ -314,7 +315,7 @@ function collectModules(inventory) {
   return [...modules.values()].sort((left, right) => compareCodeUnits(left.name, right.name));
 }
 
-function normalizeMember(moduleName, member) {
+function normalizeMember(moduleName, member, valueTypes) {
   const rawName = member.name;
   const jsName = memberIdentifier(rawName);
   const common = {
@@ -341,7 +342,7 @@ function normalizeMember(moduleName, member) {
         type: { kind: "unprojectable", code: "call-signature-without-function-type", raw: typeof member.type === "string" ? member.type : null }
       }, [{ site: "value", code: "call-signature-without-function-type", raw: typeof member.type === "string" ? member.type : null }]);
     }
-    const type = normalizeType(member);
+    const type = normalizeType(member, valueTypes);
     return withBlockers({ ...common, kind: "value", type }, typeBlockers(type, "value"));
   }
   const blockers = [];
@@ -350,7 +351,7 @@ function normalizeMember(moduleName, member) {
     const site = `parameter[${index}]:${declared.name}`;
     const type = declared.blocker
       ? { kind: "unprojectable", code: declared.blocker, raw: typeof parameter?.name === "string" ? parameter.name : null }
-      : normalizeType(parameter);
+      : normalizeType(parameter, valueTypes);
     blockers.push(...typeBlockers(type, site));
     const entry = {
       rawName: declared.name,
@@ -374,8 +375,8 @@ function normalizeMember(moduleName, member) {
     : Array.isArray(result)
       // A one-entry `returns:` sequence is a single Lua return value, not a
       // one-element tuple.
-      ? (result.length === 1 ? normalizeType(result[0]) : { kind: "tuple", types: result.map(normalizeType) })
-      : normalizeType(result);
+      ? (result.length === 1 ? normalizeType(result[0], valueTypes) : { kind: "tuple", types: result.map((entry) => normalizeType(entry, valueTypes)) })
+      : normalizeType(result, valueTypes);
   blockers.push(...typeBlockers(returns, "return"));
   return withBlockers({ ...common, kind: "function", parameters, returns }, blockers);
 }
@@ -396,7 +397,8 @@ function withBlockers(normalized, blockers) {
   };
 }
 
-export function buildProjectBindingIr(inventory) {
+export function buildProjectBindingIr(inventory, layouts) {
+  const valueTypes = createDefoldValueTypeCatalog(layouts);
   const baseModules = collectModules(inventory).map((module) => {
     const members = [];
     const rawNames = new Set();
@@ -404,7 +406,7 @@ export function buildProjectBindingIr(inventory) {
     for (const member of module.members) {
       if (!member || typeof member.name !== "string" || rawNames.has(member.name)) continue;
       rawNames.add(member.name);
-      const normalized = normalizeMember(module.name, member);
+      const normalized = normalizeMember(module.name, member, valueTypes);
       const collision = jsNames.get(normalized.jsName);
       if (collision) {
         throw new Error(`${module.name}: ${collision} and ${member.name} both map to TypeScript name ${normalized.jsName}`);
@@ -487,12 +489,13 @@ function blockedMemberMessage(module, member) {
   return `deherm: ${module.runtimeName}.${member.rawName} is not projectable from .script_api (${member.blockers.map(({ site, code }) => `${site}=${code}`).join(", ")})`;
 }
 
-function generatedModuleSource(module) {
+function generatedModuleSource(module, valueTypes) {
   const interfaceName = module.typeName;
   const exportName = module.jsName;
+  const typeImports = [interfaceName, "DefoldAddressLiteral", "DefoldRelativeAddress", "DefoldHash", "DefoldUrl", ...valueTypes.imports];
   const lines = [
     "// Generated by deherm. Do not edit.",
-    `import type { ${interfaceName}, DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl, ${defoldValueTypeImports.join(", ")} } from "../../extensions.js";`,
+    `import type { ${typeImports.join(", ")} } from "../../extensions.js";`,
     'import { callExtension, getExtensionValue } from "../runtime.js";',
     "",
     `export const ${exportName}: ${interfaceName} = {`
@@ -906,14 +909,15 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   }));
   const sdkSourceRoot = surface.sdkRoot;
   const {
-    scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath,
+    valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath,
     scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath
   } = surface.paths;
   // The lowering-plan generator is package code, not engine surface: it is the
   // program that produced the plan, and its digest authenticates the plan
   // whichever revision the plan describes.
   const loweringPlanGeneratorPath = path.join(packageRoot, "packages", "compiler", "src", "generate-binding-lowering-plan.mjs");
-  const [scriptSource, dmsdkSource, scriptDispatchSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, dmsdkUniversalSource, packageSource] = await Promise.all([
+  const [valueLayoutsSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, dmsdkUniversalSource, packageSource] = await Promise.all([
+    readFile(valueLayoutsPath),
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
     readFile(scriptDispatchPath),
@@ -927,6 +931,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     readFile(dmsdkUniversalPath),
     readFile(path.join(packageRoot, "package.json"), "utf8")
   ]);
+  const valueLayouts = JSON.parse(valueLayoutsSource);
   const scriptIr = JSON.parse(scriptSource);
   const dmsdkIr = JSON.parse(dmsdkSource);
   const scriptDispatch = JSON.parse(scriptDispatchSource);
@@ -937,7 +942,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const loweringPlanSentinel = JSON.parse(loweringPlanSentinelSource);
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
   const dmsdkUniversal = JSON.parse(dmsdkUniversalSource);
-  const revisions = new Set([scriptIr, dmsdkIr, scriptDispatch, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
+  const revisions = new Set([valueLayouts, scriptIr, dmsdkIr, scriptDispatch, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
@@ -974,6 +979,8 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     // carries parseEnvironment, not a fake host platform. This field names the
     // host on which the generated project will run conformance/development.
     platform: hostDefoldPlatform(),
+    valueLayouts,
+    valueTypes: createDefoldValueTypeCatalog(valueLayouts),
     scriptIr,
     dmsdkIr,
     scriptDispatch,
@@ -985,6 +992,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     dmsdkThunks,
     dmsdkUniversal,
     inputs: {
+      valueLayoutsSha256: sha256(valueLayoutsSource),
       scriptIrSha256: sha256(scriptSource),
       dmsdkIrSha256: sha256(dmsdkSource),
       scriptDispatchSha256: sha256(scriptDispatchSource),
@@ -997,7 +1005,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
       dmsdkUniversalSha256: sha256(dmsdkUniversalSource),
       sdkSourceSha256
     },
-    paths: { scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath }
+    paths: { valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath }
   };
 }
 
@@ -1034,15 +1042,17 @@ function validateEngineProfiles(engineProfiles, catalog) {
   };
 }
 
-export function generateExtensionTypes(inventory) {
-  const modules = buildProjectBindingIr(inventory).modules;
-  const valueTypes = defoldValueTypeImports.join(", ");
+export function generateExtensionTypes(inventory, layouts) {
+  const valueTypes = createDefoldValueTypeCatalog(layouts);
+  const modules = buildProjectBindingIr(inventory, layouts).modules;
   const lines = [
     "// Generated by deherm. Do not edit.",
     'import type { DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl } from "./sdk/address.js";',
     'export type { DefoldAddressLiteral, DefoldRelativeAddress, DefoldHash, DefoldUrl } from "./sdk/address.js";',
-    `import type { ${valueTypes} } from "./sdk/generated/script/types.js";`,
-    `export type { ${valueTypes} } from "./sdk/generated/script/types.js";`,
+    ...(valueTypes.imports.length ? [
+      `import type { ${valueTypes.imports.join(", ")} } from "./sdk/generated/script/types.js";`,
+      `export type { ${valueTypes.imports.join(", ")} } from "./sdk/generated/script/types.js";`
+    ] : []),
     ""
   ];
   for (const module of modules) {
@@ -1180,7 +1190,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const toolchain = defoldToolchain(core.revision);
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const portableInventory = { ...inventory, projectRoot: "." };
-  const bindingIr = buildProjectBindingIr(inventory);
+  const bindingIr = buildProjectBindingIr(inventory, core.valueLayouts);
   const generation = await projectGenerationIdentity({
     inventory: portableInventory,
     outputDirectory: relativeRoot,
@@ -1232,6 +1242,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await writeFile(path.join(root, "bindings.ir.json"), `${JSON.stringify(bindingIr, null, 2)}\n`);
   const irRoot = path.join(root, "ir");
   await mkdir(irRoot, { recursive: true });
+  await cp(core.paths.valueLayoutsPath, path.join(irRoot, "defold-value-layouts.json"));
   await cp(core.paths.scriptIrPath, path.join(irRoot, "script-api.json"));
   await cp(core.paths.dmsdkIrPath, path.join(irRoot, "dmsdk.json"));
   await cp(core.paths.scriptDispatchPath, path.join(irRoot, "script-scalar-dispatch.json"));
@@ -1242,7 +1253,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(core.paths.loweringPlanSentinelPath, path.join(irRoot, "binding-lowering-plan.sentinel.json"));
   await cp(core.paths.dmsdkThunksPath, path.join(irRoot, "dmsdk-scalar-thunks.json"));
   await cp(core.paths.dmsdkUniversalPath, path.join(irRoot, "dmsdk-universal-bindings.json"));
-  await writeFile(path.join(root, "extensions.d.ts"), generateExtensionTypes(inventory));
+  await writeFile(path.join(root, "extensions.d.ts"), generateExtensionTypes(inventory, core.valueLayouts));
   const modules = bindingIr.modules;
   const sdkRoot = path.join(root, "sdk");
   const modulesRoot = path.join(sdkRoot, "modules");
@@ -1276,7 +1287,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   ];
   for (const module of modules) {
     const moduleFile = module.fileName;
-    await writeFile(path.join(modulesRoot, `${moduleFile}.ts`), generatedModuleSource(module));
+    await writeFile(path.join(modulesRoot, `${moduleFile}.ts`), generatedModuleSource(module, core.valueTypes));
     exports.push(`export { ${module.jsName} } from "./modules/${moduleFile}.js";`);
   }
   exports.push("");

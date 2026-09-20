@@ -43,13 +43,14 @@ Resolution stops at the first layer whose content hash matches.
 
 | Layer | Contents | Keyed by | Ships in |
 | --- | --- | --- | --- |
-| 0 | The pinned Defold engine surface | Defold revision | the déherm package |
-| 1 | Curated policies for audited extensions | archive content hash | the déherm package |
+| 0 | The pinned Defold engine surface | Defold revision | the content-addressed policy site; the package ships only a small locator/index seed |
+| 1 | Curated policies for audited extensions | archive content hash | the policy site or another configured immutable policy source |
 | 2 | Project-local policies for the user's own and unaudited extensions | archive or tree content hash | the user's project, committed |
 | 3 | Parse from source | — | nothing; produces a layer-2 policy |
 
-Layer 0 means the engine surface costs nothing to consume and requires no engine
-checkout. Layer 1 means common extensions cost nothing either. Layer 2 means an
+Layer 0 means the engine surface requires no engine checkout and does not force
+an npm release for each Defold revision. Layer 1 means common extensions need no
+source parse when an authenticated policy is available. Layer 2 means an
 unknown extension is parsed once per project and then committed, so the next
 generation — and every teammate and CI run — reuses it. Layer 3 runs only when
 nothing matches.
@@ -60,9 +61,11 @@ A policy is only valid for the exact bytes it was derived from.
 
 * The key is the content hash of the extension archive or tree, not its version
   string, URL, or declared revision. Publishers retag.
-* A policy also records the **generator revision** that produced it. Improving
-  the parser invalidates every policy derived by an older one, because the newer
-  parser may resolve a construct the older one blocked.
+* A policy also records the **generator revision** that produced it and a
+  realizer compatibility contract. Improving source derivation produces a new
+  root; adding a genuinely new realization construct raises the minimum package
+  version and names its required capability. A Defold revision that only changes
+  names or ordinary declarations does neither.
 * A hash mismatch causes a reparse and a diagnostic naming both hashes. It never
   silently uses the nearest policy, and never silently accepts one whose key
   does not match.

@@ -379,11 +379,14 @@ catalogs are the project-local authorities for that next build step.
 
 `materialize-dmsdk` is that deterministic next step for native extension code.
 It accepts a versioned JSON document with a `usages` array, resolves every
-`declarationId` against the shipped universal recipe catalog, and emits a
+`declarationId` against the revision-matched policy catalog already materialized
+at `.deherm/ir/dmsdk-universal-bindings.json`, and emits a
 single usage-pruned C++ provider plus a hash-bound JSON report. Concrete
 functions need only their declaration identity; templates, records, receivers,
 and ambiguous native types supply the explicit materializer fields recorded by
-their recipe. `--check` verifies both outputs byte-for-byte without writing.
+their recipe. Outside a generated project, pass
+`--catalog <defold-dmsdk-universal-bindings.json>` explicitly. `--check`
+verifies both outputs byte-for-byte without writing.
 The generated report names the provider install function that the consuming
 Defold extension calls during initialization. This keeps native reachability
 and all non-inferable ABI choices in checked configuration instead of edits to

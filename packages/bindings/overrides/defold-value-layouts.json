@@ -8,31 +8,37 @@
   },
   "transparent": {
     "vector3": {
+      "typescriptType": "Vector3",
       "source": "vmath",
       "declaration": "Vector3",
       "transport": "float-lanes"
     },
     "vector4": {
+      "typescriptType": "Vector4",
       "source": "vmath",
       "declaration": "Vector4",
       "transport": "float-lanes"
     },
     "quaternion": {
+      "typescriptType": "Quaternion",
       "source": "vmath",
       "declaration": "Quat",
       "transport": "float-lanes"
     },
     "matrix4": {
+      "typescriptType": "Matrix4",
       "source": "vmath",
       "declaration": "Matrix4",
       "transport": "float-arena"
     },
     "hash": {
+      "typescriptType": "DefoldHash",
       "source": "hash",
       "declaration": "dmhash_t",
       "transport": "u64-scalar"
     },
     "url": {
+      "typescriptType": "DefoldUrl",
       "source": "message",
       "declaration": "URL",
       "transport": "u64-lane-quad"

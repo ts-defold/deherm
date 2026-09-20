@@ -8,22 +8,25 @@ import { fileURLToPath } from "node:url";
 
 import {
   assertNoRevisionLeak,
+  buildIndexEntry,
   buildPolicy,
+  buildPolicyRealizer,
   canonicalize,
   dmsdkNamespaceOfHeader,
   hashBytes,
   indexPath,
   normalizePaths,
   objectPath,
+  POLICY_REALIZER_CAPABILITIES,
   policyPath,
   scriptNamespaceOfModulePath,
   scriptNamespaceOfTypeName,
   sealObject,
   serializeObject
-} from "../packages/compiler/src/api-policy.mjs";
+} from "../packages/generator/src/policy/api-policy.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
-import { generatorRevision } from "../scripts/generate-api-policy.mjs";
+import { buildShippedIndex, generatorRevision } from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -178,6 +181,7 @@ function fixture(overrides = {}) {
     },
     resourceSchema: { derivation: [], resources: [], blockers: [], ...overrides.resourceSchema },
     toolchain: { source: "sdk.py", pins: { EMSCRIPTEN_VERSION_STR: "4.0.6" }, platformKeys: [], ...overrides.toolchain },
+    compilerSurface: overrides.compilerSurface,
     generator: overrides.generator ?? "sha256:fixture",
     repositoryRoot: "/checkout"
   };
@@ -239,6 +243,70 @@ test("deriving the same inputs twice produces identical hashes", () => {
   // Every object is addressed by the hash of its own bytes.
   for (const [hash, bytes] of first.objects) assert.equal(hashBytes(bytes), hash);
   assert.equal(hashBytes(first.rootBytes), first.rootHash);
+});
+
+test("policy roots carry only the realization capabilities their payload uses", () => {
+  const compilerSurface = {
+    documents: {},
+    sdk: {
+      "script/types.ts": { mode: "render-and-verify" },
+      "dmsdk/types.ts": { mode: "render-and-verify" },
+      "script/value-target-support.ts": { mode: "authenticated-compatibility-source" }
+    },
+    realizationRecipes: {
+      documents: {},
+      sdk: {
+        "script/types.ts": "sdk.script.types.render.v1",
+        "dmsdk/types.ts": "sdk.dmsdk.types.render.v1",
+        "script/value-target-support.ts": "sdk.compatibility-source.copy.v1"
+      }
+    }
+  };
+  const policy = buildPolicy(fixture({ compilerSurface }));
+  assert.deepEqual(policy.root.realizer, {
+    minimumPackageVersion: "0.0.0",
+    requiredCapabilities: [
+      "policy.content-addressed-graph.v1",
+      "sdk.compatibility-source.copy.v1",
+      "sdk.dmsdk.types.render.v1",
+      "sdk.script.types.render.v1"
+    ]
+  });
+  assert.deepEqual(buildPolicyRealizer({ compilerSurface: undefined }), {
+    minimumPackageVersion: "0.0.0",
+    requiredCapabilities: ["policy.content-addressed-graph.v1"]
+  });
+  const introduced = Object.fromEntries(POLICY_REALIZER_CAPABILITIES.map((capability) => [
+    capability,
+    { introducedInVersion: capability === "sdk.script.types.render.v1" ? "2.4.0" : "1.3.0" }
+  ]));
+  assert.equal(
+    buildPolicyRealizer({ compilerSurface, capabilityRegistry: introduced }).minimumPackageVersion,
+    "2.4.0",
+    "the floor is the newest capability actually required, not the producer package version"
+  );
+});
+
+test("index entries and the shipped index preserve the root realization contract", () => {
+  const policy = buildPolicy(fixture());
+  const entry = buildIndexEntry({
+    defoldRevision: "a".repeat(40),
+    policyRoot: policy.rootHash,
+    generator: policy.root.generator,
+    realizer: policy.root.realizer
+  });
+  assert.deepEqual(entry.realizer, policy.root.realizer);
+  const shipped = buildShippedIndex({
+    site: {
+      baseUrl: "https://example.test/deherm",
+      pathPrefix: "policies",
+      layoutVersion: "v1",
+      channels: ["stable"],
+      channelInfoUrl: "https://example.test/{channel}/info.json"
+    },
+    entries: [entry]
+  });
+  assert.deepEqual(shipped.entries[0].realizer, policy.root.realizer);
 });
 
 test("two inputs differing in one namespace share every other subtree", () => {

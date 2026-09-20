@@ -1,15 +1,18 @@
 import { materializeDmSdkUsages as materializeWithCatalog } from "./dmsdk-universal-materializer-core.mjs";
-import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "./generated/dmsdk-universal-recipes.mjs";
-
-export { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes };
 
 export function materializeDmSdkUsages(usages, options = {}) {
-  if (options.catalogSha256 !== dmSdkUniversalCatalogSha256) {
-    throw new Error(`dmSDK catalog identity mismatch: expected ${dmSdkUniversalCatalogSha256}`);
+  const catalog = options.catalog;
+  const recipes = options.recipes ?? catalog?.recipes;
+  const catalogSha256 = catalog?.sourceHashes?.catalog;
+  if (!Array.isArray(recipes) || recipes.length === 0 || !/^[a-f0-9]{64}$/.test(catalogSha256 ?? "")) {
+    throw new Error("dmSDK materializer requires a resolved policy catalog with recipes and sourceHashes.catalog");
+  }
+  if (options.catalogSha256 !== catalogSha256) {
+    throw new Error(`dmSDK catalog identity mismatch: expected ${catalogSha256}`);
   }
   return materializeWithCatalog(usages, {
-    recipes: options.recipes ?? dmSdkUniversalRecipes,
+    recipes,
     ...options,
-    catalogSha256: dmSdkUniversalCatalogSha256
+    catalogSha256
   });
 }

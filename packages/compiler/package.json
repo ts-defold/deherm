@@ -12,7 +12,6 @@
     "./binding-lowering-plan": "./src/generate-binding-lowering-plan.mjs",
     "./dmsdk-universal-materializer": "./src/dmsdk-universal-materializer.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
-    "./policy-surface-materializer": "./src/policy-surface-materializer.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"
   }

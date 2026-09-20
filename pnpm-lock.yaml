@@ -70,6 +70,8 @@ importers:
 
   packages/compiler: {}
 
+  packages/generator: {}
+
   packages/polyfills: {}
 
   packages/sdk: {}

@@ -18,12 +18,51 @@ source checkout, `ref-doc.zip`, or a previously generated SDK tree.
 
 | Installed npm package | Defold-revision policy | Project generation |
 | --- | --- | --- |
-| Parsers, schemas, naming rules, stable binding identity, type renderers, lowering algorithms, code emitters, runtime templates, arena/scratch/callback/handle implementations, CLI/cache logic | Script and dmSDK declarations/docs, registered routes, profile availability, source-backed semantic verdicts, deprecation/removal status, revision ABI/layout facts, lowering recipes | Extension IR, selected target/profile, reachability plan, component proxies, extension bindings, emitted SDK/glue and final bundle |
+| Parsers, policy schemas, generic identifier-safety rules, stable binding-identity algorithms, type/lowering recipe interpreters, code emitters, runtime templates, arena/scratch/callback/handle implementations, CLI/cache logic | Every fact defined by Defold: script and dmSDK declarations/docs, raw and public names, namespaces, semantic type vocabulary, registered routes, profile availability, source-backed semantic verdicts, deprecation/removal status, revision ABI/layout facts, and the recipe selections/parameters those facts require | Extension IR, selected target/profile, reachability plan, component proxies, extension bindings, emitted SDK/glue and final bundle |
 
 The boundary is algorithm versus result. “Generate a borrowed-handle table” is
 package code. The handle kinds and routes at one Defold revision are policy
 data. Generic arena code is package code. The contracts using that arena are
-policy data. Generated TypeScript, C++, and JavaScript are outputs.
+policy data. Generated TypeScript, C++, and JavaScript are outputs. A package
+emitter may know how to render a generic scalar, pointer, span, callback, or
+borrowed-handle recipe. It must not contain a list of Defold module names, type
+spellings, route names, context names, or rename decisions that can change when
+Defold changes. Those are policy data even when they appear stable today.
+
+# Realizer compatibility contract
+
+Every published index entry and its authenticated policy root carry the same
+realizer contract:
+
+```json
+{
+  "minimumPackageVersion": "0.0.0",
+  "requiredCapabilities": [
+    "policy.compiler-surface.v1",
+    "sdk.dmsdk.render.v1",
+    "sdk.script.render.v1"
+  ]
+}
+```
+
+The small revision index is checked before the policy root or any subtree is
+downloaded. If the installed `@ts-defold/deherm` is too old, or lacks a named
+capability, the CLI stops with the installed version, required version, missing
+capabilities, and an explicit package-upgrade command. After fetching the root,
+the CLI requires its contract to exactly match the index; this prevents a
+mutable index from weakening an authenticated policy requirement.
+
+This is the release boundary:
+
+* A normal Defold release changes policy data only. Nightly derivation publishes
+  its new index/root/objects and every already-capable npm package can realize
+  it without an npm release.
+* An npm release is needed only when Defold exposes a construct the installed
+  realizer cannot express, or when the generic compiler/runtime is improved.
+  The new policy names that capability and raises its minimum package version.
+* Capability identifiers are monotonic implementation contracts, not Defold
+  version labels. They describe machinery such as a schema reader or lowering
+  recipe family and never encode route, namespace, or type names.
 
 Pinned host compilers and native Hermes libraries are a separate distributable
 class. They may ship with the npm package or release artifacts, but they are
@@ -32,7 +71,7 @@ toolchain artifacts rather than Defold API policy.
 # Current executable cut
 
 The authenticated `@compiler` subtree carries eleven semantic documents and an
-SDK manifest. `packages/compiler/src/policy-surface-materializer.mjs` restores
+SDK manifest. `packages/generator/src/policy/surface-materializer.mjs` restores
 the selected revision, regenerates the core script and dmSDK TypeScript files
 from IR, verifies their policy SHA-256 values, writes the remaining support
 files from explicitly labelled authenticated compatibility snapshots, and

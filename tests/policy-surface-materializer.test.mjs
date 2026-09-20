@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { materializePolicySurface } from "../packages/compiler/src/policy-surface-materializer.mjs";
+import { materializePolicySurface } from "../packages/generator/src/policy/surface-materializer.mjs";
 import { derivePolicy } from "../scripts/generate-api-policy.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
@@ -27,7 +27,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const policy = await currentResolvedPolicy();
   const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 11);
+  assert.equal(first.descriptor.documents.length, 12);
   assert.equal(Object.keys(first.descriptor.sdk).length, 28);
 
   for (const relative of Object.keys(first.descriptor.sdk)) {

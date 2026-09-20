@@ -27,7 +27,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { hashBytes } from "../packages/compiler/src/api-policy.mjs";
+import { hashBytes } from "../packages/generator/src/policy/api-policy.mjs";
 import { releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
 import { buildPolicySite } from "./build-policy-site.mjs";
 import { readSiteConfig, shippedIndexPath } from "./generate-api-policy.mjs";

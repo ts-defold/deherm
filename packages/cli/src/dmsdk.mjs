@@ -3,6 +3,7 @@ import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { materializeDmSdkUsages } from "../../compiler/src/dmsdk-universal-materializer.mjs";
+import { findProjectRoot } from "./project.mjs";
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -48,13 +49,26 @@ async function writeAtomically(target, contents) {
   }
 }
 
-export async function materializeDmSdkUsageFile({ usage, output, check = false }) {
+async function resolveCatalogPath({ catalog, project, usagePath }) {
+  if (catalog) return path.resolve(catalog);
+  const projectRoot = await findProjectRoot(path.dirname(usagePath), project).catch(() => null);
+  if (!projectRoot) {
+    throw new Error("dmSDK materialization needs --catalog <defold-dmsdk-universal-bindings.json>, or a generated Defold project containing .deherm/ir/dmsdk-universal-bindings.json");
+  }
+  return path.join(projectRoot, ".deherm", "ir", "dmsdk-universal-bindings.json");
+}
+
+export async function materializeDmSdkUsageFile({ usage, output, catalog, project, check = false }) {
   if (!usage) throw new Error("dmSDK materialization requires --usage <path>");
   if (!output) throw new Error("dmSDK materialization requires --output <path>");
   const usagePath = path.resolve(usage);
   const outputPath = path.resolve(output);
   const reportPath = `${outputPath}.json`;
-  const usageSource = await readFile(usagePath, "utf8");
+  const catalogPath = await resolveCatalogPath({ catalog, project, usagePath });
+  const [usageSource, catalogSource] = await Promise.all([
+    readFile(usagePath, "utf8"),
+    readFile(catalogPath, "utf8")
+  ]);
   let parsed;
   try {
     parsed = JSON.parse(usageSource);
@@ -62,12 +76,23 @@ export async function materializeDmSdkUsageFile({ usage, output, check = false }
     throw new Error(`${usagePath}: invalid JSON: ${error.message}`);
   }
   const document = validateUsageDocument(parsed, usagePath);
-  const generated = materializeDmSdkUsages(document.usages, { ...(document.options ?? {}), catalogSha256: document.catalogSha256 });
+  let catalogDocument;
+  try {
+    catalogDocument = JSON.parse(catalogSource);
+  } catch (error) {
+    throw new Error(`${catalogPath}: invalid JSON: ${error.message}`);
+  }
+  const generated = materializeDmSdkUsages(document.usages, {
+    ...(document.options ?? {}),
+    catalog: catalogDocument,
+    catalogSha256: document.catalogSha256
+  });
   const source = generated.source.endsWith("\n") ? generated.source : `${generated.source}\n`;
   const report = `${JSON.stringify({
     schemaVersion: 1,
     source: "deherm-dmsdk-usage-materializer",
     usageSha256: sha256(usageSource),
+    catalogSourceSha256: sha256(catalogSource),
     outputSha256: sha256(source),
     catalogSha256: generated.catalogSha256,
     provider: generated.provider,
@@ -89,6 +114,7 @@ export async function materializeDmSdkUsageFile({ usage, output, check = false }
   }
   return {
     usage: usagePath,
+    catalog: catalogPath,
     output: outputPath,
     report: reportPath,
     provider: generated.provider,

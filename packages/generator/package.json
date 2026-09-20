@@ -1,0 +1,14 @@
+{
+  "name": "@deherm/generator",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "source": "./src/index.mjs",
+  "exports": {
+    ".": "./src/index.mjs",
+    "./policy": "./src/policy/api-policy.mjs",
+    "./policy/materializer": "./src/policy/surface-materializer.mjs",
+    "./sdk/script": "./src/sdk/script-sdk.mjs",
+    "./sdk/dmsdk": "./src/sdk/dmsdk-sdk.mjs"
+  }
+}

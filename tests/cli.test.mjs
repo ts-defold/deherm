@@ -8,7 +8,7 @@ import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes, installNativeExtension, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, installNativeExtension, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
 import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
@@ -21,6 +21,10 @@ import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/
 // `defold-revision.test.mjs`.
 const bundledDefoldRevision = JSON.parse(
   await readFile(path.resolve("packages/bindings/generated/defold-script-api-ir.json"), "utf8")).defoldRevision;
+const defoldValueLayouts = JSON.parse(
+  await readFile(path.resolve("packages/bindings/generated/defold-value-layouts.json"), "utf8"));
+const buildProjectBindingIr = (inventory) => compileProjectBindingIr(inventory, defoldValueLayouts);
+const generateExtensionTypes = (inventory) => renderExtensionTypes(inventory, defoldValueLayouts);
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "defold-hermes-cli-"));
@@ -138,6 +142,13 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   assert.ok(recipe);
   const usage = path.join(root, "dmsdk-usage.json");
   const output = path.join(root, "generated", "dmsdk-provider.cpp");
+  const catalog = path.resolve("packages/bindings/generated/defold-dmsdk-universal-bindings.json");
+  await writeFile(path.join(root, "game.project"), "[project]\ntitle = dmSDK materializer fixture\n");
+  await mkdir(path.join(root, ".deherm", "ir"), { recursive: true });
+  await writeFile(
+    path.join(root, ".deherm", "ir", "dmsdk-universal-bindings.json"),
+    await readFile(catalog)
+  );
   await writeFile(usage, `${JSON.stringify({
     schemaVersion: 1,
     catalogSha256: dmSdkUniversalCatalogSha256,
@@ -162,7 +173,7 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   const cliOutput = path.join(root, "generated", "dmsdk-provider-cli.cpp");
   const cli = spawnSync(process.execPath, [
     path.resolve("bin/deherm.mjs"), "materialize-dmsdk",
-    "--usage", usage, "--output", cliOutput, "--json"
+    "--usage", usage, "--output", cliOutput, "--project", root, "--json"
   ], { cwd: process.cwd(), encoding: "utf8" });
   assert.equal(cli.status, 0, `${cli.stdout}\n${cli.stderr}`);
   assert.equal(JSON.parse(cli.stdout).materializedCount, 1);

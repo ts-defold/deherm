@@ -30,6 +30,7 @@ import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 // TypeScript surface derived from them. A layer that is missing any of these is
 // incomplete and is not used.
 export const surfaceIrFiles = Object.freeze({
+  valueLayoutsPath: "defold-value-layouts.json",
   scriptIrPath: "defold-script-api-ir.json",
   dmsdkIrPath: "defold-sdk-ir.json",
   scriptDispatchPath: "defold-script-scalar-dispatch.json",

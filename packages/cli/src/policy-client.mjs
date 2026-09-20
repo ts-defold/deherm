@@ -9,8 +9,8 @@ import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { hashBytes } from "../../compiler/src/api-policy.mjs";
-import { materializePolicySurface } from "../../compiler/src/policy-surface-materializer.mjs";
+import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../../generator/src/policy/api-policy.mjs";
+import { materializePolicySurface } from "../../generator/src/policy/surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 
@@ -23,6 +23,86 @@ function expand(template, values) {
 
 function policyBase(index) {
   return `${index.base.url.replace(/\/$/, "")}${index.base.pathPrefix ? `/${index.base.pathPrefix.replace(/^\/+|\/+$/g, "")}` : ""}`;
+}
+
+const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/u;
+
+function parseSemver(value, label) {
+  const match = SEMVER.exec(String(value ?? ""));
+  if (!match) throw new Error(`${label} is not a valid semantic version: ${JSON.stringify(value)}`);
+  return {
+    core: match.slice(1, 4).map(Number),
+    prerelease: match[4]?.split(".") ?? []
+  };
+}
+
+function compareSemver(left, right) {
+  for (let index = 0; index < 3; index += 1) {
+    if (left.core[index] !== right.core[index]) return left.core[index] < right.core[index] ? -1 : 1;
+  }
+  if (left.prerelease.length === 0 || right.prerelease.length === 0) {
+    return left.prerelease.length === right.prerelease.length ? 0 : left.prerelease.length === 0 ? 1 : -1;
+  }
+  const count = Math.max(left.prerelease.length, right.prerelease.length);
+  for (let index = 0; index < count; index += 1) {
+    const a = left.prerelease[index];
+    const b = right.prerelease[index];
+    if (a === undefined || b === undefined) return a === b ? 0 : a === undefined ? -1 : 1;
+    if (a === b) continue;
+    const aNumeric = /^\d+$/u.test(a);
+    const bNumeric = /^\d+$/u.test(b);
+    if (aNumeric && bNumeric) return Number(a) < Number(b) ? -1 : 1;
+    if (aNumeric !== bNumeric) return aNumeric ? -1 : 1;
+    return a < b ? -1 : 1;
+  }
+  return 0;
+}
+
+function validateRealizer(realizer, label) {
+  if (!realizer || typeof realizer.minimumPackageVersion !== "string" ||
+      !Array.isArray(realizer.requiredCapabilities) || realizer.requiredCapabilities.length === 0 ||
+      realizer.requiredCapabilities.some((capability) => typeof capability !== "string" || capability.length === 0) ||
+      new Set(realizer.requiredCapabilities).size !== realizer.requiredCapabilities.length) {
+    throw new Error(`${label}: invalid policy realizer compatibility contract`);
+  }
+  parseSemver(realizer.minimumPackageVersion, `${label} minimumPackageVersion`);
+  return realizer;
+}
+
+function sameRealizer(left, right) {
+  return left?.minimumPackageVersion === right?.minimumPackageVersion &&
+    Array.isArray(left?.requiredCapabilities) && Array.isArray(right?.requiredCapabilities) &&
+    left.requiredCapabilities.length === right.requiredCapabilities.length &&
+    left.requiredCapabilities.every((capability, index) => capability === right.requiredCapabilities[index]);
+}
+
+async function installedPackageVersion() {
+  const document = JSON.parse(await readFile(new URL("../../../package.json", import.meta.url), "utf8"));
+  return document.version;
+}
+
+function upgradePrompt() {
+  return "Upgrade with `pnpm up @ts-defold/deherm@latest` or `npm install @ts-defold/deherm@latest`.";
+}
+
+async function assertCompatibleRealizer(revision, realizer, options) {
+  const packageVersion = options.packageVersion ?? await installedPackageVersion();
+  const installed = parseSemver(packageVersion, "Installed @ts-defold/deherm version");
+  const minimum = parseSemver(realizer.minimumPackageVersion, "Policy minimumPackageVersion");
+  if (compareSemver(installed, minimum) < 0) {
+    throw new Error(
+      `Policy for Defold ${revision} requires @ts-defold/deherm >= ${realizer.minimumPackageVersion}, ` +
+      `but ${packageVersion} is installed. ${upgradePrompt()}`
+    );
+  }
+  const capabilities = new Set(options.capabilities ?? POLICY_REALIZER_CAPABILITIES);
+  const missing = realizer.requiredCapabilities.filter((capability) => !capabilities.has(capability));
+  if (missing.length > 0) {
+    throw new Error(
+      `Policy for Defold ${revision} requires unsupported realization capabilities: ${missing.join(", ")}. ` +
+      upgradePrompt()
+    );
+  }
 }
 
 async function atomicWrite(file, bytes) {
@@ -78,8 +158,14 @@ export async function resolvePublishedPolicy(revision, options = {}) {
       !/^[0-9a-f]{64}$/.test(entry.policyRoot ?? "")) {
     throw new Error(`${entryResult.relative}: invalid policy index entry for ${revision}`);
   }
+  validateRealizer(entry.realizer, entryResult.relative);
+  // This happens before the root or any object is fetched: a package that
+  // cannot realize the policy should not download the large authenticated
+  // surface only to discover that fact afterwards.
+  await assertCompatibleRealizer(revision, entry.realizer, options);
   const shipped = index.entries?.find((candidate) => candidate.defoldRevision === revision);
-  if (shipped && (shipped.policyRoot !== entry.policyRoot || shipped.generator !== entry.generator)) {
+  if (shipped && (shipped.policyRoot !== entry.policyRoot || shipped.generator !== entry.generator ||
+      !sameRealizer(shipped.realizer, entry.realizer))) {
     throw new Error(`${revision}: published entry contradicts this package's shipped index`);
   }
 
@@ -90,6 +176,10 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   const policy = JSON.parse(rootResult.bytes.toString("utf8"));
   if (policy.kind !== "deherm.policy.root" || policy.generator !== entry.generator || !policy.subtrees) {
     throw new Error(`${rootResult.relative}: invalid policy root`);
+  }
+  validateRealizer(policy.realizer, rootResult.relative);
+  if (!sameRealizer(policy.realizer, entry.realizer)) {
+    throw new Error(`${rootResult.relative}: policy realizer contract does not match its index entry`);
   }
 
   const objects = new Map();
