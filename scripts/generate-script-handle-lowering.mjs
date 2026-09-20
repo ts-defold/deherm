@@ -217,6 +217,13 @@ function targetDisposition(row, target, policy) {
   return policy.targetBackends[target];
 }
 
+function nativeAdapterHarnessDisposition(row, policy) {
+  if (row.availability.runtimeAvailable === false) return "profile-symbol-unavailable";
+  const disposition = policy.nativeAdapterHarnessContexts?.[row.context.token];
+  if (!disposition) throw new Error(`unreviewed native-adapter harness context ${row.context.token}`);
+  return disposition;
+}
+
 function pascal(value) {
   const result = String(value).split(/[^A-Za-z0-9]+/).filter(Boolean)
     .map((part) => `${part[0].toUpperCase()}${part.slice(1)}`).join("");
@@ -314,6 +321,7 @@ struct Route {
   const char* availabilityToken;
   bool runtimeAvailable;
   uint8_t runtimeProfileMask;
+  bool nativeAdapterHarness;
   Disposition nativeDynamicHermes;
   Disposition nativeStaticHermes;
   Disposition html5BrowserHost;
@@ -488,7 +496,7 @@ function renderSource(report) {
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
   const results = report.resultCodecs.map((codec) =>
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
-  const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.runtimeMask}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
+  const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
   const runtimeProfiles = report.runtimeProfiles.map((profile) =>
     `  {${profile.index}, ${profile.mask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`).join("\n");
   const stableOrder = [...report.routes].sort((left, right) => left.stableId - right.stableId).map(({ index }) => index);
@@ -606,7 +614,7 @@ int protectedDetectRuntimeProfile(lua_State* state) {
   RuntimeProfileDetection& output = *context->output;
   for (uint16_t index = 0; index < kRouteCount; ++index) {
     const Route& route = kRoutes[index];
-    if (route.nativeDynamicHermes != Disposition::kCapturedLuaRouterHarnessProvenJsiUnverified) continue;
+    if (!route.nativeAdapterHarness) continue;
     const bool present = rawFunctionPresent(state, route);
     if (present) ++output.observedPresent;
     for (uint8_t profileIndex = 0; profileIndex < kRuntimeProfileCount; ++profileIndex) {
@@ -978,7 +986,7 @@ bool CapturedLuaRouter::dispatchUnsafe(DispatchContext& context) {
   const Route& route = *context.route;
   ScriptCallFrame* frame = context.frame;
   if (!bind(route, context.error, context.errorCapacity)) return false;
-  if (route.context == Context::kGameObjectInstance) {
+  if (route.context == Context::kGameObjectInstance || route.context == Context::kGuiScene || route.context == Context::kRenderScriptAndGraphics) {
     lua_rawgeti(state_, LUA_REGISTRYINDEX, instanceRef_);
     instanceApi_.set(state_);
   }
@@ -1008,13 +1016,13 @@ bool CapturedLuaRouter::dispatch(ScriptCallFrame* frame, char* error, size_t cap
   // and the O(log n) route lookup above it, which precede the crossing.
   DEHERM_PROFILE_TRANSPORT_SCOPE(DEHERM_PROFILE_TRANSPORT_LUA_STACK, route->stableId,
       kRouteContractShapes[route->index], kRouteProfileNames[route->index]);
-  if(route->nativeDynamicHermes!=Disposition::kCapturedLuaRouterHarnessProvenJsiUnverified){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route is blocked for this context");return false;}
+  if(!route->nativeAdapterHarness){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route is blocked in the native adapter harness");return false;}
   if(!activeProfile_||!routeAvailableInProfile(*route,*activeProfile_)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route is unavailable in the active runtime profile");return false;}
   if(frame->argumentCount!=route->argumentCount||(frame->argumentCount&&!frame->arguments)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle argument count mismatch");return false;}
   if(route->resultCount&&(!frame->results||frame->resultCapacity<route->resultCount)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle result storage is exhausted");return false;}
   if(!state_||!registry_){DEHERM_PROFILE_SCOPE_FAILED();return false;}
-  const bool scoped=route->context==Context::kGameObjectInstance;
-  if(scoped&&(!instanceApi_.get||!instanceApi_.set||instanceRef_==LUA_NOREF||instanceRef_==LUA_REFNIL)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route requires a captured game-object instance");return false;}
+  const bool scoped=route->context==Context::kGameObjectInstance||route->context==Context::kGuiScene||route->context==Context::kRenderScriptAndGraphics;
+  if(scoped&&(!instanceApi_.get||!instanceApi_.set||instanceRef_==LUA_NOREF||instanceRef_==LUA_REFNIL)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route requires a captured component script instance");return false;}
   const int top=lua_gettop(state_); const uint32_t stringMark=frame->stringScratchUsed; const uint32_t tableMark=frame->tableScratchUsed;
   InstanceContext instanceContext{this,LUA_NOREF,false}; bool ok=true;
   if(scoped){const int captureStatus=lua_cpcall(state_,ProtectedCaptureCurrentInstance,&instanceContext);if(captureStatus!=0){fail(error,capacity,lua_type(state_,-1)==LUA_TSTRING?lua_tostring(state_,-1):"capturing current Lua instance failed");ok=false;}lua_settop(state_,top);if(ok&&!instanceContext.ok){fail(error,capacity,"capturing current Lua instance failed");ok=false;}}
@@ -1181,20 +1189,32 @@ export function generateScriptHandleLowering(textInputs) {
       nativeStaticHermes: targetDisposition(row, "nativeStaticHermes", policy),
       html5BrowserHost: targetDisposition(row, "html5BrowserHost", policy)
     };
-    const blocked = targets.nativeDynamicHermes.endsWith("unavailable");
-    const runtimeProfileIds = [...(row.availability.runtimeProfiles ?? [])].sort();
+    const harnessDisposition = nativeAdapterHarnessDisposition(row, policy);
+    const blocked = harnessDisposition !== "router-candidate";
+    let runtimeProfileIds = [...(row.availability.runtimeProfiles ??
+      (row.availability.runtimeAvailable !== false && row.availability.token === "core"
+        ? runtimeProfiles.map(({ id }) => id)
+        : []))].sort();
+    const semanticKinds = [...new Set([...discoveredInputKinds, ...discoveredReturnKinds])];
+    runtimeProfileIds = runtimeProfileIds.filter((profileId) => {
+      const profile = runtimeProfileById.get(profileId);
+      return semanticKinds.every((kind) => (kindById[kind].capturableProfileMask & profile.mask) !== 0);
+    });
     let runtimeMask = 0;
     for (const profileId of runtimeProfileIds) {
       const profile = runtimeProfileById.get(profileId);
       if (!profile) throw new Error(`${row.id} references unknown runtime profile ${profileId}`);
-      if (!availableRouteIdsByProfile.get(profileId)?.has(row.id)) {
+      if (row.availability.token !== "core" && !availableRouteIdsByProfile.get(profileId)?.has(row.id)) {
         throw new Error(`${row.id} runtime profile ${profileId} disagrees with the source-derived route set`);
       }
       runtimeMask |= profile.mask;
     }
     for (const profile of runtimeProfiles) {
       const catalogAvailable = availableRouteIdsByProfile.get(profile.id)?.has(row.id) === true;
-      if (catalogAvailable !== runtimeProfileIds.includes(profile.id)) {
+      const capturable = semanticKinds.every((kind) =>
+        (kindById[kind].capturableProfileMask & profile.mask) !== 0);
+      if (row.availability.token !== "core" &&
+          (catalogAvailable && capturable) !== runtimeProfileIds.includes(profile.id)) {
         throw new Error(`${row.id} source-derived runtime profile membership drifted for ${profile.id}`);
       }
     }
@@ -1321,6 +1341,11 @@ export function generateScriptHandleLowering(textInputs) {
       "*.gui.ts": { proxyExtension: ".gui_script", context: "gui-scene", state: "provider-required-unimplemented" },
       "*.render.ts": { proxyExtension: ".render_script", context: "render-script-instance-and-graphics-context", state: "provider-required-unimplemented" }
     },
+    nativeAdapterHarnessContexts: {
+      gameObject: "captured-and-selected",
+      gui: "captured-and-selected-test-fixture-only",
+      render: "captured-and-selected-test-fixture-only"
+    },
     runtimeProfileDetection: {
       authority: "generated-lua-registration-surface",
       strategy: "exact-function-presence-vector",
@@ -1351,7 +1376,8 @@ export function generateScriptHandleLowering(textInputs) {
     projectionLifetimePolicyUnresolved: routes.filter(({ lifetime }) => lifetime.projectionToken.endsWith("-unresolved")).length,
     executableAdapterUnimplemented: 0,
     guiAttachmentUnavailable: routes.filter(({ context }) => context === "gui-scene").length,
-    renderAttachmentUnavailable: routes.filter(({ context }) => context === "render-script-instance-and-graphics-context").length,
+    renderAttachmentUnavailable: routes.filter(({ context }) =>
+      context === "render-script-instance-and-graphics-context").length,
     profileSymbolUnavailable: runtimeUnavailable
   };
   report.generated = {

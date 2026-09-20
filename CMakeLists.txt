@@ -592,6 +592,28 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 endif()
 target_link_libraries(defold-hermes-script-recording-engine PRIVATE defold-hermes-runtime)
 
+# Generated exact-call twin for the lua-stack transport. It installs all 915
+# source-corrected module/member providers into pinned Lua 5.1, then calls them
+# only through the production ScriptAdapter API.
+add_executable(defold-hermes-script-recording-lua-adapter
+  tests/fixtures/generated_script_recording_lua_adapter.cpp
+  tests/fixtures/generated_script_recording_tables.cpp
+  native/defold_script_value_test_support.cpp
+)
+target_compile_features(defold-hermes-script-recording-lua-adapter PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-recording-lua-adapter PRIVATE
+  defold/defold_hermes/include
+  tests/fixtures
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-recording-lua-adapter PRIVATE
+    -Wall -Wextra -Werror -Wno-zero-length-array -pedantic
+  )
+endif()
+target_link_libraries(defold-hermes-script-recording-lua-adapter PRIVATE
+  defold-hermes-lua-bridge
+)
+
 add_executable(defold-hermes-script-handle-router-test
   native/script_handle_router_test.cpp
 )

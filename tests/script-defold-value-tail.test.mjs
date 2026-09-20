@@ -17,14 +17,9 @@ test("value-tail generator covers the exact remaining Defold-value accounting ta
   execFileSync(process.execPath, ["scripts/generate-script-defold-value-tail.mjs", "--check"], { cwd: root, stdio: "pipe" });
   const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root), "utf8"));
   assert.equal(report.routeCount, 26);
-  assert.equal(report.candidateCount, 16);
-  assert.equal(report.blockedCount, 10);
-  assert.deepEqual(report.blockerCounts, {
-    "gui-script-instance-attachment-unavailable": 4,
-    "image-type-union-codec": 1,
-    "named-enum-domain-codec": 1,
-    "render-script-instance-attachment-unavailable": 4
-  });
+  assert.equal(report.candidateCount, 26);
+  assert.equal(report.blockedCount, 0);
+  assert.deepEqual(report.blockerCounts, {});
   assert.match(report.inputEvidence.valueBindingsSha256, /^[0-9a-f]{64}$/);
   assert.match(report.inputEvidence.urlBindingsSha256, /^[0-9a-f]{64}$/);
   assert.equal(report.targetSupport.nativeDynamicHermes, "generated-executable-shared-script-adapter");
@@ -32,18 +27,22 @@ test("value-tail generator covers the exact remaining Defold-value accounting ta
   assert.deepEqual(report.bindings.map(({ stableId }) => stableId), report.bindings.map(({ stableId }) => stableId).toSorted((a, b) => a - b));
   assert.equal(report.bindings.every(({ id, stableId }) => stableId === stableBindingId(id)), true);
   assert.equal(report.bindings.filter(({ disposition }) => disposition === "candidate")
-    .every(({ backend, callShapes, sourceAnchor, requiredContext }) => backend === "captured-lua-exact-call" && callShapes.length > 0 && sourceAnchor.length > 0 && requiredContext === "script-instance"), true);
-  assert.equal(report.bindings.find(({ id }) => id === "script:gui.get_layout").blocker,
-    "gui-script-instance-attachment-unavailable");
-  assert.equal(report.bindings.find(({ id }) => id === "script:render.set_view").blocker,
-    "render-script-instance-attachment-unavailable");
-  const blocked = report.bindings.find(({ id }) => id === "script:gui.set_texture_data");
-  assert.equal(blocked.disposition, "blocked");
-  assert.equal(blocked.blocker, "image-type-union-codec");
-  assert.equal(blocked.callShapes.length, 0);
+    .every(({ backend, callShapes, sourceAnchor, requiredContext }) => backend === "captured-lua-exact-call" && callShapes.length > 0 && sourceAnchor.length > 0 && ["script-instance", "gui-script-instance", "render-script-instance"].includes(requiredContext)), true);
+  assert.equal(report.bindings.find(({ id }) => id === "script:gui.get_layout").disposition, "candidate");
+  assert.equal(report.bindings.find(({ id }) => id === "script:render.set_view").disposition, "candidate");
+  const imageEnum = report.bindings.find(({ id }) => id === "script:gui.set_texture_data");
+  assert.equal(imageEnum.disposition, "candidate");
+  assert.equal(imageEnum.family, "image-type-string-codec");
+  assert.equal(imageEnum.callShapes.every((shape) => shape[3] === "String"), true,
+    "image.TYPE must not silently widen the luaL_checkstring source contract to Number");
+  assert.equal(imageEnum.callShapes.some((shape) => shape[3] === "Number"), false);
+  assert.match(imageEnum.codecEvidence.sourceSignature, /luaL_checkstring\(L, 4\)/);
+  assert.deepEqual(imageEnum.codecEvidence.domain, ["rgb", "rgba", "l", "astc"]);
   const namedEnum = report.bindings.find(({ id }) => id === "script:liveupdate.remove_mount");
-  assert.equal(namedEnum.disposition, "blocked");
-  assert.equal(namedEnum.blocker, "named-enum-domain-codec");
+  assert.equal(namedEnum.disposition, "candidate");
+  assert.equal(namedEnum.family, "liveupdate-result-enum-codec");
+  assert.equal(namedEnum.resultCodec, "Number");
+  assert.match(namedEnum.codecEvidence.sourceSignature, /lua_pushinteger\(L, result\)/);
   assert.equal(report.bindings.find(({ id }) => id === "script:hash_to_hex").sourceSymbol, "HashToHex");
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:camera.get_view").callShapes,
     [[], ["Url"], ["Number"], ["Nil"]]);
@@ -56,18 +55,20 @@ test("value-tail candidate dispatch is generated as fail-closed metadata", async
     readFile(new URL("packages/sdk/src/generated/script/value-tail-target-support.ts", root), "utf8")
   ]);
   assert.match(header, /kRouteCount = 26/);
-  assert.match(header, /kCandidateCount = 16/);
+  assert.match(header, /kCandidateCount = 26/);
   assert.match(header, /candidateRouteOffsets/);
   assert.match(source, /captured Lua backend is unavailable/);
   assert.match(source, /arguments do not match a reviewed exact codec shape/);
   assert.match(source, /Lua result does not match the reviewed codec/);
-  assert.match(source, /image-type-union-codec/);
-  assert.match(source, /named-enum-domain-codec/);
+  assert.doesNotMatch(source, /image-type-union-codec|named-enum-domain-codec/);
   assert.match(source, /candidateIndex >= kCandidateCount/);
   assert.match(source, /candidate shape offsets drifted/);
   assert.match(source, /shape argument offsets drifted/);
   assert.doesNotMatch(source, /lua_newuserdata|luaL_ref|\bnew\b|malloc|std::vector/);
   assert.match(target, /script:gui\.set_texture_data/);
+  assert.match(target, /"accountingDisposition": "universal-fallback-test-fixture-adapter-only"/);
+  assert.match(target, /"requiredContext": "gui-script-instance"/);
+  assert.match(target, /"requiredContext": "render-script-instance"/);
   assert.match(target, /not executable in the HTML5 browser host/);
 });
 
@@ -82,16 +83,10 @@ test("value-tail generation reports stale source evidence and rejects incomplete
   incomplete.families[0].sourceRoutes[0].ids.pop();
   assert.throws(() => generateScriptDefoldValueTail({ ...inputs, policyText: JSON.stringify(incomplete) }), /reviewed route count drifted/);
 
-  const unsafe = JSON.parse(inputs.policyText);
-  const enumFamily = unsafe.families.find(({ id }) => id === "unsafe-named-enum-result-codec");
-  enumFamily.disposition = "candidate";
-  enumFamily.backend = "captured-lua-exact-call";
-  assert.throws(() => generateScriptDefoldValueTail({ ...inputs, policyText: JSON.stringify(unsafe) }), /exact tail codec is not reviewed for liveupdate\.LIVEUPDATE/);
-
   const unsupportedContext = JSON.parse(inputs.policyText);
-  unsupportedContext.families[0].requiredContext = "gui-script-instance";
+  unsupportedContext.families[0].requiredContext = "unknown-script-instance";
   assert.throws(() => generateScriptDefoldValueTail({ ...inputs, policyText: JSON.stringify(unsupportedContext) }),
-    /shared router only supports game-object script instances/);
+    /invalid or missing value-tail execution context/);
 });
 
 test("value-tail generation rejects every cross-input provenance drift", async () => {

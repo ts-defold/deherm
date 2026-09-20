@@ -35,22 +35,22 @@ test("selects all 407 borrowed-handle routes from shape and effect predicates", 
   assert.deepEqual(generated.coverage, {
     selectedRoutes: 407,
     descriptorRowsEmitted: 407,
-    routerCandidates: 343,
-    blocked: 64,
-    adapterExecutableRoutes: 343,
-    nativeAdapterHarnessRoutes: 343,
+    routerCandidates: 405,
+    blocked: 2,
+    adapterExecutableRoutes: 405,
+    nativeAdapterHarnessRoutes: 405,
     defoldEngineVerifiedRoutes: 0,
     nativeDynamicHermesJsiVerifiedRoutes: 0,
     nativeStaticHermesExecutableRoutes: 0,
     html5BrowserExecutableRoutes: 0,
     runtimeUnavailable: 2,
     adapterExecutableRoutesByProfile: {
-      "bullet-only": 139,
-      "default-legacy-bullet": 253,
-      "legacy-no-bullet": 122,
-      "no-physics": 8,
-      "v3-bullet": 318,
-      "v3-no-bullet": 187
+      "bullet-only": 201,
+      "default-legacy-bullet": 313,
+      "legacy-no-bullet": 182,
+      "no-physics": 70,
+      "v3-bullet": 380,
+      "v3-no-bullet": 249
     }
   });
   assert.equal(new Set(generated.routes.map(({ id }) => id)).size, 407);
@@ -116,12 +116,12 @@ test("brands semantic handle kinds and separates adapter coverage from engine ev
 test("derives exact fail-closed runtime profile masks and handshakes", () => {
   assert.equal(generated.runtimeProfiles.length, 6);
   assert.deepEqual(generated.runtimeProfiles.map(({ id, adapterExecutableRouteCount }) => [id, adapterExecutableRouteCount]), [
-    ["bullet-only", 139],
-    ["default-legacy-bullet", 253],
-    ["legacy-no-bullet", 122],
-    ["no-physics", 8],
-    ["v3-bullet", 318],
-    ["v3-no-bullet", 187]
+    ["bullet-only", 201],
+    ["default-legacy-bullet", 313],
+    ["legacy-no-bullet", 182],
+    ["no-physics", 70],
+    ["v3-bullet", 380],
+    ["v3-no-bullet", 249]
   ]);
   for (const profile of generated.runtimeProfiles) {
     assert.equal(profile.mask, 1 << profile.index);
@@ -203,13 +203,18 @@ test("publishes source-suffix attachment providers without route wrappers", () =
     "*.gui.ts": { proxyExtension: ".gui_script", context: "gui-scene", state: "provider-required-unimplemented" },
     "*.render.ts": { proxyExtension: ".render_script", context: "render-script-instance-and-graphics-context", state: "provider-required-unimplemented" }
   });
+  assert.deepEqual(generated.nativeAdapterHarnessContexts, {
+    gameObject: "captured-and-selected",
+    gui: "captured-and-selected-test-fixture-only",
+    render: "captured-and-selected-test-fixture-only"
+  });
 });
 
 test("publishes exact-vector profile detection without mutable project authority", async () => {
   assert.deepEqual(generated.runtimeProfileDetection, {
     authority: "generated-lua-registration-surface",
     strategy: "exact-function-presence-vector",
-    routeCount: 343,
+    routeCount: 405,
     lookup: "protected-raw-table-traversal-no-metamethods",
     initialization: "lazy-first-bootstrap-attach",
     nativeLuaHarness: "six-exact-profiles-and-negative-vectors-covered",

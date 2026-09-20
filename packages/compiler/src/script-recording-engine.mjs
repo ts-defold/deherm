@@ -40,12 +40,14 @@ export const shapeCodes = SHAPE;
 
 export const transportOrder = Object.freeze(["jsi", "direct-memory", "typed-native"]);
 
+export const luaAdapterProfile = "generated-runtime-profile-union";
+
 /** Transports the canonical plan models but this harness cannot drive itself. */
 export const undrivableTransports = Object.freeze([
   Object.freeze({
     transport: "lua-stack",
     runtime: "hermes",
-    reason: "lua-stack-requires-a-real-lua-engine-below-the-recorded-seam"
+    reason: "lua-stack-driven-by-exact-script-adapter-companion-outside-recorded-trace"
   })
 ]);
 
@@ -231,7 +233,7 @@ function collectHandleNeeds(shapes, index, into, seen = new Set()) {
 }
 
 export function buildRecordingEngineModel(inputs) {
-  const { projection, universal, handleLowering, loweringPlan, inputHashes } = inputs;
+  const { projection, universal, handleLowering, tableRecords, valueBindings, overloadDispatch, loweringPlan, inputHashes } = inputs;
 
   assert(loweringPlan.schemaVersion === 2, "recording engine requires canonical lowering plan schema v2");
   assert(projection.defoldRevision === universal.defoldRevision,
@@ -261,6 +263,11 @@ export function buildRecordingEngineModel(inputs) {
   const shapes = new ShapeTable(text);
 
   const projectionRows = new Map(projection.rows.map((row) => [row.id, row]));
+  const universalRows = new Map((universal.bindings ?? []).map((row) => [row.id, row]));
+  const handleRows = new Map((handleLowering.routes ?? []).map((row) => [row.id, row]));
+  const tableRecordRows = new Map((tableRecords?.bindings ?? []).map((row) => [row.id, row]));
+  const valueBindingRows = new Map((valueBindings?.bindings ?? []).map((row) => [row.id, row]));
+  const overloadRows = new Map((overloadDispatch?.bindings ?? []).map((row) => [row.id, row]));
   const planUnits = new Map((canonicalPlanMatchesRevision ? loweringPlan.units : [])
     .filter((unit) => unit.identity.surface === "script")
     .map((unit) => [unit.identity.id, unit]));
@@ -345,6 +352,14 @@ export function buildRecordingEngineModel(inputs) {
         return node(SHAPE.unsupported);
       }
       case "record-ref":
+        if (tableRecordRows.has(routeId)) {
+          const fields = tableRecordRows.get(routeId).fields.map((field) => lower(routeId, {
+            kind: "scalar",
+            name: field.codec === "Boolean" ? "boolean" : field.codec === "String" ? "string" :
+              field.codec === "Integer" || field.codec === "Number" ? "number" : "unsupported"
+          }, field.name));
+          return node(SHAPE.record, 0, fields);
+        }
         return node(SHAPE.record, 0, []);
       case "record": {
         const fields = (value.fields ?? []).map((field) => lower(routeId, field.value, field.name));
@@ -382,6 +397,18 @@ export function buildRecordingEngineModel(inputs) {
     return shapes.intern({ code: entry.code, aux: entry.aux, key, children: entry.children });
   }
 
+  function lowerExactCodec(routeId, codec, keyText) {
+    const values = {
+      Number: { kind: "scalar", name: "number" },
+      Vector3: { kind: "defold-value", name: "vector3" },
+      Vector4: { kind: "defold-value", name: "vector4" },
+      Quaternion: { kind: "defold-value", name: "quaternion" },
+      Matrix4: { kind: "defold-value", name: "matrix4" }
+    };
+    assert(values[codec], `${routeId}: unsupported exact overload codec ${codec}`);
+    return lower(routeId, values[codec], keyText);
+  }
+
   const routes = [];
   for (const binding of [...universal.bindings].sort((left, right) => compareCodeUnits(left.id, right.id))) {
     const row = projectionRows.get(binding.id);
@@ -399,10 +426,16 @@ export function buildRecordingEngineModel(inputs) {
     const parameters = row.signature.parameters ?? [];
     const returns = row.signature.returns ?? [];
     const argumentCount = Math.min(parameters.length, binding.maximumArgumentCount);
-    const argumentShapes = parameters.slice(0, argumentCount)
+    let argumentShapes = parameters.slice(0, argumentCount)
       .map((parameter) => lower(binding.id, parameter.value, parameter.name));
     const resultCount = Math.min(returns.length, binding.maximumResultCount);
-    const resultShapes = returns.slice(0, resultCount).map((result) => lower(binding.id, result.value));
+    let resultShapes = returns.slice(0, resultCount).map((result) => lower(binding.id, result.value));
+    const overloadShape = overloadRows.get(binding.id)?.callShapes?.[0];
+    if (overloadShape) {
+      argumentShapes = overloadShape.arguments.map((codec, index) =>
+        lowerExactCodec(binding.id, codec, parameters[index]?.name));
+      resultShapes = [lowerExactCodec(binding.id, overloadShape.resultCodec)];
+    }
 
     const route = {
       id: binding.id,
@@ -413,6 +446,7 @@ export function buildRecordingEngineModel(inputs) {
       contractTokens: unit.contract,
       marshallingPrograms: Object.fromEntries(Object.entries(unit.backends)
         .map(([backend, disposition]) => [backend, disposition.marshallingProgram])),
+      dynamicHermesSelection: unit.backends.dynamicHermesJsi?.selection ?? "emit",
       loweringPlanEvidence: canonicalUnit ? "canonical-plan" : "projection-derived-unverified-fallback",
       context: row.context?.token ?? "unspecified",
       arity: { minimum: binding.minimumArgumentCount, maximum: binding.maximumArgumentCount, driven: argumentCount },
@@ -424,7 +458,8 @@ export function buildRecordingEngineModel(inputs) {
       },
       argumentShapes,
       resultShapes,
-      transports: {}
+      transports: {},
+      luaAdapter: { status: "exercise", reason: "", argumentCount: binding.minimumArgumentCount }
     };
 
     if (argumentCount < binding.minimumArgumentCount) {
@@ -461,6 +496,47 @@ export function buildRecordingEngineModel(inputs) {
       universalSkip = "projected-result-count-differs-from-generated";
     }
     route.universalSkip = universalSkip;
+    const valueBindingRow = valueBindingRows.get(route.id);
+    const handleRow = handleRows.get(route.id);
+    const universalRow = universalRows.get(route.id);
+    route.luaAdapter.handleCodec = route.loweringFamily === "multi-result" &&
+        argumentsHave(route, (shape) => shape.code === SHAPE.handle)
+      ? "lua-userdata"
+      : (route.loweringFamily === "multi-result" ||
+          valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-captured-lua") &&
+          argumentsHave(route, (shape) => shape.code === SHAPE.guiNode)
+      ? "gui-node"
+      : "semantic";
+    const topLevelResultShapes = route.resultShapes.map((index) => shapeList[index]);
+    const topLevelGuiNode = topLevelResultShapes.some((shape) => shape.code === SHAPE.guiNode);
+    const resultHasHandle = resultsHave(route,
+      (shape) => shape.code === SHAPE.handle || shape.code === SHAPE.guiNode);
+    route.luaAdapter.resultHandleCodec = !resultHasHandle
+      ? "none"
+      : topLevelGuiNode &&
+            valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-captured-lua"
+        ? "gui-node"
+        : handleRow || universalRow?.resultSemanticKindId > 0
+        ? "semantic"
+        : "lua-userdata";
+    if (universalSkip) {
+      route.luaAdapter = { ...route.luaAdapter, status: "skip", reason: universalSkip };
+    } else if (route.dynamicHermesSelection === "omit" || handleRow?.profiles?.runtimeAvailable === false) {
+      route.luaAdapter = {
+        status: "skip",
+        reason: "canonical-dynamic-hermes-route-omitted",
+        argumentCount: route.arity.minimum
+      };
+    } else if (valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-native-pod") {
+      route.luaAdapter = {
+        status: "skip",
+        reason: "route-uses-native-pod-not-lua-stack",
+        argumentCount: route.arity.minimum
+      };
+    } else if (valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend ===
+        "generated-native-pod-with-addressed-captured-lua") {
+      route.luaAdapter.argumentCount = route.arity.maximum;
+    }
   }
 
   // The JSI transport can only present a retained engine handle that a previous
@@ -562,6 +638,22 @@ export function buildRecordingEngineModel(inputs) {
       exercised: routes.filter((route) => route.transports[transport].status === "exercise").length,
       skipped: routes.filter((route) => route.transports[transport].status === "skip").length
     }])),
+    luaAdapter: {
+      profile: luaAdapterProfile,
+      installed: routes.length,
+      exercised: routes.filter((route) => route.luaAdapter.status === "exercise").length,
+      skipped: routes.filter((route) => route.luaAdapter.status === "skip").length,
+      failureSchema: "deherm-script-lua-exact-failure/v1"
+    },
+    dynamicHermesExactPartition: {
+      emitted: routes.filter((route) =>
+        route.luaAdapter.reason !== "canonical-dynamic-hermes-route-omitted").length,
+      luaStackExact: routes.filter((route) => route.luaAdapter.status === "exercise").length,
+      nativePodExactPending: routes.filter((route) =>
+        route.luaAdapter.reason === "route-uses-native-pod-not-lua-stack").length,
+      sourceProfileOmitted: routes.filter((route) =>
+        route.luaAdapter.reason === "canonical-dynamic-hermes-route-omitted").length
+    },
     blockerCount: blockers.length
   };
 

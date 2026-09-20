@@ -4,13 +4,15 @@
   "transport": "typed-native",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "inputHashes": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "812f8cd6ae3342f996aef64a45842a96b930f257cd6259a7acee73ef5be87235",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "3c95de321a340bed655f7671861c056d0c6ec1d085fefd9e23563994f32efd22"
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "0bdc6ba6109a99d264760ed76efb20e33067e3fb91aff87ee43a59bf670ff871",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "33144a8632477a55246ecb1878bc1fc7384d4c6ac5bb5a7fd754138c235afd79",
+    "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp": "5abcca927b7d97ca7e1e07103f490d485c345ba9072db64e93ffe328e580267c"
   },
   "planTypedNativeEmit": 325,
-  "claimedRouteCount": 320,
-  "declinedRouteCount": 5,
-  "maximumArgumentCount": 7,
+  "planTypedNativeBackendEmit": 351,
+  "claimedRouteCount": 325,
+  "declinedRouteCount": 0,
+  "maximumArgumentCount": 32,
   "claimedRoutes": [
     {
       "id": "script:physics.destroy_joint",
@@ -51,6 +53,12 @@
       "id": "script:resource.create_sound_data",
       "stableId": 109392419,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:bit.bor",
+      "stableId": 143800718,
+      "maximumArgumentCount": 32,
+      "arity": "bounded-variadic"
     },
     {
       "id": "script:sys.set_connectivity_host",
@@ -668,6 +676,12 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:bit.band",
+      "stableId": 2020799616,
+      "maximumArgumentCount": 32,
+      "arity": "bounded-variadic"
+    },
+    {
       "id": "script:sound.is_music_playing",
       "stableId": 2034901354,
       "maximumArgumentCount": 0
@@ -873,6 +887,12 @@
       "maximumArgumentCount": 3
     },
     {
+      "id": "script:bit.bxor",
+      "stableId": 2492420236,
+      "maximumArgumentCount": 32,
+      "arity": "bounded-variadic"
+    },
+    {
       "id": "script:go.world_to_local_position",
       "stableId": 2492984466,
       "maximumArgumentCount": 2
@@ -921,6 +941,12 @@
       "id": "script:types.is_matrix4",
       "stableId": 2597142853,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:socket.skip",
+      "stableId": 2601339186,
+      "maximumArgumentCount": 32,
+      "arity": "bounded-variadic"
     },
     {
       "id": "script:gui.show_keyboard",
@@ -1076,6 +1102,12 @@
       "id": "script:sys.get_host_path",
       "stableId": 2971433320,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:pprint",
+      "stableId": 2977240615,
+      "maximumArgumentCount": 32,
+      "arity": "bounded-variadic"
     },
     {
       "id": "script:vmath.length_sqr",
@@ -1613,35 +1645,9 @@
       "maximumArgumentCount": 1
     }
   ],
-  "declinedRoutes": [
-    {
-      "id": "script:bit.bor",
-      "stableId": 143800718,
-      "reason": "variadic-argument-window"
-    },
-    {
-      "id": "script:bit.band",
-      "stableId": 2020799616,
-      "reason": "variadic-argument-window"
-    },
-    {
-      "id": "script:bit.bxor",
-      "stableId": 2492420236,
-      "reason": "variadic-argument-window"
-    },
-    {
-      "id": "script:socket.skip",
-      "stableId": 2601339186,
-      "reason": "variadic-argument-window"
-    },
-    {
-      "id": "script:pprint",
-      "stableId": 2977240615,
-      "reason": "variadic-argument-window"
-    }
-  ],
+  "declinedRoutes": [],
   "generatedSha256": {
-    "typescript": "71a5383a4fa616f7014358600d0c546fe2c6cb65038be836ae44cf3b2633cb3b"
+    "typescript": "a0cf0fa42bc363738602ca9811768ed3bd4f7cd7ac45b4d06c80734f390417ac"
   },
   "evidenceBoundary": {
     "routeSelection": "derived-from-the-canonical-lowering-plan",
@@ -1650,5 +1656,5 @@
     "linkage": "not-claimed",
     "runtime": "not-claimed"
   },
-  "reportSha256": "61d90f5e8ed2305865a488a41f0aef445a97a65200f970f37587a3208f621b9a"
+  "reportSha256": "8da60fb1df5e80b939212c8cd4525931e3c50ff2c7b284cb33a76c70d28d152c"
 }

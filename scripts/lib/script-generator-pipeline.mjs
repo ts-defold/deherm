@@ -18,6 +18,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-table-record-bindings.mjs",
   "scripts/generate-defold-value-layouts.mjs",
   "scripts/generate-script-universal-value-bindings.mjs",
+  "scripts/generate-typed-native-bridge.mjs",
   "scripts/generate-script-copied-value-record-blockers.mjs",
   "scripts/generate-script-opaque-record-blockers.mjs",
   "scripts/generate-static-hermes-vmath.mjs",
@@ -81,6 +82,7 @@ export const scriptPinnedInputs = Object.freeze([
   "packages/bindings/overrides/script-route-availability-profiles.json",
   "packages/bindings/overrides/script-handle-lowering-policy.json",
   "packages/bindings/overrides/static-hermes-vmath.json",
+  "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp",
   "packages/bindings/probes/defold-script-real-engine-matrix.json",
   "packages/bindings/probes/defold-script-real-engine-probes.json",
   "packages/bindings/probes/defold-script-value-real-engine-probes.json",
@@ -156,6 +158,8 @@ export const generatedScriptArtifacts = Object.freeze([
   "packages/sdk/src/generated/script/universal-value-bindings.ts",
   "packages/sdk/src/generated/script/browser-target-support.ts",
   "packages/static-hermes/src/generated/script-universal-value.ts",
+  "packages/bindings/generated/defold-typed-native-bridge.json",
+  "packages/static-hermes/src/generated/script-typed-native-bridge.ts",
   "defold/defold_hermes/lib/web/generated_script_universal_value.js",
   "packages/bindings/generated/defold-script-copied-value-record-blockers.json",
   "packages/sdk/src/generated/script/copied-value-record-blockers.ts",
@@ -187,6 +191,7 @@ export const generatedScriptArtifacts = Object.freeze([
   "tests/fixtures/generated_script_recording_engine.h",
   "tests/fixtures/generated_script_recording_tables.cpp",
   "tests/fixtures/generated_script_recording_provider.cpp",
+  "tests/fixtures/generated_script_recording_lua_adapter.cpp",
   "tests/fixtures/generated_script_recording_driver.cpp",
   "tests/fixtures/generated_script_recording_driver.js",
   "tests/fixtures/generated_script_recording_expected_trace.txt"
@@ -220,6 +225,7 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-projection-ir.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-defold-value-layouts.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-universal-value-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-typed-native-bridge.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-handle-lowering.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" })
 ]);

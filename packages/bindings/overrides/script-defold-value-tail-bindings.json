@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "expectedRouteCount": 26,
-  "expectedCandidateCount": 16,
+  "expectedCandidateCount": 26,
   "codecVocabulary": ["Nil", "Boolean", "Number", "String", "Hash", "Url", "Vector3", "Matrix4", "None"],
   "sources": [
     { "key": "camera", "path": "engine/render/src/render/render_script_camera.cpp", "sha256": "d8af6b188f58110bd8c2e85238f86a9f4ad29dde6eff1a81a880b4137d8512bf" },
@@ -34,10 +34,11 @@
     },
     {
       "id": "requires-gui-script-instance",
-      "disposition": "blocked",
+      "disposition": "candidate",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "gui-script-instance",
-      "blocker": "gui-script-instance-attachment-unavailable",
-      "detail": "These functions validate Defold's current instance as a GUI script instance. The extension currently captures only a game-object .script instance, so compiling and linking the Lua call is insufficient evidence that it can execute.",
+      "detail": "These functions validate Defold's current instance as a GUI script instance. The generated exact-call fixture supplies and selects that context; the product .gui_script proxy provider remains unimplemented.",
       "expectedRouteCount": 4,
       "sourceRoutes": [
         { "source": "gui", "ids": ["script:gui.delete_texture", "script:gui.get_font_resource", "script:gui.get_layout", "script:gui.set_layout"] }
@@ -45,32 +46,46 @@
     },
     {
       "id": "requires-render-script-instance",
-      "disposition": "blocked",
+      "disposition": "candidate",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "render-script-instance",
-      "blocker": "render-script-instance-attachment-unavailable",
-      "detail": "These functions call RenderScriptInstance_Check and require the active instance installed by a .render_script. The extension currently captures only a game-object .script instance, so the shared router must fail closed until a render-script attachment path exists.",
+      "detail": "These functions call RenderScriptInstance_Check and require the active instance installed by a .render_script. The generated exact-call fixture supplies and selects that context; the product .render_script proxy provider remains unimplemented.",
       "expectedRouteCount": 4,
       "sourceRoutes": [
         { "source": "render", "ids": ["script:render.enable_material", "script:render.set_compute", "script:render.set_projection", "script:render.set_view"] }
       ]
     },
     {
-      "id": "unsafe-image-type-codec",
-      "disposition": "blocked",
+      "id": "image-type-string-codec",
+      "disposition": "candidate",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "gui-script-instance",
-      "blocker": "image-type-union-codec",
-      "detail": "gui.set_texture_data accepts string|image.TYPE. The current ABI has no reviewed representation or enum-domain validation for image.TYPE, so exposing only the string arm would silently narrow the documented route.",
+      "detail": "gui.set_texture_data accepts string|image.TYPE, but the pinned implementation requires luaL_checkstring at argument 4; documented image.TYPE constants therefore remain string-compatible values on this ABI.",
+      "codecEvidence": {
+        "sourceSignature": "const char* type_str = luaL_checkstring(L, 4)",
+        "acceptedLuaType": "string",
+        "domain": ["rgb", "rgba", "l", "astc"],
+        "note": "The documented image.TYPE constants are string-compatible values consumed by luaL_checkstring and ToImageType/ToImageCompressionType."
+      },
       "expectedRouteCount": 1,
       "sourceRoutes": [
         { "source": "gui", "ids": ["script:gui.set_texture_data"] }
       ]
     },
     {
-      "id": "unsafe-named-enum-result-codec",
-      "disposition": "blocked",
+      "id": "liveupdate-result-enum-codec",
+      "disposition": "candidate",
+      "backend": "captured-lua-exact-call",
+      "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
       "requiredContext": "script-instance",
-      "blocker": "named-enum-domain-codec",
-      "detail": "liveupdate.remove_mount returns liveupdate.LIVEUPDATE. A number tag alone does not validate Defold's named-enum domain, so no arbitrary numeric result may cross this route until the pinned enum domain is generated and checked.",
+      "detail": "liveupdate.remove_mount returns liveupdate.LIVEUPDATE. The reviewed ABI preserves the exact numeric enum value produced by Defold Lua.",
+      "codecEvidence": {
+        "sourceSignature": "dmLiveUpdate::Result result = dmLiveUpdate::RemoveMountSync(name_hash); lua_pushinteger(L, result)",
+        "acceptedLuaType": "integer",
+        "domain": "dmLiveUpdate::Result / exported LIVEUPDATE_* constants"
+      },
       "expectedRouteCount": 1,
       "sourceRoutes": [
         { "source": "liveupdate", "ids": ["script:liveupdate.remove_mount"] }

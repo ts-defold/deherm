@@ -31,7 +31,8 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 
 const relativeInputs = {
   plan: "packages/bindings/generated/defold-binding-lowering-plan.json",
-  universal: "packages/bindings/generated/defold-script-universal-value-bindings.json"
+  universal: "packages/bindings/generated/defold-script-universal-value-bindings.json",
+  capi: "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp"
 };
 const relativeOutputs = {
   typescript: "packages/static-hermes/src/generated/script-typed-native-bridge.ts",
@@ -87,7 +88,6 @@ export function selectClaimedRoutes(plan, universal) {
   assert.equal(universal.schemaVersion, 1, "Unsupported universal-value binding report schema");
   const universalById = new Map(universal.bindings.map((binding) => [binding.stableId, binding]));
   const claimed = [];
-  const declined = [];
   for (const unit of plan.units) {
     if (unit.identity.surface !== "script") continue;
     if (unit.backends?.staticHermesCAbi?.selection !== "emit") continue;
@@ -95,28 +95,33 @@ export function selectClaimedRoutes(plan, universal) {
     assert.ok(Number.isInteger(stableId) && stableId >= 0 && stableId <= 0xffffffff,
       `${unit.identity.id} has no stable ID`);
     const binding = universalById.get(stableId);
-    if (!binding) {
-      declined.push({ id: unit.identity.id, stableId, reason: "no-universal-value-frame" });
-      continue;
-    }
+    assert.ok(binding, `${unit.identity.id}: canonical typed-native selection has no universal-value frame`);
     const unsupported = binding.shapeKinds.filter((kind) => kUnsupportedShapeKinds.has(kind));
-    if (unsupported.length) {
-      declined.push({ id: unit.identity.id, stableId, reason: `unrepresentable-shape:${unsupported.sort().join("+")}` });
-      continue;
-    }
+    assert.deepEqual(unsupported, [],
+      `${unit.identity.id}: canonical typed-native selection contains unrepresentable shapes`);
     if (binding.variadic) {
-      // A variadic route's argument count is not bounded by its contract, so
-      // the fixed argument window below cannot state a sound bound for it.
-      declined.push({ id: unit.identity.id, stableId, reason: "variadic-argument-window" });
-      continue;
+      // Universal-value variadics are not unbounded: their generated operation
+      // descriptor fixes the same policy-owned maximum the native frame checks.
+      // The adapter below already walks the runtime argument array, so these
+      // routes need no handwritten arity expansion; they share this mechanical
+      // bounded adapter with every fixed-arity route.
+      assert.equal(binding.maximumArgumentCount, universal.bounds.maximumArguments,
+        `${unit.identity.id}: variadic bound differs from the universal frame capacity`);
     }
-    claimed.push({ id: unit.identity.id, stableId, maximumArgumentCount: binding.maximumArgumentCount });
+    assert.ok(Number.isInteger(binding.maximumArgumentCount) && binding.maximumArgumentCount >= 0 &&
+      binding.maximumArgumentCount <= universal.bounds.maximumArguments,
+      `${unit.identity.id}: argument bound exceeds the universal frame capacity`);
+    claimed.push({
+      id: unit.identity.id,
+      stableId,
+      maximumArgumentCount: binding.maximumArgumentCount,
+      ...(binding.variadic ? { arity: "bounded-variadic" } : {})
+    });
   }
   claimed.sort((left, right) => left.stableId - right.stableId);
-  declined.sort((left, right) => left.stableId - right.stableId);
   const maximumArgumentCount = claimed.reduce(
     (maximum, route) => Math.max(maximum, route.maximumArgumentCount), 0);
-  return { claimed, declined, maximumArgumentCount };
+  return { claimed, declined: [], maximumArgumentCount };
 }
 
 export function renderTypescript({ claimed, maximumArgumentCount }) {
@@ -435,12 +440,19 @@ export async function run(argv = process.argv) {
   const [planRaw, universalRaw, capiHeader] = await Promise.all([
     readFile(path.join(repositoryRoot, relativeInputs.plan), "utf8"),
     readFile(path.join(repositoryRoot, relativeInputs.universal), "utf8"),
-    readFile(path.join(repositoryRoot, "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp"), "utf8")
+    readFile(path.join(repositoryRoot, relativeInputs.capi), "utf8")
   ]);
   assertAbiTags(capiHeader);
   const plan = JSON.parse(planRaw);
   const universal = JSON.parse(universalRaw);
   const selection = selectClaimedRoutes(plan, universal);
+  const planScriptTypedNativeEmit = plan.units.filter((unit) =>
+    unit.identity.surface === "script" &&
+    unit.backends?.staticHermesCAbi?.selection === "emit").length;
+  assert.equal(selection.claimed.length, planScriptTypedNativeEmit,
+    "typed-native bridge selection differs from the canonical script plan");
+  assert.equal(selection.declined.length, 0,
+    "typed-native bridge cannot decline a route selected by the canonical script plan");
   const typescript = renderTypescript(selection);
   const body = {
     schemaVersion: 1,
@@ -449,9 +461,11 @@ export async function run(argv = process.argv) {
     defoldRevision: plan.defoldRevision,
     inputHashes: {
       [relativeInputs.plan]: sha256(planRaw),
-      [relativeInputs.universal]: sha256(universalRaw)
+      [relativeInputs.universal]: sha256(universalRaw),
+      [relativeInputs.capi]: sha256(capiHeader)
     },
-    planTypedNativeEmit: plan.runtimes?.hermes?.byTransport?.["typed-native"]?.emit ?? null,
+    planTypedNativeEmit: planScriptTypedNativeEmit,
+    planTypedNativeBackendEmit: plan.runtimes?.hermes?.byTransport?.["typed-native"]?.emit ?? null,
     claimedRouteCount: selection.claimed.length,
     declinedRouteCount: selection.declined.length,
     maximumArgumentCount: selection.maximumArgumentCount,
@@ -470,7 +484,7 @@ export async function run(argv = process.argv) {
   await writeOrCheck(path.join(repositoryRoot, relativeOutputs.typescript), typescript, check);
   await writeOrCheck(path.join(repositoryRoot, relativeOutputs.report), report, check);
   console.log(
-    `typed-native bridge claims ${selection.claimed.length} of ${plan.runtimes?.hermes?.byTransport?.["typed-native"]?.emit ?? "?"} lowered routes (${selection.declined.length} declined)`);
+    `typed-native bridge claims all ${selection.claimed.length} canonical script routes (${selection.declined.length} declined)`);
   return body;
 }
 

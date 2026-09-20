@@ -264,6 +264,27 @@ bool ScriptAdapter::captureLuaUserdata(int stackIndex, ScriptValue* output) noex
   return true;
 }
 
+bool ScriptAdapter::captureGuiNode(int stackIndex, ScriptValue* output) noexcept {
+  adapterError_[0] = '\0';
+  if (!state_ || !output || !lua_isuserdata(state_, stackIndex)) {
+    return fail("GUI node capture requires an active runtime and userdata value");
+  }
+  lua_pushvalue(state_, stackIndex);
+  const int reference = luaL_ref(state_, LUA_REGISTRYINDEX);
+  const auto handle = luaHandles_.acquire(runtimeGeneration_, kNodeHandleType,
+      state_, static_cast<uintptr_t>(reference));
+  if (!handle) {
+    luaL_unref(state_, LUA_REGISTRYINDEX, reference);
+    return fail("GUI node handle pool is exhausted");
+  }
+  *output = {};
+  output->tag = ScriptValueTag::kHandle;
+  output->handleKind = ScriptHandleKind::kGuiNode;
+  output->length = handle.runtime;
+  output->payload = packHandle(handle);
+  return true;
+}
+
 bool ScriptAdapter::captureLuaClosure(int stackIndex, ScriptValue* output) noexcept {
   if (!state_ || !output || !lua_isfunction(state_, stackIndex) ||
       !luaClosureLifetime_ || !luaClosureLifetime_->active) {
@@ -423,8 +444,27 @@ bool ScriptAdapter::dispatch(ScriptCallFrame* frame) noexcept {
   if (tableRecordStatus == table_record::DispatchStatus::kError) return false;
 
   if (const auto* handleRoute = script_handle_lowering::find(frame->stableId)) {
-    (void)handleRoute;
     if (!handleRouter_) return fail("Defold semantic handle router is unavailable");
+    const bool needsComponentContext =
+        handleRoute->context == script_handle_lowering::Context::kGameObjectInstance ||
+        handleRoute->context == script_handle_lowering::Context::kGuiScene ||
+        handleRoute->context == script_handle_lowering::Context::kRenderScriptAndGraphics;
+    if (needsComponentContext) {
+      const ActiveContext requiredContext =
+          handleRoute->context == script_handle_lowering::Context::kGuiScene
+          ? ActiveContext::kGui
+          : handleRoute->context == script_handle_lowering::Context::kRenderScriptAndGraphics
+          ? ActiveContext::kRender
+          : ActiveContext::kGameObject;
+      if (!hasSelectedContext() || selectedContext() != requiredContext) {
+        return fail(
+            handleRoute->context == script_handle_lowering::Context::kGuiScene
+            ? "Defold handle call requires a captured GUI script instance"
+            : handleRoute->context == script_handle_lowering::Context::kRenderScriptAndGraphics
+            ? "Defold handle call requires a captured render script instance"
+            : "Defold handle call requires a captured game-object script instance");
+      }
+    }
     return handleRouter_->dispatch(frame, adapterError_, sizeof(adapterError_));
   }
 
@@ -1432,10 +1472,20 @@ value_tail::DispatchStatus ScriptAdapter::invokeValueTail(
     writeError(error, errorCapacity, lastError());
     return Status::kError;
   }
+  const ActiveContext requiredContext = route.context == value_tail::Context::kGui
+      ? ActiveContext::kGui
+      : route.context == value_tail::Context::kRender
+      ? ActiveContext::kRender
+      : ActiveContext::kGameObject;
   if (!instanceApi_.get || !instanceApi_.set || instanceRef_ == LUA_NOREF ||
       instanceRef_ == LUA_REFNIL || !hasSelectedContext() ||
-      selectedContext() != ActiveContext::kGameObject) {
-    writeError(error, errorCapacity, "Defold value-tail call requires a captured game-object script instance");
+      selectedContext() != requiredContext) {
+    writeError(error, errorCapacity,
+        route.context == value_tail::Context::kGui
+          ? "Defold value-tail call requires a captured GUI script instance"
+          : route.context == value_tail::Context::kRender
+          ? "Defold value-tail call requires a captured render script instance"
+          : "Defold value-tail call requires a captured game-object script instance");
     return Status::kError;
   }
   const int baseTop = lua_gettop(state_);

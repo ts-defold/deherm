@@ -35,6 +35,7 @@ class ScriptAdapter {
   bool captureGuiInstance(int stackIndex) noexcept;
   bool captureRenderInstance(int stackIndex) noexcept;
   bool captureLuaUserdata(int stackIndex, ScriptValue* output) noexcept;
+  bool captureGuiNode(int stackIndex, ScriptValue* output) noexcept;
   bool captureSemanticHandle(int stackIndex,
       ::defold_hermes::script_handle_lowering::SemanticHandleKind kind,
       ScriptValue* output) noexcept;

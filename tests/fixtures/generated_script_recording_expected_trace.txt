@@ -1,12 +1,12 @@
 # generated-script-recording-engine v1
 # defold-revision 7f0f554f41f9dce1e0ddff99bf08200657d1ee05
-# lowering-plan bd0c30a4f703144b4412a5b04456d92be89a546422c404063201efe8dcecd9b4
+# lowering-plan 2897ef0ac8bc513b170c580ede10ef90401641f61a9809538d5d63785e8b9243
 # expectation derived from the declared contract; not engine conformance
 call b2d.get_body jsi c147 arity=1 args=[str:d1] ctx=game-object-instance
 recv b2d.get_body jsi c147 results=1 [h:box2d-body]
 end b2d.get_body jsi c147 status=ok
 call b2d.get_version jsi c148 arity=0 args=[] ctx=global
-recv b2d.get_version jsi c148 results=1 [rec()]
+recv b2d.get_version jsi c148 results=1 [rec(version=str:d4371,major=num:4372,middle=num:4373,minor=num:4374)]
 end b2d.get_version jsi c148 status=ok
 call b2d.get_world jsi c149 arity=0 args=[] ctx=game-object-instance
 recv b2d.get_world jsi c149 results=1 [h:box2d-world]
@@ -456,7 +456,7 @@ call bullet3d.get_rigid_body jsi c173 arity=1 args=[str:d1] ctx=game-object-inst
 recv bullet3d.get_rigid_body jsi c173 results=1 [h:bullet-object]
 end bullet3d.get_rigid_body jsi c173 status=ok
 call bullet3d.get_version jsi c148 arity=0 args=[] ctx=global
-recv bullet3d.get_version jsi c148 results=1 [rec()]
+recv bullet3d.get_version jsi c148 results=1 [rec(version=str:d4371,number=num:4372,major=num:4373,minor=num:4374)]
 end bullet3d.get_version jsi c148 status=ok
 call bullet3d.get_world jsi c174 arity=0 args=[] ctx=game-object-instance
 recv bullet3d.get_world jsi c174 results=1 [h:bullet-world]
@@ -1185,7 +1185,7 @@ call http.request jsi c200 arity=6 args=[str:d1 str:d2 cb map(str:d70=>str:d71) 
 recv http.request jsi c200 results=0 []
 end http.request jsi c200 status=ok
 call image.get_astc_header jsi c148 arity=1 args=[str:d1] ctx=global
-recv image.get_astc_header jsi c148 results=1 [rec()]
+recv image.get_astc_header jsi c148 results=1 [rec(width=num:4371,height=num:4372,depth=num:4373,block_size_x=num:4374,block_size_y=num:4375,block_size_z=num:4376)]
 end image.get_astc_header jsi c148 status=ok
 call image.load jsi c160 arity=2 args=[str:d1 bool:0] ctx=context-policy-unresolved
 recv image.load jsi c160 results=1 [rec()]
@@ -1787,7 +1787,7 @@ end vmath.conj jsi c160 status=ok
 call vmath.cross jsi c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.cross jsi c160 results=1 [dv:v3:257,258,259]
 end vmath.cross jsi c160 status=ok
-call vmath.dot jsi c160 arity=2 args=[num:1 num:2] ctx=context-policy-unresolved
+call vmath.dot jsi c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.dot jsi c160 results=1 [num:257]
 end vmath.dot jsi c160 status=ok
 call vmath.euler_to_quat jsi c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
@@ -1802,8 +1802,8 @@ end vmath.length jsi c160 status=ok
 call vmath.length_sqr jsi c160 arity=1 args=[dv:v3:1,2,3] ctx=context-policy-unresolved
 recv vmath.length_sqr jsi c160 results=1 [num:257]
 end vmath.length_sqr jsi c160 status=ok
-call vmath.lerp jsi c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
-recv vmath.lerp jsi c160 results=1 [num:257]
+call vmath.lerp jsi c160 arity=3 args=[num:1 dv:v3:2,3,4 dv:v3:3,4,5] ctx=context-policy-unresolved
+recv vmath.lerp jsi c160 results=1 [dv:v3:257,258,259]
 end vmath.lerp jsi c160 status=ok
 call vmath.matrix4 jsi c160 arity=0 args=[] ctx=context-policy-unresolved
 recv vmath.matrix4 jsi c160 results=1 [dv:mat4:257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272]
@@ -1844,8 +1844,8 @@ end vmath.matrix4_scale jsi c160 status=ok
 call vmath.matrix4_translation jsi c160 arity=1 args=[dv:v3:1,2,3] ctx=context-policy-unresolved
 recv vmath.matrix4_translation jsi c160 results=1 [dv:mat4:257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272]
 end vmath.matrix4_translation jsi c160 status=ok
-call vmath.mul_per_elem jsi c160 arity=2 args=[num:1 num:2] ctx=context-policy-unresolved
-recv vmath.mul_per_elem jsi c160 results=1 [num:257]
+call vmath.mul_per_elem jsi c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
+recv vmath.mul_per_elem jsi c160 results=1 [dv:v3:257,258,259]
 end vmath.mul_per_elem jsi c160 status=ok
 call vmath.normalize jsi c160 arity=1 args=[num:1] ctx=context-policy-unresolved
 recv vmath.normalize jsi c160 results=1 [num:257]
@@ -1886,8 +1886,8 @@ end vmath.quat_to_euler jsi c221 status=ok
 call vmath.rotate jsi c160 arity=2 args=[dv:quat:1,2,3,4 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.rotate jsi c160 results=1 [dv:v3:257,258,259]
 end vmath.rotate jsi c160 status=ok
-call vmath.slerp jsi c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
-recv vmath.slerp jsi c160 results=1 [num:257]
+call vmath.slerp jsi c160 arity=3 args=[num:1 dv:v3:2,3,4 dv:v3:3,4,5] ctx=context-policy-unresolved
+recv vmath.slerp jsi c160 results=1 [dv:v3:257,258,259]
 end vmath.slerp jsi c160 status=ok
 call vmath.vector jsi c160 arity=1 args=[seq(num:19)] ctx=context-policy-unresolved
 recv vmath.vector jsi c160 results=1 [h:lua-userdata]
@@ -2751,7 +2751,7 @@ call b2d.get_body direct-memory c147 arity=1 args=[str:d1] ctx=game-object-insta
 recv b2d.get_body direct-memory c147 results=1 [h:box2d-body]
 end b2d.get_body direct-memory c147 status=ok
 call b2d.get_version direct-memory c148 arity=0 args=[] ctx=global
-recv b2d.get_version direct-memory c148 results=1 [rec()]
+recv b2d.get_version direct-memory c148 results=1 [rec(version=str:d4371,major=num:4372,middle=num:4373,minor=num:4374)]
 end b2d.get_version direct-memory c148 status=ok
 call b2d.get_world direct-memory c149 arity=0 args=[] ctx=game-object-instance
 recv b2d.get_world direct-memory c149 results=1 [h:box2d-world]
@@ -3201,7 +3201,7 @@ call bullet3d.get_rigid_body direct-memory c173 arity=1 args=[str:d1] ctx=game-o
 recv bullet3d.get_rigid_body direct-memory c173 results=1 [h:bullet-object]
 end bullet3d.get_rigid_body direct-memory c173 status=ok
 call bullet3d.get_version direct-memory c148 arity=0 args=[] ctx=global
-recv bullet3d.get_version direct-memory c148 results=1 [rec()]
+recv bullet3d.get_version direct-memory c148 results=1 [rec(version=str:d4371,number=num:4372,major=num:4373,minor=num:4374)]
 end bullet3d.get_version direct-memory c148 status=ok
 call bullet3d.get_world direct-memory c174 arity=0 args=[] ctx=game-object-instance
 recv bullet3d.get_world direct-memory c174 results=1 [h:bullet-world]
@@ -3910,7 +3910,7 @@ end html5.run direct-memory c160 status=ok
 skip html5.set_interaction_listener direct-memory c199 callback-input-requires-the-html5-browser-registry
 skip http.request direct-memory c200 callback-input-requires-the-html5-browser-registry
 call image.get_astc_header direct-memory c148 arity=1 args=[str:d1] ctx=global
-recv image.get_astc_header direct-memory c148 results=1 [rec()]
+recv image.get_astc_header direct-memory c148 results=1 [rec(width=num:4371,height=num:4372,depth=num:4373,block_size_x=num:4374,block_size_y=num:4375,block_size_z=num:4376)]
 end image.get_astc_header direct-memory c148 status=ok
 call image.load direct-memory c160 arity=2 args=[str:d1 bool:0] ctx=context-policy-unresolved
 recv image.load direct-memory c160 results=1 [rec()]
@@ -4488,7 +4488,7 @@ end vmath.conj direct-memory c160 status=ok
 call vmath.cross direct-memory c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.cross direct-memory c160 results=1 [dv:v3:257,258,259]
 end vmath.cross direct-memory c160 status=ok
-call vmath.dot direct-memory c160 arity=2 args=[num:1 num:2] ctx=context-policy-unresolved
+call vmath.dot direct-memory c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.dot direct-memory c160 results=1 [num:257]
 end vmath.dot direct-memory c160 status=ok
 call vmath.euler_to_quat direct-memory c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
@@ -4503,8 +4503,8 @@ end vmath.length direct-memory c160 status=ok
 call vmath.length_sqr direct-memory c160 arity=1 args=[dv:v3:1,2,3] ctx=context-policy-unresolved
 recv vmath.length_sqr direct-memory c160 results=1 [num:257]
 end vmath.length_sqr direct-memory c160 status=ok
-call vmath.lerp direct-memory c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
-recv vmath.lerp direct-memory c160 results=1 [num:257]
+call vmath.lerp direct-memory c160 arity=3 args=[num:1 dv:v3:2,3,4 dv:v3:3,4,5] ctx=context-policy-unresolved
+recv vmath.lerp direct-memory c160 results=1 [dv:v3:257,258,259]
 end vmath.lerp direct-memory c160 status=ok
 call vmath.matrix4 direct-memory c160 arity=0 args=[] ctx=context-policy-unresolved
 recv vmath.matrix4 direct-memory c160 results=1 [dv:mat4:257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272]
@@ -4545,8 +4545,8 @@ end vmath.matrix4_scale direct-memory c160 status=ok
 call vmath.matrix4_translation direct-memory c160 arity=1 args=[dv:v3:1,2,3] ctx=context-policy-unresolved
 recv vmath.matrix4_translation direct-memory c160 results=1 [dv:mat4:257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272]
 end vmath.matrix4_translation direct-memory c160 status=ok
-call vmath.mul_per_elem direct-memory c160 arity=2 args=[num:1 num:2] ctx=context-policy-unresolved
-recv vmath.mul_per_elem direct-memory c160 results=1 [num:257]
+call vmath.mul_per_elem direct-memory c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
+recv vmath.mul_per_elem direct-memory c160 results=1 [dv:v3:257,258,259]
 end vmath.mul_per_elem direct-memory c160 status=ok
 call vmath.normalize direct-memory c160 arity=1 args=[num:1] ctx=context-policy-unresolved
 recv vmath.normalize direct-memory c160 results=1 [num:257]
@@ -4587,8 +4587,8 @@ end vmath.quat_to_euler direct-memory c221 status=ok
 call vmath.rotate direct-memory c160 arity=2 args=[dv:quat:1,2,3,4 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.rotate direct-memory c160 results=1 [dv:v3:257,258,259]
 end vmath.rotate direct-memory c160 status=ok
-call vmath.slerp direct-memory c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
-recv vmath.slerp direct-memory c160 results=1 [num:257]
+call vmath.slerp direct-memory c160 arity=3 args=[num:1 dv:v3:2,3,4 dv:v3:3,4,5] ctx=context-policy-unresolved
+recv vmath.slerp direct-memory c160 results=1 [dv:v3:257,258,259]
 end vmath.slerp direct-memory c160 status=ok
 call vmath.vector direct-memory c160 arity=1 args=[seq(num:19)] ctx=context-policy-unresolved
 recv vmath.vector direct-memory c160 results=1 [h:lua-userdata]
@@ -5446,7 +5446,7 @@ call b2d.get_body typed-native c147 arity=1 args=[str:d1] ctx=game-object-instan
 recv b2d.get_body typed-native c147 results=1 [h:box2d-body]
 end b2d.get_body typed-native c147 status=ok
 call b2d.get_version typed-native c148 arity=0 args=[] ctx=global
-recv b2d.get_version typed-native c148 results=1 [rec()]
+recv b2d.get_version typed-native c148 results=1 [rec(version=str:d4371,major=num:4372,middle=num:4373,minor=num:4374)]
 end b2d.get_version typed-native c148 status=ok
 call b2d.get_world typed-native c149 arity=0 args=[] ctx=game-object-instance
 recv b2d.get_world typed-native c149 results=1 [h:box2d-world]
@@ -5896,7 +5896,7 @@ call bullet3d.get_rigid_body typed-native c173 arity=1 args=[str:d1] ctx=game-ob
 recv bullet3d.get_rigid_body typed-native c173 results=1 [h:bullet-object]
 end bullet3d.get_rigid_body typed-native c173 status=ok
 call bullet3d.get_version typed-native c148 arity=0 args=[] ctx=global
-recv bullet3d.get_version typed-native c148 results=1 [rec()]
+recv bullet3d.get_version typed-native c148 results=1 [rec(version=str:d4371,number=num:4372,major=num:4373,minor=num:4374)]
 end bullet3d.get_version typed-native c148 status=ok
 call bullet3d.get_world typed-native c174 arity=0 args=[] ctx=game-object-instance
 recv bullet3d.get_world typed-native c174 results=1 [h:bullet-world]
@@ -6605,7 +6605,7 @@ end html5.run typed-native c160 status=ok
 skip html5.set_interaction_listener typed-native c199 callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame
 skip http.request typed-native c200 callback-input-falls-back-to-jsi-and-is-not-emitted-in-the-static-frame
 call image.get_astc_header typed-native c148 arity=1 args=[str:d1] ctx=global
-recv image.get_astc_header typed-native c148 results=1 [rec()]
+recv image.get_astc_header typed-native c148 results=1 [rec(width=num:4371,height=num:4372,depth=num:4373,block_size_x=num:4374,block_size_y=num:4375,block_size_z=num:4376)]
 end image.get_astc_header typed-native c148 status=ok
 call image.load typed-native c160 arity=2 args=[str:d1 bool:0] ctx=context-policy-unresolved
 recv image.load typed-native c160 results=1 [rec()]
@@ -7183,7 +7183,7 @@ end vmath.conj typed-native c160 status=ok
 call vmath.cross typed-native c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.cross typed-native c160 results=1 [dv:v3:257,258,259]
 end vmath.cross typed-native c160 status=ok
-call vmath.dot typed-native c160 arity=2 args=[num:1 num:2] ctx=context-policy-unresolved
+call vmath.dot typed-native c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.dot typed-native c160 results=1 [num:257]
 end vmath.dot typed-native c160 status=ok
 call vmath.euler_to_quat typed-native c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
@@ -7198,8 +7198,8 @@ end vmath.length typed-native c160 status=ok
 call vmath.length_sqr typed-native c160 arity=1 args=[dv:v3:1,2,3] ctx=context-policy-unresolved
 recv vmath.length_sqr typed-native c160 results=1 [num:257]
 end vmath.length_sqr typed-native c160 status=ok
-call vmath.lerp typed-native c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
-recv vmath.lerp typed-native c160 results=1 [num:257]
+call vmath.lerp typed-native c160 arity=3 args=[num:1 dv:v3:2,3,4 dv:v3:3,4,5] ctx=context-policy-unresolved
+recv vmath.lerp typed-native c160 results=1 [dv:v3:257,258,259]
 end vmath.lerp typed-native c160 status=ok
 call vmath.matrix4 typed-native c160 arity=0 args=[] ctx=context-policy-unresolved
 recv vmath.matrix4 typed-native c160 results=1 [dv:mat4:257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272]
@@ -7240,8 +7240,8 @@ end vmath.matrix4_scale typed-native c160 status=ok
 call vmath.matrix4_translation typed-native c160 arity=1 args=[dv:v3:1,2,3] ctx=context-policy-unresolved
 recv vmath.matrix4_translation typed-native c160 results=1 [dv:mat4:257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272]
 end vmath.matrix4_translation typed-native c160 status=ok
-call vmath.mul_per_elem typed-native c160 arity=2 args=[num:1 num:2] ctx=context-policy-unresolved
-recv vmath.mul_per_elem typed-native c160 results=1 [num:257]
+call vmath.mul_per_elem typed-native c160 arity=2 args=[dv:v3:1,2,3 dv:v3:2,3,4] ctx=context-policy-unresolved
+recv vmath.mul_per_elem typed-native c160 results=1 [dv:v3:257,258,259]
 end vmath.mul_per_elem typed-native c160 status=ok
 call vmath.normalize typed-native c160 arity=1 args=[num:1] ctx=context-policy-unresolved
 recv vmath.normalize typed-native c160 results=1 [num:257]
@@ -7282,8 +7282,8 @@ end vmath.quat_to_euler typed-native c221 status=ok
 call vmath.rotate typed-native c160 arity=2 args=[dv:quat:1,2,3,4 dv:v3:2,3,4] ctx=context-policy-unresolved
 recv vmath.rotate typed-native c160 results=1 [dv:v3:257,258,259]
 end vmath.rotate typed-native c160 status=ok
-call vmath.slerp typed-native c160 arity=3 args=[num:1 num:2 num:3] ctx=context-policy-unresolved
-recv vmath.slerp typed-native c160 results=1 [num:257]
+call vmath.slerp typed-native c160 arity=3 args=[num:1 dv:v3:2,3,4 dv:v3:3,4,5] ctx=context-policy-unresolved
+recv vmath.slerp typed-native c160 results=1 [dv:v3:257,258,259]
 end vmath.slerp typed-native c160 status=ok
 call vmath.vector typed-native c160 arity=1 args=[seq(num:19)] ctx=context-policy-unresolved
 recv vmath.vector typed-native c160 results=1 [h:lua-userdata]

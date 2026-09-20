@@ -29,32 +29,32 @@
       "availability": "packages/bindings/generated/defold-script-route-availability-profiles.json"
     },
     "hashes": {
-      "policy": "4a3874d56311637cc6571c7a3a3faef758604e0f053e4f44b18b346e81aeb006",
-      "projection": "f8241dbffcd0d96c439a78f0da8a8a43643fe4ce09e22f67e8e113350536eeb9",
-      "classification": "eb89f55b5e91fd17e2d54dd4983ce1f75163d12bc938f663d5679c0d4c166bb7",
-      "availability": "ce6c6dab4de1e3e028ef0bf322f332372cae640423f745e9a9afc53c61e44e47"
+      "policy": "68239dfe605ef568c51fd53898744eeadefb6a525fc9a366968f46e806d40546",
+      "projection": "8131f8ad67722c7d3b20d9f68a162235b379a058a20db7cad8d0d477b80f71fc",
+      "classification": "8cac63bc8998edccb4a65c2b5f2859f560e10f66484195d5d5926e2acbfe05c5",
+      "availability": "81e6a2b2b6b5dc7244d696ffd4e59b31c755d1afe7bf99749054ce0713fe5cd7"
     },
     "availabilityCatalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"
   },
   "coverage": {
     "selectedRoutes": 407,
     "descriptorRowsEmitted": 407,
-    "routerCandidates": 343,
-    "blocked": 64,
-    "adapterExecutableRoutes": 343,
-    "nativeAdapterHarnessRoutes": 343,
+    "routerCandidates": 405,
+    "blocked": 2,
+    "adapterExecutableRoutes": 405,
+    "nativeAdapterHarnessRoutes": 405,
     "defoldEngineVerifiedRoutes": 0,
     "nativeDynamicHermesJsiVerifiedRoutes": 0,
     "nativeStaticHermesExecutableRoutes": 0,
     "html5BrowserExecutableRoutes": 0,
     "runtimeUnavailable": 2,
     "adapterExecutableRoutesByProfile": {
-      "bullet-only": 139,
-      "default-legacy-bullet": 253,
-      "legacy-no-bullet": 122,
-      "no-physics": 8,
-      "v3-bullet": 318,
-      "v3-no-bullet": 187
+      "bullet-only": 201,
+      "default-legacy-bullet": 313,
+      "legacy-no-bullet": 182,
+      "no-physics": 70,
+      "v3-bullet": 380,
+      "v3-no-bullet": 249
     }
   },
   "operationClassCounts": {
@@ -92,10 +92,15 @@
       "state": "provider-required-unimplemented"
     }
   },
+  "nativeAdapterHarnessContexts": {
+    "gameObject": "captured-and-selected",
+    "gui": "captured-and-selected-test-fixture-only",
+    "render": "captured-and-selected-test-fixture-only"
+  },
   "runtimeProfileDetection": {
     "authority": "generated-lua-registration-surface",
     "strategy": "exact-function-presence-vector",
-    "routeCount": 343,
+    "routeCount": 405,
     "lookup": "protected-raw-table-traversal-no-metamethods",
     "initialization": "lazy-first-bootstrap-attach",
     "nativeLuaHarness": "six-exact-profiles-and-negative-vectors-covered",
@@ -4449,8 +4454,8 @@
       "sourceRouteCount": 198,
       "routeSetSha256": "f0b71c047ed49a3ce96d9fec21f215d5279d1a67d6cf7b1ca2850a237d5b2e08",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
-      "adapterExecutableRouteCount": 139,
-      "adapterSurfaceSha256": "2542ef35fadab778e291b4c72a5fddb32efe30ec11c1a8f993618ffffec6c54c",
+      "adapterExecutableRouteCount": 201,
+      "adapterSurfaceSha256": "2d680275e47133ba3e466c31256f6d0ab6b4215aa36ecc3c2cbf3c5e1cc547d6",
       "equivalentProfileIds": [
         "bullet-only"
       ],
@@ -4467,8 +4472,8 @@
       "sourceRouteCount": 343,
       "routeSetSha256": "86aa4a3c9f3bf3e25be216cde81f7c10bbb82c0b1d9bc253549ee5c822ac8730",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
-      "adapterExecutableRouteCount": 253,
-      "adapterSurfaceSha256": "480a3e44d1938092328e0e0ba1e69148085d5de3de8d3482bc95a814c25d4753",
+      "adapterExecutableRouteCount": 313,
+      "adapterSurfaceSha256": "b5a8441fcd1a85e3159703ca27b7b350288fae4466c50da4de7ead5d4197801b",
       "equivalentProfileIds": [
         "default-legacy-bullet"
       ],
@@ -4485,8 +4490,8 @@
       "sourceRouteCount": 171,
       "routeSetSha256": "1d71f8ec8f69147743c11df72bafe9601ffbcf65f8cc568e71d01f6cf5ca389b",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
-      "adapterExecutableRouteCount": 122,
-      "adapterSurfaceSha256": "038223ce569435c47e7a7ec6e3b3ec16b184c4ec08d5183ff8c02aeefcc5f13f",
+      "adapterExecutableRouteCount": 182,
+      "adapterSurfaceSha256": "1456b1ca8f58728f63c3ec1f23adf9e50d0a8161da131ce9afe8a4892acfb6f1",
       "equivalentProfileIds": [
         "legacy-no-bullet"
       ],
@@ -4503,8 +4508,8 @@
       "sourceRouteCount": 26,
       "routeSetSha256": "e98ea2491703ab70fb825391d82e9a4b989bcaef00390e439e3df9a600aba91a",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
-      "adapterExecutableRouteCount": 8,
-      "adapterSurfaceSha256": "cb6675359c4a61c21ef72c715fc756b2af76cfc551761301939478f0c7327c23",
+      "adapterExecutableRouteCount": 70,
+      "adapterSurfaceSha256": "157c3993b26f7df2700baf327754ee0ad85b5025a4aad32500836cc5228963eb",
       "equivalentProfileIds": [
         "no-physics"
       ],
@@ -4521,8 +4526,8 @@
       "sourceRouteCount": 417,
       "routeSetSha256": "4986f1ce48a4ac0794db982c2aba6df98f50d0b8d1be96d2b47d87ef40e487fa",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
-      "adapterExecutableRouteCount": 318,
-      "adapterSurfaceSha256": "5297363ad7b0d160eeb26396ac0046ab0a8a687ff80b448ff2463a97016c8199",
+      "adapterExecutableRouteCount": 380,
+      "adapterSurfaceSha256": "e5c62b968dd4ce1b04c0666f0107b13ceab513832c7fb21874e3c70dd0bdd57f",
       "equivalentProfileIds": [
         "v3-bullet"
       ],
@@ -4539,8 +4544,8 @@
       "sourceRouteCount": 245,
       "routeSetSha256": "84e476bd290eb2b22320e97a361882270a777c77dbb5eb40749ca46f08a6b493",
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
-      "adapterExecutableRouteCount": 187,
-      "adapterSurfaceSha256": "4f5a2d9d9f549a5daf5721fc49991f2205ef89dfaa2a9cf0ac29905efd0522c7",
+      "adapterExecutableRouteCount": 249,
+      "adapterSurfaceSha256": "2750367813e3322e9b0f91e79a38655ea443b539911dff0ac82d241bfbd364dc",
       "equivalentProfileIds": [
         "v3-no-bullet"
       ],
@@ -7450,13 +7455,11 @@
           "v3-no-bullet"
         ],
         "runtime": [
-          "default-legacy-bullet",
-          "legacy-no-bullet",
           "v3-bullet",
           "v3-no-bullet"
         ],
         "runtimeAvailable": true,
-        "runtimeMask": 54
+        "runtimeMask": 48
       },
       "argumentOffset": 51,
       "argumentCount": 1,
@@ -11745,13 +11748,11 @@
           "v3-no-bullet"
         ],
         "runtime": [
-          "default-legacy-bullet",
-          "legacy-no-bullet",
           "v3-bullet",
           "v3-no-bullet"
         ],
         "runtimeAvailable": true,
-        "runtimeMask": 54
+        "runtimeMask": 48
       },
       "argumentOffset": 145,
       "argumentCount": 0,
@@ -32721,9 +32722,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 562,
       "argumentCount": 2,
@@ -32736,10 +32744,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -32794,9 +32802,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 564,
       "argumentCount": 1,
@@ -32809,10 +32824,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -32869,9 +32884,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 565,
       "argumentCount": 1,
@@ -32884,10 +32906,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -32942,9 +32964,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 566,
       "argumentCount": 1,
@@ -32957,10 +32986,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33015,9 +33044,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 567,
       "argumentCount": 1,
@@ -33030,10 +33066,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33088,9 +33124,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 568,
       "argumentCount": 1,
@@ -33103,10 +33146,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33161,9 +33204,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 569,
       "argumentCount": 1,
@@ -33176,10 +33226,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33234,9 +33284,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 570,
       "argumentCount": 1,
@@ -33249,10 +33306,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33307,9 +33364,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 571,
       "argumentCount": 1,
@@ -33322,10 +33386,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33380,9 +33444,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 572,
       "argumentCount": 1,
@@ -33395,10 +33466,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33453,9 +33524,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 573,
       "argumentCount": 1,
@@ -33468,10 +33546,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33526,9 +33604,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 574,
       "argumentCount": 1,
@@ -33541,10 +33626,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33599,9 +33684,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 575,
       "argumentCount": 1,
@@ -33614,10 +33706,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33672,9 +33764,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 576,
       "argumentCount": 1,
@@ -33687,10 +33786,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33745,9 +33844,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 577,
       "argumentCount": 1,
@@ -33760,10 +33866,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33818,9 +33924,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 578,
       "argumentCount": 1,
@@ -33833,10 +33946,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33891,9 +34004,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 579,
       "argumentCount": 1,
@@ -33906,10 +34026,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -33964,9 +34084,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 580,
       "argumentCount": 1,
@@ -33979,10 +34106,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34037,9 +34164,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 581,
       "argumentCount": 1,
@@ -34052,10 +34186,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34110,9 +34244,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 582,
       "argumentCount": 1,
@@ -34125,10 +34266,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34183,9 +34324,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 583,
       "argumentCount": 1,
@@ -34198,10 +34346,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34256,9 +34404,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 584,
       "argumentCount": 1,
@@ -34271,10 +34426,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34329,9 +34484,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 585,
       "argumentCount": 1,
@@ -34344,10 +34506,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34402,9 +34564,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 586,
       "argumentCount": 1,
@@ -34417,10 +34586,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34475,9 +34644,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 587,
       "argumentCount": 1,
@@ -34490,10 +34666,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34548,9 +34724,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 588,
       "argumentCount": 1,
@@ -34563,10 +34746,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34621,9 +34804,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 589,
       "argumentCount": 1,
@@ -34636,10 +34826,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34696,9 +34886,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 590,
       "argumentCount": 1,
@@ -34711,10 +34908,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34769,9 +34966,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 591,
       "argumentCount": 1,
@@ -34784,10 +34988,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34842,9 +35046,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 592,
       "argumentCount": 1,
@@ -34857,10 +35068,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34915,9 +35126,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 593,
       "argumentCount": 1,
@@ -34930,10 +35148,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -34988,9 +35206,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 594,
       "argumentCount": 1,
@@ -35003,10 +35228,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35061,9 +35286,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 595,
       "argumentCount": 1,
@@ -35076,10 +35308,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35134,9 +35366,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 596,
       "argumentCount": 1,
@@ -35149,10 +35388,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35207,9 +35446,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 597,
       "argumentCount": 1,
@@ -35222,10 +35468,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35280,9 +35526,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 598,
       "argumentCount": 1,
@@ -35295,10 +35548,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35353,9 +35606,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 599,
       "argumentCount": 1,
@@ -35368,10 +35628,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35426,9 +35686,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 600,
       "argumentCount": 1,
@@ -35441,10 +35708,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35499,9 +35766,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 601,
       "argumentCount": 1,
@@ -35514,10 +35788,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35572,9 +35846,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 602,
       "argumentCount": 1,
@@ -35587,10 +35868,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35645,9 +35926,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 603,
       "argumentCount": 1,
@@ -35660,10 +35948,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35718,9 +36006,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 604,
       "argumentCount": 1,
@@ -35733,10 +36028,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35791,9 +36086,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 605,
       "argumentCount": 1,
@@ -35806,10 +36108,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35864,9 +36166,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 606,
       "argumentCount": 1,
@@ -35879,10 +36188,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -35937,9 +36246,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 607,
       "argumentCount": 1,
@@ -35952,10 +36268,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36010,9 +36326,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 608,
       "argumentCount": 2,
@@ -36025,10 +36348,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36083,9 +36406,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 610,
       "argumentCount": 2,
@@ -36098,10 +36428,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36156,9 +36486,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 612,
       "argumentCount": 2,
@@ -36171,10 +36508,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36229,9 +36566,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 614,
       "argumentCount": 2,
@@ -36244,10 +36588,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36302,9 +36646,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 616,
       "argumentCount": 2,
@@ -36317,10 +36668,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36375,9 +36726,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 618,
       "argumentCount": 2,
@@ -36390,10 +36748,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36448,9 +36806,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 620,
       "argumentCount": 2,
@@ -36463,10 +36828,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36521,9 +36886,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 622,
       "argumentCount": 3,
@@ -36536,10 +36908,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36594,9 +36966,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 625,
       "argumentCount": 1,
@@ -36609,10 +36988,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36667,9 +37046,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 626,
       "argumentCount": 2,
@@ -36682,10 +37068,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36740,9 +37126,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 628,
       "argumentCount": 0,
@@ -36755,10 +37148,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36813,9 +37206,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 628,
       "argumentCount": 1,
@@ -36828,10 +37228,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36886,9 +37286,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 629,
       "argumentCount": 1,
@@ -36901,10 +37308,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -36959,9 +37366,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 630,
       "argumentCount": 3,
@@ -36974,10 +37388,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -37032,9 +37446,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 633,
       "argumentCount": 2,
@@ -37047,10 +37468,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -37105,9 +37526,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 635,
       "argumentCount": 2,
@@ -37120,10 +37548,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -37178,9 +37606,16 @@
           "defold-core"
         ],
         "documented": [],
-        "runtime": [],
+        "runtime": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
         "runtimeAvailable": true,
-        "runtimeMask": 0
+        "runtimeMask": 63
       },
       "argumentOffset": 637,
       "argumentCount": 3,
@@ -37193,10 +37628,10 @@
       },
       "generation": {
         "descriptor": "emitted",
-        "router": "blocked"
+        "router": "emitted"
       },
       "evidence": {
-        "nativeAdapterHarness": "blocked-disposition-covered",
+        "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
         "defoldEngineBehavior": "unverified",
         "nativeDynamicHermesJsi": "unverified",
         "nativeStaticHermes": "unverified",
@@ -37562,7 +37997,7 @@
     "profileSymbolUnavailable": 2
   },
   "generated": {
-    "report": "{\"routeCount\":407,\"hash\":\"03ebbc19a091271341a6dfde06845df9076238d9d2668a229b5423bfe8584f15\"}",
+    "report": "{\"routeCount\":407,\"hash\":\"0db8047d411bad6540b64037a202f3c8517ea785d55399933db79d512a302041\"}",
     "artifacts": [
       "packages/bindings/generated/defold-script-handle-lowering.json",
       "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",

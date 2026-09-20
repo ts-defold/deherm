@@ -2,29 +2,29 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "target": "arm64-macos-dynamic-hermes",
-  "inputSha256": "297f7f12ae7e57f68bad79aec37a87e1937c121d9587caaec17f61eb696d9281",
+  "inputSha256": "ade85cfa4744d7195db456fa51c5af789d571aab5445ec3a073f544d8939b24b",
   "evidencePolicy": "Scenario state records planning/instrumentation only. A route stage is verified exclusively by an explicit, passed, target-matched observation whose repository-confined evidence artifact matches its declared SHA-256. Runtime requires the current probe-set fingerprint and an exact line or explicitly declared line prefix for every scenario.",
-  "coverageClaim": "All 286 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
-  "routeCount": 286,
-  "scenarioCount": 298,
+  "coverageClaim": "All 296 generated executable script routes have at least one deterministic scenario. No compile, link, or runtime behavior is claimed without a verified observation.",
+  "routeCount": 296,
+  "scenarioCount": 308,
   "instrumentedScenarioCount": 44,
-  "plannedScenarioCount": 254,
+  "plannedScenarioCount": 264,
   "instrumentedRouteCount": 32,
-  "plannedOnlyRouteCount": 254,
+  "plannedOnlyRouteCount": 264,
   "setupCount": 4,
   "observationCount": 1,
   "stageSummary": {
     "compile": {
       "verifiedRouteCount": 0,
-      "unverifiedRouteCount": 286
+      "unverifiedRouteCount": 296
     },
     "link": {
       "verifiedRouteCount": 0,
-      "unverifiedRouteCount": 286
+      "unverifiedRouteCount": 296
     },
     "runtime": {
       "verifiedRouteCount": 32,
-      "unverifiedRouteCount": 254
+      "unverifiedRouteCount": 264
     }
   },
   "setups": [
@@ -919,8 +919,29 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:gui.delete_texture",
+      "routeId": "script:gui.delete_texture",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:gui.get_font_resource",
+      "routeId": "script:gui.get_font_resource",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:gui.get_height",
       "routeId": "script:gui.get_height",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:gui.get_layout",
+      "routeId": "script:gui.get_layout",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -1103,6 +1124,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:gui.set_layout",
+      "routeId": "script:gui.set_layout",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:gui.set_leading",
       "routeId": "script:gui.set_leading",
       "state": "planned",
@@ -1259,6 +1287,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:gui.set_texture_data",
+      "routeId": "script:gui.set_texture_data",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:gui.set_tracking",
       "routeId": "script:gui.set_tracking",
       "state": "planned",
@@ -1339,6 +1374,13 @@
     {
       "key": "planned:script:liveupdate.is_built_with_excluded_files",
       "routeId": "script:liveupdate.is_built_with_excluded_files",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:liveupdate.remove_mount",
+      "routeId": "script:liveupdate.remove_mount",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -1612,6 +1654,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:render.enable_material",
+      "routeId": "script:render.enable_material",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:render.enable_state",
       "routeId": "script:render.enable_state",
       "state": "planned",
@@ -1675,6 +1724,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:render.set_compute",
+      "routeId": "script:render.set_compute",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:render.set_cull_face",
       "routeId": "script:render.set_cull_face",
       "state": "planned",
@@ -1703,6 +1759,13 @@
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
     },
     {
+      "key": "planned:script:render.set_projection",
+      "routeId": "script:render.set_projection",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
       "key": "planned:script:render.set_stencil_func",
       "routeId": "script:render.set_stencil_func",
       "state": "planned",
@@ -1719,6 +1782,13 @@
     {
       "key": "planned:script:render.set_stencil_op",
       "routeId": "script:render.set_stencil_op",
+      "state": "planned",
+      "setupId": "global-runtime",
+      "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
+    },
+    {
+      "key": "planned:script:render.set_view",
+      "routeId": "script:render.set_view",
       "state": "planned",
       "setupId": "global-runtime",
       "reason": "A generated executable route exists, but no route-specific packaged-engine scenario has been authored yet."
@@ -5431,6 +5501,58 @@
       }
     },
     {
+      "id": "script:gui.delete_texture",
+      "stableId": 2687333512,
+      "rawName": "gui.delete_texture",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gui/src/gui_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:gui.delete_texture"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:gui.get_font_resource",
+      "stableId": 4047461608,
+      "rawName": "gui.get_font_resource",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gui/src/gui_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:gui.get_font_resource"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:gui.get_height",
       "stableId": 1986171713,
       "rawName": "gui.get_height",
@@ -5439,6 +5561,32 @@
       "line": 1108,
       "scenarios": [
         "planned:script:gui.get_height"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:gui.get_layout",
+      "stableId": 3027276460,
+      "rawName": "gui.get_layout",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gui/src/gui_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:gui.get_layout"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -6083,6 +6231,32 @@
       }
     },
     {
+      "id": "script:gui.set_layout",
+      "stableId": 4235294552,
+      "rawName": "gui.set_layout",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gui/src/gui_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:gui.set_layout"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:gui.set_leading",
       "stableId": 1425442548,
       "rawName": "gui.set_leading",
@@ -6629,6 +6803,32 @@
       }
     },
     {
+      "id": "script:gui.set_texture_data",
+      "stableId": 4140093370,
+      "rawName": "gui.set_texture_data",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/gui/src/gui_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:gui.set_texture_data"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:gui.set_tracking",
       "stableId": 1740794531,
       "rawName": "gui.set_tracking",
@@ -6899,6 +7099,32 @@
       "line": 175,
       "scenarios": [
         "planned:script:liveupdate.is_built_with_excluded_files"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:liveupdate.remove_mount",
+      "stableId": 3486747409,
+      "rawName": "liveupdate.remove_mount",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/liveupdate/src/script_liveupdate.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:liveupdate.remove_mount"
       ],
       "scenarioState": "planned",
       "evidence": {
@@ -7831,6 +8057,32 @@
       }
     },
     {
+      "id": "script:render.enable_material",
+      "stableId": 3764411239,
+      "rawName": "render.enable_material",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/render/src/render/render_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:render.enable_material"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:render.enable_state",
       "stableId": 3190141495,
       "rawName": "render.enable_state",
@@ -8065,6 +8317,32 @@
       }
     },
     {
+      "id": "script:render.set_compute",
+      "stableId": 1089182856,
+      "rawName": "render.set_compute",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/render/src/render/render_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:render.set_compute"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:render.set_cull_face",
       "stableId": 3782563365,
       "rawName": "render.set_cull_face",
@@ -8169,6 +8447,32 @@
       }
     },
     {
+      "id": "script:render.set_projection",
+      "stableId": 2094481018,
+      "rawName": "render.set_projection",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/render/src/render/render_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:render.set_projection"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
       "id": "script:render.set_stencil_func",
       "stableId": 1699887816,
       "rawName": "render.set_stencil_func",
@@ -8229,6 +8533,32 @@
       "line": 1063,
       "scenarios": [
         "planned:script:render.set_stencil_op"
+      ],
+      "scenarioState": "planned",
+      "evidence": {
+        "compile": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "link": {
+          "status": "unverified",
+          "observationIds": []
+        },
+        "runtime": {
+          "status": "unverified",
+          "observationIds": []
+        }
+      }
+    },
+    {
+      "id": "script:render.set_view",
+      "stableId": 1992852954,
+      "rawName": "render.set_view",
+      "routeKind": "captured-lua-value-tail",
+      "source": "engine/render/src/render/render_script.cpp",
+      "line": 0,
+      "scenarios": [
+        "planned:script:render.set_view"
       ],
       "scenarioState": "planned",
       "evidence": {

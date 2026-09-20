@@ -45,28 +45,31 @@ struct Storage {
 };
 ScriptValue hash() { ScriptValue value{}; value.tag = ScriptValueTag::kHandle; value.handleKind = ScriptHandleKind::kHash; return value; }
 ScriptValue vector3() { ScriptValue value{}; value.tag = ScriptValueTag::kDefoldValue; value.defoldKind = ScriptDefoldValueKind::kVector3; return value; }
+ScriptValue number() { ScriptValue value{}; value.tag = ScriptValueTag::kNumber; return value; }
+ScriptValue boolean() { ScriptValue value{}; value.tag = ScriptValueTag::kBoolean; return value; }
+ScriptValue string() { ScriptValue value{}; value.tag = ScriptValueTag::kString; value.data = "x"; value.length = 1; return value; }
 }  // namespace
 
 int main() {
-  expect(tail::kRouteCount == 26 && tail::kCandidateCount == 16, "generated tail census drifted");
+  expect(tail::kRouteCount == 26 && tail::kCandidateCount == 26, "generated tail census drifted");
   const tail::Route* hashToHex = tail::find(UINT32_C(0x2cf8087e));
-  const tail::Route* blocked = tail::find(UINT32_C(0xf6c4cfba));
+  const tail::Route* imageType = tail::find(UINT32_C(0xf6c4cfba));
   const tail::Route* namedEnum = tail::find(UINT32_C(0xcfd38b11));
   const tail::Route* cameraView = tail::find(UINT32_C(0x3ac6e427));
   const tail::Route* gravity = tail::find(UINT32_C(0x4c2011da));
   const tail::Route* guiLayout = tail::find(UINT32_C(3027276460));
   const tail::Route* renderView = tail::find(UINT32_C(1992852954));
   expect(hashToHex && std::strcmp(hashToHex->sourceSymbol, "HashToHex") == 0, "hash_to_hex registration proof is missing");
-  expect(blocked && blocked->disposition == tail::Disposition::kBlocked && std::strcmp(blocked->blocker, "image-type-union-codec") == 0, "unsafe image union was not blocked");
-  expect(namedEnum && namedEnum->disposition == tail::Disposition::kBlocked && std::strcmp(namedEnum->blocker, "named-enum-domain-codec") == 0, "unconstrained named enum was not blocked");
+  expect(imageType && imageType->disposition == tail::Disposition::kCandidate &&
+      imageType->context == tail::Context::kGui, "image.TYPE string candidate metadata drifted");
+  expect(namedEnum && namedEnum->disposition == tail::Disposition::kCandidate &&
+      namedEnum->resultCodec == tail::Codec::kNumber, "liveupdate result codec metadata drifted");
   expect(cameraView && cameraView->resultCodec == tail::Codec::kMatrix4, "matrix4 candidate metadata drifted");
   expect(gravity && gravity->resultCodec == tail::Codec::kNone, "vector3 setter metadata drifted");
-  expect(guiLayout && guiLayout->disposition == tail::Disposition::kBlocked &&
-      std::strcmp(guiLayout->blocker, "gui-script-instance-attachment-unavailable") == 0,
-    "GUI-script context route was not blocked");
-  expect(renderView && renderView->disposition == tail::Disposition::kBlocked &&
-      std::strcmp(renderView->blocker, "render-script-instance-attachment-unavailable") == 0,
-    "render-script context route was not blocked");
+  expect(guiLayout && guiLayout->disposition == tail::Disposition::kCandidate &&
+      guiLayout->context == tail::Context::kGui, "GUI-script candidate context drifted");
+  expect(renderView && renderView->disposition == tail::Disposition::kCandidate &&
+      renderView->context == tail::Context::kRender, "render-script candidate context drifted");
 
   Backend backend; const tail::LuaApi api{&backend, invoke};
   Storage valid(hashToHex->stableId); valid.frame.argumentCount = 1; valid.arguments[0] = hash();
@@ -87,23 +90,21 @@ int main() {
   expect(tail::dispatch(&matrix.frame, matrix.error.data(), matrix.error.size(), &api) == tail::DispatchStatus::kError, "wrong matrix4 result codec was accepted");
   expect(matrix.frame.resultCount == 0 && std::strstr(matrix.error.data(), "result does not match"), "bad result did not fail closed");
 
-  Storage blockedCall(blocked->stableId); blockedCall.frame.argumentCount = 6;
-  expect(tail::dispatch(&blockedCall.frame, blockedCall.error.data(), blockedCall.error.size(), &api) == tail::DispatchStatus::kError, "blocked image enum route was dispatched");
-  expect(backend.calls == 3 && std::strcmp(blockedCall.error.data(), "image-type-union-codec") == 0, "blocked route called the backend");
+  Storage badImageType(imageType->stableId); badImageType.frame.argumentCount = 6;
+  badImageType.arguments = {string(), number(), number(), number(), string(), boolean()};
+  expect(tail::dispatch(&badImageType.frame, badImageType.error.data(), badImageType.error.size(), &api) == tail::DispatchStatus::kError,
+    "numeric image.TYPE silently widened the pinned luaL_checkstring source contract");
+  expect(backend.calls == 3 && std::strstr(badImageType.error.data(), "reviewed exact codec shape"),
+    "wrong image.TYPE codec called the backend");
+  Storage imageCall(imageType->stableId); imageCall.frame.argumentCount = 6;
+  imageCall.arguments = {string(), number(), number(), string(), string(), boolean()};
+  backend.wrongResult = false;
+  expect(tail::dispatch(&imageCall.frame, imageCall.error.data(), imageCall.error.size(), &api) == tail::DispatchStatus::kSuccess,
+    "string-compatible image.TYPE candidate was rejected");
   Storage enumCall(namedEnum->stableId); enumCall.frame.argumentCount = 1; enumCall.arguments[0] = hash();
-  enumCall.results[0].tag = ScriptValueTag::kNumber; enumCall.results[0].number = 999.0;
-  expect(tail::dispatch(&enumCall.frame, enumCall.error.data(), enumCall.error.size(), &api) == tail::DispatchStatus::kError, "arbitrary numeric named-enum result was allowed to cross the ABI");
-  expect(enumCall.frame.resultCount == 0 && backend.calls == 3 && std::strcmp(enumCall.error.data(), "named-enum-domain-codec") == 0,
-    "blocked named enum route called the backend");
-  Storage guiCall(guiLayout->stableId);
-  expect(tail::dispatch(&guiCall.frame, guiCall.error.data(), guiCall.error.size(), &api) == tail::DispatchStatus::kError,
-    "GUI-script context route was dispatched through a game-object instance");
-  expect(backend.calls == 3 && std::strcmp(guiCall.error.data(), "gui-script-instance-attachment-unavailable") == 0,
-    "blocked GUI-script route called the backend");
-  Storage renderCall(renderView->stableId); renderCall.frame.argumentCount = 1;
-  expect(tail::dispatch(&renderCall.frame, renderCall.error.data(), renderCall.error.size(), &api) == tail::DispatchStatus::kError,
-    "render-script context route was dispatched through a game-object instance");
-  expect(backend.calls == 3 && std::strcmp(renderCall.error.data(), "render-script-instance-attachment-unavailable") == 0,
-    "blocked render-script route called the backend");
+  expect(tail::dispatch(&enumCall.frame, enumCall.error.data(), enumCall.error.size(), &api) == tail::DispatchStatus::kSuccess,
+    "integer dmLiveUpdate::Result candidate was rejected");
+  expect(enumCall.frame.resultCount == 1 && enumCall.results[0].tag == ScriptValueTag::kNumber && backend.calls == 5,
+    "liveupdate result did not cross the numeric enum carrier");
   std::puts("script-value-tail:ok");
 }

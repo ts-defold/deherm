@@ -435,16 +435,18 @@ export function generateScriptApiAccounting(inputs) {
       row.targetSupport?.nativeDynamicHermes?.status === "generated-executable",
     `${id}: URL route lacks generated native-dynamic disposition`);
   }
-  const valueTailCandidates = valueTail.bindings.filter(({ disposition }) => disposition === "candidate");
+  const allValueTailCandidates = valueTail.bindings.filter(({ disposition }) => disposition === "candidate");
+  const valueTailCandidates = allValueTailCandidates.filter(({ accountingDisposition }) =>
+    accountingDisposition !== "universal-fallback-test-fixture-adapter-only");
   const valueTailById = uniqueMap(valueTailCandidates, "value-tail binding report candidates");
   // Internal consistency - the report against itself - stays exact. The 16 is a
   // count taken at the reviewed revision and is an observation anywhere else.
   assert(valueTail.routeCount === valueTail.bindings.length &&
-    valueTail.candidateCount === valueTailCandidates.length,
+    valueTail.candidateCount === allValueTailCandidates.length,
   "value-tail binding census is stale");
   expectReviewedCount({
     input: "packages/bindings/overrides/script-defold-value-tail-bindings.json",
-    label: "value-tail candidate census", expected: 16, observed: valueTail.candidateCount
+    label: "value-tail accounting census", expected: 16, observed: valueTailCandidates.length
   });
   for (const [id, row] of valueTailById) {
     assert(patternById.get(id)?.loweringFamily === "defold-value",

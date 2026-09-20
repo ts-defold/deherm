@@ -10,6 +10,10 @@ import {
   inputPaths,
   loadBindingLoweringInputs
 } from "../scripts/generate-binding-lowering-plan.mjs";
+import {
+  renderTypescript as renderTypedNativeBridge,
+  selectClaimedRoutes as selectTypedNativeRoutes
+} from "../scripts/generate-typed-native-bridge.mjs";
 
 const repositoryRoot = resolve(new URL("..", import.meta.url).pathname);
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json");
@@ -148,6 +152,31 @@ test("generated implementation lanes join by exact identity and universal fallba
   assert.equal(borrowedImplementation.lane, "dmsdk-borrowed-handle");
   assert.equal(borrowedImplementation.disposition, "generated-provider-boundary");
   assert.equal(borrowed.backends.dynamicHermesJsi.selection, "blocked-semantic");
+});
+
+test("typed-native bridge exactly realizes the canonical script selection, including bounded variadics", () => {
+  const universal = JSON.parse(inputs.scriptUniversalValue);
+  const selection = selectTypedNativeRoutes(generated, universal);
+  const planned = generated.units.filter((unit) =>
+    unit.identity.surface === "script" && unit.backends.staticHermesCAbi.selection === "emit");
+  assert.equal(planned.length, 325);
+  assert.equal(selection.claimed.length, planned.length);
+  assert.deepEqual(selection.declined, []);
+  assert.equal(selection.maximumArgumentCount, universal.bounds.maximumArguments);
+  assert.deepEqual(
+    selection.claimed.filter(({ arity }) => arity === "bounded-variadic").map(({ id }) => id).sort(),
+    ["script:bit.band", "script:bit.bor", "script:bit.bxor", "script:pprint", "script:socket.skip"]
+  );
+  const source = renderTypedNativeBridge(selection);
+  for (const route of selection.claimed.filter(({ arity }) => arity === "bounded-variadic")) {
+    assert.match(source, new RegExp(`\\b${route.stableId}\\b`), `${route.id} is absent from the generated route table`);
+  }
+  assert.match(source, /count > __DEHERM_TYPED_NATIVE_MAX_ARGUMENTS/);
+
+  const drifted = structuredClone(universal);
+  drifted.bindings.find(({ id }) => id === "script:bit.band").maximumArgumentCount -= 1;
+  assert.throws(() => selectTypedNativeRoutes(generated, drifted),
+    /script:bit\.band: variadic bound differs from the universal frame capacity/);
 });
 
 test("implementation lane joins fail closed on identity and census drift", () => {

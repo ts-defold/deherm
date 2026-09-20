@@ -238,7 +238,7 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
     // source tree rather than an enumerable input list, so this clean room
     // cannot regenerate it and must not claim to own it.
     if (file === "defold-script-resource-namespaces.json") continue;
-    if (/^(?:defold-script-|defold-static-hermes-|defold-value-layouts|war-battles-script-)/.test(file)) {
+    if (/^(?:defold-script-|defold-static-hermes-|defold-typed-native-|defold-value-layouts|war-battles-script-)/.test(file)) {
       candidates.add(`packages/bindings/generated/${file}`);
     }
   }
@@ -259,7 +259,8 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
     if (file.endsWith("real-engine-probes.ts")) candidates.add(`examples/runtime-smoke/src/generated/${file}`);
   }
   for (const file of await walkFiles(path.join(repositoryRoot, "packages/static-hermes/src/generated"))) {
-    if (file === "script-vmath.ts" || file === "script-universal-value.ts") {
+    if (file === "script-vmath.ts" || file === "script-universal-value.ts" ||
+        file === "script-typed-native-bridge.ts") {
       candidates.add(`packages/static-hermes/src/generated/${file}`);
     }
   }
@@ -325,7 +326,8 @@ function ids(rows, label) {
 
 async function validateRouteProvenance(cleanRoot) {
   const load = async (relativePath) => JSON.parse(await readFile(path.join(cleanRoot, relativePath), "utf8"));
-  const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload, universal, profiles, projection] = await Promise.all([
+  const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload, universal, profiles, projection,
+    typedNative, loweringPlan] = await Promise.all([
     load("packages/bindings/generated/defold-script-api-inventory.json"),
     load("packages/bindings/generated/defold-script-api-ir.json"),
     load("packages/bindings/generated/defold-script-api-accounting.json"),
@@ -337,7 +339,9 @@ async function validateRouteProvenance(cleanRoot) {
     load("packages/bindings/generated/defold-script-overload-dispatch.json"),
     load("packages/bindings/generated/defold-script-universal-value-bindings.json"),
     load("packages/bindings/generated/defold-script-route-availability-profiles.json"),
-    load("packages/bindings/generated/defold-script-projection-ir.json")
+    load("packages/bindings/generated/defold-script-projection-ir.json"),
+    load("packages/bindings/generated/defold-typed-native-bridge.json"),
+    load("packages/bindings/generated/defold-binding-lowering-plan.json")
   ]);
   assert(inventory.countsByKind?.function === 926, `Pinned inventory contains ${inventory.countsByKind?.function} functions, expected 926`);
   assert(ir.counts?.functions === 926, `Clean IR contains ${ir.counts?.functions} functions, expected 926`);
@@ -376,6 +380,18 @@ async function validateRouteProvenance(cleanRoot) {
   assert(universalIds.size === 915 && universal.candidateCount === universalIds.size,
     "Universal fallback must cover exactly the 915 callable non-intrinsic script routes");
   for (const id of universalIds) assert(irIds.has(id), `Universal fallback route is absent from pinned IR: ${id}`);
+  const plannedTypedNative = loweringPlan.units.filter((unit) =>
+    unit.identity.surface === "script" &&
+    unit.backends?.staticHermesCAbi?.selection === "emit")
+    .map((unit) => `${unit.identity.stableId}:${unit.identity.id}`).sort();
+  const generatedTypedNative = typedNative.claimedRoutes
+    .map((route) => `${route.stableId}:${route.id}`).sort();
+  assert(typedNative.planTypedNativeEmit === plannedTypedNative.length,
+    "Typed-native report does not carry the canonical script plan count");
+  assert(typedNative.claimedRouteCount === plannedTypedNative.length && typedNative.declinedRouteCount === 0,
+    "Typed-native bridge must realize every canonical script selection without a second decline list");
+  assert(JSON.stringify(generatedTypedNative) === JSON.stringify(plannedTypedNative),
+    "Typed-native bridge route identities differ from the canonical script plan");
   const modulesSource = await readFile(path.join(cleanRoot, "packages/sdk/src/generated/script/modules.ts"), "utf8");
   const emittedStableIds = [...modulesSource.matchAll(/callScriptApi\((0x[0-9a-f]{8}), args\)/g)]
     .map((match) => match[1]);
@@ -398,6 +414,7 @@ async function validateRouteProvenance(cleanRoot) {
     urlRouteCount: url.routeCount,
     valueTailRouteCount: valueTail.candidateCount,
     overloadRouteCount: overload.generatedFamilyCandidateCount,
+    typedNativeRouteCount: typedNative.claimedRouteCount,
     projectedRouteCount: projection.routeCount,
     defaultProfileRouteCount: profiles.profiles["default-legacy-bullet"].availableRouteCount,
     defoldRevision: ir.defoldRevision

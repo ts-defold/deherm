@@ -9,10 +9,11 @@ namespace defold_hermes::value_tail {
 enum class DispatchStatus : uint8_t { kMissing, kSuccess, kError };
 enum class Codec : uint8_t { kNil, kBoolean, kNumber, kString, kHash, kUrl, kVector3, kMatrix4, kNone };
 enum class Disposition : uint8_t { kCandidate, kBlocked };
-struct Route { uint16_t index; uint16_t candidateIndex; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; const char* sourcePath; const char* sourceSymbol; Disposition disposition; Codec resultCodec; const char* blocker; };
+enum class Context : uint8_t { kGameObject, kGui, kRender };
+struct Route { uint16_t index; uint16_t candidateIndex; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; const char* sourcePath; const char* sourceSymbol; Disposition disposition; Codec resultCodec; Context context; const char* blocker; };
 struct LuaApi { void* context = nullptr; DispatchStatus (*invoke)(void*, const Route&, ScriptCallFrame*, char*, size_t) noexcept = nullptr; };
 inline constexpr size_t kRouteCount = 26;
-inline constexpr size_t kCandidateCount = 16;
+inline constexpr size_t kCandidateCount = 26;
 const Route* routes() noexcept;
 const uint16_t* candidateRouteOffsets() noexcept;
 const uint16_t* shapeArgumentOffsets() noexcept;

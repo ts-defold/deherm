@@ -77,6 +77,7 @@ struct Route {
   const char* availabilityToken;
   bool runtimeAvailable;
   uint8_t runtimeProfileMask;
+  bool nativeAdapterHarness;
   Disposition nativeDynamicHermes;
   Disposition nativeStaticHermes;
   Disposition html5BrowserHost;
@@ -119,9 +120,9 @@ struct RuntimeProfileDetection {
 
 inline constexpr uint16_t kHandleKindCount = 15;
 inline constexpr uint16_t kRouteCount = 407;
-inline constexpr uint16_t kRouterCandidateCount = 343;
-inline constexpr uint16_t kBlockedCount = 64;
-inline constexpr uint16_t kAdapterExecutableCount = 343;
+inline constexpr uint16_t kRouterCandidateCount = 405;
+inline constexpr uint16_t kBlockedCount = 2;
+inline constexpr uint16_t kAdapterExecutableCount = 405;
 inline constexpr uint8_t kRuntimeProfileCount = 6;
 
 const HandleKind* handleKinds() noexcept;

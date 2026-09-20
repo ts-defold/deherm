@@ -22,21 +22,21 @@
   "inputHashes": {
     "ir": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "patterns": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "accounting": "1b57598f5c56fa350ebab5f060d03a56dd0d5f9e8f8c84d58423eee667a4393b",
+    "accounting": "b099abba21bba27e3332416921b258f15c70438e55cecf603a51954918f1062e",
     "values": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "handles": "eb89f55b5e91fd17e2d54dd4983ce1f75163d12bc938f663d5679c0d4c166bb7",
+    "handles": "8cac63bc8998edccb4a65c2b5f2859f560e10f66484195d5d5926e2acbfe05c5",
     "urls": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
     "tuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "dynamics": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "tails": "737c828a0f4e529bf09217f60ea828961dd4757e319a85a8feb44bd7ffe88de0",
+    "tails": "7c8255dabc3b69477ba1868cddbd28e6c3bc0546e5e424d060887b1dcdcca69e",
     "overloads": "010e8b3200e8aa55895bbf8e84a72a6a7a9e43c4c6f4a3033cd3f6c46ff3627a",
-    "tableSchemas": "74533aa6dea0599f792f5e4788075ecf81afdca5ff1fa518df547616568082f4",
-    "tableRecords": "afbee9f90267792486b54b7a17532df7aa0107f74c73ae51cfdc657cdfa19ec7",
-    "copiedRecords": "92c76dd887afb27f325a05a025b7b2997daf44306052fcb03ccd47f30aa832a0",
-    "opaqueRecords": "eb2fdc541f5270f5830c8467aecc83409420a0ea18aa61de519d02130ced56d5",
-    "engineMatrix": "b9c4e3e23c584a59a692cb64de0d5b901cb81ee2ee0414c37a6d627b4ea9228e",
-    "availabilityProfiles": "ce6c6dab4de1e3e028ef0bf322f332372cae640423f745e9a9afc53c61e44e47",
+    "tableSchemas": "5130081abe1c4c50b2d85b7d222d02f192be84c47c4f96e8a6967a2ad2a07500",
+    "tableRecords": "699a157fbeef88e02be9e37caf2dc0fb43997505e60e3bbba7a26dd7362864d8",
+    "copiedRecords": "84684facfefd54ba3872e70d1f5c60c5fc3cbc5602ed59fb887d5dce3b6b4785",
+    "opaqueRecords": "eefefa3a0c8c77a5e119046f6500d2a42ee7dcad40ba439c02565e93db5cee04",
+    "engineMatrix": "d6a532fdb09a9372c6f9d339ef4a7a52352d2d8f2898c2bcf3321e6954d5a5ea",
+    "availabilityProfiles": "81e6a2b2b6b5dc7244d696ffd4e59b31c755d1afe7bf99749054ce0713fe5cd7",
     "registrationGate": "6f7d613b953d7de6bd2c5f2316b70610f405cb08b1d9540a790d3ab9f6009c78"
   },
   "routeCount": 926,
@@ -105,17 +105,13 @@
     "policy:copied-defold-value-record": 9,
     "policy:dynamic-recursive-values": 5,
     "policy:font-resource-and-hash-resolution": 1,
-    "policy:gui-script-instance-attachment-unavailable": 4,
     "policy:handle-or-callback-crossing": 39,
-    "policy:image-type-union-codec": 1,
-    "policy:named-enum-domain-codec": 1,
     "policy:opaque-or-nested-record": 2,
     "policy:physics-world-and-sparse-variant-record": 1,
     "policy:physics-world-and-variant-record": 2,
     "policy:recursive-json-value-policy": 2,
     "policy:recursive-log-side-effect-policy": 1,
     "policy:render-context-and-camera-url": 1,
-    "policy:render-script-instance-attachment-unavailable": 4,
     "policy:render-target-table-and-resource-lifetime-codecs": 1,
     "policy:reviewed-semantic-record": 6,
     "policy:tagged-table-union": 3,
@@ -1290,12 +1286,6 @@
       ]
     },
     {
-      "id": "script:gui.delete_texture",
-      "tokens": [
-        "policy:gui-script-instance-attachment-unavailable"
-      ]
-    },
-    {
       "id": "script:gui.get",
       "tokens": [
         "context-policy",
@@ -1303,21 +1293,9 @@
       ]
     },
     {
-      "id": "script:gui.get_font_resource",
-      "tokens": [
-        "policy:gui-script-instance-attachment-unavailable"
-      ]
-    },
-    {
       "id": "script:gui.get_height",
       "tokens": [
         "context-policy"
-      ]
-    },
-    {
-      "id": "script:gui.get_layout",
-      "tokens": [
-        "policy:gui-script-instance-attachment-unavailable"
       ]
     },
     {
@@ -1373,12 +1351,6 @@
       ]
     },
     {
-      "id": "script:gui.set_layout",
-      "tokens": [
-        "policy:gui-script-instance-attachment-unavailable"
-      ]
-    },
-    {
       "id": "script:gui.set_render_order",
       "tokens": [
         "context-policy"
@@ -1388,12 +1360,6 @@
       "id": "script:gui.set_safe_area_mode",
       "tokens": [
         "context-policy"
-      ]
-    },
-    {
-      "id": "script:gui.set_texture_data",
-      "tokens": [
-        "policy:image-type-union-codec"
       ]
     },
     {
@@ -1479,12 +1445,6 @@
       "id": "script:liveupdate.is_built_with_excluded_files",
       "tokens": [
         "context-policy"
-      ]
-    },
-    {
-      "id": "script:liveupdate.remove_mount",
-      "tokens": [
-        "policy:named-enum-domain-codec"
       ]
     },
     {
@@ -1876,12 +1836,6 @@
       ]
     },
     {
-      "id": "script:render.enable_material",
-      "tokens": [
-        "policy:render-script-instance-attachment-unavailable"
-      ]
-    },
-    {
       "id": "script:render.enable_state",
       "tokens": [
         "context-policy"
@@ -1957,12 +1911,6 @@
       ]
     },
     {
-      "id": "script:render.set_compute",
-      "tokens": [
-        "policy:render-script-instance-attachment-unavailable"
-      ]
-    },
-    {
       "id": "script:render.set_cull_face",
       "tokens": [
         "context-policy"
@@ -1984,12 +1932,6 @@
       "id": "script:render.set_polygon_offset",
       "tokens": [
         "context-policy"
-      ]
-    },
-    {
-      "id": "script:render.set_projection",
-      "tokens": [
-        "policy:render-script-instance-attachment-unavailable"
       ]
     },
     {
@@ -2015,12 +1957,6 @@
       "id": "script:render.set_stencil_op",
       "tokens": [
         "context-policy"
-      ]
-    },
-    {
-      "id": "script:render.set_view",
-      "tokens": [
-        "policy:render-script-instance-attachment-unavailable"
       ]
     },
     {
@@ -80277,9 +80213,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:gui-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -82113,9 +82047,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:gui-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -82927,9 +82859,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:gui-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -91162,9 +91092,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:gui-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -94146,9 +94074,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:image-type-union-codec"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -97270,9 +97196,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:named-enum-domain-codec"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -106745,9 +106669,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:render-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -108742,9 +108664,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:render-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -109425,9 +109345,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:render-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",
@@ -110171,9 +110089,7 @@
       "generation": {
         "state": "projected",
         "deterministic": true,
-        "semanticHoles": [
-          "policy:render-script-instance-attachment-unavailable"
-        ]
+        "semanticHoles": []
       },
       "evidence": {
         "accountingCategory": "executable-stable-id",

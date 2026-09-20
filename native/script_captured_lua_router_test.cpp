@@ -400,15 +400,52 @@ int main() {
   expect(adapter.captureInstance(-1), "instance capture failed");
   lua_pop(state, 1);
 
+  const tail::Route* guiContextRoute = nullptr;
+  const tail::Route* renderContextRoute = nullptr;
+  for (size_t index = 0; index < tail::kRouteCount; ++index) {
+    const auto& route = tail::routes()[index];
+    if (route.disposition != tail::Disposition::kCandidate) continue;
+    if (!guiContextRoute && route.context == tail::Context::kGui) guiContextRoute = &route;
+    if (!renderContextRoute && route.context == tail::Context::kRender) renderContextRoute = &route;
+  }
+  expect(guiContextRoute && renderContextRoute, "GUI/render value-tail fixtures are absent");
+  {
+    ScriptMatrix4Arena matrices{};
+    ScriptUrlArena<> urls(89);
+    ScriptValue result{};
+    const uint64_t calls = gTailCalls;
+    expect(!dispatchTail(adapter, *guiContextRoute,
+        tail::candidateRouteOffsets()[guiContextRoute->candidateIndex], matrices, urls, &result),
+        "GUI value-tail route accepted a game-object context");
+    expect(std::strstr(adapter.lastError(), "GUI script instance") && gTailCalls == calls,
+        "GUI value-tail context gate was not fail-closed before Lua");
+    expect(adapter.pushComponentContext(scalar::ScriptAdapter::ComponentContext::kGui),
+        adapter.lastError());
+    expect(!dispatchTail(adapter, *renderContextRoute,
+        tail::candidateRouteOffsets()[renderContextRoute->candidateIndex], matrices, urls, &result),
+        "render value-tail route accepted a GUI context");
+    adapter.popComponentContext();
+    expect(std::strstr(adapter.lastError(), "render script instance") && gTailCalls == calls,
+        "render value-tail context gate was not fail-closed before Lua");
+  }
+
   size_t tailRouteCount = 0;
   for (size_t index = 0; index < tail::kRouteCount; ++index) {
     const auto& route = tail::routes()[index];
     if (route.disposition != tail::Disposition::kCandidate) continue;
+    const auto context = route.context == tail::Context::kGui
+        ? scalar::ScriptAdapter::ComponentContext::kGui
+        : route.context == tail::Context::kRender
+        ? scalar::ScriptAdapter::ComponentContext::kRender
+        : scalar::ScriptAdapter::ComponentContext::kGameObject;
+    expect(adapter.pushComponentContext(context), adapter.lastError());
     ScriptMatrix4Arena matrices{};
     ScriptUrlArena<> urls(91);
     ScriptValue result{};
     const size_t shape = tail::candidateRouteOffsets()[route.candidateIndex];
-    expect(dispatchTail(adapter, route, shape, matrices, urls, &result), adapter.lastError());
+    const bool dispatched = dispatchTail(adapter, route, shape, matrices, urls, &result);
+    adapter.popComponentContext();
+    expect(dispatched, adapter.lastError());
     ++tailRouteCount;
   }
   expect(tailRouteCount == tail::kCandidateCount && gTailCalls == tail::kCandidateCount,

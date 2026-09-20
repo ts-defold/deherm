@@ -32,6 +32,13 @@
     "gui-scene": "blocked-gui-script-attachment-unavailable",
     "render-script-instance-and-graphics-context": "blocked-render-script-attachment-unavailable"
   },
+  "nativeAdapterHarnessContexts": {
+    "explicit-physics-handle": "router-candidate",
+    "runtime-global": "router-candidate",
+    "game-object-instance": "router-candidate",
+    "gui-scene": "router-candidate",
+    "render-script-instance-and-graphics-context": "router-candidate"
+  },
   "targetBackends": {
     "nativeDynamicHermes": "captured-lua-router-harness-proven-jsi-unverified",
     "nativeStaticHermes": "static-ffi-unimplemented",
@@ -51,8 +58,8 @@
       "gui-scene": 55,
       "render-script-instance-and-graphics-context": 7
     },
-    "routerCandidateCount": 343,
-    "blockedCount": 64,
+    "routerCandidateCount": 405,
+    "blockedCount": 2,
     "runtimeUnavailableCount": 2
   }
 }

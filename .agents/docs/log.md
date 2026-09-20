@@ -1,5 +1,52 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - The generated script corpus now reaches the real Lua adapter
+
+The recording-engine owner now emits a real-Lua companion that registers all
+915 exact nested module/member paths as route-indexed C closures and drives the
+real `ScriptAdapter::api()` directly. Across the generated six-profile runtime
+union it executes 882 Lua-backed Dynamic-Hermes routes with exact argument and
+result checks, one provider call per route, restored Lua stack/current instance,
+and a machine-readable missing-member failure probe. The canonical emitted
+partition is explicit: 882 Lua-stack exact routes plus 31 native-POD routes
+whose exact twin remains the next obligation; the other two routes are canonical
+source/profile omissions. GUI and render instances are captured only by the
+native fixture—product `*.gui.ts`/`*.render.ts` proxy providers remain honestly
+unimplemented. The value-tail owner now carries all 26 routes: the pinned
+`gui.set_texture_data` implementation's fourth argument is a string domain via
+`luaL_checkstring`, while `liveupdate.remove_mount` returns its
+`dmLiveUpdate::Result` through `lua_pushinteger`; tests prevent either codec from
+silently widening. This is exact adapter/bridge evidence, not packaged-engine
+semantic evidence.
+
+ASan/UBSan initially exposed that the older captured-Lua router fixture drove
+all 26 value-tail routes under one game-object context. The fixture now pushes
+the generated game-object, GUI, or render context around each dispatch and
+always pops it before asserting the result. The complete generated-family
+sanitizer suite passes, including all 26 value-tail routes, the 405-route
+six-profile handle union, protected error/reentrancy/lifetime cases, and zero
+warmed C++ allocations. The generated 882-route real-Lua companion also builds
+and passes under ASan/UBSan with its stack and instance restoration checks.
+
+Adversarial review then found that the harness-only capability bit had become
+the generated product dispatch gate for 55 GUI and seven render handle routes.
+The product `ScriptAdapter` now requires the exact active component context
+before entering those routes, and the generated router treats game-object, GUI,
+and render calls alike as protected captured-instance scopes. Wrong-context
+GUI/render handle and value-tail calls are rejected before their Lua provider
+runs. The generated exact fixture uses distinct instance identities for all
+three contexts, derives each result-handle carrier from the actual selected
+adapter family, and checks semantic, GUI-node, and generic nested-userdata
+carriers instead of accepting any handle-shaped result. The SDK value-tail
+artifact now retains both `requiredContext` and its fixture-only accounting
+disposition; the typed-native report also hashes the C ABI header whose enum
+ordering it consumes. The three remaining, independently verified transport
+debts are explicitly tracked rather than hidden in the success count: nested
+semantic handle branding in [#111](https://github.com/ts-defold/deherm/issues/111),
+byte-exact binary Lua strings in [#112](https://github.com/ts-defold/deherm/issues/112),
+and allocator-failure protection for pre-call Lua pushes in
+[#110](https://github.com/ts-defold/deherm/issues/110).
+
 ## 2026-09-20 - The ready dmSDK exact corpus became a generated artifact
 
 The 486 declaration-only universal-ready calls now come from one compiler-owned
@@ -26,10 +73,12 @@ SDK's `graphics_native.h` requires `GL/glx.h` even for the generated headless
 exact-call census. Reproducing that census in a Linux container exposed Xlib's
 global `Font` typedef colliding with Defold's own opaque `Font` when all 486
 ready calls share one generated translation unit. The materializer now primes
-GLX's include guard with only the Xlib typedef renamed, then includes Defold's
-authoritative headers normally. The canonical 486-call test compiles and runs
-13/13 tests in the Linux container, while a focused assertion proves non-native-
-graphics materializations do not acquire GLX. This is generated bridge
+GLX's include guard with only the Xlib typedef renamed, removes Xlib's `None`
+macro after its declarations so it cannot corrupt Hermes enum members in the
+same translation unit, then includes Defold's authoritative headers normally.
+The canonical 486-call test compiles and runs 13/13 tests in the Linux
+container, while a focused assertion proves non-native-graphics
+materializations do not acquire GLX. This is generated bridge
 compile/runtime evidence against recording callees, not engine-semantic
 evidence. Host-parity now carries the regenerated target-conditional report
 that was stale after the preceding SDK import change.

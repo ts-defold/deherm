@@ -39,6 +39,14 @@ Defold value type in its signature — including types reachable only inside uni
 variants — has a transparent fixed layout derived from the pinned dmSDK headers.
 That promotes the tier to 325 routes.
 
+Five of those routes (`bit.band`, `bit.bor`, `bit.bxor`, `pprint`, and
+`socket.skip`) have runtime arity, but they are not unbounded. The universal
+policy caps them at 32 arguments, the generated operation descriptors enforce
+that cap, and the sound-typed bridge mechanically walks the runtime argument
+array into the same fixed-capacity frame. The bridge therefore realizes the
+canonical plan's full 325-route script selection; it does not maintain a
+second route-selection exception list.
+
 | Transport | Backend | Emitted routes |
 | --- | --- | --- |
 | jsi | dynamicHermesJsi | 913 |

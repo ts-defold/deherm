@@ -12,20 +12,20 @@
     "conformance": "not-claimed"
   },
   "inputHashes": {
-    "scriptProjection": "f8241dbffcd0d96c439a78f0da8a8a43643fe4ce09e22f67e8e113350536eeb9",
+    "scriptProjection": "8131f8ad67722c7d3b20d9f68a162235b379a058a20db7cad8d0d477b80f71fc",
     "scriptScalarDispatch": "ec01d55f6d135721399bb37c65e89aa5b388c9f9c4a0401b387c4818f73c267b",
     "scriptValueBindings": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9",
     "scriptFixedTuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "scriptDynamicValues": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "scriptValueTail": "737c828a0f4e529bf09217f60ea828961dd4757e319a85a8feb44bd7ffe88de0",
+    "scriptValueTail": "7c8255dabc3b69477ba1868cddbd28e6c3bc0546e5e424d060887b1dcdcca69e",
     "scriptOverloadDispatch": "010e8b3200e8aa55895bbf8e84a72a6a7a9e43c4c6f4a3033cd3f6c46ff3627a",
-    "scriptTableRecords": "afbee9f90267792486b54b7a17532df7aa0107f74c73ae51cfdc657cdfa19ec7",
+    "scriptTableRecords": "699a157fbeef88e02be9e37caf2dc0fb43997505e60e3bbba7a26dd7362864d8",
     "scriptCallbackLifecycle": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "scriptCopiedValueBlockers": "92c76dd887afb27f325a05a025b7b2997daf44306052fcb03ccd47f30aa832a0",
-    "scriptOpaqueRecordBlockers": "eb2fdc541f5270f5830c8467aecc83409420a0ea18aa61de519d02130ced56d5",
+    "scriptCopiedValueBlockers": "84684facfefd54ba3872e70d1f5c60c5fc3cbc5602ed59fb887d5dce3b6b4785",
+    "scriptOpaqueRecordBlockers": "eefefa3a0c8c77a5e119046f6500d2a42ee7dcad40ba439c02565e93db5cee04",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "5c767e7f0d11cd13c56079b992a54814f88788de823d8e1b221f8baf74ced43d",
-    "scriptUniversalValue": "127a1ac3f1ed0edf7ece38696feab15b20bfafa89316f87ca7276751f9a63fb2",
+    "scriptHandleLowering": "2996c4ac53c90dc4e34471383550bd4f6d49171227f8fe09155440b6f0067a2d",
+    "scriptUniversalValue": "33144a8632477a55246ecb1878bc1fc7384d4c6ac5bb5a7fd754138c235afd79",
     "defoldValueLayouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
     "dmsdkProjection": "ccde0d5efee6829232e288a923a1eb40bee78eb8ffa451118d1a100ea37f72f0",
     "dmsdkUniversal": "a9ecb1b1bc83a04d3195e8aebe8fd7794fd23ed8bd2aa0ff1b4195223ac3d984",
@@ -48,20 +48,20 @@
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
   "inputCanonicalHashes": {
-    "scriptProjection": "e6536bfb04d312fb7abbb69d2131397440b821d10074c73e80527e0581158eaa",
+    "scriptProjection": "460b1af136af6d4a442973adf0c96f1f18e1385e31bec58ef5fcbd53907e4d88",
     "scriptScalarDispatch": "0c2ec5b561bfb41c071ca9f00cd999310eb1b48f4f444714fea5ed888c6b8859",
     "scriptValueBindings": "8b6102c70db2b5a1dfb6a65511a96eb928ea36cad8fcba12fdf47fdd2cfe8efe",
     "scriptFixedTuples": "985cc2541d2fd278c59bfc0f0aa5f0083b5a94073ff3a7b6f83cd315ecdf9628",
     "scriptDynamicValues": "b987ff960b43ae0fc45d3a6d7002e2b54eca98fc26c35a421d8e7fcc74416326",
-    "scriptValueTail": "bbcbb448866e62b010714f02fc15978cddd50b8bd2172df1cdff288e1b2b0304",
+    "scriptValueTail": "e5ad3afe40fea1a1b2533ef1e594d6385f83d1508aeb2538ab573827e852b291",
     "scriptOverloadDispatch": "68f9f75029e58402fd9d2bd1b4b11e292195f959eb80b69d7a2a10ea2e03c090",
-    "scriptTableRecords": "cf503851949b66d63e6eb8c2376c9de5e8dfbe3e0b470bf659427ba6d3826a85",
+    "scriptTableRecords": "5a336717cf74349c51593ef94ef4198aab3e20640d19c9651ee3071163199107",
     "scriptCallbackLifecycle": "ae1ea85b129434f31fd28655f78177ead8eab7d8d2e4ea39d19fc8f915b9c1df",
-    "scriptCopiedValueBlockers": "ce0c577165559d3ab3e0591a79e47d41520610e85dfa4819bffbec56ff90d361",
-    "scriptOpaqueRecordBlockers": "567dc9ffd40c14980ada92740dd391f506fe026e4ef896e41efad631679b38c0",
+    "scriptCopiedValueBlockers": "153efa3a85f250e2fcb0ac037e2dad2c1b83e49a368edfd5839220efc44ee8e2",
+    "scriptOpaqueRecordBlockers": "3c3a48957d7c82f1e2b64fbc1cda59efad614b08735df4859088f0dd4e4ecaca",
     "scriptUrlAddress": "0c30abae7994fb4f4ba13e53958732c2f5ec4814e3669afeabe379d6180f258f",
-    "scriptHandleLowering": "3d898c10f5b2b2882c70d64c93e4b205dcb4a38ba1f489121ead443a3b9dda71",
-    "scriptUniversalValue": "74b69fd1ba6d3153188c565ab328caf7d5237e9070ba2edc31361c13ae1b4e6a",
+    "scriptHandleLowering": "5bb16bd361d8bd0a61645d26497fd43386809e1b9d1d401cd4207ab3fe9deaaf",
+    "scriptUniversalValue": "9e2b326d6d8cc6356bcc9e07c66972e3eae8e1b973bfacfdde56660e8dfae426",
     "defoldValueLayouts": "e7dfbb78eec1c3fbd432080161989576915d554668f0d8b009fe420167325d29",
     "dmsdkProjection": "419314a04e57b4448713b0084afb69101b581fc6ce75fb3e4135e43119ae283e",
     "dmsdkUniversal": "fb0af6a204668b4e133df96995a24cff593388227c2da5cf868c4fca2b42591e",
@@ -26038,23 +26038,11 @@
         }
       },
       {
-        "policy:gui-script-instance-attachment-unavailable": {
-          "rule": "generated:script-universal-value",
-          "decision": "bounded-recursive-captured-lua-adapter"
-        }
-      },
-      {
         "context-policy": {
           "rule": "generated:script-universal-value",
           "decision": "bounded-recursive-captured-lua-adapter"
         },
         "policy:handle-or-callback-crossing": {
-          "rule": "generated:script-universal-value",
-          "decision": "bounded-recursive-captured-lua-adapter"
-        }
-      },
-      {
-        "policy:image-type-union-codec": {
           "rule": "generated:script-universal-value",
           "decision": "bounded-recursive-captured-lua-adapter"
         }
@@ -26075,12 +26063,6 @@
           "decision": "bounded-recursive-captured-lua-adapter"
         },
         "policy:recursive-json-value-policy": {
-          "rule": "generated:script-universal-value",
-          "decision": "bounded-recursive-captured-lua-adapter"
-        }
-      },
-      {
-        "policy:named-enum-domain-codec": {
           "rule": "generated:script-universal-value",
           "decision": "bounded-recursive-captured-lua-adapter"
         }
@@ -26205,12 +26187,6 @@
           "decision": "bounded-recursive-captured-lua-adapter"
         },
         "policy:target-context-or-platform-state-record": {
-          "rule": "generated:script-universal-value",
-          "decision": "bounded-recursive-captured-lua-adapter"
-        }
-      },
-      {
-        "policy:render-script-instance-attachment-unavailable": {
           "rule": "generated:script-universal-value",
           "decision": "bounded-recursive-captured-lua-adapter"
         }
@@ -28048,14 +28024,8 @@
         "policy:unbounded-typed-map"
       ],
       [
-        "policy:gui-script-instance-attachment-unavailable"
-      ],
-      [
         "context-policy",
         "policy:handle-or-callback-crossing"
-      ],
-      [
-        "policy:image-type-union-codec"
       ],
       [
         "context-policy",
@@ -28064,9 +28034,6 @@
       [
         "context-policy",
         "policy:recursive-json-value-policy"
-      ],
-      [
-        "policy:named-enum-domain-codec"
       ],
       [
         "context-policy",
@@ -28113,9 +28080,6 @@
       [
         "context-policy",
         "policy:target-context-or-platform-state-record"
-      ],
-      [
-        "policy:render-script-instance-attachment-unavailable"
       ],
       [
         "policy:render-target-table-and-resource-lifetime-codecs"
@@ -229618,13 +229582,11 @@
                 "v3-no-bullet"
               ],
               "runtime": [
-                "default-legacy-bullet",
-                "legacy-no-bullet",
                 "v3-bullet",
                 "v3-no-bullet"
               ],
               "runtimeAvailable": true,
-              "runtimeMask": 54
+              "runtimeMask": 48
             }
           },
           "targets": {
@@ -235786,13 +235748,11 @@
                 "v3-no-bullet"
               ],
               "runtime": [
-                "default-legacy-bullet",
-                "legacy-no-bullet",
                 "v3-bullet",
                 "v3-no-bullet"
               ],
               "runtimeAvailable": true,
-              "runtimeMask": 54
+              "runtimeMask": 48
             }
           },
           "targets": {
@@ -273492,8 +273452,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -273525,9 +273485,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -273537,10 +273504,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -273599,8 +273566,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -273632,9 +273599,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -273644,10 +273618,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -273702,8 +273676,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -273735,9 +273709,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -273747,10 +273728,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -273850,8 +273831,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -273883,9 +273864,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -273895,10 +273883,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274000,10 +273988,10 @@
           "lane": "script-value-tail",
           "reportRow": 17,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "gui-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-gui-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 2687333512,
@@ -274063,8 +274051,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274096,9 +274084,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274108,10 +274103,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274167,8 +274162,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274200,9 +274195,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274212,10 +274214,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274271,8 +274273,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274304,9 +274306,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274316,10 +274325,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274375,8 +274384,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274408,9 +274417,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274420,10 +274436,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274479,8 +274495,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274512,9 +274528,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274524,10 +274547,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274583,8 +274606,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274616,9 +274639,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274628,10 +274658,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274687,8 +274717,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274720,9 +274750,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274732,10 +274769,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274791,8 +274828,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274824,9 +274861,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274836,10 +274880,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274895,8 +274939,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -274928,9 +274972,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -274940,10 +274991,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -274999,8 +275050,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275032,9 +275083,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275044,10 +275102,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275103,8 +275161,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275136,9 +275194,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275148,10 +275213,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275207,8 +275272,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275240,9 +275305,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275252,10 +275324,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275311,8 +275383,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275344,9 +275416,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275356,10 +275435,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275462,14 +275541,14 @@
           "lane": "script-value-tail",
           "reportRow": 23,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "gui-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-gui-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 4047461608,
-            "resultCodec": "None",
+            "resultCodec": "Hash",
             "requiredContext": "gui-script-instance"
           }
         }
@@ -275531,8 +275610,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275564,9 +275643,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275576,10 +275662,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275635,8 +275721,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275668,9 +275754,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275680,10 +275773,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275739,8 +275832,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275772,9 +275865,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275784,10 +275884,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275843,8 +275943,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275876,9 +275976,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275888,10 +275995,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -275947,8 +276054,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -275980,9 +276087,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -275992,10 +276106,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276096,14 +276210,14 @@
           "lane": "script-value-tail",
           "reportRow": 18,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "gui-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-gui-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 3027276460,
-            "resultCodec": "None",
+            "resultCodec": "Hash",
             "requiredContext": "gui-script-instance"
           }
         }
@@ -276201,8 +276315,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -276234,9 +276348,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -276246,10 +276367,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276305,8 +276426,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -276338,9 +276459,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -276350,10 +276478,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276409,8 +276537,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -276442,9 +276570,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -276454,10 +276589,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276583,8 +276718,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -276616,9 +276751,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -276628,10 +276770,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276687,8 +276829,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -276720,9 +276862,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -276732,10 +276881,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276791,8 +276940,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -276824,9 +276973,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -276836,10 +276992,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276895,8 +277051,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -276928,9 +277084,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -276940,10 +277103,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -276999,8 +277162,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277032,9 +277195,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277044,10 +277214,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277103,8 +277273,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277136,9 +277306,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277148,10 +277325,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277207,8 +277384,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277240,9 +277417,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277252,10 +277436,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277311,8 +277495,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277344,9 +277528,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277356,10 +277547,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277415,8 +277606,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277448,9 +277639,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277460,10 +277658,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277519,8 +277717,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277552,9 +277750,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277564,10 +277769,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277623,8 +277828,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277656,9 +277861,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277668,10 +277880,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277727,8 +277939,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277760,9 +277972,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277772,10 +277991,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277831,8 +278050,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277864,9 +278083,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277876,10 +278102,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -277935,8 +278161,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -277968,9 +278194,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -277980,10 +278213,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278039,8 +278272,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -278072,9 +278305,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -278084,10 +278324,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278143,8 +278383,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -278176,9 +278416,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -278188,10 +278435,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278247,8 +278494,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -278280,9 +278527,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -278292,10 +278546,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278458,8 +278712,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -278491,9 +278745,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -278503,10 +278764,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278616,8 +278877,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -278649,9 +278910,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -278661,10 +278929,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278720,8 +278988,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -278753,9 +279021,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -278765,10 +279040,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278876,8 +279151,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -278909,9 +279184,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -278921,10 +279203,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -278980,8 +279262,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -279013,9 +279295,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -279025,10 +279314,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -279084,8 +279373,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -279117,9 +279406,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -279129,10 +279425,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -279188,8 +279484,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -279221,9 +279517,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -279233,10 +279536,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -279294,8 +279597,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -279327,9 +279630,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -279339,10 +279649,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -279402,8 +279712,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -279435,9 +279745,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -279447,10 +279764,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -279508,8 +279825,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -279541,9 +279858,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -279553,10 +279877,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -279678,8 +280002,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -279711,9 +280035,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -279723,10 +280054,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -279967,8 +280298,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -280000,9 +280331,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -280012,10 +280350,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -280122,8 +280460,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "gui-scene",
             "ownership": {
@@ -280155,9 +280493,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -280167,10 +280512,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -281508,14 +281853,14 @@
           "lane": "script-value-tail",
           "reportRow": 25,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "gui-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-gui-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 4235294552,
-            "resultCodec": "None",
+            "resultCodec": "Boolean",
             "requiredContext": "gui-script-instance"
           }
         }
@@ -283008,14 +283353,14 @@
           "lane": "script-value-tail",
           "reportRow": 24,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "image-type-union-codec",
-            "family": "unsafe-image-type-codec",
-            "backend": null
+            "disposition": "candidate",
+            "blocker": null,
+            "family": "image-type-string-codec",
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 4140093370,
-            "resultCodec": "None",
+            "resultCodec": "Boolean",
             "requiredContext": "gui-script-instance"
           }
         }
@@ -284362,14 +284707,14 @@
           "lane": "script-value-tail",
           "reportRow": 21,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "named-enum-domain-codec",
-            "family": "unsafe-named-enum-result-codec",
-            "backend": null
+            "disposition": "candidate",
+            "blocker": null,
+            "family": "liveupdate-result-enum-codec",
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 3486747409,
-            "resultCodec": "None",
+            "resultCodec": "Number",
             "requiredContext": "script-instance"
           }
         }
@@ -287700,8 +288045,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "render-script-instance-and-graphics-context",
             "ownership": {
@@ -287733,9 +288078,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -287745,10 +288097,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -287803,8 +288155,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "render-script-instance-and-graphics-context",
             "ownership": {
@@ -287836,9 +288188,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -287848,10 +288207,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -288012,8 +288371,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "render-script-instance-and-graphics-context",
             "ownership": {
@@ -288045,9 +288404,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -288057,10 +288423,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -288296,10 +288662,10 @@
           "lane": "script-value-tail",
           "reportRow": 22,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "render-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-render-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 3764411239,
@@ -288365,8 +288731,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "render-script-instance-and-graphics-context",
             "ownership": {
@@ -288398,9 +288764,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -288410,10 +288783,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -288526,8 +288899,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "render-script-instance-and-graphics-context",
             "ownership": {
@@ -288559,9 +288932,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -288571,10 +288951,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -288633,8 +289013,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "render-script-instance-and-graphics-context",
             "ownership": {
@@ -288666,9 +289046,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -288678,10 +289065,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -289323,10 +289710,10 @@
           "lane": "script-value-tail",
           "reportRow": 5,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "render-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-render-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 1089182856,
@@ -289661,10 +290048,10 @@
           "lane": "script-value-tail",
           "reportRow": 11,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "render-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-render-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 2094481018,
@@ -289723,8 +290110,8 @@
       [
         {
           "lane": "script-handle-lowering",
-          "disposition": "blocked",
-          "semanticState": "blocked-by-declared-target-or-context-policy",
+          "disposition": "generated-private-runtime",
+          "semanticState": "generated-contract-retains-declared-policy-holes",
           "contract": {
             "context": "render-script-instance-and-graphics-context",
             "ownership": {
@@ -289756,9 +290143,16 @@
                 "defold-core"
               ],
               "documented": [],
-              "runtime": [],
+              "runtime": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
               "runtimeAvailable": true,
-              "runtimeMask": 0
+              "runtimeMask": 63
             }
           },
           "targets": {
@@ -289768,10 +290162,10 @@
           },
           "generation": {
             "descriptor": "emitted",
-            "router": "blocked"
+            "router": "emitted"
           },
           "evidence": {
-            "nativeAdapterHarness": "blocked-disposition-covered",
+            "nativeAdapterHarness": "covered-by-all-route-descriptor-loop",
             "defoldEngineBehavior": "unverified",
             "nativeDynamicHermesJsi": "unverified",
             "nativeStaticHermes": "unverified",
@@ -290037,10 +290431,10 @@
           "lane": "script-value-tail",
           "reportRow": 10,
           "reportState": {
-            "disposition": "blocked",
-            "blocker": "render-script-instance-attachment-unavailable",
+            "disposition": "candidate",
+            "blocker": null,
             "family": "requires-render-script-instance",
-            "backend": null
+            "backend": "captured-lua-exact-call"
           },
           "generationIdentity": {
             "stableId": 1992852954,
@@ -458988,7 +459382,7 @@
       "shapeKinds": [
         "union"
       ],
-      "unresolvedTokenSet": 227,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -459000,34 +459394,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 227
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -459071,7 +459465,7 @@
         "scalar",
         "union"
       ],
-      "unresolvedTokenSet": 228,
+      "unresolvedTokenSet": 227,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -459083,13 +459477,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 295,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -459097,20 +459491,20 @@
           "marshallingProgram": 0,
           "blockerSet": 148,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 295,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 295,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         }
       }
@@ -460201,7 +460595,7 @@
         "defold-value",
         "union"
       ],
-      "unresolvedTokenSet": 227,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -460213,34 +460607,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 227
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 304,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 304,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 304,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 304,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -460764,7 +461158,7 @@
       "shapeKinds": [
         "defold-value"
       ],
-      "unresolvedTokenSet": 227,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -460776,34 +461170,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 227
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 306,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 306,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 306,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 306,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -464479,7 +464873,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 228,
+      "unresolvedTokenSet": 227,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -464491,13 +464885,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 328,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -464505,20 +464899,20 @@
           "marshallingProgram": 0,
           "blockerSet": 148,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 328,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 328,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         }
       }
@@ -465937,7 +466331,7 @@
         "scalar",
         "union"
       ],
-      "unresolvedTokenSet": 227,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -465949,34 +466343,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 227
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 238,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 238,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 238,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 238,
           "blockerSet": 0,
-          "resolvedTokenSet": 19,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -467715,7 +468109,7 @@
         "scalar",
         "union"
       ],
-      "unresolvedTokenSet": 229,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -467727,34 +468121,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 229
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 341,
           "blockerSet": 0,
-          "resolvedTokenSet": 21,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 341,
           "blockerSet": 0,
-          "resolvedTokenSet": 21,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 341,
           "blockerSet": 0,
-          "resolvedTokenSet": 21,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 341,
           "blockerSet": 0,
-          "resolvedTokenSet": 21,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -468201,7 +468595,7 @@
         "defold-value",
         "record-ref"
       ],
-      "unresolvedTokenSet": 228,
+      "unresolvedTokenSet": 227,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -468213,13 +468607,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 344,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -468227,20 +468621,20 @@
           "marshallingProgram": 0,
           "blockerSet": 150,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 344,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 344,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         }
       }
@@ -468775,7 +469169,7 @@
         "scalar",
         "union"
       ],
-      "unresolvedTokenSet": 230,
+      "unresolvedTokenSet": 228,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -468787,34 +469181,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 230
+          "unresolvedTokenSet": 228
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 350,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 350,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 350,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 350,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         }
       }
@@ -468858,7 +469252,7 @@
         "scalar",
         "union"
       ],
-      "unresolvedTokenSet": 230,
+      "unresolvedTokenSet": 228,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -468870,34 +469264,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 230
+          "unresolvedTokenSet": 228
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 351,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 351,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 351,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 351,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         }
       }
@@ -468940,7 +469334,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 231,
+      "unresolvedTokenSet": 229,
       "sourceState": {
         "loweringFamily": "dynamic-values",
         "accountingCategory": "executable-stable-id"
@@ -468952,34 +469346,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 231
+          "unresolvedTokenSet": 229
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 352,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 352,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 352,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 352,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         }
       }
@@ -469022,7 +469416,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 231,
+      "unresolvedTokenSet": 229,
       "sourceState": {
         "loweringFamily": "dynamic-values",
         "accountingCategory": "executable-stable-id"
@@ -469034,34 +469428,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 231
+          "unresolvedTokenSet": 229
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 353,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 353,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 353,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 353,
           "blockerSet": 0,
-          "resolvedTokenSet": 23,
+          "resolvedTokenSet": 21,
           "unresolvedTokenSet": 0
         }
       }
@@ -469594,7 +469988,7 @@
         "enum",
         "union"
       ],
-      "unresolvedTokenSet": 232,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -469606,34 +470000,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 232
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 359,
           "blockerSet": 0,
-          "resolvedTokenSet": 24,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 359,
           "blockerSet": 0,
-          "resolvedTokenSet": 24,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 359,
           "blockerSet": 0,
-          "resolvedTokenSet": 24,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 359,
           "blockerSet": 0,
-          "resolvedTokenSet": 24,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -470408,7 +470802,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 233,
+      "unresolvedTokenSet": 230,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -470420,34 +470814,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 233
+          "unresolvedTokenSet": 230
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 361,
           "blockerSet": 0,
-          "resolvedTokenSet": 25,
+          "resolvedTokenSet": 22,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 361,
           "blockerSet": 0,
-          "resolvedTokenSet": 25,
+          "resolvedTokenSet": 22,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 361,
           "blockerSet": 0,
-          "resolvedTokenSet": 25,
+          "resolvedTokenSet": 22,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 361,
           "blockerSet": 0,
-          "resolvedTokenSet": 25,
+          "resolvedTokenSet": 22,
           "unresolvedTokenSet": 0
         }
       }
@@ -471227,7 +471621,7 @@
       "shapeKinds": [
         "defold-value"
       ],
-      "unresolvedTokenSet": 234,
+      "unresolvedTokenSet": 231,
       "sourceState": {
         "loweringFamily": "overload-dispatch",
         "accountingCategory": "executable-stable-id"
@@ -471239,34 +471633,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 234
+          "unresolvedTokenSet": 231
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 369,
           "blockerSet": 0,
-          "resolvedTokenSet": 26,
+          "resolvedTokenSet": 23,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 369,
           "blockerSet": 0,
-          "resolvedTokenSet": 26,
+          "resolvedTokenSet": 23,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 369,
           "blockerSet": 0,
-          "resolvedTokenSet": 26,
+          "resolvedTokenSet": 23,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 369,
           "blockerSet": 0,
-          "resolvedTokenSet": 26,
+          "resolvedTokenSet": 23,
           "unresolvedTokenSet": 0
         }
       }
@@ -471553,7 +471947,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 235,
+      "unresolvedTokenSet": 232,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -471565,34 +471959,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 235
+          "unresolvedTokenSet": 232
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 373,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 373,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 373,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 373,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         }
       }
@@ -471636,7 +472030,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 236,
+      "unresolvedTokenSet": 233,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -471648,34 +472042,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 236
+          "unresolvedTokenSet": 233
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 374,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 374,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 374,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 374,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         }
       }
@@ -471958,7 +472352,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 237,
+      "unresolvedTokenSet": 234,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -471970,34 +472364,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 237
+          "unresolvedTokenSet": 234
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 376,
           "blockerSet": 0,
-          "resolvedTokenSet": 29,
+          "resolvedTokenSet": 26,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 376,
           "blockerSet": 0,
-          "resolvedTokenSet": 29,
+          "resolvedTokenSet": 26,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 376,
           "blockerSet": 0,
-          "resolvedTokenSet": 29,
+          "resolvedTokenSet": 26,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 376,
           "blockerSet": 0,
-          "resolvedTokenSet": 29,
+          "resolvedTokenSet": 26,
           "unresolvedTokenSet": 0
         }
       }
@@ -472282,7 +472676,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 238,
+      "unresolvedTokenSet": 235,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -472294,34 +472688,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 380,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 380,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 380,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 380,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         }
       }
@@ -472853,7 +473247,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 236,
+      "unresolvedTokenSet": 233,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -472865,34 +473259,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 236
+          "unresolvedTokenSet": 233
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 386,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 386,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 386,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 386,
           "blockerSet": 0,
-          "resolvedTokenSet": 28,
+          "resolvedTokenSet": 25,
           "unresolvedTokenSet": 0
         }
       }
@@ -473015,7 +473409,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 238,
+      "unresolvedTokenSet": 235,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -473027,34 +473421,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 388,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 388,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 388,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 388,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         }
       }
@@ -473337,7 +473731,7 @@
       "shapeKinds": [
         "dynamic"
       ],
-      "unresolvedTokenSet": 239,
+      "unresolvedTokenSet": 236,
       "sourceState": {
         "loweringFamily": "dynamic-values",
         "accountingCategory": "executable-stable-id"
@@ -473349,34 +473743,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 239
+          "unresolvedTokenSet": 236
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 389,
           "blockerSet": 0,
-          "resolvedTokenSet": 31,
+          "resolvedTokenSet": 28,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 389,
           "blockerSet": 0,
-          "resolvedTokenSet": 31,
+          "resolvedTokenSet": 28,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 389,
           "blockerSet": 0,
-          "resolvedTokenSet": 31,
+          "resolvedTokenSet": 28,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 389,
           "blockerSet": 0,
-          "resolvedTokenSet": 31,
+          "resolvedTokenSet": 28,
           "unresolvedTokenSet": 0
         }
       }
@@ -474373,7 +474767,7 @@
       "shapeKinds": [
         "union"
       ],
-      "unresolvedTokenSet": 230,
+      "unresolvedTokenSet": 228,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -474385,34 +474779,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 230
+          "unresolvedTokenSet": 228
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 22,
+          "resolvedTokenSet": 20,
           "unresolvedTokenSet": 0
         }
       }
@@ -474934,7 +475328,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 240,
+      "unresolvedTokenSet": 237,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -474946,34 +475340,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 240
+          "unresolvedTokenSet": 237
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 397,
           "blockerSet": 0,
-          "resolvedTokenSet": 32,
+          "resolvedTokenSet": 29,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 397,
           "blockerSet": 0,
-          "resolvedTokenSet": 32,
+          "resolvedTokenSet": 29,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 397,
           "blockerSet": 0,
-          "resolvedTokenSet": 32,
+          "resolvedTokenSet": 29,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 397,
           "blockerSet": 0,
-          "resolvedTokenSet": 32,
+          "resolvedTokenSet": 29,
           "unresolvedTokenSet": 0
         }
       }
@@ -475015,7 +475409,7 @@
         "defold-value",
         "record-ref"
       ],
-      "unresolvedTokenSet": 241,
+      "unresolvedTokenSet": 238,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -475027,13 +475421,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 241
+          "unresolvedTokenSet": 238
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 398,
           "blockerSet": 0,
-          "resolvedTokenSet": 33,
+          "resolvedTokenSet": 30,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -475041,20 +475435,20 @@
           "marshallingProgram": 0,
           "blockerSet": 154,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 241
+          "unresolvedTokenSet": 238
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 398,
           "blockerSet": 0,
-          "resolvedTokenSet": 33,
+          "resolvedTokenSet": 30,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 398,
           "blockerSet": 0,
-          "resolvedTokenSet": 33,
+          "resolvedTokenSet": 30,
           "unresolvedTokenSet": 0
         }
       }
@@ -475095,7 +475489,7 @@
       "shapeKinds": [
         "record-ref"
       ],
-      "unresolvedTokenSet": 242,
+      "unresolvedTokenSet": 239,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -475107,34 +475501,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 242
+          "unresolvedTokenSet": 239
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 399,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 399,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 399,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 399,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         }
       }
@@ -475175,7 +475569,7 @@
       "shapeKinds": [
         "union"
       ],
-      "unresolvedTokenSet": 243,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -475187,34 +475581,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 243
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -475983,7 +476377,7 @@
         "defold-value",
         "record-ref"
       ],
-      "unresolvedTokenSet": 244,
+      "unresolvedTokenSet": 240,
       "sourceState": {
         "loweringFamily": "overload-dispatch",
         "accountingCategory": "executable-stable-id"
@@ -475995,13 +476389,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 244
+          "unresolvedTokenSet": 240
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 404,
           "blockerSet": 0,
-          "resolvedTokenSet": 36,
+          "resolvedTokenSet": 32,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -476009,20 +476403,20 @@
           "marshallingProgram": 0,
           "blockerSet": 156,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 244
+          "unresolvedTokenSet": 240
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 404,
           "blockerSet": 0,
-          "resolvedTokenSet": 36,
+          "resolvedTokenSet": 32,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 404,
           "blockerSet": 0,
-          "resolvedTokenSet": 36,
+          "resolvedTokenSet": 32,
           "unresolvedTokenSet": 0
         }
       }
@@ -476304,7 +476698,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 245,
+      "unresolvedTokenSet": 241,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -476316,34 +476710,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 245
+          "unresolvedTokenSet": 241
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 408,
           "blockerSet": 0,
-          "resolvedTokenSet": 37,
+          "resolvedTokenSet": 33,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 408,
           "blockerSet": 0,
-          "resolvedTokenSet": 37,
+          "resolvedTokenSet": 33,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 408,
           "blockerSet": 0,
-          "resolvedTokenSet": 37,
+          "resolvedTokenSet": 33,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 408,
           "blockerSet": 0,
-          "resolvedTokenSet": 37,
+          "resolvedTokenSet": 33,
           "unresolvedTokenSet": 0
         }
       }
@@ -476464,7 +476858,7 @@
       "shapeKinds": [
         "union"
       ],
-      "unresolvedTokenSet": 243,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -476476,34 +476870,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 243
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 251,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -476947,7 +477341,7 @@
       "shapeKinds": [
         "defold-value"
       ],
-      "unresolvedTokenSet": 243,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -476959,34 +477353,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 243
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -477430,7 +477824,7 @@
       "shapeKinds": [
         "defold-value"
       ],
-      "unresolvedTokenSet": 243,
+      "unresolvedTokenSet": 0,
       "sourceState": {
         "loweringFamily": "defold-value",
         "accountingCategory": "executable-stable-id"
@@ -477442,34 +477836,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 243
+          "unresolvedTokenSet": 0
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 414,
           "blockerSet": 0,
-          "resolvedTokenSet": 35,
+          "resolvedTokenSet": 0,
           "unresolvedTokenSet": 0
         }
       }
@@ -477834,7 +478228,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 238,
+      "unresolvedTokenSet": 235,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -477846,34 +478240,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 421,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 421,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 421,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 421,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         }
       }
@@ -477916,7 +478310,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 238,
+      "unresolvedTokenSet": 235,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -477928,34 +478322,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 422,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 422,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 422,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 422,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         }
       }
@@ -477998,7 +478392,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 228,
+      "unresolvedTokenSet": 227,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -478010,13 +478404,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 423,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -478024,20 +478418,20 @@
           "marshallingProgram": 0,
           "blockerSet": 158,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 423,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 423,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         }
       }
@@ -478487,7 +478881,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 246,
+      "unresolvedTokenSet": 242,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -478499,34 +478893,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 246
+          "unresolvedTokenSet": 242
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 428,
           "blockerSet": 0,
-          "resolvedTokenSet": 38,
+          "resolvedTokenSet": 34,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 428,
           "blockerSet": 0,
-          "resolvedTokenSet": 38,
+          "resolvedTokenSet": 34,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 428,
           "blockerSet": 0,
-          "resolvedTokenSet": 38,
+          "resolvedTokenSet": 34,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 428,
           "blockerSet": 0,
-          "resolvedTokenSet": 38,
+          "resolvedTokenSet": 34,
           "unresolvedTokenSet": 0
         }
       }
@@ -478568,7 +478962,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 238,
+      "unresolvedTokenSet": 235,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -478580,13 +478974,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 429,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -478594,20 +478988,20 @@
           "marshallingProgram": 0,
           "blockerSet": 160,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 429,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 429,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         }
       }
@@ -479133,7 +479527,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 238,
+      "unresolvedTokenSet": 235,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -479145,13 +479539,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 433,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -479159,20 +479553,20 @@
           "marshallingProgram": 0,
           "blockerSet": 161,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 238
+          "unresolvedTokenSet": 235
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 433,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 433,
           "blockerSet": 0,
-          "resolvedTokenSet": 30,
+          "resolvedTokenSet": 27,
           "unresolvedTokenSet": 0
         }
       }
@@ -479296,7 +479690,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 228,
+      "unresolvedTokenSet": 227,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -479308,13 +479702,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 434,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -479322,20 +479716,20 @@
           "marshallingProgram": 0,
           "blockerSet": 158,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 434,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 434,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         }
       }
@@ -481819,7 +482213,7 @@
         "record-ref",
         "union"
       ],
-      "unresolvedTokenSet": 235,
+      "unresolvedTokenSet": 232,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -481831,34 +482225,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 235
+          "unresolvedTokenSet": 232
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 449,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 449,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 449,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 449,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         }
       }
@@ -482468,7 +482862,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 242,
+      "unresolvedTokenSet": 239,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -482480,34 +482874,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 242
+          "unresolvedTokenSet": 239
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 453,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 453,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 453,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 453,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         }
       }
@@ -483029,7 +483423,7 @@
       "shapeKinds": [
         "record-ref"
       ],
-      "unresolvedTokenSet": 242,
+      "unresolvedTokenSet": 239,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -483041,34 +483435,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 242
+          "unresolvedTokenSet": 239
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 458,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 458,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 458,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 458,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         }
       }
@@ -483350,7 +483744,7 @@
       "shapeKinds": [
         "record-ref"
       ],
-      "unresolvedTokenSet": 242,
+      "unresolvedTokenSet": 239,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -483362,34 +483756,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 242
+          "unresolvedTokenSet": 239
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 461,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 461,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 461,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 461,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         }
       }
@@ -483757,7 +484151,7 @@
         "record-ref",
         "scalar"
       ],
-      "unresolvedTokenSet": 242,
+      "unresolvedTokenSet": 239,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -483769,34 +484163,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 242
+          "unresolvedTokenSet": 239
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 464,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 464,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 464,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 464,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         }
       }
@@ -484726,7 +485120,7 @@
         "scalar",
         "union"
       ],
-      "unresolvedTokenSet": 235,
+      "unresolvedTokenSet": 232,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -484738,34 +485132,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 235
+          "unresolvedTokenSet": 232
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 472,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 472,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 472,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 472,
           "blockerSet": 0,
-          "resolvedTokenSet": 27,
+          "resolvedTokenSet": 24,
           "unresolvedTokenSet": 0
         }
       }
@@ -485215,7 +485609,7 @@
         "named",
         "scalar"
       ],
-      "unresolvedTokenSet": 247,
+      "unresolvedTokenSet": 243,
       "sourceState": {
         "loweringFamily": "separate-module",
         "accountingCategory": "separate-module"
@@ -485227,35 +485621,35 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 247
+          "unresolvedTokenSet": 243
         },
         "dynamicHermesJsi": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 120,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 247
+          "unresolvedTokenSet": 243
         },
         "staticHermesCAbi": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 120,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 247
+          "unresolvedTokenSet": 243
         },
         "luaStack": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 120,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 247
+          "unresolvedTokenSet": 243
         },
         "browserWasmHost": {
           "selection": "separate-module",
           "marshallingProgram": 0,
           "blockerSet": 120,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 247
+          "unresolvedTokenSet": 243
         }
       }
     },
@@ -485297,7 +485691,7 @@
         "optional",
         "record-ref"
       ],
-      "unresolvedTokenSet": 228,
+      "unresolvedTokenSet": 227,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -485309,13 +485703,13 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 475,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
@@ -485323,20 +485717,20 @@
           "marshallingProgram": 0,
           "blockerSet": 164,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 228
+          "unresolvedTokenSet": 227
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 475,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 475,
           "blockerSet": 0,
-          "resolvedTokenSet": 20,
+          "resolvedTokenSet": 19,
           "unresolvedTokenSet": 0
         }
       }
@@ -489489,7 +489883,7 @@
       "shapeKinds": [
         "record-ref"
       ],
-      "unresolvedTokenSet": 242,
+      "unresolvedTokenSet": 239,
       "sourceState": {
         "loweringFamily": "lua-table",
         "accountingCategory": "executable-stable-id"
@@ -489501,34 +489895,34 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 0,
-          "unresolvedTokenSet": 242
+          "unresolvedTokenSet": 239
         },
         "dynamicHermesJsi": {
           "selection": "emit",
           "marshallingProgram": 507,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "staticHermesCAbi": {
           "selection": "emit",
           "marshallingProgram": 507,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "luaStack": {
           "selection": "emit",
           "marshallingProgram": 507,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         },
         "browserWasmHost": {
           "selection": "emit",
           "marshallingProgram": 507,
           "blockerSet": 0,
-          "resolvedTokenSet": 34,
+          "resolvedTokenSet": 31,
           "unresolvedTokenSet": 0
         }
       }
@@ -490257,5 +490651,5 @@
       }
     }
   ],
-  "planSha256": "bd0c30a4f703144b4412a5b04456d92be89a546422c404063201efe8dcecd9b4"
+  "planSha256": "2897ef0ac8bc513b170c580ede10ef90401641f61a9809538d5d63785e8b9243"
 }

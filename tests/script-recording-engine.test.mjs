@@ -96,6 +96,26 @@ test("the recording engine is generated from the same IR as the bindings, and is
   // JSI for function values.
   assert.deepEqual(report.summary.byTransport["direct-memory"], { exercised: 890, skipped: 25 });
   assert.deepEqual(report.summary.byTransport["typed-native"], { exercised: 890, skipped: 25 });
+  assert.deepEqual(report.summary.luaAdapter, {
+    profile: "generated-runtime-profile-union",
+    installed: 915,
+    exercised: 882,
+    skipped: 33,
+    failureSchema: "deherm-script-lua-exact-failure/v1"
+  });
+  assert.deepEqual(report.summary.dynamicHermesExactPartition, {
+    emitted: 913,
+    luaStackExact: 882,
+    nativePodExactPending: 31,
+    sourceProfileOmitted: 2
+  });
+  assert.deepEqual(Object.fromEntries([...new Set(report.routes
+    .filter(({ luaAdapter }) => luaAdapter.status === "skip")
+    .map(({ luaAdapter }) => luaAdapter.reason))].map((reason) => [reason, report.routes
+      .filter(({ luaAdapter }) => luaAdapter.reason === reason).length])), {
+    "canonical-dynamic-hermes-route-omitted": 2,
+    "route-uses-native-pod-not-lua-stack": 31
+  });
   assert.ok(report.routes.every((route) =>
     route.transports["typed-native"].reason !== "static-frame-has-no-url-or-matrix4-argument-push"));
   const directSkips = report.routes

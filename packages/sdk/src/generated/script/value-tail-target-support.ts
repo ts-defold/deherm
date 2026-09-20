@@ -6,6 +6,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "None",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -14,6 +16,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "None",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -22,6 +26,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "None",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -30,6 +36,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "String",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -38,15 +46,19 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "Matrix4",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
     "id": "script:render.set_compute",
     "stableId": "0x40eb9c88",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": "render-script-instance-attachment-unavailable"
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "render-script-instance",
+    "blocker": null
   },
   {
     "id": "script:physics.get_gravity",
@@ -54,6 +66,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "Vector3",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -62,6 +76,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "None",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -70,6 +86,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "Hash",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -78,23 +96,29 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "Matrix4",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
     "id": "script:render.set_view",
     "stableId": "0x76c885da",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": "render-script-instance-attachment-unavailable"
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "render-script-instance",
+    "blocker": null
   },
   {
     "id": "script:render.set_projection",
     "stableId": "0x7cd73e7a",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": "render-script-instance-attachment-unavailable"
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "render-script-instance",
+    "blocker": null
   },
   {
     "id": "script:go.world_to_local_transform",
@@ -102,6 +126,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "Matrix4",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -110,6 +136,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "None",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -118,6 +146,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "Matrix4",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -126,6 +156,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "None",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -134,23 +166,29 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "String",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
     "id": "script:gui.delete_texture",
     "stableId": "0xa02d7488",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-gui-script-instance",
     "resultCodec": "None",
-    "blocker": "gui-script-instance-attachment-unavailable"
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "gui-script-instance",
+    "blocker": null
   },
   {
     "id": "script:gui.get_layout",
     "stableId": "0xb47092ac",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-gui-script-instance",
-    "resultCodec": "None",
-    "blocker": "gui-script-instance-attachment-unavailable"
+    "resultCodec": "Hash",
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "gui-script-instance",
+    "blocker": null
   },
   {
     "id": "script:sound.get_group_gain",
@@ -158,6 +196,8 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "Number",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
@@ -166,47 +206,59 @@ export const scriptValueTailRoutes = [
     "disposition": "candidate",
     "family": "captured-lua-exact-codec",
     "resultCodec": "None",
+    "accountingDisposition": "generated-family",
+    "requiredContext": "script-instance",
     "blocker": null
   },
   {
     "id": "script:liveupdate.remove_mount",
     "stableId": "0xcfd38b11",
-    "disposition": "blocked",
-    "family": "unsafe-named-enum-result-codec",
-    "resultCodec": "None",
-    "blocker": "named-enum-domain-codec"
+    "disposition": "candidate",
+    "family": "liveupdate-result-enum-codec",
+    "resultCodec": "Number",
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "script-instance",
+    "blocker": null
   },
   {
     "id": "script:render.enable_material",
     "stableId": "0xe0605b67",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-render-script-instance",
     "resultCodec": "None",
-    "blocker": "render-script-instance-attachment-unavailable"
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "render-script-instance",
+    "blocker": null
   },
   {
     "id": "script:gui.get_font_resource",
     "stableId": "0xf13f5ce8",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-gui-script-instance",
-    "resultCodec": "None",
-    "blocker": "gui-script-instance-attachment-unavailable"
+    "resultCodec": "Hash",
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "gui-script-instance",
+    "blocker": null
   },
   {
     "id": "script:gui.set_texture_data",
     "stableId": "0xf6c4cfba",
-    "disposition": "blocked",
-    "family": "unsafe-image-type-codec",
-    "resultCodec": "None",
-    "blocker": "image-type-union-codec"
+    "disposition": "candidate",
+    "family": "image-type-string-codec",
+    "resultCodec": "Boolean",
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "gui-script-instance",
+    "blocker": null
   },
   {
     "id": "script:gui.set_layout",
     "stableId": "0xfc717758",
-    "disposition": "blocked",
+    "disposition": "candidate",
     "family": "requires-gui-script-instance",
-    "resultCodec": "None",
-    "blocker": "gui-script-instance-attachment-unavailable"
+    "resultCodec": "Boolean",
+    "accountingDisposition": "universal-fallback-test-fixture-adapter-only",
+    "requiredContext": "gui-script-instance",
+    "blocker": null
   }
 ] as const;
 export const scriptValueTailTargetSupport = {
