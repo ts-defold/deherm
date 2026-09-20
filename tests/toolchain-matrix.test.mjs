@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { deriveBundleTargets } from "../scripts/generate-defold-bundle-targets.mjs";
+import { deriveBundleTargets, derivePlatformPairs } from "../scripts/generate-defold-bundle-targets.mjs";
 import { hostCompilerKey, inspectHostCompilers, hostCompilerReport, requireHostCompilers, requireHostTool } from "../packages/cli/src/host-compilers.mjs";
-import { nativeArtifactReport } from "../packages/cli/src/toolchains.mjs";
+import { assertProjectNativeArtifact, nativeArtifactReport, resolveDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import { dehermPluginManifest, transformCompilerIdentity, transformProject } from "../packages/cli/src/transform-compiler.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
@@ -28,6 +29,33 @@ test("the bundle target list is derived from the pinned Defold sources, not hand
   for (const group of generated.groups) assert.equal(group.includes("-"), false);
   assert.ok(generated.targets.some((entry) => entry.group === "android"), "Android must be derived, not omitted");
   assert.ok(generated.targets.some((entry) => entry.group === "ios"), "iOS must be derived, not omitted");
+});
+
+test("Bob and Extender platform identities are derived from Defold Platform.java", async () => {
+  const generated = await readJson("packages/toolchains/defold-platform-pairs.json");
+  assert.deepEqual(generated, await derivePlatformPairs());
+  assert.deepEqual(
+    await resolveDefoldPlatform("arm64-osx"),
+    { extenderTarget: "arm64-osx", bobPlatform: "arm64-macos", source: generated.source }
+  );
+  assert.equal((await resolveDefoldPlatform("x86_64-macos")).extenderTarget, "x86_64-osx");
+  assert.equal((await resolveDefoldPlatform("wasm-web")).bobPlatform, "wasm-web");
+  await assert.rejects(resolveDefoldPlatform("x86-osx"), /no active Bob\/Extender platform pair/);
+});
+
+test("a copied browser-host source artifact satisfies the project artifact gate", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-web-artifact."));
+  try {
+    const relative = "defold_hermes/lib/web/library_defold_hermes.js";
+    await mkdir(path.join(project, path.dirname(relative)), { recursive: true });
+    await copyFile(path.join(repositoryRoot, "defold", relative), path.join(project, relative));
+    const result = await assertProjectNativeArtifact(project, "wasm-web");
+    assert.equal(path.relative(project, result.file), relative);
+    await writeFile(path.join(project, relative), "tampered");
+    await assert.rejects(assertProjectNativeArtifact(project, "wasm-web"), /source checksum mismatch/);
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
 });
 
 test("every Defold bundle target carries an explicit status and never silence", async () => {

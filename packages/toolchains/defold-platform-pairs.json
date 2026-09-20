@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "source": "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/Platform.java",
+  "sourceSha256": "b4bcda7ce7a1162caf0ab29aac816e87a01d6f35722c4f6b48802e8d69c16263",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "platforms": [
+    {
+      "extenderTarget": "arm64_sim-ios",
+      "bobPlatform": "arm64_sim-ios"
+    },
+    {
+      "extenderTarget": "arm64-android",
+      "bobPlatform": "arm64-android"
+    },
+    {
+      "extenderTarget": "arm64-ios",
+      "bobPlatform": "arm64-ios"
+    },
+    {
+      "extenderTarget": "arm64-linux",
+      "bobPlatform": "arm64-linux"
+    },
+    {
+      "extenderTarget": "arm64-osx",
+      "bobPlatform": "arm64-macos"
+    },
+    {
+      "extenderTarget": "armv7-android",
+      "bobPlatform": "armv7-android"
+    },
+    {
+      "extenderTarget": "wasm_pthread-web",
+      "bobPlatform": "wasm_pthread-web"
+    },
+    {
+      "extenderTarget": "wasm-web",
+      "bobPlatform": "wasm-web"
+    },
+    {
+      "extenderTarget": "x86_64-android",
+      "bobPlatform": "x86_64-android"
+    },
+    {
+      "extenderTarget": "x86_64-linux",
+      "bobPlatform": "x86_64-linux"
+    },
+    {
+      "extenderTarget": "x86_64-osx",
+      "bobPlatform": "x86_64-macos"
+    },
+    {
+      "extenderTarget": "x86_64-win32",
+      "bobPlatform": "x86_64-win32"
+    }
+  ]
+}

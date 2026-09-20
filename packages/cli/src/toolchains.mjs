@@ -39,6 +39,23 @@ export async function readDefoldBundleTargets() {
   return JSON.parse(await readFile(path.join(packageRoot, "packages", "toolchains", "defold-bundle-targets.json"), "utf8"));
 }
 
+export async function readDefoldPlatformPairs() {
+  return JSON.parse(await readFile(path.join(packageRoot, "packages", "toolchains", "defold-platform-pairs.json"), "utf8"));
+}
+
+/** Resolve either public spelling to the exact Bob/Extender pair Defold declares. */
+export async function resolveDefoldPlatform(platform) {
+  const document = await readDefoldPlatformPairs();
+  const match = document.platforms.find(({ extenderTarget, bobPlatform }) =>
+    platform === extenderTarget || platform === bobPlatform);
+  if (!match) {
+    throw new Error(
+      `Defold declares no active Bob/Extender platform pair for ${platform}; expected one of ` +
+      document.platforms.flatMap(({ extenderTarget, bobPlatform }) => [extenderTarget, bobPlatform]).join(", "));
+  }
+  return { ...match, source: document.source };
+}
+
 // What this installed package can and cannot bundle, per Defold bundle target.
 // Every platform the pinned engine's Extender accepts appears here with an
 // explicit status: a target that is absent from the manifest would leave a user
@@ -114,10 +131,13 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform) {
   if (artifact.status === "blocked" || artifact.status === "retired-upstream") {
     throw new Error(`The installed déherm package cannot bundle for ${target} (${artifact.blocker?.code ?? artifact.status}): ${artifact.blocker?.reason ?? "no reason recorded"}`);
   }
-  if (artifact.status !== "vendored") {
+  if (artifact.status !== "vendored" && artifact.status !== "vendored-source") {
     throw new Error(`The installed déherm package does not contain the required ${target} Hermes artifact (status: ${artifact.status}; CI builds it with ${artifact.builder ?? "no declared builder"})`);
   }
-  const file = path.join(projectRoot, "defold_hermes", "lib", target, path.basename(artifact.library));
+  const relativeLibrary = artifact.status === "vendored-source"
+    ? path.relative("defold/defold_hermes", artifact.library)
+    : path.join("lib", target, path.basename(artifact.library));
+  const file = path.join(projectRoot, "defold_hermes", relativeLibrary);
   let bytes;
   try {
     bytes = await readFile(file);
@@ -125,7 +145,10 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform) {
     throw new Error(`The installed déherm extension is missing ${path.relative(projectRoot, file)}`);
   }
   const actual = createHash("sha256").update(bytes).digest("hex");
-  if (actual !== artifact.sha256) throw new Error(`Vendored ${target} Hermes artifact checksum mismatch`);
+  const expected = artifact.status === "vendored-source"
+    ? createHash("sha256").update(await readFile(path.join(packageRoot, artifact.library))).digest("hex")
+    : artifact.sha256;
+  if (actual !== expected) throw new Error(`Vendored ${target} ${artifact.status === "vendored-source" ? "source" : "Hermes artifact"} checksum mismatch`);
   return { target, file, sha256: actual };
 }
 import { createHash } from "node:crypto";

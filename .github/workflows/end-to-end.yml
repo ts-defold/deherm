@@ -38,8 +38,17 @@ on:
     - cron: '43 6 * * *'
   push:
     paths:
+      - packages/cli/src/scaffold.mjs
+      - packages/cli/src/toolchains.mjs
+      - packages/toolchains/defold-platform-pairs.json
+      - packages/toolchains/package.json
       - scripts/check-end-to-end.mjs
       - scripts/bob.sh
+      - scripts/generate-defold-bundle-targets.mjs
+      - scripts/resolve-defold-platform.mjs
+      - tests/end-to-end-gate.test.mjs
+      - tests/package-smoke.test.mjs
+      - tests/toolchain-matrix.test.mjs
       - .github/workflows/end-to-end.yml
   workflow_dispatch:
     inputs:

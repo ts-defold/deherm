@@ -141,6 +141,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   assert.equal(JSON.parse(created.stdout).projectRoot, project);
   assert.match(await readFile(path.join(project, "game.project"), "utf8"), /title = Packed smoke test/);
   assert.match(await readFile(path.join(project, "src", "main.script.ts"), "utf8"), /defineComponent/);
+  assert.equal(await readFile(path.join(project, "input", "game.input_binding"), "utf8"), "");
 
   const verified = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),

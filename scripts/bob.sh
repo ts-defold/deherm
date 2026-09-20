@@ -55,7 +55,9 @@ if [[ "$local_build" == "1" ]] && ! curl --silent --fail --max-time 2 "$build_se
   exit 1
 fi
 
-platform="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
+platform_input="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
+platform_identity="$(node "$repo_root/scripts/resolve-defold-platform.mjs" "$platform_input")"
+IFS=$'\t' read -r bundle_target bob_platform <<< "$platform_identity"
 variant="${DEFOLD_HERMES_VARIANT:-debug}"
 
 # The smoke project under defold/ is the default Bob root. A product example is
@@ -79,7 +81,7 @@ fi
 # reconciles the project's .defignore against the selected target before Bob
 # walks it; it never deletes the unit.
 node "$repo_root/scripts/assemble-typed-native-extension.mjs" \
-  --project "$project_root" --target "$platform" --reconcile
+  --project "$project_root" --target "$bundle_target" --reconcile
 
 # The project generator has already installed the package's managed extension,
 # including the archive for this exact Defold bundle target (or the generated
@@ -89,7 +91,7 @@ node "$repo_root/scripts/assemble-typed-native-extension.mjs" \
 # manufacture an arm64-macOS package from local source after scaffolding.
 # The checker verifies only the project's copied bytes against the shipped
 # target manifest; Bob does not need a local Hermes compiler or source build.
-node "$repo_root/scripts/check-project-native-artifact.mjs" "$project_root" "$platform"
+node "$repo_root/scripts/check-project-native-artifact.mjs" "$project_root" "$bundle_target"
 
 # Bob archives whatever /deherm/app.dehermc is on disk as a custom_resources
 # entry, and nothing in Bob relates that file to the TypeScript beside it. The
@@ -107,8 +109,8 @@ arguments=(
   --root "$project_root"
   --output build/bob
   --bundle-output build/bundle
-  --platform "$platform"
-  --architectures "$platform"
+  --platform "$bob_platform"
+  --architectures "$bob_platform"
   --variant "$variant"
   --build-server "$build_server"
   --verbose

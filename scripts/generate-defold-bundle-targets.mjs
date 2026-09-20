@@ -26,6 +26,11 @@ export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 export const buildInputPath = path.join(root, "upstream", "defold", "share", "extender", "build_input.yml");
 export const sdkVersionsPath = path.join(root, "upstream", "defold", "build_tools", "sdk.py");
 export const generatedPath = path.join(root, "packages", "toolchains", "defold-bundle-targets.json");
+export const platformSourcePath = path.join(
+  root,
+  "upstream", "defold", "com.dynamo.cr", "com.dynamo.cr.bob", "src", "com", "dynamo", "bob", "Platform.java"
+);
+export const platformPairsPath = path.join(root, "packages", "toolchains", "defold-platform-pairs.json");
 
 // The SDK levels each cross build has to match are pinned by the engine, not by
 // us: an Android archive built against a different NDK API level or a different
@@ -50,6 +55,38 @@ async function deriveSdkVersions() {
     versions[name] = match[1];
   }
   return versions;
+}
+
+/**
+ * Bob's command-line platform and Extender's archive key are separate fields
+ * in Defold's Platform.java. They currently differ only for macOS, but deriving
+ * the pair keeps that upstream fact out of our shell wrappers.
+ */
+export async function derivePlatformPairs(bundleTargets) {
+  bundleTargets ??= await deriveBundleTargets();
+  const source = await readFile(platformSourcePath, "utf8");
+  const entries = [];
+  for (const line of source.split(/\r?\n/u)) {
+    const match = /^\s*public static final Platform \w+\s*=\s*new Platform\([^,]+,\s*"([^"]+)",\s*(?:true|false),\s*"([^"]+)",.*,\s*"([^"]+)"\);\s*$/u.exec(line);
+    if (!match) continue;
+    const [, architecture, osName, extenderTarget] = match;
+    entries.push({ extenderTarget, bobPlatform: `${architecture}-${osName}` });
+  }
+  const byExtenderTarget = new Map(entries.map((entry) => [entry.extenderTarget, entry]));
+  const activeTargets = bundleTargets.targets.filter(({ kind }) => kind === "bundle");
+  const missing = activeTargets.filter(({ target }) => !byExtenderTarget.has(target)).map(({ target }) => target);
+  if (missing.length) {
+    throw new Error(`${path.relative(root, platformSourcePath)} declares no Bob platform for ${missing.join(", ")}`);
+  }
+  return {
+    schemaVersion: 1,
+    source: path.relative(root, platformSourcePath).split(path.sep).join("/"),
+    sourceSha256: createHash("sha256").update(source).digest("hex"),
+    defoldRevision: bundleTargets.defoldRevision,
+    platforms: activeTargets
+      .map(({ target }) => byExtenderTarget.get(target))
+      .sort((left, right) => left.extenderTarget.localeCompare(right.extenderTarget))
+  };
 }
 
 export async function deriveBundleTargets() {
@@ -105,14 +142,22 @@ export function allTargetNames(document) {
 if (import.meta.url === `file://${process.argv[1]}`) {
   const derived = await deriveBundleTargets();
   const serialized = `${JSON.stringify(derived, null, 2)}\n`;
+  const platformPairs = await derivePlatformPairs(derived);
+  const pairsSerialized = `${JSON.stringify(platformPairs, null, 2)}\n`;
   if (process.argv.includes("--check")) {
-    const current = await readFile(generatedPath, "utf8").catch(() => "");
-    if (current !== serialized) {
-      throw new Error(`${path.relative(root, generatedPath)} is stale; run node scripts/generate-defold-bundle-targets.mjs`);
+    const [current, currentPairs] = await Promise.all([
+      readFile(generatedPath, "utf8").catch(() => ""),
+      readFile(platformPairsPath, "utf8").catch(() => "")
+    ]);
+    if (current !== serialized || currentPairs !== pairsSerialized) {
+      throw new Error("Defold target metadata is stale; run node scripts/generate-defold-bundle-targets.mjs");
     }
-    console.log(`ok Defold bundle targets: ${bundleTargetNames(derived).length} bundle, ${derived.targets.length - bundleTargetNames(derived).length} retired`);
+    console.log(`ok Defold bundle targets: ${bundleTargetNames(derived).length} bundle, ${derived.targets.length - bundleTargetNames(derived).length} retired, ${platformPairs.platforms.length} Bob pairs`);
   } else {
-    await writeFile(generatedPath, serialized);
-    console.log(`wrote ${path.relative(root, generatedPath)}: ${derived.targets.map(({ target }) => target).join(", ")}`);
+    await Promise.all([
+      writeFile(generatedPath, serialized),
+      writeFile(platformPairsPath, pairsSerialized)
+    ]);
+    console.log(`wrote Defold target metadata: ${derived.targets.map(({ target }) => target).join(", ")}`);
   }
 }
