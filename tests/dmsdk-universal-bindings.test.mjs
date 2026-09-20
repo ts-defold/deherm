@@ -211,8 +211,8 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
   assert.equal(committedVerification, generated.verificationSource);
   for (const source of [generated.source, generated.verificationSource]) {
     assert.match(source,
-      /#if defined\(__linux__\) && !defined\(ANDROID\)\n#define Font DehermX11Font\n#include <GL\/glx\.h>\n#undef Font\n#endif/u,
-      "a native-graphics materialization must isolate Xlib's global Font typedef");
+      /#if defined\(__linux__\) && !defined\(ANDROID\)\n#define Font DehermX11Font\n#include <GL\/glx\.h>\n#undef Font\n#ifdef None\n#undef None\n#endif\n#endif/u,
+      "a native-graphics materialization must isolate Xlib's global Font typedef and None macro");
   }
   assert.doesNotMatch(helperSource, /dmsdk:[^"'\s]+@/, "the corpus helper must not own declaration IDs");
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-ready-census-"));

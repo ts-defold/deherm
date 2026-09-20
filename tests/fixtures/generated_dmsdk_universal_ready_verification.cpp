@@ -4,6 +4,9 @@
 #define Font DehermX11Font
 #include <GL/glx.h>
 #undef Font
+#ifdef None
+#undef None
+#endif
 #endif
 #include <defold_hermes/generated_dmsdk_universal.h>
 #include <dmsdk/ddf/ddf.h>

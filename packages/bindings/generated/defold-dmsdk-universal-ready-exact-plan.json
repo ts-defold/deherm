@@ -9,11 +9,11 @@
   "artifacts": {
     "productionSource": {
       "path": "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
-      "sha256": "58c9c32ef8516815573d3801a4e595f9406f3c4af795fb0fe825c7a6c17d6732"
+      "sha256": "1ef9c5ad564c1dad9f4f09e4b78d27e5b24f474b5567369c38b172ac6c3d7c5a"
     },
     "verificationSource": {
       "path": "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
-      "sha256": "a60a77c83b250af9b37d82f4e71113f1b7a6fb5cca441f4fde8bd0bf942adf53"
+      "sha256": "04550ae8fda7ca13a7620dfe08c6c72f70adffa193cecd9ed09cbde2b0b5a66f"
     }
   },
   "production": {
@@ -21,7 +21,7 @@
       "function": "deherm_dmsdk_universal_ready_provider",
       "install": "deherm_dmsdk_universal_ready_provider_install"
     },
-    "sourceSha256": "58c9c32ef8516815573d3801a4e595f9406f3c4af795fb0fe825c7a6c17d6732",
+    "sourceSha256": "1ef9c5ad564c1dad9f4f09e4b78d27e5b24f474b5567369c38b172ac6c3d7c5a",
     "manifest": [
       {
         "declarationId": "dmsdk:ConfigFileGetFloat@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:135:117",
@@ -59448,7 +59448,7 @@
       }
     ],
     "manifestSha256": "c560e7a676d29384cb38914674e28b226003d9410c96e4fffab59859305d2dd5",
-    "sourceSha256": "a60a77c83b250af9b37d82f4e71113f1b7a6fb5cca441f4fde8bd0bf942adf53"
+    "sourceSha256": "04550ae8fda7ca13a7620dfe08c6c72f70adffa193cecd9ed09cbde2b0b5a66f"
   },
-  "corpusSha256": "8053401affee5906892b62819466d5cc16d87955ec64f418d13006b2392ee5ae"
+  "corpusSha256": "b32f71703e710d83dcc730b79ad092336d7cacda60dd9bddda226a73f7dc1d8a"
 }

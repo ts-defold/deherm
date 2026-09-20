@@ -185,8 +185,10 @@ global-name collision: Xlib's `Font` typedef, included by
 materialization includes the native-graphics header, the compiler now primes
 the GLX include guard while spelling only Xlib's typedef as
 `DehermX11Font`, then restores the preprocessor state before including the
-authoritative Defold headers. No generated wrapper names or calls that Xlib
-type, so this is a target-scoped header-composition repair rather than an ABI
+authoritative Defold headers. It also removes Xlib's object-like `None` macro
+after the GLX declarations are complete so later Hermes enum members named
+`None` remain valid C++. No generated wrapper names or calls either Xlib name,
+so this is a target-scoped header-composition repair rather than an ABI
 translation. Materializations without native graphics do not acquire GLX.
 
 The arbitrary-extension C-header lane follows the same rule. Function identity

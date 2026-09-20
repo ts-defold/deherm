@@ -553,7 +553,10 @@ function expectedResultCheck(plan, result = "result") {
  * under a private spelling before the independently authoritative Defold
  * headers are combined. The native-graphics header already requires GLX on
  * this target; this adds no dependency and changes no declaration that a
- * generated wrapper calls.
+ * generated wrapper calls. Xlib also exports the object-like `None` macro;
+ * remove it after GLX is complete so a consumer can include Hermes' strongly
+ * scoped `RuntimeConfig::None` and debugger enums in the same translation
+ * unit.
  */
 function renderPlatformHeaderPrelude(includes) {
   if (!includes.has("#include <dmsdk/graphics/graphics_native.h>")) return "";
@@ -561,6 +564,9 @@ function renderPlatformHeaderPrelude(includes) {
     "#define Font DehermX11Font\n" +
     "#include <GL/glx.h>\n" +
     "#undef Font\n" +
+    "#ifdef None\n" +
+    "#undef None\n" +
+    "#endif\n" +
     "#endif\n";
 }
 
