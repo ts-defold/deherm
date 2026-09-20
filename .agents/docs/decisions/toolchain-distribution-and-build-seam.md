@@ -485,6 +485,13 @@ post-publication dispatch retain the full Bob matrix.
 | `host-compilers` | per-host runners | `hermesc`/`shermes` for all five hosts, into the `hermes-host` family's release |
 | `go-compiler` | one `ubuntu-24.04` | `dehermc` for all five hosts, `CGO_ENABLED=0`, into the `dehermc` family's release |
 
+The Linux lane's **runner** is Ubuntu 24.04, but `Dockerfile.linux` deliberately
+builds inside Ubuntu 22.04. The target archive therefore keeps a glibc 2.35
+floor instead of inheriting the runner's glibc: the hosted Extender link proved
+that Ubuntu 24.04 objects reference `__isoc23_*` and `arc4random`, which are not
+available in Defold's Linux target environment. This floor applies to the
+merged static ICU objects as well as Hermes itself.
+
 iOS and macOS x64 need the Apple SDKs, so they have no container path and run on
 a macOS runner. Android needs the NDK, pinned by digest inside the container
 rather than trusted from the network.

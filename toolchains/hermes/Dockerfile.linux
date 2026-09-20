@@ -45,7 +45,12 @@
 # builds only, and shipping both in one archive is what lets one download serve
 # both.
 
-FROM ubuntu:24.04
+# The archive is linked into Defold's hosted Extender environment, not into the
+# GitHub runner that builds this image. Ubuntu 24.04 compiled Hermes and static
+# ICU against glibc symbols (`__isoc23_*`, `arc4random`) newer than that target
+# environment. Build on the oldest supported floor, matching the published
+# Linux host tools, so the archive never acquires those newer symbol versions.
+FROM ubuntu:22.04
 
 ARG TARGET_ARCH=x86_64
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \

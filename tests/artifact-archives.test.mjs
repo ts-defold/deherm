@@ -196,7 +196,7 @@ test("package-archive.sh is an input to every family, because it decides the pub
   }
 });
 
-test("the Windows archiver protects MSVC's /OUT option from Git Bash path rewriting", async (t) => {
+test("the Windows archiver protects options and removes Hermes' duplicate zip member", async (t) => {
   const directory = await scratch(t);
   const build = path.join(directory, "build");
   const tools = path.join(directory, "bin");
@@ -231,9 +231,10 @@ test("the Windows archiver protects MSVC's /OUT option from Git Bash path rewrit
   });
 
   const args = (await readFile(capture, "utf8")).trimEnd().split("\n");
-  assert.equal(args[0], "/OUT:");
+  assert.equal(args[0], "/OUT:;/REMOVE:");
   assert.equal(args[1], "/OUT:C:\\native\\hermes.lib");
-  assert.deepEqual(args.slice(2), [
+  assert.equal(args[2], "/REMOVE:zip.c.obj");
+  assert.deepEqual(args.slice(3), [
     path.join(build, "lib", "hermesvm_a.lib"),
     path.join(build, "jsi", "jsi.lib")
   ]);
@@ -268,6 +269,15 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
   assert.match(source, /if\(NOT IS_DIRECTORY "\$\{include_root\}"\)/);
   assert.match(source, /set\(CMAKE_ASM_COMPILER_TARGET x86_64-pc-win32-msvc\)/);
   assert.match(source, /set\(CMAKE_ASM_FLAGS_INIT "-target x86_64-pc-win32-msvc -m64"\)/);
+});
+
+test("the Linux target archive keeps the glibc 2.35 compatibility floor", async () => {
+  const dockerfile = await readFile(
+    path.join(repositoryRoot, "toolchains/hermes/Dockerfile.linux"),
+    "utf8"
+  );
+  assert.match(dockerfile, /^FROM ubuntu:22\.04$/mu);
+  assert.doesNotMatch(dockerfile, /^FROM ubuntu:24\.04$/mu);
 });
 
 test("the POSIX packager merges explicit static runtime dependencies", async (t) => {

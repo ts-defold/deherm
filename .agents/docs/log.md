@@ -169,6 +169,24 @@
   checkout/package assembly mismatch; it does not by itself prove any target
   ABI until the full hosted Extender matrix passes.
 
+* **The next real target-specific failure is owned by the Windows archive
+  recipe**: after header staging, hosted Extender compiled every extension
+  source and reached the final `x86_64-win32` link, where `hermes.lib(zip.c.obj)`
+  collided with Defold's authoritative `zip.lib(zip.c.obj)`. The MSVC packager
+  now removes that unused compiler-side archive member, matching the existing
+  POSIX packaging rule, and protects both `/OUT:` and `/REMOVE:` from MSYS2 path
+  rewriting. This is recipe evidence until the fingerprinted Windows archive is
+  rebuilt, published, and linked by hosted Extender.
+
+* **Both Linux archives had inherited the builder's newer glibc instead of the
+  target's compatibility floor**: hosted Extender compiled the complete
+  extension, then rejected `__isoc23_strtol`, `__isoc23_strtoul`,
+  `__isoc23_strtoll`, `__isoc23_fscanf`, and `arc4random` references from the
+  Ubuntu 24.04-built Hermes/ICU archive. `Dockerfile.linux` now builds inside
+  Ubuntu 22.04 (glibc 2.35), matching the existing Linux host-tool floor. A
+  focused test pins that base. This is recipe evidence until both rebuilt Linux
+  target archives pass the hosted Extender link.
+
 ## 2026-09-20 - GitHub issues are the external roadmap ledger
 
 * **Every execution wave now owns issue reconciliation**: the existing open
