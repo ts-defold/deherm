@@ -186,7 +186,10 @@ native-artifacts summary verifies every row and dispatches the full end-to-end
 workflow after publication. The dispatched run never defers the stage. Cheap
 push proofs and full dispatched proofs use separate concurrency keys, so a
 follow-up push may replace an obsolete cheap run but cannot cancel the Bob
-matrix consuming the just-published artifacts.
+matrix consuming the just-published artifacts. The native summary dispatches
+that full proof after verifying every row even when the current invocation was
+a no-op; published assets, rather than `build_any`, are the ordering boundary
+and a canceled full proof is therefore recoverable without rebuilding bytes.
 
 The published Linux compilers are built on `ubuntu-22.04` runners, which sets
 their glibc floor at 2.35.

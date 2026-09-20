@@ -113,6 +113,7 @@ test("the Bob matrix consumes the package's pinned Hermes public headers", async
 
 test("pushes run the available cheap consumer half while artifact-dispatched runs require every artifact", async () => {
   const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
+  const nativeWorkflow = await readFile(new URL("../.github/workflows/native-artifacts.yml", import.meta.url), "utf8");
   const local = workflow.slice(workflow.indexOf("  local:"), workflow.indexOf("  extension-headers:"));
   assert.match(local, /if \[ "\$\{\{ github\.event_name \}\}" != push \]; then[\s\S]*stages\+=\(--stage target-archives\)/u);
   assert.match(local, /--stage policy[\s\S]*--stage scaffold[\s\S]*--stage generate/u);
@@ -123,6 +124,9 @@ test("pushes run the available cheap consumer half while artifact-dispatched run
   assert.match(workflow, /group: end-to-end-\$\{\{ github\.ref \}\}-\$\{\{ github\.event_name == 'push' && 'push' \|\| 'full' \}\}/u);
   assert.match(workflow, /extension-headers:[\s\S]*if: github\.event_name != 'push'/u);
   assert.match(workflow, /bob:[\s\S]*if: github\.event_name != 'push'/u);
+  const dispatch = nativeWorkflow.slice(nativeWorkflow.indexOf("Verify every fingerprinted row is published"));
+  assert.match(dispatch, /Run full end-to-end after every fingerprinted row is published[\s\S]*gh workflow run end-to-end\.yml/u);
+  assert.doesNotMatch(dispatch, /if: needs\.plan\.outputs\.build_any == 'true'/u);
 });
 
 test("Bob consumes the generated project's target artifact instead of rebuilding a host-native package", async () => {

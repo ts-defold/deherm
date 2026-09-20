@@ -636,8 +636,10 @@ jobs:
               row.missing.map((asset) => `${family}: ${asset}`));
             if (missing.length) throw new Error(`fingerprinted release rows remain unpublished:\n${missing.join("\n")}`);
           '
-      - name: Run end-to-end only after changed artifacts are published
-        if: needs.plan.outputs.build_any == 'true'
+      # Verification, not whether this invocation happened to compile a row, is
+      # the ordering boundary. A no-op retry may be exactly how a canceled full
+      # consumer run is recovered after all immutable assets already exist.
+      - name: Run full end-to-end after every fingerprinted row is published
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"
