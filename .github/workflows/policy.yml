@@ -252,10 +252,18 @@ jobs:
         with:
           path: upstream/dmsdk-parse-sysroot
           key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
-      # Both inputs participate in dmSDK generation: headers come from the
-      # Defold checkout and documentation/type metadata comes from ref-doc.zip.
-      # A parity runner must materialize the same authoritative pair as derive.
-      - run: ./scripts/bootstrap-upstreams.sh defold ref-doc
+      - id: defold-sdk
+        run: sed -n 's/^DEFOLD_SDK_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: upstream/defoldsdk.zip
+          key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
+      # All three inputs participate in dmSDK generation: public headers come
+      # from the Defold checkout, documentation/type metadata comes from
+      # ref-doc.zip, and generated DDF/platform support types come from the
+      # digest-pinned SDK for the same revision. A parity runner must
+      # materialize the same authoritative inputs as derivation.
+      - run: ./scripts/bootstrap-upstreams.sh defold ref-doc defold-sdk
       - run: ${{ matrix.python }} scripts/import-defold-sdk.py --check
       - run: node scripts/generate-dmsdk-sdk.mjs --check
       - run: node scripts/generate-dmsdk-target-conditionals.mjs --check
