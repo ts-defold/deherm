@@ -77,9 +77,18 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /needs: \[derive, host-parity\]/u);
   assert.match(publish, /needs\.host-parity\.result == 'success'/u);
   assert.match(workflow, /manage-native-artifacts\.mjs pull --target x86_64-linux/u);
+  assert.match(engine, /Wait for the content-addressed Linux archive/u);
+  assert.match(engine, /manage-native-artifacts\.mjs tag/u);
+  assert.match(engine, /hermes-x86_64-linux\.tar\.gz/u);
+  assert.match(engine, /deadline=\$\(\(SECONDS \+ 2700\)\)/u);
   assert.doesNotMatch(workflow, /pnpm artifacts:pull/u);
   assert.match(engine, /pnpm check:exact-call-materializers/u);
   assert.match(engine, /DEHERM_REQUIRE_PACKAGED_HERMES: '1'/u);
+  assert.ok(
+    engine.indexOf("Wait for the content-addressed Linux archive") <
+      engine.indexOf("manage-native-artifacts.mjs pull --target x86_64-linux"),
+    "the policy engine lane must wait for its exact content-addressed archive before pulling"
+  );
   assert.ok(
     engine.indexOf("manage-native-artifacts.mjs pull --target x86_64-linux") <
       engine.indexOf("pnpm check:exact-call-materializers"),

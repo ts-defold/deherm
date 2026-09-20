@@ -82,6 +82,14 @@ unproven API route is evidence and does not fail the job; failure to run the
 evidence machinery itself is a CI failure. This prevents a green wrapper from
 masking a compiler or engine-launch defect.
 
+The engine lane consumes the exact content-addressed Linux Hermes archive named
+by its checkout. Native artifact publication is a separate workflow, so a push
+that changes that fingerprint can start both graphs concurrently. The engine
+lane therefore waits up to 45 minutes for that exact release row before pulling
+it. A bounded wait removes the publication race without accepting an older
+archive; timeout remains an infrastructure failure and is reconciled through the
+same evidence issue.
+
 The consumer smoke is deliberately after publication and resolves
 `https://ts-defold.dev/deherm`; the local relocation/tamper test is not accepted
 as evidence that Pages deployed the new bytes. It waits for the public manifest

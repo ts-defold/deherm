@@ -1,5 +1,16 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Policy engine evidence waits for its exact native input
+
+* **The policy/native-artifact race is now explicit and bounded**: run
+  `35510063943` generated, reproduced, published, and resolved the policy store,
+  but its engine-evidence job requested `libs-0a6894a8e8e1` before the concurrent
+  artifact workflow had published `hermes-x86_64-linux.tar.gz`. The engine lane
+  now polls the exact tag/asset for at most 45 minutes before pulling; it never
+  substitutes an older archive, and timeout remains a red infrastructure
+  failure. This is orchestration evidence, not a replacement for the subsequent
+  Bob compile/link/runtime result.
+
 ## 2026-09-20 - Native archive ABI guards corrected before republishing
 
 * **Windows duplicate-symbol packaging now follows the archiver actually in

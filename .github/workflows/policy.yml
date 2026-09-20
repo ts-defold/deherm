@@ -294,6 +294,23 @@ jobs:
           path: upstream/defoldsdk.zip
           key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
       - run: bash scripts/bootstrap-upstreams.sh defold hermes extender ref-doc defold-sdk
+      - name: Wait for the content-addressed Linux archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$(node scripts/manage-native-artifacts.mjs tag)"
+          asset=hermes-x86_64-linux.tar.gz
+          deadline=$((SECONDS + 2700))
+          while ! gh release view "$tag" --repo "${{ github.repository }}" --json assets \
+            --jq '.assets[].name' 2>/dev/null | grep -Fxq "$asset"; do
+            if (( SECONDS >= deadline )); then
+              echo "Timed out waiting for $asset in $tag" >&2
+              exit 1
+            fi
+            echo "::notice::Waiting for native-artifacts to publish $asset in $tag"
+            sleep 30
+          done
       - name: Pull the Linux Hermes target archive
         run: node scripts/manage-native-artifacts.mjs pull --target x86_64-linux
       - name: Compile and run generated dmSDK and extension exact-call twins
