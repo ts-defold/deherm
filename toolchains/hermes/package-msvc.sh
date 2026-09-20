@@ -76,4 +76,51 @@ else
     exit 1
   fi
 fi
+
+# Defold's Windows libraries carry `/FAILIFMISMATCH` directives for the static
+# release CRT. A green archive build is not evidence that Hermes matches them:
+# `/MD` archives package successfully and fail only when Extender combines them
+# with Defold's `/MT` engine libraries. Inspect the produced COFF members and
+# refuse every dynamic or mixed runtime before publication.
+directives_tool="${COFF_DIRECTIVES_TOOL:-}"
+directives_mode=""
+if [[ -z "$directives_tool" ]]; then
+  if command -v llvm-readobj >/dev/null 2>&1; then
+    directives_tool="llvm-readobj"
+    directives_mode="llvm"
+  elif command -v dumpbin >/dev/null 2>&1; then
+    directives_tool="dumpbin"
+    directives_mode="dumpbin"
+  else
+    echo "package-msvc: llvm-readobj or dumpbin is required to verify the COFF runtime contract" >&2
+    exit 1
+  fi
+else
+  directives_name="$(basename "$directives_tool" | tr '[:upper:]' '[:lower:]')"
+  if [[ "$directives_name" == dumpbin* ]]; then
+    directives_mode="dumpbin"
+  else
+    directives_mode="llvm"
+  fi
+fi
+
+if [[ "$directives_mode" == "dumpbin" ]]; then
+  coff_directives="$(MSYS2_ARG_CONV_EXCL="/DIRECTIVES;/NOLOGO" "$directives_tool" /NOLOGO /DIRECTIVES "$lib_output")"
+else
+  coff_directives="$("$directives_tool" --coff-directives "$output")"
+fi
+
+runtime_values="$(grep -oE 'RuntimeLibrary=[A-Za-z_]+' <<< "$coff_directives" | sort -u || true)"
+if [[ "$runtime_values" != "RuntimeLibrary=MT_StaticRelease" ]]; then
+  echo "package-msvc: $output has an incompatible or mixed MSVC runtime contract: ${runtime_values:-missing}" >&2
+  exit 1
+fi
+if grep -Eiq 'DEFAULTLIB:msvcrtd?\.lib' <<< "$coff_directives"; then
+  echo "package-msvc: $output still requests the dynamic MSVC runtime" >&2
+  exit 1
+fi
+if ! grep -Eiq 'DEFAULTLIB:libcmt\.lib' <<< "$coff_directives"; then
+  echo "package-msvc: $output does not request Defold's static MSVC runtime" >&2
+  exit 1
+fi
 echo "package-msvc: wrote $output from ${#members[@]} library file(s)"

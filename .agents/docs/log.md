@@ -1,5 +1,18 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Windows archives now match Defold's static CRT contract
+
+* **The duplicate ZIP object was real but not the only Windows incompatibility**:
+  corrected release `libs-f8d8d7e4c0ad` contains neither `zip.c.obj` nor an
+  unresolved `zip_*` symbol in either library, and Extender advanced to the
+  next link check. It then rejected Hermes' `RuntimeLibrary=MD_DynamicRelease`
+  against Defold Bullet's `MT_StaticRelease`. The Windows cross toolchain and
+  native fallback now select CMake `MultiThreaded` (`/MT`) before targets are
+  created. Packaging enumerates the emitted COFF directives, requires the sole
+  runtime value to be `MT_StaticRelease`, requires `libcmt.lib`, and rejects
+  `msvcrt.lib` before publication. The next fingerprinted Windows asset and Bob
+  link remain the publication and integration proof.
+
 ## 2026-09-20 - Published Windows archive inspection rejected a false green
 
 * **The release bytes overruled the packaging job**: after

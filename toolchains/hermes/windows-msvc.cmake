@@ -7,6 +7,15 @@ set(CMAKE_C_COMPILER_TARGET x86_64-pc-win32-msvc)
 set(CMAKE_CXX_COMPILER_TARGET x86_64-pc-win32-msvc)
 set(CMAKE_ASM_COMPILER_TARGET x86_64-pc-win32-msvc)
 
+# Defold's Windows SDK archives are compiled against the static release CRT
+# (`/MT`, recorded in COFF as `RuntimeLibrary=MT_StaticRelease`). Hermes' CMake
+# default is the DLL runtime (`/MD`), and lld refuses to combine the resulting
+# objects with Defold's `libBulletDynamics.lib` before an engine can be linked.
+# Set this before Hermes' first `project()` enables an MSVC-ABI language so
+# CMP0091 initializes every target, including JSI, with the Defold contract.
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded" CACHE STRING
+  "Use Defold's statically linked MSVC release runtime" FORCE)
+
 # The Extender image carries the exact MSVC and Windows SDK headers Defold uses,
 # but clang's GNU-style driver does not discover those roots merely because its
 # target triple names MSVC.  A trivial CMake compiler probe still succeeds in

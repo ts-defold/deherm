@@ -209,13 +209,17 @@ test("native MSVC packaging protects options and removes Hermes' duplicate zip m
 
   const cygpath = path.join(tools, "cygpath");
   const archiver = path.join(tools, "mock-lib");
+  const readobj = path.join(tools, "llvm-readobj");
   await writeFile(cygpath, "#!/usr/bin/env bash\nprintf 'C:\\\\native\\\\hermes.lib\\n'\n");
   await writeFile(
     archiver,
     "#!/usr/bin/env bash\nif [[ \"$1\" == /LIST ]]; then exit 0; fi\nprintf '%s\\n' \"$MSYS2_ARG_CONV_EXCL\" \"$@\" > \"$CAPTURE\"\n"
   );
-  await chmod(cygpath, 0o755);
-  await chmod(archiver, 0o755);
+  await writeFile(
+    readobj,
+    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:libcmt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MT_StaticRelease\"'\n"
+  );
+  await Promise.all([chmod(cygpath, 0o755), chmod(archiver, 0o755), chmod(readobj, 0o755)]);
 
   await execFileAsync("bash", [
     path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"),
@@ -256,6 +260,7 @@ test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
   const cygpath = path.join(tools, "cygpath");
   const archiver = path.join(tools, "llvm-lib");
   const editor = path.join(tools, "llvm-ar");
+  const readobj = path.join(tools, "llvm-readobj");
   await writeFile(cygpath, "#!/usr/bin/env bash\nprintf 'C:\\\\native\\\\hermes.lib\\n'\n");
   await writeFile(
     archiver,
@@ -279,7 +284,11 @@ test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
       "touch \"$REMOVED\""
     ].join("\n") + "\n"
   );
-  await Promise.all([chmod(cygpath, 0o755), chmod(archiver, 0o755), chmod(editor, 0o755)]);
+  await writeFile(
+    readobj,
+    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:libcmt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MT_StaticRelease\"'\n"
+  );
+  await Promise.all([chmod(cygpath, 0o755), chmod(archiver, 0o755), chmod(editor, 0o755), chmod(readobj, 0o755)]);
 
   const output = path.join(directory, "hermes.lib");
   await execFileAsync("bash", [
@@ -306,6 +315,48 @@ test("the Extender llvm-lib path deletes zip.c.obj with llvm-ar", async (t) => {
     path.join(build, "jsi", "jsi.lib")
   ]);
   assert.deepEqual((await readFile(arCapture, "utf8")).trimEnd().split("\n"), ["d", output, "zip.c.obj"]);
+});
+
+test("MSVC packaging rejects a dynamic CRT archive before publication", async (t) => {
+  const directory = await scratch(t);
+  const build = path.join(directory, "build");
+  const tools = path.join(directory, "bin");
+  await mkdir(path.join(build, "lib"), { recursive: true });
+  await mkdir(path.join(build, "jsi"), { recursive: true });
+  await mkdir(tools, { recursive: true });
+  await writeFile(path.join(build, "lib", "hermesvm_a.lib"), "hermes");
+  await writeFile(path.join(build, "jsi", "jsi.lib"), "jsi");
+
+  const archiver = path.join(tools, "llvm-lib");
+  const editor = path.join(tools, "llvm-ar");
+  const readobj = path.join(tools, "llvm-readobj");
+  await writeFile(archiver, "#!/usr/bin/env bash\nexit 0\n");
+  await writeFile(editor, "#!/usr/bin/env bash\nif [[ \"$1\" == t ]]; then exit 0; fi\n");
+  await writeFile(
+    readobj,
+    "#!/usr/bin/env bash\nprintf '%s\\n' 'Directive(s): /DEFAULTLIB:msvcrt.lib /FAILIFMISMATCH:\"RuntimeLibrary=MD_DynamicRelease\"'\n"
+  );
+  await Promise.all([chmod(archiver, 0o755), chmod(editor, 0o755), chmod(readobj, 0o755)]);
+
+  await assert.rejects(
+    execFileAsync("bash", [
+      path.join(repositoryRoot, "toolchains/hermes/package-msvc.sh"),
+      build,
+      path.join(directory, "hermes.lib")
+    ], {
+      env: {
+        ...process.env,
+        AR_TOOL: editor,
+        COFF_DIRECTIVES_TOOL: readobj,
+        LIB_TOOL: archiver,
+        PATH: `${tools}:${process.env.PATH}`
+      }
+    }),
+    (error) => {
+      assert.match(error.stderr ?? "", /MD_DynamicRelease/);
+      return true;
+    }
+  );
 });
 
 test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () => {
@@ -337,6 +388,13 @@ test("the Windows cross toolchain uses Defold's MSVC and SDK headers", async () 
   assert.match(source, /if\(NOT IS_DIRECTORY "\$\{include_root\}"\)/);
   assert.match(source, /set\(CMAKE_ASM_COMPILER_TARGET x86_64-pc-win32-msvc\)/);
   assert.match(source, /set\(CMAKE_ASM_FLAGS_INIT "-target x86_64-pc-win32-msvc -m64"\)/);
+  assert.match(source, /set\(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded"/);
+
+  const nativeBuild = await readFile(
+    path.join(repositoryRoot, "toolchains/hermes/build-windows.sh"),
+    "utf8"
+  );
+  assert.match(nativeBuild, /-DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded/);
 });
 
 test("the Linux target archive keeps the glibc 2.35 compatibility floor", async () => {

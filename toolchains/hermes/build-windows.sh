@@ -91,6 +91,7 @@ build_variant() {
   local suffix="$1" debugger="$2" library="$3"
   cmake -S "$hermes_source" -B "$work$suffix" -G Ninja \
     -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_MSVC_RUNTIME_LIBRARY=MultiThreaded \
     -DHERMES_ENABLE_TEST_SUITE=OFF \
     -DHERMES_ENABLE_TOOLS=ON \
     -DHERMES_ENABLE_NAPI=OFF \
