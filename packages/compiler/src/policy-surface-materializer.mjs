@@ -17,7 +17,9 @@ import {
 } from "./sdk/dmsdk-sdk.mjs";
 import {
   generateDmSdkBrowserArena,
+  generateDmSdkScalar,
   generateDmSdkUniversal,
+  generateScriptBrowserTargetSupport,
   generateScriptHandleLowering,
   generateScriptUniversalValue
 } from "./sdk/support-sdk.mjs";
@@ -43,6 +45,8 @@ const SDK_RECIPES = Object.freeze({
   "dmsdk/index.ts": "sdk.dmsdk.index.render.v1",
   "script/handle-lowering.ts": "sdk.script.handle-lowering.render.v1",
   "script/universal-value-bindings.ts": "sdk.script.universal-value.render.v1",
+  "script/browser-target-support.ts": "sdk.script.browser-target-support.render.v1",
+  "dmsdk/scalar.ts": "sdk.dmsdk.scalar.render.v1",
   "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
   "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1"
 });
@@ -223,6 +227,8 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     ...renderDmSdk(documents[DMSDK_IR]),
     "script/handle-lowering.ts": generateScriptHandleLowering(documents[HANDLE_LOWERING]),
     "script/universal-value-bindings.ts": generateScriptUniversalValue(documents["defold-script-universal-value-bindings.json"]),
+    "script/browser-target-support.ts": generateScriptBrowserTargetSupport(documents["defold-script-universal-value-bindings.json"]),
+    "dmsdk/scalar.ts": generateDmSdkScalar(documents["defold-dmsdk-scalar-thunks.json"], documents[DMSDK_IR]),
     "dmsdk/universal.ts": generateDmSdkUniversal(documents["defold-dmsdk-universal-bindings.json"]),
     "dmsdk/browser-arena.ts": generateDmSdkBrowserArena(documents["defold-dmsdk-universal-bindings.json"])
   };

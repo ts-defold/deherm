@@ -21,8 +21,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "9149470ec631bc4e84a2724c955d64d8f130601a106719403565ed1b0dfc1ecd",
-      "generator": "sha256:cf198d49a0e706fb024f89f32268618a8486e59c98a09d40f5a4088f4a4973de",
+      "policyRoot": "ae7e6c2bd88218857250bc036e33a2114e6efb3724b04e28bbe7d521570d4670",
+      "generator": "sha256:342d8d6828f7869e0cbe95d9d458e4644f92ef0cf651a7fedaa33d9f9a587d65",
       "realizer": {
         "minimumPackageVersion": "0.0.0",
         "requiredCapabilities": [
@@ -35,8 +35,10 @@
           "sdk.dmsdk.browser-arena.render.v1",
           "sdk.dmsdk.index.render.v1",
           "sdk.dmsdk.runtime.render.v1",
+          "sdk.dmsdk.scalar.render.v1",
           "sdk.dmsdk.types.render.v1",
           "sdk.dmsdk.universal.render.v1",
+          "sdk.script.browser-target-support.render.v1",
           "sdk.script.handle-lowering.render.v1",
           "sdk.script.index.render.v1",
           "sdk.script.modules.render.v1",

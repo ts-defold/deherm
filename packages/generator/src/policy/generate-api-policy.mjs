@@ -85,6 +85,8 @@ const locallyRenderedSdkSources = new Set([
   "dmsdk/index.ts",
   "script/handle-lowering.ts",
   "script/universal-value-bindings.ts",
+  "script/browser-target-support.ts",
+  "dmsdk/scalar.ts",
   "dmsdk/universal.ts",
   "dmsdk/browser-arena.ts"
 ]);
@@ -99,6 +101,8 @@ const locallyRenderedSdkRecipes = Object.freeze({
   "dmsdk/index.ts": "sdk.dmsdk.index.render.v1",
   "script/handle-lowering.ts": "sdk.script.handle-lowering.render.v1",
   "script/universal-value-bindings.ts": "sdk.script.universal-value.render.v1",
+  "script/browser-target-support.ts": "sdk.script.browser-target-support.render.v1",
+  "dmsdk/scalar.ts": "sdk.dmsdk.scalar.render.v1",
   "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
   "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1"
 });
@@ -113,6 +117,8 @@ const locallyRenderedSdkInputs = Object.freeze({
   "dmsdk/index.ts": Object.freeze([]),
   "script/handle-lowering.ts": Object.freeze(["defold-script-handle-lowering.json"]),
   "script/universal-value-bindings.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
+  "script/browser-target-support.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
+  "dmsdk/scalar.ts": Object.freeze(["defold-dmsdk-scalar-thunks.json", "defold-sdk-ir.json"]),
   "dmsdk/universal.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"]),
   "dmsdk/browser-arena.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"])
 });

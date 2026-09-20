@@ -22,7 +22,9 @@ export {
 } from "./sdk/dmsdk-sdk.mjs";
 export {
   generateDmSdkBrowserArena,
+  generateDmSdkScalar,
   generateDmSdkUniversal,
+  generateScriptBrowserTargetSupport,
   generateScriptHandleLowering,
   generateScriptUniversalValue
 } from "./sdk/support-sdk.mjs";

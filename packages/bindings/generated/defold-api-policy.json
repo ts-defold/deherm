@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:cf198d49a0e706fb024f89f32268618a8486e59c98a09d40f5a4088f4a4973de",
+  "generator": "sha256:342d8d6828f7869e0cbe95d9d458e4644f92ef0cf651a7fedaa33d9f9a587d65",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "9149470ec631bc4e84a2724c955d64d8f130601a106719403565ed1b0dfc1ecd",
+  "policyRoot": "ae7e6c2bd88218857250bc036e33a2114e6efb3724b04e28bbe7d521570d4670",
   "layoutVersion": "v1",
   "counts": {
-    "subtrees": 85,
+    "subtrees": 83,
     "namespaces": 52,
-    "objectBytes": 28293582,
+    "objectBytes": 28286461,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,8 +54,8 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "72a22ee328f80ae06bf1d60e4723eff095e0d1d95e2a85e080ca4e4a1181b291",
-      "bytes": 11727
+      "hash": "0bb660b09631763cd05e6939c48652b52314f671cbb1ba09dbb02767ab6cc469",
+      "bytes": 11691
     },
     "@compiler:document:defold-binding-lowering-plan.json": {
       "hash": "3c1628e2bbec9db93cc6a2437c06a0e780f7e088449f2778f0b74e9f618e6872",
@@ -121,17 +121,9 @@
       "hash": "1e33d2c1638c5c63076c4058f12cbcaef9a8ff37caef68d0a263ede4f9a9bdec",
       "bytes": 329
     },
-    "@compiler:sdk:dmsdk/scalar.ts": {
-      "hash": "09d42c6eb7068765e074afb5d230645c4f45b60a98cc406daa404826481229e4",
-      "bytes": 6326
-    },
     "@compiler:sdk:dmsdk/scratch-scalar-out.ts": {
       "hash": "2a55876f6db24ca4316e1efca5417c2b27403bd73834858c32c03930ccb042a7",
       "bytes": 5500
-    },
-    "@compiler:sdk:script/browser-target-support.ts": {
-      "hash": "050cd30abc726d29346f5e8f1f01d86e43d5b04a928768ac1e0e50e6d5222e25",
-      "bytes": 759
     },
     "@compiler:sdk:script/callback-lifecycle.ts": {
       "hash": "9f73c6a2a353a987344b691d84644ccd60f79346c7891bee10ebf2b5cf181e6d",

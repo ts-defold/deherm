@@ -3,17 +3,27 @@ import path from "node:path";
 
 import { normalizeDefoldRevision } from "./defold-revision.mjs";
 
-const packageRoot = path.resolve(import.meta.dirname, "../../..");
+const installedPackageRoot = path.resolve(import.meta.dirname, "../../..");
 
-// A scaffold has no editor, no Bob and no build to witness an engine revision,
-// so it states the one this package can actually generate for. That is a
-// declaration the project makes about itself, checked against Bob or a real
-// build the moment either exists - not a silent default applied at generation
-// time, which is the failure this whole lane exists to remove.
-async function packagedDefoldRevision() {
-  const ir = JSON.parse(await readFile(
-    path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json"), "utf8"));
-  return normalizeDefoldRevision(ir.defoldRevision, "the packaged Defold script API IR revision");
+// A scaffold has no editor, Bob, or build to witness an engine revision, so it
+// uses the package's explicit offline policy seed. The index is the
+// revision-to-policy authority; generated SDK/IR files are materialized outputs
+// and must never become a second source of revision truth.
+async function packagedDefoldRevision(packageRoot = installedPackageRoot) {
+  const index = JSON.parse(await readFile(
+    path.join(packageRoot, "packages", "bindings", "generated", "defold-policy-index.json"), "utf8"));
+  if (index.schemaVersion !== 1 || index.kind !== "deherm.policy.index" || !Array.isArray(index.entries)) {
+    throw new Error("The packaged Defold policy index is invalid");
+  }
+  if (index.entries.length !== 1) {
+    throw new Error(
+      `The packaged Defold policy index must contain exactly one offline policy entry; found ${index.entries.length}`
+    );
+  }
+  return normalizeDefoldRevision(
+    index.entries[0].defoldRevision,
+    "the packaged Defold policy index revision"
+  );
 }
 
 function projectSlug(value) {
@@ -71,7 +81,7 @@ export async function createDefoldProject(options = {}) {
   const name = projectTitle(options.name ?? path.basename(target));
   const defoldRevision = options.defoldRevision
     ? normalizeDefoldRevision(options.defoldRevision, "createDefoldProject defoldRevision")
-    : await packagedDefoldRevision();
+    : await packagedDefoldRevision(options.packageRoot ?? installedPackageRoot);
   const files = templateFiles({ name, packageVersion: options.packageVersion ?? "0.0.0", defoldRevision });
   for (const [relative, source] of files) {
     const output = path.join(target, relative);

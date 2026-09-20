@@ -46,11 +46,11 @@ test("authenticated policy materializes the complete generated SDK without a Def
     .filter(([, record]) => record.mode === "render-and-verify").map(([name]) => name).sort();
   const snapshots = Object.entries(first.descriptor.sdk)
     .filter(([, record]) => record.mode === "authenticated-compatibility-source").map(([name]) => name).sort();
-  assert.equal(rendered.length, 11);
+  assert.equal(rendered.length, 13);
   assert.deepEqual(snapshots, [
     "dmsdk/borrowed-handle.ts", "dmsdk/cstring-value.ts",
-    "dmsdk/enum-value.ts", "dmsdk/named-scalar.ts", "dmsdk/scalar.ts",
-    "dmsdk/scratch-scalar-out.ts", "script/browser-target-support.ts",
+    "dmsdk/enum-value.ts", "dmsdk/named-scalar.ts",
+    "dmsdk/scratch-scalar-out.ts",
     "script/callback-lifecycle.ts", "script/copied-value-record-blockers.ts",
     "script/dynamic-values.ts", "script/fixed-tuple-target-support.ts",
     "script/opaque-record-blockers.ts", "script/overload-dispatch-target-support.ts",
@@ -68,7 +68,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_427_496, snapshots: 84_745 },
+  assert.deepEqual(bytesByMode, { rendered: 3_434_070, snapshots: 78_171 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));
