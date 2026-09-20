@@ -117,6 +117,26 @@ async function layerProvides(candidate, revision) {
     }
   }
   if (missing.length) return { ok: false, missing };
+  if (candidate.descriptor) {
+    let descriptor;
+    try {
+      descriptor = JSON.parse(await readFile(candidate.descriptor, "utf8"));
+    } catch (error) {
+      return { ok: false, missing: ["surface.json"], error: error?.code === "ENOENT" ? undefined : error.message };
+    }
+    if (descriptor.kind !== "deherm.materialized-defold-surface" || descriptor.defoldRevision !== revision) {
+      return { ok: false, missing: [], revision: descriptor.defoldRevision, error: "invalid surface descriptor" };
+    }
+    for (const relative of Object.keys(descriptor.sdk ?? {})) {
+      try {
+        const information = await stat(path.join(candidate.sdkRoot, "generated", relative));
+        if (!information.isFile()) missing.push(`sdk/generated/${relative}`);
+      } catch {
+        missing.push(`sdk/generated/${relative}`);
+      }
+    }
+    if (missing.length) return { ok: false, missing };
+  }
   let declared;
   try {
     declared = JSON.parse(await readFile(path.join(candidate.irRoot, surfaceIrFiles.scriptIrPath), "utf8")).defoldRevision;
@@ -183,9 +203,9 @@ export async function resolveDefoldSurface(revision, options = {}) {
         `No generated Defold API surface is available for engine revision ${revision}.`,
         "Searched:",
         ...searched.map((entry) => `  - ${entry.layer}: ${entry.root} (${entry.reason})`),
-        "Building one for a revision reads that revision's engine/share/ref-doc.zip from",
-        "https://d.defold.com/archive/<revision>/ and its engine source tree, so it needs network access",
-        "and is a separate, explicit step - never something `deherm generate` does silently.",
+        "Run `deherm policy --defold-sdk <revision-or-SDK>` to fetch the authenticated published policy",
+        "and materialize its revision-keyed surface using the compiler shipped in this package.",
+        "No Defold source checkout or reference archive is required for a published revision.",
         "Until that surface exists, generating for this revision would mean emitting another revision's",
         "signatures, which is refused."
       ].join("\n")

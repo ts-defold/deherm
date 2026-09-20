@@ -508,6 +508,7 @@ export async function run(argv = process.argv.slice(2)) {
       console.log(`Verified Defold ${summary.defoldRevision} -> policy ${summary.policyRoot.slice(0, 12)}`);
       console.log(`${summary.namespaces} namespaces, ${summary.objects} authenticated objects; ${summary.written} cache file(s) written`);
       console.log(`Cache: ${summary.cacheRoot}`);
+      if (result.surface) console.log(`Surface: ${result.surface.outputRoot} (${result.surface.written.length} file(s) updated)`);
     }
     return 0;
   }

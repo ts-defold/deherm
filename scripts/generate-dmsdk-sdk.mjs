@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { strFromU8, unzipSync } from "fflate";
 import { safeParameterIdentifier } from "../packages/cli/src/names.mjs";
 
@@ -37,7 +37,7 @@ function normalizeType(raw) {
   return String(raw || "void").replace(/\b(?:const|volatile|restrict)\b/g, "").replace(/\s+/g, " ").trim();
 }
 
-function createTypeRenderer(ir) {
+export function createTypeRenderer(ir) {
   const declarations = new Map();
   for (const declaration of ir.declarations) {
     if (["record", "enum", "type-alias"].includes(declaration.kind) && !declarations.has(declaration.name)) {
@@ -269,7 +269,7 @@ function enumType(declaration) {
     : `DmNativeType<${JSON.stringify(declaration.name)}>`;
 }
 
-function generateTypes(ir, renderer) {
+export function generateTypes(ir, renderer) {
   const { renderType } = renderer;
   const groups = new Map();
   for (const declaration of ir.declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call")) {
@@ -344,7 +344,7 @@ function generateTypes(ir, renderer) {
   return lines.join("\n");
 }
 
-function generateRuntime(ir, renderer) {
+export function generateRuntime(ir, renderer) {
   const groups = new Map();
   for (const declaration of ir.declarations.filter((item) => callableKinds.has(item.kind) && item.disposition === "generated-raw-call")) {
     const declarations = groups.get(declaration.name) ?? [];
@@ -400,6 +400,7 @@ async function output(file, contents) {
   await writeFile(file, normalized);
 }
 
+async function main() {
 const inventory = JSON.parse(await readFile(inventoryPath, "utf8"));
 const referenceArchive = unzipSync(new Uint8Array(await readFile(path.join(root, "upstream", "ref-doc.zip"))));
 const ir = enrich({ ...inventory, declarations: attachDocumentation(inventory, docsByHeader(referenceArchive)) });
@@ -424,3 +425,6 @@ await output(
   `${banner}\nexport * from "./types";\nexport * from "./runtime";\nexport * from "./scalar";\nexport * from "./enum-value";\nexport * from "./universal";\n`
 );
 console.log(`${check ? "checked" : "generated"} ${ir.declarationCount} dmSDK declarations, ${Object.keys(inventory.countsByKind).length} kinds, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

@@ -36,6 +36,10 @@
       "import": "./packages/compiler/src/native-extension-generator.mjs",
       "default": "./packages/compiler/src/native-extension-generator.mjs"
     },
+    "./compiler/policy-surface-materializer": {
+      "import": "./packages/compiler/src/policy-surface-materializer.mjs",
+      "default": "./packages/compiler/src/policy-surface-materializer.mjs"
+    },
     "./dev/runtime-diagnostics": {
       "import": "./packages/cli/src/dev/runtime-diagnostics.mjs",
       "default": "./packages/cli/src/dev/runtime-diagnostics.mjs"
@@ -52,6 +56,7 @@
   "files": [
     "bin/",
     "packages/",
+    "scripts/",
     "defold/defold_hermes/",
     "!packages/**/*.type-test.ts",
     "README.md"

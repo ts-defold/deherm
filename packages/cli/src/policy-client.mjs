@@ -10,6 +10,7 @@ import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { hashBytes } from "../../compiler/src/api-policy.mjs";
+import { materializePolicySurface } from "../../compiler/src/policy-surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 
@@ -122,6 +123,11 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   const receiptBytes = Buffer.from(`${JSON.stringify(receipt, null, 2)}\n`);
   writes.push(await atomicWrite(path.join(cacheRoot, "receipt", `${revision}.json`), receiptBytes));
 
+  const surfaceRoot = path.join(cacheHome, "surfaces", revision);
+  const surface = objects.has("@compiler")
+    ? await materializePolicySurface({ revision, entry, policy, objects }, { revision, outputRoot: surfaceRoot })
+    : null;
+
   return {
     revision,
     entry,
@@ -129,6 +135,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     objects,
     cacheRoot,
     receipt: path.join(cacheRoot, "receipt", `${revision}.json`),
+    surface,
     written: writes.filter(Boolean).length,
     source: `${base}/${entryResult.relative}`
   };

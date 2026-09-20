@@ -30,9 +30,17 @@ the source-derived Lua registration surface and the resource declaration schema
 toolchain pins from `build_tools/sdk.py`.
 
 For the pinned revision `7f0f554f41f9dce1e0ddff99bf08200657d1ee05` the policy is
-**55 subtrees - 52 namespaces plus `@shared`, `@profiles` and `@toolchain` - in
-6.19 MB**, under policy root
-`27f0c00d84e57224a03e1f55d0477d1d412e3de68e746b50f09fd091377242c7`.
+**56 subtrees - 52 namespaces plus `@shared`, `@profiles`, `@toolchain` and
+`@compiler` - in 29.26 MB**, under policy root
+`85409076d94b0882a1464b2b8189ea54adb3fa1ca5174f1e6a6609bdb70da226`.
+
+`@compiler` is the correctness-first local-materialization cut. It contains the
+semantic documents consumed by project generation and an SDK manifest. The
+installed compiler locally renders the core script/dmSDK TypeScript files and
+checks their hashes; support files whose emitters are not yet package modules
+are visibly tagged authenticated compatibility sources. The 21 MB object is
+not the intended steady-state size: the 15 MB lowering plan is derived and will
+move back behind package code once its smaller recipe inputs are normalized.
 
 # The structure is the decision
 
@@ -46,6 +54,7 @@ first policy was written rather than recovered afterwards with a delta format.
 | shared | `@shared` | what no single namespace owns: global types (`hash`, `url`, `vector3`), lifecycle callback shapes, dmSDK opaque and unresolved types, the resource declaration schema, and every parser refusal, which is attributed to a C file rather than to a namespace |
 | profiles | `@profiles` | the cross-namespace profile and feature definitions, the handshake contract, and the recipe for rebuilding the revision-keyed catalog digest |
 | toolchain | `@toolchain` | Defold's own pins, under Defold's own symbol names |
+| compiler | `@compiler` | Semantic generator documents plus the transition manifest used to reconstruct and verify the complete local SDK surface |
 
 Namespace attribution is structural, never a name list: a script route takes the
 first segment of its Lua module path, a declared type is attributed to a module

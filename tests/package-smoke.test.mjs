@@ -4,6 +4,7 @@ import { mkdtemp, mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { pathToFileURL } from "node:url";
 
 import { parseArguments } from "../packages/cli/src/cli.mjs";
 
@@ -63,6 +64,30 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "binding-identity.mjs"), "utf8");
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "component-proxy-generator.mjs"), "utf8");
   await readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-script-real-engine-probes.json"), "utf8");
+
+  // The packed package, not the repository checkout, must contain all compiler
+  // code needed to turn its authenticated policy into a local surface.
+  const shippedIndex = JSON.parse(await readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-policy-index.json"), "utf8"));
+  const entry = shippedIndex.entries[0];
+  const store = path.join(packageRoot, "packages", "bindings", "generated", "policy", shippedIndex.base.layoutVersion);
+  const policy = JSON.parse(await readFile(path.join(store, "policy", `${entry.policyRoot}.json`), "utf8"));
+  const objects = new Map(await Promise.all(Object.entries(policy.subtrees).map(async ([namespace, digest]) => [namespace, {
+    digest,
+    value: JSON.parse(await readFile(path.join(store, "object", `${digest}.json`), "utf8"))
+  }])));
+  const { materializePolicySurface } = await import(pathToFileURL(path.join(
+    packageRoot,
+    "packages", "compiler", "src", "policy-surface-materializer.mjs"
+  )));
+  const packedSurfaceRoot = path.join(root, "packed-surface");
+  const materialized = await materializePolicySurface({
+    revision: entry.defoldRevision,
+    entry,
+    policy,
+    objects
+  }, { outputRoot: packedSurfaceRoot });
+  assert.equal(Object.keys(materialized.descriptor.sdk).length, 28);
+  await readFile(path.join(packedSurfaceRoot, "sdk", "generated", "script", "types.ts"), "utf8");
 
   const help = run(process.execPath, [path.join(packageRoot, "bin", "deherm.mjs"), "--help"]);
   assert.match(help.stdout, /deherm <command>/);

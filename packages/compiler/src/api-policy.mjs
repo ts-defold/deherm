@@ -38,6 +38,8 @@ export const RESERVED_SUBTREE_PREFIX = "@";
 export const TOOLCHAIN_SUBTREE = "@toolchain";
 export const SHARED_SUBTREE = "@shared";
 export const PROFILES_SUBTREE = "@profiles";
+export const COMPILER_SUBTREE = "@compiler";
+export const DEFOLD_REVISION_TOKEN = "${DEFOLD_REVISION}";
 
 // Type names in the script IR are written in one of these declaration
 // namespaces before the module they belong to. `defold_api.gui` and
@@ -140,6 +142,30 @@ export function normalizePaths(value, repositoryRoot) {
   return value;
 }
 
+/**
+ * Replace the revision in compiler IR with a stable token before sealing it.
+ * The index owns the revision; the compiler subtree owns the semantic program
+ * that a client materializes after resolving that index entry.
+ */
+export function abstractDefoldRevision(value, revision) {
+  if (typeof value === "string") return value.split(revision).join(DEFOLD_REVISION_TOKEN);
+  if (Array.isArray(value)) return value.map((entry) => abstractDefoldRevision(entry, revision));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, abstractDefoldRevision(entry, revision)]));
+  }
+  return value;
+}
+
+/** Restore the exact revision only after a content-addressed policy resolves. */
+export function restoreDefoldRevision(value, revision) {
+  if (typeof value === "string") return value.split(DEFOLD_REVISION_TOKEN).join(revision);
+  if (Array.isArray(value)) return value.map((entry) => restoreDefoldRevision(entry, revision));
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, restoreDefoldRevision(entry, revision)]));
+  }
+  return value;
+}
+
 function sortBy(rows, key) {
   return [...rows].sort((left, right) => {
     const a = key(left);
@@ -176,6 +202,7 @@ export function buildPolicy(inputs) {
     routeProfiles,
     resourceSchema,
     toolchain,
+    compilerSurface,
     generator,
     repositoryRoot = ""
   } = inputs;
@@ -420,6 +447,16 @@ export function buildPolicy(inputs) {
     kind: "deherm.policy.toolchain",
     ...toolchain
   });
+  if (compilerSurface) {
+    subtrees[COMPILER_SUBTREE] = seal({
+      schemaVersion: POLICY_SCHEMA_VERSION,
+      kind: "deherm.policy.compiler-surface",
+      namespace: COMPILER_SUBTREE,
+      revisionToken: DEFOLD_REVISION_TOKEN,
+      documents: abstractDefoldRevision(normalizePaths(compilerSurface.documents, repositoryRoot), scriptIr.defoldRevision),
+      sdk: abstractDefoldRevision(normalizePaths(compilerSurface.sdk, repositoryRoot), scriptIr.defoldRevision)
+    });
+  }
 
   const namespaceKeys = Object.keys(subtrees).filter((key) => !key.startsWith(RESERVED_SUBTREE_PREFIX));
   const root = {

@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { strFromU8, unzipSync } from "fflate";
 import { reservedParameterSynonyms, safeParameterIdentifier } from "../packages/cli/src/names.mjs";
 import { hexBindingId, stableBindingId } from "./lib/binding-identity.mjs";
@@ -371,7 +371,7 @@ function parseArchive(lifecycleNames) {
 
 let requireBuffer;
 
-function createTypeRenderer(model) {
+export function createTypeRenderer(model) {
   const named = new Map();
   const used = new Set();
   const unresolved = new Set();
@@ -505,7 +505,7 @@ function treeNode() {
   return { fields: [], functions: [], children: new Map(), description: "" };
 }
 
-function buildApiTrees(model) {
+export function buildApiTrees(model) {
   const roots = new Map();
   const nodeAt = (segments) => {
     const [rootName, ...rest] = publicScriptModulePath(segments);
@@ -626,7 +626,7 @@ function renderNodeValue(rootName, pathSegments, node, interfaceAccess, indent =
   return lines;
 }
 
-function generateTypes(model, renderer, trees, semanticHandleTypes) {
+export function generateTypes(model, renderer, trees, semanticHandleTypes) {
   const lines = [
     banner,
     'import type { DefoldAddress, DefoldHash, DefoldUrl } from "../../address";',
@@ -669,7 +669,7 @@ function generateTypes(model, renderer, trees, semanticHandleTypes) {
   return `${lines.join("\n").trimEnd()}\n`;
 }
 
-function generateModules(trees) {
+export function generateModules(trees) {
   const lines = [banner, 'import { callScriptApi, getScriptApiValue } from "./runtime";', 'import type * as Types from "./types";', ""];
   for (const [rootName, node] of [...trees].sort(([left], [right]) => left.localeCompare(right))) {
     const interfaceName = `${pascal(rootName)}Api`;
@@ -682,7 +682,7 @@ function generateModules(trees) {
   return `${lines.join("\n").trimEnd()}\n`;
 }
 
-function generateRuntime() {
+export function generateRuntime() {
   return `${banner}
 import { assertValueRouteTargetSupport } from "./value-target-support";
 import { assertFixedTupleTargetSupport } from "./fixed-tuple-target-support";
@@ -729,7 +729,7 @@ export function getScriptApiValue(modulePath: string, memberName: string): unkno
 `;
 }
 
-function generateIndex(trees) {
+export function generateIndex(trees) {
   const names = [...trees.keys()].sort().map(camel);
   return `${banner}\nexport { ${names.join(", ")} } from "./modules";\nexport { installDefoldScriptBridge, type DefoldScriptBridge } from "./runtime";\nexport * from "./handle-lowering";\nexport type * from "./types";\n`;
 }
@@ -745,6 +745,7 @@ async function output(file, contents) {
   await writeFile(file, contents);
 }
 
+async function main() {
 requireBuffer = await readFile(archivePath);
 const defoldRevision = (await readFile(path.join(root, "upstream.lock"), "utf8")).match(/^DEFOLD_REV=(\w+)$/m)?.[1] ?? "unknown";
 const semanticHandleTypes = await loadSemanticHandleTypes(defoldRevision);
@@ -910,3 +911,6 @@ if (model.duplication.length) {
 if (unsupportedLifecycle.length) {
   console.log(`engine lifecycle callbacks the component contract does not support: ${unsupportedLifecycle.join(", ")}`);
 }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

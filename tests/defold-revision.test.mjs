@@ -190,8 +190,8 @@ test("no layer-0 surface exists for an unknown revision and generation refuses t
   assert.equal(surface.layer, null);
   assert.equal(surface.blocker.code, "defold-surface-not-cached");
   assert.match(surface.blocker.message, new RegExp(otherRevision));
-  assert.match(surface.blocker.message, /ref-doc\.zip/);
-  assert.match(surface.blocker.message, /network access/);
+  assert.match(surface.blocker.message, /deherm policy/);
+  assert.match(surface.blocker.message, /No Defold source checkout/);
   assert.deepEqual(surface.searched.map(({ layer }) => layer), ["packaged", "user-cache", "project-cache"]);
   assert.equal(surface.searched[0].reason, `holds Defold ${bundled}`);
 

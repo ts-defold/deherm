@@ -55,6 +55,64 @@ export const sitePath = path.join(root, "packages", "bindings", "policy-site.jso
 
 const generatedDir = path.join(root, "packages", "bindings", "generated");
 
+// The exact semantic cut consumed by `deherm generate`. These are compiler IR
+// and recipe catalogs, not emitted TypeScript/C++/JavaScript. Keeping the list
+// here makes policy derivation and local materialization agree by filename.
+export const compilerSurfaceDocuments = Object.freeze({
+  "defold-script-api-ir.json": "defold-script-api-ir.json",
+  "defold-sdk-ir.json": "defold-sdk-ir.json",
+  "defold-script-scalar-dispatch.json": "defold-script-scalar-dispatch.json",
+  "defold-script-api-accounting.json": "defold-script-api-accounting.json",
+  "defold-script-universal-value-bindings.json": "defold-script-universal-value-bindings.json",
+  "defold-script-route-availability-profiles.json": "defold-script-route-availability-profiles.json",
+  "defold-script-handle-lowering.json": "defold-script-handle-lowering.json",
+  "defold-binding-lowering-plan.json": "defold-binding-lowering-plan.json",
+  "defold-binding-lowering-plan.sentinel.json": "defold-binding-lowering-plan.sentinel.json",
+  "defold-dmsdk-scalar-thunks.json": "defold-dmsdk-scalar-thunks.json",
+  "defold-dmsdk-universal-bindings.json": "defold-dmsdk-universal-bindings.json"
+});
+
+const locallyRenderedSdkSources = new Set([
+  "script/types.ts",
+  "script/modules.ts",
+  "script/runtime.ts",
+  "script/index.ts",
+  "dmsdk/types.ts",
+  "dmsdk/runtime.ts",
+  "dmsdk/index.ts"
+]);
+
+export const compilerSurfaceSdkSources = Object.freeze([
+  "script/browser-target-support.ts",
+  "script/callback-lifecycle.ts",
+  "script/copied-value-record-blockers.ts",
+  "script/dynamic-values.ts",
+  "script/fixed-tuple-target-support.ts",
+  "script/handle-lowering.ts",
+  "script/index.ts",
+  "script/modules.ts",
+  "script/opaque-record-blockers.ts",
+  "script/overload-dispatch-target-support.ts",
+  "script/runtime.ts",
+  "script/table-record-bindings.ts",
+  "script/types.ts",
+  "script/universal-value-bindings.ts",
+  "script/url-target-support.ts",
+  "script/value-tail-target-support.ts",
+  "script/value-target-support.ts",
+  "dmsdk/borrowed-handle.ts",
+  "dmsdk/browser-arena.ts",
+  "dmsdk/cstring-value.ts",
+  "dmsdk/enum-value.ts",
+  "dmsdk/index.ts",
+  "dmsdk/named-scalar.ts",
+  "dmsdk/runtime.ts",
+  "dmsdk/scalar.ts",
+  "dmsdk/scratch-scalar-out.ts",
+  "dmsdk/types.ts",
+  "dmsdk/universal.ts"
+]);
+
 async function readJson(file) {
   return JSON.parse(await readFile(file, "utf8"));
 }
@@ -235,6 +293,21 @@ export async function derivePolicy(options = {}) {
   });
   const reconciliation = reconcileLocalPins({ lock, pins: toolchain.pins });
 
+  const compilerSurface = {
+    documents: Object.fromEntries(await Promise.all(Object.entries(compilerSurfaceDocuments).map(async ([name, relative]) => [
+      name,
+      await readJson(path.join(artifacts, relative))
+    ]))),
+    sdk: Object.fromEntries(await Promise.all(compilerSurfaceSdkSources.map(async (relative) => {
+      const source = await readFile(path.join(root, "packages", "sdk", "src", "generated", relative), "utf8");
+      return [relative, {
+        mode: locallyRenderedSdkSources.has(relative) ? "render-and-verify" : "authenticated-compatibility-source",
+        sha256: createHash("sha256").update(source).digest("hex"),
+        source: locallyRenderedSdkSources.has(relative) ? undefined : source
+      }];
+    })))
+  };
+
   const generator = options.generator ?? await generatorRevision();
   const policy = buildPolicy({
     scriptIr,
@@ -243,6 +316,7 @@ export async function derivePolicy(options = {}) {
     routeProfiles,
     resourceSchema,
     toolchain,
+    compilerSurface,
     generator,
     repositoryRoot: sourceRoot
   });

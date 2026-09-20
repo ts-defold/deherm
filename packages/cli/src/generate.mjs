@@ -966,6 +966,9 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     revision: scriptIr.defoldRevision,
     surfaceLayer: surface.layer,
     sdkSourceRoot,
+    // Revision-invariant authoring/runtime templates ship with the compiler.
+    // A materialized policy surface only owns revision-specific generated code.
+    sdkTemplateRoot: path.join(packageRoot, "packages", "sdk", "src"),
     packageVersion: JSON.parse(packageSource).version,
     // The dmSDK declaration IR is deliberately platform-neutral and therefore
     // carries parseEnvironment, not a fake host platform. This field names the
@@ -1249,8 +1252,8 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await rm(contextsRoot, { recursive: true, force: true });
   await mkdir(modulesRoot, { recursive: true });
   await mkdir(contextsRoot, { recursive: true });
-  await cp(path.join(core.sdkSourceRoot, "address.ts"), path.join(sdkRoot, "address.ts"));
-  await cp(path.join(core.sdkSourceRoot, "component.ts"), path.join(sdkRoot, "component.ts"));
+  await cp(path.join(core.sdkTemplateRoot, "address.ts"), path.join(sdkRoot, "address.ts"));
+  await cp(path.join(core.sdkTemplateRoot, "component.ts"), path.join(sdkRoot, "component.ts"));
   await cp(
     path.join(core.sdkSourceRoot, "generated", "script"),
     path.join(sdkRoot, "generated", "script"),
