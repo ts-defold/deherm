@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { test } from "node:test";
 
-import { buildLedger, readLedger, stageNames } from "../scripts/check-end-to-end.mjs";
+import {
+  buildLedger,
+  buildServerForDefoldRef,
+  readLedger,
+  stageNames
+} from "../scripts/check-end-to-end.mjs";
 
 // The property that makes the gate worth having: it cannot silently omit a
 // target. Every check in this file is about that, not about whether any
@@ -75,6 +80,25 @@ test("the declared stages are the ones the gate can run", async () => {
   assert.ok(stageNames.includes("policy"), "the gate must resolve a published policy");
   assert.ok(module.defaultBuildServer.startsWith("https://"),
     "the gate must default to a real build server, not this repository's localhost Extender");
+});
+
+test("the implicit hosted Extender follows the pinned Defold channel", async () => {
+  const module = await import("../scripts/check-end-to-end.mjs");
+  const lock = await readFile(new URL("../upstream.lock", import.meta.url), "utf8");
+  const ref = /^DEFOLD_REF=(.+)$/mu.exec(lock)?.[1];
+  assert.equal(module.defaultBuildServer, buildServerForDefoldRef(ref));
+  assert.equal(buildServerForDefoldRef("stable"), "https://build.defold.com");
+  for (const channel of ["dev", "alpha", "beta"]) {
+    assert.equal(buildServerForDefoldRef(channel), "https://build-stage.defold.com");
+  }
+});
+
+test("the Bob matrix prints and preserves the target's Extender failure log", async () => {
+  const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
+  assert.match(workflow, /Print Extender failure log/u);
+  assert.match(workflow, /cat "\$log"/u);
+  assert.match(workflow, /bob-extender-log-\$\{\{ matrix\.target \}\}/u);
+  assert.match(workflow, /build\/end-to-end\/project\/build\/\$\{\{ matrix\.target \}\}\/log\.txt/u);
 });
 
 test("Bob consumes the generated project's target artifact instead of rebuilding a host-native package", async () => {

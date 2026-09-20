@@ -46,6 +46,7 @@
 // decline reasons reviewable without a network, a JDK or an hour.
 
 import { execFile } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -69,7 +70,23 @@ export const paths = Object.freeze({
  * gate must exercise, because the question is whether OUR extension builds on
  * THEIR build server.
  */
-export const defaultBuildServer = "https://build.defold.com";
+export function buildServerForDefoldRef(ref) {
+  return String(ref).trim().toLowerCase() === "stable"
+    ? "https://build.defold.com"
+    : "https://build-stage.defold.com";
+}
+
+const pinnedDefoldRef = /^DEFOLD_REF=(.+)$/mu.exec(
+  readFileSync(path.join(root, "upstream.lock"), "utf8")
+)?.[1];
+if (!pinnedDefoldRef) throw new Error("upstream.lock has no DEFOLD_REF");
+
+// Defold publishes pending SDK/Extender changes to the staging service. A dev,
+// alpha or beta SDK can therefore be newer than production Extender's build.yml
+// schema even when both services are healthy. Keep the consumer proof on the
+// service belonging to the pinned channel; an explicit --build-server still
+// overrides this for a maintainer testing another deployment.
+export const defaultBuildServer = buildServerForDefoldRef(pinnedDefoldRef);
 
 /**
  * Where the gate scaffolds the project it exercises.
@@ -251,7 +268,13 @@ const stages = {
         context.targetResult(row.target, "bob", { detail: `built against ${context.buildServer}` });
       } catch (error) {
         const output = [error.stdout, error.stderr].filter(Boolean).join("\n").trim().split("\n").slice(-8).join("\n");
-        failures.push(`${row.target}:\n${output || error.message}`);
+        const projectRoot = path.resolve(root, context.project);
+        const extenderLogPath = path.join(projectRoot, "build", row.target, "log.txt");
+        const extenderLog = await readFile(extenderLogPath, "utf8").catch(() => "");
+        const diagnostic = extenderLog.trim()
+          ? `Extender log (${path.relative(root, extenderLogPath)}):\n${extenderLog.trimEnd()}`
+          : output || error.message;
+        failures.push(`${row.target}:\n${diagnostic}`);
       }
     }
     if (failures.length) throw new Error(failures.join("\n\n"));
@@ -279,7 +302,7 @@ export async function main(argv) {
   let plan = false;
   let project = scratchProject;
   let projectWasGiven = false;
-  let buildServer = process.env.DEFOLD_HERMES_BUILD_SERVER ?? defaultBuildServer;
+  let buildServer = process.env.DEFOLD_HERMES_BUILD_SERVER || defaultBuildServer;
   for (let index = 0; index < argv.length; index += 1) {
     const value = argv[index];
     if (value === "--json") json = true;

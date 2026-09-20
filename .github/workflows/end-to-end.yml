@@ -53,9 +53,8 @@ on:
   workflow_dispatch:
     inputs:
       build-server:
-        description: Defold build service to send extension builds to
+        description: Defold build service override; blank selects production for stable and staging otherwise
         required: false
-        default: https://build.defold.com
 
 permissions:
   contents: read
@@ -128,9 +127,26 @@ jobs:
 
       - name: Build for ${{ matrix.target }}
         env:
-          DEFOLD_HERMES_BUILD_SERVER: ${{ inputs.build-server || 'https://build.defold.com' }}
+          DEFOLD_HERMES_BUILD_SERVER: ${{ inputs.build-server }}
         run: |
           node scripts/check-end-to-end.mjs \
             --target "${{ matrix.target }}" \
-            --stage target-archives --stage scaffold --stage generate --stage bob \
-            --build-server "$DEFOLD_HERMES_BUILD_SERVER"
+            --stage target-archives --stage scaffold --stage generate --stage bob
+
+      - name: Print Extender failure log
+        if: failure()
+        run: |
+          log="build/end-to-end/project/build/${{ matrix.target }}/log.txt"
+          if [ -f "$log" ]; then
+            echo "===== $log ====="
+            cat "$log"
+          else
+            echo "Bob did not leave an Extender log at $log" >&2
+          fi
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bob-extender-log-${{ matrix.target }}
+          path: build/end-to-end/project/build/${{ matrix.target }}/log.txt
+          if-no-files-found: ignore
