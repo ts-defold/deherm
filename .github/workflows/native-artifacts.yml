@@ -298,7 +298,7 @@ jobs:
         with: { node-version: '22' }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "linux=${{ matrix.row }}" --github-env "$GITHUB_ENV"
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
@@ -349,7 +349,7 @@ jobs:
         with: { node-version: '22' }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "windows=${{ matrix.row }}" --github-env "$GITHUB_ENV"
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
@@ -453,7 +453,7 @@ jobs:
         with: { node-version: '22' }
       - name: Resolve the canonical build row
         run: node scripts/plan-native-artifact-builds.mjs --describe-row "android=${{ matrix.row }}" --github-env "$GITHUB_ENV"
-      - uses: docker/setup-buildx-action@v3
+      - uses: docker/setup-buildx-action@v4
       # `upstream/` is not committed - it is bootstrapped reproducibly from
       # upstream.lock. Only the Hermes tree is named, because cloning Defold on
       # every build lane costs more than the build it prepares for.
