@@ -98,7 +98,7 @@ function decode(parameter, slot, usage) {
         `${usage.declarationId} callback parameter ${parameter.position} needs callbackTrampolines.${parameter.position}`,
       );
     }
-    return cppSymbol(trampoline, `callback trampoline ${parameter.position}`);
+    return identifier(trampoline, `callback trampoline ${parameter.position}`);
   }
   if (["cstring", "pointer", "opaque"].includes(shape.kind)) {
     return `reinterpret_cast<${type}>(static_cast<uintptr_t>(arguments[${slot}].payload))`;
@@ -267,6 +267,167 @@ function renderFakeDeclaration({ fakeCallee, wrapper, kind, receiverType, result
   return `${aliases.join("\n")}\nextern "C" ${returnAlias} ${fakeCallee}(${argumentAliases.join(",")});`;
 }
 
+function wireTag(shape) {
+  const name = scalarName(shape);
+  if (name === "bool") return "DEHERM_DMSDK_UNIVERSAL_BOOL";
+  if (["f32", "f64"].includes(name)) return "DEHERM_DMSDK_UNIVERSAL_F64";
+  if (signedNames.has(name)) return "DEHERM_DMSDK_UNIVERSAL_I64";
+  if (name) return "DEHERM_DMSDK_UNIVERSAL_U64";
+  if (shape.kind === "callback") return "DEHERM_DMSDK_UNIVERSAL_CALLBACK";
+  if (["cstring", "pointer", "reference", "handle", "opaque"].includes(shape.kind)) {
+    return "DEHERM_DMSDK_UNIVERSAL_ADDRESS";
+  }
+  return null;
+}
+
+function deterministicScalar(shape, seed, enumValues) {
+  const name = scalarName(shape);
+  if (shape.kind === "enum") return enumValues[0];
+  if (name === "bool") return seed % 2;
+  if (["f32", "f64"].includes(name)) return seed + 0.25;
+  const unsignedMaximum = { u8: 0xff, u16: 0xffff, u32: 0xffffffff }[name];
+  if (unsignedMaximum !== undefined) return seed % (unsignedMaximum + 1);
+  const signedMaximum = { i8: 0x7f, i16: 0x7fff, i32: 0x7fffffff }[name];
+  if (signedMaximum !== undefined) return -(seed % signedMaximum || 1);
+  if (signedNames.has(name)) return -seed;
+  return seed;
+}
+
+function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expression }) {
+  const tag = wireTag(shape);
+  if (!tag) return null;
+  const name = scalarName(shape);
+  const cell = { slot, tag: tag.replace("DEHERM_DMSDK_UNIVERSAL_", "").toLowerCase() };
+  const setup = [];
+  const declarations = [];
+  if (name) {
+    const value = deterministicScalar(shape, seed, enumValues);
+    cell.value = value;
+    if (["f32", "f64"].includes(name)) {
+      setup.push(`{ const double value = ${Number(value).toFixed(2)}; memcpy(&${prefix}_arguments[${slot}].payload,&value,sizeof(value)); }`);
+    } else if (signedNames.has(name)) {
+      setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(INT64_C(${value}));`);
+    } else {
+      setup.push(`${prefix}_arguments[${slot}].payload=UINT64_C(${value});`);
+    }
+    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+  } else if (shape.kind === "cstring") {
+    const fixture = `${prefix}_cstring_${slot}`;
+    declarations.push(`static const char ${fixture}[]="deherm_exact_${seed}";`);
+    setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`);
+    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+    cell.fixture = "cstring";
+    cell.value = `deherm_exact_${seed}`;
+  } else if (shape.kind === "reference") {
+    const fixture = `${prefix}_reference_${slot}`;
+    declarations.push(`static std::remove_cv_t<std::remove_reference_t<${nativeAlias}>> ${fixture}{};`);
+    setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
+    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+    cell.fixture = "value-object";
+  } else if (shape.kind === "callback") {
+    setup.push(`${prefix}_arguments[${slot}].payload=UINT64_C(0);`);
+    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+    cell.fixture = "fixed-trampoline";
+  } else {
+    const fixture = `${prefix}_address_${slot}`;
+    declarations.push(`static std::max_align_t ${fixture}{};`);
+    setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&${fixture}));`);
+    setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
+    cell.fixture = "aligned-address-token";
+  }
+  const expectedExpression = expression.replaceAll("arguments", `${prefix}_arguments`);
+  return { cell, declarations, setup, expectedExpression };
+}
+
+function fakeReturnPlan({ shape, seed, prefix, returnAlias, kind, enumValue }) {
+  if (kind === "placement-constructor") {
+    return { declarations: [], statement: "return receiver;", cell: { tag: "void" } };
+  }
+  if (kind === "explicit-destructor" || shape.kind === "void") {
+    return { declarations: [], statement: "return;", cell: { tag: "void" } };
+  }
+  const tag = wireTag(shape);
+  if (!tag) return null;
+  const name = scalarName(shape);
+  if (name) {
+    if (shape.kind === "enum" && !Number.isSafeInteger(enumValue)) return null;
+    const value = deterministicScalar(shape, seed, [enumValue]);
+    return {
+      declarations: [],
+      statement: `return static_cast<${returnAlias}>(${value});`,
+      cell: { tag: tag.replace("DEHERM_DMSDK_UNIVERSAL_", "").toLowerCase(), value },
+    };
+  }
+  if (shape.kind === "cstring") {
+    const fixture = `${prefix}_return_cstring`;
+    return {
+      declarations: [`static const char ${fixture}[]="deherm_exact_result_${seed}";`],
+      statement: `return ${fixture};`,
+      cell: { tag: "address", fixture: "cstring", value: `deherm_exact_result_${seed}` },
+      addressExpression: fixture,
+    };
+  }
+  if (shape.kind === "reference") {
+    const fixture = `${prefix}_return_reference`;
+    return {
+      declarations: [`static std::remove_cv_t<std::remove_reference_t<${returnAlias}>> ${fixture}{};`],
+      statement: `return ${fixture};`,
+      cell: { tag: "address", fixture: "value-object" },
+      addressExpression: `&${fixture}`,
+    };
+  }
+  if (shape.kind === "callback") {
+    return {
+      declarations: [],
+      statement: `return static_cast<${returnAlias}>(nullptr);`,
+      cell: { tag: "address", value: 0 },
+      addressExpression: "nullptr",
+    };
+  }
+  const fixture = `${prefix}_return_address`;
+  return {
+    declarations: [`static std::max_align_t ${fixture}{};`],
+    statement: `return reinterpret_cast<${returnAlias}>(&${fixture});`,
+    cell: { tag: "address", fixture: "aligned-address-token" },
+    addressExpression: `&${fixture}`,
+  };
+}
+
+function renderRecordingFake({ fakeCallee, wrapper, kind, receiverType, parameters, plan }) {
+  const returnAlias = `DehermExact_${wrapper}_Return`;
+  const argumentsList = [];
+  const comparisons = [];
+  if (receiverType) {
+    argumentsList.push(`DehermExact_${wrapper}_Receiver receiver`);
+    comparisons.push(`receiver==${plan.prefix}_expected_receiver`);
+  }
+  for (const [index, parameter] of parameters.entries()) {
+    argumentsList.push(`DehermExact_${wrapper}_Arg${index} argument_${index}`);
+    const expected = plan.arguments[index + (receiverType ? 1 : 0)].expectedExpression;
+    comparisons.push(parameter.shape.kind === "reference"
+      ? `&argument_${index}==&(${expected})`
+      : `argument_${index}==${expected}`);
+  }
+  const condition = comparisons.length ? comparisons.join(" && ") : "true";
+  return `extern "C" ${returnAlias} ${fakeCallee}(${argumentsList.join(",")}){\n` +
+    ` ++${plan.prefix}_calls; if(!(${condition})) ++${plan.prefix}_failures; ${plan.result.statement}\n}`;
+}
+
+function expectedResultCheck(plan, result = "result") {
+  const cell = plan.result.cell;
+  if (cell.tag === "void") return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_VOID`;
+  if (cell.tag === "f64") {
+    return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_F64 && deherm_dmsdk_unpack_f64(${result}.payload)==${Number(cell.value).toFixed(2)}`;
+  }
+  if (cell.tag === "i64") {
+    return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_I64 && deherm_dmsdk_unpack_i64(${result}.payload)==INT64_C(${cell.value})`;
+  }
+  if (cell.tag === "u64" || cell.tag === "bool") {
+    return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_${cell.tag.toUpperCase()} && ${result}.payload==UINT64_C(${cell.value})`;
+  }
+  return `${result}.tag==DEHERM_DMSDK_UNIVERSAL_ADDRESS && ${result}.payload==static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${plan.result.addressExpression}))`;
+}
+
 export function materializeDmSdkUsages(usages, options = {}) {
   const recipes = options.recipes;
   if (!Array.isArray(recipes) || !recipes.length) {
@@ -288,16 +449,26 @@ export function materializeDmSdkUsages(usages, options = {}) {
   const installName = identifier(options.installName ?? `${providerName}_install`, "installName");
   const exactProviderName = identifier(`${providerName}_exact_verification`, "exact verification providerName");
   const exactInstallName = identifier(`${installName}_exact_verification`, "exact verification installName");
+  const exactDriverName = identifier(`${installName}_run_exact_verification`, "exact verification driverName");
+  const exactResetName = identifier(`${installName}_reset_exact_observations`, "exact verification resetName");
+  const exactCallsName = identifier(`${installName}_exact_call_count`, "exact verification callsName");
+  const exactFailuresName = identifier(`${installName}_exact_failure_count`, "exact verification failuresName");
   const includes = new Set([
     "#include <defold_hermes/generated_dmsdk_universal.h>",
     "#include <memory>",
     "#include <new>",
+    "#include <stdio.h>",
     "#include <stdint.h>",
     "#include <string.h>",
+    "#include <type_traits>",
   ]);
   const wrappers = [];
   const exactWrappers = [];
   const fakeDeclarations = [];
+  const recordingFakes = [];
+  const verificationPlans = [];
+  const callbackDeclarations = new Map();
+  const callbackMacros = new Map();
   const manifest = [];
   const verificationVectors = [];
   const ids = new Set();
@@ -383,15 +554,30 @@ export function materializeDmSdkUsages(usages, options = {}) {
           .replaceAll("$slot", String(slot))
           .replaceAll("$arguments", "arguments")
         : decode(parameter, slot, usage);
+      const resolvedNativeType = nativeType(parameter.shape, parameter.nativeType, usage.typeSubstitutions);
+      if (parameter.shape.kind === "callback") {
+        const symbol = identifier(
+          usage.callbackTrampolines?.[parameter.position],
+          `callback trampoline ${parameter.position}`,
+        );
+        const alias = `DehermCallback_${wrapper}_Arg${index}`;
+        const prior = callbackDeclarations.get(symbol);
+        if (prior && prior.resolvedNativeType !== resolvedNativeType) {
+          throw new Error(`${usage.declarationId} callback trampoline ${symbol} is reused with incompatible native types`);
+        }
+        callbackDeclarations.set(symbol, { alias, resolvedNativeType });
+        callbackMacros.set(symbol, alias);
+      }
       return {
         position: parameter.position,
         slot,
         name: parameter.name,
         direction: parameter.direction,
-        resolvedNativeType: nativeType(parameter.shape, parameter.nativeType, usage.typeSubstitutions),
+        resolvedNativeType,
         shape: copy(parameter.shape),
         requirements: copy(parameter.requirements ?? []),
         expression,
+        exactExpression: expression,
       };
     });
     const expressions = parameters.map(({ expression }) => expression);
@@ -415,9 +601,10 @@ export function materializeDmSdkUsages(usages, options = {}) {
 
     const exactWrapper = identifier(`${wrapper}__exact_call`, "exact verification wrapper");
     const fakeCallee = identifier(`${wrapper}__exact_callee`, "exact verification fake callee");
+    const exactExpressions = parameters.map(({ exactExpression }) => exactExpression);
     const fakeArguments = receiverType
-      ? [receiverExpression(receiverType), ...expressions]
-      : expressions;
+      ? [receiverExpression(receiverType), ...exactExpressions]
+      : exactExpressions;
     const exactCall = `${fakeCallee}(${fakeArguments.join(", ")})`;
     const exactBody = resultBody(effective, exactCall, resultType, usage.resultExpression);
     const fakeDeclarationSource = renderFakeDeclaration({
@@ -429,6 +616,72 @@ export function materializeDmSdkUsages(usages, options = {}) {
       parameters,
     });
     fakeDeclarations.push(fakeDeclarationSource);
+
+    const vectorIndex = verificationPlans.length;
+    const prefix = `deherm_exact_vector_${vectorIndex}`;
+    const plan = {
+      prefix,
+      declarations: [
+        `static DehermDmSdkUniversalValue ${prefix}_arguments[${Math.max(1, argumentCount)}]{};`,
+        `static uint32_t ${prefix}_calls=0;`,
+        `static uint32_t ${prefix}_failures=0;`,
+      ],
+      setup: [
+        `memset(${prefix}_arguments,0,sizeof(${prefix}_arguments));`,
+      ],
+      arguments: [],
+    };
+    if (receiverType) {
+      const fixture = `${prefix}_receiver_storage`;
+      plan.declarations.push(`alignas(${receiverType}) static unsigned char ${fixture}[sizeof(${receiverType})]{};`);
+      plan.setup.push(`${prefix}_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`);
+      plan.setup.push(`${prefix}_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;`);
+      plan.declarations.push(`static ${receiverType}* ${prefix}_expected_receiver=reinterpret_cast<${receiverType}*>(${fixture});`);
+      plan.arguments.push({
+        cell: { slot: 0, tag: "address", fixture: "aligned-receiver-storage" },
+        expectedExpression: `${prefix}_expected_receiver`,
+      });
+    }
+    for (const [index, parameter] of parameters.entries()) {
+      const argumentPlan = fixturePlan({
+        shape: parameter.shape,
+        slot: parameter.slot,
+        seed: (recipe.numericId + 1) * 17 + parameter.slot + 1,
+        prefix,
+        nativeAlias: `DehermExact_${wrapper}_Arg${index}`,
+        enumValues: usage.enumDomains?.[parameter.position] ?? [],
+        expression: parameter.exactExpression,
+      });
+      if (!argumentPlan) {
+        throw new Error(`${usage.declarationId} exact-call driver cannot derive a wire fixture for ${parameter.name} (${parameter.shape.kind})`);
+      }
+      plan.declarations.push(...argumentPlan.declarations);
+      plan.setup.push(...argumentPlan.setup);
+      plan.arguments.push(argumentPlan);
+    }
+    plan.result = fakeReturnPlan({
+      shape: effective.abi.resultShape,
+      seed: (recipe.numericId + 1) * 19 + 7001,
+      prefix,
+      returnAlias: `DehermExact_${wrapper}_Return`,
+      kind: recipe.invocation.kind,
+      enumValue: usage.resultEnumValue,
+    });
+    if (!plan.result) {
+      const detail = effective.abi.resultShape.kind === "enum" ? "; provide a safe-integer resultEnumValue" : "";
+      throw new Error(`${usage.declarationId} exact-call driver cannot derive a fake result for ${effective.abi.resultShape.kind}${detail}`);
+    }
+    plan.declarations.push(...plan.result.declarations);
+    const recordingFakeSource = renderRecordingFake({
+      fakeCallee,
+      wrapper,
+      kind: recipe.invocation.kind,
+      receiverType,
+      parameters,
+      plan,
+    });
+    recordingFakes.push(recordingFakeSource);
+    verificationPlans.push(plan);
     const exactWrapperSource = renderWrapper({
       wrapper: exactWrapper,
       argumentCount,
@@ -455,10 +708,12 @@ export function materializeDmSdkUsages(usages, options = {}) {
       argumentCount,
       preconditions: [...checks],
       parameters,
+      wireArguments: plan.arguments.map(({ cell }) => copy(cell)),
       result: {
         resolvedNativeType: resultType,
         shape: copy(effective.abi.resultShape),
         customExpression: usage.resultExpression ?? null,
+        fakeReturn: copy(plan.result.cell),
       },
       requirements: copy(recipe.fallback.requirements),
       productionWrapper: wrapper,
@@ -467,6 +722,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
       productionWrapperSha256: sha256(productionWrapperSource),
       exactWrapperSha256: sha256(exactWrapperSource),
       fakeCalleeDeclarationSha256: sha256(fakeDeclarationSource),
+      fakeCalleeDefinitionSha256: sha256(recordingFakeSource),
       catalogSha256,
     };
     vector.vectorSha256 = sha256(canonicalJson(vector));
@@ -486,6 +742,35 @@ export function materializeDmSdkUsages(usages, options = {}) {
 
   const provider = renderProvider(providerName, installName, manifest, "wrapper");
   const exactProvider = renderProvider(exactProviderName, exactInstallName, manifest, "exactWrapper");
+  const callbackDeclarationSource = [...callbackDeclarations.entries()].map(([symbol, { alias, resolvedNativeType }]) =>
+    `using ${alias}=${resolvedNativeType}; static_assert(std::is_pointer_v<${alias}>); extern std::remove_pointer_t<${alias}> ${symbol};`
+  ).join("\n");
+  const callbackMacroSource = [...callbackMacros.entries()].map(([symbol, alias]) =>
+    `#define ${symbol} (&DehermExactCallbackFixture<${alias}>::call)`
+  ).join("\n");
+  const callbackUndefSource = [...callbackMacros.keys()].map((symbol) => `#undef ${symbol}`).join("\n");
+  const verificationState = verificationPlans.flatMap((plan) => plan.declarations).join("\n");
+  const observationApi =
+    `extern "C" void ${exactResetName}(void){${verificationPlans.map((plan) =>
+      `${plan.prefix}_calls=0;${plan.prefix}_failures=0;`).join("")}}\n` +
+    `extern "C" uint32_t ${exactCallsName}(uint32_t id){switch(id){${verificationPlans.map((plan, index) =>
+      `case UINT32_C(${manifest[index].numericId}):return ${plan.prefix}_calls;`).join("")}default:return UINT32_MAX;}}\n` +
+    `extern "C" uint32_t ${exactFailuresName}(uint32_t id){switch(id){${verificationPlans.map((plan, index) =>
+      `case UINT32_C(${manifest[index].numericId}):return ${plan.prefix}_failures;`).join("")}default:return UINT32_MAX;}}`;
+  const exactFailureName = identifier(`${installName}_exact_failure`, "exact verification failureName");
+  const exactFailureReporter = `static int ${exactFailureName}(const char* stage,uint32_t vector,uint32_t id){` +
+    `fprintf(stderr,"dmSDK exact-call failure: stage=%s vector=%u id=%u\\n",stage,vector,id);return 1;}`;
+  const verificationDriver = `extern "C" int ${exactDriverName}(void){\n ${exactInstallName}(); ${exactResetName}();\n` +
+    verificationPlans.map((plan, index) => {
+      const argumentPointer = manifest[index].argumentCount ? `${plan.prefix}_arguments` : "nullptr";
+      const resultName = `${plan.prefix}_result`;
+      const id = `UINT32_C(${manifest[index].numericId})`;
+      return ` ${plan.setup.join("\n ")}\n DehermDmSdkUniversalValue ${resultName}{};\n` +
+        ` if(deherm_dmsdk_universal_dispatch(${id},${argumentPointer},UINT32_C(${manifest[index].argumentCount}),&${resultName})!=DEHERM_DMSDK_UNIVERSAL_OK)return ${exactFailureName}("dispatch",UINT32_C(${index}),${id});\n` +
+        ` if(${exactCallsName}(${id})!=UINT32_C(1))return ${exactFailureName}("call-count",UINT32_C(${index}),${id});\n` +
+        ` if(${exactFailuresName}(${id})!=UINT32_C(0))return ${exactFailureName}("arguments",UINT32_C(${index}),${id});\n` +
+        ` if(!(${expectedResultCheck(plan, resultName)}))return ${exactFailureName}("result",UINT32_C(${index}),${id});`;
+    }).join("\n") + "\n return 0;\n}";
   const preamble = `${[...includes].sort().join("\n")}\n` +
     "[[maybe_unused]] static int deherm_dmsdk_address_fits(uint64_t value){return sizeof(uintptr_t)>=sizeof(uint64_t)||value<=UINTPTR_MAX;}\n" +
     "[[maybe_unused]] static int64_t deherm_dmsdk_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}\n" +
@@ -493,9 +778,16 @@ export function materializeDmSdkUsages(usages, options = {}) {
   const verification = {
     schemaVersion: 1,
     source: "deherm-dmsdk-exact-call-verification",
-    evidenceBoundary: "Generated fake callees define the exact-call contract for wrapper selection, precondition checks, decoded native arguments, receiver transport, and result encoding. Evidence exists only when a consumer harness defines, compiles, and executes those callees; the contract does not execute Defold implementation semantics or prove handle/callback ownership lifecycles.",
+    evidenceBoundary: "Generated recording fake callees and the native C-ABI driver execute the exact-call contract for wrapper selection, precondition checks, deterministic wire inputs, decoded native arguments, receiver transport, and fake-result encoding; C-ABI observation accessors expose per-vector call and mismatch counts to other transport runners. This does not execute Defold implementation semantics or prove handle/callback ownership lifecycles.",
     catalogSha256,
     provider: { function: exactProviderName, install: exactInstallName },
+    driver: { function: exactDriverName, transport: "native-c-abi", sourceSha256: sha256(verificationDriver) },
+    observations: {
+      reset: exactResetName,
+      calls: exactCallsName,
+      failures: exactFailuresName,
+      sourceSha256: sha256(observationApi),
+    },
     vectorCount: verificationVectors.length,
     vectors: verificationVectors,
   };
@@ -503,10 +795,17 @@ export function materializeDmSdkUsages(usages, options = {}) {
 
   return {
     source: "// Generated by @deherm/compiler dmSDK usage materializer. Do not edit.\n" +
-      `${preamble}${wrappers.join("\n")}\n${provider}\n`,
+      `${preamble}${callbackDeclarationSource}\n${wrappers.join("\n")}\n${provider}\n`,
     verificationSource:
       "// Generated by @deherm/compiler dmSDK exact-call materializer. Do not edit.\n" +
-      `${preamble}${fakeDeclarations.join("\n")}\n${exactWrappers.join("\n")}\n${exactProvider}\n`,
+      `#include <cstddef>\n${preamble}` +
+      "template<typename> struct DehermExactCallbackFixture;\n" +
+      "template<typename R,typename... A> struct DehermExactCallbackFixture<R(*)(A...)>{" +
+      "static R call(A...){if constexpr(!std::is_void_v<R>)return R{};}};\n" +
+      `${callbackDeclarationSource}\n${callbackMacroSource}\n` +
+      `${fakeDeclarations.join("\n")}\n` +
+      `${verificationState}\n${recordingFakes.join("\n")}\n` +
+      `${exactWrappers.join("\n")}\n${exactProvider}\n${observationApi}\n${exactFailureReporter}\n${verificationDriver}\n${callbackUndefSource}\n`,
     manifest: Object.freeze(manifest),
     provider: Object.freeze({ function: providerName, install: installName }),
     verification: Object.freeze(verification),

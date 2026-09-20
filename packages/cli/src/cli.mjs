@@ -370,8 +370,18 @@ export async function run(argv = process.argv.slice(2)) {
       writeFile(path.join(output, "extension.ir.json"), `${JSON.stringify(ir, null, 2)}\n`),
       writeFile(path.join(output, `${ir.module}.ts`), generated.typescript),
       writeFile(path.join(output, `${ir.module}_glue.cpp`), generated.source),
+      writeFile(path.join(output, `${ir.module}_glue.verify.cpp`), generated.verificationSource),
+      writeFile(path.join(output, `${ir.module}_glue.verify.driver.cpp`), generated.verificationDriver),
+      writeFile(path.join(output, `${ir.module}_glue.verify.json`), `${JSON.stringify(generated.verification, null, 2)}\n`),
     ]);
-    const result = { output, module: ir.module, routeCount: ir.routes.length, generatedRouteCount: generated.generatedRouteCount, blockedRouteCount: generated.blockedRouteCount };
+    const result = {
+      output,
+      module: ir.module,
+      routeCount: ir.routes.length,
+      generatedRouteCount: generated.generatedRouteCount,
+      blockedRouteCount: generated.blockedRouteCount,
+      verificationManifestSha256: generated.verification.manifestSha256,
+    };
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
     else console.log(`Generated ${result.generatedRouteCount}/${result.routeCount} native extension route(s) in ${path.relative(process.cwd(), output) || "."}; ${result.blockedRouteCount} need layout policy`);
     return result.blockedRouteCount ? 2 : 0;

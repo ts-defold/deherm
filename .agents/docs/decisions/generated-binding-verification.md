@@ -97,12 +97,31 @@ an exact-call wrapper/provider targeting a uniquely named ABI-compatible fake
 callee. A content-addressed vector records the source symbol, invocation kind,
 receiver, template arguments, ordered native parameters and slots, result
 shape, requirements, and both wrapper identities. The native test compiles,
-links, and executes that twin for direct functions, a template specialization,
-a constructor, a member function, and a destructor, asserting receiver and
-ordered native values as well as result re-encoding. The remaining census work
-is transport-driving each reachable concrete usage through JSI, Static Hermes,
-and browser/Wasm adapters where that usage is emitted; abstract recipes remain
-available but are not falsely described as concrete calls.
+links, and executes the generator-owned driver for direct functions, a template
+specialization, a constructor, a member function, and a destructor. A second
+shape suite covers booleans, floating point, enums, C strings, scalar and
+pointer-represented handles, references, and callbacks. The generated recording
+callees compare the decoded receiver and every native argument, return a
+deterministic native value, and expose reset/call/failure counters through C ABI
+observation functions. Record-by-value and enum-result cases fail closed until
+their usage supplies the missing layout or domain fact. This proves the native
+C-ABI exact-call lane for every concrete usage the materializer accepts; it
+does not prove Defold implementation semantics or callback/handle ownership.
+The remaining census work is driving the same vector through JSI, Static
+Hermes, and browser/Wasm adapters where that usage is emitted; abstract recipes
+remain available but are not falsely described as concrete calls.
+
+The arbitrary-extension C-header lane follows the same rule. Function identity
+is derived from module, native symbol, ordered native parameter spellings, and
+native result spelling plus the variadic call form, so inserting lines in a
+header cannot renumber calls. Repeated compatible declarations deduplicate;
+variadic declarations remain visible but require a typed non-variadic facade.
+The generated production dispatcher, ABI-compatible fake dispatcher, runnable
+driver, and content-addressed verification report all consume that normalized
+route plan. `deherm generate-extension-api` writes all four artifacts. The
+current parser is deliberately a single-header C11 lane: C++ methods/templates,
+multi-header project assembly, records, unsafe pointers, and callback ownership
+remain explicit follow-on shape work rather than implied support.
 
 # Integration tests are sentinels
 

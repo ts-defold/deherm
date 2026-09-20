@@ -1,5 +1,36 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Generated native exact-call drivers for dmSDK and extensions
+
+* **Concrete dmSDK usages now bring their own executable native proof**: the
+  materializer derives deterministic wire cells, ABI-compatible recording fake
+  callees, fake results, a driver, and reset/call/failure observation functions
+  from the same resolved recipe that emits production code. Direct, template,
+  constructor, member, destructor, boolean, float, enum, C-string, scalar and
+  pointer handle, reference, and callback shapes compile and run. Record values
+  and unspecified enum results fail closed. This is native C-ABI exact-call
+  evidence, not Defold semantics or cross-transport ownership evidence.
+
+* **The C11 extension lane now has stable identities and ships its twin**:
+  module/signature hashes replace line-number IDs; moving declarations without
+  changing their ABI preserves identity. The CLI emits production glue, exact
+  glue, a runnable fake driver, and the content-addressed report. The default
+  check and policy engine job compile and execute both the dmSDK and extension
+  twins. Automatic project-header integration, `.script_api` installation,
+  C++/multi-header parsing, and record/pointer/callback ownership remain named
+  follow-on work.
+
+* **The adversarial pass converted green-test blind spots into generator
+  invariants**: narrow integer fixtures are bounded before native casts; the
+  production callback symbol is type-declared and the exact twin maps that same
+  expression to its generated typed fixture; C varargs are cataloged behind a
+  typed-facade blocker; repeated compatible prototypes deduplicate before true
+  numeric-collision checks; verification reports hash both emitted sources, the
+  driver, and its fake definitions; and every generated failure returns a fixed
+  nonzero process status while printing its stage, vector, and ID. A 157-route
+  executable regression fails at vector 156 with status 1, closing the former
+  POSIX `256 -> 0` false success.
+
 ## 2026-09-20 - Bound policy-site handshakes to the resolved revision
 
 * **The clean consumer now validates each published revision against its own

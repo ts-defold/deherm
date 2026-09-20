@@ -72,6 +72,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(publish, /needs\.host-parity\.result == 'success'/u);
   assert.match(workflow, /manage-native-artifacts\.mjs pull --target x86_64-linux/u);
   assert.doesNotMatch(workflow, /pnpm artifacts:pull/u);
+  assert.match(engine, /pnpm check:exact-call-materializers/u);
   assert.match(engine, /continue-on-error: true/u);
   assert.match(engine, /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u);
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);

@@ -4,10 +4,13 @@
 #include <memory>
 #include <new>
 #include <stdint.h>
+#include <stdio.h>
 #include <string.h>
+#include <type_traits>
 [[maybe_unused]] static int deherm_dmsdk_address_fits(uint64_t value){return sizeof(uintptr_t)>=sizeof(uint64_t)||value<=UINTPTR_MAX;}
 [[maybe_unused]] static int64_t deherm_dmsdk_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}
 [[maybe_unused]] static double deherm_dmsdk_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}
+
 extern "C" DehermDmSdkUniversalStatus deherm_test_to_network(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
  if(argument_count != UINT32_C(1)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
  if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;

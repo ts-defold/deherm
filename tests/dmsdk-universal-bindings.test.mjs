@@ -254,44 +254,6 @@ extern "C" DehermDmSdkUniversalStatus wrap_array_capacity(const DehermDmSdkUnive
 extern "C" DehermDmSdkUniversalStatus wrap_array_destroy(const DehermDmSdkUniversalValue*, uint32_t, DehermDmSdkUniversalValue*);
 extern "C" DehermDmSdkUniversalStatus wrap_clamp_i32(const DehermDmSdkUniversalValue*, uint32_t, DehermDmSdkUniversalValue*);
 extern "C" void deherm_dmsdk_generated_provider_install(void);
-extern "C" void deherm_dmsdk_generated_provider_install_exact_verification(void);
-
-static uint32_t exact_calls = 0;
-static dmArray<uint32_t>* exact_receiver = nullptr;
-static uint32_t* exact_backing = nullptr;
-static uint32_t exact_size = 0;
-static uint32_t exact_capacity = 0;
-
-extern "C" uint32_t wrap_to_network__exact_callee(uint32_t value) {
-  ++exact_calls;
-  return value ^ UINT32_C(0x55aa55aa);
-}
-extern "C" uint32_t wrap_to_host__exact_callee(uint32_t value) {
-  ++exact_calls;
-  return value ^ UINT32_C(0xaa55aa55);
-}
-extern "C" dmArray<uint32_t>* wrap_array_construct__exact_callee(
-    dmArray<uint32_t>* receiver, uint32_t* backing, uint32_t size, uint32_t capacity) {
-  ++exact_calls;
-  exact_receiver = receiver;
-  exact_backing = backing;
-  exact_size = size;
-  exact_capacity = capacity;
-  return receiver;
-}
-extern "C" uint32_t wrap_array_capacity__exact_callee(dmArray<uint32_t>* receiver) {
-  ++exact_calls;
-  exact_receiver = receiver;
-  return 91;
-}
-extern "C" void wrap_array_destroy__exact_callee(dmArray<uint32_t>* receiver) {
-  ++exact_calls;
-  exact_receiver = receiver;
-}
-extern "C" int32_t wrap_clamp_i32__exact_callee(int32_t value, int32_t minimum, int32_t maximum) {
-  ++exact_calls;
-  return value + minimum + maximum;
-}
 
 int main() {
   if (deherm_dmsdk_universal_count() != 1361) return 1;
@@ -338,26 +300,7 @@ int main() {
   if (deherm_dmsdk_universal_dispatch(${clamp.numericId}, clamp_args, 3, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
       result.tag != DEHERM_DMSDK_UNIVERSAL_I64 || static_cast<int64_t>(result.payload) != -10) return 9;
 
-  // Install the automatically generated exact-call twin. The same stable IDs,
-  // checks, native decoders, result encoders and receiver expressions now call
-  // ABI-compatible fake callees whose observations are asserted below.
-  deherm_dmsdk_generated_provider_install_exact_verification();
-  scalar[0].tag = DEHERM_DMSDK_UNIVERSAL_U64;
-  scalar[0].payload = UINT32_C(0x12345678);
-  if (deherm_dmsdk_universal_dispatch(${toNetwork.numericId}, scalar, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
-      result.payload != (UINT32_C(0x12345678) ^ UINT32_C(0x55aa55aa))) return 20;
-  if (deherm_dmsdk_universal_dispatch(${toHost.numericId}, scalar, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
-      result.payload != (UINT32_C(0x12345678) ^ UINT32_C(0xaa55aa55))) return 21;
-  if (deherm_dmsdk_universal_dispatch(${constructor.numericId}, ctor, 4, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
-      result.tag != DEHERM_DMSDK_UNIVERSAL_VOID || exact_receiver != reinterpret_cast<dmArray<uint32_t>*>(storage) ||
-      exact_backing != backing || exact_size != 2 || exact_capacity != 4) return 22;
-  if (deherm_dmsdk_universal_dispatch(${capacity.numericId}, ctor, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
-      result.payload != 91 || exact_receiver != reinterpret_cast<dmArray<uint32_t>*>(storage)) return 23;
-  if (deherm_dmsdk_universal_dispatch(${destructor.numericId}, ctor, 1, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
-      result.tag != DEHERM_DMSDK_UNIVERSAL_VOID || exact_receiver != reinterpret_cast<dmArray<uint32_t>*>(storage)) return 24;
-  if (deherm_dmsdk_universal_dispatch(${clamp.numericId}, clamp_args, 3, &result) != DEHERM_DMSDK_UNIVERSAL_OK ||
-      result.tag != DEHERM_DMSDK_UNIVERSAL_I64 || static_cast<int64_t>(result.payload) != -17) return 25;
-  if (exact_calls != 6) return 26;
+  if (deherm_dmsdk_generated_provider_install_run_exact_verification() != 0) return 20;
   puts("dmsdk-universal:ok");
   return 0;
 }
@@ -388,10 +331,192 @@ test("usage materializer normalizes JavaScript numeric cells for f32 arguments a
   assert.doesNotMatch(generated.source, /deherm_dmsdk_unpack_f32/);
 });
 
+test("generated exact-call fixtures stay within the declared narrow integer width", async () => {
+  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  const base = structuredClone(recipe(report, "dmEndian::ByteSwap", (item) => item.abi.parameters[0]?.nativeType === "uint16_t"));
+  const numericId = 531;
+  const declarationId = "dmsdk:fixture::NarrowU8@tests/fixtures/narrow_u8.h:1:1";
+  const narrow = {
+    ...base,
+    numericId,
+    declarationId,
+    projectionId: "dmsdk-projection:narrow-u8-fixture",
+    symbol: "deherm_narrow_u8_fixture",
+    include: "stdint.h",
+    preferredLowering: { state: "universal-fallback", family: "universal-recipe" },
+    fallback: { ...base.fallback, requirements: [] },
+    abi: {
+      ...base.abi,
+      resultNativeType: "uint8_t",
+      resultShape: { kind: "scalar", name: "u8" },
+      parameters: [{
+        ...base.abi.parameters[0],
+        nativeType: "uint8_t",
+        shape: { kind: "scalar", name: "u8" },
+      }],
+    },
+  };
+  const recipes = structuredClone(policyCatalog.recipes);
+  recipes[numericId] = narrow;
+  const catalogSha256 = "f".repeat(64);
+  const generated = materializeDmSdkUsages([{ declarationId }], {
+    catalog: { sourceHashes: { catalog: catalogSha256 }, recipes },
+    catalogSha256,
+  });
+  const vector = generated.verification.vectors[0];
+  assert.ok(vector.wireArguments[0].value >= 0 && vector.wireArguments[0].value <= 0xff);
+  assert.ok(vector.result.fakeReturn.value >= 0 && vector.result.fakeReturn.value <= 0xff);
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-narrow-width-"));
+  try {
+    const verification = path.join(output, "materialized.verify.cpp");
+    const harness = path.join(output, "harness.cpp");
+    const executable = path.join(output, "narrow-width");
+    await writeFile(verification, generated.verificationSource);
+    await writeFile(harness, `#include "materialized.verify.cpp"
+static DehermDmSdkUniversalProvider provider=nullptr;
+static void* provider_context=nullptr;
+extern "C" void deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider value,void* context){provider=value;provider_context=context;}
+extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(uint32_t id,const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
+  if(!provider)return DEHERM_DMSDK_UNIVERSAL_NO_PROVIDER;
+  const DehermDmSdkUniversalDescriptor descriptor={id,UINT16_C(1),0,0};
+  return provider(provider_context,&descriptor,arguments,argument_count,result);
+}
+int main(){return deherm_dmsdk_generated_provider_install_run_exact_verification();}
+`);
+    run(compiler, [
+      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      `-I${path.join(root, "defold/defold_hermes/include")}`, harness,
+      "-o", executable,
+    ]);
+    run(executable, []);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("generated exact-call driver owns deterministic scalar, pointer-like, callback, and reference fixtures", async () => {
+  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  const boolean = recipe(report, "dmUtf8::IsWhiteSpace");
+  const floating = recipe(report, "dmTrigLookup::Cos");
+  const enumeration = recipe(report, "dmBuffer::GetSizeForValueType");
+  const cstring = recipe(report, "dmHashString32");
+  const handle = recipe(report, "dmBuffer::IsBufferValid");
+  const pointerHandle = recipe(report, "ConfigFileGetFloat");
+  const reference = recipe(report, "dmArray::dmArray::Push");
+  const callback = recipe(report, "dmLog::RegisterLogListener");
+  const bypass = { generatedAdapterBypass: { reason: "exercise exact universal decoding", evidence: "generated native driver records the native call and result" } };
+  const generated = materializeDmSdkUsages([
+    { declarationId: boolean.declarationId, wrapper: "verify_bool", acknowledgements: bypass },
+    {
+      declarationId: floating.declarationId,
+      wrapper: "verify_float",
+      acknowledgements: { generatedAdapterBypass: { reason: "exercise exact universal decoding", evidence: "generated native driver records the f32 call and result" } },
+    },
+    { declarationId: enumeration.declarationId, wrapper: "verify_enum", enumDomains: { 0: [0] }, acknowledgements: bypass },
+    { declarationId: cstring.declarationId, wrapper: "verify_cstring", acknowledgements: bypass },
+    {
+      declarationId: handle.declarationId,
+      wrapper: "verify_handle",
+      typeSubstitutions: { HBuffer: "dmBuffer::HBuffer" },
+      acknowledgements: bypass,
+    },
+    {
+      declarationId: pointerHandle.declarationId,
+      wrapper: "verify_pointer_handle",
+      acknowledgements: {
+        recordLayout: { reason: "exercise opaque pointer-handle transport", evidence: "generated driver uses an aligned identity token and never dereferences it" },
+      },
+    },
+    {
+      declarationId: reference.declarationId,
+      wrapper: "verify_reference",
+      receiverCppType: "dmArray<uint32_t>",
+      typeSubstitutions: { T: "uint32_t" },
+      acknowledgements: bypass,
+    },
+    {
+      declarationId: callback.declarationId,
+      wrapper: "verify_callback",
+      callbackTrampolines: { 0: "native_log_listener" },
+      acknowledgements: {
+        callbackTrampoline: { reason: "exercise exact callback transport", evidence: "generated typed trampoline identity is recorded by the native driver" },
+      },
+    },
+  ], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+  assert.deepEqual(
+    generated.verification.vectors.map((vector) => ({
+      arguments: vector.wireArguments.map(({ tag, fixture }) => fixture ?? tag),
+      result: vector.result.fakeReturn.tag,
+    })),
+    [
+      { arguments: ["u64"], result: "bool" },
+      { arguments: ["f64"], result: "f64" },
+      { arguments: ["i64"], result: "u64" },
+      { arguments: ["cstring"], result: "u64" },
+      { arguments: ["u64"], result: "bool" },
+      { arguments: ["aligned-address-token", "cstring", "f64"], result: "f64" },
+      { arguments: ["aligned-receiver-storage", "value-object"], result: "void" },
+      { arguments: ["fixed-trampoline"], result: "void" },
+    ],
+  );
+  assert.match(generated.verification.evidenceBoundary, /does not execute Defold implementation semantics/);
+  assert.doesNotMatch(generated.verification.evidenceBoundary, /consumer harness defines/);
+  assert.deepEqual({ ...generated.verification.observations, sourceSha256: undefined }, {
+    reset: "deherm_dmsdk_generated_provider_install_reset_exact_observations",
+    calls: "deherm_dmsdk_generated_provider_install_exact_call_count",
+    failures: "deherm_dmsdk_generated_provider_install_exact_failure_count",
+    sourceSha256: undefined,
+  });
+  assert.match(generated.verification.observations.sourceSha256, /^[0-9a-f]{64}$/);
+  assert.match(generated.verification.driver.sourceSha256, /^[0-9a-f]{64}$/);
+  assert.match(generated.source, /extern std::remove_pointer_t<DehermCallback_verify_callback_Arg0> native_log_listener/);
+  assert.match(generated.verificationSource, /#define native_log_listener \(&DehermExactCallbackFixture<DehermCallback_verify_callback_Arg0>::call\)/);
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-exact-shapes-"));
+  try {
+    const production = path.join(output, "materialized.cpp");
+    const verification = path.join(output, "materialized.verify.cpp");
+    const harness = path.join(output, "harness.cpp");
+    const executable = path.join(output, "exact-shapes");
+    await writeFile(production, generated.source);
+    await writeFile(verification, generated.verificationSource);
+    await writeFile(harness, `
+#include "materialized.verify.cpp"
+int main() {
+  const int status = deherm_dmsdk_generated_provider_install_run_exact_verification();
+  if (status) return status;
+  if (deherm_dmsdk_generated_provider_install_exact_call_count(UINT32_C(${boolean.numericId})) != 1) return 90;
+  if (deherm_dmsdk_generated_provider_install_exact_failure_count(UINT32_C(${boolean.numericId})) != 0) return 91;
+  deherm_dmsdk_generated_provider_install_reset_exact_observations();
+  return deherm_dmsdk_generated_provider_install_exact_call_count(UINT32_C(${boolean.numericId})) == 0 ? 0 : 92;
+}
+`);
+    run(compiler, [
+      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
+      "-c", production, "-o", path.join(output, "materialized.o"),
+    ]);
+    run(compiler, [
+      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
+      "defold/defold_hermes/src/generated_dmsdk_universal.cpp", harness,
+      "-o", executable,
+    ]);
+    run(executable, []);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
 test("usage materializer fails closed on catalog drift, unsafe bypass, arity overrides, and scalar narrowing", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const toNetwork = recipe(report, "dmEndian::ToNetwork", (item) => item.abi.parameters[0]?.nativeType === "uint32_t");
   const configFloat = recipe(report, "ConfigFileGetFloat");
+  const enumResult = recipe(report, "dmBuffer::Copy");
+  const recordArgument = recipe(report, "dmSocket::Connect");
   assert.throws(() => materializeDmSdkUsages([], {}), /requires a resolved policy catalog/);
   assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /generatedAdapterBypass/);
   assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, parameters: [], acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /override parameters only/);
@@ -404,6 +529,19 @@ test("usage materializer fails closed on catalog drift, unsafe bypass, arity ove
     acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } },
   }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }),
   /may not declare receiverCppType for direct-function/);
+  assert.throws(() => materializeDmSdkUsages([{
+    declarationId: enumResult.declarationId,
+    typeSubstitutions: { HBuffer: "dmBuffer::HBuffer", Result: "dmBuffer::Result" },
+  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /resultEnumValue/);
+  assert.throws(() => materializeDmSdkUsages([{
+    declarationId: recordArgument.declarationId,
+    typeSubstitutions: { Socket: "dmSocket::Socket", Address: "dmSocket::Address", Result: "dmSocket::Result" },
+    argumentExpressions: { 1: "dmSocket::Address{}" },
+    resultEnumValue: 0,
+    acknowledgements: {
+      recordLayout: { reason: "exercise unsupported exact record boundary", evidence: "materializer must fail before claiming a wire representation" },
+    },
+  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /wire fixture.*record/);
 
   const configUsage = {
     declarationId: configFloat.declarationId,

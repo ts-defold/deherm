@@ -294,6 +294,8 @@ jobs:
           path: upstream/defoldsdk.zip
           key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
       - run: bash scripts/bootstrap-upstreams.sh defold hermes extender ref-doc defold-sdk
+      - name: Compile and run generated dmSDK and extension exact-call twins
+        run: pnpm check:exact-call-materializers
       - id: engine
         name: Materialize the runtime and exercise every generated route
         continue-on-error: true

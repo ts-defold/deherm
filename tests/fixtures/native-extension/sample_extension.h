@@ -18,7 +18,9 @@ typedef struct SamplePoint {
 uint32_t sample_accumulate(uint32_t value, int32_t delta);
 double sample_apply(double value, SampleMode mode);
 const char* sample_label(SampleMode mode);
+const char* sample_label(SampleMode mode);
 SamplePoint sample_translate(SamplePoint point, float x, float y);
+uint32_t sample_variadic(uint32_t count, ...);
 
 #ifdef __cplusplus
 }
