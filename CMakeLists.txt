@@ -246,6 +246,58 @@ target_include_directories(defold-hermes-static-special-call-test PRIVATE
 target_link_libraries(defold-hermes-static-special-call-test PRIVATE
   defold-hermes-runtime)
 
+set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR
+  "${CMAKE_CURRENT_BINARY_DIR}/generated/static-dmsdk-exact")
+set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_C
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR}/static-dmsdk-exact.c")
+set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_CPP
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR}/static_dmsdk_exact_fixture.cpp")
+set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_H
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR}/static_dmsdk_exact_fixture.h")
+set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_EVIDENCE
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR}/static-dmsdk-exact-evidence.json")
+add_custom_command(
+  OUTPUT
+    "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_C}"
+    "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_CPP}"
+    "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_H}"
+    "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_EVIDENCE}"
+  COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-dmsdk-exact-verification.mjs"
+    --shermes "$<TARGET_FILE:shermes>"
+    --output-dir "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR}"
+  DEPENDS
+    shermes
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-dmsdk-exact-verification.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-materializer.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-materializer-core.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-static-frame.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/generated/dmsdk-universal-recipes.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-dmsdk-universal-bindings.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/dmsdk-universal.ts"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  VERBATIM)
+set_source_files_properties(
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_C}"
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_CPP}"
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_H}"
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_EVIDENCE}"
+  PROPERTIES GENERATED TRUE)
+add_executable(defold-hermes-static-dmsdk-exact-test
+  native/static_dmsdk_exact_test.cpp
+  defold/defold_hermes/src/generated_dmsdk_universal.cpp
+  defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_C}"
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_CPP}")
+target_compile_features(defold-hermes-static-dmsdk-exact-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-static-dmsdk-exact-test PRIVATE
+  defold/defold_hermes/include
+  "${DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR}")
+target_include_directories(defold-hermes-static-dmsdk-exact-test SYSTEM PRIVATE
+  upstream/defold/engine/dlib/src)
+target_link_libraries(defold-hermes-static-dmsdk-exact-test PRIVATE
+  defold-hermes-runtime)
+
 add_executable(defold-hermes-binding-arena-test native/binding_arena_test.cpp)
 target_compile_features(defold-hermes-binding-arena-test PRIVATE cxx_std_17)
 target_include_directories(defold-hermes-binding-arena-test PRIVATE

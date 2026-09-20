@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:342d8d6828f7869e0cbe95d9d458e4644f92ef0cf651a7fedaa33d9f9a587d65",
+  "generator": "sha256:d894f93b1b499937fafc353284c8918b4113b2a8478077622b87b4e115f9b4e1",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "c17e74a7f2fa46858961e248d2acd776bff7e985b1e4e005998148e70302e8a5",
+  "policyRoot": "c3f289e1dd30f85cdc6aa004d5c8b49715ff51473965d1019594b69561b9b363",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 83,
     "namespaces": 52,
-    "objectBytes": 28286105,
+    "objectBytes": 28286261,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -58,11 +58,11 @@
       "bytes": 11691
     },
     "@compiler:document:defold-binding-lowering-plan.json": {
-      "hash": "3b1ef60d198ea302aa3404aea6943524e61c68de393a85044e331ba729c7a202",
+      "hash": "09068da818ba937a9a44f289b18e5b09af92f6851bf2d9b8b5ad211d57a43469",
       "bytes": 10214154
     },
     "@compiler:document:defold-binding-lowering-plan.sentinel.json": {
-      "hash": "fab77a450fdf86e51677bdcca29a9aff6bbe6054dde154d323b5bd41c609b359",
+      "hash": "496dec2e4d6065020909b365b9b191a7356f0825dcc9cf5c3ec226b4da611403",
       "bytes": 6612
     },
     "@compiler:document:defold-dmsdk-scalar-thunks.json": {
@@ -70,8 +70,8 @@
       "bytes": 80506
     },
     "@compiler:document:defold-dmsdk-universal-bindings.json": {
-      "hash": "c549924d567d41f198ca73e993869957d1a147003c3ffbc98e53774125c100b1",
-      "bytes": 2985836
+      "hash": "27f7a2f74e774a1b1eb3c30cb8f8ca4e02366e04ea15db79b7c4da92a6240416",
+      "bytes": 2985992
     },
     "@compiler:document:defold-script-api-accounting.json": {
       "hash": "195f1bc7ef4378ed64f246167467c4b63a434aa8c0b824e6b9bf3f80750bd240",

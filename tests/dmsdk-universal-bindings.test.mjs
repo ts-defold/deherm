@@ -7,6 +7,10 @@ import path from "node:path";
 import test from "node:test";
 
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
+import {
+  DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
+  emitDmSdkUniversalStaticFrame,
+} from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 import { buildUniversalDmSdkBindings } from "../scripts/generate-dmsdk-universal-bindings.mjs";
 
@@ -88,6 +92,25 @@ test("universal dmSDK artifacts regenerate byte-for-byte", async () => {
   }
 });
 
+test("Static Hermes dmSDK frame artifacts come from the stable compiler capability", async () => {
+  const emitted = emitDmSdkUniversalStaticFrame();
+  assert.equal(emitted.argumentCapacity, 32);
+  assert.equal(DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY, 32);
+  assert.match(emitted.header, /DEHERM_DMSDK_STATIC_FRAME_ARGUMENT_CAPACITY UINT32_C\(32\)/);
+  assert.match(emitted.source, /DEHERM_DMSDK_STATIC_FRAME_ARGUMENT_CAPACITY/);
+  assert.match(emitted.staticHermes, /DMSDK_UNIVERSAL_MAX_ARGUMENTS=32/);
+  const [header, source, staticHermes] = await Promise.all([
+    readFile(path.join(root, "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h"), "utf8"),
+    readFile(path.join(root, "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp"), "utf8"),
+    readFile(path.join(root, "packages/static-hermes/src/generated/dmsdk-universal.ts"), "utf8"),
+  ]);
+  assert.deepEqual({ header, source, staticHermes }, {
+    header: emitted.header,
+    source: emitted.source,
+    staticHermes: emitted.staticHermes,
+  });
+});
+
 test("universal dmSDK ABI header is C11-compatible and linkable", async () => {
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-universal-c-"));
   try {
@@ -112,13 +135,46 @@ int main(void) {
   }
 });
 
+test("Static Hermes dmSDK transport owns a bounded reentrant frame", async () => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-static-frame-"));
+  try {
+    const harness = path.join(output, "static-frame.cpp");
+    const executable = path.join(output, "static-frame");
+    await writeFile(harness, `
+#include <defold_hermes/generated_dmsdk_universal_static_frame.h>
+#include <stdint.h>
+extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(uint32_t id,const DehermDmSdkUniversalValue* arguments,uint32_t count,DehermDmSdkUniversalValue* result){
+  if(id!=UINT32_C(17)||count!=UINT32_C(1)||!arguments||!result)return DEHERM_DMSDK_UNIVERSAL_PROVIDER_ERROR;
+  *result=arguments[0];return DEHERM_DMSDK_UNIVERSAL_OK;
+}
+int main(){
+  DehermDmSdkUniversalStaticFrame* frames[DEHERM_DMSDK_STATIC_FRAME_REENTRANCY]{};
+  for(uint32_t index=0;index<DEHERM_DMSDK_STATIC_FRAME_REENTRANCY;++index)if(!(frames[index]=deherm_dmsdk_static_frame_acquire()))return 1;
+  if(deherm_dmsdk_static_frame_acquire()!=nullptr)return 2;
+  if(!deherm_dmsdk_static_frame_set(frames[0],0,UINT32_C(0x89abcdef),UINT32_C(0x01234567),UINT32_C(3),UINT32_C(4),DEHERM_DMSDK_UNIVERSAL_U64,UINT32_C(9)))return 3;
+  if(deherm_dmsdk_static_frame_dispatch(frames[0],UINT32_C(17),UINT32_C(1))!=DEHERM_DMSDK_UNIVERSAL_OK)return 4;
+  if(deherm_dmsdk_static_frame_result_payload_low(frames[0])!=UINT32_C(0x89abcdef)||deherm_dmsdk_static_frame_result_payload_high(frames[0])!=UINT32_C(0x01234567)||deherm_dmsdk_static_frame_result_auxiliary_low(frames[0])!=UINT32_C(3)||deherm_dmsdk_static_frame_result_auxiliary_high(frames[0])!=UINT32_C(4)||deherm_dmsdk_static_frame_result_tag(frames[0])!=DEHERM_DMSDK_UNIVERSAL_U64||deherm_dmsdk_static_frame_result_type_id(frames[0])!=UINT32_C(9))return 5;
+  for(auto* frame:frames)deherm_dmsdk_static_frame_release(frame);
+  return deherm_dmsdk_static_frame_acquire()?0:6;
+}
+`);
+    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp", harness, "-o", executable]);
+    run(executable, []);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
 test("universal dmSDK runtime bridge is generated, catalog-authenticated, and direct-memory linked", async () => {
-  const [header, source, web, typescript, installer] = await Promise.all([
+  const [header, source, web, typescript, installer, staticHermes] = await Promise.all([
     readFile(path.join(root, "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp"), "utf8"),
     readFile(path.join(root, "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp"), "utf8"),
     readFile(path.join(root, "defold/defold_hermes/lib/web/generated_dmsdk_universal.js"), "utf8"),
     readFile(path.join(root, "packages/sdk/src/generated/dmsdk/universal.ts"), "utf8"),
     readFile(path.join(root, "defold/defold_hermes/src/generated_jsi.cpp"), "utf8"),
+    readFile(path.join(root, "packages/static-hermes/src/generated/dmsdk-universal.ts"), "utf8"),
   ]);
   assert.match(header, /installDmSdkUniversalModule/);
   assert.match(source, /deherm_dmsdk_universal_catalog_sha256/);
@@ -127,6 +183,8 @@ test("universal dmSDK runtime bridge is generated, catalog-authenticated, and di
   assert.match(web, /DMSDK_UNIVERSAL__deps:\["deherm_dmsdk_universal_dispatch","deherm_dmsdk_universal_catalog_sha256"\]/);
   assert.match(typescript, /catalog identity mismatch/);
   assert.match(installer, /installDmSdkUniversalModule\(runtime, modules\)/);
+  assert.match(staticHermes, /deherm_dmsdk_static_frame_dispatch/);
+  assert.doesNotMatch(staticHermes, /function deherm_dmsdk_universal_dispatch/);
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-universal-jsi-"));
   try {
     run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
@@ -517,6 +575,19 @@ test("usage materializer fails closed on catalog drift, unsafe bypass, arity ove
   const configFloat = recipe(report, "ConfigFileGetFloat");
   const enumResult = recipe(report, "dmBuffer::Copy");
   const recordArgument = recipe(report, "dmSocket::Connect");
+  const oversizedCatalog = structuredClone(policyCatalog);
+  oversizedCatalog.abi = { maxArguments: DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY + 1 };
+  oversizedCatalog.recipes[0].abi.argumentCount = DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY + 1;
+  assert.throws(() => materializeDmSdkUsages([], {
+    catalog: oversizedCatalog,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+  }), /requires 33 arguments.*supports 32/);
+  const inconsistentCatalog = structuredClone(policyCatalog);
+  inconsistentCatalog.abi = { maxArguments: 14 };
+  assert.throws(() => materializeDmSdkUsages([], {
+    catalog: inconsistentCatalog,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+  }), /abi\.maxArguments 14 does not match recipe maximum 15/);
   assert.throws(() => materializeDmSdkUsages([], {}), /requires a resolved policy catalog/);
   assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /generatedAdapterBypass/);
   assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, parameters: [], acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /override parameters only/);

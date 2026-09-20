@@ -25,6 +25,7 @@ import {
 } from "./sdk/support-sdk.mjs";
 import { DEFOLD_REVISION_TOKEN, restoreDefoldRevision } from "./api-policy.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
+import { assertDmSdkUniversalStaticFrameCapacity } from "./dmsdk-universal-static-frame.mjs";
 
 const SCRIPT_IR = "defold-script-api-ir.json";
 const DMSDK_IR = "defold-sdk-ir.json";
@@ -216,6 +217,7 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   for (const required of [SCRIPT_IR, DMSDK_IR, HANDLE_LOWERING]) {
     if (!documents[required]) throw new Error(`Policy compiler surface is missing ${required}`);
   }
+  assertDmSdkUniversalStaticFrameCapacity(documents["defold-dmsdk-universal-bindings.json"]);
   for (const name of Object.keys(documents)) {
     if (!DOCUMENT_RECIPES.has(recipes.documents?.[name])) {
       throw new Error(`${name}: unsupported compiler-document recipe ${JSON.stringify(recipes.documents?.[name])}`);

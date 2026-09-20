@@ -169,4 +169,5 @@ bytes. This is a structural transfer boundary, not yet a total-size victory.
 The 10.21 MB canonical lowering plan is still a referenced derived output and
 must be rebuilt locally from normalized recipe facts. The 15 support-source
 objects must likewise be replaced by compiler-owned emitters. Those changes
-will reduce total transfer size without changing the consumer contract.
+will reduce total transfer size without changing the consumer contract; the
+work is tracked in [#93](https://github.com/ts-defold/deherm/issues/93).

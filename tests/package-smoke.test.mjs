@@ -59,6 +59,14 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
     "repo-only policy derivation must not ship in the consumer package");
   assert.equal(packedFiles.has("packages/compiler/src/generated/dmsdk-universal-recipes.mjs"), false,
     "the package must not ship a pinned Defold dmSDK catalog as realization authority");
+  for (const relative of [
+    "packages/compiler/src/dmsdk-universal-static-frame.mjs",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
+    "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
+    "packages/static-hermes/src/generated/dmsdk-universal.ts"
+  ]) {
+    assert.equal(packedFiles.has(relative), true, `packed npm artifact is missing ${relative}`);
+  }
   const archive = path.join(root, packed.filename);
   const installRoot = path.join(root, "install");
   await mkdir(installRoot, { recursive: true });
@@ -69,6 +77,20 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "binding-identity.mjs"), "utf8");
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "component-proxy-generator.mjs"), "utf8");
   await readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-script-real-engine-probes.json"), "utf8");
+  const staticFrame = await import(pathToFileURL(path.join(
+    packageRoot, "packages", "compiler", "src", "dmsdk-universal-static-frame.mjs"
+  )));
+  const emittedStaticFrame = staticFrame.emitDmSdkUniversalStaticFrame();
+  assert.equal(emittedStaticFrame.argumentCapacity, 32);
+  assert.equal(await readFile(path.join(
+    packageRoot, "defold", "defold_hermes", "include", "defold_hermes", "generated_dmsdk_universal_static_frame.h"
+  ), "utf8"), emittedStaticFrame.header);
+  assert.equal(await readFile(path.join(
+    packageRoot, "defold", "defold_hermes", "src", "generated_dmsdk_universal_static_frame.cpp"
+  ), "utf8"), emittedStaticFrame.source);
+  assert.equal(await readFile(path.join(
+    packageRoot, "packages", "static-hermes", "src", "generated", "dmsdk-universal.ts"
+  ), "utf8"), emittedStaticFrame.staticHermes);
 
   // The packed package, not the repository checkout, must contain all compiler
   // code needed to turn its authenticated policy into a local surface.
@@ -98,6 +120,10 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
   // dmSDK twins from policy-derived IR without reaching back into this checkout.
   const packedCatalog = path.join(packedSurfaceRoot, "ir", "defold-dmsdk-universal-bindings.json");
   const packedCatalogDocument = JSON.parse(await readFile(packedCatalog, "utf8"));
+  assert.equal(
+    staticFrame.assertDmSdkUniversalStaticFrameCapacity(packedCatalogDocument),
+    packedCatalogDocument.abi.maxArguments
+  );
   const packedRecipe = packedCatalogDocument.recipes.find(({ symbol, declarationKind, abi }) =>
     symbol === "dmEndian::ToNetwork" && declarationKind === "function" &&
     abi.parameters[0]?.nativeType === "uint32_t");

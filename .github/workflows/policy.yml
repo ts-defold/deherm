@@ -294,18 +294,37 @@ jobs:
           path: upstream/defoldsdk.zip
           key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
       - run: bash scripts/bootstrap-upstreams.sh defold hermes extender ref-doc defold-sdk
+      - name: Pull the Linux Hermes target archive
+        run: node scripts/manage-native-artifacts.mjs pull --target x86_64-linux
       - name: Compile and run generated dmSDK and extension exact-call twins
+        env:
+          DEHERM_REQUIRE_PACKAGED_HERMES: '1'
         run: pnpm check:exact-call-materializers
+      - name: Configure the native exact-call targets
+        run: pnpm configure:native
+      - name: Compile and run the bounded Static Hermes exact-call unit
+        run: |
+          cmake --build build/native --target defold-hermes-static-dmsdk-exact-test --parallel
+          build/native/defold-hermes-static-dmsdk-exact-test
+      - id: emsdk
+        run: |
+          sed -n 's/^EMSDK_VERSION=/version=/p' upstream.lock >> "$GITHUB_OUTPUT"
+          sed -n 's/^EMSDK_REV=/revision=/p' upstream.lock >> "$GITHUB_OUTPUT"
+      - uses: actions/cache@v4
+        with:
+          path: |
+            upstream/extender/platformsdk/emsdk-${{ steps.emsdk.outputs.version }}
+            upstream/extender/platformsdk/emcache_${{ steps.emsdk.outputs.version }}
+          key: emsdk-${{ runner.os }}-${{ steps.emsdk.outputs.version }}-${{ steps.emsdk.outputs.revision }}
+      - name: Bootstrap the pinned Emscripten SDK
+        run: bash scripts/bootstrap-emsdk.sh
+      - name: Compile and run dmSDK exact calls in real browser Wasm
+        run: pnpm test:dmsdk-browser-exact-call
       - id: engine
         name: Materialize the runtime and exercise every generated route
         continue-on-error: true
         run: |
           bash scripts/bootstrap-bob.sh
-          # This runner executes the x86_64 Linux driver. Pulling every bundle
-          # target made engine evidence depend on unrelated iOS/Android/Windows
-          # publication and downloaded hundreds of megabytes it could not use.
-          node scripts/manage-native-artifacts.mjs pull --target x86_64-linux
-          pnpm configure:native
           node scripts/check-headless-conformance.mjs
       - name: Derive and report per-route verification
         if: always()

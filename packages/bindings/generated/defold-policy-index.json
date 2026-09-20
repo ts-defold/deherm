@@ -21,11 +21,12 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "c17e74a7f2fa46858961e248d2acd776bff7e985b1e4e005998148e70302e8a5",
-      "generator": "sha256:342d8d6828f7869e0cbe95d9d458e4644f92ef0cf651a7fedaa33d9f9a587d65",
+      "policyRoot": "c3f289e1dd30f85cdc6aa004d5c8b49715ff51473965d1019594b69561b9b363",
+      "generator": "sha256:d894f93b1b499937fafc353284c8918b4113b2a8478077622b87b4e115f9b4e1",
       "realizer": {
         "minimumPackageVersion": "0.0.0",
         "requiredCapabilities": [
+          "dmsdk.static-hermes-bounded-frame.v1",
           "policy.compiler-document.copy-json.v1",
           "policy.compiler-document.defold-value-layouts.v1",
           "policy.compiler-document.dmsdk-universal.v1",

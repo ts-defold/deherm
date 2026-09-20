@@ -31,6 +31,37 @@
   executable regression fails at vector 156 with status 1, closing the former
   POSIX `256 -> 0` false success.
 
+* **Browser-target dmSDK exact calls now execute in a real Emscripten module**:
+  a wasm32-specific gate materializes four source-derived dmSDK vectors, compiles
+  the generated exact provider and universal dispatcher with pinned Emscripten
+  4.0.6, serves the emitted HTML/JavaScript/Wasm artifacts on loopback, and
+  observes the manifest-bound success marker in headless Chrome. The report
+  names the exact vector and artifact hashes and declares `mockMemory: false`.
+  Missing Emscripten activation or Chrome fails with machine-readable
+  prerequisites rather than falling back to the existing Node mock-memory
+  adapter tests. This is real-browser wasm32 C-ABI evidence; the production
+  JavaScript browser arena remains a separate transport gate.
+
+* **Dynamic and Static Hermes now replay generator-owned dmSDK vectors**: the
+  Dynamic runner uses a real packaged Hermes runtime and the production JSI
+  host function for five non-callback vector families. The Static runner emits
+  strict C from sound TypeScript and crosses a generated four-deep bounded
+  frame for nine scalar, value, handle, reference, and callback vectors.
+  Both assert exact native call counts and argument observations. Dynamic JSI
+  asserts decoded result signatures; Static asserts all six result-cell fields
+  and C-string address identity. The package owns a 32-cell frame capability;
+  each policy carries a recipe-derived maximum, currently fifteen, and an
+  incompatible future catalog fails with an explicit package-upgrade error.
+  Dynamic callbacks remain unsupported until the production JSI
+  encoder owns a callback representation; retained ownership semantics remain
+  outside both claims.
+
+* **The real-browser gate rejects runtime failures without favicon flakiness**:
+  the Emscripten HTML shell receives an inline favicon before hashing and
+  launch. This prevents Chrome's optional `/favicon.ico` request from creating
+  an unrelated 404 while preserving strict rejection of actual page, Wasm, and
+  console failures.
+
 ## 2026-09-20 - Bound policy-site handshakes to the resolved revision
 
 * **The clean consumer now validates each published revision against its own

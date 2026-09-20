@@ -28,6 +28,11 @@
 // of that boundary, where a hash only decides whether to redo work.
 
 import { createHash } from "node:crypto";
+import {
+  DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
+  DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
+  DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,
+} from "./dmsdk-universal-static-frame.mjs";
 
 export const POLICY_SCHEMA_VERSION = 1;
 
@@ -55,9 +60,20 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "sdk.script.runtime.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.types.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.universal-value.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
-  "binding.raw-unverified-fallback.v1": Object.freeze({ introducedInVersion: "0.0.0" })
+  "binding.raw-unverified-fallback.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  [DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]: Object.freeze({
+    introducedInVersion: "0.0.0",
+    schema: DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,
+    argumentCapacity: DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
+  }),
 });
 export const POLICY_REALIZER_CAPABILITIES = Object.freeze(Object.keys(POLICY_REALIZER_CAPABILITY_REGISTRY).sort());
+
+const POLICY_REALIZER_CAPABILITY_IMPLICATIONS = Object.freeze({
+  "policy.compiler-document.dmsdk-universal.v1": Object.freeze([
+    DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
+  ]),
+});
 
 function versionTuple(version) {
   const match = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/u.exec(version);
@@ -90,6 +106,7 @@ export function buildPolicyRealizer({ compilerSurface, capabilityRegistry = POLI
           throw new Error(`${section}.${name}: no explicit policy realization recipe selected`);
         }
         required.add(capability);
+        for (const implied of POLICY_REALIZER_CAPABILITY_IMPLICATIONS[capability] ?? []) required.add(implied);
       }
       const stale = Object.keys(selected).filter((name) => !(name in values));
       if (stale.length) throw new Error(`${section}: realization recipes name absent values: ${stale.join(", ")}`);

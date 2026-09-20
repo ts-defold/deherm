@@ -76,3 +76,23 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const second = await materializePolicySurface(policy, { outputRoot });
   assert.deepEqual(second.written, [], "materialization must be idempotent when policy and compiler are unchanged");
 });
+
+test("policy materialization fails closed when the dmSDK catalog exceeds the package frame", async () => {
+  const policy = await currentResolvedPolicy();
+  const compiler = policy.objects.get("@compiler");
+  const catalogKey = compiler.value.documents.entries["defold-dmsdk-universal-bindings.json"].object;
+  const catalogObject = policy.objects.get(catalogKey);
+  const value = structuredClone(catalogObject.value);
+  const catalog = value.value;
+  catalog.abi.maxArguments = 33;
+  catalog.recipes[0].abi.argumentCount = 33;
+  const oversized = {
+    ...policy,
+    objects: new Map(policy.objects).set(catalogKey, { ...catalogObject, value })
+  };
+  const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-capacity-test-"));
+  await assert.rejects(
+    materializePolicySurface(oversized, { outputRoot }),
+    /requires 33 arguments.*supports 32.*upgrade @ts-defold\/deherm/u
+  );
+});

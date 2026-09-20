@@ -2,7 +2,7 @@
 
 export { dispatchDmSdkBorrowedHandle } from "./generated/dmsdk-borrowed-handle.js";
 export { dispatchDmSdkScratchScalarOut } from "./generated/dmsdk-scratch-scalar-out.js";
-export { __ffi_dmsdkUniversalDispatch, DMSDK_UNIVERSAL_MAX_ARGUMENTS, DMSDK_UNIVERSAL_VALUE_BYTES } from "./generated/dmsdk-universal.js";
+export { DehermStaticDmSdkCell, dispatchDmSdkUniversalFrame, DMSDK_UNIVERSAL_MAX_ARGUMENTS, DMSDK_UNIVERSAL_VALUE_BYTES } from "./generated/dmsdk-universal.js";
 export {
   DehermStaticValue,
   DehermStaticUndefined,

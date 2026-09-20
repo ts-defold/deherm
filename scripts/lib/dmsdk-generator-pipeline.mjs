@@ -24,7 +24,8 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/lib/reviewed-revision.mjs",
   "scripts/lib/revision-audit.mjs",
   "packages/compiler/src/dmsdk-universal-materializer-core.mjs",
-  "packages/compiler/src/dmsdk-universal-materializer.mjs"
+  "packages/compiler/src/dmsdk-universal-materializer.mjs",
+  "packages/compiler/src/dmsdk-universal-static-frame.mjs"
 ]);
 
 export const dmSdkPinnedInputs = Object.freeze([
@@ -139,8 +140,10 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
   "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
   "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
   "defold/defold_hermes/lib/web/generated_dmsdk_universal.js",
   "packages/sdk/src/generated/dmsdk/browser-arena.ts",
   "packages/sdk/src/generated/dmsdk/universal.ts",

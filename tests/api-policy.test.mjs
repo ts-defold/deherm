@@ -18,12 +18,18 @@ import {
   normalizePaths,
   objectPath,
   POLICY_REALIZER_CAPABILITIES,
+  POLICY_REALIZER_CAPABILITY_REGISTRY,
   policyPath,
   scriptNamespaceOfModulePath,
   scriptNamespaceOfTypeName,
   sealObject,
   serializeObject
 } from "../packages/compiler/src/api-policy.mjs";
+import {
+  DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
+  DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
+  DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA
+} from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
@@ -73,6 +79,15 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(workflow, /manage-native-artifacts\.mjs pull --target x86_64-linux/u);
   assert.doesNotMatch(workflow, /pnpm artifacts:pull/u);
   assert.match(engine, /pnpm check:exact-call-materializers/u);
+  assert.match(engine, /DEHERM_REQUIRE_PACKAGED_HERMES: '1'/u);
+  assert.ok(
+    engine.indexOf("manage-native-artifacts.mjs pull --target x86_64-linux") <
+      engine.indexOf("pnpm check:exact-call-materializers"),
+    "the JSI exact-call gate must run after the packaged Hermes archive is installed"
+  );
+  assert.match(engine, /defold-hermes-static-dmsdk-exact-test/u);
+  assert.match(engine, /bash scripts\/bootstrap-emsdk\.sh/u);
+  assert.match(engine, /pnpm test:dmsdk-browser-exact-call/u);
   assert.match(engine, /continue-on-error: true/u);
   assert.match(engine, /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u);
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
@@ -325,6 +340,35 @@ test("policy roots carry only the realization capabilities their payload uses", 
     "2.4.0",
     "the floor is the newest capability actually required, not the producer package version"
   );
+});
+
+test("dmSDK universal policies require the package-owned bounded Static Hermes frame", () => {
+  const compilerSurface = {
+    documents: {
+      "defold-dmsdk-universal-bindings.json": {}
+    },
+    sdk: {},
+    realizationRecipes: {
+      documents: {
+        "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1"
+      },
+      sdk: {}
+    }
+  };
+  assert.deepEqual(buildPolicyRealizer({ compilerSurface }), {
+    minimumPackageVersion: "0.0.0",
+    requiredCapabilities: [
+      DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY,
+      "policy.compiler-document.dmsdk-universal.v1",
+      "policy.compiler-surface.references.v1",
+      "policy.content-addressed-graph.v1"
+    ]
+  });
+  assert.deepEqual(POLICY_REALIZER_CAPABILITY_REGISTRY[DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY], {
+    introducedInVersion: "0.0.0",
+    schema: DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA,
+    argumentCapacity: DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY
+  });
 });
 
 test("index entries and the shipped index preserve the root realization contract", () => {

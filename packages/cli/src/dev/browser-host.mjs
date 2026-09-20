@@ -68,6 +68,7 @@ export async function waitFor(predicate, { timeoutMs, intervalMs = 150, what }) 
       const value = await predicate();
       if (value) return value;
     } catch (error) {
+      if (error?.fatal === true) throw error;
       lastError = error;
     }
     await new Promise((sleep) => setTimeout(sleep, intervalMs));
@@ -245,7 +246,7 @@ export async function openBundlePage(options) {
     await terminate(browser?.child);
     await server.close();
     if (browser?.profile && options.keepProfile !== true) {
-      await rm(browser.profile, { recursive: true, force: true });
+      await rm(browser.profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
     }
   };
   try {
@@ -277,6 +278,9 @@ export async function openBundlePage(options) {
     return { server, browser, client, debuggingPort, pageUrl: server.pageUrl, profile: browser.profile, close };
   } catch (error) {
     await close();
+    if (browser?.profile && options.keepProfile === true) {
+      await rm(browser.profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+    }
     throw error;
   }
 }

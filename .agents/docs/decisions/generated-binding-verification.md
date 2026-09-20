@@ -43,9 +43,9 @@ the binding.
 | --- | --- | --- |
 | Lua/script API | The stable-ID operation catalog plus generated null/recording providers assert the exact module, member, arity, argument tags/order, result tags/order, stack discipline, bounds, and ownership behavior. Compile-time property intrinsics and the specialized timer bridge form their own generated lanes. | A route is `verified` when its generated lane passes CI. Missing a bespoke live-engine fixture is only a harness coverage note. |
 | dmSDK | The declaration recipe records the exact native symbol, invocation kind, receiver, ordered native parameter types, result type, and ABI cells. Each usage materialization must emit the production wrapper and a verification vector/stub contract from the same resolved recipe and substitutions. | Every runtime declaration ships with a materializable recipe. Every reachable/materialized call must pass its generated exact-call test. Templates are tested after usage supplies the specialization; an abstract template is not falsely called a concrete function. |
-| Static Hermes | The sound-typed extern-C declaration is checked against the same ABI cells and exact-call vectors used by the native provider. | A compiler/frontend smoke is required for emitted reachable units; no separate semantic certification. |
-| Dynamic Hermes/JSI | The generated adapter is driven by the same exact-call vectors through a recording provider. | Transport parity and ownership checks are required. |
-| HTML5/Wasm | The direct-memory provider consumes the same vectors. Playwright runs a packaged browser sentinel to prove the JavaScript/Wasm/engine boundary exists. | Playwright is an integration sentinel, not one browser scenario per Defold function. |
+| Static Hermes | The sound-typed extern-C declaration is checked against the same ABI-cell contract with generator-owned, lane-specific exact-call vectors. | A compiler/frontend smoke is required for emitted reachable units; no separate semantic certification. |
+| Dynamic Hermes/JSI | The generated adapter is driven by generator-owned, lane-specific exact-call vectors through a recording provider. | Transport parity and ownership checks are required. |
+| HTML5/Wasm | The wasm32 C ABI consumes generator-owned, lane-specific vectors. Playwright runs a packaged browser sentinel to prove the JavaScript/Wasm/engine boundary exists. | Playwright is an integration sentinel, not one browser scenario per Defold function. |
 
 # Current evidence
 
@@ -107,9 +107,9 @@ observation functions. Record-by-value and enum-result cases fail closed until
 their usage supplies the missing layout or domain fact. This proves the native
 C-ABI exact-call lane for every concrete usage the materializer accepts; it
 does not prove Defold implementation semantics or callback/handle ownership.
-The remaining census work is driving the same vector through JSI, Static
-Hermes, and browser/Wasm adapters where that usage is emitted; abstract recipes
-remain available but are not falsely described as concrete calls.
+The remaining census work is generating an applicability manifest and expanding
+the relevant vectors across every emitted shape in each transport; abstract
+recipes remain available but are not falsely described as concrete calls.
 
 The arbitrary-extension C-header lane follows the same rule. Function identity
 is derived from module, native symbol, ordered native parameter spellings, and
@@ -122,6 +122,42 @@ route plan. `deherm generate-extension-api` writes all four artifacts. The
 current parser is deliberately a single-header C11 lane: C++ methods/templates,
 multi-header project assembly, records, unsafe pointers, and callback ownership
 remain explicit follow-on shape work rather than implied support.
+
+The browser-target dmSDK lane has a separate target gate because host-native
+execution is not wasm32 evidence. `pnpm test:dmsdk-browser-exact-call` materializes four
+real dmSDK recipes through the same exact-call generator, compiles the generated
+provider, recording callees, observations, driver, and universal dispatcher
+with the pinned Emscripten toolchain, and runs the emitted `.wasm` from a
+loopback page in Chrome. Success is a manifest-bound marker printed by code
+executing inside that Wasm module. The gate never substitutes a JavaScript
+`WebAssembly.Memory` or a mock heap. Missing pinned Emscripten activation or a
+real browser is a named prerequisite failure, not a skipped or downgraded test.
+The current bounded vector set proves unsigned integer, float, boolean, and C
+string calls in a real browser-loaded wasm32 C ABI. It does not yet drive those
+cells through the production JavaScript browser arena/dispatcher, and it is not
+evidence for every dmSDK recipe or a Defold engine implementation.
+
+The Dynamic Hermes lane generates a C++ runner from generator-owned,
+lane-specific materialized vectors, creates a real packaged Hermes runtime,
+installs the production
+`DmSdkUniversal.call` JSI host function, and verifies native recording-callee
+observations and decoded JavaScript results. Its current vectors cover boolean,
+integer, floating-point, address/handle, constructor, and template argument
+ordering. Callback transport remains an explicit gap because the production
+JSI encoder has no callback wire-value representation.
+
+The Static Hermes lane uses a generated, thread-local four-frame pool rather
+than exposing the raw universal-dispatch pointer ABI to sound TypeScript. Each
+frame owns 32 24-byte argument cells and one result cell; that capacity and the
+frame emitter are a versioned package capability, while a policy carries and
+cross-checks its recipe-derived maximum (currently fifteen). Acquire, cell
+copy, dispatch, result access, and release are the only Static Hermes FFI
+operations. A strict `shermes` unit replays nine lane-specific exact vectors
+covering bool, float, enum, C string, handle, pointer, reference, and callback
+shapes. It compares payload low/high, auxiliary low/high, tag, and type ID, and
+checks C-string address identity. This proves the bounded frame transport and
+generated fake observations, not Defold semantics or retained handle/callback
+lifetime policy.
 
 # Integration tests are sentinels
 

@@ -589,12 +589,18 @@ complete the layered cache:
 * The compiler manifest names the document/source objects a materializer needs,
   but the client still eagerly downloads the entire policy closure. A future
   layout may fetch the manifest first and then only its required subtrees.
-* The 10.21 MB canonical lowering plan and 17 TypeScript compatibility sources
+  Track this with project-cache population in
+  [#94](https://github.com/ts-defold/deherm/issues/94).
+* The 10.21 MB canonical lowering plan and 15 TypeScript compatibility sources
   remain referenced derived objects. Compiler-owned recipe emitters must replace
   them before the policy is a compact result rather than a correctness-first
-  transition artifact.
+  transition artifact. Track the ownership/size migration in
+  [#93](https://github.com/ts-defold/deherm/issues/93).
 * A project-cache population command is still needed; today `deherm policy`
   writes the shared user cache and project cache is read-only.
+* The default user-cache root is Linux-shaped on every host. Native macOS and
+  Windows cache roots plus a non-destructive compatibility path are tracked in
+  [#95](https://github.com/ts-defold/deherm/issues/95).
 
 Layer 0's content-addressed publication and materialization are implemented and
 tested, but accepting the whole layered-cache decision waits on those items.

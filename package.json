@@ -32,6 +32,10 @@
       "import": "./packages/compiler/src/dmsdk-universal-materializer.mjs",
       "default": "./packages/compiler/src/dmsdk-universal-materializer.mjs"
     },
+    "./compiler/dmsdk-universal-static-frame": {
+      "import": "./packages/compiler/src/dmsdk-universal-static-frame.mjs",
+      "default": "./packages/compiler/src/dmsdk-universal-static-frame.mjs"
+    },
     "./compiler/native-extension-generator": {
       "import": "./packages/compiler/src/native-extension-generator.mjs",
       "default": "./packages/compiler/src/native-extension-generator.mjs"
@@ -237,7 +241,7 @@
     "check:dmsdk-runtime": "node scripts/generate-dmsdk-runtime.mjs --check",
     "check:dmsdk-clean-room": "node scripts/check-dmsdk-clean-room-regeneration.mjs",
     "check:static-hermes": "pnpm check:static-hermes-vmath && cmake --build build/native --target shermes --parallel && node scripts/check-static-hermes.mjs",
-    "test:static-hermes": "pnpm check:static-hermes-vmath && pnpm generate:script-special-call-verification && pnpm build:js && pnpm configure:native && cmake --build build/native --target defold-hermes-static-special-call-test --parallel && build/native/defold-hermes-static-special-call-test && cmake --build build/native --target defold-hermes-static-runner --parallel && build/native/defold-hermes-static-runner",
+    "test:static-hermes": "pnpm check:static-hermes-vmath && pnpm generate:script-special-call-verification && pnpm build:js && pnpm configure:native && cmake --build build/native --target defold-hermes-static-special-call-test --parallel && build/native/defold-hermes-static-special-call-test && cmake --build build/native --target defold-hermes-static-dmsdk-exact-test --parallel && build/native/defold-hermes-static-dmsdk-exact-test && cmake --build build/native --target defold-hermes-static-runner --parallel && build/native/defold-hermes-static-runner",
     "check:extension-syntax": "python3 scripts/check-extension-syntax.py",
     "check:war-battles-gate": "node scripts/check-war-battles-runtime-gate.mjs --check",
     "generate:war-battles-gate": "node scripts/check-war-battles-runtime-gate.mjs",
@@ -249,7 +253,7 @@
     "capture:policy-surface-fixture": "node scripts/capture-policy-surface-old-pipeline.mjs --update",
     "check:types": "ttsc check",
     "check": "pnpm check:commit-provenance && pnpm check:policy-surface-fixture && pnpm check:bindings && pnpm check:lua-bridge && pnpm check:sdk-inventory && pnpm check:script-api-inventory && pnpm check:script-sdk && pnpm check:dmsdk-sdk && pnpm check:binding-patterns && pnpm check:script-descriptors && pnpm check:script-special-call-verification && pnpm check:exact-call-materializers && pnpm check:api-emission-completeness && pnpm check:war-battles-real-engine-probes && pnpm check:script-clean-room && pnpm check:dmsdk-runtime && pnpm check:dmsdk-clean-room && pnpm check:binding-lowering-plan && pnpm check:component-proxy-runtime-capability && pnpm check:war-battles-gate && pnpm check:profile-shipped-default && pnpm check:war-battles-projections && pnpm check:release-tags && pnpm check:dmsdk-accounting && pnpm check:route-verification && pnpm check:api-policy && pnpm check:types && pnpm check:knowledge",
-    "check:exact-call-materializers": "node --test tests/dmsdk-universal-bindings.test.mjs tests/native-extension-generator.test.mjs",
+    "check:exact-call-materializers": "node --test tests/dmsdk-universal-bindings.test.mjs tests/native-extension-generator.test.mjs tests/dmsdk-browser-exact-call.test.mjs tests/dmsdk-universal-jsi-exact-call.test.mjs",
     "build:js": "pnpm generate:bindings && node scripts/build.mjs",
     "build:device-dev": "pnpm build:js && cmake --build build/native --target hermesc --parallel && build/native/bin/hermesc -Og -g2 -emit-binary -out=dist/sample.hbc dist/sample.js",
     "generate:release-bindings": "node scripts/generate-release-build.mjs",
@@ -289,6 +293,7 @@
     "test:contract": "pnpm build:js && node --test tests/contract.test.mjs",
     "test:web-host": "pnpm build:js && node --test tests/web-host.test.mjs",
     "test:web-library": "node --test tests/web-library.test.mjs",
+    "test:dmsdk-browser-exact-call": "node scripts/check-dmsdk-browser-exact-call.mjs",
     "test:polyfills": "node --test tests/polyfill-manifest.test.mjs",
     "test:conformance": "node --test tests/conformance-harness.test.mjs",
     "test:lua-value-registry": "node --test tests/lua-value-registry.test.mjs",

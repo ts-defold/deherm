@@ -318,6 +318,7 @@ export const apiPolicyGenerator = Object.freeze({
     "packages/compiler/src/sdk/dmsdk-sdk.mjs",
     "packages/compiler/src/api-policy.mjs",
     "packages/compiler/src/policy-surface-materializer.mjs",
+    "packages/compiler/src/dmsdk-universal-static-frame.mjs",
     "packages/compiler/src/defold-toolchain-pins.mjs"
   ]),
   pinnedInputs: Object.freeze([

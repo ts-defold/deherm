@@ -5,6 +5,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer-core.mjs";
+import {
+  assertDmSdkUniversalStaticFrameCapacity,
+  emitDmSdkUniversalStaticFrame,
+} from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const defaultProjectionPath = "packages/bindings/generated/defold-dmsdk-projection-ir.json";
@@ -29,6 +33,8 @@ const artifacts = Object.freeze([
   "packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
   "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
   "tests/fixtures/generated_dmsdk_universal_test_ids.h",
+  "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
+  "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
 ]);
 
 const valueKind = Object.freeze({
@@ -231,10 +237,6 @@ function renderTypeScript(recipes, catalogHash) {
   return `// ${banner}\nexport const DMSDK_UNIVERSAL_CATALOG_SHA256=${JSON.stringify(catalogHash)};\nexport type DmSdkUniversalDeclarationId = keyof typeof DmSdkUniversalId;\nexport type DmSdkUniversalValue = undefined | boolean | number | bigint | string | DmSdkUniversalI64 | DmSdkUniversalU64 | DmSdkUniversalAddress | DmSdkUniversalMemory | DmSdkUniversalNativeValue;\nexport interface DmSdkUniversalI64 { readonly kind:"i64"; readonly value:bigint; }\nexport interface DmSdkUniversalU64 { readonly kind:"u64"; readonly value:bigint; }\nexport interface DmSdkUniversalAddress { readonly kind:"address"; readonly value:bigint; readonly typeId?:number; }\nexport interface DmSdkUniversalMemory { readonly kind:"memory"; readonly address:bigint; readonly byteLength:number; readonly typeId?:number; }\nexport interface DmSdkUniversalNativeValue { readonly kind:"native-value"; readonly address:bigint; readonly typeId:number; }\nexport interface DmSdkUniversalBridge { readonly catalogSha256:string; call(id:number,args:readonly DmSdkUniversalValue[]):DmSdkUniversalValue; }\ndeclare global { var __defoldModulesV1:Record<string,object>|undefined; }\nlet bridge:DmSdkUniversalBridge|undefined;\nexport function installDmSdkUniversalBridge(value:DmSdkUniversalBridge):void{bridge=value;}\nfunction requireBridge():DmSdkUniversalBridge{\n  const value=bridge??globalThis.__defoldModulesV1?.DmSdkUniversal as DmSdkUniversalBridge|undefined;\n  if(!value)throw new Error("Defold module is not registered: DmSdkUniversal");\n  if(value.catalogSha256!==DMSDK_UNIVERSAL_CATALOG_SHA256)throw new Error("DmSdkUniversal catalog identity mismatch");\n  return value;\n}\nexport const DmSdkUniversalId={\n${ids}\n} as const;\nexport function callDmSdkUniversal(id:DmSdkUniversalDeclarationId,args:readonly DmSdkUniversalValue[]):DmSdkUniversalValue{\n  return requireBridge().call(DmSdkUniversalId[id],args);\n}\n`;
 }
 
-function renderStaticHermes(maxArguments) {
-  return `// ${banner}\n// Direct-memory C ABI; no arrays or objects cross the boundary.\n"use strict";\nexport const DMSDK_UNIVERSAL_VALUE_BYTES=24;\nexport const DMSDK_UNIVERSAL_MAX_ARGUMENTS=${maxArguments};\nexport const __ffi_dmsdkUniversalDispatch=$SHBuiltin.extern_c(\n  {include:"defold_hermes/generated_dmsdk_universal.h"},\n  function deherm_dmsdk_universal_dispatch(id:c_uint,args:c_ptr,argCount:c_uint,result:c_ptr):c_uint{throw 0;}\n);\n`;
-}
-
 function renderBrowserArena(catalogHash, maxArguments) {
   return `// ${banner}
 import type { DmSdkUniversalBridge, DmSdkUniversalValue } from "./universal.js";
@@ -300,6 +302,8 @@ export async function buildUniversalDmSdkBindings({
   if (recipes.length !== expectedRuntimeDeclarations) throw new Error(`Expected ${expectedRuntimeDeclarations} recipes, got ${recipes.length}`);
   if (new Set(recipes.map(({ declarationId }) => declarationId)).size !== recipes.length) throw new Error("Duplicate universal declaration recipe");
   const maxArguments = Math.max(...recipes.map(({ abi }) => abi.argumentCount));
+  assertDmSdkUniversalStaticFrameCapacity({ abi: { maxArguments } });
+  const staticFrame = emitDmSdkUniversalStaticFrame();
   const specializedSourceHashes = Object.fromEntries(specializedReports.map(([family, content]) => [family, sha256(content)]));
   const sourceHash = sha256(projectionContent + irContent + specializedReports.map(([family, content]) => `${family}\0${content}`).join(""));
   const catalogHash = sha256(JSON.stringify(recipes));
@@ -332,8 +336,10 @@ export async function buildUniversalDmSdkBindings({
     [artifacts[5], renderWeb(recipes, maxArguments, catalogHash)],
     [artifacts[6], renderTypeScript(recipes, catalogHash)],
     [artifacts[7], renderBrowserArena(catalogHash, maxArguments)],
-    [artifacts[8], renderStaticHermes(maxArguments)],
+    [artifacts[8], staticFrame.staticHermes],
     [artifacts[9], renderRecipesModule(recipes, sourceHash, catalogHash)],
+    [artifacts[12], staticFrame.header],
+    [artifacts[13], staticFrame.source],
   ]);
   const endianRecipes = ["dmEndian::ToNetwork", "dmEndian::ToHost"].map((symbol) => {
     const matches = recipes.filter((recipe) => recipe.symbol === symbol && recipe.abi.parameters[0]?.nativeType === "uint32_t");

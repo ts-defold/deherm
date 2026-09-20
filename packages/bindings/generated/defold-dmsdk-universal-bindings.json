@@ -42,7 +42,9 @@
     "packages/static-hermes/src/generated/dmsdk-universal.ts",
     "packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
     "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
-    "tests/fixtures/generated_dmsdk_universal_test_ids.h"
+    "tests/fixtures/generated_dmsdk_universal_test_ids.h",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
+    "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp"
   ],
   "recipes": [
     {
