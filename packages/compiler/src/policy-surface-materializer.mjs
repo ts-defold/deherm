@@ -15,6 +15,12 @@ import {
   generateRuntime as generateDmSdkRuntime,
   generateTypes as generateDmSdkTypes
 } from "./sdk/dmsdk-sdk.mjs";
+import {
+  generateDmSdkBrowserArena,
+  generateDmSdkUniversal,
+  generateScriptHandleLowering,
+  generateScriptUniversalValue
+} from "./sdk/support-sdk.mjs";
 import { DEFOLD_REVISION_TOKEN, restoreDefoldRevision } from "./api-policy.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
 
@@ -34,7 +40,11 @@ const SDK_RECIPES = Object.freeze({
   "script/index.ts": "sdk.script.index.render.v1",
   "dmsdk/types.ts": "sdk.dmsdk.types.render.v1",
   "dmsdk/runtime.ts": "sdk.dmsdk.runtime.render.v1",
-  "dmsdk/index.ts": "sdk.dmsdk.index.render.v1"
+  "dmsdk/index.ts": "sdk.dmsdk.index.render.v1",
+  "script/handle-lowering.ts": "sdk.script.handle-lowering.render.v1",
+  "script/universal-value-bindings.ts": "sdk.script.universal-value.render.v1",
+  "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
+  "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1"
 });
 
 function sha256(value) {
@@ -210,7 +220,11 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
 
   const rendered = {
     ...renderScriptSdk(documents[SCRIPT_IR], documents[HANDLE_LOWERING]),
-    ...renderDmSdk(documents[DMSDK_IR])
+    ...renderDmSdk(documents[DMSDK_IR]),
+    "script/handle-lowering.ts": generateScriptHandleLowering(documents[HANDLE_LOWERING]),
+    "script/universal-value-bindings.ts": generateScriptUniversalValue(documents["defold-script-universal-value-bindings.json"]),
+    "dmsdk/universal.ts": generateDmSdkUniversal(documents["defold-dmsdk-universal-bindings.json"]),
+    "dmsdk/browser-arena.ts": generateDmSdkBrowserArena(documents["defold-dmsdk-universal-bindings.json"])
   };
   const sdk = compiler.sdk ?? {};
   const writes = [];

@@ -43,12 +43,16 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "policy.compiler-document.dmsdk-universal.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.index.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "sdk.dmsdk.browser-arena.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.runtime.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.types.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "sdk.dmsdk.universal.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "sdk.script.handle-lowering.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.index.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.modules.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.runtime.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.types.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "sdk.script.universal-value.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "binding.raw-unverified-fallback.v1": Object.freeze({ introducedInVersion: "0.0.0" })
 });
 export const POLICY_REALIZER_CAPABILITIES = Object.freeze(Object.keys(POLICY_REALIZER_CAPABILITY_REGISTRY).sort());

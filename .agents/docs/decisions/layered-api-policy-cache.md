@@ -589,7 +589,7 @@ complete the layered cache:
 * The compiler manifest names the document/source objects a materializer needs,
   but the client still eagerly downloads the entire policy closure. A future
   layout may fetch the manifest first and then only its required subtrees.
-* The 10.21 MB canonical lowering plan and 21 TypeScript compatibility sources
+* The 10.21 MB canonical lowering plan and 17 TypeScript compatibility sources
   remain referenced derived objects. Compiler-owned recipe emitters must replace
   them before the policy is a compact result rather than a correctness-first
   transition artifact.

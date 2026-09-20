@@ -70,17 +70,17 @@ toolchain artifacts rather than Defold API policy.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now an **11,853-byte manifest**, not a
+The authenticated `@compiler` subtree is now an **11,727-byte manifest**, not a
 21 MB container. It references twelve independently content-addressed semantic
-documents and 21 independently content-addressed compatibility sources. This
+documents and 17 independently content-addressed compatibility sources. This
 keeps each document shareable and makes the remaining migration debt
 enumerable; it does not pretend the referenced bytes have disappeared. The
-complete policy remains 29.29 MB until the lowering-plan and support-source
+complete policy remains 28.29 MB until the lowering-plan and support-source
 emitters below replace those objects.
 
 `packages/compiler/src/policy-surface-materializer.mjs` owns the public
 realization contract. It restores the selected revision, resolves and validates
-the manifest's authenticated references, regenerates seven core script and
+the manifest's authenticated references, regenerates eleven script and
 dmSDK TypeScript files from IR, verifies their policy SHA-256 values, writes the
 remaining support files from explicitly labelled authenticated compatibility
 sources, and records a revision-keyed `surface.json` descriptor. The repository
@@ -113,10 +113,13 @@ the document is a minimal policy input.
 | `defold-value-layouts.json` | 8,074 | ABI/layout facts | retain as policy facts |
 | `defold-binding-lowering-plan.sentinel.json` | 6,415 | copied output cache metadata | regenerate locally beside the plan |
 
-The existing seven SDK renderers consume only the two primary IR documents and
-`handleKinds`, 4,069,164 compact bytes in total. That measured cut—not an
-assumption about the old 21 MB blob—shows that the current locally rendered SDK
-can be driven by less than 5 MB of policy facts. The other documents remain available because
+The existing eleven SDK renderers consume the two primary IR documents, the
+handle-lowering report, and the script/dmSDK universal recipe catalogs. Four
+support emitters now live in `packages/compiler/src/sdk/support-sdk.mjs`:
+script handle-lowering types, script universal-value metadata, dmSDK universal
+metadata, and the dmSDK browser arena. That measured cut—not an assumption
+about the old 21 MB blob—shows that the current locally rendered SDK can be
+driven entirely by semantic documents already present in the policy. The other documents remain available because
 `deherm generate` still consumes them; deleting them before their local recipe
 emitters exist would create a smaller policy that cannot build a game.
 
@@ -150,15 +153,15 @@ directory and compares all 28 SDK files against immutable size/SHA-256 evidence
 captured from the pre-materializer checkout-backed pipeline at commit
 `fd2e6c30af4c9fc9e71b38dc73c010666ca13aba`. The fixture is not rewritten by
 normal generation, so the proof no longer compares a pipeline with the tree it
-just generated. Seven files (2,513,290 bytes) are locally rendered; 21 files
-(998,951 bytes) remain authenticated compatibility sources, and the test names
-all 21 so migration debt cannot change silently. A second pass requires zero
+just generated. Eleven files (3,427,496 bytes) are locally rendered; 17 files
+(84,745 bytes) remain authenticated compatibility sources, and the test names
+all 17 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
 no Defold checkout.
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 11,853
+The `<5 MB` compiler-object budget is enforced; the current manifest is 11,727
 bytes. This is a structural transfer boundary, not yet a total-size victory.
 The 10.21 MB canonical lowering plan is still a referenced derived output and
-must be rebuilt locally from normalized recipe facts. The 21 support-source
+must be rebuilt locally from normalized recipe facts. The 17 support-source
 objects must likewise be replaced by compiler-owned emitters. Those changes
 will reduce total transfer size without changing the consumer contract.

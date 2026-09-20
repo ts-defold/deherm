@@ -30,27 +30,32 @@ the source-derived Lua registration surface and the resource declaration schema
 toolchain pins from `build_tools/sdk.py`.
 
 For the pinned revision `7f0f554f41f9dce1e0ddff99bf08200657d1ee05` the policy is
-**89 subtrees - 52 namespaces, four cross-cutting roots, twelve compiler
-documents, and 21 compatibility-source objects - in 29.29 MB**, under policy
-root `cb586c79ecaedb404cb022ca6806b56a6f0ea811e120fcffb70e025f4867bcdb`.
+**85 subtrees - 52 namespaces, four cross-cutting roots, twelve compiler
+documents, and 17 compatibility-source objects - in 28.29 MB**, under policy
+root `9149470ec631bc4e84a2724c955d64d8f130601a106719403565ed1b0dfc1ecd`.
 
-`@compiler` is now an 11,853-byte versioned manifest. Its semantic documents
+`@compiler` is now an 11,727-byte versioned manifest. Its semantic documents
 and temporary compatibility sources are separate content-addressed objects, so
 they can be shared and the manifest can eventually drive lazy fetching. The
-installed compiler locally renders the seven core script/dmSDK TypeScript files
-and checks their hashes; the other 21 files remain visibly tagged authenticated
+installed compiler locally renders eleven script/dmSDK TypeScript files
+and checks their hashes; the other 17 files remain visibly tagged authenticated
 compatibility sources. This split fixes the ownership and object-size boundary,
 but not total transfer cost: the 10.21 MB lowering plan is still referenced
 derived output and must move behind package code once normalized recipe facts
 can reproduce it.
 
-The policy/package dependency points in one direction. Policy objects carry all
+The intended policy/package dependency points in one direction. Policy objects carry all
 Defold-defined vocabulary and the exact recipe data selected from it. The npm
 package carries reusable parsers, recipe interpreters, emitters, and runtime
 shapes. Each index entry advertises the minimum package version and exact
 realizer capabilities needed, allowing the CLI to reject an old installation
 before downloading the large root/object closure. Ordinary new Defold revisions
 therefore publish policy only; they do not require an npm release.
+
+The current npm payload has not completed that migration: its broad `files`
+rules still include duplicate generated binding/SDK trees and pinned native
+glue. Those bytes are compatibility debt, not policy authority, and must be
+removed after all consumer paths resolve the materialized revision surface.
 
 # The structure is the decision
 

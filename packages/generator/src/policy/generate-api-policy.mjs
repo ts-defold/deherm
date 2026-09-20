@@ -82,7 +82,11 @@ const locallyRenderedSdkSources = new Set([
   "script/index.ts",
   "dmsdk/types.ts",
   "dmsdk/runtime.ts",
-  "dmsdk/index.ts"
+  "dmsdk/index.ts",
+  "script/handle-lowering.ts",
+  "script/universal-value-bindings.ts",
+  "dmsdk/universal.ts",
+  "dmsdk/browser-arena.ts"
 ]);
 
 const locallyRenderedSdkRecipes = Object.freeze({
@@ -92,7 +96,11 @@ const locallyRenderedSdkRecipes = Object.freeze({
   "script/index.ts": "sdk.script.index.render.v1",
   "dmsdk/types.ts": "sdk.dmsdk.types.render.v1",
   "dmsdk/runtime.ts": "sdk.dmsdk.runtime.render.v1",
-  "dmsdk/index.ts": "sdk.dmsdk.index.render.v1"
+  "dmsdk/index.ts": "sdk.dmsdk.index.render.v1",
+  "script/handle-lowering.ts": "sdk.script.handle-lowering.render.v1",
+  "script/universal-value-bindings.ts": "sdk.script.universal-value.render.v1",
+  "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
+  "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1"
 });
 
 const locallyRenderedSdkInputs = Object.freeze({
@@ -102,7 +110,11 @@ const locallyRenderedSdkInputs = Object.freeze({
   "script/index.ts": Object.freeze(["defold-script-api-ir.json"]),
   "dmsdk/types.ts": Object.freeze(["defold-sdk-ir.json"]),
   "dmsdk/runtime.ts": Object.freeze(["defold-sdk-ir.json"]),
-  "dmsdk/index.ts": Object.freeze([])
+  "dmsdk/index.ts": Object.freeze([]),
+  "script/handle-lowering.ts": Object.freeze(["defold-script-handle-lowering.json"]),
+  "script/universal-value-bindings.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
+  "dmsdk/universal.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"]),
+  "dmsdk/browser-arena.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"])
 });
 
 const compilerDocumentRecipes = Object.freeze({

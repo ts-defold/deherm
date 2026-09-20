@@ -20,3 +20,9 @@ export {
   generateRuntime as generateDmSdkRuntime,
   generateTypes as generateDmSdkTypes
 } from "./sdk/dmsdk-sdk.mjs";
+export {
+  generateDmSdkBrowserArena,
+  generateDmSdkUniversal,
+  generateScriptHandleLowering,
+  generateScriptUniversalValue
+} from "./sdk/support-sdk.mjs";

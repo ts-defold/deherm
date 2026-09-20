@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:60777cd2f163ff0f6e5304dd94367075fdc485ef5c9fa25d179f459522e0b045",
+  "generator": "sha256:cf198d49a0e706fb024f89f32268618a8486e59c98a09d40f5a4088f4a4973de",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "cb586c79ecaedb404cb022ca6806b56a6f0ea811e120fcffb70e025f4867bcdb",
+  "policyRoot": "9149470ec631bc4e84a2724c955d64d8f130601a106719403565ed1b0dfc1ecd",
   "layoutVersion": "v1",
   "counts": {
-    "subtrees": 89,
+    "subtrees": 85,
     "namespaces": 52,
-    "objectBytes": 29285277,
+    "objectBytes": 28293582,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,8 +54,8 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "a298eb55c0ffdedfb4f3b18ab9b8c3b6ada47fa12bdf769c03d40d343faaad30",
-      "bytes": 11853
+      "hash": "72a22ee328f80ae06bf1d60e4723eff095e0d1d95e2a85e080ca4e4a1181b291",
+      "bytes": 11727
     },
     "@compiler:document:defold-binding-lowering-plan.json": {
       "hash": "3c1628e2bbec9db93cc6a2437c06a0e780f7e088449f2778f0b74e9f618e6872",
@@ -109,10 +109,6 @@
       "hash": "24dc599b196e5360972fa11e0ddb45fa34abc940fd4403ff7cae7d306e5bb474",
       "bytes": 29259
     },
-    "@compiler:sdk:dmsdk/browser-arena.ts": {
-      "hash": "a5d9fb5aadc101e2f301d85747947561123b8a98779dec4dad7905e3df053a98",
-      "bytes": 5718
-    },
     "@compiler:sdk:dmsdk/cstring-value.ts": {
       "hash": "e3747d1f1bfc61d6d00c1e528b04060fae9051ff4e2e7439640c6fe4c98b18c3",
       "bytes": 4973
@@ -132,10 +128,6 @@
     "@compiler:sdk:dmsdk/scratch-scalar-out.ts": {
       "hash": "2a55876f6db24ca4316e1efca5417c2b27403bd73834858c32c03930ccb042a7",
       "bytes": 5500
-    },
-    "@compiler:sdk:dmsdk/universal.ts": {
-      "hash": "5dcb52f117b39cedb3b374e4bc12c131d6d92fe991b7bb295c6a23a80922d8ce",
-      "bytes": 152484
     },
     "@compiler:sdk:script/browser-target-support.ts": {
       "hash": "050cd30abc726d29346f5e8f1f01d86e43d5b04a928768ac1e0e50e6d5222e25",
@@ -157,10 +149,6 @@
       "hash": "c27b2ecd0d8661f77702a4358c6feceeb23e9be8cc23c9e49ddcda94a5f397f6",
       "bytes": 1911
     },
-    "@compiler:sdk:script/handle-lowering.ts": {
-      "hash": "843174da2e564dd0e03e5e0d77b5d8fe82aeb86aa7474a068f50880497011087",
-      "bytes": 480591
-    },
     "@compiler:sdk:script/opaque-record-blockers.ts": {
       "hash": "f4b740bb2888bc309eb4b2c77cf4647f524957c212155f1448e182f3c504a975",
       "bytes": 856
@@ -172,10 +160,6 @@
     "@compiler:sdk:script/table-record-bindings.ts": {
       "hash": "311efc6da4bbe9d69de7d1de9e071bb0e868366609eab8f138484631e1ef2163",
       "bytes": 2848
-    },
-    "@compiler:sdk:script/universal-value-bindings.ts": {
-      "hash": "3d84374f508dd16e47e49e6403934cdb0814281c2810c3639c09e51e62d65e05",
-      "bytes": 352776
     },
     "@compiler:sdk:script/url-target-support.ts": {
       "hash": "42a74ea8a9ad98877170cc9b458b2d1dcd95f6f9d118285bb66ad0f6eeeca2d2",
