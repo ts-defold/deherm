@@ -56,6 +56,8 @@
   "files": [
     "bin/",
     "packages/",
+    "!packages/generator/src/policy/generate-api-policy.mjs",
+    "!packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
     "defold/defold_hermes/",
     "!packages/**/*.type-test.ts",
     "README.md"

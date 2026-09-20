@@ -50,15 +50,20 @@ If deleting a Defold checkout would make a value unknowable, that value belongs 
 
 The initial migration moved `defold-value-layouts.json`, including policy-defined TypeScript projection names, into the authenticated compiler surface. Extension generation now reads that document from the resolved revision surface rather than importing the package's pinned revision.
 
+The dmSDK usage materializer is likewise catalog-free: it consumes the resolved
+policy's `defold-dmsdk-universal-bindings.json`. The repository keeps a generated
+JavaScript catalog only as a regeneration/test fixture; npm packaging explicitly
+excludes it. Repository-only policy derivation code is also excluded from the
+consumer package.
+
 ## Remaining migration frontier
 
 The same rule must be applied to:
 
-1. The dmSDK universal recipe catalog: make the materializer catalog-free and supply the resolved policy catalog explicitly.
-2. Native extension sources: ship only invariant skeleton/runtime/emitters; materialize revision-generated descriptors and adapters from policy.
-3. Component contracts: keep proxy mechanics in npm and move lifecycle, property, and resource vocabulary into policy.
-4. Script type and context vocabulary, handle classifications, route semantics, dynamic-route evidence, dmSDK specializations, and platform/toolchain vocabulary.
-5. Generated SDK and Static Hermes files: package copies may be fixtures for the pinned revision, never authority for an arbitrary revision.
+1. Native extension sources: ship only invariant skeleton/runtime/emitters; materialize revision-generated descriptors and adapters from policy.
+2. Component contracts: keep proxy mechanics in npm and move lifecycle, property, and resource vocabulary into policy.
+3. Script type and context vocabulary, handle classifications, route semantics, dynamic-route evidence, dmSDK specializations, and platform/toolchain vocabulary.
+4. Generated SDK and Static Hermes files: package copies may be fixtures for the pinned revision, never authority for an arbitrary revision.
 
 The capability registry must become per-recipe rather than filename/mode-based. A new construct inside an existing renderer must therefore select a new capability and cannot hide behind an old coarse capability.
 

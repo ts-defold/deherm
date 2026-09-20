@@ -54,6 +54,11 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async () => 
     "--cache", cache,
     "--pack-destination", root
   ]).stdout)[0];
+  const packedFiles = new Set(packed.files.map(({ path: relative }) => relative));
+  assert.equal(packedFiles.has("packages/generator/src/policy/generate-api-policy.mjs"), false,
+    "repo-only policy derivation must not ship in the consumer package");
+  assert.equal(packedFiles.has("packages/compiler/src/generated/dmsdk-universal-recipes.mjs"), false,
+    "the package must not ship a pinned Defold dmSDK catalog as realization authority");
   const archive = path.join(root, packed.filename);
   const installRoot = path.join(root, "install");
   await mkdir(installRoot, { recursive: true });
