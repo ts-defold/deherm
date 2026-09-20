@@ -1,0 +1,318 @@
+{
+  "schemaVersion": 1,
+  "source": "deherm-script-special-call-verification",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "evidenceBoundary": "Compiler intrinsics are verified by exact generated Lua declarations. Lua, Dynamic Hermes/JSI, and browser/Wasm execute the generated timer lifecycle scenario with exact call and ownership assertions. Static Hermes separately verifies sound-typed symbol selection, ordered ABI values/results, and callback-handle field transport; it does not claim callback ownership. Defold remains the semantic authority behind the bridge.",
+  "inputs": {
+    "accountingSha256": "28fafe916a452684766d39302e7d9a056c1bb2a58039ba52d763eca1bc667002",
+    "moduleSchemaSha256": "f3d6492da495392d5149ca3b6429cf3f59ebbc01f4cbe80464ef7b4289c1d912",
+    "luaSchemaSha256": "89bf097676883d82dfc90cd21c0b520f9bb5b9c68721e1ac804510e80b1abe44"
+  },
+  "counts": {
+    "componentPropertyCompiler": 8,
+    "separateModule": 3,
+    "total": 11
+  },
+  "compilerIntrinsics": [
+    {
+      "id": "script:go.property",
+      "rawName": "go.property",
+      "source": "doc/go.lua",
+      "line": 817,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermNumber",
+      "authoringExpression": "property.number(17)",
+      "expectedLua": "go.property(\"dehermNumber\", 17)"
+    },
+    {
+      "id": "script:resource.atlas",
+      "rawName": "resource.atlas",
+      "source": "doc/resource.lua",
+      "line": 46,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermResource0",
+      "authoringExpression": "property.atlas(\"/deherm/atlas.atlas\")",
+      "expectedLua": "go.property(\"dehermResource0\", resource.atlas(\"/deherm/atlas.atlas\"))"
+    },
+    {
+      "id": "script:resource.buffer",
+      "rawName": "resource.buffer",
+      "source": "doc/resource.lua",
+      "line": 69,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermResource1",
+      "authoringExpression": "property.buffer(\"/deherm/buffer.buffer\")",
+      "expectedLua": "go.property(\"dehermResource1\", resource.buffer(\"/deherm/buffer.buffer\"))"
+    },
+    {
+      "id": "script:resource.font",
+      "rawName": "resource.font",
+      "source": "doc/resource.lua",
+      "line": 492,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermResource2",
+      "authoringExpression": "property.font(\"/deherm/font.font\")",
+      "expectedLua": "go.property(\"dehermResource2\", resource.font(\"/deherm/font.font\"))"
+    },
+    {
+      "id": "script:resource.material",
+      "rawName": "resource.material",
+      "source": "doc/resource.lua",
+      "line": 682,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermResource3",
+      "authoringExpression": "property.material(\"/deherm/material.material\")",
+      "expectedLua": "go.property(\"dehermResource3\", resource.material(\"/deherm/material.material\"))"
+    },
+    {
+      "id": "script:resource.render_target",
+      "rawName": "resource.render_target",
+      "source": "doc/resource.lua",
+      "line": 714,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermResource4",
+      "authoringExpression": "property.renderTarget(\"/deherm/render_target.render_target\")",
+      "expectedLua": "go.property(\"dehermResource4\", resource.render_target(\"/deherm/render_target.render_target\"))"
+    },
+    {
+      "id": "script:resource.texture",
+      "rawName": "resource.texture",
+      "source": "doc/resource.lua",
+      "line": 1040,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermResource5",
+      "authoringExpression": "property.texture(\"/deherm/texture.texture\")",
+      "expectedLua": "go.property(\"dehermResource5\", resource.texture(\"/deherm/texture.texture\"))"
+    },
+    {
+      "id": "script:resource.tile_source",
+      "rawName": "resource.tile_source",
+      "source": "doc/resource.lua",
+      "line": 1063,
+      "lane": "component-property-compiler",
+      "transport": "compile-time-typescript-to-lua",
+      "propertyName": "dehermResource6",
+      "authoringExpression": "property.tileSource(\"/deherm/tile_source.tile_source\")",
+      "expectedLua": "go.property(\"dehermResource6\", resource.tile_source(\"/deherm/tile_source.tile_source\"))"
+    }
+  ],
+  "separateModules": [
+    {
+      "id": "script:timer.cancel",
+      "rawName": "timer.cancel",
+      "source": "doc/timer.lua",
+      "line": 41,
+      "lane": "separate-module",
+      "module": "Timer",
+      "function": "cancel",
+      "cSymbol": "defold_hermes_lua_timer_cancel",
+      "luaModule": "timer",
+      "luaFunction": "cancel",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "u32",
+          "sample": 4045620583,
+          "cAbi": [
+            "handle"
+          ]
+        }
+      ],
+      "cAbiArguments": [
+        "handle"
+      ],
+      "staticCAbiSamples": [
+        4045620583
+      ],
+      "returns": "bool",
+      "staticResultSample": true,
+      "callbackFailureValue": null,
+      "evidence": [
+        {
+          "lane": "lua-stack-compatibility",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "dynamic-hermes-jsi",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "browser-wasm-host",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "static-hermes-c-abi",
+          "contract": "exact-symbol-ordered-abi-result-and-callback-handle-field-transport",
+          "samples": "staticCAbiSamples",
+          "callbackOwnership": "not-exercised"
+        }
+      ],
+      "vectorSha256": "210cdd0bb5fed0702f5530a910302b1663e3fcde14111f6840a4991d7794dfaa"
+    },
+    {
+      "id": "script:timer.delay",
+      "rawName": "timer.delay",
+      "source": "doc/timer.lua",
+      "line": 80,
+      "lane": "separate-module",
+      "module": "Timer",
+      "function": "delay",
+      "cSymbol": "defold_hermes_lua_timer_delay",
+      "luaModule": "timer",
+      "luaFunction": "delay",
+      "parameters": [
+        {
+          "name": "delay",
+          "type": "f64",
+          "sample": 0.125,
+          "cAbi": [
+            "delay"
+          ]
+        },
+        {
+          "name": "repeating",
+          "type": "bool",
+          "sample": true,
+          "cAbi": [
+            "repeating"
+          ]
+        },
+        {
+          "name": "callback",
+          "type": "callback",
+          "sample": {
+            "runtime": 2166572391,
+            "slot": 2433814808,
+            "generation": 2701057225,
+            "type": 2968299642
+          },
+          "cAbi": [
+            "callback_runtime",
+            "callback_slot",
+            "callback_generation",
+            "callback_type"
+          ]
+        }
+      ],
+      "cAbiArguments": [
+        "delay",
+        "repeating",
+        "callback_runtime",
+        "callback_slot",
+        "callback_generation",
+        "callback_type"
+      ],
+      "staticCAbiSamples": [
+        0.125,
+        true,
+        2166572391,
+        2433814808,
+        2701057225,
+        2968299642
+      ],
+      "returns": "u32",
+      "staticResultSample": 3777183751,
+      "callbackFailureValue": 4294967295,
+      "evidence": [
+        {
+          "lane": "lua-stack-compatibility",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "dynamic-hermes-jsi",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "browser-wasm-host",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "static-hermes-c-abi",
+          "contract": "exact-symbol-ordered-abi-result-and-callback-handle-field-transport",
+          "samples": "staticCAbiSamples",
+          "callbackOwnership": "not-exercised"
+        }
+      ],
+      "vectorSha256": "42eb8216f5ec7b612b4e7403c8c15b4a92739737ff88fa662aed7bb642fb15e7"
+    },
+    {
+      "id": "script:timer.trigger",
+      "rawName": "timer.trigger",
+      "source": "doc/timer.lua",
+      "line": 119,
+      "lane": "separate-module",
+      "module": "Timer",
+      "function": "trigger",
+      "cSymbol": "defold_hermes_lua_timer_trigger",
+      "luaModule": "timer",
+      "luaFunction": "trigger",
+      "parameters": [
+        {
+          "name": "handle",
+          "type": "u32",
+          "sample": 4045620583,
+          "cAbi": [
+            "handle"
+          ]
+        }
+      ],
+      "cAbiArguments": [
+        "handle"
+      ],
+      "staticCAbiSamples": [
+        4045620583
+      ],
+      "returns": "bool",
+      "staticResultSample": true,
+      "callbackFailureValue": null,
+      "evidence": [
+        {
+          "lane": "lua-stack-compatibility",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "dynamic-hermes-jsi",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "browser-wasm-host",
+          "contract": "scenario-exact-call-and-lifecycle",
+          "samples": "timer-lifecycle-v1"
+        },
+        {
+          "lane": "static-hermes-c-abi",
+          "contract": "exact-symbol-ordered-abi-result-and-callback-handle-field-transport",
+          "samples": "staticCAbiSamples",
+          "callbackOwnership": "not-exercised"
+        }
+      ],
+      "vectorSha256": "8139a5eb755017ede22541a57359e42d317545ef0e8d965086d3b88d4b098926"
+    }
+  ],
+  "scenarios": [
+    {
+      "module": "Timer",
+      "kind": "timer-lifecycle-v1",
+      "delay": 0.125,
+      "elapsed": 0.25,
+      "firstHandle": 1,
+      "secondHandle": 2
+    }
+  ],
+  "reportSha256": "5547f23727ad24662ca799cd89914379b306174868076d8902012c094eefe9f0"
+}

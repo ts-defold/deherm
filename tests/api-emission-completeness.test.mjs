@@ -6,12 +6,13 @@ const root = new URL("../", import.meta.url);
 const json = async (relative) => JSON.parse(await readFile(new URL(relative, root), "utf8"));
 
 test("verification status never suppresses Lua API emission machinery", async () => {
-  const [ir, accounting, verification, universal, compatibility] = await Promise.all([
+  const [ir, accounting, verification, universal, compatibility, specialCalls] = await Promise.all([
     json("packages/bindings/generated/defold-script-api-ir.json"),
     json("packages/bindings/generated/defold-script-api-accounting.json"),
     json("packages/bindings/generated/defold-route-verification.json"),
     json("packages/bindings/generated/defold-script-universal-value-bindings.json"),
-    json("packages/bindings/lua-compat.json")
+    json("packages/bindings/lua-compat.json"),
+    json("packages/bindings/generated/defold-script-special-call-verification.json")
   ]);
 
   const universalIds = new Set(universal.bindings.map(({ id }) => id));
@@ -24,6 +25,16 @@ test("verification status never suppresses Lua API emission machinery", async ()
     .filter(({ id, rawName }) => accounting.rows.some((row) => row.id === id && row.category === "separate-module")
       && compatibilityNames.has(rawName))
     .map(({ id }) => id));
+  assert.deepEqual(
+    specialCalls.compilerIntrinsics.map(({ id }) => id).sort(),
+    [...compilerIds].sort(),
+    "every compiler intrinsic must have an exact generated declaration vector"
+  );
+  assert.deepEqual(
+    specialCalls.separateModules.map(({ id }) => id).sort(),
+    [...separateIds].sort(),
+    "every separate module must have generated specialized-bridge inventory"
+  );
 
   const machinery = new Map();
   for (const id of universalIds) machinery.set(id, "universal-runtime-dispatch");

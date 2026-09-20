@@ -43,6 +43,13 @@
     {
       "name": "Timer",
       "description": "Lua compatibility projection for Defold's instance-bound timer module.",
+      "verification": {
+        "kind": "timer-lifecycle-v1",
+        "delay": 0.125,
+        "elapsed": 0.25,
+        "firstHandle": 1,
+        "secondHandle": 2
+      },
       "functions": [
         {
           "name": "delay",

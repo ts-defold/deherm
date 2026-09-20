@@ -69,6 +69,27 @@ HTML5 callback registry or JSI fallback, and two routes return functions that
 only JSI emits. Static URL and Matrix4 arguments are exercised through their
 real bounded frame helpers rather than skipped by the harness.
 
+The remaining eleven script routes now have their own generated exact-call
+report and C verification header. The emitter exact-set joins the accounting
+rows to the component compiler capability and to both timer schemas; either
+schema drifting, a missing row, or an unexpected row fails generation. All
+eight compiler intrinsics are compiled from one generated `.script.ts` fixture
+through the real TypeScript AST component compiler and compared with their
+exact emitted `go.property`/`resource.*` Lua declarations. The three timer
+routes execute through four applicable lanes: cached Lua stack thunks, a real
+Dynamic Hermes/JSI runtime, the browser/Wasm host glue, and a sound-typed Static
+Hermes unit compiled to C by the pinned frontend. Evidence is lane-specific.
+Lua, Dynamic Hermes/JSI, and browser/Wasm run the same generated lifecycle
+scenario and check exact route selection, ordered values, result normalization,
+one-shot and repeating ownership/release, failure rollback where applicable,
+and stack restoration. Static Hermes checks its generated symbol, ordered
+scalar values, result, and flattened callback-handle field transport; its fake
+C callee does not claim to prove callback ownership. The warmed Lua bridge
+still reports zero Lua allocator calls on the primitive and callback hot paths.
+This closes the generated 915 + 8 + 3 script-call inventory and its declared
+lane contracts; it does not claim that a packaged engine exercised every
+gameplay context.
+
 The dmSDK surface has 1,361 runtime declarations and 1,361 materializable
 recipes with silent omission forbidden. Every concrete usage materialization
 now emits two artifacts from one resolved call plan: the production wrapper and

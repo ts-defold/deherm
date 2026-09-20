@@ -215,6 +215,37 @@ target_include_directories(defold-hermes-static-runner PRIVATE
 )
 target_link_libraries(defold-hermes-static-runner PRIVATE defold-hermes-runtime)
 
+set(DEFOLD_HERMES_STATIC_SPECIAL_CALL_DIR
+  "${CMAKE_CURRENT_BINARY_DIR}/generated/static-special-call")
+set(DEFOLD_HERMES_STATIC_SPECIAL_CALL_C
+  "${DEFOLD_HERMES_STATIC_SPECIAL_CALL_DIR}/static-special-call.c")
+add_custom_command(
+  OUTPUT "${DEFOLD_HERMES_STATIC_SPECIAL_CALL_C}"
+  COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-special-call-verification.mjs"
+    --shermes "$<TARGET_FILE:shermes>"
+    --output-dir "${DEFOLD_HERMES_STATIC_SPECIAL_CALL_DIR}"
+  DEPENDS
+    shermes
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-special-call-verification.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/static-hermes/src/generated/ffi.js"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-script-special-call-verification.json"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  VERBATIM
+)
+set_source_files_properties(
+  "${DEFOLD_HERMES_STATIC_SPECIAL_CALL_C}"
+  PROPERTIES GENERATED TRUE)
+add_executable(defold-hermes-static-special-call-test
+  native/static_special_call_test.cpp
+  "${DEFOLD_HERMES_STATIC_SPECIAL_CALL_C}"
+)
+target_compile_features(defold-hermes-static-special-call-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-static-special-call-test PRIVATE
+  defold/defold_hermes/include)
+target_link_libraries(defold-hermes-static-special-call-test PRIVATE
+  defold-hermes-runtime)
+
 add_executable(defold-hermes-binding-arena-test native/binding_arena_test.cpp)
 target_compile_features(defold-hermes-binding-arena-test PRIVATE cxx_std_17)
 target_include_directories(defold-hermes-binding-arena-test PRIVATE

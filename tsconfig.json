@@ -16,6 +16,8 @@
       "@deherm/cli/*": ["./packages/cli/src/*"],
       "@deherm/compiler": ["./packages/compiler/src/index.mjs"],
       "@deherm/compiler/*": ["./packages/compiler/src/*"],
+      "@deherm/generator": ["./packages/generator/src/index.mjs"],
+      "@deherm/generator/*": ["./packages/generator/src/*"],
       "@deherm/polyfills": ["./packages/polyfills/compatibility.json"],
       "@deherm/sdk": ["./packages/sdk/src/index.ts"],
       "@deherm/sdk/component": ["./packages/sdk/src/component.ts"],

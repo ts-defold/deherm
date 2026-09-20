@@ -1,4 +1,5 @@
 #include <defold_hermes/generated_lua_bridge.hpp>
+#include <defold_hermes/generated_script_special_call_verification.h>
 #include <defold_hermes/lua_bridge_core.hpp>
 
 #include <chrono>
@@ -21,6 +22,8 @@ constexpr uint32_t kMaxFakeTimers = 8192;
 int gTimerCallbacks[kMaxFakeTimers];
 bool gTimerRepeating[kMaxFakeTimers];
 uint32_t gNextTimer = 1;
+double gLastDelay = 0.0;
+bool gLastRepeating = false;
 
 struct AllocatorStats {
   bool tracking = false;
@@ -65,7 +68,7 @@ int TimerCancel(lua_State* state) {
 }
 
 int TimerDelay(lua_State* state) {
-  luaL_checknumber(state, 1);
+  gLastDelay = luaL_checknumber(state, 1);
   luaL_checktype(state, 2, LUA_TBOOLEAN);
   luaL_checktype(state, 3, LUA_TFUNCTION);
   if (gNextTimer >= kMaxFakeTimers) return luaL_error(state, "fake timer capacity exhausted");
@@ -73,6 +76,7 @@ int TimerDelay(lua_State* state) {
   lua_pushvalue(state, 3);
   gTimerCallbacks[handle] = luaL_ref(state, LUA_REGISTRYINDEX);
   gTimerRepeating[handle] = lua_toboolean(state, 2) != 0;
+  gLastRepeating = gTimerRepeating[handle];
   lua_pushnumber(state, handle);
   return 1;
 }
@@ -87,7 +91,7 @@ int TimerTrigger(lua_State* state) {
   lua_rawgeti(state, LUA_REGISTRYINDEX, gTimerCallbacks[handle]);
   lua_pushnil(state);
   lua_pushnumber(state, handle);
-  lua_pushnumber(state, 0.5);
+  lua_pushnumber(state, DEHERM_VERIFY_TIMER_SCENARIO_ELAPSED);
   if (lua_pcall(state, 3, 0, 0) != 0) return lua_error(state);
   if (!gTimerRepeating[handle]) {
     luaL_unref(state, LUA_REGISTRYINDEX, gTimerCallbacks[handle]);
@@ -228,17 +232,25 @@ int main() {
 
   const bridge::Handle oneShot = bridge.handles().acquire(1, 1, state, 101);
   uint32_t oneShotTimer = 0;
-  Expect(generated::timerDelay(bridge, 0.1, false, oneShot, &oneShotTimer), bridge.lastError());
+  Expect(generated::timerDelay(
+      bridge, DEHERM_VERIFY_TIMER_SCENARIO_DELAY, false, oneShot, &oneShotTimer), bridge.lastError());
+  Expect(gLastDelay == DEHERM_VERIFY_TIMER_SCENARIO_DELAY && !gLastRepeating,
+      "timer.delay reordered or changed its one-shot inputs");
   bool result = false;
   Expect(generated::timerTrigger(bridge, oneShotTimer, &result) && result, bridge.lastError());
   bridge::HandleRecord callbackRecord;
   Expect(!bridge.handles().resolve(oneShot, &callbackRecord), "one-shot callback was not released");
   Expect(callbackStats.invokes == 1 && callbackStats.releases == 1, "one-shot callback accounting is wrong");
-  Expect(callbackStats.lastTimer == oneShotTimer && callbackStats.lastElapsed == 0.5, "callback arguments are wrong");
+  Expect(callbackStats.lastTimer == oneShotTimer &&
+      callbackStats.lastElapsed == DEHERM_VERIFY_TIMER_SCENARIO_ELAPSED,
+      "callback arguments are wrong");
 
   const bridge::Handle repeating = bridge.handles().acquire(1, 1, state, 202);
   uint32_t repeatingTimer = 0;
-  Expect(generated::timerDelay(bridge, 0.1, true, repeating, &repeatingTimer), bridge.lastError());
+  Expect(generated::timerDelay(
+      bridge, DEHERM_VERIFY_TIMER_SCENARIO_DELAY, true, repeating, &repeatingTimer), bridge.lastError());
+  Expect(gLastDelay == DEHERM_VERIFY_TIMER_SCENARIO_DELAY && gLastRepeating,
+      "timer.delay reordered or changed its repeating inputs");
   for (uint32_t index = 0; index < 1000; ++index) {
     Expect(generated::timerTrigger(bridge, repeatingTimer, &result) && result, bridge.lastError());
   }

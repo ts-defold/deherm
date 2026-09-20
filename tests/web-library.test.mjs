@@ -90,23 +90,116 @@ test("web callback storage enforces the same fixed capacity as native", async ()
   assert.throws(() => callbacks.acquire(() => {}), /pool is exhausted/);
 });
 
-test("generated web bindings normalize C ABI booleans to JavaScript booleans", async () => {
-  const { context } = await loadLibrary();
+test("generated web bindings execute the timer lifecycle through real callback hooks", async () => {
+  const { context, library } = await loadLibrary();
   const source = await readFile(
     new URL("../defold/defold_hermes/lib/web/generated_modules.js", import.meta.url),
     "utf8"
   );
-  context._defold_hermes_lua_timer_cancel = () => 1;
-  context._defold_hermes_lua_timer_trigger = () => 0;
+  const verification = JSON.parse(await readFile(
+    new URL("../packages/bindings/generated/defold-script-special-call-verification.json", import.meta.url),
+    "utf8"
+  ));
+  const vectors = new Map(verification.separateModules.map((vector) => [vector.function, vector]));
+  const scenario = verification.scenarios.find(({ module }) => module === "Timer");
+  const calls = [];
+  const timers = new Map();
+  let nextHandle = scenario.firstHandle;
+  context._defold_hermes_lua_timer_delay = (...args) => {
+    calls.push({ function: "delay", args });
+    const handle = nextHandle++;
+    timers.set(handle, {
+      repeating: args[1] !== 0,
+      callback: { runtime: args[2], slot: args[3], generation: args[4], type: args[5] }
+    });
+    return handle;
+  };
+  context._defold_hermes_lua_timer_cancel = (handle) => {
+    calls.push({ function: "cancel", args: [handle] });
+    const timer = timers.get(handle);
+    if (!timer) return 0;
+    library.defoldHermesWebReleaseCallback(
+      timer.callback.runtime,
+      timer.callback.slot,
+      timer.callback.generation,
+      timer.callback.type
+    );
+    timers.delete(handle);
+    return 1;
+  };
+  context._defold_hermes_lua_timer_trigger = (handle) => {
+    calls.push({ function: "trigger", args: [handle] });
+    const timer = timers.get(handle);
+    if (!timer) return 0;
+    const invoked = library.defoldHermesWebInvokeCallback(
+      timer.callback.runtime,
+      timer.callback.slot,
+      timer.callback.generation,
+      timer.callback.type,
+      handle,
+      scenario.elapsed
+    );
+    if (!timer.repeating) {
+      library.defoldHermesWebReleaseCallback(
+        timer.callback.runtime,
+        timer.callback.slot,
+        timer.callback.generation,
+        timer.callback.type
+      );
+      timers.delete(handle);
+    }
+    return invoked;
+  };
   context.DEFOLD_HERMES_DMSDK_SCALAR = { install: () => ({ call() {} }) };
   const universal = { catalogSha256: "0".repeat(64), abi: {}, recipes: [], call() {} };
   context.DEFOLD_HERMES_DMSDK_UNIVERSAL = universal;
   vm.runInContext(source, context, { filename: "generated_modules.js" });
 
   const modules = context.LibraryDefoldHermesGeneratedModules.$DEFOLD_HERMES_GENERATED_MODULES.install();
-  assert.equal(modules.Timer.cancel(7), true);
-  assert.equal(modules.Timer.trigger(7), false);
+  const callbackEvents = [];
+  const callback = (handle, elapsed) => callbackEvents.push({ handle, elapsed });
+  const oneShot = modules.Timer.delay(scenario.delay, false, callback);
+  assert.equal(oneShot, scenario.firstHandle);
+  assert.equal(calls[0].args[0], scenario.delay);
+  assert.equal(calls[0].args[1], 0);
+  assert.equal(calls[0].args.length, vectors.get("delay").cAbiArguments.length);
+  const callbackHandle = {
+    runtime: calls[0].args[2],
+    slot: calls[0].args[3],
+    generation: calls[0].args[4],
+    type: calls[0].args[5]
+  };
+  assert.equal(context.DEFOLD_HERMES_WEB_CALLBACKS.resolve(callbackHandle), callback);
+  assert.equal(modules.Timer.trigger(oneShot), true);
+  assert.deepEqual(callbackEvents, [{ handle: scenario.firstHandle, elapsed: scenario.elapsed }]);
+  assert.equal(context.DEFOLD_HERMES_WEB_CALLBACKS.resolve(callbackHandle), null);
+
+  const repeating = modules.Timer.delay(scenario.delay, true, callback);
+  assert.equal(repeating, scenario.secondHandle);
+  const repeatingCallback = timers.get(repeating).callback;
+  assert.equal(modules.Timer.trigger(repeating), true);
+  assert.equal(context.DEFOLD_HERMES_WEB_CALLBACKS.resolve(repeatingCallback), callback);
+  assert.equal(modules.Timer.cancel(repeating), true);
+  assert.equal(context.DEFOLD_HERMES_WEB_CALLBACKS.resolve(repeatingCallback), null);
+  assert.equal(modules.Timer.trigger(repeating), false);
   assert.equal(typeof modules.Timer.cancel(7), "boolean");
+  assert.deepEqual(calls.map(({ function: name, args }) => [name, args[0]]), [
+    ["delay", scenario.delay],
+    ["trigger", scenario.firstHandle],
+    ["delay", scenario.delay],
+    ["trigger", scenario.secondHandle],
+    ["cancel", scenario.secondHandle],
+    ["trigger", scenario.secondHandle],
+    ["cancel", 7]
+  ]);
+
+  let failedHandle;
+  context._defold_hermes_lua_timer_delay = (...args) => {
+    failedHandle = { runtime: args[2], slot: args[3], generation: args[4], type: args[5] };
+    return vectors.get("delay").callbackFailureValue;
+  };
+  assert.throws(() => modules.Timer.delay(scenario.delay, false, () => {}), /Timer\.delay failed/);
+  assert.equal(context.DEFOLD_HERMES_WEB_CALLBACKS.resolve(failedHandle), null);
   assert.equal(modules.DmSdkUniversalRaw, universal);
 });
 

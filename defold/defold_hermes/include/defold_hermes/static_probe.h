@@ -8,6 +8,7 @@ extern "C" {
 #endif
 
 void defold_hermes_static_probe_report(double value);
+void defold_hermes_static_timer_report(uint32_t stage, double value);
 void defold_hermes_static_lifecycle_report(uint32_t stage, double value);
 void defold_hermes_static_vmath_report(uint32_t stage, double value);
 void defold_hermes_static_universal_report(uint32_t results, uint32_t record_entries);

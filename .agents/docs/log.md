@@ -1,5 +1,21 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Closed the 915 + 8 + 3 generated script-call partition
+
+* **Compiler intrinsics and specialized timers now have generated verification
+  contracts**: a compiler-owned emitter exact-set joins the route accounting,
+  component property capability, public module schema, and cached Lua schema.
+  It emits a content-bound eleven-vector report plus C constants. All eight
+  property routes compile through the real TypeScript AST/proxy generator and
+  match exact Lua declarations. Timer delay/cancel/trigger execute a generated
+  lifecycle scenario with exact argument/result and callback ownership
+  assertions through cached Lua, Dynamic Hermes/JSI, and browser/Wasm host
+  glue. The sound-typed Static Hermes C unit separately proves exact symbol,
+  ordered ABI values/results, and callback-handle field transport; it does not
+  claim callback ownership. The warmed Lua bridge still performs zero Lua
+  allocations on its primitive and callback hot paths. This is bridge-contract
+  evidence, not a claim about every Defold gameplay context.
+
 ## 2026-09-20 - Generated exact-call twins became materializer output
 
 * **Exact-call twins are now a materializer output, and the script recorder no longer hides target-capable rows**: each concrete dmSDK usage produces a production wrapper plus a second provider whose uniquely named ABI-compatible fake callee receives the same resolved receiver and ordered decoded native arguments. Its JSON vector is hash-bound to the catalog and records symbol, invocation kind, resolved native types, slots, shapes, preconditions, requirements, wrapper-source hashes, result shape, and wrapper identities. The native harness includes the generated verification translation unit so the compiler checks its fake definitions, then executes the twin across direct functions, a function-template specialization, placement construction, a member call, and explicit destruction, asserting receiver identity, argument values, dispatch ID, and encoded result. The installed CLI stages the production source and `.verify.cpp`/`.verify.json` members before publishing the content-binding manifest last; `--check` validates the four-file set together. In parallel, the generated script recording engine now drives all 915 universal rows through Dynamic Hermes/JSI: generated provider-only seed routes mint genuine HostObjects for the two input-only handle kinds, callback inputs use real JSI function descriptors, and callback results use a bounded static descriptor. Direct-memory and typed-native each drive 890 rows; their only 25 exclusions are explicit callback target partitions, while URL and Matrix4 static-frame calls now execute. Hash and URL probes carry nonzero upper 32-bit sentinels through all three transports and render exact unsigned 64-bit values. Evidence remains the generated bridge contract, not Defold implementation semantics.

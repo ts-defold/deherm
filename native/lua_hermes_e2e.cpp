@@ -1,4 +1,5 @@
 #include <defold_hermes/generated_lua_bridge.hpp>
+#include <defold_hermes/generated_script_special_call_verification.h>
 #include <defold_hermes/lua_capi.hpp>
 #include <defold_hermes/runtime.hpp>
 
@@ -23,6 +24,12 @@ constexpr uint32_t kTimerCapacity = 64;
 int gTimerCallbacks[kTimerCapacity];
 bool gTimerRepeating[kTimerCapacity];
 uint32_t gNextTimer = 1;
+double gDelayValues[2]{};
+bool gDelayRepeating[2]{};
+uint32_t gDelayCallCount = 0;
+uint32_t gCancelHandle = 0;
+uint32_t gTriggerHandles[2]{};
+uint32_t gTriggerCallCount = 0;
 bridge::LuaBridge* gBridge = nullptr;
 defold_hermes::Runtime* gRuntime = nullptr;
 
@@ -32,11 +39,16 @@ defold_hermes::Runtime* gRuntime = nullptr;
 }
 
 int TimerDelay(lua_State* state) {
-  luaL_checknumber(state, 1);
+  const double delay = luaL_checknumber(state, 1);
   luaL_checktype(state, 2, LUA_TBOOLEAN);
   luaL_checktype(state, 3, LUA_TFUNCTION);
   if (gNextTimer >= kTimerCapacity) return luaL_error(state, "timer capacity exhausted");
   const uint32_t timer = gNextTimer++;
+  if (gDelayCallCount < 2) {
+    gDelayValues[gDelayCallCount] = delay;
+    gDelayRepeating[gDelayCallCount] = lua_toboolean(state, 2) != 0;
+  }
+  ++gDelayCallCount;
   lua_pushvalue(state, 3);
   gTimerCallbacks[timer] = luaL_ref(state, LUA_REGISTRYINDEX);
   gTimerRepeating[timer] = lua_toboolean(state, 2) != 0;
@@ -46,6 +58,7 @@ int TimerDelay(lua_State* state) {
 
 int TimerCancel(lua_State* state) {
   const uint32_t timer = static_cast<uint32_t>(luaL_checknumber(state, 1));
+  gCancelHandle = timer;
   const bool active = timer < kTimerCapacity && gTimerCallbacks[timer] != LUA_NOREF;
   if (active) {
     luaL_unref(state, LUA_REGISTRYINDEX, gTimerCallbacks[timer]);
@@ -57,6 +70,8 @@ int TimerCancel(lua_State* state) {
 
 int TimerTrigger(lua_State* state) {
   const uint32_t timer = static_cast<uint32_t>(luaL_checknumber(state, 1));
+  if (gTriggerCallCount < 2) gTriggerHandles[gTriggerCallCount] = timer;
+  ++gTriggerCallCount;
   if (timer >= kTimerCapacity || gTimerCallbacks[timer] == LUA_NOREF) {
     lua_pushboolean(state, 0);
     return 1;
@@ -64,7 +79,7 @@ int TimerTrigger(lua_State* state) {
   lua_rawgeti(state, LUA_REGISTRYINDEX, gTimerCallbacks[timer]);
   lua_pushnil(state);
   lua_pushnumber(state, timer);
-  lua_pushnumber(state, 0.25);
+  lua_pushnumber(state, DEHERM_VERIFY_TIMER_SCENARIO_ELAPSED);
   if (lua_pcall(state, 3, 0, 0) != 0) return lua_error(state);
   if (!gTimerRepeating[timer]) {
     luaL_unref(state, LUA_REGISTRYINDEX, gTimerCallbacks[timer]);
@@ -140,10 +155,15 @@ int main() {
     globalThis.__defoldAppV1 = {
       init: function() {
         var timer = globalThis.__defoldModulesV1.Timer;
-        var handle = timer.delay(0.1, false, function(timerHandle, elapsed) {
+        var handle = timer.delay(0.125, false, function(timerHandle, elapsed) {
           globalThis.__defoldHostV1.log('info', 'callback:' + timerHandle + ':' + elapsed.toFixed(2));
         });
         if (!timer.trigger(handle)) throw new Error('timer.trigger failed');
+        var repeating = timer.delay(0.125, true, function() {
+          throw new Error('cancelled repeating timer invoked its callback');
+        });
+        if (!timer.cancel(repeating)) throw new Error('timer.cancel failed');
+        if (timer.trigger(repeating)) throw new Error('cancelled timer remained active');
       },
       final: function() {
         globalThis.__defoldHostV1.log('info', 'final');
@@ -153,7 +173,27 @@ int main() {
 
   runtime.load(source, "defold-hermes://lua-e2e.js");
   runtime.init();
-  if (host.transcript.size() != 1 || host.transcript[0] != "info:callback:1:0.25") {
+  if (gDelayCallCount != 2 ||
+      gDelayValues[0] != DEHERM_VERIFY_TIMER_SCENARIO_DELAY ||
+      gDelayValues[1] != DEHERM_VERIFY_TIMER_SCENARIO_DELAY ||
+      gDelayRepeating[0] || !gDelayRepeating[1]) {
+    Fail("Hermes delay arguments did not reach Lua in exact order");
+  }
+  if (gNextTimer != DEHERM_VERIFY_TIMER_SCENARIO_SECOND_HANDLE + 1 ||
+      gCancelHandle != DEHERM_VERIFY_TIMER_SCENARIO_SECOND_HANDLE ||
+      gTriggerCallCount != 2 ||
+      gTriggerHandles[0] != DEHERM_VERIFY_TIMER_SCENARIO_FIRST_HANDLE ||
+      gTriggerHandles[1] != DEHERM_VERIFY_TIMER_SCENARIO_SECOND_HANDLE) {
+    Fail("Hermes timer results were not routed into exact follow-up calls");
+  }
+  char expectedCallback[64]{};
+  std::snprintf(
+      expectedCallback,
+      sizeof(expectedCallback),
+      "info:callback:%u:%.2f",
+      DEHERM_VERIFY_TIMER_SCENARIO_FIRST_HANDLE,
+      DEHERM_VERIFY_TIMER_SCENARIO_ELAPSED);
+  if (host.transcript.size() != 1 || host.transcript[0] != expectedCallback) {
     Fail("Hermes callback transcript is wrong");
   }
   if (runtime.liveCallbacks() != 0) Fail("one-shot Hermes callback leaked");

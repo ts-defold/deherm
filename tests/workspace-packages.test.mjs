@@ -75,6 +75,8 @@ test("the public package ships directory boundaries instead of enumerated genera
   assert.deepEqual(manifest.files, [
     "bin/",
     "packages/",
+    "!packages/generator/src/policy/generate-api-policy.mjs",
+    "!packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
     "defold/defold_hermes/",
     "!packages/**/*.type-test.ts",
     "README.md"

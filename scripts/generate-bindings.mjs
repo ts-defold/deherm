@@ -97,12 +97,32 @@ export function validateSchema(schema) {
   for (const [moduleIndex, module] of schema.modules.entries()) {
     const path = `modules[${moduleIndex}]`;
     expectIdentifier(module.name, `${path}.name`);
+    if (module.verification !== undefined) {
+      if (module.verification?.kind !== "timer-lifecycle-v1") {
+        fail(`${path}.verification.kind`, "unsupported verification scenario");
+      }
+      for (const field of ["delay", "elapsed"]) {
+        if (!Number.isFinite(module.verification[field]) || module.verification[field] < 0) {
+          fail(`${path}.verification.${field}`, "expected a non-negative finite number");
+        }
+      }
+      for (const field of ["firstHandle", "secondHandle"]) {
+        const value = module.verification[field];
+        if (!Number.isInteger(value) || value < 0 || value > 0xffff_ffff) {
+          fail(`${path}.verification.${field}`, "expected a u32");
+        }
+      }
+    }
     expectArray(module.functions, `${path}.functions`);
     expectUnique(module.functions, (fn) => fn.name, `${path}.functions`);
     for (const [functionIndex, fn] of module.functions.entries()) {
       const fnPath = `${path}.functions[${functionIndex}]`;
       expectIdentifier(fn.name, `${fnPath}.name`);
       if (fn.symbol !== undefined) expectIdentifier(fn.symbol, `${fnPath}.symbol`);
+      if (fn.callbackFailureValue !== undefined &&
+          (!Number.isSafeInteger(fn.callbackFailureValue) || fn.callbackFailureValue < 0)) {
+        fail(`${fnPath}.callbackFailureValue`, "expected a non-negative safe integer");
+      }
       expectArray(fn.parameters, `${fnPath}.parameters`);
       expectUnique(fn.parameters, (parameter) => parameter.name, `${fnPath}.parameters`);
       for (const [parameterIndex, parameter] of fn.parameters.entries()) {
