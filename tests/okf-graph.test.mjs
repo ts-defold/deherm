@@ -1,4 +1,6 @@
 import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -74,6 +76,41 @@ four
   return { root, docs, databasePath };
 }
 
+async function waitForOutput(stream, expected) {
+  stream.setEncoding("utf8");
+  let output = "";
+  for await (const chunk of stream) {
+    output += chunk;
+    if (output.includes(expected)) return;
+  }
+  throw new Error(`child exited before emitting ${JSON.stringify(expected)}; received ${JSON.stringify(output)}`);
+}
+
+async function holdDatabaseLock(databasePath, begin) {
+  const child = spawn(process.execPath, [
+    "--input-type=module",
+    "--eval",
+    `
+      import { DatabaseSync } from "node:sqlite";
+      const database = new DatabaseSync(process.argv[1]);
+      database.exec(process.argv[2]);
+      process.stdout.write("database-locked\\n");
+      setTimeout(() => {
+        database.exec("COMMIT");
+        database.close();
+      }, 300);
+    `,
+    databasePath,
+    begin
+  ], { stdio: ["ignore", "pipe", "pipe"] });
+  const exit = once(child, "exit");
+  let stderr = "";
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data", (chunk) => { stderr += chunk; });
+  await waitForOutput(child.stdout, "database-locked\n");
+  return { child, exit, stderr: () => stderr };
+}
+
 test("OKF graph refresh is content-addressed and updates source digests incrementally", async () => {
   const value = await fixture();
   try {
@@ -94,6 +131,40 @@ test("OKF graph refresh is content-addressed and updates source digests incremen
     assert.equal(changedSource.indexed, 0);
     assert.equal(changedSource.sourceUpdated, 1);
   } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("OKF refresh and read operations wait for concurrent locks instead of failing", async () => {
+  const value = await fixture();
+  let lock;
+  try {
+    await refreshOkfIndex(value);
+    lock = await holdDatabaseLock(value.databasePath, "BEGIN IMMEDIATE");
+    const stats = await refreshOkfIndex(value);
+    assert.deepEqual(
+      { indexed: stats.indexed, reused: stats.reused, documents: stats.documents },
+      { indexed: 0, reused: 2, documents: 2 }
+    );
+    let [code] = await lock.exit;
+    assert.equal(code, 0, lock.stderr());
+    lock = undefined;
+
+    lock = await holdDatabaseLock(value.databasePath, "PRAGMA locking_mode = EXCLUSIVE; BEGIN EXCLUSIVE");
+    const section = await sectionOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/a.md",
+      terms: ["ownership"]
+    });
+    assert.equal(section.title, "Ownership");
+    [code] = await lock.exit;
+    assert.equal(code, 0, lock.stderr());
+    lock = undefined;
+  } finally {
+    if (lock) {
+      lock.child.kill();
+      await lock.exit;
+    }
     await rm(value.root, { recursive: true, force: true });
   }
 });

@@ -107,7 +107,7 @@ build_variant() {
 # Separate build trees, so neither variant can pick up the other's objects.
 build_variant "" OFF hermes.lib
 build_variant "-debug" ON hermes.debug.lib
-cp "$work/hermes/lib/config/libhermesvm-config.h" "$staging/libhermesvm-config.h"
+cp "$work/lib/config/libhermesvm-config.h" "$staging/libhermesvm-config.h"
 
 bash "$here/package-archive.sh" "$output" \
   "$staging/hermes.lib" "$staging/hermes.debug.lib" "$staging/libhermesvm-config.h"

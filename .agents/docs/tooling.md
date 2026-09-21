@@ -50,6 +50,8 @@ local source references carry only their path and digest. Explicit Markdown,
 frontmatter, ownership, generation, and verification references become graph
 edges. `pnpm knowledge:sql -- <query>` exposes a bounded, physically read-only
 SQL escape hatch for precise joins without injecting the corpus into context.
+Concurrent commands share the disposable cache safely: a writer waits for up
+to five seconds for an active refresh transaction before reporting contention.
 
 # Commands that work now
 

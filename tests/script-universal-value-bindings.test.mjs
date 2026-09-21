@@ -242,6 +242,10 @@ test("Static Hermes provider type-checks and compiles through the pinned Static 
 test("browser provider round-trips recursive direct-memory values and rejects cycles", async () => {
   const source = await readFile(path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"), "utf8");
   assert.doesNotMatch(source, /embind|Embind|ccall|cwrap/);
+  const callScratchSource = source.slice(source.indexOf("    call: function(stableId, args)"), source.indexOf("    install: function()"));
+  assert.doesNotMatch(callScratchSource, /stackAlloc|stackSave|stackRestore/,
+    "universal calls must not place their bounded scratch arena on the 64 KiB Wasm stack");
+  assert.match(callScratchSource, /acquireScratch\(this\.depth - 1\)/);
   const memory = new ArrayBuffer(16 * 1024 * 1024);
   const HEAPU8 = new Uint8Array(memory);
   const HEAPU32 = new Uint32Array(memory);
@@ -255,6 +259,11 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   let nested = false;
   let host;
   let callbackToken;
+  let heap = 1024 * 1024;
+  const allocations = [];
+  const frees = [];
+  const liveAllocations = new Map();
+  const dispatchPointers = [];
   const align = (value) => (value + 15) & ~15;
   const context = {
     HEAPU8, HEAPU32, HEAPF32, HEAPF64, BigInt, Map, Object, Array,
@@ -262,6 +271,17 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
     stackSave: () => stack,
     stackAlloc: (size) => { const pointer = align(stack); stack = align(pointer + size); return pointer; },
     stackRestore: (checkpoint) => { stack = checkpoint; },
+    _malloc: (size) => {
+      const pointer = align(heap);
+      heap = align(pointer + size);
+      allocations.push({ pointer, size });
+      liveAllocations.set(pointer, size);
+      return pointer;
+    },
+    _free: (pointer) => {
+      assert.equal(liveAllocations.delete(pointer), true, "scratch blocks must be freed exactly once");
+      frees.push(pointer);
+    },
     lengthBytesUTF8: (value) => encoder.encode(value).length,
     stringToUTF8: (value, pointer, capacity) => {
       const bytes = encoder.encode(value);
@@ -284,7 +304,11 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
         outValues, , outValueCount, outEntries, , outEntryCount,
         outStrings, , outStringCount, outFloats, , outFloatCount,
         outUrls, , outUrlCount, resultRoots, , resultCount] = parameters;
-      if (stableId === 99 && !nested) { nested = true; host.call(100, []); nested = false; }
+      dispatchPointers.push({ stableId, values });
+      if (stableId === 99 && !nested) {
+        assert.throws(() => host.dispose(), /active call/);
+        nested = true; host.call(100, []); nested = false;
+      }
       if (stableId === 200) {
         assert.equal(argumentCount, 1);
         const callbackPointer = values + HEAPU32[roots >> 2] * 48;
@@ -340,6 +364,8 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   vm.runInNewContext(source, context, { filename: "generated_script_universal_value.js" });
   context.DEFOLD_HERMES_SCRIPT_UNIVERSAL = library.$DEFOLD_HERMES_SCRIPT_UNIVERSAL;
   host = library.$DEFOLD_HERMES_SCRIPT_UNIVERSAL.install();
+  assert.throws(() => context.DEFOLD_HERMES_SCRIPT_UNIVERSAL.acquireScratch(16), /reentrancy bound/);
+  assert.equal(allocations.length, 0, "an out-of-range depth must fail before allocation");
   const boundaryCheckpoint = stack;
   const boundaryValues = context.stackAlloc(48);
   const boundaryStrings = context.stackAlloc(5);
@@ -362,10 +388,17 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   assert.deepEqual(Array.from(output.values), [1, true, 9n]);
   assert.equal(output.nested.get("x").z, 3);
   assert.equal(output.url.fragment, 4n);
-  assert.equal(stack, 4096, "browser stack arena was not restored after reentrant dispatch");
+  assert.equal(stack, 4096, "universal call scratch must not consume the browser Wasm stack");
+  assert.equal(allocations.length, 2, "outer and reentrant calls warm exactly two depth slots");
+  assert.ok(allocations.every(({ size }) => size === context.DEFOLD_HERMES_SCRIPT_UNIVERSAL.scratchBytes));
+  const outerScratch = dispatchPointers.find(({ stableId }) => stableId === 99).values;
+  const nestedScratch = dispatchPointers.find(({ stableId }) => stableId === 100).values;
+  assert.notEqual(outerScratch, nestedScratch, "reentrant calls must use separate scratch slots");
   const variableTuple = host.call(0x8993930a, ["resource-data"]);
   assert.deepEqual(Array.from(variableTuple), ["resource-data", undefined],
     "browser SDK bridge must pad an omitted trailing optional Lua result");
+  assert.equal(dispatchPointers.at(-1).values, outerScratch, "a warmed outer-depth arena must be reused");
+  assert.equal(allocations.length, 2, "warmed calls must not allocate additional Wasm heap scratch");
   const cycle = {}; cycle.self = cycle;
   assert.throws(() => host.call(101, [cycle]), /cycle/);
   const retained = host.call(102, [{ __dehermHandleV1: true, kind: 5, semanticKind: 7, runtime: 3, payload: 12n }]);
@@ -439,4 +472,15 @@ test("browser provider round-trips recursive direct-memory values and rejects cy
   assert.throws(() => host.call(201, [() => {}, callbackCycle]), /cycle/);
   assert.equal(callbackRegistry.functions.filter(Boolean).length, leakedBefore,
     "failed pre-dispatch encoding must release callback registry slots");
+  assert.equal(allocations.length, 2, "fail-closed encoding must retain the reusable arena pool");
+  host.dispose();
+  assert.equal(frees.length, 2);
+  assert.equal(liveAllocations.size, 0, "disposing the bridge must release every warmed depth slot");
+  host.dispose();
+  assert.equal(frees.length, 2, "bridge disposal must be idempotent");
+  host.call(100, []);
+  assert.equal(allocations.length, 3, "a disposed bridge may warm a fresh bounded arena");
+  host.dispose();
+  assert.equal(frees.length, 3);
+  assert.equal(liveAllocations.size, 0);
 });

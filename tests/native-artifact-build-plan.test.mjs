@@ -178,3 +178,27 @@ test("the Apple archive stages Hermes' configured header from the CMake build ro
   );
   assert.doesNotMatch(builder, /\$cross_build\/hermes\/lib\/config\/libhermesvm-config\.h/u);
 });
+
+test("every native builder stages Hermes' configured header from the CMake build root", async () => {
+  const builders = await Promise.all([
+    "toolchains/hermes/Dockerfile.linux",
+    "toolchains/hermes/Dockerfile.android",
+    "toolchains/hermes/Dockerfile.win32",
+    "toolchains/hermes/build-windows.sh"
+  ].map(async (file) => [file, await readFile(file, "utf8")]));
+
+  for (const [file, builder] of builders) {
+    assert.doesNotMatch(
+      builder,
+      /(?:\/work\/build|\$work)\/hermes\/lib\/config\/libhermesvm-config\.h/u,
+      `${file} must not treat the Hermes source directory as the CMake build root`
+    );
+    assert.match(
+      builder,
+      file.endsWith("build-windows.sh")
+        ? /\$work\/lib\/config\/libhermesvm-config\.h/u
+        : /\/work\/build\/lib\/config\/libhermesvm-config\.h/u,
+      `${file} must package the configured header emitted under <build>/lib/config`
+    );
+  }
+});

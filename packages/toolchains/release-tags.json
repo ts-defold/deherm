@@ -71,8 +71,8 @@
       }
     },
     "native-artifacts": {
-      "tag": "libs-bb93fc4e84dd",
-      "fingerprint": "bb93fc4e84ddf9abacb89530084459373d7dfe98073286c78972c24622d53538",
+      "tag": "libs-52a1faec5d17",
+      "fingerprint": "52a1faec5d177f7df14b4d76b33336b9c2db07f0c5e179febc765a612ae1df98",
       "indexedBy": "bundleTarget",
       "summary": "Hermes release/debug libraries plus generated target config, per Defold bundle target",
       "assets": {

@@ -58,6 +58,14 @@ version invalidates and recreates the disposable cache before current indexes
 are created when extraction rules change. Markdown frontmatter is normalized
 for LF, CRLF, and legacy-CR checkouts before parsing.
 
+Cache connections use a bounded five-second SQLite busy timeout. Concurrent
+query commands may both refresh the same disposable database; the later writer
+waits for the active refresh transaction instead of failing at `BEGIN
+IMMEDIATE` with `database is locked`, and a read-only query waits for a
+concurrent schema/write phase to clear. This coordination applies to schema
+initialization and independent source-digest updates without making the cache
+authoritative or its SQL connections writable.
+
 Search returns at most 50 rows, outline returns at most 200 headings, and a
 section returns at most 200 lines. Every textual cell and section line also has
 a byte cap, and a complete result cannot exceed 64 KiB. SQL blobs are reduced
@@ -75,8 +83,9 @@ invalidation, independent source-digest refresh, stable line-independent
 section identities, fragment-link resolution, all supported edge families,
 metadata-only handling for generated JSON, output bounds, and rejection of SQL
 writes. It also covers CRLF parity, old-schema cache recreation, single-line
-section flooding, BLOB reduction, and recursive-query rejection. The first
-implementation uses deterministic Markdown structure and explicit path
-language. A later Tree-sitter adapter may add symbol-level source nodes, but it
-must preserve the same bounded query contract and cannot make the cache
-necessary for correctness.
+section flooding, BLOB reduction, recursive-query rejection, and deterministic
+write-lock contention from a concurrent process. The first implementation uses
+deterministic Markdown structure and explicit path language. A later
+Tree-sitter adapter may add symbol-level source nodes, but it must preserve the
+same bounded query contract and cannot make the cache necessary for
+correctness.

@@ -107,7 +107,7 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
 # workflow uploads it under `hermes-<target>.tar.gz`, and renaming a file does
 # not change its bytes. Keeping the target out of the recipe keeps this
 # Dockerfile free of a build argument it would otherwise only echo.
-RUN cp /work/build/hermes/lib/config/libhermesvm-config.h /out/libhermesvm-config.h && \
+RUN cp /work/build/lib/config/libhermesvm-config.h /out/libhermesvm-config.h && \
     package-archive /out/hermes.tar.gz \
       /out/libhermes.a /out/libhermes.debug.a /out/libhermesvm-config.h
 

@@ -61,6 +61,14 @@ test("web callback reset invalidates handles across runtime reloads", async () =
   assert.equal(typeof callbacks.resolve(current), "function");
 });
 
+test("web reset disposes the generated universal scratch pool", async () => {
+  const { context } = await loadLibrary();
+  let disposals = 0;
+  context.DEFOLD_HERMES_SCRIPT_UNIVERSAL = { dispose() { ++disposals; } };
+  context.DEFOLD_HERMES_BRIDGE.reset();
+  assert.equal(disposals, 1);
+});
+
 test("web finalization cleans roots and callbacks when the app hook throws", async () => {
   const { context } = await loadLibrary();
   const callbacks = context.DEFOLD_HERMES_WEB_CALLBACKS;

@@ -151,6 +151,7 @@ function renderHeader(model, native, counts) {
 #define DEHERM_RECORDING_LUA_EXACT_COUNT ${model.summary.luaAdapter.exercised}u
 #define DEHERM_RECORDING_LUA_SKIP_COUNT ${model.summary.luaAdapter.skipped}u
 #define DEHERM_RECORDING_DYNAMIC_NATIVE_POD_COUNT ${model.summary.targetApplicability["dynamic-hermes"].lanes["dynamic-hermes-native-pod"]}u
+#define DEHERM_RECORDING_BROWSER_EXACT_COUNT ${model.summary.browserExact.routeCount}u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_COUNT ${model.summary.browserCallbackExact.routeCount}u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_CALLBACK_COUNT ${model.summary.browserCallbackExact.callbackCount}u
 
@@ -235,6 +236,9 @@ int deherm_recording_driver_present(uint32_t route, uint32_t transport);
 /** Browser/Wasm callback-registry exact-call controls. */
 uint32_t deherm_recording_browser_callback_count(uint32_t route);
 uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route);
+uint32_t deherm_recording_browser_first_outstanding_callback_route(void);
+uint32_t deherm_recording_browser_handle_release_count(void);
+void deherm_recording_browser_drain_handle_releases(void);
 int deherm_recording_browser_invoke_callback(uint32_t route, uint32_t callback,
     char* error, uint32_t errorCapacity);
 uint32_t deherm_recording_browser_release_callbacks(uint32_t route);
@@ -366,6 +370,7 @@ struct BrowserCallbackObservation {
 };
 
 BrowserCallbackObservation gBrowserCallbacks[DEHERM_RECORDING_ROUTE_COUNT];
+uint32_t gBrowserHandleReleaseCount = 0;
 
 const char* textOf(int32_t id) {
   return id >= 0 && static_cast<uint32_t>(id) < DEHERM_RECORDING_TEXT_COUNT
@@ -833,7 +838,20 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
 
 const char* LastError(void*) { return gLastError; }
 
-void Release(void*, ScriptHandleKind, uint32_t, uint64_t) noexcept {}
+void Release(void*, ScriptHandleKind kind, uint32_t runtime, uint64_t payload) noexcept {
+  if (kind != ScriptHandleKind::kGuiNode && kind != ScriptHandleKind::kLuaUserdata &&
+      kind != ScriptHandleKind::kLuaSemanticHandle) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError), "browser released a non-owning handle kind");
+    return;
+  }
+  if (runtime != 1 || payload != ((UINT64_C(1) << 32u) | UINT64_C(1))) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError), "browser released the wrong handle identity");
+    return;
+  }
+  ++gBrowserHandleReleaseCount;
+}
 
 }  // namespace
 
@@ -848,6 +866,7 @@ uint32_t deherm_recording_find_route(uint32_t stableId) {
 
 void deherm_recording_install(void) {
   gLastError[0] = '\\0';
+  gBrowserHandleReleaseCount = 0;
   installScriptBridgeApi({nullptr, Dispatch, LastError, Release});
 }
 
@@ -910,6 +929,21 @@ uint32_t deherm_recording_browser_callback_count(uint32_t route) {
 
 uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route) {
   return route < DEHERM_RECORDING_ROUTE_COUNT ? gBrowserCallbacks[route].invocations : 0;
+}
+
+uint32_t deherm_recording_browser_first_outstanding_callback_route(void) {
+  for (uint32_t route = 0; route < DEHERM_RECORDING_ROUTE_COUNT; ++route) {
+    if (gBrowserCallbacks[route].count != 0) return route;
+  }
+  return DEHERM_RECORDING_ROUTE_COUNT;
+}
+
+uint32_t deherm_recording_browser_handle_release_count(void) {
+  return gBrowserHandleReleaseCount;
+}
+
+void deherm_recording_browser_drain_handle_releases(void) {
+  drainReleasedScriptHandles();
 }
 
 struct BrowserConsumeContext {
@@ -2486,21 +2520,28 @@ for (const slot of ORDER) {
 `;
 }
 
-function browserCallbackRoutes(model) {
+function browserExactRoutes(model) {
+  const targetIndex = model.applicabilityCatalog.targets.indexOf("browser-wasm");
+  assert(targetIndex >= 0, "recording engine has no browser-wasm applicability target");
   return model.routes.flatMap((route, routeIndex) => {
+    const lane = model.applicabilityCatalog.lanes[route.applicability[targetIndex]];
+    if (lane?.status !== "exercise") return [];
     const override = route.exactVector.laneOverride;
-    if (override?.lane !== "browser-wasm-callback-registry") return [];
+    if (lane.lane === "browser-wasm-callback-registry") {
+      assert(override?.lane === lane.lane,
+        `${route.id}: browser callback applicability has no callback exact vector`);
+    }
     const contract = model.exactVectorCatalog.vectors[route.exactVector.contract];
-    return [{ route, routeIndex, override, contract }];
+    return [{ route, routeIndex, override: override ?? null, contract }];
   });
 }
 
 function renderBrowserCallbackDriver(model) {
-  const routes = browserCallbackRoutes(model);
-  assert(routes.length === model.summary.browserCallbackExact.routeCount,
-    "browser callback exact route census drifted while rendering the driver");
+  const routes = browserExactRoutes(model);
+  assert(routes.length === model.summary.browserExact.routeCount,
+    "browser exact route census drifted while rendering the driver");
   return `${banner}
-// Real Emscripten/Wasm entry point for the generated browser callback vectors.
+// Real Emscripten/Wasm entry point for every generated browser exact vector.
 
 #include "generated_script_recording_engine.h"
 
@@ -2524,12 +2565,12 @@ int main() {
   const int status = deherm_recording_browser_run_exact();
   deherm_recording_uninstall();
   if (status != 0 || deherm_recording_violation_count() != 0) {
-    std::printf("DEHERM_SCRIPT_BROWSER_CALLBACK_EXACT_FAIL status=%d violations=%u\\n",
+    std::printf("DEHERM_SCRIPT_BROWSER_EXACT_FAIL status=%d violations=%u\\n",
         status, deherm_recording_violation_count());
     return status ? status : 1;
   }
-  std::printf("DEHERM_SCRIPT_BROWSER_CALLBACK_EXACT_OK routes=%u callbacks=%u plan=%s\\n",
-      DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_COUNT,
+  std::printf("DEHERM_SCRIPT_BROWSER_EXACT_OK routes=%u callbacks=%u plan=%s\\n",
+      DEHERM_RECORDING_BROWSER_EXACT_COUNT,
       DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_CALLBACK_COUNT,
       DEHERM_RECORDING_PLAN_SHA256);
   return 0;
@@ -2544,7 +2585,24 @@ function renderBrowserCallbackDriverJs(model) {
     shape.key >= 0 ? model.text[shape.key] : "",
     shape.children
   ]);
-  const routes = browserCallbackRoutes(model).map(({ route, routeIndex, override, contract }) => [
+  const ownedHandleCounts = new Map();
+  const ownedHandleCount = (shapeIndex) => {
+    const cached = ownedHandleCounts.get(shapeIndex);
+    if (cached !== undefined) return cached;
+    const shape = model.shapes[shapeIndex];
+    const count = shape.code === shapeCodes.handle || shape.code === shapeCodes.guiNode ||
+        shape.code === shapeCodes.userdata
+      ? 1
+      : shape.children.reduce((sum, child) => sum + ownedHandleCount(child), 0);
+    ownedHandleCounts.set(shapeIndex, count);
+    return count;
+  };
+  const exactRoutes = browserExactRoutes(model);
+  const callbackReentrantOrdinal = exactRoutes.findIndex(({ override }) =>
+    (override?.callbackSlots?.length ?? 0) > 0);
+  const reentrantTargetOrdinal = exactRoutes.findIndex(({ override }, index) =>
+    index !== callbackReentrantOrdinal && (override?.callbackSlots?.length ?? 0) === 0);
+  const routes = exactRoutes.map(({ route, routeIndex, override, contract }) => [
     routeIndex,
     route.stableId,
     route.canonical,
@@ -2554,9 +2612,10 @@ function renderBrowserCallbackDriverJs(model) {
     route.results.maximum,
     contract.argumentValues.join(" "),
     contract.resultValues.join(" "),
-    override.callbackSlots,
-    override.callbackInvocation,
-    override.lifecycle
+    override?.callbackSlots ?? [],
+    override?.callbackInvocation ?? null,
+    override?.lifecycle ?? null,
+    route.resultShapes.reduce((sum, shape) => sum + ownedHandleCount(shape), 0)
   ]);
   return `${banner}
 // Emscripten JS-library driver generated from the same route/shape/vector IR
@@ -2568,6 +2627,9 @@ var LibraryDehermRecordingBrowserCallbackExact = {
     '$stringToUTF8', '$UTF8ToString',
     'deherm_recording_browser_callback_count',
     'deherm_recording_browser_callback_invocation_count',
+    'deherm_recording_browser_first_outstanding_callback_route',
+    'deherm_recording_browser_handle_release_count',
+    'deherm_recording_browser_drain_handle_releases',
     'deherm_recording_select_transport', 'deherm_recording_current_transport',
     'deherm_recording_browser_invoke_callback',
     'deherm_recording_browser_release_callbacks',
@@ -2578,18 +2640,21 @@ var LibraryDehermRecordingBrowserCallbackExact = {
   deherm_recording_browser_run_exact: function() {
     _deherm_recording_select_transport(1);
     if (_deherm_recording_current_transport() !== 1) {
-      throw new Error('browser-callback-exact: direct-memory transport selection failed');
+      throw new Error('browser-exact: direct-memory transport selection failed');
     }
     var SHAPES = ${JSON.stringify(shapeRows)};
     var ROUTES = ${JSON.stringify(routes)};
     var CODE = ${JSON.stringify(shapeCodes)};
+    var SEMANTIC = ${JSON.stringify(model.semanticHandleKindNames)};
     var bridge = DEFOLD_HERMES_SCRIPT_UNIVERSAL.install();
     var registry = DEFOLD_HERMES_WEB_CALLBACKS;
     var nested = false;
+    var callbackReentrantOrdinal = ${callbackReentrantOrdinal};
+    var reentrantTargetOrdinal = ${reentrantTargetOrdinal};
     var activeHandles = [];
     var originalAcquire = registry.acquire;
 
-    function fail(message) { throw new Error('browser-callback-exact: ' + message); }
+    function fail(message) { throw new Error('browser-exact: ' + message); }
     function childSentinel(seed, index) { return ((seed * 17 + index + 1) % 10000) + 1; }
     function u64Sentinel(seed) { return (BigInt(seed + 0x10000) << 32n) | BigInt(seed); }
     function build(shapeIndex, seed, routeOrdinal) {
@@ -2631,15 +2696,28 @@ var LibraryDehermRecordingBrowserCallbackExact = {
       if (value.__dehermValueKind === 'vector4') return 'dv:v4:'+value.x+','+value.y+','+value.z+','+value.w;
       if (value.__dehermValueKind === 'quaternion') return 'dv:quat:'+value.x+','+value.y+','+value.z+','+value.w;
       if (value.__dehermValueKind === 'matrix4') return 'dv:mat4:'+value.elements.join(',');
-      if (value.__dehermHandleV1 || (typeof value.kind === 'string' && typeof value.dispose === 'function')) return 'h:'+(value.kind || 'handle');
+      if (value.__dehermHandleV1) return 'h:'+(value.kind === 3 ? 'gui-node' :
+        value.kind === 4 ? 'lua-userdata' : SEMANTIC[value.semanticKind] || 'handle');
+      if (typeof value.kind === 'string' && typeof value.dispose === 'function') return 'h:'+(value.kind || 'handle');
       return 'rec('+Object.keys(value).map(function(key){return key+'='+render(value[key],depth+1);}).join(',')+')';
+    }
+    function disposeReturned(value, seen) {
+      if (value === null || value === undefined || typeof value !== 'object') return;
+      if (seen.indexOf(value) !== -1) return;
+      seen.push(value);
+      if (typeof value.dispose === 'function') { value.dispose(); return; }
+      if (Array.isArray(value)) { for (var item=0;item<value.length;++item) disposeReturned(value[item],seen); return; }
+      if (value instanceof Map) { value.forEach(function(item,key){disposeReturned(key,seen);disposeReturned(item,seen);}); return; }
+      for (var key in value) if (Object.prototype.hasOwnProperty.call(value,key)) disposeReturned(value[key],seen);
     }
     function makeCallback(routeOrdinal) {
       return function() {
         var vector = ROUTES[routeOrdinal], invocation = vector[10];
         var actual = Array.prototype.map.call(arguments,function(value){return render(value,0);});
         if (actual.join(' ') !== invocation.argumentValues.join(' ')) fail(vector[2]+' callback argument mismatch '+actual.join(' '));
-        if (routeOrdinal === 0 && !nested) { nested=true; try { runRoute(1); } finally { nested=false; } }
+        if (routeOrdinal === callbackReentrantOrdinal && reentrantTargetOrdinal >= 0 && !nested) {
+          nested=true; try { runRoute(reentrantTargetOrdinal); } finally { nested=false; }
+        }
         var values = invocation.resultValues.map(function(specification,index){
           return index === 0 ? Number(specification.slice(4)) : specification.slice(4);
         });
@@ -2657,8 +2735,14 @@ var LibraryDehermRecordingBrowserCallbackExact = {
       activeHandles=acquired;
       registry.acquire=function(callback){var handle=originalAcquire.call(registry,callback);activeHandles.push(handle);return handle;};
       try {
+        var outstandingBefore=_deherm_recording_browser_callback_count(route);
+        if(outstandingBefore!==0)fail(canonical+' entered with '+outstandingBefore+' outstanding native callbacks');
+        var releasesBefore=_deherm_recording_browser_handle_release_count();
         var args=vector[3].map(function(shape,index){return build(shape,index+1,routeOrdinal);});
-        var value=bridge.call(stableId,args), results=vector[6]>1?Array.from(value).slice(0,vector[5]):vector[5]===0?[]:[value];
+        var value;
+        try { value=bridge.call(stableId,args); }
+        catch(error) { fail(canonical+' bridge call failed: '+(error&&error.message?error.message:String(error))); }
+        var results=vector[6]>1?Array.from(value).slice(0,vector[5]):vector[5]===0?[]:[value];
         var rendered=results.map(function(item){return render(item,0);}).join(' ');
         if(rendered!==vector[8])fail(canonical+' result mismatch '+rendered+' != '+vector[8]);
         if(_deherm_recording_browser_callback_count(route)!==vector[9].length)fail(canonical+' native callback count mismatch');
@@ -2681,6 +2765,16 @@ var LibraryDehermRecordingBrowserCallbackExact = {
         if(!_deherm_recording_browser_verify_route(route,stableId,expected,vector[3].length))fail(canonical+' stable-id/argument/invocation verification failed');
         if(_deherm_recording_browser_release_callbacks(route)!==acquired.length)fail(canonical+' native callback release count mismatch');
         for(var released=0;released<acquired.length;++released)if(registry.resolve(acquired[released]))fail(canonical+' callback token survived finalization');
+        if(!nested){
+          var dirtyRoute=_deherm_recording_browser_first_outstanding_callback_route();
+          if(dirtyRoute!==${model.routes.length})fail(canonical+' corrupted callback state for native route '+dirtyRoute+
+            ' count='+_deherm_recording_browser_callback_count(dirtyRoute));
+        }
+        disposeReturned(results,[]);
+        _deherm_recording_browser_drain_handle_releases();
+        var releasedHandles=_deherm_recording_browser_handle_release_count()-releasesBefore;
+        if(releasedHandles!==vector[12])fail(canonical+' released '+releasedHandles+
+          ' result handles; expected '+vector[12]);
       } finally {
         registry.acquire=originalAcquire;
         activeHandles=[];
@@ -2703,9 +2797,9 @@ var LibraryDehermRecordingBrowserCallbackExact = {
       if(registry.runtime===runtime||registry.resolve(finalized)!==null)fail('registry reset did not invalidate final token');
       return 0;
     } catch(error) {
-      console.error('DEHERM_SCRIPT_BROWSER_CALLBACK_EXACT_FAIL '+(error&&error.stack?error.stack:String(error)));
+      console.error('DEHERM_SCRIPT_BROWSER_EXACT_FAIL '+(error&&error.stack?error.stack:String(error)));
       return 1;
-    } finally { registry.acquire=originalAcquire; }
+    } finally { registry.acquire=originalAcquire;if(typeof bridge.dispose==='function')bridge.dispose(); }
   }
 };
 autoAddDeps(LibraryDehermRecordingBrowserCallbackExact, '$DEFOLD_HERMES_SCRIPT_UNIVERSAL');

@@ -47,6 +47,7 @@ struct BrowserCallbackObservation {
 };
 
 BrowserCallbackObservation gBrowserCallbacks[DEHERM_RECORDING_ROUTE_COUNT];
+uint32_t gBrowserHandleReleaseCount = 0;
 
 const char* textOf(int32_t id) {
   return id >= 0 && static_cast<uint32_t>(id) < DEHERM_RECORDING_TEXT_COUNT
@@ -514,7 +515,20 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
 
 const char* LastError(void*) { return gLastError; }
 
-void Release(void*, ScriptHandleKind, uint32_t, uint64_t) noexcept {}
+void Release(void*, ScriptHandleKind kind, uint32_t runtime, uint64_t payload) noexcept {
+  if (kind != ScriptHandleKind::kGuiNode && kind != ScriptHandleKind::kLuaUserdata &&
+      kind != ScriptHandleKind::kLuaSemanticHandle) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError), "browser released a non-owning handle kind");
+    return;
+  }
+  if (runtime != 1 || payload != ((UINT64_C(1) << 32u) | UINT64_C(1))) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError), "browser released the wrong handle identity");
+    return;
+  }
+  ++gBrowserHandleReleaseCount;
+}
 
 }  // namespace
 
@@ -529,6 +543,7 @@ uint32_t deherm_recording_find_route(uint32_t stableId) {
 
 void deherm_recording_install(void) {
   gLastError[0] = '\0';
+  gBrowserHandleReleaseCount = 0;
   installScriptBridgeApi({nullptr, Dispatch, LastError, Release});
 }
 
@@ -591,6 +606,21 @@ uint32_t deherm_recording_browser_callback_count(uint32_t route) {
 
 uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route) {
   return route < DEHERM_RECORDING_ROUTE_COUNT ? gBrowserCallbacks[route].invocations : 0;
+}
+
+uint32_t deherm_recording_browser_first_outstanding_callback_route(void) {
+  for (uint32_t route = 0; route < DEHERM_RECORDING_ROUTE_COUNT; ++route) {
+    if (gBrowserCallbacks[route].count != 0) return route;
+  }
+  return DEHERM_RECORDING_ROUTE_COUNT;
+}
+
+uint32_t deherm_recording_browser_handle_release_count(void) {
+  return gBrowserHandleReleaseCount;
+}
+
+void deherm_recording_browser_drain_handle_releases(void) {
+  drainReleasedScriptHandles();
 }
 
 struct BrowserConsumeContext {

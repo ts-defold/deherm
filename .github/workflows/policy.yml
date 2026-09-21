@@ -367,8 +367,8 @@ jobs:
         run: bash scripts/bootstrap-emsdk.sh
       - name: Compile and run dmSDK exact calls in real browser Wasm
         run: pnpm test:dmsdk-browser-exact-call
-      - name: Compile and run script callback exact calls in real browser Wasm
-        run: pnpm test:script-browser-callback-exact-call
+      - name: Compile and run every emitted script exact call in real browser Wasm
+        run: pnpm test:script-browser-exact-call
       - id: engine
         name: Materialize the runtime and exercise every generated route
         continue-on-error: true

@@ -636,7 +636,7 @@ target_link_libraries(defold-hermes-script-recording-native-pod PRIVATE
   defold-hermes-lua-bridge
 )
 
-# The browser callback exact-call twin is intentionally a custom target: it
+# The complete browser exact-call twin is intentionally a custom target: it
 # invokes the pinned Emscripten toolchain and a real headless browser rather
 # than pretending the host C++ compiler can prove the JavaScript/Wasm seam.
 add_custom_target(defold-hermes-script-recording-browser-callback

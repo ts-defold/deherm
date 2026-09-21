@@ -1,5 +1,44 @@
 # Defold Hermes knowledge log
 
+## 2026-09-21 - Browser exact calls cover every emitted script route
+
+The generated browser exact-call driver now executes all 911 emitted script
+routes in a real Emscripten module and headless Chrome: 888 direct-memory rows
+and 23 callback-registry rows. The same generated route/shape/vector IR drives
+the provider and caller. Exact stable IDs, arguments, results, observed handle
+disposal, generic callback retain/invoke/release, registry reset, nested
+reentrancy, and callback state cleanliness are checked without mocks.
+Route-specific callback lifetime policies remain separate lifecycle evidence.
+The two function-result routes
+that the browser target does not emit remain explicit applicability blockers.
+
+Expanding from the callback-only slice found a production transport defect.
+The browser bridge placed roughly 193 KiB of family-wide wire scratch on every
+Wasm call stack; an isolated module using Emscripten's default stack overwrote
+static callback state. The generated host now lazily allocates one bounded
+scratch arena for each reentrancy depth actually observed, reuses warmed slots,
+and frees every slot on full bridge reset. Ordinary HMR reuses the bounded
+pool. The test passes without increasing the default stack and requires both a
+clean success record and a zero-status runtime-exit record.
+
+Native artifact publication was independently blocked by Linux, Android, and
+Windows builders copying `libhermesvm-config.h` from an incorrect nested build
+path instead of CMake's actual build subtree. All builders now use
+`<build>/lib/config`,
+with cross-platform parity assertions. This changes the content-addressed
+artifact fingerprint; CI evidence remains pending until the replacement
+archives publish. The concurrent OKF cache also now waits up to five seconds
+for SQLite writer/exclusive locks, with cross-process tests proving refresh and
+read contention no longer fail spuriously.
+
+Evidence: Chrome 153 and pinned Emscripten 4.0.6 reported
+`DEHERM_SCRIPT_BROWSER_EXACT_OK routes=911 callbacks=23` on the default Wasm
+stack. Focused recording, universal-value, web lifecycle, artifact-plan, and
+OKF tests pass locally. This is exact generated bridge-contract evidence, not
+semantic execution of every operation inside a packaged Defold game. Native
+artifact CI and the full repository gate were not yet complete when this entry
+was written.
+
 ## 2026-09-20 - Integrated API wave closes review defects and repository gate
 
 The generated dmSDK exact-call corpus now executes 486/486 applicable vectors

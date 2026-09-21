@@ -55,7 +55,7 @@ RUN cmake -S /src/hermes -B /work/build-debug -G Ninja \
 
 # Named for the family, not the target: the workflow uploads this under
 # `hermes-x86_64-win32.tar.gz`, and renaming a file does not change its bytes.
-RUN cp /work/build/hermes/lib/config/libhermesvm-config.h /out/libhermesvm-config.h && \
+RUN cp /work/build/lib/config/libhermesvm-config.h /out/libhermesvm-config.h && \
     package-archive /out/hermes.tar.gz \
       /out/hermes.lib /out/hermes.debug.lib /out/libhermesvm-config.h
 

@@ -82,6 +82,9 @@ var LibraryDefoldHermes = {
     lastFrameDtMs: null,
 
     reset: function() {
+      if (DEFOLD_HERMES_SCRIPT_UNIVERSAL && typeof DEFOLD_HERMES_SCRIPT_UNIVERSAL.dispose === 'function') {
+        DEFOLD_HERMES_SCRIPT_UNIVERSAL.dispose();
+      }
       this.app = null;
       this.generation = 0;
       this.frames = 0;

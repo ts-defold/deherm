@@ -79,12 +79,25 @@ closure-result blockers; Lua emits 911 routes and retains those same two
 blockers. Exact input/result vectors are interned into 406 contracts rather
 than copied into 915 rows. A generated real-Hermes driver now executes all 31
 Dynamic-Hermes native-POD routes through the production value-binding
-dispatcher. A second generated driver executes all 23 browser callback-registry
-rows in a real Emscripten module and headless Chrome through the production
-direct-memory arena and callback registry. It checks stable-ID selection,
-ordered arguments/results, retain/invoke/release, stale-token finalization,
-registry exhaustion, reset invalidation, and a nested reentrant call. The two
-Lua-owned function results remain the browser transport's precise blockers.
+dispatcher. A second generated driver executes all 911 browser-emitted rows --
+888 direct-memory routes and 23 callback-registry routes -- in a real
+Emscripten module and headless Chrome through the production direct-memory
+arena and callback registry. It checks stable-ID selection, ordered
+arguments/results, observed result-handle disposal, generic single-invocation
+callback retain/invoke/release, stale-token
+finalization, registry exhaustion, reset invalidation, nested reentrancy, and
+global callback-state cleanliness after every outer call. Broadening this gate
+found that the production host's family-wide wire scratch exceeded
+Emscripten's default stack and could overwrite static data. The generated host
+now retains one lazily allocated bounded arena per observed reentrancy depth,
+reuses it without warmed-path allocation, and explicitly frees the pool on a
+full bridge reset. Ordinary HMR retains and reuses that bounded pool. The gate
+passes on the default Wasm stack; it does not mask
+the defect by enlarging the test stack. The two Lua-owned function results
+remain the browser transport's precise blockers. Route-specific callback
+lifetime semantics such as persistent replacement and terminal one-shot
+invalidation remain separate engine-lifecycle evidence; this gate proves the
+common callback token transport, not those policies.
 
 The remaining eleven script routes now have their own generated exact-call
 report and C verification header. The emitter exact-set joins the accounting

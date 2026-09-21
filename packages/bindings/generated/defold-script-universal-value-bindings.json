@@ -1035,7 +1035,7 @@
     "packages/sdk/src/generated/script/universal-value-bindings.ts": "d26d083ebb0caed7f60d2d0fe62842f31384488975315e3430cb1aae05c96ff7",
     "packages/sdk/src/generated/script/browser-target-support.ts": "4de2ba390aef3354cbdd498617ce92820975a99077d26ce116a43fed4532e9c8",
     "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
-    "defold/defold_hermes/lib/web/generated_script_universal_value.js": "6e0bba955d31d3073907a9c1a941f3d7bdc63a0065702bb2da56eb8f896f8730"
+    "defold/defold_hermes/lib/web/generated_script_universal_value.js": "c4f207e51a4352ce9208b238b17e7a6b1668594725b7579f5dbe53ceefc77dca"
   },
   "bindings": [
     {

@@ -160,7 +160,15 @@ test("the recording engine is generated from the same IR as the bindings, and is
     routeCount: 23,
     callbackCount: browserCallbackRoutes.reduce((count, route) =>
       count + route.exactVector.laneOverride.callbackSlots.length, 0),
-    resultSchema: "deherm-script-browser-callback-exact-result/v1"
+    resultSchema: "deherm-script-browser-callback-exact-result/v1",
+    lifecycleCoverage: "generic-token-round-trip"
+  });
+  assert.deepEqual(report.summary.browserExact, {
+    routeCount: 911,
+    callbackRouteCount: 23,
+    callbackCount: 23,
+    resultSchema: "deherm-script-browser-exact-result/v1",
+    lifecycleCoverage: "generic-token-round-trip"
   });
   assert.equal(report.exactVectorCatalog.schema, "deherm-script-exact-vector/v1");
   assert.ok(report.routes.every((route) =>

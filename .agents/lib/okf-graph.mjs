@@ -10,6 +10,7 @@ const MAX_CELL_BYTES = 4_096;
 const MAX_LABEL_BYTES = 1_024;
 const MAX_RESPONSE_BYTES = 64 * 1_024;
 const MAX_SQL_BYTES = 16 * 1_024;
+const CACHE_BUSY_TIMEOUT_MS = 5_000;
 const INDEX_VERSION = "5";
 
 function sha256(value) {
@@ -211,7 +212,9 @@ async function sqlite() {
 
 async function openDatabase(databasePath, readOnly = false) {
   const { DatabaseSync } = await sqlite();
-  return new DatabaseSync(databasePath, readOnly ? { readOnly: true } : {});
+  const database = new DatabaseSync(databasePath, readOnly ? { readOnly: true } : {});
+  database.exec(`PRAGMA busy_timeout = ${CACHE_BUSY_TIMEOUT_MS};`);
+  return database;
 }
 
 function createSchema(database) {

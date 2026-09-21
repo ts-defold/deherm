@@ -5,8 +5,8 @@
 
 #define DEHERM_RECORDING_SCHEMA_VERSION 2u
 #define DEHERM_RECORDING_DEFOLD_REVISION "7f0f554f41f9dce1e0ddff99bf08200657d1ee05"
-#define DEHERM_RECORDING_PLAN_SHA256 "e38fc13d3c98c509c68505b7effbb92b120a53b52f4e90c80b3814c9dc2c019f"
-#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "03218000be8de2b5f954d67c73285279f7881b9fdbff15b2670e0f1dbbfa1459"
+#define DEHERM_RECORDING_PLAN_SHA256 "b5aadeb85e2740b8f62c7329c018f70033f5c130e6f802e222b3e382d3c92760"
+#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "50d48701a964a02cdfdd166905e8300aafa0cef1f3d34823822ac4a96dc050ba"
 #define DEHERM_RECORDING_ROUTE_COUNT 915u
 #define DEHERM_RECORDING_SHAPE_COUNT 439u
 #define DEHERM_RECORDING_SHAPE_REF_COUNT 2267u
@@ -19,6 +19,7 @@
 #define DEHERM_RECORDING_LUA_EXACT_COUNT 882u
 #define DEHERM_RECORDING_LUA_SKIP_COUNT 33u
 #define DEHERM_RECORDING_DYNAMIC_NATIVE_POD_COUNT 31u
+#define DEHERM_RECORDING_BROWSER_EXACT_COUNT 911u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_COUNT 23u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_CALLBACK_COUNT 23u
 
@@ -122,6 +123,9 @@ int deherm_recording_driver_present(uint32_t route, uint32_t transport);
 /** Browser/Wasm callback-registry exact-call controls. */
 uint32_t deherm_recording_browser_callback_count(uint32_t route);
 uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route);
+uint32_t deherm_recording_browser_first_outstanding_callback_route(void);
+uint32_t deherm_recording_browser_handle_release_count(void);
+void deherm_recording_browser_drain_handle_releases(void);
 int deherm_recording_browser_invoke_callback(uint32_t route, uint32_t callback,
     char* error, uint32_t errorCapacity);
 uint32_t deherm_recording_browser_release_callbacks(uint32_t route);

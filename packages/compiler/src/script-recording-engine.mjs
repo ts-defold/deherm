@@ -870,7 +870,18 @@ export function buildRecordingEngineModel(inputs) {
       callbackCount: routes.reduce((count, route) =>
         count + (route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry"
           ? route.exactVector.laneOverride.callbackSlots.length : 0), 0),
-      resultSchema: "deherm-script-browser-callback-exact-result/v1"
+      resultSchema: "deherm-script-browser-callback-exact-result/v1",
+      lifecycleCoverage: "generic-token-round-trip"
+    },
+    browserExact: {
+      routeCount: targetApplicability["browser-wasm"].status.exercise,
+      callbackRouteCount: routes.filter((route) =>
+        route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry").length,
+      callbackCount: routes.reduce((count, route) =>
+        count + (route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry"
+          ? route.exactVector.laneOverride.callbackSlots.length : 0), 0),
+      resultSchema: "deherm-script-browser-exact-result/v1",
+      lifecycleCoverage: "generic-token-round-trip"
     },
     blockerCount: blockers.length
   };

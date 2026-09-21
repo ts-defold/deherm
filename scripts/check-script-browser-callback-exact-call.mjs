@@ -87,22 +87,23 @@ export async function materializeScriptBrowserCallbackExactVectors() {
   const contracts = new Map(report.exactVectorCatalog.vectors.map((vector) => [vector.id, vector]));
   const vectors = report.routes.flatMap((route) => {
     const lane = lanes.get(route.applicability[target]);
-    if (lane?.lane !== "browser-wasm-callback-registry") return [];
+    if (lane?.status !== "exercise") return [];
     const override = route.exactVector.laneOverride;
-    if (override?.lane !== lane.lane) {
+    if (lane.lane === "browser-wasm-callback-registry" && override?.lane !== lane.lane) {
       throw new Error(`${route.id} has callback applicability without a callback exact vector`);
     }
     return [{
       id: route.id,
       stableId: route.stableId,
-      callbackSlots: override.callbackSlots,
-      callbackInvocation: override.callbackInvocation,
-      lifecycle: override.lifecycle,
+      lane: lane.lane,
+      callbackSlots: override?.callbackSlots ?? [],
+      callbackInvocation: override?.callbackInvocation ?? null,
+      lifecycle: override?.lifecycle ?? null,
       contract: contracts.get(route.exactVector.contract),
     }];
   });
-  if (vectors.length !== report.summary.browserCallbackExact.routeCount) {
-    throw new Error(`browser callback vector census drifted: ${vectors.length}`);
+  if (vectors.length !== report.summary.browserExact.routeCount) {
+    throw new Error(`browser exact vector census drifted: ${vectors.length}`);
   }
   return {
     report,
@@ -118,8 +119,12 @@ export async function buildScriptBrowserCallbackExactModule({ output, prerequisi
   await mkdir(prerequisites.emCache, { recursive: true });
   const htmlPath = path.join(output, "index.html");
   const callbackRegistryPath = path.join(output, "production_callback_registry.js");
+  const runtimeLifecyclePath = path.join(output, "runtime_lifecycle.js");
   const callbackRegistry = extractProductionCallbackRegistry(await readFile(browserBootstrapPath, "utf8"));
   await writeFile(callbackRegistryPath, callbackRegistry);
+  await writeFile(runtimeLifecyclePath,
+    "var Module = typeof Module === 'object' ? Module : {};\n" +
+    "Module.onExit = function(status) { console.log('DEHERM_SCRIPT_BROWSER_EXACT_EXIT status=' + status); };\n");
   execFileSync(prerequisites.emxx, [
     "-std=c++17",
     "-O2",
@@ -137,6 +142,7 @@ export async function buildScriptBrowserCallbackExactModule({ output, prerequisi
     path.join(root, "tests/fixtures/generated_script_recording_provider.cpp"),
     path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.cpp"),
     "--js-library", callbackRegistryPath,
+    "--pre-js", runtimeLifecyclePath,
     "--js-library", path.join(root, "defold/defold_hermes/lib/web/generated_script_universal_value.js"),
     "--js-library", path.join(root, "tests/fixtures/generated_script_recording_browser_callback_driver.js"),
     "-o", htmlPath,
@@ -174,7 +180,7 @@ export async function runScriptBrowserCallbackExactCall(options = {}) {
   const output = path.resolve(options.output ?? await mkdtemp(path.join(tmpdir(), "deherm-script-browser-callback-exact.")));
   try {
     const built = await buildScriptBrowserCallbackExactModule({ output, prerequisites });
-    const marker = `DEHERM_SCRIPT_BROWSER_CALLBACK_EXACT_OK routes=${built.vectors.length}`;
+    const marker = `DEHERM_SCRIPT_BROWSER_EXACT_OK routes=${built.vectors.length}`;
     const page = await openBundlePage({
       bundleDirectory: output,
       chromeBinary: prerequisites.chrome,
@@ -184,22 +190,33 @@ export async function runScriptBrowserCallbackExactCall(options = {}) {
     });
     try {
       await waitFor(() => {
-        const success = page.client.transcript.find((line) => line.includes(marker));
-        if (success) return success;
-        const failure = page.client.transcript.find((line) => line.includes("DEHERM_SCRIPT_BROWSER_CALLBACK_EXACT_FAIL"));
+        const failure = page.client.transcript.find((line) => line.includes("DEHERM_SCRIPT_BROWSER_EXACT_FAIL"));
         if (failure || page.client.failures.length) {
           const error = new Error(failure ?? JSON.stringify(page.client.failures));
           error.fatal = true;
           throw error;
         }
+        const successes = page.client.transcript.filter((line) => line.startsWith(marker));
+        if (successes.length > 1) {
+          const error = new Error(`browser exact-call emitted ${successes.length} success records`);
+          error.fatal = true;
+          throw error;
+        }
+        const exited = page.client.transcript.includes("DEHERM_SCRIPT_BROWSER_EXACT_EXIT status=0");
+        if (successes.length === 1 && exited) return successes[0];
         return false;
       }, { timeoutMs: options.runtimeTimeoutMs ?? 30_000, what: "the real script callback Wasm marker" });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      const lateFailure = page.client.transcript.find((line) => line.includes("DEHERM_SCRIPT_BROWSER_EXACT_FAIL"));
+      if (lateFailure || page.client.failures.length) throw new Error(lateFailure ?? JSON.stringify(page.client.failures));
       return {
-        schema: "deherm-script-browser-callback-exact-result/v1",
-        lane: "browser-wasm-callback-registry",
+        schema: "deherm-script-browser-exact-result/v1",
+        lane: "browser-wasm",
         realWasmModule: true,
         mockMemory: false,
         routeCount: built.vectors.length,
+        directMemoryRouteCount: built.vectors.filter((vector) => vector.lane === "browser-wasm-direct-memory").length,
+        callbackRouteCount: built.vectors.filter((vector) => vector.lane === "browser-wasm-callback-registry").length,
         callbackCount: built.vectors.reduce((count, vector) => count + vector.callbackSlots.length, 0),
         manifestSha256: built.manifestSha256,
         reportSha256: built.reportSha256,

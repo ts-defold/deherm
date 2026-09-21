@@ -3,10 +3,12 @@ var LibraryDefoldHermesScriptUniversalValue = {
   $DEFOLD_HERMES_SCRIPT_UNIVERSAL__deps: [
     'deherm_script_universal_dispatch', 'deherm_script_universal_release',
     '$DEFOLD_HERMES_WEB_CALLBACKS',
-    '$stackSave', '$stackAlloc', '$stackRestore', '$UTF8ToString', '$stringToUTF8', '$lengthBytesUTF8'
+    'malloc', 'free', '$stackSave', '$stackAlloc', '$stackRestore',
+    '$UTF8ToString', '$stringToUTF8', '$lengthBytesUTF8'
   ],
   $DEFOLD_HERMES_SCRIPT_UNIVERSAL: {
     depth: 0,
+    maximumCallDepth: 16,
     maximumDepth: 8,
     maximumArguments: 32,
     maximumResults: 4,
@@ -16,7 +18,30 @@ var LibraryDefoldHermesScriptUniversalValue = {
     tupleResultArities: {"19395531":2,"51420040":3,"74788897":3,"238271325":3,"378378773":2,"508811620":2,"557192288":2,"628130855":2,"634121622":2,"764766037":2,"803274747":2,"1054417193":2,"1130607345":2,"1298827590":2,"1362876804":3,"1431438690":2,"1432460324":2,"1576371206":2,"2038251318":4,"2136912702":2,"2158702312":4,"2254437809":2,"2308150026":2,"2327634387":2,"2463011221":2,"2635085856":2,"2641296689":3,"2653029218":2,"2722214421":2,"2832050683":2,"2928762044":2,"2979094901":2,"3105177886":2,"3116923594":2,"3303829155":2,"3373475968":2,"3392355731":4,"3428878228":2,"3495086682":2,"3950716894":2,"4017512905":2,"4052701394":2},
     valueStride: 48,
     entryStride: 8,
+    scratchBytes: 192576,
+    scratchOffsets: {"values":0,"entries":26304,"strings":28352,"floats":93892,"urls":94920,"roots":95944,"outValues":96072,"outEntries":122376,"outStrings":124424,"outFloats":189964,"outUrls":190992,"resultRoots":192016,"counts":192032,"error":192056},
+    scratchSlots: [],
     finalizers: null,
+    acquireScratch: function(slotIndex) {
+      if (!Number.isInteger(slotIndex) || slotIndex < 0 || slotIndex >= this.maximumCallDepth) throw new RangeError('Universal browser scratch slot is outside the reentrancy bound');
+      var existing = this.scratchSlots[slotIndex];
+      if (existing) return existing;
+      var base = _malloc(this.scratchBytes);
+      if (!base) throw new RangeError('Universal browser scratch allocation failed');
+      var offsets = this.scratchOffsets;
+      var slot = {base:base};
+      for (var name in offsets) if (Object.prototype.hasOwnProperty.call(offsets, name)) slot[name] = base + offsets[name];
+      this.scratchSlots[slotIndex] = slot;
+      return slot;
+    },
+    dispose: function() {
+      if (this.depth !== 0) throw new Error('Universal browser scratch cannot be disposed during an active call');
+      for (var index = 0; index < this.scratchSlots.length; ++index) {
+        var slot = this.scratchSlots[index];
+        if (slot) _free(slot.base);
+      }
+      this.scratchSlots.length = 0;
+    },
     normalizeString: function(value) {
       var result = null;
       for (var index = 0; index < value.length; ++index) {
@@ -240,27 +265,27 @@ var LibraryDefoldHermesScriptUniversalValue = {
     call: function(stableId, args) {
       if (!Number.isInteger(stableId) || stableId < 0 || stableId > 0xffffffff) throw new TypeError('Universal stable ID must be a u32');
       if (!Array.isArray(args) || args.length > this.maximumArguments) throw new TypeError('Universal call arguments violate the generated bound');
-      if (this.depth >= 16) throw new RangeError('Universal browser bridge reentrancy depth is exhausted');
+      if (this.depth >= this.maximumCallDepth) throw new RangeError('Universal browser bridge reentrancy depth is exhausted');
       ++this.depth;
-      var checkpoint = stackSave();
       var bridge = this;
       var callbackHandles = [];
       var callbacksTransferred = false;
       try {
-        var values = stackAlloc(this.maximumValues * 48);
-        var entries = stackAlloc(this.maximumEntries * 8);
-        var strings = stackAlloc(this.maximumStringBytes + 1);
-        var floats = stackAlloc(16 * 16 * 4);
-        var urls = stackAlloc(32 * 32);
-        var roots = stackAlloc(this.maximumArguments * 4);
-        var outValues = stackAlloc(this.maximumValues * 48);
-        var outEntries = stackAlloc(this.maximumEntries * 8);
-        var outStrings = stackAlloc(this.maximumStringBytes + 1);
-        var outFloats = stackAlloc(16 * 16 * 4);
-        var outUrls = stackAlloc(32 * 32);
-        var resultRoots = stackAlloc(this.maximumResults * 4);
-        var counts = stackAlloc(6 * 4);
-        var error = stackAlloc(512);
+        var scratch = this.acquireScratch(this.depth - 1);
+        var values = scratch.values;
+        var entries = scratch.entries;
+        var strings = scratch.strings;
+        var floats = scratch.floats;
+        var urls = scratch.urls;
+        var roots = scratch.roots;
+        var outValues = scratch.outValues;
+        var outEntries = scratch.outEntries;
+        var outStrings = scratch.outStrings;
+        var outFloats = scratch.outFloats;
+        var outUrls = scratch.outUrls;
+        var resultRoots = scratch.resultRoots;
+        var counts = scratch.counts;
+        var error = scratch.error;
         var state = {value: 0, entry: 0, string: 0, float: 0, url: 0, ancestors: [], callbacks: callbackHandles};
         function reserveValue() {
           if (state.value >= bridge.maximumValues) throw new RangeError('Universal browser value arena is exhausted');
@@ -457,11 +482,10 @@ var LibraryDefoldHermesScriptUniversalValue = {
         if (!callbacksTransferred) {
           for (var callbackIndex = 0; callbackIndex < callbackHandles.length; ++callbackIndex) DEFOLD_HERMES_WEB_CALLBACKS.release(callbackHandles[callbackIndex]);
         }
-        stackRestore(checkpoint);
         --this.depth;
       }
     },
-    install: function() { return {target:'html5-browser-host', call:this.call.bind(this)}; }
+    install: function() { return {target:'html5-browser-host', call:this.call.bind(this), dispose:this.dispose.bind(this)}; }
   },
   defoldHermesWebInvokeUniversalCallback__deps: [
     '$DEFOLD_HERMES_SCRIPT_UNIVERSAL', '$DEFOLD_HERMES_WEB_CALLBACKS',
