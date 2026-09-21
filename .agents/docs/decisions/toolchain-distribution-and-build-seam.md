@@ -308,12 +308,25 @@ The development compiler invokes `dehermc transform`, reads its typed-source
 JSON envelope, and serves those modules to esbuild without
 `@ttsc/unplugin/esbuild` or a user-side Go build.
 
-The packed-package smoke test builds and stages one authenticated current-host
-binary in an isolated tool cache, forces offline resolution, and requires both
-release checking and the development compiler to report that exact path and
-SHA-256. This proves the installed package uses the precompiled seam without a
-network fallback. It is package/tool invocation evidence, not target-engine
-runtime evidence.
+The packed-package smoke test never builds `dehermc`. Before publication, the
+Linux producer passes the exact archive it just built into an isolated tool
+cache, forces offline resolution, and requires both release checking and the
+development compiler to report that artifact's pinned path and SHA-256. The
+producer also compares every host row's raw binary byte size and SHA-256 with
+`host-compilers.json` before upload; a successful Go build or an asset name in a
+release is not accepted as byte identity.
+
+After publication, the ordered end-to-end workflow runs the same packed test
+with a fresh cache and no supplied compiler path. The installed CLI therefore
+has to resolve the content-addressed release, download and extract the
+current-host archive, authenticate the member, cache it, and execute it through
+the normal `requireHostTool` path. A contributor's artifact-free checkout takes
+that same published-download path by default; an explicitly offline run must
+supply or already cache the authenticated artifact instead of rebuilding it.
+The two lanes deliberately prove different
+boundaries: pre-publication tests the exact candidate bytes without a network
+race, while post-publication tests the actual customer delivery path. Both are
+package/tool invocation evidence, not target-engine runtime evidence.
 
 # The build seam
 
@@ -535,8 +548,11 @@ available in Defold's Linux target environment. This floor applies to the
 merged static ICU objects as well as Hermes itself.
 
 iOS and macOS x64 need the Apple SDKs, so they have no container path and run on
-a macOS runner. Android needs the NDK, pinned by digest inside the container
-rather than trusted from the network.
+a macOS runner. The Apple packager takes its target config from
+`<release-build>/lib/config/libhermesvm-config.h`, matching the pinned Hermes
+`add_subdirectory(lib)` plus `configure_file(config/...)` output contract; no
+extra `hermes/` directory exists inside that CMake build root. Android needs the
+NDK, pinned by digest inside the container rather than trusted from the network.
 
 `Dockerfile.win32` remains a manually dispatched canary for Defold's Extender
 image. Its current C++ standard-library probe is not yet proven, so it is
@@ -612,6 +628,8 @@ not declare. `--json` emits the same report as data.
 * A Defold repin rebuilds nothing. A Hermes repin rebuilds the Hermes families
   and leaves `dehermc` alone. Each published asset is skipped independently
   inside its family's release, so a partial retry rebuilds only failed rows.
+* Consumer smoke never recompiles a host tool. It consumes either a producer-
+  supplied candidate before publication or the immutable release afterward.
 * A user who resolved a Defold revision through the policy index is told which
   tags and which asset names go with it - see *The entry also answers "what do I
   download?"* in the layered API policy cache decision.

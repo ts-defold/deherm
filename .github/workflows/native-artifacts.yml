@@ -83,6 +83,7 @@ on:
       - packages/toolchains/defold-bundle-targets.json
       - packages/toolchains/host-compilers.json
       - scripts/lib/artifact-releases.mjs
+      - scripts/lib/host-compiler-artifact-verification.mjs
       - scripts/manage-native-artifacts.mjs
       - scripts/manage-host-compilers.mjs
       - scripts/plan-native-artifact-builds.mjs
@@ -266,12 +267,30 @@ jobs:
           bash toolchains/go/build-dehermc.sh "$HOST" \
             "build/artifacts/host-compilers/$HOST/bin" \
             "build/artifacts/dehermc-$HOST.tar.gz"
+      # A successful Go build is not publication evidence. Consumers accept
+      # only the digest and byte size pinned in host-compilers.json, so reject
+      # any runner/toolchain drift before its archive can become immutable.
+      - name: Verify the exact compiler bytes consumers pin
+        run: |
+          executable=dehermc
+          if [ "$HOST" = win32-x64 ]; then executable=dehermc.exe; fi
+          node scripts/manage-host-compilers.mjs verify-file "$HOST" dehermc \
+            "build/artifacts/host-compilers/$HOST/bin/$executable"
       # A binary that cannot answer for itself is not shippable. `version` is
       # the identity `deherm doctor` reads back.
       - run: |
           if [ "$HOST" = linux-x64 ]; then
             build/artifacts/host-compilers/linux-x64/bin/dehermc version
           fi
+      # The pre-publication consumer proof receives the archive this job just
+      # built. It must never rebuild dehermc inside the package test: that
+      # would test a second binary rather than the one about to be published.
+      - name: Consume the supplied compiler artifact before publication
+        run: |
+          if [ "$HOST" != linux-x64 ]; then exit 0; fi
+          bash scripts/bootstrap-upstreams.sh hermes
+          DEHERM_PACKAGE_SMOKE_DEHERMC_ARCHIVE="$PWD/build/artifacts/dehermc-$HOST.tar.gz" \
+            node --test --test-name-pattern "packed npm artifact" tests/package-smoke.test.mjs
       - env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_TITLE: ${{ needs.plan.outputs.dehermc_title }}
@@ -643,3 +662,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh workflow run end-to-end.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"
+      # A policy run may have completed while these rows were still building.
+      # It publishes policy objects immediately but retains the last complete
+      # artifact mapping rather than exposing deterministic 404s. Re-run the
+      # single policy graph now so that mapping advances only after this job's
+      # exact completeness proof.
+      - name: Refresh policy artifact mappings after publication
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run policy.yml --repo "${{ github.repository }}" --ref "${{ github.ref_name }}"

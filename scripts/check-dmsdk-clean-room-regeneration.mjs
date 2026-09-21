@@ -133,7 +133,7 @@ async function walk(root, relative = "") {
 export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositoryRootDefault) {
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
-    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|universal-ready-exact-plan)\.json$/.test(file)) {
+    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(file)) {
       result.add(`packages/bindings/generated/${file}`);
     }
   }
@@ -173,7 +173,9 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
     "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
     "tests/fixtures/generated_dmsdk_universal_test_ids.h",
     "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
-    "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp"
+    "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
+    "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
+    "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp"
   ]) {
     try {
       if ((await lstat(path.join(repositoryRoot, relative))).isFile()) result.add(relative);

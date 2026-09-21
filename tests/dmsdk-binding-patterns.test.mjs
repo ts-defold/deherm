@@ -107,7 +107,7 @@ test("locks the current family census", async () => {
       callback: 95,
       constructor: 57,
       destructor: 8,
-      "enum-handle": 862,
+      "enum-handle": 867,
       method: 102,
       "out-param": 118,
       "platform-gated": 42,

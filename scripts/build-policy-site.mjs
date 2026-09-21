@@ -30,6 +30,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { ARTIFACTS_DOCUMENT_KIND, artifactsPath, hashBytes } from "../packages/compiler/src/api-policy.mjs";
 import { buildArtifactReferences, readSiteConfig, readStore, shippedIndexPath, storeRoot } from "./generate-api-policy.mjs";
+import { artifactFamilyNames } from "./lib/artifact-releases.mjs";
 
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const defaultOutputDirectory = path.join(root, "build", "policy-site");
@@ -57,6 +58,26 @@ const wordmarkPath = path.join(root, "docs", "assets", "brand", "deherm-wordmark
 // unfurler. Regenerate with sips: fit the wordmark to 1000px wide, then pad to
 // 1200x630 with the page background (262626) so the card has no seam.
 const ogImagePath = path.join(root, "docs", "assets", "brand", "deherm-og.png");
+
+export function validateArtifactReferences(value, label = "artifact references") {
+  const references = value?.kind === ARTIFACTS_DOCUMENT_KIND ? value.artifacts : value;
+  if (!references || typeof references !== "object" || Array.isArray(references)) {
+    throw new Error(`${label} must be an artifact mapping or published artifacts document`);
+  }
+  for (const family of artifactFamilyNames) {
+    const row = references[family];
+    if (!row || typeof row !== "object" || Array.isArray(row)) {
+      throw new Error(`${label} has no ${family} family`);
+    }
+    if (typeof row.tag !== "string" || !row.tag.length || !/^[0-9a-f]{64}$/u.test(row.fingerprint ?? "")) {
+      throw new Error(`${label} has an invalid ${family} release identity`);
+    }
+    if (!row.assets || typeof row.assets !== "object" || !Object.keys(row.assets).length) {
+      throw new Error(`${label} has no ${family} assets`);
+    }
+  }
+  return references;
+}
 
 // Intrinsic size straight from the PNG's IHDR, so the markup can pin the
 // aspect ratio and the browser reserves the space before the image loads.
@@ -235,7 +256,9 @@ export async function buildPolicySite(options = {}) {
   //
   // Every indexed revision gets one, naming the tags this publish is current
   // for. It is the one served document that is legitimately rewritten.
-  const artifactReferences = options.artifactReferences ?? await buildArtifactReferences();
+  const artifactReferences = validateArtifactReferences(
+    options.artifactReferences ?? await buildArtifactReferences()
+  );
   for (const entry of store.entries) {
     const document = {
       schemaVersion: 1,
@@ -310,6 +333,13 @@ async function main(argv = process.argv.slice(2)) {
     if (argument === "--out") options.output = path.resolve(argv[++index]);
     else if (argument === "--base-url") options.baseUrl = argv[++index];
     else if (argument === "--path-prefix") options.pathPrefix = argv[++index];
+    else if (argument === "--artifact-references") {
+      const file = path.resolve(argv[++index]);
+      options.artifactReferences = validateArtifactReferences(
+        JSON.parse(await readFile(file, "utf8")),
+        `artifact references from ${file}`
+      );
+    }
     else throw new Error(`Unknown argument: ${argument}`);
   }
   const result = await buildPolicySite(options);

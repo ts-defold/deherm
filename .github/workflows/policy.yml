@@ -189,6 +189,7 @@ jobs:
           tar -czf "$RUNNER_TEMP/policy-surface.tar.gz" \
             upstream.lock \
             packages/bindings/generated \
+            packages/abi/src/generated \
             packages/sdk/src/generated \
             packages/static-hermes/src/generated \
             defold/defold_hermes/include/defold_hermes \
@@ -236,7 +237,7 @@ jobs:
           path: ${{ runner.temp }}/policy-surface
       - name: Install the generated surface
         run: |
-          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
           archive="$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
           if [ "$RUNNER_OS" = Windows ]; then archive="$(cygpath -u "$archive")"; fi
           tar -xzf "$archive"
@@ -286,7 +287,7 @@ jobs:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
       - run: |
-          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
           tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -366,6 +367,8 @@ jobs:
         run: bash scripts/bootstrap-emsdk.sh
       - name: Compile and run dmSDK exact calls in real browser Wasm
         run: pnpm test:dmsdk-browser-exact-call
+      - name: Compile and run script callback exact calls in real browser Wasm
+        run: pnpm test:script-browser-callback-exact-call
       - id: engine
         name: Materialize the runtime and exercise every generated route
         continue-on-error: true
@@ -484,12 +487,17 @@ jobs:
       pages: write
     steps:
       - uses: actions/checkout@v7
+      - uses: actions/checkout@v7
+        with:
+          repository: ts-defold/deherm
+          ref: deherm-policy-site
+          path: build/published-policy-site
       - uses: actions/download-artifact@v5
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
       - run: |
-          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
           tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7
@@ -497,7 +505,69 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: bash scripts/bootstrap-upstreams.sh defold
       - run: node scripts/generate-api-policy.mjs --check
-      - run: node scripts/build-policy-site.mjs --out build/policy-site
+      - id: artifact-map
+        name: Select only a completely published artifact mapping
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          missing=()
+          while IFS=$'\t' read -r family tag asset; do
+            if ! gh release view "$tag" --repo "${{ github.repository }}" \
+              --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "$asset"; then
+              missing+=("$family:$tag:$asset")
+            fi
+          done < <(node -e '
+            const tags = require("./packages/toolchains/release-tags.json").families;
+            for (const [family, row] of Object.entries(tags))
+              for (const asset of Object.values(row.assets))
+                console.log(`${family}\t${row.tag}\t${asset}`);
+          ')
+          if [ "${#missing[@]}" -eq 0 ]; then
+            echo 'Current artifact mapping is complete.' >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          previous="$(find build/published-policy-site/v1/artifacts -type f -name '*.json' | sort | head -n1)"
+          if [ -z "$previous" ]; then
+            printf 'Current artifact mapping is incomplete and no last-complete mapping exists:\n%s\n' \
+              "${missing[*]}" >&2
+            exit 1
+          fi
+          fallback="$RUNNER_TEMP/last-complete-artifacts.json"
+          node -e '
+            const fs = require("node:fs");
+            const source = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+            fs.writeFileSync(process.argv[2], `${JSON.stringify(source.artifacts, null, 2)}\n`);
+          ' "$previous" "$fallback"
+          fallback_missing=()
+          while IFS=$'\t' read -r family tag asset; do
+            if ! gh release view "$tag" --repo "${{ github.repository }}" \
+              --json assets --jq '.assets[].name' 2>/dev/null | grep -Fxq "$asset"; then
+              fallback_missing+=("$family:$tag:$asset")
+            fi
+          done < <(node -e '
+            const refs = require(process.argv[1]);
+            for (const [family, row] of Object.entries(refs))
+              for (const asset of Object.values(row.assets))
+                console.log(`${family}\t${row.tag}\t${asset}`);
+          ' "$fallback")
+          if [ "${#fallback_missing[@]}" -ne 0 ]; then
+            printf 'The prior site mapping is also incomplete:\n%s\n' "${fallback_missing[*]}" >&2
+            exit 1
+          fi
+          echo "fallback=$fallback" >> "$GITHUB_OUTPUT"
+          {
+            echo 'Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping.'
+            printf -- '- `%s`\n' "${missing[@]}"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Build the policy site
+        env:
+          FALLBACK_ARTIFACTS: ${{ steps.artifact-map.outputs.fallback }}
+        run: |
+          set -euo pipefail
+          args=(--out build/policy-site)
+          if [ -n "$FALLBACK_ARTIFACTS" ]; then args+=(--artifact-references "$FALLBACK_ARTIFACTS"); fi
+          node scripts/build-policy-site.mjs "${args[@]}"
       - run: node scripts/check-policy-site-resolution.mjs
       - name: Publish accumulated policies to deherm-policy-site
         env:
@@ -538,7 +608,7 @@ jobs:
           path: ${{ runner.temp }}/policy-surface
       - name: Install the exact published surface
         run: |
-          rm -rf packages/bindings/generated packages/sdk/src/generated packages/static-hermes/src/generated
+          rm -rf packages/bindings/generated packages/abi/src/generated packages/sdk/src/generated packages/static-hermes/src/generated
           tar -xzf "$RUNNER_TEMP/policy-surface/policy-surface.tar.gz"
       - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v7

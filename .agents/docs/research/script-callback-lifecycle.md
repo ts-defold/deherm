@@ -60,6 +60,18 @@ encoding, direct-memory invocation, unsigned token normalization, borrowed
 callback handles, stale-token rejection, result encoding, and rollback when
 argument encoding fails before native ownership transfers.
 
+The recording projection now emits exact vectors for all 23 registry-eligible
+routes and a real browser/Wasm driver from the same IR. The driver compiles the
+production direct-memory arena and callback registry with pinned Emscripten,
+runs them in Chrome, and observes every stable ID and ordered input/result. It
+also proves a retained callback remains callable after the forward call, that
+native finalization releases and invalidates its token, that a nested reverse
+callback can reenter a second route, and that capacity exhaustion and registry
+reset fail closed. The provider copies the fixed `ScriptCallback` record by
+value before retaining its context because the decoder arena that owned the
+original record ends with the forward call; retaining an arena pointer would
+be a use-after-lifetime bug.
+
 Dynamic Hermes now owns a separate 4,096-entry callback-root lifetime table.
 `Runtime::Impl` invalidates every root and destroys its `jsi::Function` while
 the Hermes runtime is still alive. Lua closures may then reject invocation and
@@ -101,10 +113,11 @@ filtered: their two precise blockers are
 `higher-order-lua-closure-result-transport-unavailable`. Browser input callback
 trampolines alone cannot carry a Lua-owned function back into JavaScript, while
 the Static sound-type frame has no callable value class or C callback token.
-Packaged HTML5 execution of the 23 emitted callback-input routes remains
-unverified and is not inferred from either harness.
+The 23 emitted callback-input routes have exact standalone Emscripten/Chrome
+bridge evidence. Packaged Defold HTML5 execution of those routes remains an
+integration sentinel gap and is not inferred from the exact-call harness.
 
 The callback generator, reviewed policy, and four generated artifacts are part
 of the central script pipeline registry. Clean-room regeneration includes the
-23 pinned Defold source files and currently reproduces all 49 script artifacts
-byte-for-byte.
+23 pinned Defold source files and reproduces the complete registered script
+artifact set byte-for-byte.

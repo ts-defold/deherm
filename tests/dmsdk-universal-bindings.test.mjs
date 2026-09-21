@@ -1,13 +1,14 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
 import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
+import { dmSdkGeneratedAdapterCorpusArtifacts } from "../packages/compiler/src/dmsdk-generated-adapter-corpus.mjs";
 import {
   materializationFromDmSdkConcreteCallPlan,
   materializeDmSdkGeneratedAdapterUsages,
@@ -24,6 +25,7 @@ import {
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 import { buildUniversalDmSdkBindings } from "../scripts/generate-dmsdk-universal-bindings.mjs";
+import { buildDmSdkGeneratedAdapterExact } from "../scripts/generate-dmsdk-generated-adapter-exact.mjs";
 
 const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json");
@@ -47,6 +49,16 @@ function sha256(value) {
 
 function run(command, args) {
   return execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe" });
+}
+
+async function packagedHermesArchive() {
+  const relative = {
+    "darwin-arm64": "defold/defold_hermes/lib/arm64-osx/libhermes.a",
+    "linux-x64": "defold/defold_hermes/lib/x86_64-linux/libhermes.a",
+  }[`${process.platform}-${process.arch}`];
+  if (!relative) return null;
+  const absolute = path.join(root, relative);
+  try { await stat(absolute); return absolute; } catch { return null; }
 }
 
 function recipe(report, symbol, predicate = () => true) {
@@ -172,6 +184,120 @@ test("callable generated adapter selections emit compile-valid exact linker iden
     recipes: dmSdkUniversalRecipes,
     catalogSha256: dmSdkUniversalCatalogSha256,
   }), /has no callable generated adapter route/);
+});
+
+test("all callable generated adapters own same-recipe C ABI and emitted-JSI exact vectors", async (context) => {
+  const temporary = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-adapter-exact-copy-"));
+  let corpus;
+  try {
+    corpus = await buildDmSdkGeneratedAdapterExact({ root, outRoot: temporary });
+    for (const relative of Object.values(dmSdkGeneratedAdapterCorpusArtifacts)) {
+      const [committed, regenerated] = await Promise.all([
+        readFile(path.join(root, relative)),
+        readFile(path.join(temporary, relative)),
+      ]);
+      assert.ok(committed.equals(regenerated), `${relative} must regenerate byte-for-byte in a temporary root`);
+    }
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
+  const usages = corpus.usages;
+  assert.equal(usages.length, 59);
+  assert.equal(corpus.report.recipeCount, 1361);
+  assert.equal(corpus.report.generatedAdapterCount, 59);
+  assert.equal(corpus.report.silentlyOmitted, 0);
+  assert.equal(corpus.report.verification.vectorCount, 59);
+  assert.equal(corpus.report.verification.jsiVectorCount, 33);
+  assert.deepEqual(corpus.report.familyCounts, {
+    astcProbe: 2,
+    base64Span: 2,
+    cstringValue: 14,
+    enumValue: 7,
+    fixedDigest: 4,
+    hashSpan: 2,
+    scalar: 26,
+    xteaSpan: 2,
+  });
+  assert.deepEqual(
+    corpus.report.verification.vectors.map(({ declarationId }) => declarationId),
+    usages.map(({ declarationId }) => declarationId),
+  );
+  for (const vector of corpus.report.verification.vectors) {
+    assert.match(vector.vectorSha256, /^[0-9a-f]{64}$/);
+    assert.equal(vector.adapterKind, "family-dispatch");
+    assert.equal(vector.expectations.failClosed, true);
+    assert.equal(vector.transports.cAbi.applicability, "callable");
+    assert.ok(Number.isSafeInteger(vector.adapterId));
+  }
+  assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, 59);
+  assert.deepEqual(
+    [...new Set(corpus.report.verification.vectors
+      .filter(({ transports }) => transports.dynamicHermesJsi.applicability === "callable")
+      .map(({ family }) => family))].sort(),
+    ["enumValue", "scalar"],
+  );
+  assert.ok(corpus.report.verification.vectors
+    .filter(({ family }) => family === "cstringValue")
+    .every(({ transports }) => transports.dynamicHermesJsi.applicability === "not-emitted"));
+  const [committedPlan, committedSource, committedJsiSource] = await Promise.all([
+    readFile(path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.plan), "utf8"),
+    readFile(path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.verificationSource), "utf8"),
+    readFile(path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.jsiVerificationSource), "utf8"),
+  ]);
+  assert.deepEqual(JSON.parse(committedPlan), corpus.report);
+  assert.equal(committedSource, corpus.verificationSource);
+  assert.equal(committedJsiSource, corpus.jsiVerificationSource);
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-adapter-exact-"));
+  try {
+    const harness = path.join(output, "harness.cpp");
+    const executable = path.join(output, "adapter-exact");
+    await writeFile(harness, "extern \"C\" int deherm_dmsdk_run_generated_adapter_exact_verification(void);int main(){return deherm_dmsdk_run_generated_adapter_exact_verification();}\n");
+    const sdkRoot = path.join(root,
+      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+    run(compiler, [
+      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-DDEHERM_ENABLE_PRIVATE_DMSDK_CSTRING_VALUE=1",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "-isystem", path.join(sdkRoot, "sdk/include"),
+      "-isystem", path.join(sdkRoot, "include"),
+      "-isystem", path.join(sdkRoot, "ext/include"),
+      ...[
+        "scalar_runtime", "enum_value_runtime", "fixed_digest_runtime", "hash_span_runtime", "base64_span_runtime",
+        "xtea_span_runtime", "astc_probe_runtime", "cstring_value_runtime", "cstring_value",
+      ].map((name) => `defold/defold_hermes/src/generated_dmsdk_${name}.cpp`),
+      path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.verificationSource), harness,
+      "-o", executable,
+    ]);
+    run(executable, []);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+  const hermesArchive = await packagedHermesArchive();
+  if (hermesArchive) {
+    const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-adapter-jsi-exact-"));
+    try {
+      const harness = path.join(output, "harness.cpp");
+      const executable = path.join(output, "adapter-jsi-exact");
+      await writeFile(harness, "extern \"C\" int deherm_dmsdk_run_generated_adapter_jsi_exact_verification(void);int main(){return deherm_dmsdk_run_generated_adapter_jsi_exact_verification();}\n");
+      const linkFlags = process.platform === "linux" ? ["-pthread", "-ldl"] : ["-pthread", "-framework", "CoreFoundation"];
+      run(compiler, [
+        "-std=c++17", "-Wall", "-Wextra", "-Werror",
+        `-I${path.join(root, "defold/defold_hermes/include")}`,
+        "-isystem", path.join(root, "upstream/hermes/API"),
+        "-isystem", path.join(root, "upstream/hermes/API/jsi"),
+        "-isystem", path.join(root, "upstream/hermes/public"),
+        "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp",
+        "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp",
+        path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.jsiVerificationSource),
+        harness, hermesArchive, ...linkFlags, "-o", executable,
+      ]);
+      run(executable, []);
+    } finally {
+      await rm(output, { recursive: true, force: true });
+    }
+  } else {
+    context.diagnostic(`generated-adapter JSI runtime skipped: no packaged Hermes archive for ${process.platform}-${process.arch}`);
+  }
 });
 
 test("universal dmSDK artifacts regenerate byte-for-byte", async () => {

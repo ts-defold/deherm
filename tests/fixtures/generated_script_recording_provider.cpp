@@ -12,6 +12,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <array>
 #include <string>
 #include <vector>
 
@@ -35,6 +36,17 @@ Observation gObservations[DEHERM_RECORDING_ROUTE_COUNT][DEHERM_RECORDING_TRANSPO
 uint32_t gTransport = 0;
 uint32_t gViolations = 0;
 char gLastError[512];
+
+struct BrowserCallbackObservation {
+  // ScriptValue::data points into the per-call decoder arena. Persist the
+  // callback record by value while retaining its registry context; retaining
+  // only the arena pointer would make the reverse call use dead scratch.
+  std::array<ScriptCallback, DEHERM_RECORDING_MAX_ARGUMENT_COUNT> callbacks{};
+  uint32_t count = 0;
+  uint32_t invocations = 0;
+};
+
+BrowserCallbackObservation gBrowserCallbacks[DEHERM_RECORDING_ROUTE_COUNT];
 
 const char* textOf(int32_t id) {
   return id >= 0 && static_cast<uint32_t>(id) < DEHERM_RECORDING_TEXT_COUNT
@@ -455,6 +467,36 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
     return false;
   }
 
+  // The browser exact-call driver owns one extra retain while it crosses back
+  // from Wasm into the production JavaScript registry. The C ABI's local lease
+  // then releases its reference at dispatch return; this retained reference is
+  // what proves that the token remains callable until the generated driver
+  // explicitly finalizes it.
+  if (gTransport == DEHERM_RECORDING_TRANSPORT_DIRECT_MEMORY) {
+    BrowserCallbackObservation& callbacks = gBrowserCallbacks[route];
+    if (callbacks.count != 0) {
+      observation.violation = "browser-callback-route-was-not-finalized";
+      ++gViolations;
+      std::snprintf(gLastError, sizeof(gLastError), "%s", observation.violation.c_str());
+      return false;
+    }
+    callbacks.invocations = 0;
+    for (uint32_t index = 0; index < frame->argumentCount; ++index) {
+      if (frame->arguments[index].tag != ScriptValueTag::kCallback) continue;
+      auto* callback = const_cast<ScriptCallback*>(
+          static_cast<const ScriptCallback*>(frame->arguments[index].data));
+      if (!callback || !callback->invoke || !callback->retain || !callback->release ||
+          callbacks.count >= callbacks.callbacks.size()) {
+        observation.violation = "browser-callback-contract-is-malformed";
+        ++gViolations;
+        std::snprintf(gLastError, sizeof(gLastError), "%s", observation.violation.c_str());
+        return false;
+      }
+      callback->retain(callback->context);
+      callbacks.callbacks[callbacks.count++] = *callback;
+    }
+  }
+
   Synthesizer synthesizer{frame, {}};
   for (uint32_t index = 0; index < descriptor.resultCount; ++index) {
     if (!synthesizer.value(kDehermRecordingShapeRefs[descriptor.resultFirst + index],
@@ -495,6 +537,8 @@ void deherm_recording_uninstall(void) { uninstallScriptBridgeApi(); }
 void deherm_recording_select_transport(uint32_t transport) {
   gTransport = transport < DEHERM_RECORDING_TRANSPORT_COUNT ? transport : 0;
 }
+
+uint32_t deherm_recording_current_transport(void) { return gTransport; }
 
 const char* deherm_recording_observed_arguments(uint32_t route, uint32_t transport) {
   return gObservations[route][transport].arguments.c_str();
@@ -539,6 +583,84 @@ const char* deherm_recording_driver_status(uint32_t route, uint32_t transport) {
 
 int deherm_recording_driver_present(uint32_t route, uint32_t transport) {
   return gObservations[route][transport].driven ? 1 : 0;
+}
+
+uint32_t deherm_recording_browser_callback_count(uint32_t route) {
+  return route < DEHERM_RECORDING_ROUTE_COUNT ? gBrowserCallbacks[route].count : 0;
+}
+
+uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route) {
+  return route < DEHERM_RECORDING_ROUTE_COUNT ? gBrowserCallbacks[route].invocations : 0;
+}
+
+struct BrowserConsumeContext {
+  uint32_t stableId;
+  bool valid;
+};
+
+bool ConsumeBrowserCallback(void* opaque, const ScriptCallFrame* frame) noexcept {
+  auto* context = static_cast<BrowserConsumeContext*>(opaque);
+  if (!context || !frame || frame->resultCount != 2 || !frame->results) return false;
+  const uint32_t expectedNumber = 16384u + (context->stableId % 8192u);
+  const std::string expectedString = "browser-result-" + std::to_string(context->stableId);
+  const ScriptValue& number = frame->results[0];
+  const ScriptValue& string = frame->results[1];
+  context->valid = number.tag == ScriptValueTag::kNumber &&
+      number.number == static_cast<double>(expectedNumber) &&
+      string.tag == ScriptValueTag::kString && string.data &&
+      string.length == expectedString.size() &&
+      std::memcmp(string.data, expectedString.data(), expectedString.size()) == 0;
+  return context->valid;
+}
+
+int deherm_recording_browser_invoke_callback(
+    uint32_t route, uint32_t callbackIndex, char* error, uint32_t errorCapacity) {
+  if (route >= DEHERM_RECORDING_ROUTE_COUNT ||
+      callbackIndex >= gBrowserCallbacks[route].count) return 0;
+  ScriptCallback* callback = &gBrowserCallbacks[route].callbacks[callbackIndex];
+  if (!callback->invoke) return 0;
+  const uint32_t stableId = kDehermRecordingRoutes[route].stableId;
+  const double number = static_cast<double>(1024u + (stableId % 8192u));
+  const std::string text = "browser-callback-" + std::to_string(stableId);
+  ScriptValue arguments[2]{};
+  arguments[0].tag = ScriptValueTag::kNumber;
+  arguments[0].number = number;
+  arguments[1].tag = ScriptValueTag::kString;
+  arguments[1].data = text.data();
+  arguments[1].length = static_cast<uint32_t>(text.size());
+  ScriptCallFrame frame{};
+  frame.arguments = arguments;
+  frame.argumentCount = 2;
+  BrowserConsumeContext consume{stableId, false};
+  const bool invoked = callback->invoke(
+      callback->context, &frame, &consume, ConsumeBrowserCallback, error, errorCapacity);
+  if (invoked && consume.valid) ++gBrowserCallbacks[route].invocations;
+  return invoked && consume.valid ? 1 : 0;
+}
+
+uint32_t deherm_recording_browser_release_callbacks(uint32_t route) {
+  if (route >= DEHERM_RECORDING_ROUTE_COUNT) return 0;
+  BrowserCallbackObservation& observation = gBrowserCallbacks[route];
+  const uint32_t count = observation.count;
+  while (observation.count) {
+    ScriptCallback& callback = observation.callbacks[--observation.count];
+    if (callback.release) callback.release(callback.context);
+    callback = {};
+  }
+  return count;
+}
+
+int deherm_recording_browser_verify_route(
+    uint32_t route, uint32_t stableId, const char* expectedArguments,
+    uint32_t expectedArgumentCount) {
+  if (route >= DEHERM_RECORDING_ROUTE_COUNT || !expectedArguments) return 0;
+  const DehermRecordingRoute& descriptor = kDehermRecordingRoutes[route];
+  const Observation& observation =
+      gObservations[route][DEHERM_RECORDING_TRANSPORT_DIRECT_MEMORY];
+  const BrowserCallbackObservation& callbacks = gBrowserCallbacks[route];
+  return descriptor.stableId == stableId && observation.recorded &&
+      observation.violation.empty() && observation.arity == expectedArgumentCount &&
+      observation.arguments == expectedArguments && callbacks.invocations == callbacks.count;
 }
 
 }  // extern "C"

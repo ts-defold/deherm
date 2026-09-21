@@ -6,8 +6,18 @@ and Hermes runtime integration for Defold.
 ## Knowledge base
 
 - The canonical Open Knowledge Format bundle is `.agents/docs/`.
-- Start with `.agents/docs/index.md`, then follow its architecture, decisions,
-  research, roadmap, evidence, and log links.
+- Do not preload the knowledge base or recursively follow the index. Search it
+  with `pnpm knowledge:search -- <terms>`, then open only the matched documents
+  and sections needed for the current task. The search command intentionally
+  returns a small, bounded result set so repository history does not poison the
+  working context.
+- Inspect a matched document with
+  `pnpm knowledge:outline -- <relative-document.md>`, then retrieve only the
+  needed section with
+  `pnpm knowledge:section -- <relative-document.md> <heading terms>`.
+- Read `.agents/docs/index.md` only when navigation or bundle structure is the
+  task. Read large generated policy/evidence files through their owning summary
+  or verification commands; do not dump them into agent context.
 - Put new project knowledge under `.agents/docs/`.
 - When behavior, evidence, or an architectural decision changes, update the
   relevant OKF document in the same change. Run `pnpm check:knowledge`.

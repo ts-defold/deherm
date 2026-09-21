@@ -96,9 +96,14 @@ as evidence that Pages deployed the new bytes. It waits for the public manifest
 to name the exact derived roots, verifies every fetched object against its
 content-addressed path, and then dogfoods the installed CLI's scaffold,
 generation, and typechecking flow. Full Bob builds remain downstream of the
-native-artifact workflow, because a policy is allowed to publish before a new
-platform archive fingerprint finishes building. The artifact workflow dispatches
-that all-target gate only after every immutable release row exists.
+native-artifact workflow, because policy objects are allowed to publish before
+a new platform archive fingerprint finishes building. The mutable artifact
+document is different: publication advances it only when every row for all
+three fingerprinted families exists. While a new fingerprint is still
+building, the site publishes the new policy objects but retains its previous
+complete artifact mapping, so a deterministic URL never enters the public
+index while it still returns 404. The artifact workflow dispatches both the
+all-target gate and a policy-site refresh after its exact completeness proof.
 
 # Per-revision algorithm
 

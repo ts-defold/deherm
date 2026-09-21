@@ -37,6 +37,7 @@ import {
   hostArtifactFamilyNames,
   publishedAssets
 } from "./lib/artifact-releases.mjs";
+import { verifyPinnedHostToolFile } from "./lib/host-compiler-artifact-verification.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifestPath = path.join(root, "packages", "toolchains", "host-compilers.json");
@@ -303,6 +304,17 @@ else if (command === "install") {
   console.log(`recorded ${args[0]} ${Object.entries(recorded).map(([tool, value]) => `${tool}=${value.sha256}`).join(" ")}`);
 } else if (command === "report") console.log(JSON.stringify(await report(), null, 2));
 else if (command === "expected-assets") console.log((await expectedAssets(args[0])).join("\n"));
+else if (command === "verify-file") {
+  const [key, tool, file] = args;
+  if (!key || !tool || !file) throw new Error("verify-file requires <host key> <tool> <file>");
+  const result = await verifyPinnedHostToolFile({
+    manifest: await readManifest(),
+    host: key,
+    tool,
+    file
+  });
+  console.log(`verified ${result.host} ${result.tool}: ${result.sha256} (${result.bytes} bytes) at ${result.file}`);
+}
 else if (command === "verify") await verify(args.includes("--complete"), args.includes("--json"));
 else if (command === "pull") {
   // Release assets, not workflow artifacts: a workflow artifact expires, is
@@ -402,7 +414,7 @@ else if (command === "pull") {
     `tag <${hostArtifactFamilyNames.join("|")}>|` +
     `release-metadata <${hostArtifactFamilyNames.join("|")}>|` +
     `expected-assets <${hostArtifactFamilyNames.join("|")}>|` +
-    "report|verify [--complete] [--json]|install <dir>|record <host> [tool]|" +
+    "report|verify [--complete] [--json]|verify-file <host> <tool> <file>|install <dir>|record <host> [tool]|" +
     "stage <host> <build dir> [tool]|pull [--family <name>] [--tag <tag>] [--partial]}"
   );
 }

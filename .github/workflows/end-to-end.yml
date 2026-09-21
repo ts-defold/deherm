@@ -132,6 +132,17 @@ jobs:
             echo "Host-tool consumer proof deferred until native-artifacts publishes the current fingerprint and dispatches this workflow." >> "$GITHUB_STEP_SUMMARY"
           fi
 
+      # This is deliberately a clean, online cache. Unlike the pre-publication
+      # smoke in native-artifacts.yml, no compiler path is supplied: the packed
+      # CLI must resolve, download, extract, authenticate, cache and execute the
+      # release exactly as a customer install does.
+      - name: Packed clean consumer downloads the published compiler
+        if: github.event_name != 'push'
+        run: |
+          bash scripts/bootstrap-upstreams.sh hermes
+          DEHERM_PACKAGE_SMOKE_DOWNLOAD_DEHERMC=1 \
+            node --test --test-name-pattern "packed npm artifact" tests/package-smoke.test.mjs
+
       - name: Policy, published tools, scaffold and generate
         run: |
           stages=(

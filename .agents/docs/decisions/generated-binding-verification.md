@@ -79,8 +79,12 @@ closure-result blockers; Lua emits 911 routes and retains those same two
 blockers. Exact input/result vectors are interned into 406 contracts rather
 than copied into 915 rows. A generated real-Hermes driver now executes all 31
 Dynamic-Hermes native-POD routes through the production value-binding
-dispatcher. The 23 browser callback-registry rows are now a precise executable
-obligation, not a generic recorder skip; their registry driver remains open.
+dispatcher. A second generated driver executes all 23 browser callback-registry
+rows in a real Emscripten module and headless Chrome through the production
+direct-memory arena and callback registry. It checks stable-ID selection,
+ordered arguments/results, retain/invoke/release, stale-token finalization,
+registry exhaustion, reset invalidation, and a nested reentrant call. The two
+Lua-owned function results remain the browser transport's precise blockers.
 
 The remaining eleven script routes now have their own generated exact-call
 report and C verification header. The emitter exact-set joins the accounting

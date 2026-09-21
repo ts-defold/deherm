@@ -195,6 +195,8 @@ export const generatedScriptArtifacts = Object.freeze([
   "tests/fixtures/generated_script_recording_lua_adapter.cpp",
   "tests/fixtures/generated_script_recording_native_pod_driver.cpp",
   "tests/fixtures/generated_script_recording_native_pod_driver.js",
+  "tests/fixtures/generated_script_recording_browser_callback_driver.cpp",
+  "tests/fixtures/generated_script_recording_browser_callback_driver.js",
   "tests/fixtures/generated_script_recording_driver.cpp",
   "tests/fixtures/generated_script_recording_driver.js",
   "tests/fixtures/generated_script_recording_expected_trace.txt"

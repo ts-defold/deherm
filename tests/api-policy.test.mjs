@@ -31,9 +31,14 @@ import {
   DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
+import { REVISION_OUTPUT_ROOTS } from "../packages/compiler/src/revision-output-layout.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
-import { buildShippedIndex, generatorRevision } from "../scripts/generate-api-policy.mjs";
+import {
+  buildShippedIndex,
+  canonicalizePolicyText,
+  generatorRevision
+} from "../scripts/generate-api-policy.mjs";
 import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -59,7 +64,18 @@ test("policy host parity materializes every authoritative generator input", asyn
     workflow.indexOf("  publish-site:")
   );
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
+  const packedSurface = workflow.slice(
+    workflow.indexOf("      - name: Pack the exact generated surface"),
+    workflow.indexOf("      - uses: actions/upload-artifact@v4", workflow.indexOf("      - name: Pack the exact generated surface"))
+  );
 
+  for (const { root: revisionRoot } of REVISION_OUTPUT_ROOTS) {
+    assert.ok(
+      packedSurface.includes(revisionRoot),
+      `policy-surface archive omits revision-derived root ${revisionRoot}`
+    );
+  }
+  assert.match(parity, /rm -rf[^\n]*packages\/abi\/src\/generated/u);
   assert.match(parity, /bootstrap-upstreams\.sh defold ref-doc/u);
   assert.match(engine, /bootstrap-upstreams\.sh defold hermes extender ref-doc defold-sdk/u);
   assert.match(engine, /key: defold-sdk-\$\{\{ steps\.defold-sdk\.outputs\.digest \}\}/u);
@@ -76,6 +92,10 @@ test("policy host parity materializes every authoritative generator input", asyn
   }
   assert.match(publish, /needs: \[derive, host-parity\]/u);
   assert.match(publish, /needs\.host-parity\.result == 'success'/u);
+  assert.match(publish, /Select only a completely published artifact mapping/u);
+  assert.match(publish, /build\/published-policy-site\/v1\/artifacts/u);
+  assert.match(publish, /--artifact-references/u);
+  assert.match(publish, /Current fingerprinted releases are still publishing; the site retains its last complete artifact mapping/u);
   assert.match(workflow, /manage-native-artifacts\.mjs pull --target x86_64-linux/u);
   assert.match(engine, /Wait for the content-addressed Linux archive/u);
   assert.match(engine, /manage-native-artifacts\.mjs tag/u);
@@ -97,6 +117,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(engine, /defold-hermes-static-dmsdk-exact-test/u);
   assert.match(engine, /bash scripts\/bootstrap-emsdk\.sh/u);
   assert.match(engine, /pnpm test:dmsdk-browser-exact-call/u);
+  assert.match(engine, /pnpm test:script-browser-callback-exact-call/u);
   assert.match(engine, /continue-on-error: true/u);
   assert.match(engine, /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u);
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
@@ -274,6 +295,16 @@ test("generator identity is independent of checkout newline encoding", async (t)
     await generatorRevision({ sourceRoot: lf, sources }),
     await generatorRevision({ sourceRoot: crlf, sources })
   );
+});
+
+test("content-addressed policy source snapshots are independent of checkout newline encoding", () => {
+  const lf = "export const value = {\n  enabled: true\n};\n";
+  const crlf = lf.replace(/\n/g, "\r\n");
+  const legacyMac = lf.replace(/\n/g, "\r");
+  const canonical = canonicalizePolicyText(lf);
+  assert.equal(canonicalizePolicyText(crlf), canonical);
+  assert.equal(canonicalizePolicyText(legacyMac), canonical);
+  assert.equal(hashBytes(canonicalizePolicyText(crlf)), hashBytes(canonical));
 });
 
 test("namespace assignment follows the engine's own grouping", () => {

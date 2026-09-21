@@ -15,9 +15,12 @@
 #define DEHERM_RECORDING_SEMANTIC_HANDLE_COUNT 16u
 #define DEHERM_RECORDING_HANDLE_SEED_COUNT 2u
 #define DEHERM_RECORDING_HANDLE_SEED_STORAGE_COUNT 2u
+#define DEHERM_RECORDING_MAX_ARGUMENT_COUNT 8u
 #define DEHERM_RECORDING_LUA_EXACT_COUNT 882u
 #define DEHERM_RECORDING_LUA_SKIP_COUNT 33u
 #define DEHERM_RECORDING_DYNAMIC_NATIVE_POD_COUNT 31u
+#define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_COUNT 23u
+#define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_CALLBACK_COUNT 23u
 
 enum DehermRecordingShapeCode {
   DEHERM_RECORDING_SHAPE_UNDEFINED = 0,
@@ -101,6 +104,7 @@ extern const DehermRecordingHandleSeed kDehermRecordingHandleSeeds[DEHERM_RECORD
 void deherm_recording_install(void);
 void deherm_recording_uninstall(void);
 void deherm_recording_select_transport(uint32_t transport);
+uint32_t deherm_recording_current_transport(void);
 /** Recorded arity/argument/context observation for one route on one transport. */
 const char* deherm_recording_observed_arguments(uint32_t route, uint32_t transport);
 uint32_t deherm_recording_observed_arity(uint32_t route, uint32_t transport);
@@ -115,6 +119,14 @@ const char* deherm_recording_driver_results(uint32_t route, uint32_t transport);
 uint32_t deherm_recording_driver_result_count(uint32_t route, uint32_t transport);
 const char* deherm_recording_driver_status(uint32_t route, uint32_t transport);
 int deherm_recording_driver_present(uint32_t route, uint32_t transport);
+/** Browser/Wasm callback-registry exact-call controls. */
+uint32_t deherm_recording_browser_callback_count(uint32_t route);
+uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route);
+int deherm_recording_browser_invoke_callback(uint32_t route, uint32_t callback,
+    char* error, uint32_t errorCapacity);
+uint32_t deherm_recording_browser_release_callbacks(uint32_t route);
+int deherm_recording_browser_verify_route(uint32_t route, uint32_t stableId,
+    const char* expectedArguments, uint32_t expectedArgumentCount);
 /** Synthesises the declared shape onto a caller-owned wire value graph. */
 uint32_t deherm_recording_find_route(uint32_t stableId);
 

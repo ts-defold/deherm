@@ -31,6 +31,19 @@ pnpm check
 `bootstrap` is a toolchain/materialization operation. It is not part of the
 ordinary edit loop.
 
+## Bounded knowledge retrieval
+
+Agents and contributors should query the OKF bundle instead of loading it as a
+single prompt. `pnpm knowledge:search -- <terms>` returns at most twelve ranked
+document locations by default; open only the matched documents and relevant
+sections. `pnpm knowledge:outline -- <document>` returns only its headings and
+line numbers; `pnpm knowledge:section -- <document> <heading terms>` returns one
+matching section, bounded to 200 lines. The index is for navigation work, not
+mandatory startup context.
+Large generated policies, inventories, and evidence objects stay behind their
+owner commands, which should report bounded summaries rather than print the
+objects themselves.
+
 # Commands that work now
 
 | Intent | Command | Result |

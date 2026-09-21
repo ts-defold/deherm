@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 
-const adapterHeaders = Object.freeze({
+const adapterWrapperHeaders = Object.freeze({
   astcProbe: "defold_hermes/generated_dmsdk_astc_probe.h",
   base64Span: "defold_hermes/generated_dmsdk_base64_span.h",
   cstringValue: "defold_hermes/generated_dmsdk_cstring_value.h",
@@ -10,6 +10,22 @@ const adapterHeaders = Object.freeze({
   hashSpan: "defold_hermes/generated_dmsdk_hash_span.h",
   scalar: "defold_hermes/generated_dmsdk_scalar.h",
   xteaSpan: "defold_hermes/generated_dmsdk_xtea_span.h",
+});
+
+const adapterRuntimeHeaders = Object.freeze({
+  astcProbe: "defold_hermes/generated_dmsdk_astc_probe_runtime.h",
+  base64Span: "defold_hermes/generated_dmsdk_base64_span_runtime.h",
+  cstringValue: "defold_hermes/generated_dmsdk_cstring_value.h",
+  enumValue: "defold_hermes/generated_dmsdk_enum_value_runtime.h",
+  fixedDigest: "defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
+  hashSpan: "defold_hermes/generated_dmsdk_hash_span_runtime.h",
+  scalar: "defold_hermes/generated_dmsdk_scalar_runtime.h",
+  xteaSpan: "defold_hermes/generated_dmsdk_xtea_span_runtime.h",
+});
+
+const adapterJsiModules = Object.freeze({
+  scalar: "DmSdkScalar",
+  enumValue: "DmSdkEnumValue",
 });
 
 function compareCodeUnits(left, right) {
@@ -60,7 +76,7 @@ export function resolveDmSdkConcreteCallPlan(recipe) {
       adapter.kind === "named-wrapper" ? lowering.wrapper : adapter.dispatcher,
       `${recipe.declarationId} generated adapter symbol`,
     );
-    const header = adapterHeaders[lowering.family];
+    const header = (adapter.kind === "family-dispatch" ? adapterRuntimeHeaders : adapterWrapperHeaders)[lowering.family];
     if (!header) throw new Error(`${recipe.declarationId} has no generated adapter header for ${lowering.family}`);
     if (adapter.kind === "family-dispatch" && !Number.isSafeInteger(adapter.id)) {
       throw new Error(`${recipe.declarationId} family dispatcher needs a stable adapter id`);
@@ -72,6 +88,12 @@ export function resolveDmSdkConcreteCallPlan(recipe) {
       adapterKind: adapter.kind,
       symbol,
       header,
+      transports: {
+        cAbi: { applicability: "callable", symbol },
+        dynamicHermesJsi: adapterJsiModules[lowering.family]
+          ? { applicability: "callable", module: adapterJsiModules[lowering.family], method: "call" }
+          : { applicability: "not-emitted" },
+      },
       requirements: [],
     };
     plan.planSha256 = sha256(canonicalJson(plan));
@@ -104,6 +126,7 @@ export function materializationFromDmSdkConcreteCallPlan(plan) {
         id: plan.adapterId,
         symbol: plan.symbol,
         header: plan.header,
+        transports: plan.transports,
         planSha256: plan.planSha256,
       },
       requirements: [],
@@ -182,16 +205,51 @@ export function materializeDmSdkGeneratedAdapterUsages(usages, options = {}) {
     adapterId: plan.adapterId,
     symbol: plan.symbol,
     planSha256: plan.planSha256,
+    transports: plan.transports,
     catalogSha256: options.catalogSha256,
   }));
+  const vectors = plans.map((plan) => {
+    const recipe = byId.get(plan.declarationId);
+    const vector = {
+      schemaVersion: 1,
+      declarationId: plan.declarationId,
+      numericId: plan.numericId,
+      recipeId: plan.recipeId,
+      family: plan.family,
+      adapterId: plan.adapterId,
+      adapterKind: plan.adapterKind,
+      productionSymbol: plan.symbol,
+      productionHeader: plan.header,
+      exactCallee: recipe.preferredLowering.adapter.callee ?? recipe.preferredLowering.wrapper ?? recipe.invocation.nativeSymbol,
+      familyContract: {
+        digestBytes: recipe.preferredLowering.adapter.digestBytes ?? null,
+        resultBits: recipe.preferredLowering.adapter.resultBits ?? null,
+        mode: recipe.preferredLowering.adapter.mode ?? null,
+      },
+      invocation: recipe.invocation,
+      abi: recipe.abi,
+      transports: plan.transports,
+      expectations: {
+        selection: "exact-family-adapter-id",
+        arguments: "ordered-native-abi",
+        result: "family-adapter-result-contract",
+        failClosed: true,
+      },
+    };
+    vector.vectorSha256 = sha256(canonicalJson(vector));
+    return vector;
+  });
   const verification = {
     schemaVersion: 1,
     source: "deherm-dmsdk-generated-adapter-call-plan",
-    evidenceBoundary: "The concrete plan authenticates the checker-selected recipe-to-family wrapper or dispatcher join and the emitted linker relocation. Family-owned exact-call tests remain authoritative for the adapter implementation; provider-boundary families are excluded until their policy providers exist.",
+    evidenceBoundary: "Each exact vector is derived from the same authenticated recipe and concrete family-dispatch plan as the production relocation. It fixes the production C ABI symbol, family-local adapter id, ordered native ABI, result contract, and emitted JSI module where one exists. Family runtime tests execute the C ABI vectors; JSI is applicable only to families that emit a production JSI module. Provider-boundary families remain excluded until their policy providers exist.",
     catalogSha256: options.catalogSha256,
     retain: retainName,
     callCount: manifest.length,
     calls: manifest,
+    vectorCount: vectors.length,
+    jsiVectorCount: vectors.filter((vector) => vector.transports.dynamicHermesJsi.applicability === "callable").length,
+    vectors,
   };
   verification.manifestSha256 = sha256(canonicalJson(verification));
   return Object.freeze({ source, retain: retainName, manifest: Object.freeze(manifest), verification: Object.freeze(verification) });

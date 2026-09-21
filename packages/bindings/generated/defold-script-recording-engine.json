@@ -46835,7 +46835,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 162
+        "contract": 162,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 214949730,
+          "callbackSlots": [
+            3
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:9058",
+              "str:browser-callback-214949730"
+            ],
+            "resultValues": [
+              "num:24418",
+              "str:browser-result-214949730"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "bullet-world-request",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -47085,7 +47107,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 165
+        "contract": 165,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 3637746507,
+          "callbackSlots": [
+            3
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:8011",
+              "str:browser-callback-3637746507"
+            ],
+            "resultValues": [
+              "num:23371",
+              "str:browser-result-3637746507"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "bullet-world-request",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -49956,7 +50000,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 186
+        "contract": 186,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 4139911040,
+          "callbackSlots": [
+            1
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:2944",
+              "str:browser-callback-4139911040"
+            ],
+            "resultValues": [
+              "num:18304",
+              "str:browser-result-4139911040"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "collection-factory-load",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -50269,7 +50335,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 190
+        "contract": 190,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 620577334,
+          "callbackSlots": [
+            2
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:1590",
+              "str:browser-callback-620577334"
+            ],
+            "resultValues": [
+              "num:16950",
+              "str:browser-result-620577334"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "terminal-event",
+            "owner": "collection-proxy-load",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -51921,7 +52009,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 186
+        "contract": 186,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1808015212,
+          "callbackSlots": [
+            1
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:9068",
+              "str:browser-callback-1808015212"
+            ],
+            "resultValues": [
+              "num:24428",
+              "str:browser-result-1808015212"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "factory-load",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -52314,7 +52424,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 206
+        "contract": 206,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 2848412671,
+          "callbackSlots": [
+            2
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:6143",
+              "str:browser-callback-2848412671"
+            ],
+            "resultValues": [
+              "num:21503",
+              "str:browser-result-2848412671"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "font-prewarm-request",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -52555,7 +52687,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 208
+        "contract": 208,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1302980535,
+          "callbackSlots": [
+            7
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:2999",
+              "str:browser-callback-1302980535"
+            ],
+            "resultValues": [
+              "num:18359",
+              "str:browser-result-1302980535"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "game-object-property-animation",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -54686,7 +54840,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 226
+        "contract": 226,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1559320978,
+          "callbackSlots": [
+            6
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:7570",
+              "str:browser-callback-1559320978"
+            ],
+            "resultValues": [
+              "num:22930",
+              "str:browser-result-1559320978"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "gui-node-property-animation",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -60052,7 +60228,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 252
+        "contract": 252,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1867420328,
+          "callbackSlots": [
+            2
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:5800",
+              "str:browser-callback-1867420328"
+            ],
+            "resultValues": [
+              "num:21160",
+              "str:browser-result-1867420328"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "gui-node-flipbook",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -60130,7 +60328,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 253
+        "contract": 253,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 3924164150,
+          "callbackSlots": [
+            1
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:8758",
+              "str:browser-callback-3924164150"
+            ],
+            "resultValues": [
+              "num:24118",
+              "str:browser-result-3924164150"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "terminal-event",
+            "owner": "gui-particlefx-playback",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -64432,7 +64652,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 270
+        "contract": 270,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1164539114,
+          "callbackSlots": [
+            0
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:6378",
+              "str:browser-callback-1164539114"
+            ],
+            "resultValues": [
+              "num:21738",
+              "str:browser-result-1164539114"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "persistent-replaceable",
+            "owner": "html5-interaction-singleton",
+            "threadAffinity": "browser-main-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -64514,7 +64756,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 271
+        "contract": 271,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 125289847,
+          "callbackSlots": [
+            2
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:2423",
+              "str:browser-callback-125289847"
+            ],
+            "resultValues": [
+              "num:17783",
+              "str:browser-result-125289847"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "terminal-event",
+            "owner": "http-request",
+            "threadAffinity": "engine-message-dispatch-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -65231,7 +65495,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 278
+        "contract": 278,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 3865730920,
+          "callbackSlots": [
+            3
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:9064",
+              "str:browser-callback-3865730920"
+            ],
+            "resultValues": [
+              "num:24424",
+              "str:browser-result-3865730920"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "liveupdate-add-mount-job",
+            "threadAffinity": "engine-job-completion-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -66647,7 +66933,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 286
+        "contract": 286,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1281580293,
+          "callbackSlots": [
+            4
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:8453",
+              "str:browser-callback-1281580293"
+            ],
+            "resultValues": [
+              "num:23813",
+              "str:browser-result-1281580293"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "model-animation",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -67116,7 +67424,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 186
+        "contract": 186,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 2809933664,
+          "callbackSlots": [
+            1
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:4960",
+              "str:browser-callback-2809933664"
+            ],
+            "resultValues": [
+              "num:20320",
+              "str:browser-result-2809933664"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "terminal-event",
+            "owner": "particlefx-playback",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -68309,7 +68639,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 270
+        "contract": 270,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1107212821,
+          "callbackSlots": [
+            0
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:7701",
+              "str:browser-callback-1107212821"
+            ],
+            "resultValues": [
+              "num:23061",
+              "str:browser-result-1107212821"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "persistent-replaceable",
+            "owner": "physics-world",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -72417,7 +72769,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 270
+        "contract": 270,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 2106330303,
+          "callbackSlots": [
+            0
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:4287",
+              "str:browser-callback-2106330303"
+            ],
+            "resultValues": [
+              "num:19647",
+              "str:browser-result-2106330303"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "persistent-replaceable",
+            "owner": "render-context",
+            "threadAffinity": "render-script-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -73525,7 +73899,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 328
+        "contract": 328,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 2463011221,
+          "callbackSlots": [
+            3
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:5525",
+              "str:browser-callback-2463011221"
+            ],
+            "resultValues": [
+              "num:20885",
+              "str:browser-result-2463011221"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "texture-upload-request",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -76453,7 +76849,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 350
+        "contract": 350,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 900417529,
+          "callbackSlots": [
+            2
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:3065",
+              "str:browser-callback-900417529"
+            ],
+            "resultValues": [
+              "num:18425",
+              "str:browser-result-900417529"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "sound-voice",
+            "threadAffinity": "engine-message-dispatch-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -76845,7 +77263,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 352
+        "contract": 352,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 2116188218,
+          "callbackSlots": [
+            2
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:7226",
+              "str:browser-callback-2116188218"
+            ],
+            "resultValues": [
+              "num:22586",
+              "str:browser-result-2116188218"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "sprite-animation",
+            "threadAffinity": "engine-message-dispatch-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -78497,7 +78937,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 359
+        "contract": 359,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 2461929107,
+          "callbackSlots": [
+            1
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:4755",
+              "str:browser-callback-2461929107"
+            ],
+            "resultValues": [
+              "num:20115",
+              "str:browser-result-2461929107"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "one-shot",
+            "owner": "buffer-load-request",
+            "threadAffinity": "engine-update-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -79128,7 +79590,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 270
+        "contract": 270,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 2791701985,
+          "callbackSlots": [
+            0
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:8673",
+              "str:browser-callback-2791701985"
+            ],
+            "resultValues": [
+              "num:24033",
+              "str:browser-result-2791701985"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "persistent-replaceable",
+            "owner": "lua-runtime-debug-table",
+            "threadAffinity": "lua-erroring-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -85170,7 +85654,29 @@
       },
       "universalSkip": null,
       "exactVector": {
-        "contract": 270
+        "contract": 270,
+        "laneOverride": {
+          "lane": "browser-wasm-callback-registry",
+          "stableId": 1282520203,
+          "callbackSlots": [
+            0
+          ],
+          "callbackInvocation": {
+            "argumentValues": [
+              "num:6283",
+              "str:browser-callback-1282520203"
+            ],
+            "resultValues": [
+              "num:21643",
+              "str:browser-result-1282520203"
+            ]
+          },
+          "lifecycle": {
+            "lifetime": "persistent-replaceable",
+            "owner": "window-singleton",
+            "threadAffinity": "engine-window-event-thread"
+          }
+        }
       },
       "applicability": [
         0,
@@ -85743,6 +86249,11 @@
       "skipped": 33,
       "failureSchema": "deherm-script-lua-exact-failure/v1"
     },
+    "browserCallbackExact": {
+      "routeCount": 23,
+      "callbackCount": 23,
+      "resultSchema": "deherm-script-browser-callback-exact-result/v1"
+    },
     "blockerCount": 0
   },
   "artifacts": {
@@ -85753,17 +86264,21 @@
     "luaAdapter": "tests/fixtures/generated_script_recording_lua_adapter.cpp",
     "nativePodDriver": "tests/fixtures/generated_script_recording_native_pod_driver.cpp",
     "nativePodDriverJs": "tests/fixtures/generated_script_recording_native_pod_driver.js",
+    "browserCallbackDriver": "tests/fixtures/generated_script_recording_browser_callback_driver.cpp",
+    "browserCallbackDriverJs": "tests/fixtures/generated_script_recording_browser_callback_driver.js",
     "driver": "tests/fixtures/generated_script_recording_driver.cpp",
     "driverJs": "tests/fixtures/generated_script_recording_driver.js",
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "e86cc8ac3a6d1b057049fe78ea57809954365020c629220bf02923da631f9565",
+    "header": "386fe6053b9b5f17c8c9dad6bbac612175d074887e21610ed7379fbca884da28",
     "tables": "666719e347342f667c8b71d4a27cc29dfa5ac3087b4a05679edf5562351e30f9",
-    "provider": "9ce2e8a0ed8fd8b3e42702c5ea746bb20b0806c602ec4e618db1fd2aa26173be",
+    "provider": "20f4eec083be1d760df001d5b77cfdf004d7a380f0aca3c543c38c9e1caefed8",
     "luaAdapter": "13683dad020e16914276ad877127018a9d15921eec9c3c9342b6fba8313d671d",
     "nativePodDriver": "c60ebe3fd13b85808109d0de95edf6be76fa9c40aff2ea700220d9362c84a676",
     "nativePodDriverJs": "5c86bf82e3f036fc359e61cf370450d44d93ec4119bc4d7b9c2ec98118323d7a",
+    "browserCallbackDriver": "20daa18e12afd4036074cc0aba50f3d14eb80409062ec7d17c73f967ba09e292",
+    "browserCallbackDriverJs": "daad00b8e08d15191b3ae8c94a71592a2f0cf17934a8a4f0cb288aba782b4b49",
     "driver": "bbe58abba9260aaecd329fd2883fb352d6dd56cb62f785e3da7968407181964f",
     "driverJs": "dcebcce529429b64d2cc7e5ed9bb1f5fae8a0d0c50c8b0b6057c51218a0f52eb",
     "expectedTrace": "03218000be8de2b5f954d67c73285279f7881b9fdbff15b2670e0f1dbbfa1459"

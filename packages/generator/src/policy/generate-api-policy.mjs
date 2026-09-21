@@ -176,6 +176,13 @@ async function readJson(file) {
   return JSON.parse(await readFile(file, "utf8"));
 }
 
+// Policy hashes describe source content, not Git's platform-specific checkout
+// encoding.  Every textual compatibility snapshot must cross this boundary
+// before it is hashed or embedded in a content-addressed object.
+export function canonicalizePolicyText(source) {
+  return source.replace(/\r\n?/g, "\n");
+}
+
 export async function discoverCompilerSurfaceOutputs(sourceRoot = root) {
   const files = [];
   async function visit(absoluteRoot, relativeRoot, rule) {
@@ -232,7 +239,7 @@ export async function generatorRevision(options = {}) {
     // encoding, so canonicalize text before hashing just as generated policy
     // inputs do. Every declared generator source is textual JavaScript/JSON.
     const source = await readFile(path.join(sourceRoot, relative), "utf8");
-    digest.update(relative).update("\0").update(source.replace(/\r\n?/g, "\n")).update("\0");
+    digest.update(relative).update("\0").update(canonicalizePolicyText(source)).update("\0");
   }
   return `sha256:${digest.digest("hex")}`;
 }
@@ -420,8 +427,8 @@ export async function derivePolicy(options = {}) {
       await readJson(path.join(artifacts, relative))
     ]))),
     sdk: Object.fromEntries(await Promise.all(compilerSurfaceSdkSources.map(async (relative) => {
-      const source = await readFile(path.join(root, "packages", "sdk", "src", "generated", relative), "utf8");
-      const canonicalSource = source.split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
+      const source = await readFile(path.join(sourceRoot, "packages", "sdk", "src", "generated", relative), "utf8");
+      const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
       return [relative, {
         mode: locallyRenderedSdkSources.has(relative) ? "render-and-verify" : "authenticated-compatibility-source",
         sha256: createHash("sha256").update(canonicalSource).digest("hex"),
@@ -431,7 +438,7 @@ export async function derivePolicy(options = {}) {
     }))),
     outputs: Object.fromEntries(await Promise.all(compilerOutputPaths.map(async (relative) => {
       const source = await readFile(path.join(sourceRoot, relative), "utf8");
-      const canonicalSource = source.split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
+      const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
       return [relative, {
         mode: "authenticated-compatibility-source",
         sha256: createHash("sha256").update(canonicalSource).digest("hex"),
@@ -696,8 +703,16 @@ export async function runApiPolicyGenerator(argv = process.argv.slice(2)) {
     failures.push(`${store.orphans.length} unreferenced objects in the store: ${store.orphans.slice(0, 3).join(", ")}…`);
   }
   if (check) {
-    if (result.written.length) failures.push(`${result.written.length} policy objects are missing from the store`);
-    if (result.republished.length) failures.push(`${result.republished.length} stored objects disagree with the derivation`);
+    if (result.written.length) {
+      failures.push(
+        `${result.written.length} policy objects are missing from the store: ${result.written.slice(0, 8).join(", ")}`
+      );
+    }
+    if (result.republished.length) {
+      failures.push(
+        `${result.republished.length} stored objects disagree with the derivation: ${result.republished.slice(0, 8).join(", ")}`
+      );
+    }
     if (await readFile(shippedIndexPath, "utf8").catch(() => "") !== shippedIndex) failures.push("defold-policy-index.json is stale");
     if (await readFile(manifestPath, "utf8").catch(() => "") !== manifest) failures.push("defold-api-policy.json is stale");
     if (failures.length) throw new Error(`Policy store check failed:\n  ${failures.join("\n  ")}`);

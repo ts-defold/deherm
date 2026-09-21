@@ -105,8 +105,9 @@ Every skip carries a machine-readable reason:
 
 * `callback-target-requires-jsi-registry` (23 routes, direct-memory and
   typed-native) — callback inputs execute in JSI with real function descriptors;
-  the other two target contracts intentionally do not fabricate a JavaScript
-  callback registry.
+  the generic recorder does not fabricate a JavaScript callback registry. The
+  browser applicability projection owns a separate generated exact-call driver
+  for these rows.
 * `function-result-is-jsi-only` (2 routes, direct-memory and typed-native) —
   higher-order Lua-closure results are emitted by JSI and explicitly outside the
   two fixed-frame target contracts.
@@ -115,6 +116,16 @@ Generated provider-only handle seed routes now mint genuine HostObjects for the
 two input-only `box2d-shape` and `graphics-texture` kinds, so JSI executes the
 full route set. Static URL and Matrix4 pushes also use their real bounded frame
 helpers; neither family remains a skip.
+
+The browser applicability companion derives all 23 callback-registry vectors
+from the same route, shape, exact-contract, and lifecycle records. A pinned
+Emscripten build links the production direct-memory universal bridge and the
+production browser callback registry into real Wasm, then Chrome executes the
+complete route set. The generated driver compares stable IDs, argument and
+result order, callback arguments and synchronous results, and explicit
+retain/dispatch/release/finalization. It also executes a nested reentrant route,
+the registry capacity bound, and whole-registry invalidation. This is exact
+JavaScript/Wasm bridge evidence, not packaged Defold behavior.
 
 The canonical Dynamic-Hermes emitted partition is independently reported and
 must total 913 routes:
@@ -187,6 +198,7 @@ restoration failures.
 
 ```
 pnpm test:script-recording-engine
+pnpm test:script-browser-callback-exact-call
 ```
 
 Generation is registered with the script generator pipeline and its clean-room
@@ -196,10 +208,9 @@ pinned inputs.
 
 # Next gates
 
-1. Add target-native callback adapters only if those transports begin emitting
-   the 23 callback-input or two callback-result contracts; until then the
-   partition is exact and intentional.
-2. Add generated exact twins for the 31 native-POD specialization routes.
-3. Run the same route set against a packaged Defold engine and diff **per
+1. Add a reverse callable-result token only if browser, Static Hermes, or raw
+   Lua begins emitting the two higher-order closure-result contracts; until then
+   their blocker is exact and intentional.
+2. Run the same route set against a packaged Defold engine and diff **per
    contract** against these records. Only that step can say anything about
    Defold.

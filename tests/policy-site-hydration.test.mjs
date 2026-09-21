@@ -4,8 +4,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { buildPolicySite } from "../scripts/build-policy-site.mjs";
-import { readSiteConfig, readStore, shippedIndexPath, storeRoot } from "../scripts/generate-api-policy.mjs";
+import { buildPolicySite, validateArtifactReferences } from "../scripts/build-policy-site.mjs";
+import { buildArtifactReferences, readSiteConfig, readStore, shippedIndexPath, storeRoot } from "../scripts/generate-api-policy.mjs";
 import { hydratePolicySite } from "../scripts/hydrate-policy-site.mjs";
 
 test("the packaged one-revision store hydrates idempotently from the accumulated website", async () => {
@@ -82,5 +82,27 @@ test("hydration refuses mutable bytes at a content-addressed path", async () => 
   await assert.rejects(
     hydratePolicySite({ from: published, store: hydratedStore, index: hydratedIndex, site }),
     /published and packaged policy bytes disagree/
+  );
+});
+
+test("policy publication can retain a previously complete artifact mapping", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-policy-artifact-fallback-"));
+  const site = await readSiteConfig();
+  const fallback = structuredClone(await buildArtifactReferences());
+  for (const [index, family] of Object.values(fallback).entries()) {
+    family.tag = `last-complete-${index}`;
+    family.fingerprint = String(index + 1).repeat(64);
+  }
+  const result = await buildPolicySite({ output: directory, artifactReferences: fallback });
+  for (const entry of result.entries) {
+    const document = JSON.parse(await readFile(
+      path.join(directory, site.layoutVersion, "artifacts", `${entry.defoldRevision}.json`),
+      "utf8"
+    ));
+    assert.deepEqual(document.artifacts, fallback);
+  }
+  assert.throws(
+    () => validateArtifactReferences({ "native-artifacts": fallback["native-artifacts"] }),
+    /has no hermes-host family/u
   );
 });

@@ -130,7 +130,10 @@ mkdir -p "$staging"
 # Separate build trees, so neither variant can pick up the other's objects.
 build_variant "" OFF libhermes.a
 build_variant "-debug" ON libhermes.debug.a
-cp "$cross_build/hermes/lib/config/libhermesvm-config.h" "$staging/libhermesvm-config.h"
+# Hermes configures this file from lib/CMakeLists.txt. Because `lib` is added
+# without an explicit binary directory, CMake emits it below the build root's
+# `lib/config`, beside the release archive tree (not below a `hermes` child).
+cp "$cross_build/lib/config/libhermesvm-config.h" "$staging/libhermesvm-config.h"
 
 bash "$(dirname "${BASH_SOURCE[0]}")/package-archive.sh" \
   "$output" "$staging/libhermes.a" "$staging/libhermes.debug.a" \

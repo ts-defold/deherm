@@ -65,19 +65,49 @@ test("every internal workspace package maps to canonical raw source", async () =
       `${workspaceName} publishes no raw source and must not be a TypeScript path alias`
     );
   }
-  assert.equal(Object.hasOwn(paths, "@ts-defold/deherm"), false, "the public package name must not be an internal workspace alias");
+  // The repository's examples intentionally exercise the revision-derived SDK
+  // through the public import spelling.  That development-only alias is not an
+  // internal package identity: the packed root remains the revision-neutral
+  // package.ts entry point asserted below.
+  assert.deepEqual(paths["@ts-defold/deherm"], ["./packages/sdk/src/index.ts"]);
 });
 
 test("the public package ships directory boundaries instead of enumerated generated files", async () => {
   const manifest = JSON.parse(await readFile(path.join(repositoryRoot, "package.json"), "utf8"));
   assert.equal(manifest.name, "@ts-defold/deherm");
-  assert.equal(manifest.source, "./packages/sdk/src/index.ts");
+  assert.equal(manifest.source, "./packages/sdk/src/package.ts");
   assert.deepEqual(manifest.files, [
     "bin/",
-    "packages/",
-    "!packages/generator/src/policy/generate-api-policy.mjs",
-    "!packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
+    "packages/cli/",
+    "packages/compiler/",
+    "!packages/compiler/src/generated/",
+    "packages/polyfills/",
+    "packages/sdk/src/address.ts",
+    "packages/sdk/src/component.ts",
+    "packages/sdk/src/package.ts",
+    "packages/static-hermes/src/globals.d.ts",
+    "packages/static-hermes/src/typed-app.ts",
+    "packages/static-hermes/src/generated/dmsdk-universal.ts",
+    "packages/telemetry/",
+    "packages/toolchains/host-compilers.json",
+    "packages/toolchains/release-tags.json",
+    "scripts/assemble-typed-native-extension.mjs",
+    "packages/web-adapter/",
+    "packages/bindings/policy-site.json",
+    "packages/bindings/profiles.json",
+    "packages/bindings/targets/",
     "defold/defold_hermes/",
+    "!defold/defold_hermes/lib/**/*.a",
+    "!defold/defold_hermes/lib/**/*.lib",
+    "!defold/defold_hermes/include/libhermesvm-config.h",
+    "!defold/defold_hermes/include/defold_hermes/generated*",
+    "defold/defold_hermes/include/defold_hermes/generated_build_config.h",
+    "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
+    "!defold/defold_hermes/src/generated*",
+    "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
+    "!defold/defold_hermes/lib/web/generated*",
+    "!packages/**/package.json",
     "!packages/**/*.type-test.ts",
     "README.md"
   ]);

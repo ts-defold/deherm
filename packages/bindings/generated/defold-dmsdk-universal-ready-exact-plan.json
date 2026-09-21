@@ -4,7 +4,7 @@
   "ordering": "numeric-id-ascending",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-  "symbolIndexSha256": "f84c15ac9f818dcaf4c372cb6fe539003d82e8552c69706795c97f0887741063",
+  "symbolIndexSha256": "5468d13ec45c96eddff529f81ed7cf94256ce2b3fd8dab6188828225b7f1531d",
   "universalReadyCount": 486,
   "artifacts": {
     "productionSource": {
@@ -59450,5 +59450,5 @@
     "manifestSha256": "0963991cea8bbc26d36eb33080e01c938038e96ed06f426362073b060b909279",
     "sourceSha256": "04550ae8fda7ca13a7620dfe08c6c72f70adffa193cecd9ed09cbde2b0b5a66f"
   },
-  "corpusSha256": "db59270c25c8ad1bc52b7bedd2b1eb39e9d571464306d95dbd398f5f9514c70c"
+  "corpusSha256": "acf73211a33276fd3091538cf9b3abdddf52400f738b4860cbaa293b68f888d9"
 }

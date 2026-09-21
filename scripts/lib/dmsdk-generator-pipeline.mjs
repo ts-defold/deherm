@@ -19,12 +19,14 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
   "scripts/generate-dmsdk-cstring-value-bindings.mjs",
   "scripts/generate-dmsdk-universal-bindings.mjs",
+  "scripts/generate-dmsdk-generated-adapter-exact.mjs",
   "scripts/generate-dmsdk-runtime.mjs",
   "scripts/lib/dmsdk-generator-pipeline.mjs",
   "scripts/lib/reviewed-revision.mjs",
   "scripts/lib/revision-audit.mjs",
   "packages/compiler/src/dmsdk-call-symbol-index.mjs",
   "packages/compiler/src/dmsdk-concrete-call-plan.mjs",
+  "packages/compiler/src/dmsdk-generated-adapter-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-ready-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-materializer-core.mjs",
   "packages/compiler/src/dmsdk-universal-materializer.mjs",
@@ -159,7 +161,10 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
   "tests/fixtures/generated_dmsdk_universal_test_ids.h",
   "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
-  "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp"
+  "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
+  "packages/bindings/generated/defold-dmsdk-generated-adapter-exact-plan.json",
+  "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
+  "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp"
 ]);
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.
@@ -179,5 +184,6 @@ export const dmSdkGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-borrowed-handle-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-cstring-value-bindings.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-universal-bindings.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-universal-bindings.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-generated-adapter-exact.mjs" })
 ]);

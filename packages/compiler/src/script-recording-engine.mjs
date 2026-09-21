@@ -762,6 +762,24 @@ export function buildRecordingEngineModel(inputs) {
         lane: "dynamic-hermes-native-pod",
         ...nativePodVerificationVector(valueBindingRow)
       };
+    } else if (browserCallback && browserSelection === "emit") {
+      const callbackArgument = 1024 + (route.stableId % 8192);
+      const callbackResult = 16384 + (route.stableId % 8192);
+      route.exactVector.laneOverride = {
+        lane: "browser-wasm-callback-registry",
+        stableId: route.stableId,
+        callbackSlots: route.argumentShapes.flatMap((shapeIndex, index) =>
+          shapeList[shapeIndex].code === SHAPE.callback ? [index] : []),
+        callbackInvocation: {
+          argumentValues: [`num:${callbackArgument}`, `str:browser-callback-${route.stableId}`],
+          resultValues: [`num:${callbackResult}`, `str:browser-result-${route.stableId}`]
+        },
+        lifecycle: {
+          lifetime: universalRow.browserCallback.lifetime,
+          owner: universalRow.browserCallback.owner,
+          threadAffinity: universalRow.browserCallback.threadAffinity
+        }
+      };
     }
   }
 
@@ -845,6 +863,14 @@ export function buildRecordingEngineModel(inputs) {
       exercised: routes.filter((route) => route.luaAdapter.status === "exercise").length,
       skipped: routes.filter((route) => route.luaAdapter.status === "skip").length,
       failureSchema: "deherm-script-lua-exact-failure/v1"
+    },
+    browserCallbackExact: {
+      routeCount: routes.filter((route) =>
+        route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry").length,
+      callbackCount: routes.reduce((count, route) =>
+        count + (route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry"
+          ? route.exactVector.laneOverride.callbackSlots.length : 0), 0),
+      resultSchema: "deherm-script-browser-callback-exact-result/v1"
     },
     blockerCount: blockers.length
   };

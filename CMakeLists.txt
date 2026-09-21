@@ -635,6 +635,17 @@ target_link_libraries(defold-hermes-script-recording-native-pod PRIVATE
   defold-hermes-lua-bridge
 )
 
+# The browser callback exact-call twin is intentionally a custom target: it
+# invokes the pinned Emscripten toolchain and a real headless browser rather
+# than pretending the host C++ compiler can prove the JavaScript/Wasm seam.
+add_custom_target(defold-hermes-script-recording-browser-callback
+  COMMAND ${CMAKE_COMMAND} -E env
+    ${CMAKE_COMMAND} -E chdir ${CMAKE_CURRENT_SOURCE_DIR}
+    node scripts/check-script-browser-callback-exact-call.mjs
+  VERBATIM
+  USES_TERMINAL
+)
+
 add_executable(defold-hermes-script-handle-router-test
   native/script_handle_router_test.cpp
 )

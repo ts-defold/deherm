@@ -138,6 +138,8 @@ test("pushes run the available cheap consumer half while artifact-dispatched run
   assert.match(local, /for \(const family of \["hermes-host", "dehermc"\]\)/u);
   assert.match(local, /tags\[family\]\.assets\["linux-x64"\]/u);
   assert.match(local, /ordered artifact dispatch will exercise it/u);
+  assert.match(local, /DEHERM_PACKAGE_SMOKE_DOWNLOAD_DEHERMC=1/u);
+  assert.match(local, /Packed clean consumer downloads the published compiler/u);
   assert.match(workflow, /group: end-to-end-\$\{\{ github\.ref \}\}-\$\{\{ github\.event_name == 'push' && 'push' \|\| 'full' \}\}/u);
   assert.match(workflow, /extension-headers:[\s\S]*if: github\.event_name != 'push'/u);
   assert.match(workflow, /bob:[\s\S]*if: github\.event_name != 'push'/u);

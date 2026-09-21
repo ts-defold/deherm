@@ -1,17 +1,16 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { cp, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
-import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
 
 import { parseArguments } from "../packages/cli/src/cli.mjs";
+import { extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
+import { verifyPinnedHostToolFile } from "../scripts/lib/host-compiler-artifact-verification.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
-const require = createRequire(import.meta.url);
 
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
@@ -23,7 +22,8 @@ function run(command, args, options = {}) {
   return result;
 }
 
-async function stageCurrentHostDehermc(root) {
+export async function prepareCurrentHostDehermc(root, dehermCacheHome, options = {}) {
+  const environment = options.environment ?? process.env;
   const host = `${process.platform}-${process.arch}`;
   const executable = process.platform === "win32" ? "dehermc.exe" : "dehermc";
   const manifest = JSON.parse(await readFile(path.join(
@@ -31,38 +31,92 @@ async function stageCurrentHostDehermc(root) {
   ), "utf8"));
   const record = manifest.hosts?.[host]?.tools?.dehermc;
   assert.equal(record?.status, "vendored", `${host} dehermc is not pinned`);
-  const built = path.join(root, "built-dehermc");
-  const ttscPackage = require.resolve("ttsc/package.json");
-  const ttscRequire = createRequire(ttscPackage);
-  const bundledGoRoot = path.dirname(ttscRequire.resolve(`@ttsc/${host}/package.json`));
-  const bundledGo = path.join(
-    bundledGoRoot,
-    "bin", "go", "bin",
-    process.platform === "win32" ? "go.exe" : "go"
-  );
-  run("bash", [
-    path.join(repositoryRoot, "toolchains", "go", "build-dehermc.sh"),
-    host,
-    built
-  ], {
-    env: {
-      ...process.env,
-      GOCACHE: path.join(root, "go-cache"),
-      PATH: `${path.dirname(bundledGo)}${path.delimiter}${process.env.PATH ?? ""}`
-    }
-  });
-  const source = path.join(built, executable);
-  const bytes = await readFile(source);
-  assert.equal(createHash("sha256").update(bytes).digest("hex"), record.sha256,
-    "locally reproduced dehermc does not match the packaged digest");
   const tags = JSON.parse(await readFile(path.join(
     repositoryRoot, "packages", "toolchains", "release-tags.json"
   ), "utf8"));
+
+  const download = environment.DEHERM_PACKAGE_SMOKE_DOWNLOAD_DEHERMC === "1";
+  const suppliedArchive = environment.DEHERM_PACKAGE_SMOKE_DEHERMC_ARCHIVE;
+  const suppliedBinary = environment.DEHERM_PACKAGE_SMOKE_DEHERMC_BINARY;
+  assert.equal(download && Boolean(suppliedArchive || suppliedBinary), false,
+    "choose either the normal published download or one supplied pre-publish dehermc artifact");
+  if (download) {
+    return {
+      mode: "download",
+      cacheRoot: path.join(dehermCacheHome, "toolchains"),
+      destination: path.join(dehermCacheHome, "toolchains", tags.families.dehermc.tag, host, executable),
+      sha256: record.sha256,
+      manifest,
+      host
+    };
+  }
+
+  let source = suppliedBinary ? path.resolve(suppliedBinary) : null;
+  if (suppliedArchive) {
+    const extracted = path.join(root, "supplied-dehermc");
+    await extractReleaseArchive({ archive: path.resolve(suppliedArchive), destination: extracted });
+    source = path.join(extracted, executable);
+  }
+  if (!source) {
+    const candidates = options.candidatePaths ?? [
+      path.join(repositoryRoot, "build", "artifacts", "host-compilers", host, "bin", executable),
+      path.join(repositoryRoot, manifest.hosts[host].directory, record.file)
+    ];
+    for (const candidate of candidates) {
+      if (await readFile(candidate).then(() => true, () => false)) {
+        source = candidate;
+        break;
+      }
+    }
+    if (!source) {
+      assert.notEqual(environment.DEHERM_OFFLINE, "1",
+        "offline package smoke needs a supplied or already-cached dehermc compiler artifact");
+      return {
+        mode: "download",
+        cacheRoot: path.join(dehermCacheHome, "toolchains"),
+        destination: path.join(dehermCacheHome, "toolchains", tags.families.dehermc.tag, host, executable),
+        sha256: record.sha256,
+        manifest,
+        host
+      };
+    }
+  }
+  await verifyPinnedHostToolFile({ manifest, host, tool: "dehermc", file: source });
   const cacheRoot = path.join(root, "tool-cache");
   const destination = path.join(cacheRoot, tags.families.dehermc.tag, host, executable);
   await mkdir(path.dirname(destination), { recursive: true });
   await cp(source, destination);
-  return { cacheRoot, destination, sha256: record.sha256 };
+  return { mode: "supplied", cacheRoot, destination, sha256: record.sha256, manifest, host };
+}
+
+test("an artifact-free checkout exercises the published compiler customers download", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-package-smoke-selection-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const prepared = await prepareCurrentHostDehermc(root, path.join(root, "cache"), {
+    environment: {},
+    candidatePaths: []
+  });
+  assert.equal(prepared.mode, "download");
+  assert.equal(path.basename(path.dirname(prepared.destination)), prepared.host);
+  assert.match(path.basename(prepared.destination), /^dehermc(?:\.exe)?$/u);
+  assert.match(prepared.sha256, /^[0-9a-f]{64}$/u);
+});
+
+function compilerSmokeEnvironment(dehermc, dehermCacheHome, forbiddenGoCompiler) {
+  const {
+    DEHERM_TOOL_CACHE: _inheritedToolCache,
+    DEHERM_OFFLINE: _inheritedOffline,
+    ...cleanEnvironment
+  } = process.env;
+  return {
+    ...cleanEnvironment,
+    DEHERM_CACHE_HOME: dehermCacheHome,
+    TTSC_GO_BINARY: forbiddenGoCompiler,
+    ...(dehermc.mode === "supplied" ? {
+      DEHERM_OFFLINE: "1",
+      DEHERM_TOOL_CACHE: dehermc.cacheRoot
+    } : {})
+  };
 }
 
 test("command-specific target parsing keeps dev endpoints separate from conformance targets", () => {
@@ -311,8 +365,9 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   ], { cwd: consumer });
 
   const project = path.join(root, "project");
-  const dehermc = await stageCurrentHostDehermc(root);
+  const dehermc = await prepareCurrentHostDehermc(root, dehermCacheHome);
   const forbiddenGoCompiler = path.join(root, "user-side-go-build-must-not-run");
+  const compilerEnvironment = compilerSmokeEnvironment(dehermc, dehermCacheHome, forbiddenGoCompiler);
   const created = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),
     "create", project,
@@ -367,20 +422,22 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "--project", project,
     "--json"
   ], { cwd: project, env: {
-    ...process.env,
-    DEHERM_CACHE_HOME: dehermCacheHome,
-    DEHERM_OFFLINE: "1",
-    DEHERM_TOOL_CACHE: dehermc.cacheRoot,
+    ...compilerEnvironment,
     // ttsc gives this explicit path priority over every bundled/system Go
     // compiler. It deliberately does not exist: either installed compiler path
     // reaching buildSourcePlugin would make this smoke test fail.
-    TTSC_GO_BINARY: forbiddenGoCompiler
   } });
   const releaseResult = JSON.parse(releaseChecked.stdout);
   assert.equal(releaseResult.profile, "release");
   assert.equal(releaseResult.passed, true);
   assert.equal(releaseResult.compiler, dehermc.destination);
   assert.equal(releaseResult.compilerSha256, dehermc.sha256);
+  await verifyPinnedHostToolFile({
+    manifest: dehermc.manifest,
+    host: dehermc.host,
+    tool: "dehermc",
+    file: releaseResult.compiler
+  });
   const packedReleaseUsage = JSON.parse(await readFile(
     path.join(project, ".deherm", "generated", "dmsdk-usage.json"), "utf8"));
   assert.equal(packedReleaseUsage.profile, "release");
@@ -394,11 +451,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "--headless",
     "--no-bytecode"
   ], { cwd: project, env: {
-    ...process.env,
-    DEHERM_CACHE_HOME: dehermCacheHome,
-    DEHERM_OFFLINE: "1",
-    DEHERM_TOOL_CACHE: dehermc.cacheRoot,
-    TTSC_GO_BINARY: forbiddenGoCompiler
+    ...compilerEnvironment
   } });
   assert.match(development.stdout, /\[deherm\] build-succeeded generation=1/);
   await readFile(path.join(project, ".deherm", "dev", "app.dehermc"), "utf8");

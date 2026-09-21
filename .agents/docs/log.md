@@ -1,5 +1,124 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Exact-call review corrections and artifact delivery close locally
+
+Adversarial review found two evidence problems in the integrated wave and two
+artifact-delivery gaps. The generated dmSDK verifier now executes all 59
+production family routes through their linked dispatchers with ordered native
+sentinels and result checks. Dynamic-Hermes JSI evidence is correctly limited
+to the 33 scalar/enum routes whose modules ship; the fourteen staged-private
+C-string routes are not claimed. JSI vectors check every decoded lane and the
+returned type/value, and regeneration checks use a temporary tree rather than
+repairing committed output. The complete focused exact-call set passed 44/44,
+the dmSDK runtime-codegen suite passed 86/86, and clean-room regeneration
+reproduced 108 artifacts for all 1,361 declarations.
+
+An artifact-free package checkout now exercises the published `dehermc` binary
+that customers download. Policy publication retains the previous fully
+available artifact mapping until every asset for a replacement mapping exists;
+native-artifact completion then requests a policy refresh. The focused
+policy/package suite passed 49/49. The complete `pnpm check` gate passed after
+these corrections. This proves generated state, exact bridge tests, package
+resolution, and clean-room determinism; it does not promote unobserved
+packaged-engine behavior.
+
+Repository knowledge retrieval is now bounded: agents search document metadata
+and headings, inspect an outline, and retrieve one capped section instead of
+preloading the 90-document OKF bundle. Large generated policy and evidence
+objects remain behind their owner summary commands.
+
+## 2026-09-20 - Integrated exact-call and artifact wave passes the repository gate
+
+The integrated compiler-artifact consumer, browser callback exact-call, dmSDK
+generated-adapter exact-call, host-deterministic policy, and Apple artifact
+staging changes pass `pnpm check`. The dmSDK clean room initially rejected the
+three new exact-call outputs because its discovery rules lagged the generator's
+ownership registry; discovery now recognizes the generated plan and both
+generated fixtures. A blank clean room reproduces all 1,361 dmSDK declarations
+across 108 byte-identical artifacts, including all 59 generated-adapter exact
+vectors. This is deterministic generation and focused bridge execution
+evidence; it does not promote unobserved packaged-engine routes to runtime
+evidence. The generated script-family sanitizer gate also passed under
+AddressSanitizer and UndefinedBehaviorSanitizer, including callback lifecycle,
+the 882-route Lua adapter, and the 31-route native-POD complement.
+
+## 2026-09-20 - dmSDK trait census assertion follows its generated authority
+
+The complete dmSDK runtime-codegen suite exposed a stale hard-coded test count:
+the owner generator and committed byte-identical binding-pattern artifact both
+classify 867 declarations with the compositional `enum-handle` trait, while the
+census assertion still expected 862. No generator or policy input changed in
+this repair; the assertion now matches the already-current generated authority.
+
+## 2026-09-20 - Browser callback routes have generated real-Wasm exact calls
+
+The applicability catalog's 23 `browser-wasm-callback-registry` routes now own
+lane-specific exact vectors generated from the same route, shape, contract, and
+lifecycle IR as production. A real Emscripten module links the production
+direct-memory universal bridge and the production callback registry; Chrome
+observed all 23 stable IDs, ordered forward arguments/results, callback
+arguments/results, retained dispatch, explicit native release, stale-token
+finalization, capacity exhaustion, reset invalidation, and nested reentrancy.
+The driver does not use Embind, `ccall`, `cwrap`, or mock memory. The real run
+used Emscripten 4.0.6 at revision
+`24fc909c0da13ef641d5ae75e89b5a97f25e37aa` and Chrome 153.0.8010.48; its
+vector manifest SHA-256 was
+`c3982c0d91c40b1de9d4f6a5dac42eb03b3aa8176dd0f2dd4f04ea8bf3442298`.
+
+The run exposed and fixed a verifier lifetime bug: the provider retained a
+registry context but stored the `ScriptCallback*` that lived in the decoder's
+per-call scratch. It now copies the fixed callback record by value before
+retaining the context. This is standalone exact JavaScript/Wasm bridge evidence,
+not a claim that a packaged Defold HTML5 game exercised every route. The two
+higher-order Lua closure-result routes remain the browser target's explicit
+blockers.
+
+## 2026-09-20 - Apple artifact staging follows Hermes' actual CMake tree
+
+Native-artifacts run `35549652243` completed both release and debugger Hermes
+builds for all four macOS/iOS rows, then each row failed while copying
+`<build>/hermes/lib/config/libhermesvm-config.h`. The pinned Hermes root adds
+`lib` directly and its library CMake file configures the header into
+`<build>/lib/config`; there is no intermediate `hermes` directory. The Apple
+packager now stages the header from that authoritative location. A focused test
+ties our copy path to both upstream CMake declarations so a future Hermes layout
+change fails with the source contract visible.
+
+## 2026-09-20 - Policy source snapshots are host-byte deterministic
+
+The Windows policy parity lane passed every importer and generator check, then
+derived three absent objects, one differing object, and a stale manifest. Two
+host-dependent inputs remained. The Linux surface archive omitted
+`packages/abi/src/generated` even though the compiler-output registry declares
+that directory revision-derived, so parity runners sealed the files from their
+own checkout rather than Linux's exact generated tree. The policy also embedded
+raw TypeScript/C++/JavaScript compatibility sources without normalizing Git
+checkout newlines. The archive now transports and replaces the ABI directory,
+and derivation canonicalizes every text snapshot to LF before revision
+abstraction, hashing, and embedding. SDK snapshots are read through the supplied
+source root rather than the process's checkout root. A focused hash test covers
+LF, CRLF, and legacy-CR equivalence; the Windows workflow remains the cross-host
+proof. Check failures now name exact missing or differing policy paths rather
+than counts alone.
+
+## 2026-09-20 - Package smoke consumes the compiler artifact customers receive
+
+The packed-package smoke no longer invokes `build-dehermc.sh`. Its
+pre-publication lane accepts the exact Linux archive produced by the artifact
+job, stages that member into a fresh offline cache, and requires release
+typechecking and the development compiler to execute the pinned path and
+SHA-256. Every produced host binary is now compared against both the byte size
+and digest in `host-compilers.json` before upload, so release completeness can
+no longer mistake a correctly named but different binary for a valid row.
+
+The post-publication end-to-end lane supplies no compiler path and starts with a
+fresh cache. The installed CLI must download the content-addressed release
+archive through its normal resolver, extract and authenticate it, cache it, and
+execute it. Local execution passed both the supplied-archive lane and the clean
+online-download lane with the Go fallback pointed at a nonexistent path. This
+is installed compiler and delivery evidence, not Defold linkage or runtime
+evidence; reproducible compilation remains a separate producer concern.
+
 ## 2026-09-20 - Exact-call applicability now follows production emission
 
 The script recording engine no longer treats generic harness drivability as a

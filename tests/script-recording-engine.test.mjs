@@ -150,7 +150,18 @@ test("the recording engine is generated from the same IR as the bindings, and is
     applicability(route, "browser-wasm").lane === "browser-wasm-callback-registry");
   assert.equal(browserCallbackRoutes.length, 23);
   assert.ok(browserCallbackRoutes.every((route) =>
-    applicability(route, "browser-wasm").status === "exercise"));
+    applicability(route, "browser-wasm").status === "exercise" &&
+    route.exactVector.laneOverride?.lane === "browser-wasm-callback-registry" &&
+    route.exactVector.laneOverride.stableId === route.stableId &&
+    route.exactVector.laneOverride.callbackSlots.length > 0 &&
+    route.exactVector.laneOverride.callbackInvocation.argumentValues.length === 2 &&
+    route.exactVector.laneOverride.callbackInvocation.resultValues.length === 2));
+  assert.deepEqual(report.summary.browserCallbackExact, {
+    routeCount: 23,
+    callbackCount: browserCallbackRoutes.reduce((count, route) =>
+      count + route.exactVector.laneOverride.callbackSlots.length, 0),
+    resultSchema: "deherm-script-browser-callback-exact-result/v1"
+  });
   assert.equal(report.exactVectorCatalog.schema, "deherm-script-exact-vector/v1");
   assert.ok(report.routes.every((route) =>
     Array.isArray(route.runtimeModulePath) &&

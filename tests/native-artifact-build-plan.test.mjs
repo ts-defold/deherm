@@ -60,6 +60,33 @@ test("published fingerprint rows are immutable at the upload boundary", async ()
   assert.doesNotMatch(uploader, /gh release upload[^\n]*--clobber/u);
 });
 
+test("complete artifact publication refreshes both consumer proof and policy mappings", async () => {
+  const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
+  const final = workflow.slice(workflow.indexOf("  summary:"));
+  const completeness = final.indexOf("Verify every fingerprinted row is published");
+  const endToEnd = final.indexOf("gh workflow run end-to-end.yml");
+  const policy = final.indexOf("gh workflow run policy.yml");
+  assert.ok(completeness >= 0);
+  assert.ok(endToEnd > completeness, "consumer proof must follow release completeness");
+  assert.ok(policy > completeness, "policy artifact mappings must refresh only after release completeness");
+});
+
+test("every dehermc row is authenticated and the Linux artifact is consumed before upload", async () => {
+  const workflow = await readFile(".github/workflows/native-artifacts.yml", "utf8");
+  const packageSmoke = await readFile("tests/package-smoke.test.mjs", "utf8");
+  const job = workflow.slice(workflow.indexOf("  go-compiler:"), workflow.indexOf("  # ── Target libraries"));
+  const verify = job.indexOf("manage-host-compilers.mjs verify-file \"$HOST\" dehermc");
+  const smoke = job.indexOf("DEHERM_PACKAGE_SMOKE_DEHERMC_ARCHIVE=");
+  const upload = job.indexOf("upload-release-asset.sh");
+  assert.ok(verify >= 0, "the producer never compares its binary with host-compilers.json");
+  assert.ok(smoke > verify, "the package smoke must consume only an authenticated artifact");
+  assert.ok(upload > smoke, "the consumer smoke must finish before the release asset is published");
+  assert.match(job, /--test-name-pattern "packed npm artifact" tests\/package-smoke\.test\.mjs/u);
+  assert.doesNotMatch(job.slice(smoke, upload), /build-dehermc\.sh/u);
+  assert.doesNotMatch(packageSmoke, /build-dehermc\.sh/u,
+    "a consumer smoke must not produce a substitute compiler artifact");
+});
+
 test("GitHub job outputs carry numeric slots rather than secret-scanned row data", async () => {
   const plan = await planNativeArtifactBuilds();
   const outputs = githubOutputRecords(plan);
@@ -133,4 +160,21 @@ test("release publication uses authoritative platform inputs", async () => {
     /windows-native:[\s\S]*?if: needs\.plan\.outputs\.windows_any == 'true' && needs\.plan\.outputs\.registry_credential != 'true'/u
   );
   assert.doesNotMatch(workflow, /windows:[\s\S]*?continue-on-error: true/u);
+});
+
+test("the Apple archive stages Hermes' configured header from the CMake build root", async () => {
+  const builder = await readFile("toolchains/hermes/build-apple.sh", "utf8");
+  const rootCmake = await readFile("upstream/hermes/CMakeLists.txt", "utf8");
+  const libraryCmake = await readFile("upstream/hermes/lib/CMakeLists.txt", "utf8");
+
+  assert.match(rootCmake, /add_subdirectory\(lib\)/u);
+  assert.match(
+    libraryCmake,
+    /configure_file\(config\/libhermesvm-config\.h\.in config\/libhermesvm-config\.h\)/u
+  );
+  assert.match(
+    builder,
+    /cp "\$cross_build\/lib\/config\/libhermesvm-config\.h" "\$staging\/libhermesvm-config\.h"/u
+  );
+  assert.doesNotMatch(builder, /\$cross_build\/hermes\/lib\/config\/libhermesvm-config\.h/u);
 });

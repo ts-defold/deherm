@@ -57,6 +57,7 @@ okf_version: "0.2"
 * [dmSDK ABI generator wave](research/dmsdk-abi-generator-wave.md) - Exact ABI-shape census, scalar and enum-value adapters, and isolated clean-room regeneration.
 * [dmSDK scalar out-parameter wave](research/dmsdk-scratch-scalar-out-wave.md) - Complete 79-row structural partition, seven provider-gated scalar outputs, and exact evidence boundaries.
 * [dmSDK universal fallback](research/dmsdk-universal-fallback.md) - All-declaration cross-target recipes, fixed caller-owned ABI frames, and usage-driven native thunk materialization.
+* [dmSDK generated-adapter exact calls](research/dmsdk-generated-adapter-exact-call.md) - Linked same-recipe C ABI execution for all 59 callable adapter rows and real-Hermes JSI execution for the 33 routes whose modules ship in production.
 * [Native extension header generator](research/native-extension-header-generator.md) - Clang-driven C header ingestion, deterministic extension IR/TypeScript/C glue, explicit layout blockers, and the typed browser dmSDK arena.
 * [Real Defold extension candidates](research/defold-extension-candidates.md) - Ecosystem survey against the ingestion paths, pinned candidate revisions, platform/license/provenance filters, and the `.script_api` projection gaps real extensions expose.
 * [Real third-party extension ingestion](research/real-extension-ingestion.md) - End-to-end xMath and defold-astar ingestion at pinned revisions, the fail-closed `.script_api` blocker taxonomy, and the licence provenance recorded per source.

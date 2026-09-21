@@ -72,6 +72,13 @@ A policy is only valid for the exact bytes it was derived from.
 * A policy that cannot be reparsed because source is absent, and whose hash does
   not match, is a hard failure. Stale source-derived truth is worse than none.
 
+The exact bytes here are the upstream/program bytes after one platform-neutral
+text boundary: Git checkout newlines are canonicalized to LF before generated
+compatibility sources are hashed or embedded. A Windows CRLF checkout and a
+Linux/macOS LF checkout must therefore seal the same policy objects. This does
+not normalize semantic data or generated JSON after sealing; it only removes a
+host filesystem representation from the derivation input.
+
 # Merkle over the native input set
 
 A single hash per extension is not sufficient, because the *set* of inputs is
