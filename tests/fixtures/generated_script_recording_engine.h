@@ -5,8 +5,8 @@
 
 #define DEHERM_RECORDING_SCHEMA_VERSION 2u
 #define DEHERM_RECORDING_DEFOLD_REVISION "7f0f554f41f9dce1e0ddff99bf08200657d1ee05"
-#define DEHERM_RECORDING_PLAN_SHA256 "b5aadeb85e2740b8f62c7329c018f70033f5c130e6f802e222b3e382d3c92760"
-#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "50d48701a964a02cdfdd166905e8300aafa0cef1f3d34823822ac4a96dc050ba"
+#define DEHERM_RECORDING_PLAN_SHA256 "0291519b6dd97499989f4c3bd2c4bc38d8674a4f8afd69b6f4220de25de22ab5"
+#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "3226755b08e61effc8c09a60ae249e8da2927fddf21607a60051680c5911228c"
 #define DEHERM_RECORDING_ROUTE_COUNT 915u
 #define DEHERM_RECORDING_SHAPE_COUNT 439u
 #define DEHERM_RECORDING_SHAPE_REF_COUNT 2267u
@@ -22,6 +22,7 @@
 #define DEHERM_RECORDING_BROWSER_EXACT_COUNT 911u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_COUNT 23u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_CALLBACK_COUNT 23u
+#define DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY 219u
 
 enum DehermRecordingShapeCode {
   DEHERM_RECORDING_SHAPE_UNDEFINED = 0,
@@ -112,6 +113,7 @@ uint32_t deherm_recording_observed_arity(uint32_t route, uint32_t transport);
 const char* deherm_recording_observed_context(uint32_t route, uint32_t transport);
 const char* deherm_recording_observed_violation(uint32_t route, uint32_t transport);
 uint32_t deherm_recording_violation_count(void);
+const char* deherm_recording_last_error(void);
 /** Driver-side observation of what the real binding stack returned. */
 void deherm_recording_record_results(
     uint32_t route, uint32_t transport, uint32_t resultCount,
@@ -126,6 +128,7 @@ uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route);
 uint32_t deherm_recording_browser_first_outstanding_callback_route(void);
 uint32_t deherm_recording_browser_handle_release_count(void);
 void deherm_recording_browser_drain_handle_releases(void);
+int deherm_recording_browser_verify_handle_releases(void);
 int deherm_recording_browser_invoke_callback(uint32_t route, uint32_t callback,
     char* error, uint32_t errorCapacity);
 uint32_t deherm_recording_browser_release_callbacks(uint32_t route);

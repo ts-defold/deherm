@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "arena-span-blockers-v1",
+  "policyVersion": "arena-span-cstring-v2",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
     "policy": "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
+    "output": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
     "priorWaveReports": [
       "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
       "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
@@ -17,25 +18,39 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "bd6084d8e9a4bfe5ee3eb2dd2c0cb6d5f33819b21581d640231fc39aa155d41c",
+    "policy": "417173a096bcb9e49b3422e7d431844c1920e193b9770c3388503b7795bde5e0",
     "priorWaveReports": {
       "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
       "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
       "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
       "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
       "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051"
+    },
+    "evidence": {
+      "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h": "c31d7f9f6408120e88cd0b3257720ed4cb98e6670ce9ebd15d30adbb3a8896fc",
+      "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h": "d9837d4db3c7212c83e4329e2f10068c138bfc226b8b0a2335d34a9b99aeb71c",
+      "upstream/defold/engine/resource/src/dmsdk/resource/resource.h": "c1ea1bbdde3576040d712fe837bd074a35c86090e974a5bef92f51375a097579",
+      "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp": "382d79cd16296229092883822a93a41ae896103923ef05f1901202736cfc50d7"
     }
   },
-  "scope": "Complete arena-backed-spans census after the five generated prior waves",
+  "scope": "Complete arena-backed-spans census with deterministic counted-input/caller-output cstring adapters",
   "policy": {
-    "disposition": "blocked-metadata-only",
-    "reason": "No executable adapter is emitted by this ledger. Every remaining row lacks at least one reviewed ABI, ownership, runtime-behavior, or allocation-safety contract required for promotion."
+    "disposition": "generated-cstring-arena-plus-explicit-blockers",
+    "input": "The public bridge takes a counted byte span, rejects embedded NUL, copies at most maximumInputBytes into bounded thread-local scratch, and appends one terminator.",
+    "output": "The caller supplies non-null storage with capacity 1..maximumOutputBytes. Generated glue clears it before entry, requires an in-bounds terminator afterward, and clears it on transport or native failure.",
+    "reentrancy": "Same-thread nested dispatch is rejected before touching shared scratch.",
+    "ownership": "Input scratch and output storage are borrowed only for the synchronous native call; neither pointer may escape.",
+    "fallback": "Every declaration retains its universal usage-materialized recipe; the arena adapter is an additional preferred concrete path.",
+    "maximumInputBytes": 4095,
+    "maximumOutputBytes": 4096
   },
   "coverage": {
     "arenaSpanCensus": 79,
     "coveredByPriorWaves": 12,
-    "blocked": 67,
-    "executableAdaptersEmitted": 0,
+    "generatedCStringArena": 5,
+    "blocked": 62,
+    "executableAdaptersEmitted": 5,
+    "exactCallTwinsEmitted": 5,
     "overlap": 0,
     "unaccounted": 0
   },
@@ -134,12 +149,442 @@
     }
   ],
   "partitionSummary": {
-    "cstring-termination-or-capacity-policy": 5,
     "handle-provenance-or-engine-context": 33,
     "opaque-byte-pointee-unit-or-lifetime": 4,
     "record-layout-or-borrowed-record-lifetime": 19,
     "template-element-layout-or-specialization": 6
   },
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_arena_cstring.h": "b17074fda83fe196250888861748c2b9fe9611f3fe62a3dd3659a4578c992a31",
+    "defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp": "4130202009c7eda12f1a23dba6d25eda18882c1233de9a14cb0698dc015edbd5",
+    "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp": "1eb0d83549011d4548202c086b34b0704269725c1d3220b01402c4d03a6d72e5"
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_arena_cstring.h",
+    "defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp",
+    "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp"
+  ],
+  "generatedDeclarations": [
+    {
+      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
+      "symbol": "dmResource::GetCanonicalPath",
+      "kind": "function",
+      "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+      "line": 151,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)",
+      "result": {
+        "role": "scalar:u32",
+        "direction": "value",
+        "nativeType": "uint32_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "path",
+          "role": "cstring-in",
+          "direction": "in",
+          "nativeType": "const char *"
+        },
+        {
+          "position": 1,
+          "name": "buf",
+          "role": "cstring-mutable",
+          "direction": "inout",
+          "nativeType": "char *"
+        },
+        {
+          "position": 2,
+          "name": "buf_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "disposition": "generated",
+      "preferredLowering": false,
+      "denseId": 0,
+      "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
+      "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
+      "exactCallee": "deherm_dmsdk_arena_exact_callee_0",
+      "recipe": {
+        "kind": "canonical-path",
+        "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)"
+      },
+      "universalFallback": "retained-usage-materialized-recipe",
+      "sourceEvidence": [
+        {
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+          "line": 148,
+          "text": "    * @param buf_len [type: uint32_t] the size of the output buffer"
+        },
+        {
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+          "line": 149,
+          "text": "    * @return length [type: uint32_t] the length of the output string"
+        },
+        {
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
+          "line": 321,
+          "text": " * @param buf_len [type: uint32_t] the size of the output buffer"
+        }
+      ],
+      "stages": {
+        "generated": "production-and-exact-from-one-recipe",
+        "compiled": "pinned-header-production-and-exact-object-tests",
+        "linked": "exact-recording-callee",
+        "runtime": "exact-dispatch-all-vectors",
+        "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
+      }
+    },
+    {
+      "id": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
+      "symbol": "dmStrError",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+      "line": 174,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:void(out:cstring-mutable,value:scalar:usize,value:scalar:i32)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "dst",
+          "role": "cstring-mutable",
+          "direction": "out",
+          "nativeType": "char *"
+        },
+        {
+          "position": 1,
+          "name": "size",
+          "role": "scalar:usize",
+          "direction": "value",
+          "nativeType": "size_t"
+        },
+        {
+          "position": 2,
+          "name": "err",
+          "role": "scalar:i32",
+          "direction": "value",
+          "nativeType": "int"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "disposition": "generated",
+      "preferredLowering": false,
+      "denseId": 1,
+      "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
+      "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
+      "exactCallee": "deherm_dmsdk_arena_exact_callee_1",
+      "recipe": {
+        "kind": "error-string",
+        "shape": "scalar:void(out:cstring-mutable,value:scalar:usize,value:scalar:i32)"
+      },
+      "universalFallback": "retained-usage-materialized-recipe",
+      "sourceEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+          "line": 160,
+          "text": " * If the size of the buffer is too small, the message will be truncated to fit the buffer."
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+          "line": 166,
+          "text": " * @return a null-terminated error message"
+        }
+      ],
+      "stages": {
+        "generated": "production-and-exact-from-one-recipe",
+        "compiled": "pinned-header-production-and-exact-object-tests",
+        "linked": "exact-recording-callee",
+        "runtime": "exact-dispatch-all-vectors",
+        "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
+      }
+    },
+    {
+      "id": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
+      "symbol": "dmStrTrim",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+      "line": 137,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:usize(out:cstring-mutable,value:scalar:usize,in:cstring-in)",
+      "result": {
+        "role": "scalar:usize",
+        "direction": "value",
+        "nativeType": "size_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "dst",
+          "role": "cstring-mutable",
+          "direction": "out",
+          "nativeType": "char *"
+        },
+        {
+          "position": 1,
+          "name": "dst_size",
+          "role": "scalar:usize",
+          "direction": "value",
+          "nativeType": "size_t"
+        },
+        {
+          "position": 2,
+          "name": "src",
+          "role": "cstring-in",
+          "direction": "in",
+          "nativeType": "const char *"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "disposition": "generated",
+      "preferredLowering": false,
+      "denseId": 2,
+      "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
+      "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
+      "exactCallee": "deherm_dmsdk_arena_exact_callee_2",
+      "recipe": {
+        "kind": "trimmed-string",
+        "shape": "scalar:usize(out:cstring-mutable,value:scalar:usize,in:cstring-in)"
+      },
+      "universalFallback": "retained-usage-materialized-recipe",
+      "sourceEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+          "line": 122,
+          "text": " * The destination is null-terminated when `dst_size` is greater than zero."
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
+          "line": 128,
+          "text": " * @return Length of the trimmed source string. If the return value is greater"
+        }
+      ],
+      "stages": {
+        "generated": "production-and-exact-from-one-recipe",
+        "compiled": "pinned-header-production-and-exact-object-tests",
+        "linked": "exact-recording-callee",
+        "runtime": "exact-dispatch-all-vectors",
+        "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
+      }
+    },
+    {
+      "id": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
+      "symbol": "dmURI::Encode",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
+      "line": 96,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer",
+        "enum-handle"
+      ],
+      "shape": "enum:dmURI::Result(in:cstring-in,out:cstring-mutable,value:scalar:u32,inout:pointer:scalar:u32)",
+      "result": {
+        "role": "enum:dmURI::Result",
+        "direction": "value",
+        "nativeType": "Result"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "src",
+          "role": "cstring-in",
+          "direction": "in",
+          "nativeType": "const char *"
+        },
+        {
+          "position": 1,
+          "name": "dst",
+          "role": "cstring-mutable",
+          "direction": "out",
+          "nativeType": "char *"
+        },
+        {
+          "position": 2,
+          "name": "dst_size",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        },
+        {
+          "position": 3,
+          "name": "bytes_written",
+          "role": "pointer:scalar:u32",
+          "direction": "inout",
+          "nativeType": "uint32_t *"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "enum-width-domain-validation-policy",
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "disposition": "generated",
+      "preferredLowering": false,
+      "denseId": 3,
+      "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
+      "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
+      "exactCallee": "deherm_dmsdk_arena_exact_callee_3",
+      "recipe": {
+        "kind": "uri-encode",
+        "shape": "enum:dmURI::Result(in:cstring-in,out:cstring-mutable,value:scalar:u32,inout:pointer:scalar:u32)"
+      },
+      "universalFallback": "retained-usage-materialized-recipe",
+      "sourceEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
+          "line": 92,
+          "text": "     * @param dst_size [type:uint32_t] size of the provided out buffer"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
+          "line": 93,
+          "text": "     * @param bytes_written[out] [type:uint32_t] number of bytes written"
+        },
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
+          "line": 94,
+          "text": "     * @note If dst=0 the bytes_written will return the number of required bytes (including null character)"
+        }
+      ],
+      "stages": {
+        "generated": "production-and-exact-from-one-recipe",
+        "compiled": "pinned-header-production-and-exact-object-tests",
+        "linked": "exact-recording-callee",
+        "runtime": "exact-dispatch-all-vectors",
+        "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
+      }
+    },
+    {
+      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
+      "symbol": "ResourceGetCanonicalPath",
+      "kind": "function",
+      "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
+      "line": 324,
+      "primaryFamily": "out-param",
+      "families": [
+        "out-param",
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)",
+      "result": {
+        "role": "scalar:u32",
+        "direction": "value",
+        "nativeType": "uint32_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "path",
+          "role": "cstring-in",
+          "direction": "in",
+          "nativeType": "const char *"
+        },
+        {
+          "position": 1,
+          "name": "buf",
+          "role": "cstring-mutable",
+          "direction": "inout",
+          "nativeType": "char *"
+        },
+        {
+          "position": 2,
+          "name": "buf_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "out-storage-initialization-and-failure-policy",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "disposition": "generated",
+      "preferredLowering": false,
+      "denseId": 4,
+      "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
+      "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
+      "exactCallee": "deherm_dmsdk_arena_exact_callee_4",
+      "recipe": {
+        "kind": "canonical-path",
+        "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)"
+      },
+      "universalFallback": "retained-usage-materialized-recipe",
+      "sourceEvidence": [
+        {
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+          "line": 148,
+          "text": "    * @param buf_len [type: uint32_t] the size of the output buffer"
+        },
+        {
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
+          "line": 149,
+          "text": "    * @return length [type: uint32_t] the length of the output string"
+        },
+        {
+          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
+          "line": 321,
+          "text": " * @param buf_len [type: uint32_t] the size of the output buffer"
+        }
+      ],
+      "stages": {
+        "generated": "production-and-exact-from-one-recipe",
+        "compiled": "pinned-header-production-and-exact-object-tests",
+        "linked": "exact-recording-callee",
+        "runtime": "exact-dispatch-all-vectors",
+        "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
+      }
+    }
+  ],
   "declarations": [
     {
       "id": "dmsdk:dmArray::dmArray::dmArray<T>@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:101:16",
@@ -2576,65 +3021,6 @@
       }
     },
     {
-      "id": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
-      "symbol": "dmResource::GetCanonicalPath",
-      "kind": "function",
-      "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
-      "line": 151,
-      "primaryFamily": "out-param",
-      "families": [
-        "out-param",
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)",
-      "result": {
-        "role": "scalar:u32",
-        "direction": "value",
-        "nativeType": "uint32_t"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "path",
-          "role": "cstring-in",
-          "direction": "in",
-          "nativeType": "const char *"
-        },
-        {
-          "position": 1,
-          "name": "buf",
-          "role": "cstring-mutable",
-          "direction": "inout",
-          "nativeType": "char *"
-        },
-        {
-          "position": 2,
-          "name": "buf_len",
-          "role": "scalar:u32",
-          "direction": "value",
-          "nativeType": "uint32_t"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-and-failure-policy",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "cstring-termination-or-capacity-policy",
-      "blockerReason": "The ABI needs a reviewed distinction between bounded byte count, writable capacity, and C-string termination on success and failure.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
       "id": "dmsdk:dmResource::GetRaw@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:170:2004",
       "symbol": "dmResource::GetRaw",
       "kind": "function",
@@ -3778,192 +4164,6 @@
       }
     },
     {
-      "id": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
-      "symbol": "dmStrError",
-      "kind": "function",
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
-      "line": 174,
-      "primaryFamily": "out-param",
-      "families": [
-        "out-param",
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:void(out:cstring-mutable,value:scalar:usize,value:scalar:i32)",
-      "result": {
-        "role": "scalar:void",
-        "direction": "value",
-        "nativeType": "void"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "dst",
-          "role": "cstring-mutable",
-          "direction": "out",
-          "nativeType": "char *"
-        },
-        {
-          "position": 1,
-          "name": "size",
-          "role": "scalar:usize",
-          "direction": "value",
-          "nativeType": "size_t"
-        },
-        {
-          "position": 2,
-          "name": "err",
-          "role": "scalar:i32",
-          "direction": "value",
-          "nativeType": "int"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-and-failure-policy",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "cstring-termination-or-capacity-policy",
-      "blockerReason": "The ABI needs a reviewed distinction between bounded byte count, writable capacity, and C-string termination on success and failure.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
-      "id": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
-      "symbol": "dmStrTrim",
-      "kind": "function",
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
-      "line": 137,
-      "primaryFamily": "out-param",
-      "families": [
-        "out-param",
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:usize(out:cstring-mutable,value:scalar:usize,in:cstring-in)",
-      "result": {
-        "role": "scalar:usize",
-        "direction": "value",
-        "nativeType": "size_t"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "dst",
-          "role": "cstring-mutable",
-          "direction": "out",
-          "nativeType": "char *"
-        },
-        {
-          "position": 1,
-          "name": "dst_size",
-          "role": "scalar:usize",
-          "direction": "value",
-          "nativeType": "size_t"
-        },
-        {
-          "position": 2,
-          "name": "src",
-          "role": "cstring-in",
-          "direction": "in",
-          "nativeType": "const char *"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-and-failure-policy",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "cstring-termination-or-capacity-policy",
-      "blockerReason": "The ABI needs a reviewed distinction between bounded byte count, writable capacity, and C-string termination on success and failure.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
-      "id": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
-      "symbol": "dmURI::Encode",
-      "kind": "function",
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
-      "line": 96,
-      "primaryFamily": "out-param",
-      "families": [
-        "out-param",
-        "pointer-span",
-        "pointer",
-        "enum-handle"
-      ],
-      "shape": "enum:dmURI::Result(in:cstring-in,out:cstring-mutable,value:scalar:u32,inout:pointer:scalar:u32)",
-      "result": {
-        "role": "enum:dmURI::Result",
-        "direction": "value",
-        "nativeType": "Result"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "src",
-          "role": "cstring-in",
-          "direction": "in",
-          "nativeType": "const char *"
-        },
-        {
-          "position": 1,
-          "name": "dst",
-          "role": "cstring-mutable",
-          "direction": "out",
-          "nativeType": "char *"
-        },
-        {
-          "position": 2,
-          "name": "dst_size",
-          "role": "scalar:u32",
-          "direction": "value",
-          "nativeType": "uint32_t"
-        },
-        {
-          "position": 3,
-          "name": "bytes_written",
-          "role": "pointer:scalar:u32",
-          "direction": "inout",
-          "nativeType": "uint32_t *"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "enum-width-domain-validation-policy",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-and-failure-policy",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "cstring-termination-or-capacity-policy",
-      "blockerReason": "The ABI needs a reviewed distinction between bounded byte count, writable capacity, and C-string termination on success and failure.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
       "id": "dmsdk:dmWebServer::Receive@upstream/defold/engine/dlib/src/dmsdk/dlib/webserver.h:162:720",
       "symbol": "dmWebServer::Receive",
       "kind": "function",
@@ -4399,65 +4599,6 @@
       "disposition": "blocked",
       "blocker": "handle-provenance-or-engine-context",
       "blockerReason": "The ABI consumes or returns an engine handle whose provenance, context, ownership, nullability, or teardown contract is not encoded by the arena.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
-      "id": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
-      "symbol": "ResourceGetCanonicalPath",
-      "kind": "function",
-      "header": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
-      "line": 324,
-      "primaryFamily": "out-param",
-      "families": [
-        "out-param",
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)",
-      "result": {
-        "role": "scalar:u32",
-        "direction": "value",
-        "nativeType": "uint32_t"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "path",
-          "role": "cstring-in",
-          "direction": "in",
-          "nativeType": "const char *"
-        },
-        {
-          "position": 1,
-          "name": "buf",
-          "role": "cstring-mutable",
-          "direction": "inout",
-          "nativeType": "char *"
-        },
-        {
-          "position": 2,
-          "name": "buf_len",
-          "role": "scalar:u32",
-          "direction": "value",
-          "nativeType": "uint32_t"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-and-failure-policy",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "cstring-termination-or-capacity-policy",
-      "blockerReason": "The ABI needs a reviewed distinction between bounded byte count, writable capacity, and C-string termination on success and failure.",
       "stages": {
         "generated": "not-applicable",
         "compiled": "not-claimed",

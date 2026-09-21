@@ -384,7 +384,7 @@ export async function buildUniversalDmSdkBindings({
     declarations: [...ir.declarations, ...(ir.typeSupportDeclarations ?? [])],
     templatedReceiverOwners,
   };
-  const recipes = projection.rows.map((row, numericId) => {
+  let recipes = projection.rows.map((row, numericId) => {
     const declaration = declarations.get(row.id);
     if (!declaration) throw new Error(`Projection row is absent from SDK IR: ${row.id}`);
     return buildRecipe(row, declaration, numericId, specialized, context);
@@ -392,6 +392,28 @@ export async function buildUniversalDmSdkBindings({
   const expectedRuntimeDeclarations = ir.runtimeUnimplementedCount ?? projection.rows.length;
   if (recipes.length !== expectedRuntimeDeclarations) throw new Error(`Expected ${expectedRuntimeDeclarations} recipes, got ${recipes.length}`);
   if (new Set(recipes.map(({ declarationId }) => declarationId)).size !== recipes.length) throw new Error("Duplicate universal declaration recipe");
+  // A provider-only generated lane is an additional exact boundary, not a
+  // reason to hide a universal call that already materializes from the same
+  // source-derived recipe. Resolve the candidate catalog once, then make the
+  // working universal route the preferred lowering wherever it is complete.
+  const candidateCatalogHash = sha256(JSON.stringify(recipes));
+  const candidateCatalog = {
+    schemaVersion: 1,
+    defoldRevision: projection.defoldRevision,
+    sourceHashes: { catalog: candidateCatalogHash },
+    recipes,
+  };
+  const candidateIndex = buildDmSdkCallSymbolIndex(ir, candidateCatalog);
+  recipes = recipes.map((recipe) => {
+    if (recipe.preferredLowering?.adapter?.applicability !== "provider-required" ||
+        candidateIndex.declarations[recipe.declarationId]?.materialization?.state !== "universal-ready") {
+      return recipe;
+    }
+    return {
+      ...recipe,
+      preferredLowering: { state: "universal-fallback", family: "universal-recipe" },
+    };
+  });
   const maxArguments = Math.max(...recipes.map(({ abi }) => abi.argumentCount));
   assertDmSdkUniversalStaticFrameCapacity({ abi: { maxArguments } });
   const staticFrame = emitDmSdkUniversalStaticFrame();
@@ -411,8 +433,8 @@ export async function buildUniversalDmSdkBindings({
       browserDirectMemoryMetadata: recipes.length,
       typescriptStableIds: recipes.length,
       silentlyOmitted: 0,
-      preferredSpecialized: specialized.size,
-      usageMaterializedFallback: recipes.length - specialized.size,
+      preferredSpecialized: recipes.filter(({ preferredLowering }) => preferredLowering.state === "generated-adapter").length,
+      usageMaterializedFallback: recipes.filter(({ preferredLowering }) => preferredLowering.state === "universal-fallback").length,
     },
     abi: { schema: "DehermDmSdkUniversalFrame/v1", valueBytes: 24, maxArguments, allocationPolicy: "caller-owned-fixed-frame" },
     artifacts,

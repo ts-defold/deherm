@@ -86,9 +86,12 @@ generator owns their layout or facade policy.
 - 1,361 unique declaration IDs produce 1,361 recipes and stable numeric IDs.
 - All 1,361 have C ABI, Dynamic Hermes metadata, Static Hermes, browser direct
   memory, and TypeScript projections; the omission count is zero.
-- 146 declarations prefer an existing specialized generated family; the other
-  1,215 retain the universal usage-materialized path. Of those 146, 59 have a
-  callable generated adapter and 87 remain provider-gated.
+- 66 declarations prefer an existing specialized generated family; 59 are
+  callable direct adapters and seven remain provider-gated. The other 1,295
+  retain the universal usage-materialized path. All 158 generated
+  borrowed-handle provider boundaries are additive alternatives: the compiler
+  proved their universal recipes materialize and therefore does not let the
+  absent provider suppress a working call.
 - Clean-room regeneration reproduces all universal artifacts byte-for-byte.
 - The generated common dispatcher is compiled into the local native runtime.
 - A mixed usage selection generates, compiles, links, and executes pinned
@@ -102,15 +105,16 @@ generator owns their layout or facade policy.
   arguments, and result encoding. A negative test proves generic by-value
   `dmSocket::Address` transport fails closed without a typed provider.
 - The compiler-owned Static Hermes applicability partition accounts for all
-  486 universal-ready exact vectors from the same manifest. All 486 currently
+  566 universal-ready exact vectors from the same manifest. All 566 currently
   fit the 32-cell frame and its declared wire-tag set, so the strict sound-typed
   unit executes each through acquire/set/dispatch/result/release, checks exact
   call/failure observations, and compares all six result-cell fields. Future
   over-capacity or unknown-tag vectors remain in the report with
   machine-readable `blocked-capability` reasons.
-  The runtime report independently records 486 executed vectors, a maximum
-  exercised arity of nine, argument tag mask `0x3e`, and result tag mask
-  `0x3f`; planned/applicable counts are not promoted to runtime evidence.
+  The native exact-call runtime independently records 566 executed vectors;
+  every vector checks its emitted call/failure observation and result cells.
+  The generated applicability partition records a maximum arity of fifteen;
+  planned/applicable counts are not promoted to runtime evidence.
 - The native harness exercises unsigned narrowing rejection, receiver-backed
   construction/member/destruction, and uses `std::destroy_at` for deterministic
   destructor generation. Negative generator tests cover catalog drift,
@@ -119,17 +123,19 @@ generator owns their layout or facade policy.
   and `ToHost(uint32_t)` materialized thunks through the installed JSI module
   and common C dispatcher, and verifies the bigint round trip. This proves the
   two selected usage-materialized routes, not all catalog recipes.
-- The canonical 486-vector universal-ready corpus now has a generated browser
-  applicability partition derived from wire tags and arity. All 486 current
-  vectors are applicable. A pinned Emscripten 4.0.6 module and Chrome run import
-  the production generated `browser-arena.ts` adapter, encode every vector into
-  the live Emscripten heap, call the common dispatcher through direct exports,
-  and compare the generated call count, failure count, and decoded result.
-  The run balanced 994 scratch allocations with 994 reverse-order releases and
-  observed a 240-byte peak; it uses no mock memory, Embind, `ccall`, or `cwrap`.
-  Memory growth is enabled. A forced-growth regression proves string allocation
-  cannot leave a detached `DataView`, and exact C-string fixtures now carry and
-  verify their UTF-8 byte length in the universal auxiliary field.
+- The canonical 566-vector universal-ready corpus has a generated browser
+  applicability partition derived from wire tags and arity. All 566 current
+  vectors are applicable. The browser runner imports the production generated
+  `browser-arena.ts` adapter, encodes vectors into the live Emscripten heap,
+  calls the common dispatcher through direct exports, and rejects any mismatch
+  in call count, failure count, decoded result, scratch balance, or reverse
+  release order. It uses no mock memory, Embind, `ccall`, or `cwrap`; memory
+  growth is enabled, and a forced-growth regression proves string allocation
+  cannot leave a detached `DataView`. Exact C-string fixtures carry and verify
+  their UTF-8 byte length in the universal auxiliary field. The current pinned
+  Emscripten 4.0.6 / Chrome 153 run executed all 566 vectors, recorded 1,154
+  balanced allocations and reverse-order releases, and observed a 240-byte
+  peak live arena allocation.
 
 This does not claim that all 1,361 native engine implementations have been
 linked or behavior-tested. Most are recipes awaiting a real project's reachable
@@ -141,7 +147,7 @@ the generic Dynamic Hermes `DmSdkUniversal` module, Static Hermes direct-memory
 C ABI, browser/Wasm direct memory, and TypeScript stable-ID surface. The exact
 twin is consumed by both the native verification transport and the real-browser
 JavaScript arena runner for the declaration-only ready corpus. It does not add
-usage-specific Static Hermes or browser runners for the 875 recipes that still
+usage-specific Static Hermes or browser runners for the 736 recipes that still
 need call-site specialization, nor does the arbitrary extension-header lane
 install JSI, Static Hermes, or browser modules.
 

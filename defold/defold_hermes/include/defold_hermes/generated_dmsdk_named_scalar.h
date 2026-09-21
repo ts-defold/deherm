@@ -8,7 +8,27 @@
 extern "C" {
 #endif
 
-// No named-scalar declaration has a safe default policy in this wave.
+uint64_t deherm_dmsdk_named_scalar_dm_game_object_create_instance_id(void);
+uint8_t deherm_dmsdk_named_scalar_dm_sound_is_group_muted(uint64_t group);
+uintptr_t deherm_dmsdk_named_scalar_dm_thread_alloc_tls(void);
+void deherm_dmsdk_named_scalar_dm_thread_detach(uintptr_t thread);
+void deherm_dmsdk_named_scalar_dm_thread_free_tls(uintptr_t key);
+uintptr_t deherm_dmsdk_named_scalar_dm_thread_get_current_thread(void);
+void deherm_dmsdk_named_scalar_dm_thread_join(uintptr_t thread);
+void deherm_dmsdk_named_scalar_profile_property_add_bool(uint64_t idx, int32_t v);
+void deherm_dmsdk_named_scalar_profile_property_add_f32(uint64_t idx, float v);
+void deherm_dmsdk_named_scalar_profile_property_add_f64(uint64_t idx, double v);
+void deherm_dmsdk_named_scalar_profile_property_add_s32(uint64_t idx, int32_t v);
+void deherm_dmsdk_named_scalar_profile_property_add_s64(uint64_t idx, int64_t v);
+void deherm_dmsdk_named_scalar_profile_property_add_u32(uint64_t idx, uint32_t v);
+void deherm_dmsdk_named_scalar_profile_property_add_u64(uint64_t idx, uint64_t v);
+void deherm_dmsdk_named_scalar_profile_property_set_bool(uint64_t idx, int32_t v);
+void deherm_dmsdk_named_scalar_profile_property_set_f32(uint64_t idx, float v);
+void deherm_dmsdk_named_scalar_profile_property_set_f64(uint64_t idx, double v);
+void deherm_dmsdk_named_scalar_profile_property_set_s32(uint64_t idx, int32_t v);
+void deherm_dmsdk_named_scalar_profile_property_set_s64(uint64_t idx, int64_t v);
+void deherm_dmsdk_named_scalar_profile_property_set_u32(uint64_t idx, uint32_t v);
+void deherm_dmsdk_named_scalar_profile_property_set_u64(uint64_t idx, uint64_t v);
 
 #ifdef __cplusplus
 } // extern "C"

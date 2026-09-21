@@ -36,10 +36,10 @@ test("all 1,361 declarations have unique identities, provenance, shapes, and eff
     unprojectedDeclarations: 0,
     silentUnknowns: 0,
     generatedAdapters: 45,
-    policyBlocked: 96,
+    policyBlocked: 70,
     mechanicallyProjected: 1361,
     projectionGaps: 0,
-    loweringPending: 1220,
+    loweringPending: 1246,
   });
   assert.equal(report.rows.length, 1361);
   assert.equal(new Set(report.rows.map(({ id }) => id)).size, 1361);
@@ -172,8 +172,8 @@ test("reconciles generated adapters and policy gates while projecting every pend
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   assert.deepEqual(report.loweringSummary, {
     "generated-adapter": 45,
-    "policy-blocked": 96,
-    "lowering-pending": 1220
+    "policy-blocked": 70,
+    "lowering-pending": 1246
   });
   const hash = report.rows.find(({ symbol }) => symbol === "dmHashBuffer64");
   assert.equal(hash.lowering.state, "generated-adapter");
@@ -181,9 +181,8 @@ test("reconciles generated adapters and policy gates while projecting every pend
   assert.equal(hash.loweringState, "generated-adapter");
 
   const tls = report.rows.find(({ symbol }) => symbol === "dmThread::AllocTls");
-  assert.equal(tls.lowering.state, "policy-blocked");
-  assert.equal(tls.lowering.family, "namedScalar");
-  assert.equal(tls.loweringState, "policy-blocked");
+  assert.equal(tls.lowering.state, "lowering-pending");
+  assert.equal(tls.loweringState, "lowering-pending");
 
   const pending = report.rows.find(({ symbol }) => symbol === "dmSocket::GetFD");
   assert.equal(pending.projection.state, "generated");

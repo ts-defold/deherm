@@ -426,6 +426,9 @@ function loweringEvidenceIndex(reports) {
   };
   for (const [family, report] of Object.entries(reports)) {
     for (const row of report.declarations ?? []) {
+      // Some callable C ABI families deliberately remain sibling execution
+      // lanes while the universal catalog stays the preferred lowering.
+      if (row.preferredLowering === false) continue;
       const emitted = row.emitted === true || (row.wrapper && row.disposition !== "blocked" && row.stages?.generated !== "not-applicable");
       const blocked = row.disposition === "blocked" || row.emitted === false;
       if (!emitted && !blocked) continue;

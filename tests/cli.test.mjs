@@ -621,8 +621,8 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(manifest.coverage.dmsdk.silentlyOmitted, 0);
   assert.deepEqual(manifest.coverage.dmsdk.runtimeLanes, {
     generatedScalarThunks: 26,
-    preferredSpecialized: 146,
-    usageMaterializedFallback: 1215,
+    preferredSpecialized: 66,
+    usageMaterializedFallback: 1295,
     projectMaterialized: 0
   });
   // The conformance target is the HOST this run would execute on, not a label

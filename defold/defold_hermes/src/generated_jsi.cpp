@@ -3,6 +3,7 @@
 
 #if !defined(DM_PLATFORM_HTML5)
 #include <defold_hermes/callback_registry.hpp>
+#include <defold_hermes/generated_dmsdk_borrowed_handle_jsi.hpp>
 #include <defold_hermes/generated_dmsdk_enum_value_jsi.hpp>
 #include <defold_hermes/generated_dmsdk_scalar_jsi.hpp>
 #include <defold_hermes/generated_dmsdk_universal_jsi.hpp>
@@ -146,6 +147,7 @@ void installGeneratedModules(jsi::Runtime& runtime, jsi::Object& modules, Callba
 
   installDmSdkScalarModule(runtime, modules);
   installDmSdkEnumValueModule(runtime, modules);
+  installDmSdkBorrowedHandleModule(runtime, modules);
   installDmSdkUniversalModule(runtime, modules);
 }
 

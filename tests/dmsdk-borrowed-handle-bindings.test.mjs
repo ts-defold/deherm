@@ -21,41 +21,47 @@ const includes = [
 ];
 
 test("borrowed-handle census is independently structural, exhaustive, and provider-gated", async () => {
-  const [report, shapes, policy] = await Promise.all([
+  const [report, shapes, policy, universal] = await Promise.all([
     readFile(reportPath, "utf8").then(JSON.parse),
     readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
     readFile(path.join(root, "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json"), "utf8").then(JSON.parse),
+    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json"), "utf8").then(JSON.parse),
   ]);
   const candidates = shapes.rows.filter(({ tranche }) => tranche === "borrowed-handle-consumers");
   const generated = candidates.filter((row) =>
+    policy.selection.declarationKinds.includes(row.kind) &&
     policy.selection.resultRoles.includes(row.result.role) &&
     row.parameters.some(({ role }) => role.startsWith("handle:")) &&
-    row.parameters.every(({ role }) => policy.selection.parameterRolePrefixes.some((prefix) => role.startsWith(prefix))) &&
+    row.parameters.every(({ role }) => role.startsWith(policy.selection.handleRolePrefix) || policy.selection.parameterRoles.includes(role)) &&
     policy.selection.rejectedFamilies.every((family) => !row.families.includes(family))
   );
   assert.equal(candidates.length, 348);
   // GetConstantType and GetMaterialVertexSpace are nested-enum results in the
   // exact SDK support facts, not scalar results eligible for this family.
-  assert.equal(generated.length, 80);
+  assert.equal(generated.length, 158);
   assert.deepEqual(report.coverage, {
     candidates: 348,
-    generated: 80,
-    blocked: 268,
-    cAbiGenerated: 80,
-    dynamicHermesJsiGenerated: 80,
-    staticHermesGenerated: 80,
-    browserDirectMemoryGenerated: 80,
-    typescriptGenerated: 80,
-    pinnedHeaderSignatureCompiled: 80,
-    fakeProviderHostRuntimeTested: 80,
+    generated: 158,
+    blocked: 190,
+    cAbiGenerated: 158,
+    dynamicHermesJsiGenerated: 158,
+    staticHermesGenerated: 158,
+    browserDirectMemoryGenerated: 158,
+    typescriptGenerated: 158,
+    pinnedHeaderSignatureCompiled: 158,
+    exactCallTwinsGenerated: 158,
+    fakeProviderHostRuntimeTested: 158,
     packagedEngineRuntimeVerified: 0,
     warmedDispatchIterations: 100000,
     warmedDispatchObservedCppAllocations: 0,
   });
   assert.equal(report.declarations.length, candidates.length);
+  assert.equal(universal.coverage.recipes, 1361);
+  assert.equal(universal.recipes.length, 1361);
+  assert.equal(universal.coverage.silentlyOmitted, 0);
   assert.equal(new Set(report.declarations.map(({ id }) => id)).size, candidates.length);
-  assert.equal(report.handleKinds.length, 32);
-  assert.equal(report.abi.maxArguments, 2);
+  assert.equal(report.handleKinds.length, 45);
+  assert.equal(report.abi.maxArguments, 8);
   assert.match(report.selector, /no symbol allowlist/);
   assert.equal(Object.hasOwn(policy, "entries"), false);
   for (const row of report.declarations.filter(({ disposition }) => disposition === "blocked")) {
@@ -94,7 +100,7 @@ test("borrowed-handle generation is clean-room deterministic and rejects census 
   }
 });
 
-test("all 80 selected signatures compile against the complete pinned SDK projection", async () => {
+test("all 158 selected signatures compile against the complete pinned SDK projection", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-borrowed-handle-headers-"));
   try {
     run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-DDLIB_LOG_DOMAIN=\"deherm\"", ...includes, "-c", "native/generated_dmsdk_borrowed_handle_header_audit.cpp", "-o", path.join(directory, "audit.o")]);
@@ -115,7 +121,7 @@ test("C ABI, Dynamic Hermes adapter, browser descriptor, and TypeScript projecti
     run(tsc, [...flags, "packages/sdk/src/generated/dmsdk/borrowed-handle.ts"]);
     run(tsc, [...flags, "packages/static-hermes/src/globals.d.ts", "packages/static-hermes/src/generated/dmsdk-borrowed-handle.ts"]);
     const browser = await readFile(path.join(root, "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js"), "utf8");
-    assert.match(browser, /slotBytes:8,maxArguments:2,resultBytes:8/);
+    assert.match(browser, /slotBytes:8,maxArguments:8,resultBytes:8/);
     assert.match(browser, /callRaw:function\(id,argumentsPointer,argumentCount,resultPointer\)/);
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -125,8 +131,9 @@ test("C ABI, Dynamic Hermes adapter, browser descriptor, and TypeScript projecti
 test("fake-provider host bridge links, enforces guards, sanitizes, and allocates zero when warm", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-borrowed-handle-runtime-"));
   try {
-    const executable = path.join(directory, "runtime");
-    run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-fsanitize=address,undefined", "-fno-omit-frame-pointer", ...includes, "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp", "native/dmsdk_borrowed_handle_runtime_test.cpp", "-o", executable]);
+    const executable = path.join(directory, process.platform === "win32" ? "runtime.exe" : "runtime");
+    const sanitizerFlags = process.platform === "win32" ? [] : ["-fsanitize=address,undefined", "-fno-omit-frame-pointer"];
+    run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...sanitizerFlags, ...includes, "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp", "native/generated_dmsdk_borrowed_handle_exact_call.cpp", "native/dmsdk_borrowed_handle_runtime_test.cpp", "-o", executable]);
     assert.equal(run(executable, [], { env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" } }).trim(), "dmsdk-borrowed-handle:ok");
   } finally {
     await rm(directory, { recursive: true, force: true });
@@ -139,4 +146,9 @@ test("generated runtime remains allocation-free and does not embed dmSDK symbol 
   assert.doesNotMatch(runtime, /\b(?:dmGraphics|dmGameObject|dmResource)::[A-Za-z0-9_]+\s*\(/);
   assert.match(runtime, /validate_handle/);
   assert.match(runtime, /is_current_thread/);
+});
+
+test("Dynamic Hermes f32 admission rejects finite doubles that overflow the native lane", async () => {
+  const source = await readFile(path.join(root, "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp"), "utf8");
+  assert.match(source, /const float narrowed=static_cast<float>\(number\);\s*if\(!std::isfinite\(narrowed\)\) throw jsi::JSError\(runtime,"f32 out of range"\)/);
 });

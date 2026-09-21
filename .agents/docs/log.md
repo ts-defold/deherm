@@ -1,5 +1,68 @@
 # Defold Hermes knowledge log
 
+## 2026-09-21 - Generated dmSDK fast-path wave expands and ships
+
+The borrowed-handle generator now admits 158 of 348 structurally compatible
+routes (up from 80), with exact typed provider twins, pinned-header compilation,
+ASan/UBSan execution, narrow-result rejection, and zero observed C++ allocations
+across 100,000 warmed dispatches. The named-scalar sibling generates all 21
+reviewed aliases and the bounded arena sibling generates five C-string calls;
+both retain the universal recipe as their preferred fallback. The universal
+catalog still contains all 1,361 declarations with zero omissions, while 224
+candidate adapter routes were re-evaluated against the universal materializer.
+Only 66 remain preferred (59 callable and seven provider-gated); 1,295 retain
+the universal route, and the exact universal corpus expands to 566. The 158
+borrowed provider boundaries remain generated and verified as additive lanes
+instead of suppressing their working universal recipes.
+
+The final adversarial pass closed two carrier edge cases in the generators:
+borrowed dispatch now zeroes result storage before every fallible check and on
+successful `void` calls, while arena C-string dispatch stages input before
+clearing output so same-buffer and partial-overlap calls remain valid. Both
+have executable sanitizer-backed regression vectors.
+
+The expanded browser/Wasm exact harness executed all 566 universal vectors in
+the live Emscripten heap under Chrome, with 1,154 balanced reverse-order
+releases and a 240-byte peak live arena allocation.
+
+The production runtime links the borrowed C ABI/JSI module and the
+arena C ABI, and its public C header exposes those generated contracts. Focused
+codegen is 97/97 green; clean-room regeneration reproduces its owned artifacts
+byte-for-byte. The 915-route recording engine, 882-route Lua exact adapter, and
+31-route native-POD driver all execute successfully. The real Wasm/Chrome lane
+also executes 911 routes and 23 callbacks, and its provider now assigns every
+returned owned handle a unique fixed-capacity identity and proves each is
+released exactly once; the generated failure report includes the last contract
+error. The fixed identity ledger is sized for the strongest native run (all
+three transports in one process), and reserved borrowed seed identities are
+excluded from the issued-result ledger; the focused native run finishes with
+zero lifecycle violations and zero transport divergences.
+These are exact bridge/provider proofs, not claims that all borrowed handles were
+supplied by a packaged Defold engine.
+
+## 2026-09-21 - OKF retrieval uses a bounded content-addressed graph
+
+The repository's canonical OKF helper now maintains a disposable SQLite graph
+under `.deherm/cache/`, keyed by document and referenced-source digests. Search,
+outline, section, links, backlinks, and physically read-only SQL queries return
+bounded summaries without loading generated policy bodies. Heading identities
+use deterministic anchors, graph edges cover Markdown, frontmatter sources, and
+mechanical ownership/generation/verification references, and concurrent readers
+wait for refresh transactions. The CLI supports positional searches as well as
+`--query`/`--limit` aliases and subcommand help.
+
+## 2026-09-21 - GCC exact-call engine lane treats Defold headers as upstream
+
+The Linux engine lane exposed two compile-only defects after the native
+artifact matrix completed: GCC correctly rejected misleading one-line control
+flow in the generated Lua exact-call twin, and `-pedantic -Werror` promoted
+Defold's intentional zero-length trailing-array ABI declaration to an error
+while the Clang-only suppression flag was ignored. The recording-engine
+generator now emits unambiguous blocks and statements, and the pinned Defold
+dlib include root is a CMake system include. Strict warnings remain enabled for
+deherm sources; upstream ABI headers no longer inherit this repository's
+warning-as-error policy.
+
 ## 2026-09-21 - Mutable publication pointers stay outside the immutable object cache
 
 Online policy resolution now revalidates the per-revision index entry and

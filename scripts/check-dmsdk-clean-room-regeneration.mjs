@@ -138,12 +138,12 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
     }
   }
   for (const file of await walk(path.join(repositoryRoot, "defold/defold_hermes/include/defold_hermes"))) {
-    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|borrowed_handle|scratch_scalar_out|cstring_value|universal)/.test(file)) {
+    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|arena_cstring|borrowed_handle|scratch_scalar_out|cstring_value|universal)/.test(file)) {
       result.add(`defold/defold_hermes/include/defold_hermes/${file}`);
     }
   }
   for (const file of await walk(path.join(repositoryRoot, "defold/defold_hermes/src"))) {
-    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|borrowed_handle|scratch_scalar_out|cstring_value|universal)/.test(file)) {
+    if (/^generated_dmsdk_(?:scalar|enum_value|named_scalar|fixed_digest|base64_span|astc_probe|xtea_span|hash_span|arena_cstring|borrowed_handle|scratch_scalar_out|cstring_value|universal)/.test(file)) {
       result.add(`defold/defold_hermes/src/${file}`);
     }
   }
@@ -168,8 +168,11 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
     "packages/static-hermes/src/generated/dmsdk-cstring-value.ts",
     "packages/static-hermes/src/generated/dmsdk-universal.ts",
     "packages/compiler/src/generated/dmsdk-universal-recipes.mjs",
+    "native/generated_dmsdk_borrowed_handle_exact_call.cpp",
     "native/generated_dmsdk_borrowed_handle_header_audit.cpp",
     "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp",
+    "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp",
+    "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp",
     "tests/fixtures/generated_dmsdk_universal_test_provider.cpp",
     "tests/fixtures/generated_dmsdk_universal_test_ids.h",
     "tests/fixtures/generated_dmsdk_universal_ready_provider.cpp",
@@ -241,10 +244,10 @@ async function validateReports(root) {
     projection.coverage?.unprojectedDeclarations === 0 &&
     projection.coverage?.silentUnknowns === 0 &&
     projection.coverage?.generatedAdapters === 45 &&
-    projection.coverage?.policyBlocked === 96 &&
+    projection.coverage?.policyBlocked === 70 &&
     projection.coverage?.mechanicallyProjected === 1361 &&
       projection.coverage?.projectionGaps === 0 &&
-      projection.coverage?.loweringPending === 1220,
+      projection.coverage?.loweringPending === 1246,
   "dmSDK projection IR does not have a complete fail-closed 1,361-declaration projection");
   assert(scalar.coverage.reviewed === 31 && scalar.coverage.generated === 26 && scalar.coverage.blocked === 5,
     "scalar report does not have the pinned 26/31 disposition");
@@ -259,9 +262,9 @@ async function validateReports(root) {
   assert(enumValue.coverage.discovered === 10 && enumValue.coverage.emitted === 7 &&
     enumValue.coverage.blocked === 3 && enumValue.coverage.remainingWithoutGeneratedAdapters === 1328,
   "enum-value report does not have the pinned 7/10 disposition or 1,328 remainder");
-  assert(namedScalar.coverage.reviewed === 21 && namedScalar.coverage.generated === 0 &&
-    namedScalar.coverage.policyBlocked === 21,
-  "named-scalar report does not have the pinned 0/21 policy disposition");
+  assert(namedScalar.coverage.reviewed === 21 && namedScalar.coverage.generated === 21 &&
+    namedScalar.coverage.policyBlocked === 0 && namedScalar.coverage.exactCallCovered === 21,
+  "named-scalar report does not have the pinned 21/21 exact-call disposition");
   assert(fixedDigest.coverage.discovered === 4 && fixedDigest.coverage.emitted === 4 &&
     fixedDigest.coverage.policyBlocked === 0 && fixedDigest.coverage.remainingWithoutGeneratedAdapters === 1324,
   "fixed-digest report does not have the pinned 4/4 disposition or 1,324 remainder");
@@ -278,23 +281,25 @@ async function validateReports(root) {
     hashSpan.coverage.policyBlocked === 0 && hashSpan.coverage.remainingWithoutGeneratedAdapters === 1316,
   "hash-span report does not have the pinned 2/2 disposition or 1,316 remainder");
   assert(arenaSpan.coverage.arenaSpanCensus === 79 && arenaSpan.coverage.coveredByPriorWaves === 12 &&
-    arenaSpan.coverage.blocked === 67 && arenaSpan.coverage.executableAdaptersEmitted === 0 &&
+    arenaSpan.coverage.generatedCStringArena === 5 && arenaSpan.coverage.blocked === 62 &&
+    arenaSpan.coverage.executableAdaptersEmitted === 5 && arenaSpan.coverage.exactCallTwinsEmitted === 5 &&
     arenaSpan.coverage.overlap === 0 && arenaSpan.coverage.unaccounted === 0,
-  "arena-span blocker report does not have the pinned complete 12 generated + 67 blocked partition");
+  "arena-span blocker report does not have the pinned complete 12 prior + 5 arena + 62 blocked partition");
   // Exact nested-enum support facts move GetConstantType and
   // GetMaterialVertexSpace into the enum family. No declaration disappeared;
   // the structural selector now correctly rejects those two as non-scalars.
-  assert(borrowedHandle.coverage.candidates === 348 && borrowedHandle.coverage.generated === 80 &&
-    borrowedHandle.coverage.blocked === 268 && borrowedHandle.coverage.cAbiGenerated === 80 &&
-    borrowedHandle.coverage.dynamicHermesJsiGenerated === 80 &&
-    borrowedHandle.coverage.staticHermesGenerated === 80 &&
-    borrowedHandle.coverage.browserDirectMemoryGenerated === 80 &&
-    borrowedHandle.coverage.typescriptGenerated === 80 &&
-    borrowedHandle.coverage.pinnedHeaderSignatureCompiled === 80 &&
-    borrowedHandle.coverage.fakeProviderHostRuntimeTested === 80 &&
+  assert(borrowedHandle.coverage.candidates === 348 && borrowedHandle.coverage.generated === 158 &&
+    borrowedHandle.coverage.blocked === 190 && borrowedHandle.coverage.cAbiGenerated === 158 &&
+    borrowedHandle.coverage.dynamicHermesJsiGenerated === 158 &&
+    borrowedHandle.coverage.staticHermesGenerated === 158 &&
+    borrowedHandle.coverage.browserDirectMemoryGenerated === 158 &&
+    borrowedHandle.coverage.typescriptGenerated === 158 &&
+    borrowedHandle.coverage.pinnedHeaderSignatureCompiled === 158 &&
+    borrowedHandle.coverage.exactCallTwinsGenerated === 158 &&
+    borrowedHandle.coverage.fakeProviderHostRuntimeTested === 158 &&
     borrowedHandle.coverage.packagedEngineRuntimeVerified === 0 &&
     borrowedHandle.coverage.warmedDispatchObservedCppAllocations === 0,
-  "borrowed-handle report does not preserve its pinned 80 generated + 268 blocked provider boundary");
+  "borrowed-handle report does not preserve its pinned 158 generated + 190 blocked provider boundary");
   assert(scratchScalarOut.coverage.candidates === 79 && scratchScalarOut.coverage.generated === 7 &&
     scratchScalarOut.coverage.blocked === 72 && scratchScalarOut.coverage.cAbiGenerated === 7 &&
     scratchScalarOut.coverage.dynamicHermesJsiGenerated === 7 &&
@@ -316,14 +321,14 @@ async function validateReports(root) {
     universal.coverage.staticHermesDeclarations === 1361 && universal.coverage.browserDirectMemoryMetadata === 1361 &&
     universal.coverage.typescriptStableIds === 1361 && universal.coverage.silentlyOmitted === 0,
   "universal dmSDK fallback does not cover every declaration and target");
-  assert(universal.coverage.universalReadyExactVectors === 486 &&
-    readyExact.universalReadyCount === 486 && readyExact.verification.vectorCount === 486 &&
-    readyExact.production.manifest.length === 486 &&
+  assert(universal.coverage.universalReadyExactVectors === 566 &&
+    readyExact.universalReadyCount === 566 && readyExact.verification.vectorCount === 566 &&
+    readyExact.production.manifest.length === 566 &&
     readyExact.catalogSha256 === universal.sourceHashes.catalog &&
     readyExact.verification.catalogSha256 === universal.sourceHashes.catalog &&
     /^[0-9a-f]{64}$/.test(readyExact.symbolIndexSha256) &&
     /^[0-9a-f]{64}$/.test(readyExact.corpusSha256),
-  "universal-ready exact corpus does not preserve its authenticated 486-vector plan");
+  "universal-ready exact corpus does not preserve its authenticated 566-vector plan");
   const scalarIds = new Set(scalar.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const enumIds = new Set(enumValue.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const fixedDigestIds = new Set(fixedDigest.declarations.map(({ id }) => id));
@@ -339,7 +344,7 @@ async function validateReports(root) {
     .map(({ id }) => id));
   assert(scalarIds.size === 26 && enumIds.size === 7 && fixedDigestIds.size === 4 && base64SpanIds.size === 2 && astcProbeIds.size === 2 && xteaSpanIds.size === 2 && hashSpanIds.size === 2,
     "generated dmSDK IDs are not unique within a family");
-  assert(borrowedHandleIds.size === 80, "borrowed-handle family contains duplicate generated IDs");
+  assert(borrowedHandleIds.size === 158, "borrowed-handle family contains duplicate generated IDs");
   assert(scratchScalarOutIds.size === 7, "scratch scalar-out family contains duplicate generated IDs");
   const priorGeneratedIds = new Set([
     ...scalarIds,
@@ -387,16 +392,19 @@ async function validateReports(root) {
   }
   const priorArenaIds = new Set([...fixedDigestIds, ...base64SpanIds, ...astcProbeIds, ...xteaSpanIds, ...hashSpanIds]);
   const reportedPriorArenaIds = new Set(arenaSpan.coveredByPriorWaves.map(({ id }) => id));
+  const generatedArenaIds = new Set(arenaSpan.generatedDeclarations.map(({ id }) => id));
   const blockedArenaIds = new Set(arenaSpan.declarations.map(({ id }) => id));
   const censusArenaIds = new Set(shapes.rows.filter(({ tranche }) => tranche === "arena-backed-spans").map(({ id }) => id));
-  assert(priorArenaIds.size === 12 && reportedPriorArenaIds.size === 12 && blockedArenaIds.size === 67,
+  assert(priorArenaIds.size === 12 && reportedPriorArenaIds.size === 12 && generatedArenaIds.size === 5 && blockedArenaIds.size === 62,
     "arena-span partition contains duplicate IDs");
   assert([...priorArenaIds].every((id) => reportedPriorArenaIds.has(id)),
     "arena-span prior-wave ledger does not exactly match generated families");
   assert([...priorArenaIds].every((id) => !blockedArenaIds.has(id)),
     "arena-span prior-wave and blocker ledgers overlap");
-  assert([...censusArenaIds].every((id) => priorArenaIds.has(id) || blockedArenaIds.has(id)) &&
-    priorArenaIds.size + blockedArenaIds.size === censusArenaIds.size,
+  assert([...generatedArenaIds].every((id) => !priorArenaIds.has(id) && !blockedArenaIds.has(id)),
+    "arena-span generated, prior-wave, and blocker ledgers overlap");
+  assert([...censusArenaIds].every((id) => priorArenaIds.has(id) || generatedArenaIds.has(id) || blockedArenaIds.has(id)) &&
+    priorArenaIds.size + generatedArenaIds.size + blockedArenaIds.size === censusArenaIds.size,
   "arena-span ledger does not completely partition the ABI-shape census");
   const scalarOwned = generatedDmSdkArtifacts.filter((entry) => scalar.artifacts.includes(entry));
   const enumOwned = generatedDmSdkArtifacts.filter((entry) => enumValue.artifacts.includes(entry));
@@ -405,6 +413,7 @@ async function validateReports(root) {
   const astcProbeOwned = generatedDmSdkArtifacts.filter((entry) => astcProbe.artifacts.includes(entry));
   const xteaSpanOwned = generatedDmSdkArtifacts.filter((entry) => xteaSpan.artifacts.includes(entry));
   const hashSpanOwned = generatedDmSdkArtifacts.filter((entry) => hashSpan.artifacts.includes(entry));
+  const arenaSpanOwned = generatedDmSdkArtifacts.filter((entry) => arenaSpan.artifacts.includes(entry));
   const borrowedHandleOwned = generatedDmSdkArtifacts.filter((entry) => borrowedHandle.artifacts.includes(entry));
   const scratchScalarOutOwned = generatedDmSdkArtifacts.filter((entry) => scratchScalarOut.artifacts.includes(entry));
   const cstringValueOwned = generatedDmSdkArtifacts.filter((entry) => cstringValue.artifacts.includes(entry));
@@ -421,6 +430,8 @@ async function validateReports(root) {
     "XTEA-span report names an artifact absent from registry ownership");
   assert(hashSpanOwned.length === hashSpan.artifacts.length,
     "hash-span report names an artifact absent from registry ownership");
+  assert(arenaSpanOwned.length === arenaSpan.artifacts.length,
+    "arena-span report names an artifact absent from registry ownership");
   assert(borrowedHandleOwned.length === borrowedHandle.artifacts.length,
     "borrowed-handle report names an artifact absent from registry ownership");
   assert(scratchScalarOutOwned.length === scratchScalarOut.artifacts.length,

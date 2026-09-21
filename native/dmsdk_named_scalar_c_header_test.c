@@ -3,5 +3,5 @@
 
 int dmsdk_named_scalar_c_abi_header_check(void)
 {
-    return deherm_dmsdk_named_scalar_count() == 0 ? 0 : 1;
+    return deherm_dmsdk_named_scalar_count() == 21 ? 0 : 1;
 }

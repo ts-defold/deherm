@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "ccde0d5efee6829232e288a923a1eb40bee78eb8ffa451118d1a100ea37f72f0",
+    "projection": "d66e04d0bc3f5369af6526481068fdd0c7cc7f6aa79a2859ed3b8bf1dbfc82ee",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "specialized": {
-      "borrowedHandle": "9ad792348a9e3efbe5266227b88cfec29687ced110140a250b89aa6136c44c67",
-      "scratchScalarOut": "5c21f4b197e825975e66dd430e6e9e945fe7b6e7977c1fa9fbae1c19b2468220",
-      "cstringValue": "35237653cf0e97c9637e5c923626f2ef8caacac0f332351705b011594f3639af"
+      "borrowedHandle": "659fdbe2e5afc38b435c6f2c3d88b862fbc32f59fa74af48bf667666ca049293",
+      "scratchScalarOut": "e97e2bf00a253706850d510cb9183f6721baad378022239fba1c3d8e53d383aa",
+      "cstringValue": "51d00bd80166ea00ec19f9072edd1548a6159fde6915f1215f747a96a6d13ef4"
     },
-    "aggregate": "bc5feb6b8c619b96eec5733d8a56f583bccd4df28befe429624d8168d1ffa7df",
-    "catalog": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
+    "aggregate": "f7c8182f8c0dbac06550eb0024780e6b92714a2b630ec47e817048c2c7b0eb4e",
+    "catalog": "8fe44b7cd39449530dd63ecafb1a492642ecb85d93cc0d80c7caef6a2cab68c1"
   },
   "coverage": {
     "declarations": 1361,
@@ -21,9 +21,9 @@
     "browserDirectMemoryMetadata": 1361,
     "typescriptStableIds": 1361,
     "silentlyOmitted": 0,
-    "preferredSpecialized": 146,
-    "usageMaterializedFallback": 1215,
-    "universalReadyExactVectors": 486
+    "preferredSpecialized": 66,
+    "usageMaterializedFallback": 1295,
+    "universalReadyExactVectors": 566
   },
   "abi": {
     "schema": "DehermDmSdkUniversalFrame/v1",
@@ -20880,21 +20880,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 0,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -23136,21 +23123,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 1,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -31951,21 +31925,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 2,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -36498,21 +36459,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 3,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -36718,21 +36666,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 4,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -36830,21 +36765,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 5,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -39374,21 +39296,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 6,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -40106,21 +40015,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 7,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -40840,21 +40736,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 8,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -41022,21 +40905,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 9,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -49061,21 +48931,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 10,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -49185,21 +49042,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 11,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -52071,21 +51915,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 12,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -52204,21 +52035,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 13,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -56427,21 +56245,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 14,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -66071,21 +65876,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 15,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -66179,21 +65971,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 16,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -66495,21 +66274,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 17,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -66603,21 +66369,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 18,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -66711,21 +66464,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 19,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -68286,21 +68026,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 20,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -69010,21 +68737,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 21,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -70377,21 +70091,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 22,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -70504,21 +70205,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 23,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -70945,21 +70633,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 24,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -71183,21 +70858,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 25,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -71464,21 +71126,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 26,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -71572,21 +71221,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 27,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -71680,21 +71316,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 28,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -82844,21 +82467,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 29,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -82975,21 +82585,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 30,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -83102,21 +82699,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 31,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -83547,21 +83131,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 32,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -93959,21 +93530,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 33,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -94188,21 +93746,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 34,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -97810,21 +97355,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 35,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -97916,21 +97448,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 36,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -99804,21 +99323,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 37,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -102124,21 +101630,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 38,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -102670,21 +102163,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 39,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -102794,21 +102274,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 40,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -102902,21 +102369,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 41,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -103469,21 +102923,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 42,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -110193,21 +109634,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 43,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -110305,21 +109733,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 44,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -111362,21 +110777,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 45,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -116401,21 +115803,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 46,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -116509,21 +115898,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 47,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -116629,21 +116005,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 48,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -116737,21 +116100,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 49,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -116964,21 +116314,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 50,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -117076,21 +116413,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 51,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -117317,21 +116641,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 52,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -117538,21 +116849,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 53,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -117646,21 +116944,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 54,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -118082,21 +117367,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 55,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -118588,21 +117860,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 56,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -129119,21 +128378,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 57,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -151194,21 +150440,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 58,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -151690,21 +150923,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 59,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -151810,21 +151030,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 60,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -152274,21 +151481,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 61,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -152394,21 +151588,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 62,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -152600,21 +151781,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 63,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -152708,21 +151876,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 64,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -152828,21 +151983,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 65,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -158836,21 +157978,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 66,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -165854,21 +164983,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 67,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -166162,21 +165278,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 68,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -171130,21 +170233,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 69,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -171238,21 +170328,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 70,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -171346,21 +170423,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 71,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -173515,21 +172579,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 72,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -173726,21 +172777,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 73,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -173937,21 +172975,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 74,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -174251,21 +173276,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 75,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -174752,21 +173764,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 76,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -175565,21 +174564,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 77,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -175673,21 +174659,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 78,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",
@@ -175986,21 +174959,8 @@
         }
       },
       "preferredLowering": {
-        "state": "generated-adapter",
-        "family": "borrowedHandle",
-        "wrapper": null,
-        "adapter": {
-          "applicability": "provider-required",
-          "kind": "provider-boundary",
-          "id": 79,
-          "dispatcher": null,
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
+        "state": "universal-fallback",
+        "family": "universal-recipe"
       },
       "fallback": {
         "state": "materializable",

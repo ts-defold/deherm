@@ -2,16 +2,16 @@
   "schemaVersion": 2,
   "kind": "deherm.fixture.old-pipeline-sdk",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "treeSha256": "9c999fe33542ca192e43f7fc238d3adbef5fa138555f7a647061e924df0478da",
+  "treeSha256": "8c661e6dfe0520eab2cf01af7740e56d7da2209129cac9cf4a3b4427096e0837",
   "source": "Frozen SHA-256 golden captured from the checkout-backed generated SDK and canonical lowering plan produced by the source pipeline. It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
   "files": {
     "dmsdk/borrowed-handle.ts": {
-      "bytes": 27898,
-      "sha256": "c44facb9dfe0bc0c6fd94f1a24874ee50882d1c51f8257348279f8e52891d003"
+      "bytes": 55036,
+      "sha256": "999407d1e6aab4ff466af2a41908b358f6f3f0a29f636ba7a2a2c3b952958533"
     },
     "dmsdk/browser-arena.ts": {
       "bytes": 5513,
-      "sha256": "593f782b84a5b402684302059aea8567d925143953ad0a471dc6787aa2f6a663"
+      "sha256": "4c52480638f2971cbaaa18bc9f3a31ce6ae863df93955c5c219069e08717be73"
     },
     "dmsdk/cstring-value.ts": {
       "bytes": 4753,
@@ -26,8 +26,8 @@
       "sha256": "6a5fc85dd41fa150995a703271b080799b3a056fcb8a19a415b3602b8122af26"
     },
     "dmsdk/named-scalar.ts": {
-      "bytes": 170,
-      "sha256": "0842327ac1027cc217c52197e351df2f252bb2a76655d19403075985582b0509"
+      "bytes": 179,
+      "sha256": "9f7e8f268f497e7f504544e63702e0ed61bd86f8177af0cb2f8209215fc20cbe"
     },
     "dmsdk/runtime.ts": {
       "bytes": 244348,
@@ -47,7 +47,7 @@
     },
     "dmsdk/universal.ts": {
       "bytes": 148212,
-      "sha256": "4cf7aff6b7b54b1bd1929ed5067a10a9b987beec9dc5eb3c7fcd759460cba1ae"
+      "sha256": "7c2be8825e617e98b576d9240d45a4c86c646f22c46d906cd78c22e5f9d0a359"
     },
     "script/browser-target-support.ts": {
       "bytes": 567,
@@ -120,8 +120,8 @@
   },
   "documents": {
     "defold-binding-lowering-plan.json": {
-      "bytes": 16750538,
-      "sha256": "13836d8b3561abaee97d60c675e22fc32aec32e5313982a3a00fa265b3d6135b"
+      "bytes": 16785716,
+      "sha256": "a2d2b70e7c8f1f45b1d649b490bf69798e198ca3b6f423d785b59331a13dc7c0"
     }
   }
 }

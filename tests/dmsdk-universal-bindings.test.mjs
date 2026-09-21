@@ -87,9 +87,9 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     browserDirectMemoryMetadata: 1361,
     typescriptStableIds: 1361,
     silentlyOmitted: 0,
-    preferredSpecialized: 146,
-    usageMaterializedFallback: 1215,
-    universalReadyExactVectors: 486,
+    preferredSpecialized: 66,
+    usageMaterializedFallback: 1295,
+    universalReadyExactVectors: 566,
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
   assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, 1361);
@@ -129,18 +129,18 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
   const plans = dmSdkUniversalRecipes
     .map(resolveDmSdkConcreteCallPlan)
     .filter(Boolean);
-  assert.equal(plans.length, 146);
+  assert.equal(plans.length, 66);
   const callable = plans.filter(({ state }) => state === "generated-adapter");
   const providerRequired = plans.filter(({ state }) => state === "specialization-required");
   assert.equal(callable.length, 59);
-  assert.equal(providerRequired.length, 87);
+  assert.equal(providerRequired.length, 7);
   assert.equal(callable.filter(({ adapterKind }) => adapterKind === "named-wrapper").length, 45);
   const cstring = callable.filter(({ adapterKind }) => adapterKind === "family-dispatch");
   assert.equal(cstring.length, 14);
   assert.deepEqual(cstring.map(({ adapterId }) => adapterId), Array.from({ length: 14 }, (_, index) => index));
   assert.ok(cstring.every(({ family, symbol }) =>
     family === "cstringValue" && symbol === "deherm_dmsdk_cstring_value_dispatch"));
-  assert.equal(providerRequired.filter(({ family }) => family === "borrowedHandle").length, 80);
+  assert.equal(providerRequired.filter(({ family }) => family === "borrowedHandle").length, 0);
   assert.equal(providerRequired.filter(({ family }) => family === "scratchScalarOut").length, 7);
   assert.ok(providerRequired.every(({ requirements, applicability }) =>
     applicability === "provider-required" && requirements.length > 0));
@@ -183,7 +183,7 @@ test("callable generated adapter selections emit compile-valid exact linker iden
     await rm(directory, { recursive: true, force: true });
   }
   const blockedRecipe = dmSdkUniversalRecipes.find((candidate) =>
-    candidate.preferredLowering?.family === "borrowedHandle");
+    candidate.preferredLowering?.family === "scratchScalarOut");
   await assert.rejects(async () => materializeDmSdkGeneratedAdapterUsages([{
     declarationId: blockedRecipe.declarationId,
   }], {
@@ -347,8 +347,8 @@ test("Static Hermes applicability accounts for every canonical universal-ready e
   const plan = JSON.parse(await readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.plan), "utf8"));
   const vectors = plan.verification.vectors;
   const partition = partitionDmSdkUniversalStaticExactVectors(vectors);
-  assert.equal(partition.vectorCount, 486);
-  assert.equal(partition.applicableVectorCount, 486);
+  assert.equal(partition.vectorCount, 566);
+  assert.equal(partition.applicableVectorCount, 566);
   assert.equal(partition.blockedVectorCount, 0);
   assert.equal(partition.vectors.length, partition.vectorCount);
   assert.match(partition.partitionSha256, /^[0-9a-f]{64}$/u);
@@ -430,7 +430,7 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
   const sdkIr = JSON.parse(await readFile(sdkIrPath, "utf8"));
   const index = buildDmSdkCallSymbolIndex(sdkIr, policyCatalog);
   const usages = dmSdkUniversalReadyUsages(index, policyCatalog);
-  assert.equal(usages.length, 486);
+  assert.equal(usages.length, 566);
   const corpus = materializeDmSdkUniversalReadyCorpus(index, policyCatalog);
   const { generated } = corpus;
   assert.equal(generated.verification.vectorCount, usages.length);

@@ -89,8 +89,8 @@ test("dynamic Hermes JSI runner executes exact dmSDK vectors through the product
     verificationInclude: "materialized.verify.cpp",
   });
   assert.equal(runner.report.transport, "dynamic-hermes-jsi");
-  assert.equal(runner.report.vectorCount, 486);
-  assert.equal(runner.report.executableVectorCount, 486);
+  assert.equal(runner.report.vectorCount, 566);
+  assert.equal(runner.report.executableVectorCount, 566);
   assert.deepEqual(runner.report.unsupported, []);
   assert.deepEqual(
     generated.verification.vectors.map(({ vectorSha256 }) => vectorSha256),

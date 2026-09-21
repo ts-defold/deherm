@@ -3,14 +3,16 @@
   "family": "borrowed-handle-consumers",
   "expectedCoverage": {
     "candidates": 348,
-    "generated": 80,
-    "blocked": 268,
-    "handleKinds": 32,
-    "maxArguments": 2
+    "generated": 158,
+    "blocked": 190,
+    "handleKinds": 45,
+    "maxArguments": 8
   },
   "selection": {
-    "resultRoles": ["scalar:bool", "scalar:f32", "scalar:i32", "scalar:u32", "scalar:u64"],
-    "parameterRolePrefixes": ["handle:", "scalar:"],
+    "declarationKinds": ["function"],
+    "resultRoles": ["scalar:bool", "scalar:f32", "scalar:i32", "scalar:u8", "scalar:u16", "scalar:u32", "scalar:u64", "scalar:void"],
+    "handleRolePrefix": "handle:",
+    "parameterRoles": ["scalar:bool", "scalar:f32", "scalar:i32", "scalar:u8", "scalar:u16", "scalar:u32", "scalar:u64"],
     "requiresHandleParameter": true,
     "rejectedFamilies": ["platform-gated"]
   },
@@ -20,7 +22,7 @@
     "lifetime": "provider-validates-kind-and-live-epoch-on-every-dispatch",
     "thread": "provider-is-current-thread-must-pass-before-handle-validation-or-invoke",
     "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement",
-    "result": "scalar-only-no-borrowed-pointer-or-handle-result"
+    "result": "void-or-bounded-scalar-only-no-borrowed-pointer-or-handle-result"
   },
   "targetPolicy": {
     "dynamicHermes": "handles-and-u64-use-BigInt; other scalar lanes are checked values",

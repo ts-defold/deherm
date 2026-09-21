@@ -11,6 +11,8 @@ var LibraryDehermRecordingBrowserCallbackExact = {
     'deherm_recording_browser_first_outstanding_callback_route',
     'deherm_recording_browser_handle_release_count',
     'deherm_recording_browser_drain_handle_releases',
+    'deherm_recording_browser_verify_handle_releases',
+    'deherm_recording_last_error',
     'deherm_recording_select_transport', 'deherm_recording_current_transport',
     'deherm_recording_browser_invoke_callback',
     'deherm_recording_browser_release_callbacks',
@@ -162,6 +164,7 @@ var LibraryDehermRecordingBrowserCallbackExact = {
         stackRestore(checkpoint);
       }
     }
+    var exactStatus=0;
     try {
       if(ROUTES.length!==911)fail('route census drift');
       for(var route=0;route<ROUTES.length;++route)runRoute(route);
@@ -176,11 +179,20 @@ var LibraryDehermRecordingBrowserCallbackExact = {
       registry.release(bounded);registry.capacity=priorCapacity;
       var finalized=registry.acquire(function(){}),runtime=registry.runtime;registry.reset();
       if(registry.runtime===runtime||registry.resolve(finalized)!==null)fail('registry reset did not invalidate final token');
-      return 0;
+      exactStatus=0;
     } catch(error) {
       console.error('DEHERM_SCRIPT_BROWSER_EXACT_FAIL '+(error&&error.stack?error.stack:String(error)));
-      return 1;
-    } finally { registry.acquire=originalAcquire;if(typeof bridge.dispose==='function')bridge.dispose(); }
+      exactStatus=1;
+    } finally {
+      registry.acquire=originalAcquire;
+      if(typeof bridge.dispose==='function')bridge.dispose();
+      _deherm_recording_browser_drain_handle_releases();
+      if(!_deherm_recording_browser_verify_handle_releases()){
+        console.error('DEHERM_SCRIPT_BROWSER_EXACT_FAIL '+UTF8ToString(_deherm_recording_last_error()));
+        exactStatus=1;
+      }
+    }
+    return exactStatus;
   }
 };
 autoAddDeps(LibraryDehermRecordingBrowserCallbackExact, '$DEFOLD_HERMES_SCRIPT_UNIVERSAL');

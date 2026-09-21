@@ -24,7 +24,25 @@ function compareCodeUnits(left, right) {
 
 function bareMaterialization(recipe, catalog) {
   if (recipe.preferredLowering?.state === "generated-adapter") {
-    return materializationFromDmSdkConcreteCallPlan(resolveDmSdkConcreteCallPlan(recipe));
+    const concrete = materializationFromDmSdkConcreteCallPlan(resolveDmSdkConcreteCallPlan(recipe));
+    if (concrete.state !== "specialization-required") return concrete;
+    try {
+      materializeDmSdkUsages([{
+        declarationId: recipe.declarationId,
+        acknowledgements: {
+          generatedAdapterBypass: {
+            reason: "provider-only adapter is not release-callable",
+            evidence: "deterministic universal-fallback materialization",
+          },
+        },
+      }], {
+        catalog,
+        catalogSha256: catalog.sourceHashes.catalog
+      });
+      return { state: "universal-ready", requirements: [] };
+    } catch {
+      return concrete;
+    }
   }
   try {
     materializeDmSdkUsages([{ declarationId: recipe.declarationId }], {

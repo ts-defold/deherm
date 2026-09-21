@@ -48,6 +48,12 @@ body. In particular, generated JSON bodies never enter SQLite. This makes the
 index useful for discovering the authority behind a generated artifact without
 turning large evidence or policy files into retrieval context.
 
+The bounded `knowledge:links` command exposes references originating in one
+document. `knowledge:backlinks` includes references to the document itself and
+to any of its heading nodes, so section-level Markdown links remain
+discoverable without a custom SQL join. Structural `contains` edges are omitted
+from both views; they remain available through the read-only SQL escape hatch.
+
 # Incremental and bounded behavior
 
 Each OKF document is keyed by its content digest. Unchanged documents retain
@@ -81,11 +87,12 @@ path around bounded context retrieval.
 `tests/okf-graph.test.mjs` proves content-addressed reuse, one-document
 invalidation, independent source-digest refresh, stable line-independent
 section identities, fragment-link resolution, all supported edge families,
-metadata-only handling for generated JSON, output bounds, and rejection of SQL
-writes. It also covers CRLF parity, old-schema cache recreation, single-line
-section flooding, BLOB reduction, recursive-query rejection, and deterministic
-write-lock contention from a concurrent process. The first implementation uses
-deterministic Markdown structure and explicit path language. A later
+heading-aware backlink retrieval, metadata-only handling for generated JSON,
+output bounds, and rejection of SQL writes. It also covers CRLF parity,
+old-schema cache recreation, single-line section flooding, BLOB reduction,
+recursive-query rejection, and deterministic write-lock contention from a
+concurrent process. The first implementation uses deterministic Markdown
+structure and explicit path language. A later
 Tree-sitter adapter may add symbol-level source nodes, but it must preserve the
 same bounded query contract and cannot make the cache necessary for
 correctness.

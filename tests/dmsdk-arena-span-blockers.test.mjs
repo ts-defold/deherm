@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import { generate, loadInputs } from "../scripts/generate-dmsdk-arena-span-blockers.mjs";
 
 const root = new URL("../", import.meta.url);
+const repositoryRoot = fileURLToPath(root);
 
 function withJson(text, mutate) {
   const value = JSON.parse(text);
@@ -13,7 +17,7 @@ function withJson(text, mutate) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
-test("arena-span blocker ledger is deterministic, complete, and metadata-only", async () => {
+test("arena-span census deterministically promotes bounded cstring arenas and preserves blockers", async () => {
   execFileSync(process.execPath, ["scripts/generate-dmsdk-arena-span-blockers.mjs", "--check"], {
     cwd: root,
     stdio: "pipe"
@@ -25,13 +29,14 @@ test("arena-span blocker ledger is deterministic, complete, and metadata-only", 
   assert.deepEqual(report.coverage, {
     arenaSpanCensus: 79,
     coveredByPriorWaves: 12,
-    blocked: 67,
-    executableAdaptersEmitted: 0,
+    generatedCStringArena: 5,
+    blocked: 62,
+    executableAdaptersEmitted: 5,
+    exactCallTwinsEmitted: 5,
     overlap: 0,
     unaccounted: 0
   });
   assert.deepEqual(report.partitionSummary, {
-    "cstring-termination-or-capacity-policy": 5,
     "handle-provenance-or-engine-context": 33,
     "opaque-byte-pointee-unit-or-lifetime": 4,
     "record-layout-or-borrowed-record-lifetime": 19,
@@ -40,14 +45,70 @@ test("arena-span blocker ledger is deterministic, complete, and metadata-only", 
   const priorIds = new Set(report.coveredByPriorWaves.map(({ id }) => id));
   const blockedIds = new Set(report.declarations.map(({ id }) => id));
   assert.equal(priorIds.size, 12);
-  assert.equal(blockedIds.size, 67);
+  const generatedIds = new Set(report.generatedDeclarations.map(({ id }) => id));
+  assert.equal(generatedIds.size, 5);
+  assert.equal(blockedIds.size, 62);
   assert.equal([...priorIds].some((id) => blockedIds.has(id)), false);
-  assert.equal(Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0), 67);
+  assert.equal([...priorIds].some((id) => generatedIds.has(id)), false);
+  assert.equal([...generatedIds].some((id) => blockedIds.has(id)), false);
+  assert.equal(Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0), 62);
+  assert.deepEqual(report.generatedDeclarations.map(({ recipe }) => recipe.kind), [
+    "canonical-path", "error-string", "trimmed-string", "uri-encode", "canonical-path"
+  ]);
+  for (const declaration of report.generatedDeclarations) {
+    assert.equal(declaration.disposition, "generated");
+    assert.equal(declaration.preferredLowering, false);
+    assert.equal(declaration.universalFallback, "retained-usage-materialized-recipe");
+    assert.equal(declaration.stages.generated, "production-and-exact-from-one-recipe");
+    assert.ok(declaration.sourceEvidence.length > 0);
+  }
   for (const declaration of report.declarations) {
     assert.equal(declaration.disposition, "blocked");
     assert.equal(declaration.stages.generated, "not-applicable");
     assert.equal(declaration.stages.runtime, "not-claimed");
     assert.equal(declaration.stages.allocation, "not-claimed");
+  }
+});
+
+test("arena cstring production and exact twins compile, and exact vectors execute", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-arena-cstring-"));
+  const repository = repositoryRoot;
+  const sdk = path.join(repository, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+  const compiler = process.env.CXX || "clang++";
+  const cCompiler = process.env.CC || "clang";
+  const includes = [`-I${path.join(repository, "defold/defold_hermes/include")}`, "-isystem", path.join(sdk, "sdk/include"), "-isystem", path.join(sdk, "include")];
+  try {
+    const cHeader = path.join(directory, "header.c");
+    await writeFile(cHeader, "#include <defold_hermes/generated_dmsdk_arena_cstring.h>\nint main(void){return DEHERM_DMSDK_ARENA_CSTRING_MAX_INPUT==UINT32_C(4095)?0:1;}\n");
+    execFileSync(cCompiler, ["-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", `-I${path.join(repository, "defold/defold_hermes/include")}`, "-c", cHeader, "-o", path.join(directory, "header.o")], { cwd: repository, stdio: "pipe" });
+    execFileSync(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includes, "-c", "defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp", "-o", path.join(directory, "production.o")], { cwd: repository, stdio: "pipe" });
+    const main = path.join(directory, "main.cpp");
+    await writeFile(main, "extern \"C\" int deherm_dmsdk_arena_cstring_exact_verify(void);\nint main(){return deherm_dmsdk_arena_cstring_exact_verify();}\n");
+    const executable = path.join(directory, process.platform === "win32" ? "exact.exe" : "exact");
+    const sanitizerFlags = process.platform === "win32" ? [] : ["-fsanitize=address,undefined", "-fno-omit-frame-pointer"];
+    execFileSync(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...sanitizerFlags, ...includes, "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp", main, "-o", executable], { cwd: repository, stdio: "pipe" });
+    execFileSync(executable, [], { cwd: repository, stdio: "pipe", env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" } });
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("arena cstring generation is clean-room deterministic and allocation bounded", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-arena-cstring-generation-"));
+  try {
+    execFileSync(process.execPath, ["scripts/generate-dmsdk-arena-span-blockers.mjs", "--output-root", directory], { cwd: root, stdio: "pipe" });
+    const report = JSON.parse(await readFile(new URL("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json", root), "utf8"));
+    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"]) {
+      assert.equal(await readFile(path.join(directory, artifact), "utf8"), await readFile(new URL(artifact, root), "utf8"), artifact);
+    }
+    for (const artifact of report.artifacts.filter((name) => name.endsWith(".cpp"))) {
+      const source = await readFile(new URL(artifact, root), "utf8");
+      assert.doesNotMatch(source, /\b(?:new|delete|malloc|calloc|realloc|free)\b/);
+      assert.match(source, /thread_local char gInput/);
+      assert.match(source, /gActive/);
+    }
+  } finally {
+    await rm(directory, { recursive: true, force: true });
   }
 });
 

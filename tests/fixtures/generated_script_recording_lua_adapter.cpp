@@ -190,22 +190,27 @@ std::string luaSpec(lua_State* state, int index, uint32_t shapeIndex, uint32_t s
     }
     case DEHERM_RECORDING_SHAPE_CALLBACK: return lua_isfunction(state, index) ? "cb" : "wrong:callback";
     case DEHERM_RECORDING_SHAPE_SEQUENCE: {
-      if (!lua_istable(state, index)) return "wrong:sequence"; out = "seq(";
+      if (!lua_istable(state, index)) return "wrong:sequence";
+      out = "seq(";
       if (shape.childCount) { lua_rawgeti(state, index, 1);
         out += luaSpec(state, -1, kDehermRecordingShapeRefs[shape.childFirst], childSentinel(seed, 0)); lua_pop(state, 1); }
       out += ")"; return out;
     }
     case DEHERM_RECORDING_SHAPE_RECORD: {
-      if (!lua_istable(state, index)) return "wrong:record"; out = "rec(";
+      if (!lua_istable(state, index)) return "wrong:record";
+      out = "rec(";
       for (uint32_t child = 0; child < shape.childCount; ++child) {
-        if (child) out += ","; const uint32_t item = kDehermRecordingShapeRefs[shape.childFirst + child];
+        if (child) out += ",";
+        const uint32_t item = kDehermRecordingShapeRefs[shape.childFirst + child];
         const char* key = textOf(kDehermRecordingShapes[item].key); out += key; out += "=";
         lua_getfield(state, index, key); out += luaSpec(state, -1, item, childSentinel(seed, child)); lua_pop(state, 1);
       }
       out += ")"; return out;
     }
     case DEHERM_RECORDING_SHAPE_MAP: {
-      if (!lua_istable(state, index)) return "wrong:map"; out = "map("; lua_pushnil(state);
+      if (!lua_istable(state, index)) return "wrong:map";
+      out = "map(";
+      lua_pushnil(state);
       if (lua_next(state, index < 0 ? index - 1 : index) != 0) {
         out += luaSpec(state, -2, kDehermRecordingShapeRefs[shape.childFirst], childSentinel(seed, 0)); out += "=>";
         out += luaSpec(state, -1, kDehermRecordingShapeRefs[shape.childFirst + 1], childSentinel(seed, 1)); lua_pop(state, 1);
@@ -398,11 +403,16 @@ int main(){
     lua_State* state=runtime->state;scalar::ScriptAdapter& adapter=*runtime->adapter;auto api=adapter.api();
     ++exercised;gActiveRoute=route;gActiveArgumentCount=exactArgumentCount(descriptor);gFailure={};CallStorage storage;const char* context=textOf(descriptor.context);const bool guiContext=std::strstr(context,"gui");const bool renderContext=std::strstr(context,"render");const bool gameObjectContext=std::strstr(context,"game-object");lua_pushlightuserdata(state,guiContext?gGuiInstance:renderContext?gRenderInstance:gGameObjectInstance);const bool captured=guiContext?adapter.captureGuiInstance(-1):renderContext?adapter.captureRenderInstance(-1):adapter.captureInstance(-1);expect(captured,"capture-route-instance",route,adapter.lastError());lua_pop(state,1);
     expect(gActiveArgumentCount<=descriptor.argumentCount,"adapter-arity-exceeds-projection",route,"");
-    for(uint32_t i=0;i<gActiveArgumentCount;++i)storage.arguments[i]=buildValue(adapter,state,storage,kDehermRecordingShapeRefs[descriptor.argumentFirst+i],i+1);expect(currentInstance(state)==gPreviousInstance,"argument-build-instance-drift",route,"");
+    for(uint32_t i=0;i<gActiveArgumentCount;++i){
+      storage.arguments[i]=buildValue(adapter,state,storage,kDehermRecordingShapeRefs[descriptor.argumentFirst+i],i+1);
+    }
+    expect(currentInstance(state)==gPreviousInstance,"argument-build-instance-drift",route,"");
     ScriptCallFrame frame{};frame.stableId=descriptor.stableId;frame.arguments=storage.arguments.data();frame.argumentCount=gActiveArgumentCount;frame.results=storage.results.data();frame.resultCapacity=storage.results.size();frame.stringScratch=storage.strings.data();frame.stringScratchCapacity=storage.strings.size();frame.tableScratch=storage.tables.data()+storage.tableUsed;frame.tableScratchCapacity=storage.tables.size()-storage.tableUsed;frame.urlArena=&storage.urls;frame.matrix4Arena=&storage.matrices;
     const int before=lua_gettop(state);expect(currentInstance(state)==gPreviousInstance,"pre-call-instance-drift",route,"");
     const auto selected=guiContext?scalar::ScriptAdapter::ComponentContext::kGui:renderContext?scalar::ScriptAdapter::ComponentContext::kRender:scalar::ScriptAdapter::ComponentContext::kGameObject;const bool pushed=guiContext||renderContext||gameObjectContext;
-    if(pushed)expect(adapter.pushComponentContext(selected),"component-context-push",route,adapter.lastError());const bool ok=api.dispatch(api.context,&frame);if(pushed)adapter.popComponentContext();
+    if(pushed){expect(adapter.pushComponentContext(selected),"component-context-push",route,adapter.lastError());}
+    const bool ok=api.dispatch(api.context,&frame);
+    if(pushed){adapter.popComponentContext();}
     expect(ok,"adapter-dispatch",route,api.lastError(api.context));expect(gFailure.code[0]=='\0',gFailure.code,route,gFailure.detail.c_str());expect(gCalls[route]==1,"provider-call-count",route,"");expect(lua_gettop(state)==before,"lua-stack-not-restored",route,"");expect(currentInstance(state)==gPreviousInstance,"instance-not-restored",route,"");expect(frame.resultCount==descriptor.resultCount,"result-count-mismatch",route,"");
     for(uint32_t i=0;i<frame.resultCount;++i){const uint32_t shape=kDehermRecordingShapeRefs[descriptor.resultFirst+i];const std::string actual=scriptSpec(frame.results[i],shape,257+i);const std::string expected=expectedSpec(shape,257+i);expect(actual==expected,"result-value-mismatch",route,(actual+" != "+expected).c_str());}
   }

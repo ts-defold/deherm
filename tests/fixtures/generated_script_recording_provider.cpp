@@ -48,6 +48,8 @@ struct BrowserCallbackObservation {
 
 BrowserCallbackObservation gBrowserCallbacks[DEHERM_RECORDING_ROUTE_COUNT];
 uint32_t gBrowserHandleReleaseCount = 0;
+uint32_t gBrowserHandleIssuedOrdinal = DEHERM_RECORDING_HANDLE_SEED_COUNT;
+uint32_t gBrowserHandleReleaseByOrdinal[DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY]{};
 
 const char* textOf(int32_t id) {
   return id >= 0 && static_cast<uint32_t>(id) < DEHERM_RECORDING_TEXT_COUNT
@@ -286,6 +288,10 @@ struct Synthesizer {
       case DEHERM_RECORDING_SHAPE_HANDLE:
       case DEHERM_RECORDING_SHAPE_GUI_NODE:
       case DEHERM_RECORDING_SHAPE_USERDATA:
+        if (gBrowserHandleIssuedOrdinal + 1u >= DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY) {
+          failure = "result-handle-identity-capacity-exhausted";
+          return false;
+        }
         out->tag = ScriptValueTag::kHandle;
         out->handleKind = shape.code == DEHERM_RECORDING_SHAPE_GUI_NODE
             ? ScriptHandleKind::kGuiNode
@@ -294,7 +300,8 @@ struct Synthesizer {
                 : ScriptHandleKind::kLuaSemanticHandle;
         out->reserved = shape.aux;
         out->length = 1;
-        out->payload = (UINT64_C(1) << 32u) | UINT64_C(1);
+        ++gBrowserHandleIssuedOrdinal;
+        out->payload = (static_cast<uint64_t>(gBrowserHandleIssuedOrdinal) << 32u) | UINT64_C(1);
         return true;
       case DEHERM_RECORDING_SHAPE_VECTOR3:
         out->tag = ScriptValueTag::kDefoldValue;
@@ -522,11 +529,26 @@ void Release(void*, ScriptHandleKind kind, uint32_t runtime, uint64_t payload) n
     std::snprintf(gLastError, sizeof(gLastError), "browser released a non-owning handle kind");
     return;
   }
-  if (runtime != 1 || payload != ((UINT64_C(1) << 32u) | UINT64_C(1))) {
-    ++gViolations;
-    std::snprintf(gLastError, sizeof(gLastError), "browser released the wrong handle identity");
+  const uint32_t handleOrdinal = static_cast<uint32_t>(payload >> 32u);
+  // Ordinals reserved by handleSeeds model pre-existing borrowed engine
+  // identities used to bootstrap dependent calls. They are not results issued
+  // by this recorder and therefore do not participate in the owned-result
+  // exact-once ledger.
+  if (runtime == 1u && (payload & UINT64_C(0xffffffff)) == UINT64_C(1) &&
+      handleOrdinal > 0u && handleOrdinal <= DEHERM_RECORDING_HANDLE_SEED_COUNT) {
     return;
   }
+  const bool validOrdinal = handleOrdinal > DEHERM_RECORDING_HANDLE_SEED_COUNT &&
+      handleOrdinal <= gBrowserHandleIssuedOrdinal;
+  if (runtime != 1 || (payload & UINT64_C(0xffffffff)) != UINT64_C(1) ||
+      !validOrdinal) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError),
+        "browser released the wrong handle identity runtime=%u ordinal=%u low=%u issued=%u",
+        runtime, handleOrdinal, static_cast<uint32_t>(payload), gBrowserHandleIssuedOrdinal);
+    return;
+  }
+  ++gBrowserHandleReleaseByOrdinal[handleOrdinal];
   ++gBrowserHandleReleaseCount;
 }
 
@@ -544,6 +566,10 @@ uint32_t deherm_recording_find_route(uint32_t stableId) {
 void deherm_recording_install(void) {
   gLastError[0] = '\0';
   gBrowserHandleReleaseCount = 0;
+  gBrowserHandleIssuedOrdinal = DEHERM_RECORDING_HANDLE_SEED_COUNT;
+  for (uint32_t ordinal = 0; ordinal < DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY; ++ordinal) {
+    gBrowserHandleReleaseByOrdinal[ordinal] = 0;
+  }
   installScriptBridgeApi({nullptr, Dispatch, LastError, Release});
 }
 
@@ -572,6 +598,7 @@ const char* deherm_recording_observed_violation(uint32_t route, uint32_t transpo
 }
 
 uint32_t deherm_recording_violation_count(void) { return gViolations; }
+const char* deherm_recording_last_error(void) { return gLastError; }
 
 void deherm_recording_record_results(
     uint32_t route, uint32_t transport, uint32_t resultCount,
@@ -621,6 +648,19 @@ uint32_t deherm_recording_browser_handle_release_count(void) {
 
 void deherm_recording_browser_drain_handle_releases(void) {
   drainReleasedScriptHandles();
+}
+
+int deherm_recording_browser_verify_handle_releases(void) {
+  for (uint32_t ordinal = DEHERM_RECORDING_HANDLE_SEED_COUNT + 1u;
+       ordinal <= gBrowserHandleIssuedOrdinal; ++ordinal) {
+    if (gBrowserHandleReleaseByOrdinal[ordinal] == 1u) continue;
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError),
+        "browser result handle ordinal %u released %u times",
+        ordinal, gBrowserHandleReleaseByOrdinal[ordinal]);
+    return 0;
+  }
+  return 1;
 }
 
 struct BrowserConsumeContext {

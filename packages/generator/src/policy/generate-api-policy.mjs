@@ -449,7 +449,7 @@ export async function derivePolicy(options = {}) {
   ]);
   const sdkRecipeInputs = Object.freeze({
     "dmsdk/named-scalar.ts": {
-      emittedCount: namedScalarReport.coverage?.generated
+      emittedCount: namedScalarReport.coverage?.typescriptCallable
     },
     "script/url-target-support.ts": {
       routeCount: urlBindingsReport.routeCount,

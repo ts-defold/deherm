@@ -481,6 +481,42 @@ export async function outlineOkfIndex({ databasePath, document, max }) {
   }
 }
 
+export async function referencesOkfIndex({ databasePath, document, direction, max }) {
+  if (direction !== "outgoing" && direction !== "incoming") {
+    throw new Error("direction must be outgoing or incoming");
+  }
+  const limit = boundedInteger(max, 20, MAX_RESULTS, "max");
+  const database = await openDatabase(databasePath, true);
+  try {
+    const rows = direction === "outgoing"
+      ? database.prepare(`SELECT e.kind, e.source_doc AS sourcePath, e.line,
+          e.target, coalesce(n.path, e.target) AS targetPath,
+          coalesce(n.label, e.target) AS targetLabel
+        FROM edges e LEFT JOIN nodes n ON n.id = e.target
+        WHERE e.source_doc = ? AND e.kind <> 'contains'
+        ORDER BY e.line, e.kind, e.target LIMIT ?`).all(document, limit)
+      : database.prepare(`SELECT e.kind, e.source_doc AS sourcePath, e.line,
+          e.target, coalesce(n.path, e.target) AS targetPath,
+          coalesce(n.label, e.target) AS targetLabel
+        FROM edges e LEFT JOIN nodes n ON n.id = e.target
+        WHERE e.kind <> 'contains' AND (
+          e.target = 'doc:' || ? OR e.target IN (
+            SELECT id FROM nodes WHERE owner_doc = ? AND kind = 'heading'
+          )
+        )
+        ORDER BY e.source_doc, e.line, e.kind, e.target LIMIT ?`).all(document, document, limit);
+    const displayed = rows.map((row) => ({
+      ...row,
+      targetPath: row.target.startsWith("heading:")
+        ? row.target.slice("heading:".length)
+        : row.target.startsWith("doc:") ? row.target.slice("doc:".length) : row.targetPath
+    }));
+    return boundedRows(displayed, ["kind", "sourcePath", "target", "targetPath", "targetLabel"]);
+  } finally {
+    database.close();
+  }
+}
+
 export async function sectionOkfIndex({ databasePath, document, terms, maxLines }) {
   const needles = terms.map((term) => term.trim().toLowerCase()).filter(Boolean);
   if (needles.length === 0) throw new Error("section requires heading terms");

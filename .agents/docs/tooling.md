@@ -40,6 +40,16 @@ sections. `pnpm knowledge:outline -- <document>` returns only its headings and
 line numbers; `pnpm knowledge:section -- <document> <heading terms>` returns one
 matching section, bounded to 200 lines. The index is for navigation work, not
 mandatory startup context.
+
+For callers that compose one query string, `pnpm knowledge:search --query
+"<terms>" --limit <n>` is equivalent to positional terms plus `--max <n>`.
+Every subcommand accepts `--help` without refreshing the index.
+
+`pnpm knowledge:links -- <document>` lists mechanically derived outgoing
+references, while `pnpm knowledge:backlinks -- <document>` finds references to
+the document or any of its headings. Both commands return at most twenty edges
+by default and accept `--max` up to the global fifty-row ceiling.
+
 Large generated policies, inventories, and evidence objects stay behind their
 owner commands, which should report bounded summaries rather than print the
 objects themselves.

@@ -21,8 +21,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "04e7b2585ee00314db70e203f1a80dbf1276c2e3081cf7d9206afc6ed4bae08c",
-      "generator": "sha256:5f0bf5ce3e77587fc9a557cc7485307c34223feedd611c86fb77efea374a9061",
+      "policyRoot": "1f5f320e649a4238063c98cea3309f8d0902c4961ef53690c08e3398d99eaba1",
+      "generator": "sha256:19aff0f104cccfafd3e50ad59170d4bc09ef05d5c534235b528d020db00ad708",
       "realizer": {
         "minimumPackageVersion": "0.0.0",
         "requiredCapabilities": [

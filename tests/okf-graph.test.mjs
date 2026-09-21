@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { once } from "node:events";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -9,10 +9,13 @@ import test from "node:test";
 import {
   outlineOkfIndex,
   queryOkfSql,
+  referencesOkfIndex,
   refreshOkfIndex,
   searchOkfIndex,
   sectionOkfIndex
 } from "../.agents/lib/okf-graph.mjs";
+
+const repositoryRoot = path.resolve(import.meta.dirname, "..");
 
 async function fixture() {
   const root = await import("node:fs/promises").then(({ mkdtemp }) => mkdtemp(path.join(tmpdir(), "deherm-okf-")));
@@ -111,6 +114,29 @@ async function holdDatabaseLock(databasePath, begin) {
   return { child, exit, stderr: () => stderr };
 }
 
+test("OKF CLI supports subcommand help and bounded query aliases", async () => {
+  const cacheRoot = await import("node:fs/promises").then(({ mkdtemp }) => mkdtemp(path.join(tmpdir(), "deherm-okf-cli-")));
+  try {
+    const cli = path.join(repositoryRoot, ".agents", "okf-index.mjs");
+    const environment = { ...process.env, DEHERM_OKF_CACHE: path.join(cacheRoot, "okf.sqlite") };
+    const help = execFileSync(process.execPath, [cli, "search", "--help"], {
+      cwd: repositoryRoot, env: environment, encoding: "utf8"
+    });
+    assert.match(help, /search --query <terms> \[--limit N\]/);
+    const result = execFileSync(process.execPath, [cli, "search", "--query", "dmSDK exact call", "--limit", "1"], {
+      cwd: repositoryRoot, env: environment, encoding: "utf8"
+    });
+    assert.equal(result.trim().split("\n").filter(Boolean).length, 1);
+    const literalHelp = execFileSync(process.execPath, [cli, "search", "help", "--limit", "1"], {
+      cwd: repositoryRoot, env: environment, encoding: "utf8"
+    });
+    assert.doesNotMatch(literalHelp, /Usage: node \.agents\/okf-index\.mjs/);
+    assert.equal(literalHelp.trim().split("\n").filter(Boolean).length, 1);
+  } finally {
+    await rm(cacheRoot, { recursive: true, force: true });
+  }
+});
+
 test("OKF graph refresh is content-addressed and updates source digests incrementally", async () => {
   const value = await fixture();
   try {
@@ -194,6 +220,39 @@ test("OKF graph connects links, declared sources, and semantic ownership edges w
     assert.equal(generated.path, "generated/data.json");
     assert.match(generated.digest, /^[a-f0-9]{64}$/);
     assert.equal(generated.content, "", "generated JSON bodies must not enter the index");
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("OKF graph exposes bounded document links and heading-aware backlinks", async () => {
+  const value = await fixture();
+  try {
+    await refreshOkfIndex(value);
+    const links = await referencesOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/a.md",
+      direction: "outgoing",
+      max: 50
+    });
+    assert.ok(links.some((edge) => edge.kind === "links" && edge.target === "doc:research/b.md"));
+    assert.ok(links.some((edge) => edge.kind === "source" && edge.target === "source:src/engine.ts"));
+    assert.ok(!links.some((edge) => edge.kind === "contains"));
+
+    const backlinks = await referencesOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/b.md",
+      direction: "incoming",
+      max: 50
+    });
+    assert.ok(backlinks.some((edge) => edge.target === "doc:research/b.md"));
+    assert.ok(backlinks.some((edge) => edge.target === "heading:research/b.md#shared-heading"));
+    assert.ok(backlinks.some((edge) => edge.targetPath === "research/b.md#shared-heading"));
+    assert.ok(backlinks.every((edge) => edge.sourcePath === "research/a.md"));
+    await assert.rejects(
+      referencesOkfIndex({ databasePath: value.databasePath, document: "research/a.md", direction: "sideways" }),
+      /outgoing or incoming/
+    );
   } finally {
     await rm(value.root, { recursive: true, force: true });
   }

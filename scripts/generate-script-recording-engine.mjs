@@ -126,6 +126,22 @@ function buildNativeText(model) {
   return { entries, shapeKeys, routes };
 }
 
+function createOwnedHandleCounter(model) {
+  const cache = new Map();
+  const count = (shapeIndex) => {
+    const cached = cache.get(shapeIndex);
+    if (cached !== undefined) return cached;
+    const shape = model.shapes[shapeIndex];
+    const value = shape.code === shapeCodes.handle || shape.code === shapeCodes.guiNode ||
+        shape.code === shapeCodes.userdata
+      ? 1
+      : shape.children.reduce((sum, child) => sum + count(child), 0);
+    cache.set(shapeIndex, value);
+    return value;
+  };
+  return count;
+}
+
 function renderHeader(model, native, counts) {
   const codes = Object.entries(shapeCodes)
     .map(([name, code]) => `  DEHERM_RECORDING_SHAPE_${name.replace(/([A-Z])/g, "_$1").toUpperCase()} = ${code}`)
@@ -154,6 +170,7 @@ function renderHeader(model, native, counts) {
 #define DEHERM_RECORDING_BROWSER_EXACT_COUNT ${model.summary.browserExact.routeCount}u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_COUNT ${model.summary.browserCallbackExact.routeCount}u
 #define DEHERM_RECORDING_BROWSER_CALLBACK_EXACT_CALLBACK_COUNT ${model.summary.browserCallbackExact.callbackCount}u
+#define DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY ${counts.recordingOwnedHandles + model.handleSeeds.length + 1}u
 
 enum DehermRecordingShapeCode {
 ${codes}
@@ -225,6 +242,7 @@ uint32_t deherm_recording_observed_arity(uint32_t route, uint32_t transport);
 const char* deherm_recording_observed_context(uint32_t route, uint32_t transport);
 const char* deherm_recording_observed_violation(uint32_t route, uint32_t transport);
 uint32_t deherm_recording_violation_count(void);
+const char* deherm_recording_last_error(void);
 /** Driver-side observation of what the real binding stack returned. */
 void deherm_recording_record_results(
     uint32_t route, uint32_t transport, uint32_t resultCount,
@@ -239,6 +257,7 @@ uint32_t deherm_recording_browser_callback_invocation_count(uint32_t route);
 uint32_t deherm_recording_browser_first_outstanding_callback_route(void);
 uint32_t deherm_recording_browser_handle_release_count(void);
 void deherm_recording_browser_drain_handle_releases(void);
+int deherm_recording_browser_verify_handle_releases(void);
 int deherm_recording_browser_invoke_callback(uint32_t route, uint32_t callback,
     char* error, uint32_t errorCapacity);
 uint32_t deherm_recording_browser_release_callbacks(uint32_t route);
@@ -371,6 +390,8 @@ struct BrowserCallbackObservation {
 
 BrowserCallbackObservation gBrowserCallbacks[DEHERM_RECORDING_ROUTE_COUNT];
 uint32_t gBrowserHandleReleaseCount = 0;
+uint32_t gBrowserHandleIssuedOrdinal = DEHERM_RECORDING_HANDLE_SEED_COUNT;
+uint32_t gBrowserHandleReleaseByOrdinal[DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY]{};
 
 const char* textOf(int32_t id) {
   return id >= 0 && static_cast<uint32_t>(id) < DEHERM_RECORDING_TEXT_COUNT
@@ -609,6 +630,10 @@ struct Synthesizer {
       case DEHERM_RECORDING_SHAPE_HANDLE:
       case DEHERM_RECORDING_SHAPE_GUI_NODE:
       case DEHERM_RECORDING_SHAPE_USERDATA:
+        if (gBrowserHandleIssuedOrdinal + 1u >= DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY) {
+          failure = "result-handle-identity-capacity-exhausted";
+          return false;
+        }
         out->tag = ScriptValueTag::kHandle;
         out->handleKind = shape.code == DEHERM_RECORDING_SHAPE_GUI_NODE
             ? ScriptHandleKind::kGuiNode
@@ -617,7 +642,8 @@ struct Synthesizer {
                 : ScriptHandleKind::kLuaSemanticHandle;
         out->reserved = shape.aux;
         out->length = 1;
-        out->payload = (UINT64_C(1) << 32u) | UINT64_C(1);
+        ++gBrowserHandleIssuedOrdinal;
+        out->payload = (static_cast<uint64_t>(gBrowserHandleIssuedOrdinal) << 32u) | UINT64_C(1);
         return true;
       case DEHERM_RECORDING_SHAPE_VECTOR3:
         out->tag = ScriptValueTag::kDefoldValue;
@@ -845,11 +871,26 @@ void Release(void*, ScriptHandleKind kind, uint32_t runtime, uint64_t payload) n
     std::snprintf(gLastError, sizeof(gLastError), "browser released a non-owning handle kind");
     return;
   }
-  if (runtime != 1 || payload != ((UINT64_C(1) << 32u) | UINT64_C(1))) {
-    ++gViolations;
-    std::snprintf(gLastError, sizeof(gLastError), "browser released the wrong handle identity");
+  const uint32_t handleOrdinal = static_cast<uint32_t>(payload >> 32u);
+  // Ordinals reserved by handleSeeds model pre-existing borrowed engine
+  // identities used to bootstrap dependent calls. They are not results issued
+  // by this recorder and therefore do not participate in the owned-result
+  // exact-once ledger.
+  if (runtime == 1u && (payload & UINT64_C(0xffffffff)) == UINT64_C(1) &&
+      handleOrdinal > 0u && handleOrdinal <= DEHERM_RECORDING_HANDLE_SEED_COUNT) {
     return;
   }
+  const bool validOrdinal = handleOrdinal > DEHERM_RECORDING_HANDLE_SEED_COUNT &&
+      handleOrdinal <= gBrowserHandleIssuedOrdinal;
+  if (runtime != 1 || (payload & UINT64_C(0xffffffff)) != UINT64_C(1) ||
+      !validOrdinal) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError),
+        "browser released the wrong handle identity runtime=%u ordinal=%u low=%u issued=%u",
+        runtime, handleOrdinal, static_cast<uint32_t>(payload), gBrowserHandleIssuedOrdinal);
+    return;
+  }
+  ++gBrowserHandleReleaseByOrdinal[handleOrdinal];
   ++gBrowserHandleReleaseCount;
 }
 
@@ -867,6 +908,10 @@ uint32_t deherm_recording_find_route(uint32_t stableId) {
 void deherm_recording_install(void) {
   gLastError[0] = '\\0';
   gBrowserHandleReleaseCount = 0;
+  gBrowserHandleIssuedOrdinal = DEHERM_RECORDING_HANDLE_SEED_COUNT;
+  for (uint32_t ordinal = 0; ordinal < DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY; ++ordinal) {
+    gBrowserHandleReleaseByOrdinal[ordinal] = 0;
+  }
   installScriptBridgeApi({nullptr, Dispatch, LastError, Release});
 }
 
@@ -895,6 +940,7 @@ const char* deherm_recording_observed_violation(uint32_t route, uint32_t transpo
 }
 
 uint32_t deherm_recording_violation_count(void) { return gViolations; }
+const char* deherm_recording_last_error(void) { return gLastError; }
 
 void deherm_recording_record_results(
     uint32_t route, uint32_t transport, uint32_t resultCount,
@@ -944,6 +990,19 @@ uint32_t deherm_recording_browser_handle_release_count(void) {
 
 void deherm_recording_browser_drain_handle_releases(void) {
   drainReleasedScriptHandles();
+}
+
+int deherm_recording_browser_verify_handle_releases(void) {
+  for (uint32_t ordinal = DEHERM_RECORDING_HANDLE_SEED_COUNT + 1u;
+       ordinal <= gBrowserHandleIssuedOrdinal; ++ordinal) {
+    if (gBrowserHandleReleaseByOrdinal[ordinal] == 1u) continue;
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError),
+        "browser result handle ordinal %u released %u times",
+        ordinal, gBrowserHandleReleaseByOrdinal[ordinal]);
+    return 0;
+  }
+  return 1;
 }
 
 struct BrowserConsumeContext {
@@ -1754,7 +1813,7 @@ int main(int argc, char** argv) {
       DEHERM_RECORDING_ROUTE_COUNT, DEHERM_RECORDING_TRANSPORT_COUNT, violations,
       expectationDivergences, transportDivergences);
   if (violations || expectationDivergences || transportDivergences) {
-    std::printf("recording-engine:fail\\n");
+    std::printf("recording-engine:fail last-error=%s\\n", deherm_recording_last_error());
     return 1;
   }
   std::printf("recording-engine:ok\\n");
@@ -1955,22 +2014,27 @@ std::string luaSpec(lua_State* state, int index, uint32_t shapeIndex, uint32_t s
     }
     case DEHERM_RECORDING_SHAPE_CALLBACK: return lua_isfunction(state, index) ? "cb" : "wrong:callback";
     case DEHERM_RECORDING_SHAPE_SEQUENCE: {
-      if (!lua_istable(state, index)) return "wrong:sequence"; out = "seq(";
+      if (!lua_istable(state, index)) return "wrong:sequence";
+      out = "seq(";
       if (shape.childCount) { lua_rawgeti(state, index, 1);
         out += luaSpec(state, -1, kDehermRecordingShapeRefs[shape.childFirst], childSentinel(seed, 0)); lua_pop(state, 1); }
       out += ")"; return out;
     }
     case DEHERM_RECORDING_SHAPE_RECORD: {
-      if (!lua_istable(state, index)) return "wrong:record"; out = "rec(";
+      if (!lua_istable(state, index)) return "wrong:record";
+      out = "rec(";
       for (uint32_t child = 0; child < shape.childCount; ++child) {
-        if (child) out += ","; const uint32_t item = kDehermRecordingShapeRefs[shape.childFirst + child];
+        if (child) out += ",";
+        const uint32_t item = kDehermRecordingShapeRefs[shape.childFirst + child];
         const char* key = textOf(kDehermRecordingShapes[item].key); out += key; out += "=";
         lua_getfield(state, index, key); out += luaSpec(state, -1, item, childSentinel(seed, child)); lua_pop(state, 1);
       }
       out += ")"; return out;
     }
     case DEHERM_RECORDING_SHAPE_MAP: {
-      if (!lua_istable(state, index)) return "wrong:map"; out = "map("; lua_pushnil(state);
+      if (!lua_istable(state, index)) return "wrong:map";
+      out = "map(";
+      lua_pushnil(state);
       if (lua_next(state, index < 0 ? index - 1 : index) != 0) {
         out += luaSpec(state, -2, kDehermRecordingShapeRefs[shape.childFirst], childSentinel(seed, 0)); out += "=>";
         out += luaSpec(state, -1, kDehermRecordingShapeRefs[shape.childFirst + 1], childSentinel(seed, 1)); lua_pop(state, 1);
@@ -2163,11 +2227,16 @@ int main(){
     lua_State* state=runtime->state;scalar::ScriptAdapter& adapter=*runtime->adapter;auto api=adapter.api();
     ++exercised;gActiveRoute=route;gActiveArgumentCount=exactArgumentCount(descriptor);gFailure={};CallStorage storage;const char* context=textOf(descriptor.context);const bool guiContext=std::strstr(context,"gui");const bool renderContext=std::strstr(context,"render");const bool gameObjectContext=std::strstr(context,"game-object");lua_pushlightuserdata(state,guiContext?gGuiInstance:renderContext?gRenderInstance:gGameObjectInstance);const bool captured=guiContext?adapter.captureGuiInstance(-1):renderContext?adapter.captureRenderInstance(-1):adapter.captureInstance(-1);expect(captured,"capture-route-instance",route,adapter.lastError());lua_pop(state,1);
     expect(gActiveArgumentCount<=descriptor.argumentCount,"adapter-arity-exceeds-projection",route,"");
-    for(uint32_t i=0;i<gActiveArgumentCount;++i)storage.arguments[i]=buildValue(adapter,state,storage,kDehermRecordingShapeRefs[descriptor.argumentFirst+i],i+1);expect(currentInstance(state)==gPreviousInstance,"argument-build-instance-drift",route,"");
+    for(uint32_t i=0;i<gActiveArgumentCount;++i){
+      storage.arguments[i]=buildValue(adapter,state,storage,kDehermRecordingShapeRefs[descriptor.argumentFirst+i],i+1);
+    }
+    expect(currentInstance(state)==gPreviousInstance,"argument-build-instance-drift",route,"");
     ScriptCallFrame frame{};frame.stableId=descriptor.stableId;frame.arguments=storage.arguments.data();frame.argumentCount=gActiveArgumentCount;frame.results=storage.results.data();frame.resultCapacity=storage.results.size();frame.stringScratch=storage.strings.data();frame.stringScratchCapacity=storage.strings.size();frame.tableScratch=storage.tables.data()+storage.tableUsed;frame.tableScratchCapacity=storage.tables.size()-storage.tableUsed;frame.urlArena=&storage.urls;frame.matrix4Arena=&storage.matrices;
     const int before=lua_gettop(state);expect(currentInstance(state)==gPreviousInstance,"pre-call-instance-drift",route,"");
     const auto selected=guiContext?scalar::ScriptAdapter::ComponentContext::kGui:renderContext?scalar::ScriptAdapter::ComponentContext::kRender:scalar::ScriptAdapter::ComponentContext::kGameObject;const bool pushed=guiContext||renderContext||gameObjectContext;
-    if(pushed)expect(adapter.pushComponentContext(selected),"component-context-push",route,adapter.lastError());const bool ok=api.dispatch(api.context,&frame);if(pushed)adapter.popComponentContext();
+    if(pushed){expect(adapter.pushComponentContext(selected),"component-context-push",route,adapter.lastError());}
+    const bool ok=api.dispatch(api.context,&frame);
+    if(pushed){adapter.popComponentContext();}
     expect(ok,"adapter-dispatch",route,api.lastError(api.context));expect(gFailure.code[0]=='\\0',gFailure.code,route,gFailure.detail.c_str());expect(gCalls[route]==1,"provider-call-count",route,"");expect(lua_gettop(state)==before,"lua-stack-not-restored",route,"");expect(currentInstance(state)==gPreviousInstance,"instance-not-restored",route,"");expect(frame.resultCount==descriptor.resultCount,"result-count-mismatch",route,"");
     for(uint32_t i=0;i<frame.resultCount;++i){const uint32_t shape=kDehermRecordingShapeRefs[descriptor.resultFirst+i];const std::string actual=scriptSpec(frame.results[i],shape,257+i);const std::string expected=expectedSpec(shape,257+i);expect(actual==expected,"result-value-mismatch",route,(actual+" != "+expected).c_str());}
   }
@@ -2585,18 +2654,7 @@ function renderBrowserCallbackDriverJs(model) {
     shape.key >= 0 ? model.text[shape.key] : "",
     shape.children
   ]);
-  const ownedHandleCounts = new Map();
-  const ownedHandleCount = (shapeIndex) => {
-    const cached = ownedHandleCounts.get(shapeIndex);
-    if (cached !== undefined) return cached;
-    const shape = model.shapes[shapeIndex];
-    const count = shape.code === shapeCodes.handle || shape.code === shapeCodes.guiNode ||
-        shape.code === shapeCodes.userdata
-      ? 1
-      : shape.children.reduce((sum, child) => sum + ownedHandleCount(child), 0);
-    ownedHandleCounts.set(shapeIndex, count);
-    return count;
-  };
+  const ownedHandleCount = createOwnedHandleCounter(model);
   const exactRoutes = browserExactRoutes(model);
   const callbackReentrantOrdinal = exactRoutes.findIndex(({ override }) =>
     (override?.callbackSlots?.length ?? 0) > 0);
@@ -2630,6 +2688,8 @@ var LibraryDehermRecordingBrowserCallbackExact = {
     'deherm_recording_browser_first_outstanding_callback_route',
     'deherm_recording_browser_handle_release_count',
     'deherm_recording_browser_drain_handle_releases',
+    'deherm_recording_browser_verify_handle_releases',
+    'deherm_recording_last_error',
     'deherm_recording_select_transport', 'deherm_recording_current_transport',
     'deherm_recording_browser_invoke_callback',
     'deherm_recording_browser_release_callbacks',
@@ -2781,6 +2841,7 @@ var LibraryDehermRecordingBrowserCallbackExact = {
         stackRestore(checkpoint);
       }
     }
+    var exactStatus=0;
     try {
       if(ROUTES.length!==${routes.length})fail('route census drift');
       for(var route=0;route<ROUTES.length;++route)runRoute(route);
@@ -2795,11 +2856,20 @@ var LibraryDehermRecordingBrowserCallbackExact = {
       registry.release(bounded);registry.capacity=priorCapacity;
       var finalized=registry.acquire(function(){}),runtime=registry.runtime;registry.reset();
       if(registry.runtime===runtime||registry.resolve(finalized)!==null)fail('registry reset did not invalidate final token');
-      return 0;
+      exactStatus=0;
     } catch(error) {
       console.error('DEHERM_SCRIPT_BROWSER_EXACT_FAIL '+(error&&error.stack?error.stack:String(error)));
-      return 1;
-    } finally { registry.acquire=originalAcquire;if(typeof bridge.dispose==='function')bridge.dispose(); }
+      exactStatus=1;
+    } finally {
+      registry.acquire=originalAcquire;
+      if(typeof bridge.dispose==='function')bridge.dispose();
+      _deherm_recording_browser_drain_handle_releases();
+      if(!_deherm_recording_browser_verify_handle_releases()){
+        console.error('DEHERM_SCRIPT_BROWSER_EXACT_FAIL '+UTF8ToString(_deherm_recording_last_error()));
+        exactStatus=1;
+      }
+    }
+    return exactStatus;
   }
 };
 autoAddDeps(LibraryDehermRecordingBrowserCallbackExact, '$DEFOLD_HERMES_SCRIPT_UNIVERSAL');
@@ -2824,6 +2894,7 @@ export function generateRecordingEngine(inputs) {
     shapeRefs.values.push(...route.resultShapes);
   }
 
+  const ownedHandleCount = createOwnedHandleCounter(model);
   const counts = {
     routes: model.routes.length,
     shapes: model.shapes.length,
@@ -2831,8 +2902,15 @@ export function generateRecordingEngine(inputs) {
     text: native.entries.length,
     semanticNames: model.semanticHandleKindNames.length,
     maximumArguments: Math.max(...model.routes.map((route) => route.argumentShapes.length), 1),
+    browserOwnedHandles: model.routes.reduce((sum, route) =>
+      sum + route.resultShapes.reduce((routeSum, shape) => routeSum + ownedHandleCount(shape), 0), 0),
     expectedTraceSha256: sha256(expectedTrace)
   };
+  // The native recording harness exercises every route once per transport in
+  // one process. Size the fixed release-identity ledger for that strongest
+  // execution, while browser-only harnesses use a strict subset of the same
+  // allocation-free storage.
+  counts.recordingOwnedHandles = counts.browserOwnedHandles * transportOrder.length;
   assert(counts.routes > 0 && counts.shapes > 0, "recording engine produced an empty table");
 
   const header = renderHeader(model, native, counts);

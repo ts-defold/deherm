@@ -111,8 +111,12 @@ target_include_directories(defold-dmsdk-profile-null PUBLIC
 add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/capi.cpp
   defold/defold_hermes/src/callback_registry.cpp
+  defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp
+  defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp
+  defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp
   defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp
   defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp
+  defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp
@@ -140,6 +144,10 @@ target_compile_features(defold-hermes-runtime PUBLIC cxx_std_17)
 target_include_directories(defold-hermes-runtime PUBLIC
   defold/defold_hermes/include
   upstream/defold/engine/dlib/src
+)
+target_include_directories(defold-hermes-runtime SYSTEM PRIVATE
+  "${DEHERM_DEFOLD_SDK_DIR}/sdk/include"
+  "${DEHERM_DEFOLD_SDK_DIR}/include"
 )
 target_link_libraries(defold-hermes-runtime PUBLIC hermesvm_a
   defold-dmsdk-profile-null ${DEHERM_PROFILE_LIBRARIES})
@@ -384,8 +392,14 @@ target_compile_features(defold-hermes-lua-bridge PUBLIC cxx_std_17)
 target_include_directories(defold-hermes-lua-bridge PUBLIC
   defold/defold_hermes/include
   ${DEFOLD_VECTORMATH_INCLUDE_DIR}
-  upstream/defold/engine/dlib/src
   upstream/defold/engine/lua/src
+)
+# Defold's public headers intentionally use compiler extensions such as
+# zero-length trailing arrays. Treat upstream headers as system headers so our
+# -Werror policy applies to deherm code without turning Defold's supported ABI
+# declarations into GCC pedantic failures.
+target_include_directories(defold-hermes-lua-bridge SYSTEM PUBLIC
+  upstream/defold/engine/dlib/src
 )
 target_link_libraries(defold-hermes-lua-bridge PUBLIC defold-lua-test
   defold-dmsdk-profile-null ${DEHERM_PROFILE_LIBRARIES})
@@ -463,10 +477,15 @@ add_executable(defold-hermes-dmsdk-named-scalar-test
   native/dmsdk_named_scalar_c_header_test.c
   native/dmsdk_named_scalar_runtime_test.cpp
   defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp
+  tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp
 )
 target_compile_features(defold-hermes-dmsdk-named-scalar-test PRIVATE cxx_std_17)
 target_include_directories(defold-hermes-dmsdk-named-scalar-test PRIVATE
   defold/defold_hermes/include
+)
+target_include_directories(defold-hermes-dmsdk-named-scalar-test SYSTEM PRIVATE
+  "${DEHERM_DEFOLD_SDK_DIR}/sdk/include"
+  "${DEHERM_DEFOLD_SDK_DIR}/include"
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
   target_compile_options(defold-hermes-dmsdk-named-scalar-test PRIVATE
@@ -608,7 +627,7 @@ target_include_directories(defold-hermes-script-recording-lua-adapter PRIVATE
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
   target_compile_options(defold-hermes-script-recording-lua-adapter PRIVATE
-    -Wall -Wextra -Werror -Wno-zero-length-array -pedantic
+    -Wall -Wextra -Werror -pedantic
   )
 endif()
 target_link_libraries(defold-hermes-script-recording-lua-adapter PRIVATE

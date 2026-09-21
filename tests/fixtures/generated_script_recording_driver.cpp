@@ -733,7 +733,7 @@ int main(int argc, char** argv) {
       DEHERM_RECORDING_ROUTE_COUNT, DEHERM_RECORDING_TRANSPORT_COUNT, violations,
       expectationDivergences, transportDivergences);
   if (violations || expectationDivergences || transportDivergences) {
-    std::printf("recording-engine:fail\n");
+    std::printf("recording-engine:fail last-error=%s\n", deherm_recording_last_error());
     return 1;
   }
   std::printf("recording-engine:ok\n");

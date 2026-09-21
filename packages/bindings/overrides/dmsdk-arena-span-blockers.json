@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "arena-span-blockers-v1",
+  "policyVersion": "arena-span-cstring-v2",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "tranche": "arena-backed-spans",
   "priorWaveReports": [
@@ -42,20 +42,71 @@
   "expectedCoverage": {
     "arenaSpanCensus": 79,
     "coveredByPriorWaves": 12,
-    "blocked": 67
+    "generatedCStringArena": 5,
+    "blocked": 62
   },
   "expectedPartitionSummary": {
-    "cstring-termination-or-capacity-policy": 5,
     "handle-provenance-or-engine-context": 33,
     "opaque-byte-pointee-unit-or-lifetime": 4,
     "record-layout-or-borrowed-record-lifetime": 19,
     "template-element-layout-or-specialization": 6
   },
   "blockerDefinitions": {
-    "cstring-termination-or-capacity-policy": "The ABI needs a reviewed distinction between bounded byte count, writable capacity, and C-string termination on success and failure.",
     "handle-provenance-or-engine-context": "The ABI consumes or returns an engine handle whose provenance, context, ownership, nullability, or teardown contract is not encoded by the arena.",
     "opaque-byte-pointee-unit-or-lifetime": "The void pointer's pointee unit, mutability, returned lifetime, allocation source, or ownership is not fully represented by the mechanical span shape.",
     "record-layout-or-borrowed-record-lifetime": "The ABI crosses a record pointer whose exact layout, nested fields, borrowed lifetime, or engine-context relationship is not yet verified.",
     "template-element-layout-or-specialization": "The template element type or specialization is unresolved, so the arena cannot prove element size, alignment, copying, or native linkage."
+  },
+  "cstringArena": {
+    "maximumInputBytes": 4095,
+    "maximumOutputBytes": 4096,
+    "selection": {
+      "blocker": "cstring-termination-or-capacity-policy",
+      "allowedResultRoles": ["scalar:void", "scalar:u32", "scalar:usize", "enum:dmURI::Result"],
+      "allowedParameterRoles": ["cstring-in", "cstring-mutable", "pointer:scalar:u32", "scalar:u32", "scalar:usize", "scalar:i32"]
+    },
+    "recipes": [
+      {
+        "shape": "scalar:void(out:cstring-mutable,value:scalar:usize,value:scalar:i32)",
+        "kind": "error-string",
+        "sourceEvidence": [
+          { "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h", "line": 160, "text": " * If the size of the buffer is too small, the message will be truncated to fit the buffer." },
+          { "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h", "line": 166, "text": " * @return a null-terminated error message" }
+        ]
+      },
+      {
+        "shape": "scalar:usize(out:cstring-mutable,value:scalar:usize,in:cstring-in)",
+        "kind": "trimmed-string",
+        "sourceEvidence": [
+          { "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h", "line": 122, "text": " * The destination is null-terminated when `dst_size` is greater than zero." },
+          { "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h", "line": 128, "text": " * @return Length of the trimmed source string. If the return value is greater" }
+        ]
+      },
+      {
+        "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)",
+        "kind": "canonical-path",
+        "sourceEvidence": [
+          { "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp", "line": 148, "text": "    * @param buf_len [type: uint32_t] the size of the output buffer" },
+          { "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp", "line": 149, "text": "    * @return length [type: uint32_t] the length of the output string" },
+          { "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h", "line": 321, "text": " * @param buf_len [type: uint32_t] the size of the output buffer" }
+        ]
+      },
+      {
+        "shape": "enum:dmURI::Result(in:cstring-in,out:cstring-mutable,value:scalar:u32,inout:pointer:scalar:u32)",
+        "kind": "uri-encode",
+        "sourceEvidence": [
+          { "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h", "line": 92, "text": "     * @param dst_size [type:uint32_t] size of the provided out buffer" },
+          { "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h", "line": 93, "text": "     * @param bytes_written[out] [type:uint32_t] number of bytes written" },
+          { "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h", "line": 94, "text": "     * @note If dst=0 the bytes_written will return the number of required bytes (including null character)" }
+        ]
+      }
+    ],
+    "contract": {
+      "input": "The public bridge takes a counted byte span, rejects embedded NUL, copies at most maximumInputBytes into bounded thread-local scratch, and appends one terminator.",
+      "output": "The caller supplies non-null storage with capacity 1..maximumOutputBytes. Generated glue clears it before entry, requires an in-bounds terminator afterward, and clears it on transport or native failure.",
+      "reentrancy": "Same-thread nested dispatch is rejected before touching shared scratch.",
+      "ownership": "Input scratch and output storage are borrowed only for the synchronous native call; neither pointer may escape.",
+      "fallback": "Every declaration retains its universal usage-materialized recipe; the arena adapter is an additional preferred concrete path."
+    }
   }
 }

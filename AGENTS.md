@@ -15,6 +15,10 @@ and Hermes runtime integration for Defold.
   `pnpm knowledge:outline -- <relative-document.md>`, then retrieve only the
   needed section with
   `pnpm knowledge:section -- <relative-document.md> <heading terms>`.
+- Inspect its explicit graph edges with
+  `pnpm knowledge:links -- <relative-document.md>` and find documents that
+  reference it or one of its headings with
+  `pnpm knowledge:backlinks -- <relative-document.md>`.
 - The disposable SQLite graph lives below `.deherm/cache/`; use
   `pnpm knowledge:sql -- <read-only-query>` for unusual joins. Query results are
   bounded, and the cache is never an authority or correctness dependency.

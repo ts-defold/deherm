@@ -28,14 +28,17 @@ async function expectProvenanceFailure(label, mutate, expected) {
   } finally { await rm(directory, { recursive: true, force: true }); }
 }
 
-test("named-scalar policy artifacts are deterministic and completely census-derived", async () => {
+test("named-scalar ABI artifacts are deterministic and completely census-derived", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-named-scalar-"));
   try {
     run(process.execPath, ["scripts/generate-dmsdk-named-scalar-bindings.mjs", "--out-root", output]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
-    assert.deepEqual(report.coverage, { reviewed: 21, generated: 0, policyBlocked: 21, signatureCompileCovered: 21, linked: 0, behaviorCovered: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 });
+    assert.deepEqual(report.coverage, { reviewed: 21, generated: 21, policyBlocked: 0, signatureCompileCovered: 21, linked: 21, behaviorCovered: 21, exactCallCovered: 21, typescriptCallable: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 });
     assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 21);
-    assert.equal(new Set(report.declarations.map(({ policy }) => policy.id)).size, 3);
+    assert.equal(new Set(report.declarations.map(({ bindingId }) => bindingId)).size, 21);
+    assert.equal(new Set(report.declarations.map(({ recipe }) => recipe.exactVectorSha256)).size, 21);
+    assert.equal(report.declarations.filter(({ emitted }) => emitted).length, 21);
+    assert.deepEqual(report.universalFallback, { preserved: true, catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json", mutation: "none" });
     for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json"])
       assert.equal(await readFile(join(output, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
   } finally { await rm(output, { recursive: true, force: true }); }
@@ -70,7 +73,7 @@ test("named-scalar generation rejects drifted IR and ABI-shape provenance", asyn
     shapes.rows.splice(index, 1);
     shapes.trancheSummary["next-named-scalar-direct"] = 20;
     return { irContent, shapesContent: `${JSON.stringify(shapes, null, 2)}\n` };
-  }, /must declare exactly 21/));
+  }, /must contain exactly 21/));
 });
 
 test("empty JSI and TypeScript artifacts make no module, install, or callable claim", async () => {
@@ -83,27 +86,14 @@ test("empty JSI and TypeScript artifacts make no module, install, or callable cl
   assert.match(typescript, /export \{\};/);
 });
 
-test("all named-scalar signatures compile, while links and behavior stay explicitly unclaimed", async () => {
-  const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-named-scalar-audit-"));
-  try {
-    const sdkInclude = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include");
-    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-DDLIB_LOG_DOMAIN=\"deherm\"", "-isystem", sdkInclude, "-isystem", join(repositoryRoot, "upstream/defold/engine/dlib/src"), "-isystem", join(repositoryRoot, "upstream/defold/engine/gameobject/src"), "-isystem", join(repositoryRoot, "upstream/defold/engine/sound/src"), "-c", "native/dmsdk_named_scalar_blocker_audit.cpp", "-o", join(output, "audit.o")]);
-    const report = JSON.parse(await readFile(reportPath, "utf8"));
-    for (const entry of report.declarations) {
-      assert.equal(entry.stages.compiled.status, "signature-compiled-not-linked");
-      assert.equal(entry.stages.linked.status, "not-claimed-policy-blocked");
-      assert.equal(entry.stages.conformant.status, "not-claimed-policy-blocked");
-    }
-  } finally { await rm(output, { recursive: true, force: true }); }
-});
-
-test("empty-default C ABI links and its bounded rejection path allocates nothing", async () => {
+test("all 21 production wrappers and exact-call twins link and run without warmed dispatch allocation", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-named-scalar-runtime-"));
   try {
     const cObject = join(output, "header.o");
     const executable = join(output, "runtime-test");
     run(cCompiler, ["-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", `-I${join(repositoryRoot, "defold/defold_hermes/include")}`, "-c", "native/dmsdk_named_scalar_c_header_test.c", "-o", cObject]);
-    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", `-I${join(repositoryRoot, "defold/defold_hermes/include")}`, "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp", "native/dmsdk_named_scalar_runtime_test.cpp", cObject, "-o", executable]);
+    const sdk = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-DDLIB_LOG_DOMAIN=\"deherm\"", `-I${join(repositoryRoot, "defold/defold_hermes/include")}`, "-isystem", join(sdk, "sdk/include"), "-isystem", join(sdk, "include"), "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp", "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp", "native/dmsdk_named_scalar_runtime_test.cpp", cObject, "-o", executable]);
     assert.equal(run(executable, []).trim(), "dmsdk-named-scalar-runtime:ok");
   } finally { await rm(output, { recursive: true, force: true }); }
 });

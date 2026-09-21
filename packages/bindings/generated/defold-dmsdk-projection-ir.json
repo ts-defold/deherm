@@ -48,13 +48,13 @@
       "loweringEvidence": {
         "scalar": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
         "enumValue": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555",
-        "namedScalar": "f320be6a9e4d49b9099c231874831d8fa31e6a722e50c8c104c20396926d4312",
+        "namedScalar": "f68467b39791e67bf8288a73d6e6540e4b1a1ac73331b7e161488cae8a586a12",
         "fixedDigest": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
         "base64Span": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
         "astcProbe": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
         "xteaSpan": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
         "hashSpan": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
-        "arenaSpan": "53fa6dfe6c94e2ae3c9e88696087410a611152d61969a330d22f3ed0bea443fe"
+        "arenaSpan": "0f9d8dab7f54e82e25e6ab4bf038915c49568bd3089718f128ffa24fbea515ad"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",
@@ -160,8 +160,8 @@
     "unprojectedDeclarations": 0,
     "silentUnknowns": 0,
     "generatedAdapters": 45,
-    "policyBlocked": 96,
-    "loweringPending": 1220
+    "policyBlocked": 70,
+    "loweringPending": 1246
   },
   "constructorSummary": {
     "callback": 114,
@@ -210,13 +210,13 @@
   },
   "loweringStateSummary": {
     "generated-adapter": 45,
-    "lowering-pending": 1220,
-    "policy-blocked": 96
+    "lowering-pending": 1246,
+    "policy-blocked": 70
   },
   "loweringSummary": {
     "generated-adapter": 45,
-    "lowering-pending": 1220,
-    "policy-blocked": 96
+    "lowering-pending": 1246,
+    "policy-blocked": 70
   },
   "semanticTokenSummary": {
     "call-thread-affinity": 1361,
@@ -44624,38 +44624,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "engine-context-capability-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmGameObject::Delete@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:591:1004",
@@ -127708,19 +127683,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "arenaSpan",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "cstring-termination-or-capacity-policy",
-        "stages": {
-          "generated": "not-applicable",
-          "compiled": "not-claimed",
-          "linked": "not-claimed",
-          "runtime": "not-claimed",
-          "allocation": "not-claimed"
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmResource::GetContext@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:316:1992",
@@ -153871,38 +153840,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "engine-context-capability-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
@@ -156034,19 +155978,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "arenaSpan",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "cstring-termination-or-capacity-policy",
-        "stages": {
-          "generated": "not-applicable",
-          "compiled": "not-claimed",
-          "linked": "not-claimed",
-          "runtime": "not-claimed",
-          "allocation": "not-claimed"
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmStrlCat@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:116:181",
@@ -156660,19 +156598,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "arenaSpan",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "cstring-termination-or-capacity-policy",
-        "stages": {
-          "generated": "not-applicable",
-          "compiled": "not-claimed",
-          "linked": "not-claimed",
-          "runtime": "not-claimed",
-          "allocation": "not-claimed"
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
@@ -157542,38 +157474,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "thread-ownership-capability-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmThread::Detach@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:112:607",
@@ -157684,38 +157591,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "thread-ownership-capability-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmThread::FreeTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:126:609",
@@ -157826,38 +157708,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "thread-ownership-capability-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612",
@@ -157951,38 +157808,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "thread-ownership-capability-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmThread::GetTlsValue@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:141:611",
@@ -158217,38 +158049,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "thread-ownership-capability-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmThread::New@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:92:605",
@@ -162967,19 +162774,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "arenaSpan",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "cstring-termination-or-capacity-policy",
-        "stages": {
-          "generated": "not-applicable",
-          "compiled": "not-claimed",
-          "linked": "not-claimed",
-          "runtime": "not-claimed",
-          "allocation": "not-claimed"
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmURI::Parse@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:85:654",
@@ -187013,38 +186814,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480",
@@ -187170,38 +186946,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492",
@@ -187327,38 +187078,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472",
@@ -187484,38 +187210,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484",
@@ -187641,38 +187342,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476",
@@ -187798,38 +187474,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488",
@@ -187955,38 +187606,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467",
@@ -188112,38 +187738,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479",
@@ -188269,38 +187870,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491",
@@ -188426,38 +188002,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471",
@@ -188583,38 +188134,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483",
@@ -188740,38 +188266,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475",
@@ -188897,38 +188398,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487",
@@ -189054,38 +188530,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "namedScalar",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "profile-property-provenance-required",
-        "stages": {
-          "generated": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "compiled": {
-            "status": "signature-compiled-not-linked",
-            "evidence": "native/dmsdk_named_scalar_blocker_audit.cpp"
-          },
-          "linked": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "conformant": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "allocation": {
-            "status": "not-claimed-policy-blocked",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          },
-          "typescriptCallable": {
-            "status": "blocked-by-versioned-policy",
-            "evidence": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
-          }
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ProfileRegisterProfiler@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:318:527",
@@ -194360,19 +193811,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "arenaSpan",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "cstring-termination-or-capacity-policy",
-        "stages": {
-          "generated": "not-applicable",
-          "compiled": "not-claimed",
-          "linked": "not-claimed",
-          "runtime": "not-claimed",
-          "allocation": "not-claimed"
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:ResourceGetDescriptor@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:266:1901",
