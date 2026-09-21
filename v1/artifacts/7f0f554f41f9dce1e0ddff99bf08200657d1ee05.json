@@ -39,8 +39,8 @@
       }
     },
     "dehermc": {
-      "tag": "tools-3f8fdf0e9ace",
-      "fingerprint": "3f8fdf0e9aceeffd8a5d343066382e9a17922c50c72a1feeed56583820f47d8e",
+      "tag": "tools-636828df1c50",
+      "fingerprint": "636828df1c508bd99aff1478e68ccd2ea563f996dda5003c2211603ff5e15e15",
       "indexedBy": "host",
       "summary": "dehermc, déherm's TypeScript transform compiler, per user host",
       "assets": {
@@ -69,10 +69,10 @@
       }
     },
     "native-artifacts": {
-      "tag": "libs-cfcb8d65d1d0",
-      "fingerprint": "cfcb8d65d1d0e6f045fe8212222e15011ef8c908e21b31cd23a3479e8e3ed2d8",
+      "tag": "libs-52a1faec5d17",
+      "fingerprint": "52a1faec5d177f7df14b4d76b33336b9c2db07f0c5e179febc765a612ae1df98",
       "indexedBy": "bundleTarget",
-      "summary": "libhermes.a / hermes.lib, per Defold bundle target",
+      "summary": "Hermes release/debug libraries plus generated target config, per Defold bundle target",
       "assets": {
         "arm64_sim-ios": "hermes-arm64_sim-ios.tar.gz",
         "arm64-android": "hermes-arm64-android.tar.gz",
@@ -88,44 +88,58 @@
       "contents": {
         "arm64_sim-ios": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "arm64-android": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "arm64-ios": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "arm64-linux": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "arm64-osx": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "armv7-android": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "x86_64-android": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "x86_64-linux": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "x86_64-osx": [
           "libhermes.a",
-          "libhermes.debug.a"
+          "libhermes.debug.a",
+          "libhermesvm-config.h"
         ],
         "x86_64-win32": [
           "hermes.lib",
-          "hermes.debug.lib"
+          "hermes.debug.lib",
+          "libhermesvm-config.h"
         ]
+      },
+      "compatibility": {
+        "kind": "deherm.native-artifact-compatibility",
+        "sha256": "201a2a3626b57fa786ff71b3a0966bbcf21943ef5f1ed02d2880c18e4920a584"
       }
     }
   }
