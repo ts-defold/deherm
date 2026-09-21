@@ -1,30 +1,8 @@
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { normalizeDefoldRevision } from "./defold-revision.mjs";
-
-const installedPackageRoot = path.resolve(import.meta.dirname, "../../..");
-
-// A scaffold has no editor, Bob, or build to witness an engine revision, so it
-// uses the package's explicit offline policy seed. The index is the
-// revision-to-policy authority; generated SDK/IR files are materialized outputs
-// and must never become a second source of revision truth.
-async function packagedDefoldRevision(packageRoot = installedPackageRoot) {
-  const index = JSON.parse(await readFile(
-    path.join(packageRoot, "packages", "bindings", "generated", "defold-policy-index.json"), "utf8"));
-  if (index.schemaVersion !== 1 || index.kind !== "deherm.policy.index" || !Array.isArray(index.entries)) {
-    throw new Error("The packaged Defold policy index is invalid");
-  }
-  if (index.entries.length !== 1) {
-    throw new Error(
-      `The packaged Defold policy index must contain exactly one offline policy entry; found ${index.entries.length}`
-    );
-  }
-  return normalizeDefoldRevision(
-    index.entries[0].defoldRevision,
-    "the packaged Defold policy index revision"
-  );
-}
+import { resolveDefoldChannelRevision } from "./policy-client.mjs";
 
 function projectSlug(value) {
   const slug = String(value)
@@ -81,7 +59,10 @@ export async function createDefoldProject(options = {}) {
   const name = projectTitle(options.name ?? path.basename(target));
   const defoldRevision = options.defoldRevision
     ? normalizeDefoldRevision(options.defoldRevision, "createDefoldProject defoldRevision")
-    : await packagedDefoldRevision(options.packageRoot ?? installedPackageRoot);
+    : (await resolveDefoldChannelRevision(options.channel ?? "stable", {
+        fetchImpl: options.fetchImpl,
+        locator: options.policyLocator
+      })).revision;
   const files = templateFiles({ name, packageVersion: options.packageVersion ?? "0.0.0", defoldRevision });
   for (const [relative, source] of files) {
     const output = path.join(target, relative);

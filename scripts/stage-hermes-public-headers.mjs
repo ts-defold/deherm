@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 
 import { execFileSync } from "node:child_process";
-import { cp, mkdir, readFile, readdir, rm, stat } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+
+import { resolveHermesHeaderClosure } from "./assemble-typed-native-extension.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const hermesRoot = path.join(repositoryRoot, "upstream", "hermes");
@@ -24,6 +26,7 @@ if (actualRevision !== expectedRevision) {
 
 await rm(path.join(extensionInclude, "hermes"), { recursive: true, force: true });
 await rm(path.join(extensionInclude, "jsi"), { recursive: true, force: true });
+await rm(path.join(extensionInclude, "libhermesvm-config.h"), { force: true });
 
 const copies = Object.freeze([
   ["API/hermes/hermes.h", "hermes/hermes.h"],
@@ -56,6 +59,17 @@ for (const [sourceRelative, destinationRelative] of copies) {
   } else {
     await cp(source, destination);
   }
+}
+
+const staticHeaders = await resolveHermesHeaderClosure(
+  path.join(hermesRoot, "include"),
+  null,
+  { omitTargetConfig: true }
+);
+for (const [relative, { source }] of staticHeaders) {
+  const destination = path.join(extensionInclude, relative);
+  await mkdir(path.dirname(destination), { recursive: true });
+  await writeFile(destination, source);
 }
 
 console.error("ok staged Hermes public headers for the Defold extension");

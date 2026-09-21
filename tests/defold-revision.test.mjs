@@ -15,6 +15,7 @@ import {
 } from "../packages/cli/src/defold-revision.mjs";
 import {
   buildGenerationMerkle,
+  defoldSurfaceCacheHome,
   defoldSurfaceSearchPath,
   resolveDefoldSurface
 } from "../packages/cli/src/defold-surface.mjs";
@@ -192,23 +193,32 @@ test("no layer-0 surface exists for an unknown revision and generation refuses t
   assert.match(surface.blocker.message, new RegExp(otherRevision));
   assert.match(surface.blocker.message, /deherm policy/);
   assert.match(surface.blocker.message, /No Defold source checkout/);
-  assert.deepEqual(surface.searched.map(({ layer }) => layer), ["packaged", "user-cache", "project-cache"]);
-  assert.equal(surface.searched[0].reason, `holds Defold ${bundled}`);
+  assert.deepEqual(surface.searched.map(({ layer }) => layer), ["user-cache", "project-cache", "repository-checkout"]);
+  assert.equal(surface.searched[2].reason, `holds Defold ${bundled}`);
 
   const bundledSurface = await resolveDefoldSurface(bundled, { packageRoot, projectRoot: root });
-  assert.equal(bundledSurface.layer, "packaged");
+  assert.equal(bundledSurface.layer, "repository-checkout");
   assert.equal(bundledSurface.blocker, null);
 });
 
-test("the surface search path prefers the package, then the user cache, then the project", () => {
+test("the surface search path prefers caches and uses a repository checkout only for dogfooding", () => {
   const layers = defoldSurfaceSearchPath(bundled, {
     packageRoot: "/pkg",
     projectRoot: "/proj",
     env: { DEHERM_CACHE_HOME: "/cache" }
   });
-  assert.deepEqual(layers.map(({ layer }) => layer), ["packaged", "user-cache", "project-cache"]);
-  assert.equal(layers[1].root, path.join("/cache", "surfaces", bundled));
-  assert.equal(layers[2].root, path.join("/proj", ".deherm", "cache", "surfaces", bundled));
+  assert.deepEqual(layers.map(({ layer }) => layer), ["user-cache", "project-cache", "repository-checkout"]);
+  assert.equal(layers[0].root, path.join("/cache", "surfaces", bundled));
+  assert.equal(layers[1].root, path.join("/proj", ".deherm", "cache", "surfaces", bundled));
+  assert.equal(layers[2].root, "/pkg");
+});
+
+test("the shared surface cache follows host conventions with explicit overrides first", () => {
+  assert.equal(defoldSurfaceCacheHome({ DEHERM_CACHE_HOME: "/explicit" }, "darwin", "/Users/test"), "/explicit");
+  assert.equal(defoldSurfaceCacheHome({ XDG_CACHE_HOME: "/xdg" }, "darwin", "/Users/test"), "/xdg/deherm");
+  assert.equal(defoldSurfaceCacheHome({}, "darwin", "/Users/test"), "/Users/test/Library/Caches/deherm");
+  assert.equal(defoldSurfaceCacheHome({ LOCALAPPDATA: "C:\\Users\\test\\AppData\\Local" }, "win32", "C:\\Users\\test"), path.join(path.resolve("C:\\Users\\test\\AppData\\Local"), "deherm"));
+  assert.equal(defoldSurfaceCacheHome({}, "linux", "/home/test"), "/home/test/.cache/deherm");
 });
 
 test("the generation Merkle root keys the Defold revision and the native input set independently", () => {
@@ -250,7 +260,9 @@ test("generation refuses a project whose revision cannot be resolved, and record
 
   const mismatched = await project(`[project]\ntitle = Mismatched\n[defold_hermes]\ndefold_sdk = ${otherRevision}\n`);
   await assert.rejects(
-    writeGeneratedProject(await inspectDefoldProject({ project: mismatched }), ".deherm", { env: emptyEnv }),
+    writeGeneratedProject(await inspectDefoldProject({ project: mismatched }), ".deherm", {
+      env: { ...emptyEnv, DEHERM_OFFLINE: "1" }
+    }),
     (error) => error.code === "defold-surface-not-cached" && new RegExp(otherRevision).test(error.message)
   );
 
@@ -258,7 +270,7 @@ test("generation refuses a project whose revision cannot be resolved, and record
   const output = await writeGeneratedProject(await inspectDefoldProject({ project: resolved }), ".deherm", { env: emptyEnv });
   assert.equal(output.defoldRevision, bundled);
   assert.equal(output.defoldResolution.source, "game-project");
-  assert.equal(output.defoldSurfaceLayer, "packaged");
+  assert.equal(output.defoldSurfaceLayer, "repository-checkout");
   const manifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
   const lock = JSON.parse(await readFile(path.join(resolved, "deherm.lock"), "utf8"));
   assert.deepEqual(lock.defoldResolution, manifest.defoldResolution);

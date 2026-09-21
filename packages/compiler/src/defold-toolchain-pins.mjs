@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+
 // Defold's own toolchain pins, read from the revision that declares them.
 //
 // `build_tools/sdk.py` is the authoritative statement of which Xcode, SDK, NDK,
@@ -134,5 +136,80 @@ export function buildToolchainPins({ sdkSource, buildInputPlatforms }) {
     authority: "Defold declares these; deherm never restates one as its own constant.",
     pins,
     platformKeys: [...buildInputPlatforms].sort()
+  };
+}
+
+/**
+ * Project Defold's Extender/Bob target vocabulary into revision policy data.
+ * The algorithm belongs to the package; every emitted value belongs to the
+ * selected Defold revision.
+ */
+export function buildDefoldTargetMatrix({ buildInputPlatforms, platformSource }) {
+  const targets = [];
+  for (const [name, body] of Object.entries(buildInputPlatforms)) {
+    if (!name.includes("-")) continue;
+    const separator = name.indexOf("-");
+    targets.push({
+      target: name,
+      architecture: name.slice(0, separator),
+      group: name.slice(separator + 1),
+      kind: body === null || body === undefined ? "retired" : "bundle"
+    });
+  }
+
+  const pairs = [];
+  for (const line of platformSource.replace(/\r\n?/gu, "\n").split("\n")) {
+    const match = /^\s*public static final Platform \w+\s*=\s*new Platform\([^,]+,\s*"([^"]+)",\s*(?:true|false),\s*"([^"]+)",.*,\s*"([^"]+)"\);\s*$/u.exec(line);
+    if (!match) continue;
+    const [, architecture, osName, extenderTarget] = match;
+    pairs.push({ extenderTarget, bobPlatform: `${architecture}-${osName}` });
+  }
+
+  const active = new Set(targets.filter(({ kind }) => kind === "bundle").map(({ target }) => target));
+  const byExtender = new Map(pairs.map((pair) => [pair.extenderTarget, pair]));
+  const missing = [...active].filter((target) => !byExtender.has(target));
+  if (missing.length) throw new Error(`Defold Platform.java declares no Bob platform for: ${missing.join(", ")}`);
+  return {
+    authority: {
+      targets: "upstream/defold/share/extender/build_input.yml",
+      pairs: "upstream/defold/com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/Platform.java"
+    },
+    targets: targets.sort((left, right) => left.target.localeCompare(right.target)),
+    platformPairs: pairs
+      .filter(({ extenderTarget }) => active.has(extenderTarget))
+      .sort((left, right) => left.extenderTarget.localeCompare(right.extenderTarget))
+  };
+}
+
+const NATIVE_ARTIFACT_SDK_PINS = Object.freeze({
+  androidNdkVersion: "ANDROID_NDK_VERSION",
+  androidNdkApiVersion: "ANDROID_NDK_API_VERSION",
+  android64NdkApiVersion: "ANDROID_64_NDK_API_VERSION",
+  androidTargetApiLevel: "ANDROID_TARGET_API_LEVEL",
+  iphoneosVersionMin: "VERSION_IPHONEOS_MIN",
+  macosxVersionMin: "VERSION_MACOSX_MIN"
+});
+
+function canonical(value) {
+  if (Array.isArray(value)) return value.map(canonical);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(Object.keys(value).sort().map((key) => [key, canonical(value[key])]));
+  }
+  return value;
+}
+
+/** Exact Defold-owned ABI facts consumed by the target archive builders. */
+export function nativeArtifactCompatibility(toolchain) {
+  const pins = toolchain?.pins ?? {};
+  const targets = toolchain?.targetMatrix?.targets;
+  if (!Array.isArray(targets)) throw new Error("Defold toolchain has no target matrix for native artifact compatibility");
+  const sdk = Object.fromEntries(Object.entries(NATIVE_ARTIFACT_SDK_PINS).map(([name, symbol]) => {
+    if (pins[symbol] === undefined) throw new Error(`Defold toolchain has no ${symbol} native artifact pin`);
+    return [name, pins[symbol]];
+  }));
+  const inputs = canonical({ sdk, targets });
+  return {
+    kind: "deherm.native-artifact-compatibility",
+    sha256: createHash("sha256").update(JSON.stringify(inputs)).digest("hex")
   };
 }

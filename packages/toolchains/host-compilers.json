@@ -1,10 +1,8 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "hermesRevision": "4947871513667919bf2fe225134af3e3a1a3772c",
   "ttscVersion": "0.30.4",
-  "packageScope": "@ts-defold",
-  "packageVersion": "0.0.0",
-  "distribution": "optional-per-host-package",
+  "distribution": "content-addressed-release-user-cache",
   "note": "Three tools run on the user's own machine and are therefore indexed by the user's HOST, never by the Defold bundle target. hermesc and shermes are pure compilers - text in, text out - and dehermc emits transformed TypeScript and a JSON manifest, so shipping all three imposes no native toolchain requirement on the user. Status is recorded per tool, not per host, because the three are produced by different builders on different schedules: dehermc cross-compiles to all five hosts from one job, while hermesc and shermes must each be built on a runner of their own architecture.",
   "statuses": {
     "vendored": "The binary is present for this host and matches its pinned digest.",
@@ -37,7 +35,6 @@
         "platform": "darwin",
         "architecture": "arm64"
       },
-      "package": "@ts-defold/deherm-compilers-darwin-arm64",
       "directory": "toolchains/host-compilers/darwin-arm64",
       "tools": {
         "hermesc": {
@@ -68,7 +65,6 @@
         "platform": "darwin",
         "architecture": "x64"
       },
-      "package": "@ts-defold/deherm-compilers-darwin-x64",
       "directory": "toolchains/host-compilers/darwin-x64",
       "tools": {
         "hermesc": {
@@ -99,7 +95,6 @@
         "platform": "linux",
         "architecture": "x64"
       },
-      "package": "@ts-defold/deherm-compilers-linux-x64",
       "directory": "toolchains/host-compilers/linux-x64",
       "tools": {
         "hermesc": {
@@ -130,7 +125,6 @@
         "platform": "linux",
         "architecture": "arm64"
       },
-      "package": "@ts-defold/deherm-compilers-linux-arm64",
       "directory": "toolchains/host-compilers/linux-arm64",
       "tools": {
         "hermesc": {
@@ -161,7 +155,6 @@
         "platform": "win32",
         "architecture": "x64"
       },
-      "package": "@ts-defold/deherm-compilers-win32-x64",
       "directory": "toolchains/host-compilers/win32-x64",
       "tools": {
         "hermesc": {

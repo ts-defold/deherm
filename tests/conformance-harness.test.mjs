@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -76,11 +76,36 @@ test("stable shards are exhaustive, disjoint, and argument validation is strict"
   assert.throws(() => parseShard("one"), /INDEX\/COUNT/);
 });
 
+test("conformance inputs load from a generated project's policy-backed IR", async () => {
+  const generated = path.resolve("packages/bindings/generated");
+  const irRoot = await mkdtemp(path.join(tmpdir(), "deherm-conformance-ir-"));
+  const files = {
+    "defold-script-api-ir.json": "script-api.json",
+    "defold-sdk-ir.json": "dmsdk.json",
+    "defold-script-binding-patterns.json": "script-binding-patterns.json",
+    "defold-dmsdk-binding-patterns.json": "dmsdk-binding-patterns.json",
+    "defold-script-scalar-dispatch.json": "script-scalar-dispatch.json",
+    "defold-script-real-engine-probes.json": "script-real-engine-probes.json",
+    "defold-dmsdk-scalar-thunks.json": "dmsdk-scalar-thunks.json"
+  };
+  await Promise.all(Object.entries(files).map(([source, destination]) =>
+    cp(path.join(generated, source), path.join(irRoot, destination))));
+
+  const [repositoryInputs, projectInputs] = await Promise.all([
+    loadConformanceInputs(),
+    loadConformanceInputs({ inputRoot: irRoot, layout: "project" })
+  ]);
+  assert.deepEqual(projectInputs, repositoryInputs);
+});
+
 test("the exhaustive generated TypeScript fixture compiles against the generated SDK", async () => {
   const inputs = await loadConformanceInputs();
   const plan = buildConformancePlan(inputs, { target: "arm64-macos", contexts: ["*"], shard: "0/1" });
   const output = await mkdtemp(path.join(tmpdir(), "defold-hermes-conformance-"));
-  const harness = await writeConformanceHarness(plan, output);
+  const sdkRoot = await mkdtemp(path.join(tmpdir(), "defold-hermes-policy-sdk-"));
+  await cp(path.resolve("packages/sdk/src/generated"), path.join(sdkRoot, "generated"), { recursive: true });
+  await cp(path.resolve("packages/sdk/src/address.ts"), path.join(sdkRoot, "address.ts"));
+  const harness = await writeConformanceHarness(plan, output, { sdkRoot });
   const tsc = path.resolve("node_modules/typescript/bin/tsc");
   const checked = spawnSync(process.execPath, [tsc, "--project", harness.files.tsconfig, "--pretty", "false"], {
     cwd: process.cwd(),

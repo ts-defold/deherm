@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -14,46 +14,48 @@ async function scratch(t) {
   return directory;
 }
 
-async function writePolicyIndex(packageRoot, entries) {
-  const generated = path.join(packageRoot, "packages", "bindings", "generated");
-  await mkdir(generated, { recursive: true });
-  await writeFile(path.join(generated, "defold-policy-index.json"), `${JSON.stringify({
-    schemaVersion: 1,
-    kind: "deherm.policy.index",
-    entries
-  }, null, 2)}\n`);
-}
+const locator = {
+  schemaVersion: 1,
+  kind: "deherm.policy.publication-locator",
+  base: {},
+  channels: ["stable", "beta"],
+  channelInfoUrl: "https://example.invalid/{channel}/info.json",
+  entries: []
+};
 
-test("scaffold default revision comes from the shipped policy index without generated script IR", async (t) => {
+test("scaffold resolves its default from Defold's moving stable channel, not a packaged revision", async (t) => {
   const directory = await scratch(t);
-  const packageRoot = path.join(directory, "package");
   const projectRoot = path.join(directory, "game");
-  await writePolicyIndex(packageRoot, [{ defoldRevision: revision, policyRoot: "b".repeat(64) }]);
+  const requests = [];
 
   const created = await createDefoldProject({
     directory: projectRoot,
     name: "Index-backed game",
-    packageRoot
+    policyLocator: locator,
+    fetchImpl: async (url) => {
+      requests.push(url);
+      return { ok: true, json: async () => ({ sha1: revision, version: "1.11.0" }) };
+    }
   });
 
   assert.equal(created.defoldRevision, revision);
+  assert.deepEqual(requests, ["https://example.invalid/stable/info.json"]);
   assert.match(await readFile(path.join(projectRoot, "game.project"), "utf8"), new RegExp(`defold_sdk = ${revision}`));
-  await assert.rejects(
-    readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-script-api-ir.json")),
-    (error) => error?.code === "ENOENT"
-  );
 });
 
-test("scaffold refuses an ambiguous packaged offline policy seed", async (t) => {
+test("an explicit scaffold revision is authoritative and requires no channel lookup", async (t) => {
   const directory = await scratch(t);
-  const packageRoot = path.join(directory, "package");
-  await writePolicyIndex(packageRoot, [
-    { defoldRevision: revision, policyRoot: "b".repeat(64) },
-    { defoldRevision: "c".repeat(40), policyRoot: "d".repeat(64) }
-  ]);
+  let fetched = false;
+  const projectRoot = path.join(directory, "game");
 
-  await assert.rejects(
-    createDefoldProject({ directory: path.join(directory, "game"), packageRoot }),
-    /must contain exactly one offline policy entry; found 2/u
-  );
+  const created = await createDefoldProject({
+    directory: projectRoot,
+    defoldRevision: revision,
+    policyLocator: locator,
+    fetchImpl: async () => { fetched = true; throw new Error("must not fetch"); }
+  });
+
+  assert.equal(created.defoldRevision, revision);
+  assert.equal(fetched, false);
+  assert.match(await readFile(path.join(projectRoot, "game.project"), "utf8"), new RegExp(`defold_sdk = ${revision}`));
 });

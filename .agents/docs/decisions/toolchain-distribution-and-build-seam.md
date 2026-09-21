@@ -1,7 +1,7 @@
 ---
 type: Architecture Decision
-title: Ship precompiled target libraries and host tools, and emit C into the extension for Bob
-description: CI builds Hermes per target in containers and cross-compiles dehermc for every host from one job, the package vendors those plus per-host hermesc/shermes, and generated C is assembled into the extension so Bob and Extender compile it - locally or in the cloud.
+title: Publish precompiled target libraries and host tools, and emit C into the extension for Bob
+description: CI builds Hermes per target and host tools per host, publishes them as release artifacts, and the portable CLI downloads only the selected rows into a per-user cache before Bob or Extender consumes them.
 tags: [decision, packaging, toolchain, bob, extender, static-hermes, ci]
 status: accepted
 generated: { by: claude/opus-5, at: 2026-09-18T23:50:00-04:00 }
@@ -56,9 +56,13 @@ See *The transform compiler* below.
 `libhermes.a` is the Hermes VM, JSI and `boost_context` merged into one archive,
 with the unreferenced `zip.c.o` removed so Extender's force-load does not hit
 duplicate symbols, built with `libtool -D` so it is byte-reproducible. It is
-vendored under `defold/defold_hermes/lib/<target>/` and ships in the npm
-package, because Bob uploads it to Extender for whichever platform is being
-bundled.
+published per Defold bundle target and never ships in the npm package. On first
+use the portable CLI downloads only the selected target archive into the
+platform-native per-user cache, verifies the cached row, and copies its declared
+members under the generated project's `defold_hermes/lib/<target>/` immediately
+before Bob uploads the extension to Extender. Repository-local libraries are
+build outputs, not generator inputs, and the managed extension copier excludes
+them even when the CLI is dogfooded from a source checkout.
 
 The same archive rule is enforced per object format. POSIX recipes use `ar -d`;
 native MSVC uses `lib.exe /REMOVE`; Defold's Linux-hosted Windows Extender image
@@ -72,8 +76,9 @@ It is therefore indexed by **Defold target**, never by the user's host. A user
 on macOS bundling for Android needs the Android archive and none of their own.
 
 CI builds each target in a container and publishes it as a **GitHub release
-asset**; `scripts/manage-native-artifacts.mjs pull` vendors them and records each
-digest. `toolchains/hermes/` already holds the Linux and Windows container
+asset**; the project installer downloads into the user cache, while
+`scripts/manage-native-artifacts.mjs pull` exists only for contributor/build
+staging and records each digest. `toolchains/hermes/` already holds the Linux and Windows container
 definitions. Release assets rather than workflow artifacts, because a workflow
 artifact expires, is scoped to one run, and needs an authenticated API call to
 fetch - none of which survives to a user six months after a release. The tag is
@@ -84,13 +89,16 @@ and does nothing.
 
 Each asset is one reproducible `.tar.gz` per matrix row, written by
 `toolchains/hermes/package-archive.sh`. A target's archive carries its release
-library **and** a debugger-enabled second compilation; a host's carries that
-family's compilers. A release asset is a single file, so two libraries could
-never have been two assets - and a flat asset also loses the executable bit,
-which GitHub does not store, and encodes structure in a name the download side
-then has to parse back out. `pull` extracts with `tar -xzf`, which is present on
-macOS, on Linux, and on Windows 10 1803 and later as bsdtar, so the URL-only
-vendoring path still needs no second CLI and no npm dependency.
+library, a debugger-enabled second compilation, and the release build's
+generated `libhermesvm-config.h`; a host's carries that family's compilers. The
+config is part of the native artifact because it describes the target data
+model and must match the library, so the platform-neutral npm package may not
+ship a host-generated substitute. A release asset is a single file, so the
+members could never have been separate assets - and a flat asset also loses the
+executable bit, which GitHub does not store, and encodes structure in a name the
+download side then has to parse back out. `pull` extracts with `tar -xzf`, which
+is present on macOS, on Linux, and on Windows 10 1803 and later as bsdtar, so
+the URL-only vendoring path still needs no second CLI and no npm dependency.
 
 ## What a fingerprint may hash, and what it may not
 
@@ -128,7 +136,7 @@ here rather than leaving a user to discover it.
 
 | Status | Meaning |
 | --- | --- |
-| `vendored` | present in this package and matching its pinned digest |
+| `vendored` | present in repository build staging and matching its pinned digest; never an npm payload |
 | `vendored-source` | the target links generated JavaScript, not a Hermes archive |
 | `required-missing` | a container or CI build path exists; the artifact is not in this checkout |
 | `blocked` | cannot be produced yet, and `blocker` says why in machine-readable form |
@@ -145,13 +153,13 @@ the user's machine and must ship per host: macOS arm64 and x64, Linux x64 and
 arm64, Windows x64. Both are pure compilers - text in, text out - so shipping
 them imposes no native toolchain requirement on the user.
 
-They ship as **optional per-host packages**
-(`@ts-defold/deherm-compilers-<platform>-<arch>`, declaring `os` and `cpu`),
-not vendored inside the main package. Vendoring all five would put several
-hundred megabytes of LLVM-derived binaries into every install so that one of them
-could be used. The main package does not hard-depend on them either, so a host
-with no published build still installs cleanly and gets a diagnostic instead of a
-failed install.
+They ship as **content-addressed GitHub release artifacts**, not inside the main
+npm package. Vendoring all five would put several hundred megabytes of
+LLVM-derived binaries into every install so that one of them could be used.
+First use downloads only the current host's two archives (`hermesc` + `shermes`,
+and `dehermc`) into the platform-native per-user déherm cache. A host with no
+published build still installs the portable package cleanly and gets a precise
+artifact diagnostic when compilation is requested.
 
 `packages/toolchains/host-compilers.json` is the pinned record for all three
 host tools, managed by `scripts/manage-host-compilers.mjs` with the same
@@ -159,11 +167,11 @@ host tools, managed by `scripts/manage-host-compilers.mjs` with the same
 target archives. `fingerprint`, `tag` and `expected-assets` take a family name,
 because the three tools are published under two tags; `pull` fetches both unless `--family`
 names one, and `--tag` requires `--family` since a tag addresses exactly one
-release. Resolution (`packages/cli/src/host-compilers.mjs`) checks the installed
-package first and the in-tree staging directory second, verifies the SHA-256 of
-each binary against that record, and **fails closed**: a mismatch or a missing
-package raises an error naming the host, the tool, and the exact package to
-install. There is no fallback to whatever compiler happens to be on `PATH`,
+release. Resolution (`packages/cli/src/host-compilers.mjs`) checks the in-tree
+staging directory for repository development and the user cache for installed
+consumers, verifies the SHA-256 of each binary against that record, and **fails
+closed**: a mismatch or missing release raises an error naming the host, tool,
+and cache override. There is no fallback to whatever compiler happens to be on `PATH`,
 because a build that silently proceeds without `hermesc` produces exactly the
 stale-bundle failure the build seam exists to prevent, and one that proceeds
 without `dehermc` emits a program whose `DefoldHash` literals were never

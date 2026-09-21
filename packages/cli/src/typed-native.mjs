@@ -32,7 +32,6 @@
 import { access, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { extensionPlatform, readDefoldBundleTargets, readNativeArtifactManifest } from "./toolchains.mjs";
 
 /** The materialised extension's directory name, relative to a project root. */
 export const TYPED_NATIVE_EXTENSION = "defold_hermes_typed_native";
@@ -56,36 +55,39 @@ export const TYPED_NATIVE_REFUSAL_CODE = "typed-native-requires-hermes-runtime";
  * library rather than a Hermes archive. The two must agree; a disagreement is
  * a data defect and fails closed.
  */
-export async function defoldTargetRuntime(defoldPlatform) {
+async function readProjectToolchain(projectRoot) {
+  if (!projectRoot) {
+    throw new Error("A generated Defold project or authenticated toolchain policy is required to classify a target");
+  }
+  const lock = JSON.parse(await readFile(path.join(path.resolve(projectRoot), "deherm.lock"), "utf8"));
+  if (lock.toolchain?.targetMatrix?.targets && lock.toolchain?.targetMatrix?.platformPairs) return lock.toolchain;
+  throw new Error("deherm.lock has no authenticated Defold target matrix; run 'deherm generate'");
+}
+
+export async function defoldTargetRuntime(defoldPlatform, options = {}) {
   if (typeof defoldPlatform !== "string" || !defoldPlatform) {
     throw new TypeError("A Defold bundle platform is required");
   }
-  const target = extensionPlatform(defoldPlatform);
-  const bundleTargets = await readDefoldBundleTargets();
-  const declared = bundleTargets.targets.find((entry) => entry.target === target);
+  const toolchain = options.toolchain ?? await readProjectToolchain(options.projectRoot);
+  const targetMatrix = toolchain.targetMatrix;
+  const pair = targetMatrix.platformPairs.find(
+    (entry) => entry.bobPlatform === defoldPlatform || entry.extenderTarget === defoldPlatform
+  );
+  const target = pair?.extenderTarget ?? defoldPlatform;
+  const declared = targetMatrix.targets.find((entry) => entry.target === target);
   if (!declared) {
     throw new Error(
-      `${defoldPlatform} is not a Defold bundle target in ${bundleTargets.source}; ` +
+      `${defoldPlatform} is not a Defold bundle target in ${targetMatrix.authority.targets}; ` +
       "deherm cannot decide which runtime would execute its game code");
   }
-  const artifact = (await readNativeArtifactManifest()).targets?.[target];
-  if (!artifact) {
-    throw new Error(`The installed déherm package does not declare a ${target} script artifact`);
-  }
   const byGroup = declared.group === "web" ? "browser" : "hermes";
-  const byBuilder = artifact.builder === "browser-host" ? "browser" : "hermes";
-  if (byGroup !== byBuilder) {
-    throw new Error(
-      `Pinned data disagrees about the ${target} runtime: bundle group '${declared.group}' implies ` +
-      `${byGroup} and artifact builder '${artifact.builder}' implies ${byBuilder}`);
-  }
   return {
     platform: defoldPlatform,
     extenderTarget: target,
     group: declared.group,
     runtimeId: byGroup,
-    builder: artifact.builder ?? null,
-    source: bundleTargets.source
+    artifact: null,
+    source: targetMatrix.authority.targets
   };
 }
 
@@ -94,8 +96,8 @@ export async function defoldTargetRuntime(defoldPlatform) {
  * target. The refusal is data, not prose: a caller can act on `code` without
  * reading `reason`.
  */
-export async function typedNativeDisposition(defoldPlatform) {
-  const runtime = await defoldTargetRuntime(defoldPlatform);
+export async function typedNativeDisposition(defoldPlatform, options = {}) {
+  const runtime = await defoldTargetRuntime(defoldPlatform, options);
   if (runtime.runtimeId === TYPED_NATIVE_RUNTIME) {
     return { ...runtime, eligible: true, code: null, reason: null };
   }
@@ -125,7 +127,7 @@ function parseIgnoreFile(text) {
  */
 export async function reconcileTypedNativeUpload(options) {
   const projectRoot = path.resolve(options.projectRoot);
-  const disposition = await typedNativeDisposition(options.platform);
+  const disposition = await typedNativeDisposition(options.platform, { projectRoot });
   const materialised = await access(path.join(projectRoot, TYPED_NATIVE_EXTENSION))
     .then(() => true, () => false);
   const defignore = path.join(projectRoot, ".defignore");

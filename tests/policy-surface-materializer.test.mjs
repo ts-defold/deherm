@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { materializePolicySurface } from "../packages/compiler/src/policy-surface-materializer.mjs";
-import { derivePolicy } from "../scripts/generate-api-policy.mjs";
+import { derivePolicy, discoverCompilerSurfaceOutputs } from "../scripts/generate-api-policy.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const oldPipelineFixture = JSON.parse(await readFile(path.join(
@@ -35,8 +35,16 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const policy = await currentResolvedPolicy();
   const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 12);
+  assert.equal(first.descriptor.documents.length, 17);
+  for (const name of [
+    "defold-script-binding-patterns.json",
+    "defold-dmsdk-binding-patterns.json",
+    "defold-script-real-engine-probes.json"
+  ]) {
+    assert.ok(first.descriptor.documents.includes(name), `materialized conformance input is missing ${name}`);
+  }
   assert.equal(Object.keys(first.descriptor.sdk).length, 28);
+  assert.equal(Object.keys(first.descriptor.outputs).length, 114);
 
   const compiler = policy.objects.get("@compiler");
   assert.ok(Buffer.byteLength(JSON.stringify(compiler.value)) < 5_000_000,
@@ -68,11 +76,28 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_784_443, snapshots: 77_499 },
+  assert.deepEqual(bytesByMode, { rendered: 3_790_371, snapshots: 79_846 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
+
+  const expectedOutputs = await discoverCompilerSurfaceOutputs();
+  assert.deepEqual(Object.keys(first.descriptor.outputs).sort(), expectedOutputs,
+    "policy output manifest must own every revision-generated ABI, Static Hermes, native, and browser file");
+  let outputBytes = 0;
+  for (const relative of expectedOutputs) {
+    const actual = await readFile(path.join(outputRoot, "repository", relative));
+    const expected = await readFile(path.join(repositoryRoot, relative));
+    assert.equal(sha256(actual), sha256(expected), `${relative} drifted from the source pipeline`);
+    outputBytes += actual.length;
+  }
+  assert.equal(outputBytes, 1_535_653, "revision-generated policy-output bytes changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));
   assert.equal(scriptIr.defoldRevision, policy.revision);
+  const toolchain = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-toolchain.json"), "utf8"));
+  assert.equal(toolchain.kind, "deherm.policy.toolchain");
+  assert.equal(toolchain.bob.urlTemplate, "https://d.defold.com/archive/{defoldRevision}/bob/bob.jar");
+  assert.match(toolchain.bob.sha256, /^[0-9a-f]{64}$/u);
+  assert.match(first.descriptor.toolchainSha256, /^[0-9a-f]{64}$/u);
   const second = await materializePolicySurface(policy, { outputRoot });
   assert.deepEqual(second.written, [], "materialization must be idempotent when policy and compiler are unchanged");
 });

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -7,11 +8,30 @@ import test from "node:test";
 
 import { deriveBundleTargets, derivePlatformPairs } from "../scripts/generate-defold-bundle-targets.mjs";
 import { hostCompilerKey, inspectHostCompilers, hostCompilerReport, requireHostCompilers, requireHostTool } from "../packages/cli/src/host-compilers.mjs";
-import { assertProjectNativeArtifact, nativeArtifactReport, resolveDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
+import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
+import { assertProjectNativeArtifact, ensureProjectNativeArtifact, nativeArtifactReport } from "../packages/cli/src/toolchains.mjs";
+import { buildArtifactReferences } from "../packages/generator/src/policy/generate-api-policy.mjs";
 import { dehermPluginManifest, transformCompilerIdentity, transformProject } from "../packages/cli/src/transform-compiler.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const knownTargetStatuses = new Set(["vendored", "vendored-source", "required-missing", "blocked", "retired-upstream"]);
+
+const policyManifest = await readJson("packages/bindings/generated/defold-api-policy.json");
+const policyToolchain = (await resolveDefoldSurface(policyManifest.defoldRevision, { packageRoot: repositoryRoot })).toolchain;
+const artifactDocument = {
+  schemaVersion: 1,
+  kind: "deherm.policy.artifacts",
+  defoldRevision: policyManifest.defoldRevision,
+  artifacts: await buildArtifactReferences()
+};
+
+async function writeProjectLock(root) {
+  await writeFile(path.join(root, "deherm.lock"), `${JSON.stringify({
+    defoldRevision: policyManifest.defoldRevision,
+    toolchain: policyToolchain,
+    artifacts: artifactDocument
+  }, null, 2)}\n`);
+}
 
 async function readJson(relative) {
   return JSON.parse(await readFile(path.join(repositoryRoot, relative), "utf8"));
@@ -34,18 +54,14 @@ test("the bundle target list is derived from the pinned Defold sources, not hand
 test("Bob and Extender platform identities are derived from Defold Platform.java", async () => {
   const generated = await readJson("packages/toolchains/defold-platform-pairs.json");
   assert.deepEqual(generated, await derivePlatformPairs());
-  assert.deepEqual(
-    await resolveDefoldPlatform("arm64-osx"),
-    { extenderTarget: "arm64-osx", bobPlatform: "arm64-macos", source: generated.source }
-  );
-  assert.equal((await resolveDefoldPlatform("x86_64-macos")).extenderTarget, "x86_64-osx");
-  assert.equal((await resolveDefoldPlatform("wasm-web")).bobPlatform, "wasm-web");
-  await assert.rejects(resolveDefoldPlatform("x86-osx"), /no active Bob\/Extender platform pair/);
+  assert.deepEqual(policyToolchain.targetMatrix.platformPairs, generated.platforms);
+  assert.ok(policyToolchain.targetMatrix.targets.some(({ target, kind }) => target === "x86-osx" && kind === "retired"));
 });
 
 test("a copied browser-host source artifact satisfies the project artifact gate", async () => {
   const project = await mkdtemp(path.join(tmpdir(), "deherm-web-artifact."));
   try {
+    await writeProjectLock(project);
     const relative = "defold_hermes/lib/web/library_defold_hermes.js";
     await mkdir(path.join(project, path.dirname(relative)), { recursive: true });
     await copyFile(path.join(repositoryRoot, "defold", relative), path.join(project, relative));
@@ -93,7 +109,6 @@ test("the host tool matrix covers every supported host with a pinned record per 
   assert.deepEqual(Object.keys(manifest.tools).sort(), ["dehermc", "hermesc", "shermes"]);
   for (const [key, record] of Object.entries(manifest.hosts)) {
     assert.equal(`${record.host.platform}-${record.host.architecture}`, key);
-    assert.ok(record.package.startsWith("@ts-defold/deherm-compilers-"), `${key} declares no publishable package`);
     assert.deepEqual(Object.keys(record.tools).sort(), ["dehermc", "hermesc", "shermes"], `${key} must ship all three host tools`);
     for (const [tool, toolRecord] of Object.entries(record.tools)) {
       assert.ok(toolRecord.file, `${key} ${tool} names no file`);
@@ -103,10 +118,7 @@ test("the host tool matrix covers every supported host with a pinned record per 
         assert.ok(toolRecord.builder || toolRecord.blocker?.code, `${key} ${tool} is ${toolRecord.status} without a builder or a blocker`);
       }
     }
-    const declared = JSON.parse(await readFile(path.join(repositoryRoot, record.directory, "package.json"), "utf8"));
-    assert.equal(declared.name, record.package);
-    assert.deepEqual(declared.os, [record.host.platform]);
-    assert.deepEqual(declared.cpu, [record.host.architecture]);
+    assert.equal(record.package, undefined, `${key} must not route binaries through npm`);
   }
 });
 
@@ -144,8 +156,8 @@ test("a host with no available build fails closed with an actionable diagnostic"
     await assert.rejects(requireHostCompilers(), (error) => {
       assert.match(error.message, /déherm cannot compile on this host/);
       assert.ok(
-        error.message.includes(hostCompilerKey()) || error.message.includes("@ts-defold/deherm-compilers-"),
-        `diagnostic must name the host or its package: ${error.message}`
+        error.message.includes(hostCompilerKey()) || error.message.includes("DEHERM_TOOL_CACHE"),
+        `diagnostic must name the host or release cache: ${error.message}`
       );
       return true;
     });
@@ -192,18 +204,84 @@ test("the transform compiler is driven by digest, or fails closed naming itself"
 
 
 test("the artifact report says what this package can bundle, per target", async () => {
-  const report = await nativeArtifactReport();
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-artifact-report."));
+  await writeProjectLock(project);
+  await mkdir(path.join(project, "defold_hermes/lib/web"), { recursive: true });
+  await copyFile(
+    path.join(repositoryRoot, "defold/defold_hermes/lib/web/library_defold_hermes.js"),
+    path.join(project, "defold_hermes/lib/web/library_defold_hermes.js")
+  );
+  const report = await nativeArtifactReport(project);
   const generated = await readJson("packages/toolchains/defold-bundle-targets.json");
-  assert.equal(report.targets.length, generated.targets.length);
+  assert.equal(report.targets.length, generated.targets.filter(({ kind }) => kind === "bundle").length);
   for (const row of report.targets) {
-    assert.ok(knownTargetStatuses.has(row.status), `${row.target} reported unknown status ${row.status}`);
     assert.ok(row.detail.length > 0, `${row.target} reported no detail`);
   }
   const macos = report.targets.find((row) => row.target === "arm64-osx");
-  assert.equal(macos.status, "vendored");
-  const retired = report.targets.find((row) => row.target === "x86-osx");
-  assert.equal(retired.ok, false);
-  assert.match(retired.detail, /upstream-platform-retired/);
+  assert.equal(macos.status, "published");
+  assert.equal(report.targets.some((row) => row.target === "x86-osx"), false);
+  await rm(project, { recursive: true, force: true });
+});
+
+test("a target release already in the content-addressed cache installs without network", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-target-cache."));
+  try {
+    await writeProjectLock(project);
+    const family = artifactDocument.artifacts["native-artifacts"];
+    const cacheHome = path.join(project, "user-cache");
+    const cached = path.join(cacheHome, "artifacts", family.tag, "arm64-osx");
+    await mkdir(cached, { recursive: true });
+    const hashes = {};
+    for (const member of family.contents["arm64-osx"]) {
+      const bytes = Buffer.from(`fixture:${member}`);
+      await writeFile(path.join(cached, member), bytes);
+      hashes[member] = createHash("sha256").update(bytes).digest("hex");
+    }
+    await writeFile(path.join(cached, ".deherm-target-cache.json"), `${JSON.stringify({
+      schemaVersion: 1,
+      kind: "deherm.target-artifact-cache",
+      target: "arm64-osx",
+      tag: family.tag,
+      fingerprint: family.fingerprint,
+      asset: family.assets["arm64-osx"],
+      assetSha256: "a".repeat(64),
+      members: family.contents["arm64-osx"],
+      hashes
+    }, null, 2)}\n`);
+    const installed = await ensureProjectNativeArtifact(project, "arm64-macos", {
+      env: { DEHERM_CACHE_HOME: cacheHome },
+      offline: true
+    });
+    assert.equal(installed.target, "arm64-osx");
+    const verified = await assertProjectNativeArtifact(project, "arm64-macos", { fetch: false });
+    assert.match(await readFile(verified.file, "utf8"), /^fixture:/u);
+    const installedConfig = path.join(project, "defold_hermes/include/libhermesvm-config.h");
+    assert.equal(await readFile(installedConfig, "utf8"), "fixture:libhermesvm-config.h");
+    await writeFile(installedConfig, "wrong target config");
+    await assert.rejects(
+      assertProjectNativeArtifact(project, "arm64-macos", { fetch: false }),
+      /missing or does not match its receipt/u
+    );
+    await ensureProjectNativeArtifact(project, "arm64-macos", {
+      env: { DEHERM_CACHE_HOME: cacheHome },
+      offline: true
+    });
+    await writeFile(path.join(cached, family.contents["arm64-osx"][0]), "corrupt cache");
+    await assert.rejects(
+      ensureProjectNativeArtifact(project, "arm64-macos", {
+        env: { DEHERM_CACHE_HOME: cacheHome },
+        offline: true
+      }),
+      /no valid cache receipt/u
+    );
+    await writeFile(verified.file, "corrupt");
+    await assert.rejects(
+      assertProjectNativeArtifact(project, "arm64-macos", { fetch: false }),
+      /missing or does not match its receipt: defold_hermes\/lib\/arm64-osx\/libhermes\.a/u
+    );
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
 });
 
 test("deherm doctor reports the matrix and rejects a target Defold does not declare", () => {

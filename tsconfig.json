@@ -9,6 +9,8 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "paths": {
+      "@ts-defold/deherm": ["./packages/sdk/src/index.ts"],
+      "@ts-defold/deherm/modules/*": ["./packages/sdk/src/generated/modules/*"],
       "@deherm/abi": ["./packages/abi/src/generated/layouts.ts"],
       "@deherm/bindings": ["./packages/bindings/modules.json"],
       "@deherm/bindings/*": ["./packages/bindings/*"],

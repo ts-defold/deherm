@@ -84,16 +84,6 @@ importers:
 
   packages/web-adapter: {}
 
-  toolchains/host-compilers/darwin-arm64: {}
-
-  toolchains/host-compilers/darwin-x64: {}
-
-  toolchains/host-compilers/linux-arm64: {}
-
-  toolchains/host-compilers/linux-x64: {}
-
-  toolchains/host-compilers/win32-x64: {}
-
 packages:
 
   '@esbuild/aix-ppc64@0.25.10':

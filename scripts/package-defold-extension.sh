@@ -60,5 +60,7 @@ mkdir -p "$extension_root/include/hermes/Public" "$extension_root/include/jsi"
 cp "$hermes_source/API/hermes/hermes.h" "$extension_root/include/hermes/hermes.h"
 cp "$hermes_source/API/jsi/jsi/"*.h "$extension_root/include/jsi/"
 cp "$hermes_source/public/hermes/Public/"*.h "$extension_root/include/hermes/Public/"
+cp "$hermes_build/lib/config/libhermesvm-config.h" \
+  "$extension_root/include/libhermesvm-config.h"
 
 echo "Packaged arm64-osx Hermes extension artifacts in $extension_root"

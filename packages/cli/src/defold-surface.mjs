@@ -3,9 +3,11 @@
 //
 // See `.agents/docs/decisions/layered-api-policy-cache.md`. Layer 0 is keyed by
 // the Defold revision alone and is produced once per revision, never per
-// `deherm generate`. The déherm package ships exactly one layer-0 surface - the
-// revision it was built against - and any other revision has to come from a
-// cache directory that a surface build populated.
+// `deherm generate`. The déherm package ships no layer-0 surface. A selected
+// revision is resolved from a descriptor-backed user/project cache populated
+// from its authenticated policy. A repository checkout may expose its generated
+// tree only as a final contributor fallback; an npm package carries neither the
+// checkout marker nor that generated tree.
 //
 // Two things are deliberately kept apart here and were conflated before:
 //
@@ -34,13 +36,19 @@ export const surfaceIrFiles = Object.freeze({
   scriptIrPath: "defold-script-api-ir.json",
   dmsdkIrPath: "defold-sdk-ir.json",
   scriptDispatchPath: "defold-script-scalar-dispatch.json",
+  scriptPatternsPath: "defold-script-binding-patterns.json",
+  dmsdkPatternsPath: "defold-dmsdk-binding-patterns.json",
+  scriptProbesPath: "defold-script-real-engine-probes.json",
   scriptAccountingPath: "defold-script-api-accounting.json",
   scriptUniversalPath: "defold-script-universal-value-bindings.json",
   scriptProfilesPath: "defold-script-route-availability-profiles.json",
   loweringPlanPath: "defold-binding-lowering-plan.json",
   loweringPlanSentinelPath: "defold-binding-lowering-plan.sentinel.json",
   dmsdkThunksPath: "defold-dmsdk-scalar-thunks.json",
-  dmsdkUniversalPath: "defold-dmsdk-universal-bindings.json"
+  dmsdkUniversalPath: "defold-dmsdk-universal-bindings.json",
+  resourceSchemaPath: "defold-resource-declaration-schema.json",
+  resourceNamespacesPath: "defold-script-resource-namespaces.json",
+  toolchainPath: "defold-toolchain.json"
 });
 
 function sha256(value) {
@@ -59,38 +67,35 @@ function digestOf(value) {
   return sha256(JSON.stringify(canonical(value)));
 }
 
-export function defoldSurfaceCacheHome(env = process.env) {
+export function defoldSurfaceCacheHome(env = process.env, platform = process.platform, userHome = homedir()) {
   if (env.DEHERM_CACHE_HOME) return path.resolve(env.DEHERM_CACHE_HOME);
   if (env.XDG_CACHE_HOME) return path.join(path.resolve(env.XDG_CACHE_HOME), "deherm");
-  return path.join(homedir(), ".cache", "deherm");
+  if (platform === "darwin") return path.join(userHome, "Library", "Caches", "deherm");
+  if (platform === "win32") {
+    const windowsCache = env.LOCALAPPDATA || env.APPDATA;
+    if (windowsCache) return path.join(path.resolve(windowsCache), "deherm");
+  }
+  return path.join(userHome, ".cache", "deherm");
 }
 
 /**
  * Where a layer-0 surface for `revision` may live, most preferred first.
  *
- * The packaged layer is listed first and costs nothing; the user cache is
- * shared across that user's projects; the project cache makes a checkout
- * self-contained for CI. None of them require network access - populating one
- * does, and that is a separate, explicit step.
+ * The user cache is shared across that user's projects; the project cache makes
+ * a checkout self-contained for CI. A source checkout is considered last for
+ * repository dogfooding, never as an installed-package contract.
  */
 export function defoldSurfaceSearchPath(revision, options = {}) {
   const packageRoot = options.packageRoot;
   const projectRoot = options.projectRoot;
   const layers = [];
-  if (packageRoot) {
-    layers.push({
-      layer: "packaged",
-      irRoot: path.join(packageRoot, "packages", "bindings", "generated"),
-      sdkRoot: path.join(packageRoot, "packages", "sdk", "src"),
-      descriptor: null
-    });
-  }
   const cacheHome = defoldSurfaceCacheHome(options.env ?? process.env);
   layers.push({
     layer: "user-cache",
     root: path.join(cacheHome, "surfaces", revision),
     irRoot: path.join(cacheHome, "surfaces", revision, "ir"),
     sdkRoot: path.join(cacheHome, "surfaces", revision, "sdk"),
+    repositoryRoot: path.join(cacheHome, "surfaces", revision, "repository"),
     descriptor: path.join(cacheHome, "surfaces", revision, "surface.json")
   });
   if (projectRoot) {
@@ -100,7 +105,20 @@ export function defoldSurfaceSearchPath(revision, options = {}) {
       root,
       irRoot: path.join(root, "ir"),
       sdkRoot: path.join(root, "sdk"),
+      repositoryRoot: path.join(root, "repository"),
       descriptor: path.join(root, "surface.json")
+    });
+  }
+  if (packageRoot) {
+    layers.push({
+      layer: "repository-checkout",
+      root: packageRoot,
+      irRoot: path.join(packageRoot, "packages", "bindings", "generated"),
+      sdkRoot: path.join(packageRoot, "packages", "sdk", "src"),
+      repositoryRoot: packageRoot,
+      descriptor: null,
+      repositoryMarker: path.join(packageRoot, "pnpm-workspace.yaml"),
+      policyManifest: path.join(packageRoot, "packages", "bindings", "generated", "defold-api-policy.json")
     });
   }
   return layers;
@@ -108,7 +126,19 @@ export function defoldSurfaceSearchPath(revision, options = {}) {
 
 async function layerProvides(candidate, revision) {
   const missing = [];
-  for (const relative of Object.values(surfaceIrFiles)) {
+  let descriptor = null;
+  let toolchain = null;
+  let artifacts = null;
+  if (candidate.repositoryMarker) {
+    try {
+      const information = await stat(candidate.repositoryMarker);
+      if (!information.isFile()) return { ok: false, missing: ["repository checkout marker"] };
+    } catch {
+      return { ok: false, missing: ["repository checkout marker"] };
+    }
+  }
+  for (const [key, relative] of Object.entries(surfaceIrFiles)) {
+    if (key === "toolchainPath" && candidate.policyManifest) continue;
     const file = path.join(candidate.irRoot, relative);
     try {
       const information = await stat(file);
@@ -119,7 +149,6 @@ async function layerProvides(candidate, revision) {
   }
   if (missing.length) return { ok: false, missing };
   if (candidate.descriptor) {
-    let descriptor;
     try {
       descriptor = JSON.parse(await readFile(candidate.descriptor, "utf8"));
     } catch (error) {
@@ -136,7 +165,30 @@ async function layerProvides(candidate, revision) {
         missing.push(`sdk/generated/${relative}`);
       }
     }
+    for (const relative of Object.keys(descriptor.outputs ?? {})) {
+      try {
+        const information = await stat(path.join(candidate.repositoryRoot, relative));
+        if (!information.isFile()) missing.push(`repository/${relative}`);
+      } catch {
+        missing.push(`repository/${relative}`);
+      }
+    }
     if (missing.length) return { ok: false, missing };
+    if (!/^[0-9a-f]{64}$/u.test(descriptor.sdkTreeSha256 ?? "") ||
+        !/^[0-9a-f]{64}$/u.test(descriptor.outputTreeSha256 ?? "")) {
+      return { ok: false, missing: [], error: "surface descriptor has no authenticated tree digests" };
+    }
+    if (descriptor.artifactsSha256) {
+      try {
+        const bytes = await readFile(path.join(candidate.irRoot, "defold-artifacts.json"));
+        if (sha256(bytes) !== descriptor.artifactsSha256) {
+          return { ok: false, missing: [], error: "surface artifact mapping digest mismatch" };
+        }
+        artifacts = JSON.parse(bytes);
+      } catch (error) {
+        return { ok: false, missing: ["defold-artifacts.json"], error: error.message };
+      }
+    }
   }
   let declared;
   try {
@@ -145,7 +197,25 @@ async function layerProvides(candidate, revision) {
     return { ok: false, missing: [], error: error.message };
   }
   if (declared !== revision) return { ok: false, missing: [], revision: declared };
-  return { ok: true, missing: [] };
+  if (candidate.policyManifest) {
+    try {
+      const manifest = JSON.parse(await readFile(candidate.policyManifest, "utf8"));
+      const digest = manifest.subtrees?.["@toolchain"]?.hash;
+      if (manifest.defoldRevision !== revision || !/^[0-9a-f]{64}$/u.test(digest ?? "")) {
+        return { ok: false, missing: [], error: "invalid repository policy toolchain reference" };
+      }
+      const objectFile = path.join(candidate.irRoot, "policy", manifest.layoutVersion, "object", `${digest}.json`);
+      const bytes = await readFile(objectFile);
+      if (sha256(bytes) !== digest) return { ok: false, missing: [], error: "repository toolchain object digest mismatch" };
+      toolchain = JSON.parse(bytes);
+      if (toolchain.kind !== "deherm.policy.toolchain") {
+        return { ok: false, missing: [], error: "repository toolchain object has invalid kind" };
+      }
+    } catch (error) {
+      return { ok: false, missing: [], error: `unreadable repository toolchain: ${error.message}` };
+    }
+  }
+  return { ok: true, missing: [], descriptor, toolchain, artifacts };
 }
 
 export class DefoldSurfaceError extends Error {
@@ -175,6 +245,10 @@ export async function resolveDefoldSurface(revision, options = {}) {
         layer: candidate.layer,
         irRoot: candidate.irRoot,
         sdkRoot: candidate.sdkRoot,
+        repositoryRoot: candidate.repositoryRoot,
+        descriptor: result.descriptor,
+        toolchain: result.toolchain,
+        artifacts: result.artifacts,
         paths: Object.fromEntries(Object.entries(surfaceIrFiles)
           .map(([key, relative]) => [key, path.join(candidate.irRoot, relative)])),
         searched,

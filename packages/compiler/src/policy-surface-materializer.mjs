@@ -26,6 +26,8 @@ import {
 import { DEFOLD_REVISION_TOKEN, restoreDefoldRevision } from "./api-policy.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
 import { assertDmSdkUniversalStaticFrameCapacity } from "./dmsdk-universal-static-frame.mjs";
+import { isRevisionOutput } from "./revision-output-layout.mjs";
+import { nativeArtifactCompatibility } from "./defold-toolchain-pins.mjs";
 
 const SCRIPT_IR = "defold-script-api-ir.json";
 const DMSDK_IR = "defold-sdk-ir.json";
@@ -36,6 +38,7 @@ const DOCUMENT_RECIPES = new Set([
   "policy.compiler-document.defold-value-layouts.v1",
   "policy.compiler-document.dmsdk-universal.v1"
 ]);
+const OUTPUT_RECIPE = "output.compatibility-source.copy.v1";
 const SDK_RECIPES = Object.freeze({
   "script/types.ts": "sdk.script.types.render.v1",
   "script/modules.ts": "sdk.script.modules.render.v1",
@@ -58,6 +61,12 @@ function sha256(value) {
 
 function json(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
+}
+
+function manifestTreeSha256(entries) {
+  return sha256(JSON.stringify(Object.entries(entries)
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([name, value]) => [name, value.sha256])));
 }
 
 function scriptModel(ir) {
@@ -110,11 +119,27 @@ function compilerObject(resolvedPolicy) {
   return object;
 }
 
+function toolchainObject(resolvedPolicy, revision) {
+  const object = resolvedPolicy?.objects?.get?.("@toolchain")?.value;
+  if (!object || object.kind !== "deherm.policy.toolchain") {
+    throw new Error("The resolved policy has no authenticated @toolchain surface");
+  }
+  return restoreDefoldRevision(object, revision);
+}
+
 function confinedRelativePath(value, label, extension) {
   if (typeof value !== "string" || value.length === 0 || value.includes("\\") ||
       path.posix.isAbsolute(value) || path.posix.normalize(value) !== value ||
-      value === ".." || value.startsWith("../") || !value.endsWith(extension)) {
+      value === ".." || value.startsWith("../") || (extension && !value.endsWith(extension))) {
     throw new Error(`${label}: unsafe relative path ${JSON.stringify(value)}`);
+  }
+  return value;
+}
+
+function confinedOutputPath(value) {
+  confinedRelativePath(value, "compiler output");
+  if (!isRevisionOutput(value)) {
+    throw new Error(`compiler output: unsupported owned root ${JSON.stringify(value)}`);
   }
   return value;
 }
@@ -135,13 +160,15 @@ export function resolveCompilerSurface(resolvedPolicy, revision) {
   }
   if (compiler.documents?.schemaVersion !== 1 ||
       compiler.documents?.kind !== "deherm.policy.compiler-document-manifest" ||
-      compiler.sdk?.schemaVersion !== 1 || compiler.sdk?.kind !== "deherm.policy.sdk-manifest") {
+      compiler.sdk?.schemaVersion !== 1 || compiler.sdk?.kind !== "deherm.policy.sdk-manifest" ||
+      compiler.outputs?.schemaVersion !== 1 || compiler.outputs?.kind !== "deherm.policy.output-manifest") {
     throw new Error("Policy compiler surface has an unsupported manifest schema");
   }
   const recipes = compiler.realizationRecipes;
   if (!recipes || typeof recipes !== "object") throw new Error("Policy compiler surface has no realization recipes");
   const documentEntries = compiler.documents.entries ?? {};
   const sdkEntries = compiler.sdk.entries ?? {};
+  const outputEntries = compiler.outputs.entries ?? {};
   const documents = {};
   for (const [name, record] of Object.entries(documentEntries)) {
     confinedRelativePath(name, "compiler document", ".json");
@@ -186,7 +213,23 @@ export function resolveCompilerSurface(resolvedPolicy, revision) {
   if (staleSdkRecipes.length > 0) {
     throw new Error(`SDK recipes name absent entries: ${staleSdkRecipes.join(", ")}`);
   }
-  return { ...compiler, documents, sdk };
+  const outputs = {};
+  for (const [relative, record] of Object.entries(outputEntries)) {
+    confinedOutputPath(relative);
+    if (!record || record.mode !== "authenticated-compatibility-source" ||
+        !/^[0-9a-f]{64}$/u.test(record.sha256 ?? "") ||
+        record.recipe !== recipes.outputs?.[relative] || record.recipe !== OUTPUT_RECIPE) {
+      throw new Error(`${relative}: invalid compiler-output manifest record`);
+    }
+    const object = referencedObject(
+      resolvedPolicy, record.sourceObject, "deherm.policy.compiler-output-source", relative);
+    outputs[relative] = { ...record, source: restoreDefoldRevision(object.source, revision) };
+  }
+  const staleOutputRecipes = Object.keys(recipes.outputs ?? {}).filter((name) => !(name in outputEntries));
+  if (staleOutputRecipes.length > 0) {
+    throw new Error(`Compiler-output recipes name absent entries: ${staleOutputRecipes.join(", ")}`);
+  }
+  return { ...compiler, documents, sdk, outputs };
 }
 
 async function writeStable(file, source) {
@@ -195,6 +238,43 @@ async function writeStable(file, source) {
   if (current === source) return false;
   await writeFile(file, source);
   return true;
+}
+
+async function realizeCompilerDocuments(input) {
+  const documents = structuredClone(input);
+  const planName = "defold-binding-lowering-plan.json";
+  const sentinelName = "defold-binding-lowering-plan.sentinel.json";
+  const plan = documents[planName];
+  const previousSentinel = documents[sentinelName];
+  if (!plan || !previousSentinel) return documents;
+
+  // Policy serialization canonicalizes object keys. The historical plan digest
+  // is insertion-order-sensitive JSON, so copying it after canonicalization
+  // creates a self-inconsistent plan. Realize both identities from the selected
+  // facts and this package's emitter instead of retaining checkout bytes.
+  const { planSha256: _oldPlanSha256, ...planBody } = plan;
+  const realizedPlan = { ...planBody, planSha256: sha256(JSON.stringify(planBody)) };
+  const planSource = json(realizedPlan);
+  const generatorSource = await readFile(new URL("./generate-binding-lowering-plan.mjs", import.meta.url));
+  const generatorSha256 = sha256(generatorSource);
+  const inputPaths = previousSentinel.inputPaths;
+  const inputHashes = realizedPlan.inputHashes;
+  if (!inputPaths || !inputHashes) throw new Error("Lowering-plan policy has no cache identity inputs");
+  const cacheKey = sha256(JSON.stringify({ generatorSha256, inputHashes, inputPaths, rootSchema: 1 }));
+  documents[planName] = realizedPlan;
+  documents[sentinelName] = {
+    schemaVersion: 1,
+    generator: "packages/compiler/src/generate-binding-lowering-plan.mjs",
+    generatorSha256,
+    inputPaths,
+    inputHashes,
+    cacheKey,
+    output: "packages/bindings/generated/defold-binding-lowering-plan.json",
+    outputBytes: Buffer.byteLength(planSource),
+    outputSha256: sha256(planSource),
+    planSha256: realizedPlan.planSha256
+  };
+  return documents;
 }
 
 /**
@@ -211,7 +291,8 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   if (!/^[0-9a-f]{40}$/.test(revision)) throw new Error(`Invalid Defold revision ${JSON.stringify(revision)}`);
   const outputRoot = path.resolve(options.outputRoot);
   const compiler = resolveCompilerSurface(resolvedPolicy, revision);
-  const documents = compiler.documents ?? {};
+  const toolchain = toolchainObject(resolvedPolicy, revision);
+  const documents = await realizeCompilerDocuments(compiler.documents ?? {});
   const recipes = compiler.realizationRecipes;
   if (!recipes || typeof recipes !== "object") throw new Error("Policy compiler surface has no realization recipes");
   for (const required of [SCRIPT_IR, DMSDK_IR, HANDLE_LOWERING]) {
@@ -255,6 +336,38 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   for (const [relative, value] of Object.entries(documents).sort(([left], [right]) => left.localeCompare(right))) {
     if (await writeStable(path.join(outputRoot, "ir", relative), json(value))) writes.push(`ir/${relative}`);
   }
+  const toolchainSource = json(toolchain);
+  if (await writeStable(path.join(outputRoot, "ir", "defold-toolchain.json"), toolchainSource)) {
+    writes.push("ir/defold-toolchain.json");
+  }
+  let artifactsSource = null;
+  if (options.artifacts) {
+    if (options.artifacts.kind !== "deherm.policy.artifacts" || options.artifacts.defoldRevision !== revision) {
+      throw new Error("Published artifact mapping does not describe the materialized Defold revision");
+    }
+    const declared = options.artifacts.artifacts?.["native-artifacts"]?.compatibility;
+    const expected = nativeArtifactCompatibility(toolchain);
+    if (declared?.kind !== expected.kind || declared.sha256 !== expected.sha256) {
+      throw new Error("Published native artifacts are incompatible with the selected Defold toolchain policy");
+    }
+    artifactsSource = json(options.artifacts);
+    if (await writeStable(path.join(outputRoot, "ir", "defold-artifacts.json"), artifactsSource)) {
+      writes.push("ir/defold-artifacts.json");
+    }
+  }
+  const outputs = compiler.outputs ?? {};
+  for (const [relative, record] of Object.entries(outputs).sort(([left], [right]) => left.localeCompare(right))) {
+    if (record.recipe !== OUTPUT_RECIPE || typeof record.source !== "string") {
+      throw new Error(`${relative}: unsupported compiler-output recipe ${JSON.stringify(record.recipe)}`);
+    }
+    const canonicalSource = record.source.split(revision).join(DEFOLD_REVISION_TOKEN);
+    const actual = sha256(canonicalSource);
+    if (actual !== record.sha256) {
+      throw new Error(`${relative}: materialized SHA-256 ${actual} does not match policy ${record.sha256}`);
+    }
+    const destination = path.join(outputRoot, "repository", relative);
+    if (await writeStable(destination, record.source)) writes.push(`repository/${relative}`);
+  }
 
   const descriptor = {
     schemaVersion: 1,
@@ -262,10 +375,19 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     defoldRevision: revision,
     policyRoot: resolvedPolicy?.entry?.policyRoot ?? resolvedPolicy?.policy?.rootHash ?? null,
     documents: Object.keys(documents).sort(),
+    toolchainSha256: sha256(toolchainSource),
+    artifactsSha256: artifactsSource ? sha256(artifactsSource) : null,
     sdk: Object.fromEntries(Object.entries(sdk).sort(([left], [right]) => left.localeCompare(right)).map(([name, value]) => [name, {
       mode: value.mode,
       sha256: value.sha256
-    }]))
+    }])),
+    outputs: Object.fromEntries(Object.entries(outputs).sort(([left], [right]) => left.localeCompare(right)).map(([name, value]) => [name, {
+      mode: value.mode,
+      sha256: value.sha256,
+      recipe: value.recipe
+    }])),
+    sdkTreeSha256: manifestTreeSha256(sdk),
+    outputTreeSha256: manifestTreeSha256(outputs)
   };
   if (await writeStable(path.join(outputRoot, "surface.json"), json(descriptor))) writes.push("surface.json");
   return { revision, outputRoot, descriptor, written: writes };

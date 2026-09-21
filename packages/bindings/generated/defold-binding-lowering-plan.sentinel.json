@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "generator": "packages/compiler/src/generate-binding-lowering-plan.mjs",
-  "generatorSha256": "c73b3ee73e7901f4b3c885b6eeccec58e34640e9ea5969944736fa2cd2cf9e3f",
+  "generatorSha256": "b383b1c7c675ccb440b8dc8421f28bbb17aff406fdc3d4abd5e68a44ed437469",
   "inputPaths": {
     "scriptProjection": "packages/bindings/generated/defold-script-projection-ir.json",
     "scriptScalarDispatch": "packages/bindings/generated/defold-script-scalar-dispatch.json",
@@ -74,7 +74,7 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "d89bdeefcfc5c99748e02ff935ec3a3378134fabc040a35cd334ed2f1e156a8c",
+  "cacheKey": "e7bc2d8d7822d104f7d0d8b7ff360a017048e6e3810d7ddf0a9c1a36bc4d5110",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
   "outputBytes": 16696720,
   "outputSha256": "0bdc6ba6109a99d264760ed76efb20e33067e3fb91aff87ee43a59bf670ff871",

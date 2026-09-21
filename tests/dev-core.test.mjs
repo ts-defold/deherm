@@ -15,7 +15,7 @@ import { createWatchPathFilter } from "../packages/cli/src/dev/watcher.mjs";
 import { createDevWatchOptions } from "../packages/cli/src/dev/session.mjs";
 import { createEngineController, parseEngineControlEvent, resolveBuiltEngine } from "../packages/cli/src/dev/engine-process.mjs";
 import { ensureBob, extractBobFailureDiagnostics } from "../packages/cli/src/dev/defold-builder.mjs";
-import { assertProjectNativeArtifact, hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
+import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 
 function decodeVarint(bytes, offset) {
   let value = 0;
@@ -355,10 +355,4 @@ test("host platforms map to Defold build and packaged-extension targets", () => 
   assert.equal(hostDefoldPlatform("linux", "x64"), "x86_64-linux");
   assert.equal(hostDefoldPlatform("win32", "x64"), "x86_64-win32");
   assert.throws(() => hostDefoldPlatform("win32", "arm64"), /No Defold development platform mapping/);
-});
-
-test("development build fails closed when an installed package lacks the host Hermes artifact", async () => {
-  const root = await mkdtemp(path.join(tmpdir(), "deherm-artifacts-"));
-  await assert.rejects(assertProjectNativeArtifact(root, "x86_64-win32"), /required-missing/);
-  await assert.rejects(assertProjectNativeArtifact(root, "arm64-macos"), /missing defold_hermes\/lib\/arm64-osx\/libhermes\.a/);
 });

@@ -19,52 +19,21 @@
 // new tag never overwrites an old one in place.
 
 import { createHash } from "node:crypto";
-import { existsSync } from "node:fs";
 import { chmod, mkdir, readFile, rename, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { downloadReleaseAssets, extractReleaseArchive } from "./release-assets.mjs";
+import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 
 const moduleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..", "..");
 
-/**
- * Where fetched tools live: inside the PROJECT, not the user's home.
- *
- * A per-user cache would make a build depend on machine state that no
- * teammate, CI runner or future checkout shares - the same class of problem as
- * a tool resolved from PATH. Keeping it under the project means the toolchain a
- * build used is visible next to the project that used it, and can be COMMITTED
- * so a teammate or a CI run gets the exact bytes without re-downloading and
- * without network access at all.
- *
- * `.deherm/cache` is the existing home for project-local derived state, so this
- * sits beside it rather than inventing a second location. The path is keyed by
- * release tag, so two deherm versions sharing a tag share the download and a
- * new tag never overwrites an old one in place.
- *
- * It is GITIGNORED by default - this repository at .gitignore:19, and scaffolded
- * projects through scaffold.mjs - so the default behaviour is to re-download per
- * machine and per worktree. Committing it is a deliberate opt-in for anyone who
- * wants teammates or CI to build with no network. Tag-keyed paths are what make
- * that safe: a committed cache for one tag cannot collide with another, and a
- * stale one is never silently preferred because the tag would not match.
- */
-export function projectRoot(from = process.cwd()) {
-  let directory = path.resolve(from);
-  for (;;) {
-    for (const marker of ["deherm.lock", "game.project", "package.json", ".git"]) {
-      if (existsSync(path.join(directory, marker))) return directory;
-    }
-    const parent = path.dirname(directory);
-    if (parent === directory) return path.resolve(from);
-    directory = parent;
-  }
-}
-
+/** Platform-native, per-user cache for downloaded host executables. */
 export function toolCacheRoot(options = {}) {
-  if (process.env.DEHERM_TOOL_CACHE) return path.resolve(process.env.DEHERM_TOOL_CACHE);
-  return path.join(options.projectRoot ?? projectRoot(), ".deherm", "cache", "toolchains");
+  const env = options.env ?? process.env;
+  if (env.DEHERM_TOOL_CACHE) return path.resolve(env.DEHERM_TOOL_CACHE);
+  if (options.cacheRoot) return path.resolve(options.cacheRoot);
+  return path.join(defoldSurfaceCacheHome(env), "toolchains");
 }
 
 async function readReleaseTags(options = {}) {

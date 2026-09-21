@@ -1,9 +1,9 @@
 // Resolve one immutable Defold API policy from the published Pages index.
 //
-// The shipped index supplies the base and path templates, but it is not the
-// catalogue: Defold publishes revisions after an npm package is released. The
-// exact revision entry is fetched from Pages, then the policy and every object
-// are verified against the digest in their path before any byte is cached.
+// The package ships only a revision-neutral publication locator. Defold
+// publishes revisions after an npm package is released, so the exact revision
+// entry is always fetched from Pages, followed by the content-addressed policy
+// and objects. No revision entry or generated surface is an npm resource.
 
 import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
@@ -13,6 +13,55 @@ import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../../compiler/src/api-
 import { materializePolicySurface } from "../../compiler/src/policy-surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
+
+const defaultSiteConfig = new URL("../../bindings/policy-site.json", import.meta.url);
+
+export function policyLocatorFromSiteConfig(config) {
+  if (config?.schemaVersion !== 1 || typeof config.baseUrl !== "string" ||
+      typeof config.pathPrefix !== "string" || !/^v\d+$/u.test(config.layoutVersion ?? "") ||
+      !Array.isArray(config.channels) || typeof config.channelInfoUrl !== "string") {
+    throw new Error("The packaged policy publication locator is invalid");
+  }
+  const layout = config.layoutVersion;
+  return {
+    schemaVersion: 1,
+    kind: "deherm.policy.publication-locator",
+    base: {
+      url: config.baseUrl,
+      pathPrefix: config.pathPrefix,
+      layoutVersion: layout,
+      index: `${layout}/index/{defoldRevision}.json`,
+      artifacts: `${layout}/artifacts/{defoldRevision}.json`,
+      policy: `${layout}/policy/{policyRoot}.json`,
+      object: `${layout}/object/{subtreeHash}.json`,
+      releaseAsset: "https://github.com/ts-defold/deherm/releases/download/{tag}/{asset}"
+    },
+    channels: [...config.channels],
+    channelInfoUrl: config.channelInfoUrl,
+    entries: []
+  };
+}
+
+export async function readPolicyLocator(file = defaultSiteConfig) {
+  return policyLocatorFromSiteConfig(JSON.parse(await readFile(file, "utf8")));
+}
+
+export async function resolveDefoldChannelRevision(channel = "stable", options = {}) {
+  const locator = options.locator ?? await readPolicyLocator(options.siteConfig);
+  if (!locator.channels.includes(channel)) {
+    throw new Error(`Unknown Defold channel ${JSON.stringify(channel)}; expected ${locator.channels.join(", ")}`);
+  }
+  const url = locator.channelInfoUrl.replace("{channel}", channel);
+  const fetchImpl = options.fetchImpl ?? ((value) => fetch(value, { signal: AbortSignal.timeout(30_000) }));
+  const response = await fetchImpl(url);
+  if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
+  const info = await response.json();
+  const revision = String(info?.sha1 ?? "").toLowerCase();
+  if (!DEFOLD_REVISION_PATTERN.test(revision)) {
+    throw new Error(`${url}: sha1 is not a Defold revision: ${JSON.stringify(info?.sha1)}`);
+  }
+  return { channel, revision, version: info.version ?? null, source: url };
+}
 
 function expand(template, values) {
   return template.replace(/\{(\w+)\}/g, (_, key) => {
@@ -169,6 +218,17 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     throw new Error(`${revision}: published entry contradicts this package's shipped index`);
   }
 
+  let artifacts = null;
+  if (index.base.artifacts) {
+    const artifactsResult = await fetchRelative(expand(index.base.artifacts, { defoldRevision: revision }));
+    artifacts = JSON.parse(artifactsResult.bytes.toString("utf8"));
+    if (artifacts.kind !== "deherm.policy.artifacts" || artifacts.defoldRevision !== revision ||
+        artifacts.artifacts?.["native-artifacts"]?.indexedBy !== "bundleTarget") {
+      throw new Error(`${artifactsResult.relative}: invalid artifact mapping for ${revision}`);
+    }
+    artifacts.releaseAsset = index.base.releaseAsset ?? null;
+  }
+
   const rootResult = await fetchRelative(expand(index.base.policy, { policyRoot: entry.policyRoot }));
   if (hashBytes(rootResult.bytes) !== entry.policyRoot) {
     throw new Error(`${rootResult.relative}: policy bytes do not hash to ${entry.policyRoot}`);
@@ -215,7 +275,10 @@ export async function resolvePublishedPolicy(revision, options = {}) {
 
   const surfaceRoot = path.join(cacheHome, "surfaces", revision);
   const surface = objects.has("@compiler")
-    ? await materializePolicySurface({ revision, entry, policy, objects }, { revision, outputRoot: surfaceRoot })
+    ? await materializePolicySurface(
+        { revision, entry, policy, objects },
+        { revision, outputRoot: surfaceRoot, artifacts }
+      )
     : null;
 
   return {
@@ -223,6 +286,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     entry,
     policy,
     objects,
+    artifacts,
     cacheRoot,
     receipt: path.join(cacheRoot, "receipt", `${revision}.json`),
     surface,

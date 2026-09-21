@@ -18,12 +18,11 @@
 // happened to be reachable. Shipping the binary is what makes "the user compiles
 // nothing natively" true rather than aspirational.
 //
-// They ship as optional per-host packages rather than inside the main package,
-// because vendoring five hosts' LLVM-derived binaries would put hundreds of
-// megabytes into every install to use one of them. The main package does not
-// hard-depend on them, so a host with no published build can still install
-// déherm and get a diagnostic naming exactly what is missing instead of a failed
-// install. Every resolution is checked against the digest pinned in
+// They ship as content-addressed GitHub release artifacts rather than inside
+// the main package, because vendoring five hosts' LLVM-derived binaries would
+// put hundreds of megabytes into every install to use one of them. First use
+// fetches only this host's archives into the platform-native per-user cache.
+// Every resolution is checked against the digest pinned in
 // packages/toolchains/host-compilers.json, exactly like the target archives.
 //
 // Status is recorded per tool, not per host. The three come from different
@@ -33,11 +32,12 @@
 // tool behind an unpublished one or claim a host is ready when it is not.
 
 import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
 import { existsSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+
+import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 
 const packageRoot = path.resolve(import.meta.dirname, "../../..");
 const manifestPath = path.join(packageRoot, "packages", "toolchains", "host-compilers.json");
@@ -48,15 +48,6 @@ export function hostCompilerKey(platform = process.platform, architecture = proc
 
 export async function readHostCompilerManifest() {
   return JSON.parse(await readFile(manifestPath, "utf8"));
-}
-
-function resolvePackageDirectory(name) {
-  try {
-    const require = createRequire(import.meta.url);
-    return path.dirname(require.resolve(`${name}/package.json`));
-  } catch {
-    return null;
-  }
 }
 
 async function verifiedBinary(file, pinned, description) {
@@ -124,27 +115,12 @@ async function inspectHostTool(key, tool, record, roots) {
 // and tolerantly: a missing cache is the ordinary state of a fresh install, not
 // an error. Both host families are returned because a host needs tools from
 // each, and they extract into separate tag directories.
-function findProjectRoot(from = process.cwd()) {
-  let directory = path.resolve(from);
-  for (;;) {
-    for (const marker of ["deherm.lock", "game.project", "package.json", ".git"]) {
-      if (existsSync(path.join(directory, marker))) return directory;
-    }
-    const parent = path.dirname(directory);
-    if (parent === directory) return path.resolve(from);
-    directory = parent;
-  }
-}
-
 function cachedFamilyRoots(key) {
   const found = [];
   try {
-    // Project-local, matching ensure-host-tool.mjs: a fetched toolchain belongs
-    // beside the project that uses it, where it can be committed, rather than
-    // in machine state no teammate or CI runner shares.
     const base = process.env.DEHERM_TOOL_CACHE
       ? path.resolve(process.env.DEHERM_TOOL_CACHE)
-      : path.join(findProjectRoot(), ".deherm", "cache", "toolchains");
+      : path.join(defoldSurfaceCacheHome(), "toolchains");
     const tags = JSON.parse(readFileSync(
       path.join(packageRoot, "packages", "toolchains", "release-tags.json"), "utf8"));
     for (const family of ["hermes-host", "dehermc"]) {
@@ -173,12 +149,9 @@ export async function inspectHostCompilers(key, manifest) {
     };
   }
   const roots = [];
-  const installed = resolvePackageDirectory(record.package);
-  if (installed) roots.push({ source: "package", root: installed });
   roots.push({ source: "vendored", root: path.join(packageRoot, record.directory) });
-  // The fetch cache, last: a vendored tree or an explicitly installed per-host
-  // package is a deliberate choice by whoever set this checkout up and should
-  // win over something downloaded automatically.
+  // The in-tree directory is for repository development; installed consumers
+  // resolve the authenticated release cache.
   for (const cached of cachedFamilyRoots(key)) roots.push({ source: "cache", root: cached, flat: true });
 
   const tools = {};
@@ -197,12 +170,11 @@ export async function inspectHostCompilers(key, manifest) {
       : "required-missing";
   const detail = ok
     ? names.map((tool) => `${tool} ${tools[tool].sha256.slice(0, 12)}`).join(", ")
-    : `${missing.join(", ")} unavailable for ${key}\n  ${missing.map((tool) => `${tool}: ${tools[tool].detail}`).join("\n  ")}\n  Install the published build with: npm install --save-dev ${record.package}@${resolved.packageVersion}`;
+    : `${missing.join(", ")} unavailable for ${key}\n  ${missing.map((tool) => `${tool}: ${tools[tool].detail}`).join("\n  ")}\n  Retry online to fetch the published release archive, or prefill DEHERM_TOOL_CACHE for offline use.`;
   return {
     host: key,
     ok,
     status,
-    package: record.package,
     tools,
     missing,
     // Retained for callers that only want the digests of what resolved.
@@ -223,9 +195,8 @@ export async function hostCompilerReport(manifest) {
   }
   hosts.sort((left, right) => left.host.localeCompare(right.host));
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     currentHost: current,
-    packageVersion: resolved.packageVersion,
     ttscVersion: resolved.ttscVersion ?? null,
     tools: Object.keys(resolved.tools ?? {}),
     hosts

@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "comment": [
     "Where the policy store is published. This file is CONFIGURATION, not generated state:",
-    "the base URL is carried in the shipped index so relocating the site is an edit here and a",
-    "republish, never a code change and never a release. A GitHub project page is served under",
+    "the base URL is carried in the packaged publication locator and served index, so relocating",
+    "the site is an edit here and a republish, never a code change. A GitHub project page is served under",
     "its repository name, so the default already sits beneath one owned segment; publishing from",
     "an organisation-site repository would remove that segment, which is what `pathPrefix` is for.",
     "Nothing may be published at a root-level segment: a top-level /index/ or /policy/ would",

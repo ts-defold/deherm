@@ -24,6 +24,7 @@ Commands:
   policy       Fetch, authenticate, and cache the Pages policy for the project's Defold revision
   extensions   List native extensions and their script API coverage
   generate     Write project inventory, TypeScript SDK, tsconfig, and VS Code setup
+  assemble-typed-native  Compile the reachable Static Hermes lane into a Defold extension
   materialize-dmsdk  Emit reachable dmSDK provider + exact-call twin from checker usage
   generate-extension-api  Parse a C header and emit native-extension IR, TypeScript, and C ABI glue
   typecheck    Type-check shared, game-object, GUI, and render TypeScript projects
@@ -76,6 +77,9 @@ Options:
   --shard <i/n>      Stable zero-based shard selection (default: 0/1)
   --strict           Fail a report unless every required selected stage passed
   --release          Type-check with release reachability and write release usage manifests
+  --profile          Enable typed-native transport telemetry in the assembled extension
+  --reconcile        Only reconcile typed-native upload eligibility for --target
+  --shermes <path>   Static Hermes compiler override for assemble-typed-native
   --check            Verify materialized output without writing it
   --force            Regenerate owned project outputs even when the input key is current
   --recompute        For verify-bundle, re-bundle current sources to name the fingerprint they produce
@@ -104,6 +108,9 @@ export function parseArguments(argv) {
     else if (value === "--check" && options.command === "materialize-dmsdk") options.check = true;
     else if (value === "--strict") options.strict = true;
     else if (value === "--release") options.release = true;
+    else if (value === "--profile") options.profile = true;
+    else if (value === "--reconcile") options.reconcile = true;
+    else if (value === "--shermes") options.shermes = args.shift();
     else if (value === "--force") options.force = true;
     else if (value === "--recompute") options.recompute = true;
     else if (value === "--allow-unbound") options.allowUnbound = true;
@@ -180,11 +187,15 @@ async function scaffoldProject(options) {
   const scaffold = await createDefoldProject({
     directory: options.directory,
     name: options.name,
-    packageVersion
+    packageVersion,
+    defoldRevision: options.defoldSdk
   });
   const inventory = await inspectDefoldProject({ project: scaffold.projectRoot });
   const generated = await writeGeneratedProject(inventory, options.outDir, { force: true });
-  const nativeExtension = await installNativeExtension(scaffold.projectRoot, { force: true });
+  const nativeExtension = await installNativeExtension(scaffold.projectRoot, {
+    force: true,
+    surfaceRepositoryRoot: generated.surfaceRepositoryRoot
+  });
   const components = await generateComponentProxies({ projectRoot: scaffold.projectRoot, outputRoot: scaffold.projectRoot });
   await writeProjectResourceSymbols(scaffold.projectRoot, generated.root);
   await writeProjectRouteSymbolIndex(generated.root);
@@ -357,6 +368,25 @@ export async function run(argv = process.argv.slice(2)) {
     }
     return 0;
   }
+  if (options.command === "assemble-typed-native") {
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const { hostDefoldPlatform } = await import("./toolchains.mjs");
+    const module = await import("../../../scripts/assemble-typed-native-extension.mjs");
+    const request = {
+      project: projectRoot,
+      target: options.target ?? hostDefoldPlatform(),
+      profile: options.profile === true,
+      shermes: options.shermes ?? null
+    };
+    const result = options.reconcile
+      ? await module.reconcile(request)
+      : await module.assemble(request);
+    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
+    else if (result.refusal) console.log(`${result.refusal.code}: ${result.refusal.reason}`);
+    else if (options.reconcile) console.log(`typed-native: ${result.message}`);
+    else console.log(`Assembled typed-native extension in ${path.relative(process.cwd(), result.extensionRoot) || "."}`);
+    return result.refusal ? 3 : 0;
+  }
   if (options.command === "materialize-dmsdk") {
     const result = await materializeDmSdkUsageFile({
       usage: options.usage,
@@ -397,12 +427,56 @@ export async function run(argv = process.argv.slice(2)) {
   }
   if (options.command === "conformance") {
     if (options.action === "generate") {
+      let generatedRoot;
+      const projectRoot = await findProjectRoot(process.cwd(), options.project).catch(() => null);
+      if (projectRoot) generatedRoot = path.join(projectRoot, options.outDir ?? ".deherm");
+      let inputRoot = generatedRoot ? path.join(generatedRoot, "ir") : undefined;
+      let sdkRoot = generatedRoot ? path.join(generatedRoot, "sdk") : undefined;
+      let inputLayout = generatedRoot ? "project" : undefined;
+      let sdkTemplateRoot;
+      if (!generatedRoot) {
+        const packageRoot = path.resolve(import.meta.dirname, "../../..");
+        const sourceCheckout = await readFile(path.join(packageRoot, "pnpm-workspace.yaml"))
+          .then(() => true, () => false);
+        if (!options.defoldSdk && !sourceCheckout) {
+          throw new Error("conformance generate outside a Defold project requires --defold-sdk <sha>");
+        }
+        if (options.defoldSdk) {
+          const [{ assertResolvedDefoldRevision, resolveDefoldRevision }, { resolveDefoldSurface }] = await Promise.all([
+            import("./defold-revision.mjs"),
+            import("./defold-surface.mjs")
+          ]);
+          const revision = assertResolvedDefoldRevision(await resolveDefoldRevision({
+            explicit: options.defoldSdk,
+            projectRoot: process.cwd()
+          }));
+          let surface;
+          try {
+            surface = await resolveDefoldSurface(revision, { packageRoot });
+          } catch (error) {
+            if (error?.code !== "defold-surface-not-cached") throw error;
+            const { readPolicyLocator, resolvePublishedPolicy } = await import("./policy-client.mjs");
+            const resolved = await resolvePublishedPolicy(revision, { index: await readPolicyLocator() });
+            surface = {
+              irRoot: path.join(resolved.surface.outputRoot, "ir"),
+              sdkRoot: path.join(resolved.surface.outputRoot, "sdk")
+            };
+          }
+          inputRoot = surface.irRoot;
+          sdkRoot = surface.sdkRoot;
+          sdkTemplateRoot = path.resolve(import.meta.dirname, "../../sdk/src");
+        }
+      }
       const output = await generateConformanceHarness({
         output: options.output,
         surface: options.surface,
         target: options.target,
         contexts: options.contexts,
-        shard: options.shard
+        shard: options.shard,
+        inputRoot,
+        inputLayout,
+        sdkRoot,
+        sdkTemplateRoot
       });
       const summary = {
         root: output.root,
@@ -470,8 +544,13 @@ export async function run(argv = process.argv.slice(2)) {
     if (errors.length) {
       throw new Error(`Defold project configuration is not ready for déherm dev:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
     }
-    await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk, bob: options.bob });
-    await installNativeExtension(inventory.projectRoot);
+    const generated = await writeGeneratedProject(inventory, options.outDir, {
+      defoldSdk: options.defoldSdk,
+      bob: options.bob
+    });
+    await installNativeExtension(inventory.projectRoot, {
+      surfaceRepositoryRoot: generated.surfaceRepositoryRoot
+    });
     await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot });
     const snapshot = await runDevSession(options);
     if (options.once && options.json) console.log(JSON.stringify({ schemaVersion: 1, snapshot }, null, 2));
@@ -501,8 +580,7 @@ export async function run(argv = process.argv.slice(2)) {
   if (options.command === "doctor") return await runDoctor(options);
   if (options.command === "policy") {
     const { assertResolvedDefoldRevision, resolveDefoldRevision } = await import("./defold-revision.mjs");
-    const { resolvePublishedPolicy } = await import("./policy-client.mjs");
-    const packageRoot = path.resolve(import.meta.dirname, "../../..");
+    const { readPolicyLocator, resolvePublishedPolicy } = await import("./policy-client.mjs");
     const projectRoot = options.project
       ? await findProjectRoot(process.cwd(), options.project)
       : await findProjectRoot(process.cwd()).catch(() => null);
@@ -512,8 +590,7 @@ export async function run(argv = process.argv.slice(2)) {
       bob: options.bob
     });
     const revision = assertResolvedDefoldRevision(resolution);
-    const index = JSON.parse(await readFile(path.join(packageRoot, "packages", "bindings", "generated", "defold-policy-index.json"), "utf8"));
-    const result = await resolvePublishedPolicy(revision, { index });
+    const result = await resolvePublishedPolicy(revision, { index: await readPolicyLocator() });
     const summary = {
       schemaVersion: 1,
       defoldRevision: result.revision,
@@ -588,7 +665,10 @@ export async function run(argv = process.argv.slice(2)) {
       throw new Error(`Defold project configuration is not ready for déherm:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
     }
     const output = await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk, bob: options.bob, force: options.force });
-    const nativeExtension = await installNativeExtension(inventory.projectRoot, { force: options.force });
+    const nativeExtension = await installNativeExtension(inventory.projectRoot, {
+      force: options.force,
+      surfaceRepositoryRoot: output.surfaceRepositoryRoot
+    });
     const components = await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot });
     const componentCount = components.manifest.components.length;
     const resourceSymbols = await writeProjectResourceSymbols(inventory.projectRoot, output.root);

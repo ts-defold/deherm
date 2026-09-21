@@ -65,27 +65,59 @@ This is the release boundary:
   recipe family and never encode route, namespace, or type names.
 
 Pinned host compilers and native Hermes libraries are a separate distributable
-class. They may ship with the npm package or release artifacts, but they are
-toolchain artifacts rather than Defold API policy.
+class. They never ship inside the npm package. Target-generated native config
+such as `libhermesvm-config.h` belongs to the same archive as the library it
+describes and is equally forbidden from the npm package. The CLI resolves the
+matching host or Defold bundle-target archive from the release mapping
+published beside the policy, downloads only that archive, and keeps it in the
+platform-native per-user déherm cache. They are toolchain artifacts rather than
+Defold API policy.
+
+# Distribution boundary enforcement
+
+`scripts/check-package-revision-boundary.mjs` inspects the file inventory npm
+would actually pack, rather than inferring publication from workspace layout.
+It also accepts an injected npm-inventory fixture so every classification can
+be tested without changing the release manifest. A failure is one JSON report
+whose `forbidden` object groups bundled policy/index objects, generated binding
+IR and SDK/ABI output, legacy fixed module declarations, reviewed overrides and
+probes, and revision-generated native, Static-Hermes, and web output.
+
+Generated-looking files are not stable merely because their names have existed
+for several releases. Exceptions are exact paths with package-side input
+provenance. The dmSDK universal static-frame header, source, and Static-Hermes
+transport are byte-reproduced from the compiler-owned bounded-frame emitter;
+the empty project build-config skeleton and compiler/runtime component
+capability header name their non-policy generators. An adjacent or newly named
+`generated_*` file fails classification until equivalent provenance is added.
+Generic compiler/CLI sources, runtime templates, and separately classified
+toolchain assets remain package-owned, but those directory classifications are
+evaluated only after all revision-output rules.
+
+The repository's root `tsconfig.json` deliberately maps `@ts-defold/deherm`
+and its generated module subpaths to the checkout's materialized SDK entry.
+That alias exists only for source-checkout tests and examples. The published
+package export remains the revision-neutral `package.ts`; consumer projects
+receive revision modules through their generated `@deherm/project` surface.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now an **11,691-byte manifest**, not a
-21 MB container. It references twelve independently content-addressed semantic
-documents and 15 independently content-addressed compatibility sources. This
-keeps each document shareable and makes the remaining migration debt
-enumerable; it does not pretend the referenced bytes have disappeared. The
-complete policy remains 28.29 MB until the lowering-plan and support-source
-emitters below replace those objects.
+The authenticated `@compiler` subtree is now a **64,150-byte manifest**, not a
+21 MB container. It references 17 independently content-addressed semantic
+documents, a 28-entry SDK manifest, and 114 revision-output compatibility
+sources. This keeps each object shareable and makes the remaining migration
+debt enumerable; it does not pretend the referenced bytes have disappeared.
+The current complete object store is 32,019,304 bytes until the lowering-plan,
+support-source, and revision-output emitters replace those objects.
 
 `packages/compiler/src/policy-surface-materializer.mjs` owns the public
 realization contract. It restores the selected revision, resolves and validates
 the manifest's authenticated references, regenerates thirteen script and
-dmSDK TypeScript files from IR, verifies their policy SHA-256 values, writes the
-remaining support files from explicitly labelled authenticated compatibility
-sources, and records a revision-keyed `surface.json` descriptor. The repository
-generator owns extraction and policy production; it no longer owns consumer
-emission.
+dmSDK TypeScript files from IR, verifies their policy SHA-256 values, writes 15
+SDK support files and 114 revision outputs from explicitly labelled
+authenticated compatibility sources, and records a revision-keyed
+`surface.json` descriptor. The repository generator owns extraction and policy
+production; it no longer owns the public materialization contract.
 
 The compatibility snapshots are migration debt, not a claim that generated
 source belongs in the final policy schema. Each becomes package-side emitter
@@ -158,13 +190,14 @@ implementation-independent equivalence proof. A deliberate semantic change first
 `packages/sdk/src/generated` through the source pipeline and then runs
 `scripts/capture-policy-surface-old-pipeline.mjs --update`; the capture command
 has a check-only default and records the Defold revision plus an aggregate tree
-digest. Thirteen files (3,784,443 bytes) are locally rendered; 15 files
-(77,499 bytes) remain authenticated compatibility sources, and the test names
+digest. Thirteen files (3,790,371 bytes) are locally rendered; 15 files
+(79,846 bytes) remain authenticated compatibility sources, and the test names
 all 15 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
-no Defold checkout.
+no Defold checkout. The same test requires all 114 revision outputs (1,535,653
+bytes) to match the source pipeline byte for byte.
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 11,691
+The `<5 MB` compiler-object budget is enforced; the current manifest is 64,150
 bytes. This is a structural transfer boundary, not yet a total-size victory.
 The 10.21 MB canonical lowering plan is still a referenced derived output and
 must be rebuilt locally from normalized recipe facts. The 15 support-source

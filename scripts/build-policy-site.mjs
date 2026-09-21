@@ -6,6 +6,7 @@
 // exactly the URL scheme the decision specifies, beneath one owned prefix:
 //
 //   <base>/v1/index/<defold-sha>.json    -> { policyRoot, generator }
+//   <base>/v1/artifacts/<defold-sha>.json -> release mappings for that revision
 //   <base>/v1/policy/<root-hash>.json    -> names its subtrees
 //   <base>/v1/object/<subtree-hash>.json -> one namespace's surface
 //
@@ -174,6 +175,7 @@ function landingPage({ site, plan, defoldRevision, wordmark, ogImage }) {
 
 <h2>URL schema</h2>
 <pre><span class="base">${escapeHtml(published)}/</span>${escapeHtml(site.layoutVersion)}/index/&lt;defold-sha&gt;.json     &rarr; { policyRoot, generator }
+${escapeHtml(site.layoutVersion)}/artifacts/&lt;defold-sha&gt;.json &rarr; release mappings by target/host
 ${escapeHtml(site.layoutVersion)}/policy/&lt;root-hash&gt;.json     &rarr; names its subtrees
 ${escapeHtml(site.layoutVersion)}/object/&lt;subtree-hash&gt;.json  &rarr; one namespace's surface</pre>
 

@@ -20,7 +20,7 @@ import test from "node:test";
 import { promisify } from "node:util";
 import { parse as parseYaml } from "yaml";
 
-import { extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
+import { extractReleaseArchive, releaseAssetUrl } from "../packages/cli/src/release-assets.mjs";
 import {
   artifactFamilyNames,
   expectedAssetNames,
@@ -56,13 +56,15 @@ test("packaging the same inputs twice produces a byte-identical archive", async 
 
   const release = path.join(inputs, "libhermes.a");
   const debug = path.join(inputs, "libhermes.debug.a");
+  const config = path.join(inputs, "libhermesvm-config.h");
   await writeFile(release, "release archive contents");
   await writeFile(debug, "debugger-enabled archive contents");
+  await writeFile(config, "#define HERMESVM_SIZEOF_VOID_P 8\n");
   // The executable bit is the thing a flat release asset loses; an archive is
   // supposed to carry it, so pack a file that has one.
   await chmod(release, 0o755);
 
-  const first = await pack(path.join(directory, "first.tar.gz"), [release, debug]);
+  const first = await pack(path.join(directory, "first.tar.gz"), [release, debug, config]);
 
   // Everything tar would otherwise stamp into the output, moved: the build
   // happened at a different time, in a different directory, in a different
@@ -70,15 +72,18 @@ test("packaging the same inputs twice produces a byte-identical archive", async 
   const later = new Date("2031-04-05T06:07:08Z");
   await utimes(release, later, later);
   await utimes(debug, later, later);
+  await utimes(config, later, later);
   const elsewhere = path.join(directory, "elsewhere");
   await mkdir(elsewhere, { recursive: true });
   const movedRelease = path.join(elsewhere, "libhermes.a");
   const movedDebug = path.join(elsewhere, "libhermes.debug.a");
+  const movedConfig = path.join(elsewhere, "libhermesvm-config.h");
   await writeFile(movedRelease, await readFile(release));
   await writeFile(movedDebug, await readFile(debug));
+  await writeFile(movedConfig, await readFile(config));
   await chmod(movedRelease, 0o755);
 
-  const second = await pack(path.join(directory, "second.tar.gz"), [movedDebug, movedRelease]);
+  const second = await pack(path.join(directory, "second.tar.gz"), [movedConfig, movedDebug, movedRelease]);
 
   assert.equal(
     digest(second),
@@ -101,12 +106,14 @@ test("an archive round-trips through the download side, flat and still executabl
   const directory = await scratch(t);
   const release = path.join(directory, "libhermes.a");
   const debug = path.join(directory, "libhermes.debug.a");
+  const config = path.join(directory, "libhermesvm-config.h");
   await writeFile(release, "release archive contents");
   await writeFile(debug, "debugger-enabled archive contents");
+  await writeFile(config, "#define HERMESVM_SIZEOF_VOID_P 8\n");
   await chmod(release, 0o755);
 
   const archive = path.join(directory, "hermes-arm64-osx.tar.gz");
-  await pack(archive, [release, debug]);
+  await pack(archive, [release, debug, config]);
 
   const unpacked = path.join(directory, "unpacked");
   await extractReleaseArchive({ archive, destination: unpacked });
@@ -116,6 +123,8 @@ test("an archive round-trips through the download side, flat and still executabl
   // the row's own directory and nowhere deeper.
   assert.equal(await readFile(path.join(unpacked, "libhermes.a"), "utf8"), "release archive contents");
   assert.equal(await readFile(path.join(unpacked, "libhermes.debug.a"), "utf8"), "debugger-enabled archive contents");
+  assert.equal(await readFile(path.join(unpacked, "libhermesvm-config.h"), "utf8"),
+    "#define HERMESVM_SIZEOF_VOID_P 8\n");
   // The reason the host compilers travel in an archive at all: a bare release
   // asset loses this, and a compiler that cannot be executed is not installed,
   // merely present.
@@ -133,6 +142,24 @@ test("the packager refuses an input that does not exist rather than shipping a s
       return true;
     }
   );
+});
+
+test("the download side refuses nested archive members before extraction", async (t) => {
+  const directory = await scratch(t);
+  const nested = path.join(directory, "nested");
+  await mkdir(nested);
+  await writeFile(path.join(nested, "libhermes.a"), "nested archive contents");
+  const archive = path.join(directory, "nested.tar.gz");
+  await execFileAsync("tar", ["-czf", archive, "-C", directory, "nested/libhermes.a"]);
+  await assert.rejects(
+    extractReleaseArchive({ archive, destination: path.join(directory, "unpacked") }),
+    /not a non-empty flat release archive/u
+  );
+});
+
+test("release URL construction rejects path-shaped tags and asset names", () => {
+  assert.throws(() => releaseAssetUrl({ tag: "../other", asset: "tool.tar.gz" }), /Invalid release tag/u);
+  assert.throws(() => releaseAssetUrl({ tag: "tools-deadbeef", asset: "../tool.tar.gz" }), /Invalid release asset/u);
 });
 
 test("every family publishes one archive per matrix row, named for that row", async () => {
@@ -154,7 +181,7 @@ test("every family publishes one archive per matrix row, named for that row", as
   }
 });
 
-test("a target archive carries the release library and its debugger-enabled sibling", async () => {
+test("a target archive carries both libraries and their matching generated config", async () => {
   const rows = await publishedAssets("native-artifacts");
   const manifest = JSON.parse(
     await readFile(path.join(repositoryRoot, "packages/toolchains/native-artifacts.json"), "utf8")
@@ -162,12 +189,19 @@ test("a target archive carries the release library and its debugger-enabled sibl
   for (const row of rows) {
     const artifact = manifest.targets[row.target];
     const debug = targetDebugLibraryName(row.target, artifact);
-    assert.equal(row.files.length, 2, `${row.target} must ship both variants in one asset`);
+    assert.equal(row.files.length, 3, `${row.target} must ship both variants and target config in one asset`);
     assert.ok(row.files.includes(debug), `${row.target} ships no ${debug}`);
+    assert.ok(row.files.includes("libhermesvm-config.h"), `${row.target} ships no matching Hermes config`);
     // The debugger variant is the same library name with `.debug` before the
     // extension, never a different extension: Extender force-loads by suffix.
     assert.ok(debug.endsWith(path.extname(row.files[0])), `${debug} changed the library's extension`);
   }
+});
+
+test("the local macOS packager stages the config generated beside its Hermes build", async () => {
+  const source = await readFile(path.join(repositoryRoot, "scripts/package-defold-extension.sh"), "utf8");
+  assert.match(source, /\$hermes_build\/lib\/config\/libhermesvm-config\.h/u);
+  assert.doesNotMatch(source, /\$hermes_build\/hermes\/lib\/config\/libhermesvm-config\.h/u);
 });
 
 test("the tag is a readable prefix of the full fingerprint, which is kept", async () => {

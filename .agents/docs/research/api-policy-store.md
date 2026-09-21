@@ -30,19 +30,20 @@ the source-derived Lua registration surface and the resource declaration schema
 toolchain pins from `build_tools/sdk.py`.
 
 For the pinned revision `7f0f554f41f9dce1e0ddff99bf08200657d1ee05` the policy is
-**83 subtrees - 52 namespaces, four cross-cutting roots, twelve compiler
-documents, and 15 compatibility-source objects - in 28.29 MB**, under policy
-root `c17e74a7f2fa46858961e248d2acd776bff7e985b1e4e005998148e70302e8a5`.
+**202 subtrees - 52 namespaces plus content-addressed shared, toolchain,
+compiler-document, SDK-source, and revision-output objects - in 32,019,304
+bytes**, under policy root
+`0a4d01692191125173e56af85557b7cd9c10c22cd793e0ee8ec60f5618f59314`.
 
-`@compiler` is now an 11,691-byte versioned manifest. Its semantic documents
-and temporary compatibility sources are separate content-addressed objects, so
-they can be shared and the manifest can eventually drive lazy fetching. The
-installed compiler locally renders thirteen script/dmSDK TypeScript files
-and checks their hashes; the other 15 files remain visibly tagged authenticated
-compatibility sources. This split fixes the ownership and object-size boundary,
-but not total transfer cost: the 10.21 MB lowering plan is still referenced
-derived output and must move behind package code once normalized recipe facts
-can reproduce it.
+`@compiler` is now a 64,150-byte versioned manifest. Its 17 semantic documents,
+28 SDK entries, and 114 revision outputs are separate content-addressed objects,
+so they can be shared and the manifest can eventually drive lazy fetching. The
+installed compiler locally renders thirteen script/dmSDK TypeScript files and
+checks their hashes; 15 SDK files and 114 revision outputs remain visibly
+tagged authenticated compatibility sources. This split fixes the ownership and
+object-size boundary, but not total transfer cost: the 10.21 MB lowering plan
+and compatibility outputs must still move behind package emitters once their
+normalized recipe facts can reproduce them.
 
 The intended policy/package dependency points in one direction. Policy objects carry all
 Defold-defined vocabulary and the exact recipe data selected from it. The npm
@@ -52,10 +53,11 @@ realizer capabilities needed, allowing the CLI to reject an old installation
 before downloading the large root/object closure. Ordinary new Defold revisions
 therefore publish policy only; they do not require an npm release.
 
-The current npm payload has not completed that migration: its broad `files`
-rules still include duplicate generated binding/SDK trees and pinned native
-glue. Those bytes are compatibility debt, not policy authority, and must be
-removed after all consumer paths resolve the materialized revision surface.
+The npm payload now enforces that boundary against the actual `npm pack`
+inventory. The measured package is 492,793 packed bytes / 2,034,929 unpacked
+bytes across 185 files, with no policy store, generated Defold SDK/ABI surface,
+or `.a`/`.lib` archive. Platform archives are selected by the authenticated
+release mapping, downloaded on demand, and cached per user.
 
 # The structure is the decision
 
@@ -151,9 +153,10 @@ revision they agree - `4.0.6` - and the agreement is recorded in
   alongside `v1` during a migration.
 
 The store is committed under `packages/bindings/generated/policy/`, so the site
-builds from a clean checkout with no Defold source, no clang and no network -
-and the npm package ships exactly one policy, the revision it was built against,
-together with the index.
+builds from a clean checkout with no Defold source, no clang and no network.
+The npm package ships only `packages/bindings/policy-site.json`, the
+revision-neutral publication locator; it ships no policy, revision index, or
+generated surface.
 
 # What was proven rather than asserted
 

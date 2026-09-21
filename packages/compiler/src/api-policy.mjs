@@ -60,6 +60,7 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "sdk.script.runtime.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.types.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.universal-value.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "output.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "binding.raw-unverified-fallback.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   [DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]: Object.freeze({
     introducedInVersion: "0.0.0",
@@ -97,7 +98,7 @@ export function buildPolicyRealizer({ compilerSurface, capabilityRegistry = POLI
     required.add("policy.compiler-surface.references.v1");
     const recipes = compilerSurface.realizationRecipes;
     if (!recipes || typeof recipes !== "object") throw new Error("Compiler surface has no explicit realization recipes");
-    for (const section of ["documents", "sdk"]) {
+    for (const section of ["documents", "sdk", "outputs"]) {
       const values = compilerSurface[section] ?? {};
       const selected = recipes[section] ?? {};
       for (const name of Object.keys(values)) {
@@ -133,6 +134,7 @@ export const PROFILES_SUBTREE = "@profiles";
 export const COMPILER_SUBTREE = "@compiler";
 export const COMPILER_DOCUMENT_SUBTREE_PREFIX = "@compiler:document:";
 export const COMPILER_SDK_SUBTREE_PREFIX = "@compiler:sdk:";
+export const COMPILER_OUTPUT_SUBTREE_PREFIX = "@compiler:output:";
 export const DEFOLD_REVISION_TOKEN = "${DEFOLD_REVISION}";
 
 // Type names in the script IR are written in one of these declaration
@@ -548,6 +550,8 @@ export function buildPolicy(inputs) {
       normalizePaths(compilerSurface.documents, repositoryRoot), scriptIr.defoldRevision);
     const normalizedSdk = abstractDefoldRevision(
       normalizePaths(compilerSurface.sdk, repositoryRoot), scriptIr.defoldRevision);
+    const normalizedOutputs = abstractDefoldRevision(
+      normalizePaths(compilerSurface.outputs ?? {}, repositoryRoot), scriptIr.defoldRevision);
     const documentManifest = {};
     for (const [name, value] of Object.entries(normalizedDocuments).sort(([left], [right]) => left < right ? -1 : 1)) {
       const namespace = `${COMPILER_DOCUMENT_SUBTREE_PREFIX}${name}`;
@@ -590,6 +594,27 @@ export function buildPolicy(inputs) {
       }
       sdkManifest[name] = manifestRecord;
     }
+    const outputManifest = {};
+    for (const [name, record] of Object.entries(normalizedOutputs).sort(([left], [right]) => left < right ? -1 : 1)) {
+      if (record.mode !== "authenticated-compatibility-source" ||
+          typeof record.source !== "string" || hashBytes(record.source) !== record.sha256) {
+        throw new Error(`${name}: compiler output must be an authenticated revision-abstracted source`);
+      }
+      const namespace = `${COMPILER_OUTPUT_SUBTREE_PREFIX}${name}`;
+      subtrees[namespace] = seal({
+        schemaVersion: POLICY_SCHEMA_VERSION,
+        kind: "deherm.policy.compiler-output-source",
+        namespace,
+        name,
+        source: record.source
+      });
+      outputManifest[name] = {
+        mode: record.mode,
+        sha256: record.sha256,
+        recipe: compilerSurface.realizationRecipes.outputs[name],
+        sourceObject: namespace
+      };
+    }
     subtrees[COMPILER_SUBTREE] = seal({
       schemaVersion: POLICY_SCHEMA_VERSION,
       kind: "deherm.policy.compiler-surface",
@@ -605,6 +630,11 @@ export function buildPolicy(inputs) {
         schemaVersion: 1,
         kind: "deherm.policy.sdk-manifest",
         entries: sdkManifest
+      },
+      outputs: {
+        schemaVersion: 1,
+        kind: "deherm.policy.output-manifest",
+        entries: outputManifest
       },
       realizationRecipes: compilerSurface.realizationRecipes
     });

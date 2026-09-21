@@ -51,8 +51,8 @@ ordinary edit loop.
 | Gate symbol-level reachability | `pnpm test:reachability` | Fixture project; checker/module-graph cross-check; dead-symbol retention through the emitted C |
 | Check Static Hermes declarations/export unit | `pnpm check:static-hermes` | Parses `extern_c` and proves a library-shaped exported unit without `main` |
 | Generate the typed-native JS bridge | `pnpm generate:typed-native-bridge` | Sound-typed unit that replaces `__defoldScriptBridgeV1` with the AOT lane, claiming the plan's `staticHermesCAbi` routes |
-| Assemble `shermes -emit-c` into a project | `pnpm assemble:typed-native --project <dir> [--target <platform>] [--profile]` | Materialises `<dir>/defold_hermes_typed_native/` for Bob and Extender; refuses a non-Hermes target with `typed-native-requires-hermes-runtime` and exit 3 |
-| Decide a target's typed-native upload | `pnpm assemble:typed-native --project <dir> --target <platform> --reconcile` | No `shermes`; maintains the project's `.defignore` so Bob cannot upload a Hermes-runtime unit to a browser-runtime target |
+| Assemble `shermes -emit-c` into a project | `pnpm exec deherm assemble-typed-native --project <dir> [--target <platform>] [--profile]` | Materialises `<dir>/defold_hermes_typed_native/` for Bob and Extender; refuses a non-Hermes target with `typed-native-requires-hermes-runtime` and exit 3 |
+| Decide a target's typed-native upload | `pnpm exec deherm assemble-typed-native --project <dir> --target <platform> --reconcile` | No `shermes`; maintains the project's `.defignore` so Bob cannot upload a Hermes-runtime unit to a browser-runtime target |
 | Exercise the cached Lua bridge | `pnpm test:lua-hermes` | Hermes -> JSI -> C ABI -> Lua -> callback |
 | Stage the native extension | `pnpm package:defold` | Defold package directory/archive inputs |
 | Prepare pinned local Extender | `pnpm extender:prepare` | Builds the pinned jars and maps the installed Xcode SDK |
@@ -299,11 +299,27 @@ pnpm exec deherm create my-game --name "My Game"
 pnpm exec deherm doctor
 pnpm exec deherm extensions
 pnpm exec deherm generate
+pnpm exec deherm assemble-typed-native --target arm64-macos
 pnpm exec deherm materialize-dmsdk --usage deherm.dmsdk.json --output generated/dmsdk-provider.cpp
 pnpm exec deherm typecheck
 pnpm exec deherm verify-generated
 pnpm exec deherm verify-bundle
 ```
+
+The npm package contains no platform `.a`/`.lib` archive and no generated
+`libhermesvm-config.h`. A generated project locks the Defold-owned target matrix
+and the published release mapping. The first native build downloads only the
+selected target archive into the normal per-user déherm cache
+(`DEHERM_CACHE_HOME`, XDG, macOS Library/Caches, or Windows LocalAppData),
+installs its release library, debugger library, and matching generated config
+into the project extension, and records every member hash. Later projects reuse
+the cached archive.
+
+The host executables are not npm packages either. `hermesc`/`shermes` and
+`dehermc` are separate content-addressed release families, fetched for the
+current host into `<user-cache>/toolchains/<tag>/<host>/`. Set
+`DEHERM_TOOL_CACHE` only when CI or an offline environment needs an explicit
+cache root.
 
 `materialize-dmsdk` writes a deterministic production/verification set. Each
 member is replaced atomically and the binding manifest is published last, so a

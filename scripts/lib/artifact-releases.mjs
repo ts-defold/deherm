@@ -124,7 +124,7 @@ export const artifactFamilies = Object.freeze({
     // Defold bundle target, and `hermes-arm64-android.tar.gz` says that where
     // `native-artifacts-arm64-android.tar.gz` says only "a file we built".
     assetPrefix: "hermes",
-    summary: "libhermes.a / hermes.lib, per Defold bundle target",
+    summary: "Hermes release/debug libraries plus generated target config, per Defold bundle target",
     lockKeys: ["HERMES_URL", "HERMES_REV"],
     files: [
       "toolchains/hermes/Dockerfile.linux",
@@ -439,7 +439,11 @@ export async function publishedAssets(name, options = {}) {
       if (!installableTarget(artifact)) continue;
       rows.push({
         target,
-        files: [targetLibraryName(target, artifact), targetDebugLibraryName(target, artifact)],
+        files: [
+          targetLibraryName(target, artifact),
+          targetDebugLibraryName(target, artifact),
+          "libhermesvm-config.h"
+        ],
         asset: familyArchiveName(name, target)
       });
     }

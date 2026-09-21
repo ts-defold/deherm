@@ -43,7 +43,7 @@ Resolution stops at the first layer whose content hash matches.
 
 | Layer | Contents | Keyed by | Ships in |
 | --- | --- | --- | --- |
-| 0 | The pinned Defold engine surface | Defold revision | the content-addressed policy site; the package ships only a small locator/index seed |
+| 0 | The pinned Defold engine surface | Defold revision | the content-addressed policy site; the package ships only a revision-neutral publication locator |
 | 1 | Curated policies for audited extensions | archive content hash | the policy site or another configured immutable policy source |
 | 2 | Project-local policies for the user's own and unaudited extensions | archive or tree content hash | the user's project, committed |
 | 3 | Parse from source | — | nothing; produces a layer-2 policy |
@@ -213,7 +213,7 @@ The consequence for the artifact matrix is that a `libhermes.a` is valid for a
 *range* of Defold revisions - those sharing its toolchain pins - rather than for
 one. The policy is what lets that range be computed instead of assumed.
 
-# Distribution: a content-addressed static site, plus one policy in the package
+# Distribution: a content-addressed static site plus a revision-neutral package
 
 Policies and native artifacts want opposite distribution, and conflating them is
 the mistake to avoid.
@@ -236,7 +236,8 @@ A static site - GitHub Pages is sufficient - where the path *is* the hash. Every
 object lives under a **single owned prefix**, never at the domain root:
 
 ```
-<base>/v1/index/<defold-sha>.json  -> { "policyRoot": "<hash>", "generator": "<rev>", "artifacts": { … } }
+<base>/v1/index/<defold-sha>.json  -> { "policyRoot": "<hash>", "generator": "<rev>" }
+<base>/v1/artifacts/<defold-sha>.json -> release mappings for that revision
 <base>/v1/policy/<root-hash>.json  -> the policy root, naming its subtrees
 <base>/v1/object/<subtree-hash>.json -> one namespace's derived surface
 ```
@@ -251,7 +252,7 @@ namespaced. That default must not be relied on:
 * **Nothing is published at a root-level segment.** A top-level `/index/` or
   `/policy/` would collide with whatever the organisation site routes now or
   later. Everything sits beneath one segment this project owns.
-* **The base URL is configuration carried in the shipped index, not a constant
+* **The base URL is configuration carried in the shipped locator, not a constant
   in code.** Publishing from an organisation-site repository removes the
   repository-name prefix; moving to a CDN or a different domain changes the host
   entirely. Neither may be a code change.
@@ -278,12 +279,12 @@ The index is **not one mutable file**, and it is not shipped as an authority.
 It is one small immutable document per Defold revision:
 
 ```
-<base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "generator": "<rev>", "artifacts": { … } }
+<base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "generator": "<rev>" }
 ```
 
 Keyed by a sha Defold has already published, each entry's `policyRoot` is
 written once and never rewritten, because a given revision's declaration inputs
-are fixed forever. (`artifacts` is the exception; see below.) The caller resolves the sha it needs from
+are fixed forever. The caller resolves the sha it needs from
 `d.defold.com/<channel>/info.json` and fetches exactly that one document.
 
 This is the point on which an earlier draft of this decision was wrong. It said
@@ -310,8 +311,8 @@ X" still had to be told out of band which `libhermes.a` and which `hermesc` go
 with it - by a constant in some client's code, which is exactly what keeping the
 base URL in data was supposed to prevent.
 
-The index entry is the per-revision resolution point a client already fetches,
-so it carries the answer:
+The per-revision artifact document is fetched beside the index entry and
+carries the answer without mutating the immutable sha-to-policy mapping:
 
 ```
 "artifacts": {
@@ -341,31 +342,31 @@ rests on and the one a consumer gets wrong first: target archives are keyed by
 the Defold **bundle target** being built and host tools by the user's **host**,
 and neither implies the other.
 
-**The honest caveat.** The artifact block is the one part of an entry that is
-not a function of the engine revision - it names what the build recipe publishes
-*now*. If the Hermes pin or a build recipe moves, the entry for the pinned
-revision is regenerated with new tags, while entries already published keep
-theirs and stay correct, because the release they name still holds those assets.
-So "written once, never rewritten" is a claim about the **sha-to-root half** of
-an entry, which is what the trust argument above actually rests on. The host
+**The honest caveat.** The artifact document is not content-addressed. It names
+what the build recipe publishes *now*, while the index's sha-to-root statement
+remains immutable. If the Hermes pin or a build recipe moves, the artifact
+document moves to new fingerprinted release tags; the old releases remain
+addressable. The materializer accepts a native family only when its declared
+compatibility digest matches the authenticated Defold toolchain policy. Host
 families are carried even though neither is a function of Defold at all: a user
 resolving a revision wants a working host, and one fetch that answers for both
 is worth more than the purity of omitting two tags that happen not to move.
 
 ## What ships in the package
 
-Three things, none of which grow with the number of engine releases:
+Three properties, none of which grow with the number of engine releases:
 
 * **The base URL**, as data. Relocating to a different host or CDN is a
   configuration edit, never a code change or a release.
-* **Exactly one policy** - the revision the package was tested against. This is
-  an offline fast path, not an authority: it covers a current déherm against a
-  current Defold at zero network cost, and is simply the first layer to match.
-* **Nothing keyed per revision.** No accumulating index, no policy set that
-  grows with engine history.
+* **No policy or generated Defold surface.** The installed package carries the
+  materializer and stable emitters; authenticated revision data comes from the
+  site or an already-populated cache.
+* **Nothing keyed per revision.** No accumulating index, no native archive, and
+  no generated SDK set that grows with engine history.
 
-Everything else resolves through the layers already defined: packaged, then user
-cache, then project cache, then the static site, then local derivation.
+Everything else resolves through the layers already defined: user cache, then
+project cache, then the static site, then local derivation. A source checkout is
+a dogfooding fallback, not an installed-package layer.
 
 ## The nightly job
 
@@ -395,14 +396,11 @@ and the C that registers it is exactly what a new engine release can introduce.
 Publication has two artifacts with different lifetimes, and committing them to
 the same place is the mistake to avoid.
 
-`main` carries **exactly one** policy - the revision the package was built
-against - and its single index line. That moves only when the Defold pin moves,
-which is already a human-authored change. **The nightly job commits nothing to
-`main`.** The index is the trust anchor: it is the one mutable mapping, it ships
-in the package, and it is what asserts which policy belongs to a revision. An
-automated commit to `main` would hand whatever can run CI a silent authority
-over exactly that, for no benefit - nothing reads the published objects from the
-working tree.
+`main` carries the currently pinned policy store as reproducible publication
+input and test evidence, but the npm package excludes that store, its
+per-revision index, and every generated surface. **The nightly job commits
+nothing to `main`.** Consumers fetch one per-revision index document from the
+published site and authenticate every content-addressed policy/object it names.
 
 The objects and the per-revision index entries live on an **orphan branch**,
 `deherm-policy-site`, and **GitHub Pages serves that branch directly**. Pages is
@@ -470,13 +468,13 @@ say. Runtime conformance remains the headless engine harness's job.
 
 `deherm policy` is the explicit network boundary. It resolves the project's
 exact Defold SHA (or `--defold-sdk <sha>`), fetches that SHA's entry using the
-base and templates in the shipped index, authenticates the policy root and
+base and templates in the shipped publication locator, authenticates the policy root and
 every namespace object against the digest in its path, and writes only those
-verified bytes beneath `~/.cache/deherm/policies/v1` (or
+verified bytes beneath the native per-user cache root (or
 `DEHERM_CACHE_HOME`/`XDG_CACHE_HOME`). A second resolution performs no cache
-writes. The shipped index is a trust anchor for revisions it already names,
-but not a frozen catalogue: a newer npm package can resolve a Defold revision
-published after it by fetching `v1/index/<sha>.json` directly.
+writes. The package carries no revision catalogue: an existing npm release can
+resolve a Defold revision published after it by fetching
+`v1/index/<sha>.json` directly.
 
 The policy cache and the generated-surface cache are intentionally distinct.
 The policy is source-derived API evidence; the surface additionally contains
@@ -486,16 +484,25 @@ the compiler-owned deterministic materializer into the user surface cache. A
 remote machine therefore needs the npm realizer plus the policy, not a Defold
 checkout, `ref-doc.zip`, or a previously generated SDK tree.
 
+Native target archives use a third cache beneath the same per-user root:
+`artifacts/<release-tag>/<bundle-target>/`. A native build reads the target
+matrix and release mapping from the generated project lock, downloads exactly
+one GitHub Release archive on the first build, records member hashes in the
+project installation receipt, and reuses the cached archive across projects.
+The npm tarball contains neither target archives nor host executables.
+
 `packages/cli/src/defold-surface.mjs` resolves layer 0 by Defold revision
 alone, across three roots, stopping at the first that holds a complete surface
 for that exact revision:
 
-1. **packaged** - `packages/bindings/generated` plus `packages/sdk/src`, the one
-   revision the installed déherm package was built against;
-2. **user cache** - `$DEHERM_CACHE_HOME`/`$XDG_CACHE_HOME`/`~/.cache/deherm`
-   under `surfaces/<revision>/`, shared across that user's projects;
-3. **project cache** - `<project>/.deherm/cache/surfaces/<revision>/`, so a
+1. **user cache** - `$DEHERM_CACHE_HOME`, `$XDG_CACHE_HOME/deherm`,
+   `~/Library/Caches/deherm` on macOS, `%LOCALAPPDATA%/deherm` on Windows, or
+   `~/.cache/deherm` on Linux, under `surfaces/<revision>/`;
+2. **project cache** - `<project>/.deherm/cache/surfaces/<revision>/`, so a
    checkout can be self-contained for CI.
+3. **repository checkout** - the checked-in generated tree, only when a
+   workspace marker proves this is the source repository rather than an npm
+   install.
 
 A layer is used only when its own `defold-script-api-ir.json` declares the
 requested revision and every file the generator reads is present. A revision
@@ -598,9 +605,6 @@ complete the layered cache:
   [#93](https://github.com/ts-defold/deherm/issues/93).
 * A project-cache population command is still needed; today `deherm policy`
   writes the shared user cache and project cache is read-only.
-* The default user-cache root is Linux-shaped on every host. Native macOS and
-  Windows cache roots plus a non-destructive compatibility path are tracked in
-  [#95](https://github.com/ts-defold/deherm/issues/95).
 
 Layer 0's content-addressed publication and materialization are implemented and
 tested, but accepting the whole layered-cache decision waits on those items.

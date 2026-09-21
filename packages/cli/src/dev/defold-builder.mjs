@@ -4,7 +4,7 @@ import { constants } from "node:fs";
 import { access, chmod, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { assertProjectNativeArtifact, defoldToolchain, hostDefoldPlatform } from "../toolchains.mjs";
+import { assertProjectNativeArtifact, hostDefoldPlatform } from "../toolchains.mjs";
 import { reconcileTypedNativeUpload } from "../typed-native.mjs";
 
 async function exists(file, mode) {
@@ -21,7 +21,7 @@ function sha256(bytes) {
 }
 
 export async function ensureBob(projectRoot, lock, options = {}) {
-  const metadata = lock.toolchain?.bob ?? defoldToolchain(lock.defoldRevision).bob;
+  const metadata = lock.toolchain?.bob;
   if (!/^https:\/\//.test(metadata.url) || !/^[a-f0-9]{64}$/.test(metadata.sha256)) {
     throw new Error("deherm.lock contains invalid Bob toolchain metadata");
   }

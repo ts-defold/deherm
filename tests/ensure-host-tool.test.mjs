@@ -56,7 +56,7 @@ test("a digest-mismatched host-tool cache is replaced and the repaired cache is 
 
     const options = {
       expectedDigests: { [member]: expected },
-      projectRoot: root,
+      cacheRoot: path.join(root, ".deherm", "cache", "toolchains"),
       releaseTagsPath
     };
     const repaired = await ensureHostFamily("dehermc", host, options);
@@ -105,7 +105,7 @@ test("a downloaded member with the wrong digest never replaces the existing cach
 
     await assert.rejects(ensureHostFamily("dehermc", host, {
       expectedDigests: { [member]: sha256(Buffer.from("expected release bytes\n")) },
-      projectRoot: root,
+      cacheRoot: path.join(root, ".deherm", "cache", "toolchains"),
       releaseTagsPath
     }), /manifest expects/);
     assert.equal(await readFile(path.join(destination, member), "utf8"), "original corrupt cache\n");

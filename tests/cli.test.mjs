@@ -89,7 +89,7 @@ test("managed native extension install is content-keyed and replaces through a s
   assert.equal(first.installed, true);
   const sentinelPath = path.join(project, "defold_hermes", ".deherm-managed.json");
   const firstIdentity = JSON.parse(await readFile(sentinelPath, "utf8"));
-  assert.equal(firstIdentity.schemaVersion, 2);
+  assert.equal(firstIdentity.schemaVersion, 3);
   assert.match(firstIdentity.extensionTreeSha256, /^[a-f0-9]{64}$/);
   assert.equal((await installNativeExtension(project, { source })).installed, false);
 
@@ -100,6 +100,31 @@ test("managed native extension install is content-keyed and replaces through a s
   assert.equal(await readFile(path.join(project, "defold_hermes", "src", "extension.cpp"), "utf8"), "// v2\n");
   assert.deepEqual((await readdir(project)).filter((name) => name.includes(".deherm-stage-") || name.includes(".deherm-backup-")), []);
   assert.equal((await inspectDefoldProject({ project })).extensions.length, 0, "managed runtime must not feed its own project API inventory");
+});
+
+test("managed native extension installation never copies target artifacts from a checkout", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-managed-extension-target-project-"));
+  const source = await mkdtemp(path.join(tmpdir(), "deherm-managed-extension-target-source-"));
+  await mkdir(path.join(source, "include"), { recursive: true });
+  await mkdir(path.join(source, "lib", "arm64-osx"), { recursive: true });
+  await mkdir(path.join(source, "lib", "web"), { recursive: true });
+  await writeFile(path.join(source, "ext.manifest"), 'name: "defold_hermes"\n');
+  await writeFile(path.join(source, "include", "libhermesvm-config.h"), "checkout target config\n");
+  await writeFile(path.join(source, "lib", "arm64-osx", "libhermes.a"), "checkout release library\n");
+  await writeFile(path.join(source, "lib", "arm64-osx", "libhermes.debug.a"), "checkout debug library\n");
+  await writeFile(path.join(source, "lib", "arm64-osx", ".deherm-artifact.json"), "{}\n");
+  await writeFile(path.join(source, "lib", "web", "library_defold_hermes.js"), "// portable browser source\n");
+
+  await installNativeExtension(project, { source });
+
+  await assert.rejects(stat(path.join(project, "defold_hermes", "include", "libhermesvm-config.h")), /ENOENT/u);
+  await assert.rejects(stat(path.join(project, "defold_hermes", "lib", "arm64-osx", "libhermes.a")), /ENOENT/u);
+  await assert.rejects(stat(path.join(project, "defold_hermes", "lib", "arm64-osx", "libhermes.debug.a")), /ENOENT/u);
+  await assert.rejects(stat(path.join(project, "defold_hermes", "lib", "arm64-osx", ".deherm-artifact.json")), /ENOENT/u);
+  assert.equal(
+    await readFile(path.join(project, "defold_hermes", "lib", "web", "library_defold_hermes.js"), "utf8"),
+    "// portable browser source\n"
+  );
 });
 
 test("game.project parser preserves indexed dependency keys", () => {
@@ -471,15 +496,15 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(manifest.coverage.dmsdk.silentlyOmitted, 0);
   assert.deepEqual(manifest.coverage.dmsdk.runtimeLanes, {
     generatedScalarThunks: 26,
-    preferredSpecialized: 148,
-    usageMaterializedFallback: 1213,
+    preferredSpecialized: 146,
+    usageMaterializedFallback: 1215,
     projectMaterialized: 0
   });
   // The conformance target is the HOST this run would execute on, not a label
   // copied out of the dmSDK IR - the IR no longer carries one, because its parse
   // is deliberately not any platform.
   assert.equal(manifest.platform, hostDefoldPlatform());
-  assert.equal(manifest.coverage.dmsdk.diagnosticHeaders, 55);
+  assert.equal(manifest.coverage.dmsdk.diagnosticHeaders, 32);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "script", "types.ts"), "utf8"), /export interface MsgApi/);
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8")).bindingCount, 90);
@@ -507,7 +532,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.deepEqual(lock.generatedOutputs, manifest.generatedOutputs);
   assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
   const verified = await verifyGeneratedProject(project);
-  assert.equal(verified.checkedFiles, 24);
+  assert.equal(verified.checkedFiles, 27);
   assert.equal(verified.planSha256, loweringPlan.planSha256);
   const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
     cwd: process.cwd(),
@@ -573,11 +598,11 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(baseConfig.compilerOptions.plugins[0].enabled, true);
   const guiConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.gui.json"), "utf8"));
   assert.deepEqual(guiConfig.include, ["**/*.ts", ".deherm/**/*.ts"]);
-  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts"]);
+  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts", ".deherm/static-hermes/**/*.ts"]);
   assert.deepEqual(guiConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/contexts/gui.ts"]);
   const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
   assert.deepEqual(bundleConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
-  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**"]);
+  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/static-hermes/**/*.ts"]);
   const releaseConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.release.json"), "utf8"));
   assert.equal(releaseConfig.compilerOptions.plugins[0].profile, "release");
   assert.equal(releaseConfig.compilerOptions.plugins[0].dmsdkSymbols,

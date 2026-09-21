@@ -100,7 +100,10 @@ function parseArguments(argv) {
   return options;
 }
 
-export async function loadBindingLoweringInputs(root = repositoryRoot) {
+export async function loadBindingLoweringInputs(root) {
+  if (!root) {
+    throw new Error("loadBindingLoweringInputs requires an explicit authenticated or materialized surface root");
+  }
   return Object.fromEntries(await Promise.all(Object.entries(inputPaths).map(async ([name, relative]) => [
     name,
     await readFile(resolve(root, relative), "utf8")
@@ -1063,7 +1066,7 @@ export function generateBindingLoweringPlan(inputs) {
 
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
-  const report = generateBindingLoweringPlan(await loadBindingLoweringInputs());
+  const report = generateBindingLoweringPlan(await loadBindingLoweringInputs(repositoryRoot));
   const serialized = `${JSON.stringify(report, null, 2)}\n`;
   if (options.check) {
     if (await readFile(options.output, "utf8") !== serialized) throw new Error(`${options.output} is stale; regenerate binding lowering plan`);

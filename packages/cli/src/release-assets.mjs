@@ -51,6 +51,8 @@ export function releaseAssetUrlTemplate({ repository = defaultReleaseRepository 
 export function releaseAssetUrl({ repository = defaultReleaseRepository, tag, asset }) {
   if (!tag) throw new Error("releaseAssetUrl requires a tag");
   if (!asset) throw new Error("releaseAssetUrl requires an asset name");
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(tag)) throw new Error(`Invalid release tag ${JSON.stringify(tag)}`);
+  if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(asset)) throw new Error(`Invalid release asset ${JSON.stringify(asset)}`);
   // Tags and asset names are generated from hex digests and manifest keys, so
   // they need no escaping - but encoding them keeps a malformed one from
   // silently producing a URL that resolves to something else.
@@ -148,6 +150,12 @@ export async function downloadReleaseAssets({
 export async function extractReleaseArchive({ archive, destination }) {
   await mkdir(destination, { recursive: true });
   try {
+    const { stdout } = await execFileAsync("tar", ["-tzf", path.resolve(archive)]);
+    const entries = stdout.split(/\r?\n/u).filter(Boolean).map((entry) => entry.startsWith("./") ? entry.slice(2) : entry);
+    if (entries.length === 0 || entries.some((entry) =>
+      entry.length === 0 || entry === "." || entry.includes("/") || entry.includes("\\") || entry.includes("\0"))) {
+      throw new Error(`${path.basename(archive)} is not a non-empty flat release archive`);
+    }
     await execFileAsync("tar", ["-xzf", path.resolve(archive), "-C", path.resolve(destination)]);
   } catch (error) {
     if (error?.code === "ENOENT") {

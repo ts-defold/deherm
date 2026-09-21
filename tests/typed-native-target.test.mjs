@@ -12,6 +12,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
+
 import {
   TYPED_NATIVE_EXTENSION,
   TYPED_NATIVE_IGNORE_ENTRY,
@@ -21,33 +23,41 @@ import {
   typedNativeDisposition
 } from "../packages/cli/src/typed-native.mjs";
 
+const repositoryRoot = path.resolve(import.meta.dirname, "..");
+const revision = JSON.parse(await readFile(
+  path.join(repositoryRoot, "packages/bindings/generated/defold-api-policy.json"),
+  "utf8"
+)).defoldRevision;
+const toolchain = (await resolveDefoldSurface(revision, { packageRoot: repositoryRoot })).toolchain;
+
 async function project({ materialised = true } = {}) {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-typed-native."));
+  await writeFile(path.join(root, "deherm.lock"), `${JSON.stringify({ toolchain }, null, 2)}\n`);
   if (materialised) await mkdir(path.join(root, TYPED_NATIVE_EXTENSION, "src"), { recursive: true });
   return root;
 }
 
 test("every web bundle target runs the browser runtime and every other one runs Hermes", async () => {
   for (const platform of ["wasm-web", "wasm_pthread-web"]) {
-    assert.equal((await defoldTargetRuntime(platform)).runtimeId, "browser", platform);
+    assert.equal((await defoldTargetRuntime(platform, { toolchain })).runtimeId, "browser", platform);
   }
   // Bob names macOS differently from Extender; the mapping is the package's
   // own and must not change the answer.
   for (const platform of ["arm64-macos", "x86_64-macos", "arm64-ios", "arm64-android", "x86_64-linux", "x86_64-win32"]) {
-    assert.equal((await defoldTargetRuntime(platform)).runtimeId, "hermes", platform);
+    assert.equal((await defoldTargetRuntime(platform, { toolchain })).runtimeId, "hermes", platform);
   }
 });
 
 test("an unknown platform fails closed instead of guessing a runtime", async () => {
-  await assert.rejects(() => defoldTargetRuntime("sparc-solaris"), /not a Defold bundle target/);
+  await assert.rejects(() => defoldTargetRuntime("sparc-solaris", { toolchain }), /not a Defold bundle target/);
 });
 
 test("a browser-runtime target is refused with a machine-readable code", async () => {
-  const disposition = await typedNativeDisposition("wasm-web");
+  const disposition = await typedNativeDisposition("wasm-web", { toolchain });
   assert.equal(disposition.eligible, false);
   assert.equal(disposition.code, TYPED_NATIVE_REFUSAL_CODE);
   assert.match(disposition.reason, /embeds no Hermes/);
-  const hermes = await typedNativeDisposition("arm64-macos");
+  const hermes = await typedNativeDisposition("arm64-macos", { toolchain });
   assert.equal(hermes.eligible, true);
   assert.equal(hermes.code, null);
 });

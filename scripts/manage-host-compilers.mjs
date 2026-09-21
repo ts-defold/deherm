@@ -213,7 +213,6 @@ async function report() {
       host: key,
       platform: record.host.platform,
       architecture: record.host.architecture,
-      package: record.package,
       status: missing.length === 0 ? "vendored" : tools.every((entry) => entry.status === "blocked") ? "blocked" : "required-missing",
       invalid: tools.some((entry) => entry.invalid),
       tools,
@@ -227,7 +226,6 @@ async function report() {
     schemaVersion: 3,
     hermesRevision: manifest.hermesRevision,
     ttscVersion: manifest.ttscVersion ?? null,
-    packageVersion: manifest.packageVersion,
     tools: Object.keys(manifest.tools ?? {}),
     families: Object.fromEntries(hostArtifactFamilyNames.map((name) => [name, artifactFamilies[name].tools])),
     hosts: rows

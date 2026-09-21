@@ -130,7 +130,9 @@ mkdir -p "$staging"
 # Separate build trees, so neither variant can pick up the other's objects.
 build_variant "" OFF libhermes.a
 build_variant "-debug" ON libhermes.debug.a
+cp "$cross_build/hermes/lib/config/libhermesvm-config.h" "$staging/libhermesvm-config.h"
 
 bash "$(dirname "${BASH_SOURCE[0]}")/package-archive.sh" \
-  "$output" "$staging/libhermes.a" "$staging/libhermes.debug.a"
+  "$output" "$staging/libhermes.a" "$staging/libhermes.debug.a" \
+  "$staging/libhermesvm-config.h"
 echo "build-apple.sh: wrote $output for $target"

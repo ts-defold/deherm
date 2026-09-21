@@ -93,8 +93,19 @@ pnpm exec deherm
 pnpm exec deherm doctor
 pnpm exec deherm extensions
 pnpm exec deherm generate
+pnpm exec deherm assemble-typed-native --target arm64-macos
 pnpm exec deherm verify-generated
 ```
+
+The npm package does not bundle platform-specific Hermes libraries or their
+generated target config. Native builds select one Defold bundle target from the
+generated project lock, fetch that target's GitHub Release archive on first
+use, and reuse it from the platform-native per-user déherm cache. The archive
+keeps the release library, debugger library, and `libhermesvm-config.h` from the
+same build together. HTML5 uses the packaged browser-host source adapter and
+does not download Hermes Wasm. Host executables (`hermesc`, `shermes`, and
+`dehermc`) follow the same rule: fetch the current host's release archives on
+first use and reuse the verified user cache.
 
 Running `deherm` without arguments launches the project/scaffold TUI. The
 package has not been published yet; use `pnpm cli -- ...` in this checkout

@@ -44,7 +44,15 @@ import {
   policyPath,
   serializeObject
 } from "./api-policy.mjs";
-import { buildToolchainPins } from "../../../compiler/src/defold-toolchain-pins.mjs";
+import {
+  buildDefoldTargetMatrix,
+  buildToolchainPins,
+  nativeArtifactCompatibility
+} from "../../../compiler/src/defold-toolchain-pins.mjs";
+import {
+  REVISION_OUTPUT_ROOTS,
+  STABLE_GENERATED_OUTPUTS
+} from "../../../compiler/src/revision-output-layout.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
 import { artifactFamilies, artifactFamilyNames, familyRelease, publishedAssets } from "../../../../scripts/lib/artifact-releases.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
@@ -65,6 +73,9 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-script-api-ir.json": "defold-script-api-ir.json",
   "defold-sdk-ir.json": "defold-sdk-ir.json",
   "defold-script-scalar-dispatch.json": "defold-script-scalar-dispatch.json",
+  "defold-script-binding-patterns.json": "defold-script-binding-patterns.json",
+  "defold-dmsdk-binding-patterns.json": "defold-dmsdk-binding-patterns.json",
+  "defold-script-real-engine-probes.json": "defold-script-real-engine-probes.json",
   "defold-script-api-accounting.json": "defold-script-api-accounting.json",
   "defold-script-universal-value-bindings.json": "defold-script-universal-value-bindings.json",
   "defold-script-route-availability-profiles.json": "defold-script-route-availability-profiles.json",
@@ -72,7 +83,9 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-binding-lowering-plan.json": "defold-binding-lowering-plan.json",
   "defold-binding-lowering-plan.sentinel.json": "defold-binding-lowering-plan.sentinel.json",
   "defold-dmsdk-scalar-thunks.json": "defold-dmsdk-scalar-thunks.json",
-  "defold-dmsdk-universal-bindings.json": "defold-dmsdk-universal-bindings.json"
+  "defold-dmsdk-universal-bindings.json": "defold-dmsdk-universal-bindings.json",
+  "defold-resource-declaration-schema.json": "defold-resource-declaration-schema.json",
+  "defold-script-resource-namespaces.json": "defold-script-resource-namespaces.json"
 });
 
 const locallyRenderedSdkSources = new Set([
@@ -161,6 +174,26 @@ export const compilerSurfaceSdkSources = Object.freeze([
 
 async function readJson(file) {
   return JSON.parse(await readFile(file, "utf8"));
+}
+
+export async function discoverCompilerSurfaceOutputs(sourceRoot = root) {
+  const files = [];
+  async function visit(absoluteRoot, relativeRoot, rule) {
+    const entries = await readdir(absoluteRoot, { withFileTypes: true });
+    entries.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+    for (const entry of entries) {
+      const relative = `${relativeRoot}/${entry.name}`;
+      const absolute = path.join(absoluteRoot, entry.name);
+      if (entry.isDirectory()) await visit(absolute, relative, rule);
+      else if (entry.isFile() && (rule.all || entry.name.startsWith(rule.prefix)) &&
+          !STABLE_GENERATED_OUTPUTS.has(relative)) files.push(relative);
+      else if (!entry.isFile()) throw new Error(`Unsupported compiler-output entry ${relative}`);
+    }
+  }
+  for (const rule of REVISION_OUTPUT_ROOTS) {
+    await visit(path.join(sourceRoot, rule.root), rule.root, rule);
+  }
+  return Object.freeze(files.sort());
 }
 
 export async function readSiteConfig(file = sitePath) {
@@ -262,6 +295,18 @@ export function reconcileLocalPins({ lock, pins }) {
  */
 export async function buildArtifactReferences(options = {}) {
   const sourceRoot = options.sourceRoot ?? root;
+  const bundleTargets = await readJson(path.join(sourceRoot, "packages", "toolchains", "defold-bundle-targets.json"));
+  const compatibility = nativeArtifactCompatibility({
+    pins: {
+      ANDROID_NDK_VERSION: bundleTargets.sdk.androidNdkVersion,
+      ANDROID_NDK_API_VERSION: bundleTargets.sdk.androidNdkApiVersion,
+      ANDROID_64_NDK_API_VERSION: bundleTargets.sdk.android64NdkApiVersion,
+      ANDROID_TARGET_API_LEVEL: bundleTargets.sdk.androidTargetApiLevel,
+      VERSION_IPHONEOS_MIN: bundleTargets.sdk.iphoneosVersionMin,
+      VERSION_MACOSX_MIN: bundleTargets.sdk.macosxVersionMin
+    },
+    targetMatrix: { targets: bundleTargets.targets }
+  });
   const families = {};
   for (const name of artifactFamilyNames) {
     const family = artifactFamilies[name];
@@ -289,6 +334,7 @@ export async function buildArtifactReferences(options = {}) {
       assets,
       contents
     };
+    if (name === "native-artifacts") families[name].compatibility = compatibility;
   }
   return families;
 }
@@ -337,12 +383,37 @@ export async function derivePolicy(options = {}) {
     await readFile(path.join(sourceRoot, "upstream", "defold", "share", "extender", "build_input.yml"), "utf8")
   );
   if (!buildInput?.platforms) throw new Error("share/extender/build_input.yml declares no platforms map");
-  const toolchain = buildToolchainPins({
-    sdkSource,
-    buildInputPlatforms: Object.keys(buildInput.platforms)
-  });
+  const bobUrlTemplate = "https://d.defold.com/archive/{defoldRevision}/bob/bob.jar";
+  const bobUrl = lockValue(lock, "DEFOLD_BOB_URL");
+  const bobSha256 = lockValue(lock, "DEFOLD_BOB_SHA256");
+  const expectedBobUrl = bobUrlTemplate.replace("{defoldRevision}", defoldRevision);
+  if (bobUrl !== expectedBobUrl || !/^[0-9a-f]{64}$/u.test(bobSha256)) {
+    throw new Error(
+      `upstream.lock has no authenticated Bob artifact for ${defoldRevision}: ` +
+      `expected ${expectedBobUrl} and a SHA-256 digest`
+    );
+  }
+  const platformSource = await readFile(path.join(
+    sourceRoot,
+    "upstream", "defold", "com.dynamo.cr", "com.dynamo.cr.bob", "src", "com", "dynamo", "bob", "Platform.java"
+  ), "utf8");
+  const toolchain = {
+    ...buildToolchainPins({
+      sdkSource,
+      buildInputPlatforms: Object.keys(buildInput.platforms)
+    }),
+    targetMatrix: buildDefoldTargetMatrix({
+      buildInputPlatforms: buildInput.platforms,
+      platformSource
+    }),
+    bob: {
+      urlTemplate: bobUrlTemplate,
+      sha256: bobSha256
+    }
+  };
   const reconciliation = reconcileLocalPins({ lock, pins: toolchain.pins });
 
+  const compilerOutputPaths = await discoverCompilerSurfaceOutputs(sourceRoot);
   const compilerSurface = {
     documents: Object.fromEntries(await Promise.all(Object.entries(compilerSurfaceDocuments).map(async ([name, relative]) => [
       name,
@@ -358,12 +429,25 @@ export async function derivePolicy(options = {}) {
         source: locallyRenderedSdkSources.has(relative) ? undefined : canonicalSource
       }];
     }))),
+    outputs: Object.fromEntries(await Promise.all(compilerOutputPaths.map(async (relative) => {
+      const source = await readFile(path.join(sourceRoot, relative), "utf8");
+      const canonicalSource = source.split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
+      return [relative, {
+        mode: "authenticated-compatibility-source",
+        sha256: createHash("sha256").update(canonicalSource).digest("hex"),
+        source: canonicalSource
+      }];
+    }))),
     realizationRecipes: {
       documents: Object.fromEntries(Object.keys(compilerSurfaceDocuments)
         .map((name) => [name, compilerDocumentRecipes[name] ?? "policy.compiler-document.copy-json.v1"])),
       sdk: Object.fromEntries(compilerSurfaceSdkSources.map((relative) => [
         relative,
         locallyRenderedSdkRecipes[relative] ?? "sdk.compatibility-source.copy.v1"
+      ])),
+      outputs: Object.fromEntries(compilerOutputPaths.map((relative) => [
+        relative,
+        "output.compatibility-source.copy.v1"
       ]))
     }
   };

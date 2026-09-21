@@ -499,7 +499,9 @@ RUN chmod +x /usr/local/bin/merge-android-archive && \
 # Named for the family, not the ABI: the workflow uploads this under
 # `hermes-<defold target>.tar.gz`, and renaming a file does not change its
 # bytes - so the recipe needs no build argument it would only echo.
-RUN package-archive /out/hermes.tar.gz /out/libhermes.a /out/libhermes.debug.a
+RUN cp /work/build/hermes/lib/config/libhermesvm-config.h /out/libhermesvm-config.h && \
+    package-archive /out/hermes.tar.gz \
+      /out/libhermes.a /out/libhermes.debug.a /out/libhermesvm-config.h
 
 FROM scratch
 COPY --from=build /out/hermes.tar.gz /hermes.tar.gz

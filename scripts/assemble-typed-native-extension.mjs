@@ -54,7 +54,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { recordBuildArtifact, installedToolchain } from "../packages/cli/src/build-artifacts.mjs";
-import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
+import { ensureProjectNativeArtifact, hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import {
   TYPED_NATIVE_EXTENSION,
   TYPED_NATIVE_RUNTIME,
@@ -76,18 +76,12 @@ const kRegistrationSource = "deherm_typed_native_extension.cpp";
 // one sound-typed unit. The lane's `export` statement is stripped because a
 // `shermes` unit is not a module.
 const kLaneSources = [
-  "packages/static-hermes/src/generated/script-universal-value.ts",
-  "packages/static-hermes/src/generated/script-typed-native-bridge.ts"
+  ".deherm/static-hermes/generated/script-universal-value.ts",
+  ".deherm/static-hermes/generated/script-typed-native-bridge.ts"
 ];
 
 /** Packaged Hermes archives whose assert state the emitted unit must match. */
-const kVendoredLibraryRoot = "defold/defold_hermes/lib";
-
-/** Declarations the emitted unit calls through `extern_c`, by header. */
-const kExternHeaders = [
-  "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h",
-  "upstream/hermes/include/hermes/VM/static_h.h"
-];
+const kVendoredLibraryRoot = "defold_hermes/lib";
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -123,8 +117,8 @@ function parseArguments(argv) {
     reconcile: false,
     profile: false,
     shermes: null,
-    hermesInclude: path.join(repositoryRoot, "upstream/hermes/include"),
-    hermesConfigInclude: path.join(repositoryRoot, "build/native/hermes/lib/config")
+    hermesInclude: path.join(repositoryRoot, "defold/defold_hermes/include"),
+    hermesConfigInclude: null
   };
   for (let index = 2; index < argv.length; ++index) {
     const argument = argv[index];
@@ -157,18 +151,20 @@ function parseArguments(argv) {
  * needs, walked from `static_h.h`. Derived rather than listed so an upstream
  * header that gains an include fails here instead of at Extender.
  */
-export async function resolveHermesHeaderClosure(includeRoot, configRoot) {
+export async function resolveHermesHeaderClosure(includeRoot, configRoot, options = {}) {
   const pending = ["hermes/VM/static_h.h"];
   const resolved = new Map();
   while (pending.length) {
     const relative = pending.pop();
     if (resolved.has(relative)) continue;
+    if (relative === "libhermesvm-config.h" && options.omitTargetConfig === true) continue;
     let base = includeRoot;
     let source;
     try {
       source = await readFile(path.join(includeRoot, relative), "utf8");
     } catch (error) {
       if (error?.code !== "ENOENT") throw error;
+      if (!configRoot) throw error;
       base = configRoot;
       source = await readFile(path.join(configRoot, relative), "utf8");
     }
@@ -517,7 +513,7 @@ export async function assemble(options) {
   // A typed-native unit is a transport of the `hermes` runtime. Deciding this
   // before anything is emitted is what keeps a browser-runtime target from
   // acquiring a unit whose symbols its link can never resolve.
-  const disposition = await typedNativeDisposition(options.target);
+  const disposition = await typedNativeDisposition(options.target, { projectRoot });
   if (!disposition.eligible) {
     const refusal = {
       schemaVersion: 1,
@@ -537,9 +533,17 @@ export async function assemble(options) {
     return { extensionRoot, refusal, manifest: null, written: [], recorded: null };
   }
 
+  // The generated Hermes config header describes the selected target's data
+  // model and must match the library archive exactly. Fetch/install the
+  // content-addressed target artifact before resolving the header closure;
+  // never borrow a config from the host that packed the npm package.
+  await ensureProjectNativeArtifact(projectRoot, options.target);
+  const hermesConfigInclude = options.hermesConfigInclude ??
+    path.join(projectRoot, "defold_hermes", "include");
+
   const laneSources = [];
   for (const relative of kLaneSources) {
-    const absolute = path.join(repositoryRoot, relative);
+    const absolute = path.join(projectRoot, relative);
     const source = await readFile(absolute, "utf8");
     laneSources.push({ relative, absolute, source });
   }
@@ -553,17 +557,17 @@ export async function assemble(options) {
   // different C on every run and on every host. The lane is staged at a fixed
   // repository-relative path and compiled with the repository as the working
   // directory, which makes the emission content-addressed by its inputs.
-  const stagingDirectory = path.join(repositoryRoot, "build/generated/typed-native");
-  const relativeInput = `build/generated/typed-native/${kUnitName}.ts`;
+  const stagingDirectory = path.join(projectRoot, ".deherm/build/generated/typed-native");
+  const relativeInput = `.deherm/build/generated/typed-native/${kUnitName}.ts`;
   await mkdir(stagingDirectory, { recursive: true });
   const output = path.join(stagingDirectory, `${kUnitName}.c`);
-  await writeFile(path.join(repositoryRoot, relativeInput), unitSource);
+  await writeFile(path.join(projectRoot, relativeInput), unitSource);
   const shermesPath = await resolveShermes(options.shermes);
   const result = spawnSync(shermesPath, [
     "-typed", "-strict", "-O", "-emit-c",
     `-exported-unit=${kUnitName}`,
     relativeInput, "-o", output
-  ], { cwd: repositoryRoot, encoding: "utf8" });
+  ], { cwd: projectRoot, encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr || result.stdout || "shermes did not run");
   const emittedC = await readFile(output, "utf8");
   assert.ok(emittedC.includes(`// ${relativeInput}:`),
@@ -587,8 +591,11 @@ export async function assemble(options) {
   const calleeNames = externCalleeNames(unitSource);
   assert.ok(calleeNames.length > 0, "The lane declares no extern_c callee");
   const declarations = new Map();
-  for (const relative of kExternHeaders) {
-    const header = await readFile(path.join(repositoryRoot, relative), "utf8");
+  for (const headerPath of [
+    path.join(projectRoot, "defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h"),
+    path.join(options.hermesInclude, "hermes/VM/static_h.h")
+  ]) {
+    const header = await readFile(headerPath, "utf8");
     for (const [name, declaration] of parseDeclarations(header, calleeNames)) {
       if (!declarations.has(name)) declarations.set(name, declaration);
     }
@@ -597,10 +604,10 @@ export async function assemble(options) {
   assert.deepEqual(unresolved, [],
     `extern_c callees have no parsed C declaration: ${unresolved.join(", ")}`);
   const prelude = renderPrelude([...declarations.values()]);
-  const assertState = await resolveArchiveAssertState(path.join(repositoryRoot, kVendoredLibraryRoot));
+  const assertState = await resolveArchiveAssertState(path.join(projectRoot, kVendoredLibraryRoot));
   const adapted = `${renderRuntimeGuard()}${renderArchiveMatchPrologue(assertState)}${adaptEmittedCToCxx(emittedC, kPreludeHeader)}`;
 
-  const headers = await resolveHermesHeaderClosure(options.hermesInclude, options.hermesConfigInclude);
+  const headers = await resolveHermesHeaderClosure(options.hermesInclude, hermesConfigInclude);
 
   await rm(extensionRoot, { recursive: true, force: true });
   await mkdir(path.join(extensionRoot, "src"), { recursive: true });
@@ -624,8 +631,8 @@ export async function assemble(options) {
   // The profile switch is a property of the assembled build, so it is
   // materialised with it and lives in the extension whose dispatchers it
   // instruments.
-  const buildConfig = path.join(repositoryRoot,
-    "defold/defold_hermes/include/defold_hermes/generated_build_config.h");
+  const buildConfig = path.join(projectRoot,
+    "defold_hermes/include/defold_hermes/generated_build_config.h");
   await writeFile(buildConfig, renderBuildConfig(options.profile));
 
   const manifest = {

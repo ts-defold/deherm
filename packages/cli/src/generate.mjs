@@ -11,6 +11,11 @@ import {
   assertUniquePublicScriptRoots,
   publicScriptModulePath
 } from "../../compiler/src/script-public-api-policy.mjs";
+import {
+  REVISION_OUTPUT_ROOTS,
+  isRevisionOutput,
+  isTargetNativeOutput
+} from "../../compiler/src/revision-output-layout.mjs";
 import { verifyProjectBuildArtifacts } from "./build-artifacts.mjs";
 import {
   assertResolvedDefoldRevision,
@@ -23,7 +28,7 @@ import {
   resolveDefoldSurface
 } from "./defold-surface.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
-import { defoldToolchain, hostDefoldPlatform } from "./toolchains.mjs";
+import { hostDefoldPlatform } from "./toolchains.mjs";
 import { checkProject, loadDehermPluginConfig } from "./transform-compiler.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -68,6 +73,7 @@ async function directoryDigest(root, options = {}) {
     for (const entry of entries) {
       if (options.ignore?.has(entry.name)) continue;
       const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+      if (options.exclude?.(relative, entry)) continue;
       const absolute = path.join(directory, entry.name);
       if (entry.isSymbolicLink()) throw new Error(`Refusing to hash symlink in managed tree: ${relative}`);
       if (entry.isDirectory()) {
@@ -83,6 +89,33 @@ async function directoryDigest(root, options = {}) {
     }
   }
   await visit(path.resolve(root));
+  return hash.digest("hex");
+}
+
+async function revisionOutputDigest(repositoryRoot) {
+  const files = [];
+  async function visit(directory, relativeRoot) {
+    const entries = await readdir(directory, { withFileTypes: true });
+    entries.sort((left, right) => compareCodeUnits(left.name, right.name));
+    for (const entry of entries) {
+      const relative = `${relativeRoot}/${entry.name}`;
+      const absolute = path.join(directory, entry.name);
+      if (entry.isSymbolicLink()) throw new Error(`Refusing to hash symlink in revision output: ${relative}`);
+      if (entry.isDirectory()) await visit(absolute, relative);
+      else if (entry.isFile() && isRevisionOutput(relative)) files.push([relative, absolute]);
+      else if (!entry.isFile()) throw new Error(`Refusing to hash unsupported revision-output entry: ${relative}`);
+    }
+  }
+  for (const { root } of REVISION_OUTPUT_ROOTS) {
+    await visit(path.join(repositoryRoot, root), root);
+  }
+  files.sort(([left], [right]) => compareCodeUnits(left, right));
+  const hash = createHash("sha256");
+  for (const [relative, absolute] of files) {
+    const bytes = await readFile(absolute);
+    hash.update(`f\0${relative}\0${bytes.byteLength}\0`);
+    hash.update(bytes);
+  }
   return hash.digest("hex");
 }
 
@@ -809,7 +842,11 @@ function projectBaseConfig(outputDirectory, profile = "development") {
 
 function contextProjectConfig(outputDirectory, context) {
   const generated = outputDirectory.split(path.sep).join("/");
-  const excludes = [...context.excludes, `${generated}/generated/components/registry.ts`];
+  const excludes = [
+    ...context.excludes,
+    `${generated}/generated/components/registry.ts`,
+    `${generated}/static-hermes/**/*.ts`
+  ];
   return {
     extends: "./tsconfig.deherm.base.json",
     compilerOptions: {
@@ -836,7 +873,7 @@ function bundleProjectConfig(outputDirectory) {
       }
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: ignoredAuthoredGlobs
+    exclude: [...ignoredAuthoredGlobs, `${generated}/static-hermes/**/*.ts`]
   };
 }
 
@@ -852,7 +889,7 @@ function releaseProjectConfig(outputDirectory) {
       }
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: ignoredAuthoredGlobs
+    exclude: [...ignoredAuthoredGlobs, `${generated}/static-hermes/**/*.ts`]
   };
 }
 
@@ -916,31 +953,49 @@ async function readConfinedFile(baseRoot, relative, label) {
 
 // Read the layer-0 API surface for one resolved Defold revision.
 //
-// The surface is addressed through `resolveDefoldSurface`, not through the
-// packaged directory, because the packaged directory holds exactly one
-// revision's surface and a project on any other revision must be served from a
-// revision-keyed cache or refused. `requestedRevision` is not a filter applied
-// to a fixed answer any more: it is the key.
+// The surface is addressed through `resolveDefoldSurface`, never through a
+// packaged SDK. `requestedRevision` is the policy/cache key. An installed CLI
+// populates a cache miss from the authenticated policy site; a source checkout
+// may use its generated tree only as a contributor fallback.
 async function coreSdkForRevision(requestedRevision, options = {}) {
-  const surface = assertResolvedDefoldSurface(await resolveDefoldSurface(requestedRevision, {
+  const surfaceOptions = {
     packageRoot,
     projectRoot: options.projectRoot,
     env: options.env
-  }));
+  };
+  let unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
+  if (unresolved.blocker && options.env?.DEHERM_OFFLINE !== "1" && process.env.DEHERM_OFFLINE !== "1") {
+    const { readPolicyLocator, resolvePublishedPolicy } = await import("./policy-client.mjs");
+    await resolvePublishedPolicy(requestedRevision, {
+      index: await readPolicyLocator(),
+      env: options.env
+    });
+    unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
+  }
+  const surface = assertResolvedDefoldSurface(unresolved);
   const sdkSourceRoot = surface.sdkRoot;
+  const repositorySourceRoot = surface.repositoryRoot;
   const {
-    valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath,
-    scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath
+    valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath,
+    scriptProbesPath, scriptAccountingPath, scriptUniversalPath,
+    scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath,
+    resourceSchemaPath, resourceNamespacesPath, toolchainPath
   } = surface.paths;
   // The lowering-plan generator is package code, not engine surface: it is the
   // program that produced the plan, and its digest authenticates the plan
   // whichever revision the plan describes.
   const loweringPlanGeneratorPath = path.join(packageRoot, "packages", "compiler", "src", "generate-binding-lowering-plan.mjs");
-  const [valueLayoutsSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, dmsdkUniversalSource, packageSource] = await Promise.all([
+  const toolchainSourcePromise = surface.toolchain
+    ? Promise.resolve(Buffer.from(`${JSON.stringify(surface.toolchain, null, 2)}\n`))
+    : readFile(toolchainPath);
+  const [valueLayoutsSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptPatternsSource, dmsdkPatternsSource, scriptProbesSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, dmsdkUniversalSource, resourceSchemaSource, resourceNamespacesSource, toolchainSource, packageSource] = await Promise.all([
     readFile(valueLayoutsPath),
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
     readFile(scriptDispatchPath),
+    readFile(scriptPatternsPath),
+    readFile(dmsdkPatternsPath),
+    readFile(scriptProbesPath),
     readFile(scriptAccountingPath),
     readFile(scriptUniversalPath),
     readFile(scriptProfilesPath),
@@ -949,12 +1004,18 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     readFile(loweringPlanGeneratorPath),
     readFile(dmsdkThunksPath),
     readFile(dmsdkUniversalPath),
+    readFile(resourceSchemaPath),
+    readFile(resourceNamespacesPath),
+    toolchainSourcePromise,
     readFile(path.join(packageRoot, "package.json"), "utf8")
   ]);
   const valueLayouts = JSON.parse(valueLayoutsSource);
   const scriptIr = JSON.parse(scriptSource);
   const dmsdkIr = JSON.parse(dmsdkSource);
   const scriptDispatch = JSON.parse(scriptDispatchSource);
+  const scriptPatterns = JSON.parse(scriptPatternsSource);
+  const dmsdkPatterns = JSON.parse(dmsdkPatternsSource);
+  const scriptProbes = JSON.parse(scriptProbesSource);
   const scriptAccounting = JSON.parse(scriptAccountingSource);
   const scriptUniversal = JSON.parse(scriptUniversalSource);
   const scriptProfiles = JSON.parse(scriptProfilesSource);
@@ -962,7 +1023,8 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const loweringPlanSentinel = JSON.parse(loweringPlanSentinelSource);
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
   const dmsdkUniversal = JSON.parse(dmsdkUniversalSource);
-  const revisions = new Set([valueLayouts, scriptIr, dmsdkIr, scriptDispatch, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
+  const toolchainPolicy = JSON.parse(toolchainSource);
+  const revisions = new Set([valueLayouts, scriptIr, dmsdkIr, scriptDispatch, scriptPatterns, dmsdkPatterns, scriptProbes, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
@@ -986,11 +1048,29 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
       JSON.stringify(loweringPlanSentinel.inputHashes) !== JSON.stringify(loweringPlan.inputHashes)) {
     throw new Error("Packaged canonical lowering-plan sentinel is stale or invalid");
   }
-  const sdkSourceSha256 = await directoryDigest(sdkSourceRoot);
+  const bob = toolchainPolicy.bob;
+  if (toolchainPolicy.kind !== "deherm.policy.toolchain" ||
+      typeof bob?.urlTemplate !== "string" || !bob.urlTemplate.includes("{defoldRevision}") ||
+      !/^[0-9a-f]{64}$/u.test(bob.sha256 ?? "")) {
+    throw new Error("Authenticated Defold toolchain policy has no verified Bob artifact");
+  }
+  const toolchain = {
+    pins: toolchainPolicy.pins,
+    targetMatrix: toolchainPolicy.targetMatrix,
+    bob: {
+      url: bob.urlTemplate.replace("{defoldRevision}", requestedRevision),
+      sha256: bob.sha256
+    }
+  };
+  const sdkSourceSha256 = surface.descriptor?.sdkTreeSha256 ??
+    await directoryDigest(path.join(sdkSourceRoot, "generated"));
+  const repositorySourceSha256 = surface.descriptor?.outputTreeSha256 ??
+    await revisionOutputDigest(repositorySourceRoot);
   return {
     revision: scriptIr.defoldRevision,
     surfaceLayer: surface.layer,
     sdkSourceRoot,
+    repositorySourceRoot,
     // Revision-invariant authoring/runtime templates ship with the compiler.
     // A materialized policy surface only owns revision-specific generated code.
     sdkTemplateRoot: path.join(packageRoot, "packages", "sdk", "src"),
@@ -1011,11 +1091,16 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     loweringPlanSentinel,
     dmsdkThunks,
     dmsdkUniversal,
+    toolchain,
+    artifacts: surface.artifacts ?? null,
     inputs: {
       valueLayoutsSha256: sha256(valueLayoutsSource),
       scriptIrSha256: sha256(scriptSource),
       dmsdkIrSha256: sha256(dmsdkSource),
       scriptDispatchSha256: sha256(scriptDispatchSource),
+      scriptPatternsSha256: sha256(scriptPatternsSource),
+      dmsdkPatternsSha256: sha256(dmsdkPatternsSource),
+      scriptProbesSha256: sha256(scriptProbesSource),
       scriptAccountingSha256: sha256(scriptAccountingSource),
       scriptUniversalSha256: sha256(scriptUniversalSource),
       scriptProfilesSha256: sha256(scriptProfilesSource),
@@ -1023,9 +1108,13 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
       loweringPlanSentinelSha256: sha256(loweringPlanSentinelSource),
       dmsdkThunksSha256: sha256(dmsdkThunksSource),
       dmsdkUniversalSha256: sha256(dmsdkUniversalSource),
-      sdkSourceSha256
+      resourceSchemaSha256: sha256(resourceSchemaSource),
+      resourceNamespacesSha256: sha256(resourceNamespacesSource),
+      toolchainSha256: sha256(toolchainSource),
+      sdkSourceSha256,
+      repositorySourceSha256
     },
-    paths: { valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath }
+    paths: { valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath, scriptProbesPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath, resourceSchemaPath, resourceNamespacesPath, toolchainPath }
   };
 }
 
@@ -1099,6 +1188,9 @@ export function generateExtensionTypes(inventory, layouts) {
 
 export async function installNativeExtension(projectRoot, options = {}) {
   const source = path.resolve(options.source ?? path.join(packageRoot, "defold", "defold_hermes"));
+  const surfaceSource = options.surfaceRepositoryRoot
+    ? path.join(path.resolve(options.surfaceRepositoryRoot), "defold", "defold_hermes")
+    : null;
   const destination = path.join(path.resolve(projectRoot), "defold_hermes");
   if (path.resolve(source) === path.resolve(destination)) {
     return { root: destination, installed: false, source: "workspace" };
@@ -1124,13 +1216,24 @@ export async function installNativeExtension(projectRoot, options = {}) {
   }
   const packageManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
   const extensionManifest = await readFile(path.join(source, "ext.manifest"), "utf8");
-  const extensionTreeSha256 = await directoryDigest(source, { ignore: new Set([".deherm-managed.json"]) });
+  const extensionRelative = (relative) => `defold/defold_hermes/${relative.replaceAll(path.sep, "/")}`;
+  const excludeTargetArtifact = (relative) => isTargetNativeOutput(extensionRelative(relative));
+  const excludeManagedOutput = (relative) => {
+    const repositoryRelative = extensionRelative(relative);
+    return isRevisionOutput(repositoryRelative) || isTargetNativeOutput(repositoryRelative);
+  };
+  const extensionTreeSha256 = await directoryDigest(source, {
+    ignore: new Set([".deherm-managed.json"]),
+    exclude: excludeManagedOutput
+  });
+  const surfaceTreeSha256 = surfaceSource ? await directoryDigest(surfaceSource) : null;
   const identity = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     package: packageManifest.name,
     version: packageManifest.version,
     extensionManifestSha256: sha256(extensionManifest),
-    extensionTreeSha256
+    extensionTreeSha256,
+    surfaceTreeSha256
   };
   const sentinelName = ".deherm-managed.json";
   let current = null;
@@ -1153,7 +1256,25 @@ export async function installNativeExtension(projectRoot, options = {}) {
   const backup = `${destination}.deherm-backup-${nonce}`;
   let movedCurrent = false;
   try {
-    await cp(source, stage, { recursive: true, errorOnExist: true, force: false });
+    await cp(source, stage, {
+      recursive: true,
+      errorOnExist: true,
+      force: false,
+      filter: (candidate) => {
+        const relative = path.relative(source, candidate);
+        return !relative || !excludeManagedOutput(relative);
+      }
+    });
+    if (surfaceSource) {
+      await cp(surfaceSource, stage, {
+        recursive: true,
+        force: true,
+        filter: (candidate) => {
+          const relative = path.relative(surfaceSource, candidate);
+          return !relative || !excludeTargetArtifact(relative);
+        }
+      });
+    }
     await writeFile(path.join(stage, sentinelName), `${JSON.stringify(identity, null, 2)}\n`, { flag: "wx" });
     if (current) {
       await rename(destination, backup);
@@ -1175,7 +1296,7 @@ export async function installNativeExtension(projectRoot, options = {}) {
     await rm(stage, { recursive: true, force: true });
     await rm(backup, { recursive: true, force: true });
   }
-  return { root: destination, installed: true, source: "package" };
+  return { root: destination, installed: true, source: surfaceSource ? "package+policy-surface" : "package" };
 }
 
 export async function writeGeneratedProject(inventory, outputDirectory = ".deherm", options = {}) {
@@ -1207,7 +1328,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   });
   const defoldRevision = assertResolvedDefoldRevision(revisionResolution);
   const core = await coreSdkForRevision(defoldRevision, { projectRoot: inventory.projectRoot, env: options.env });
-  const toolchain = defoldToolchain(core.revision);
+  const toolchain = core.toolchain;
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const portableInventory = { ...inventory, projectRoot: "." };
   const bindingIr = buildProjectBindingIr(inventory, core.valueLayouts);
@@ -1243,6 +1364,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
           defoldRevision: core.revision,
           defoldResolution: defoldResolutionRecord(revisionResolution),
           defoldSurfaceLayer: core.surfaceLayer,
+          surfaceRepositoryRoot: core.repositorySourceRoot,
           generationMerkle: { engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
           revisionDiagnostics: revisionResolution.diagnostics ?? [],
           moduleCount: bindingIr.modules.length,
@@ -1266,6 +1388,9 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(core.paths.scriptIrPath, path.join(irRoot, "script-api.json"));
   await cp(core.paths.dmsdkIrPath, path.join(irRoot, "dmsdk.json"));
   await cp(core.paths.scriptDispatchPath, path.join(irRoot, "script-scalar-dispatch.json"));
+  await cp(core.paths.scriptPatternsPath, path.join(irRoot, "script-binding-patterns.json"));
+  await cp(core.paths.dmsdkPatternsPath, path.join(irRoot, "dmsdk-binding-patterns.json"));
+  await cp(core.paths.scriptProbesPath, path.join(irRoot, "script-real-engine-probes.json"));
   await cp(core.paths.scriptAccountingPath, path.join(irRoot, "script-api-accounting.json"));
   await cp(core.paths.scriptUniversalPath, path.join(irRoot, "script-universal-value-bindings.json"));
   await cp(core.paths.scriptProfilesPath, path.join(irRoot, "script-route-profiles.json"));
@@ -1273,6 +1398,8 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(core.paths.loweringPlanSentinelPath, path.join(irRoot, "binding-lowering-plan.sentinel.json"));
   await cp(core.paths.dmsdkThunksPath, path.join(irRoot, "dmsdk-scalar-thunks.json"));
   await cp(core.paths.dmsdkUniversalPath, path.join(irRoot, "dmsdk-universal-bindings.json"));
+  await cp(core.paths.resourceSchemaPath, path.join(irRoot, "defold-resource-declaration-schema.json"));
+  await cp(core.paths.resourceNamespacesPath, path.join(irRoot, "defold-script-resource-namespaces.json"));
   await writeFile(path.join(root, "extensions.d.ts"), generateExtensionTypes(inventory, core.valueLayouts));
   const modules = bindingIr.modules;
   const sdkRoot = path.join(root, "sdk");
@@ -1295,6 +1422,15 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     path.join(sdkRoot, "generated", "dmsdk"),
     { recursive: true }
   );
+  const staticHermesRoot = path.join(root, "static-hermes", "generated");
+  await rm(staticHermesRoot, { recursive: true, force: true });
+  await mkdir(staticHermesRoot, { recursive: true });
+  for (const name of ["script-universal-value.ts", "script-typed-native-bridge.ts"]) {
+    await cp(
+      path.join(core.repositorySourceRoot, "packages", "static-hermes", "src", "generated", name),
+      path.join(staticHermesRoot, name)
+    );
+  }
   await writeFile(path.join(sdkRoot, "runtime.ts"), runtimeSource());
   const exports = [
     "// Generated by deherm. Do not edit.",
@@ -1353,6 +1489,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
     toolchain,
+    artifacts: core.artifacts,
     generation,
     // How the Defold revision above was decided, and from which layer-0 surface
     // its API was read. Recorded so a regeneration, a teammate, or CI can see
@@ -1427,6 +1564,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     platform: core.platform,
     generator: { package: "@ts-defold/deherm", version: core.packageVersion },
     toolchain,
+    artifacts: core.artifacts,
     generation,
     defoldResolution: defoldResolutionRecord(revisionResolution),
     defoldSurface: { layer: core.surfaceLayer },
@@ -1458,6 +1596,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     defoldRevision: core.revision,
     defoldResolution: defoldResolutionRecord(revisionResolution),
     defoldSurfaceLayer: core.surfaceLayer,
+    surfaceRepositoryRoot: core.repositorySourceRoot,
     generationMerkle: { engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
     revisionDiagnostics: revisionResolution.diagnostics ?? [],
     moduleCount: modules.length,
@@ -1516,8 +1655,11 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   if (manifest.generator?.package !== "@ts-defold/deherm" || manifest.generator?.version !== core.packageVersion) {
     throw new Error("Generated manifest names a different deherm generator package");
   }
-  if (JSON.stringify(manifest.toolchain) !== JSON.stringify(defoldToolchain(core.revision))) {
+  if (JSON.stringify(manifest.toolchain) !== JSON.stringify(core.toolchain)) {
     throw new Error("Generated manifest names a different or unverified Defold toolchain");
+  }
+  if (JSON.stringify(manifest.artifacts ?? null) !== JSON.stringify(core.artifacts ?? null)) {
+    throw new Error("Generated manifest names a different Defold artifact release mapping");
   }
   const expectedEngineProfiles = validateEngineProfiles(manifest.engineProfiles, core.scriptProfiles);
   if (JSON.stringify(manifest.engineProfiles) !== JSON.stringify(expectedEngineProfiles)) {
@@ -1538,6 +1680,9 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     scriptIrSha256: "ir/script-api.json",
     dmsdkIrSha256: "ir/dmsdk.json",
     scriptDispatchSha256: "ir/script-scalar-dispatch.json",
+    scriptPatternsSha256: "ir/script-binding-patterns.json",
+    dmsdkPatternsSha256: "ir/dmsdk-binding-patterns.json",
+    scriptProbesSha256: "ir/script-real-engine-probes.json",
     scriptAccountingSha256: "ir/script-api-accounting.json",
     scriptUniversalSha256: "ir/script-universal-value-bindings.json",
     scriptProfilesSha256: "ir/script-route-profiles.json",
@@ -1617,6 +1762,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   }
   if (JSON.stringify(lock.generator) !== JSON.stringify(manifest.generator) ||
       JSON.stringify(lock.toolchain) !== JSON.stringify(manifest.toolchain) ||
+      JSON.stringify(lock.artifacts ?? null) !== JSON.stringify(manifest.artifacts ?? null) ||
       JSON.stringify(lock.generation) !== JSON.stringify(manifest.generation) ||
       JSON.stringify(lock.defoldResolution) !== JSON.stringify(manifest.defoldResolution) ||
       JSON.stringify(lock.defoldSurface) !== JSON.stringify(manifest.defoldSurface) ||

@@ -119,8 +119,13 @@ export async function buildProjectResourceSymbols(projectRoot, options = {}) {
 /** Write `<outputRoot>/generated/resource-symbols.json` for the ttsc transform. */
 export async function writeProjectResourceSymbols(projectRoot, outputRoot, options = {}) {
   const directory = path.join(outputRoot, "generated");
+  const pinned = options.pinned ?? await loadResourceClassification({
+    schemaPath: path.join(outputRoot, "ir", "defold-resource-declaration-schema.json"),
+    classificationPath: path.join(outputRoot, "ir", "defold-script-resource-namespaces.json")
+  });
   const table = await buildProjectResourceSymbols(projectRoot, {
     ...options,
+    pinned,
     projectRootFrom: portable(path.relative(directory, path.resolve(projectRoot))) || "."
   });
   await mkdir(directory, { recursive: true });

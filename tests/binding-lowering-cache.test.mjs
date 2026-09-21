@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { mkdtemp } from "node:fs/promises";
 import test from "node:test";
 
@@ -11,7 +11,7 @@ import { inputPaths, loadBindingLoweringInputs } from "../scripts/generate-bindi
 
 async function cacheFixture() {
   const root = await mkdtemp(join(tmpdir(), "deherm-lowering-cache-"));
-  const inputs = await loadBindingLoweringInputs();
+  const inputs = await loadBindingLoweringInputs(resolve(new URL("..", import.meta.url).pathname));
   for (const [name, relative] of Object.entries(inputPaths)) {
     const destination = join(root, relative);
     await mkdir(dirname(destination), { recursive: true });
