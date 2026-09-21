@@ -4,13 +4,14 @@
 // One recipe owns the public wrapper, raw-cell dispatcher, and exact-call twin.
 import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
+import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
 const defaultIrPath = "packages/bindings/generated/defold-sdk-ir.json";
 const defaultShapesPath = "packages/bindings/generated/defold-dmsdk-abi-shapes.json";
+const defaultSymbolEvidencePath = "packages/bindings/generated/defold-dmsdk-symbol-evidence.json";
 const defaultPolicyPath = "packages/bindings/overrides/dmsdk-named-scalar-policies.json";
 const outputReportPath = "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json";
 const outputPaths = Object.freeze({
@@ -37,6 +38,15 @@ const builtinTypes = Object.freeze({
 });
 
 const digest = (content) => createHash("sha256").update(content).digest("hex");
+export const orderedBlockingReasons = ({ symbolBlocker = null, resultBlocker = null, parameterBlockers = [] }) =>
+  [...new Set([symbolBlocker, resultBlocker, ...parameterBlockers].filter(Boolean))];
+const normalizedInputPath = (input) => {
+  const absolute = resolve(repositoryRoot, input);
+  const repositoryRelative = relative(repositoryRoot, absolute).replaceAll("\\", "/");
+  return repositoryRelative && repositoryRelative !== ".." && !repositoryRelative.startsWith("../")
+    ? repositoryRelative
+    : absolute.replaceAll("\\", "/");
+};
 const canonicalJson = (value) => {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
@@ -44,12 +54,13 @@ const canonicalJson = (value) => {
 };
 
 function parseArguments(argv) {
-  const options = { outRoot: repositoryRoot, irPath: defaultIrPath, shapesPath: defaultShapesPath, policyPath: defaultPolicyPath, check: false };
+  const options = { outRoot: repositoryRoot, irPath: defaultIrPath, shapesPath: defaultShapesPath, symbolEvidencePath: defaultSymbolEvidencePath, policyPath: defaultPolicyPath, check: false };
   for (let index = 0; index < argv.length; ++index) {
     if (argv[index] === "--check") options.check = true;
     else if (argv[index] === "--out-root") options.outRoot = resolve(argv[++index]);
     else if (argv[index] === "--ir") options.irPath = resolve(argv[++index]);
     else if (argv[index] === "--shapes") options.shapesPath = resolve(argv[++index]);
+    else if (argv[index] === "--symbol-evidence") options.symbolEvidencePath = resolve(argv[++index]);
     else if (argv[index] === "--policy") options.policyPath = resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argv[index]}`);
   }
@@ -391,29 +402,62 @@ function validateProvenance(ir, irContent, shapes) {
   if (!Number.isSafeInteger(shapes.trancheSummary?.["next-named-scalar-direct"])) throw new Error("dmSDK ABI-shape report must declare its named-scalar candidate count");
 }
 
-export async function build({ irPath = defaultIrPath, shapesPath = defaultShapesPath, policyPath = defaultPolicyPath } = {}) {
-  const [irContent, shapesContent, policyContent] = await Promise.all([
-    readFile(resolve(repositoryRoot, irPath), "utf8"), readFile(resolve(repositoryRoot, shapesPath), "utf8"), readFile(resolve(repositoryRoot, policyPath), "utf8")
+export async function build({ irPath = defaultIrPath, shapesPath = defaultShapesPath, symbolEvidencePath = defaultSymbolEvidencePath, policyPath = defaultPolicyPath } = {}) {
+  const [irContent, shapesContent, symbolEvidenceContent, policyContent] = await Promise.all([
+    readFile(resolve(repositoryRoot, irPath), "utf8"), readFile(resolve(repositoryRoot, shapesPath), "utf8"),
+    readFile(resolve(repositoryRoot, symbolEvidencePath), "utf8"), readFile(resolve(repositoryRoot, policyPath), "utf8")
   ]);
-  const ir = JSON.parse(irContent); const shapes = JSON.parse(shapesContent); const policy = JSON.parse(policyContent);
+  const ir = JSON.parse(irContent); const shapes = JSON.parse(shapesContent); const symbolEvidence = JSON.parse(symbolEvidenceContent); const policy = JSON.parse(policyContent);
+  const reportedSymbolEvidencePath = normalizedInputPath(symbolEvidencePath);
   validateProvenance(ir, irContent, shapes);
-  if (policy.schemaVersion !== 2 || !policy.policyVersion || !policy.namedTypes || !policy.expectedCoverage || !Array.isArray(policy.declarationEvidenceRules)) throw new Error("Invalid named-scalar structural policy");
+  if (symbolEvidence.schemaVersion !== 2 || symbolEvidence.defoldRevision !== ir.defoldRevision || !symbolEvidence.declarations || typeof symbolEvidence.declarations !== "object") throw new Error("Invalid or revision-mismatched dmSDK symbol evidence");
+  if (policy.schemaVersion !== 2 || !policy.policyVersion || !policy.namedTypes || !policy.expectedCoverage || !Array.isArray(policy.declarationEvidenceRules) || !Array.isArray(policy.symbolEvidenceBlockers)) throw new Error("Invalid named-scalar structural policy");
+  const reviewedSymbolBlockers = new Map(policy.symbolEvidenceBlockers.map((entry) => [entry.declarationId, entry]));
+  if (reviewedSymbolBlockers.size !== policy.symbolEvidenceBlockers.length) throw new Error("Named-scalar policy contains duplicate symbol-evidence blocker declarations");
   const byId = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const candidates = shapes.rows.filter(({ tranche }) => tranche === "next-named-scalar-direct")
     .map((shape) => ({ shape, declaration: byId.get(shape.id) })).sort((a, b) => a.declaration.id.localeCompare(b.declaration.id));
   if (shapes.trancheSummary["next-named-scalar-direct"] !== policy.expectedCoverage.candidates || candidates.length !== policy.expectedCoverage.candidates || candidates.some(({ declaration }) => !declaration)) throw new Error(`The named-scalar census must contain exactly ${policy.expectedCoverage.candidates} resolvable declarations`);
   const evidenceCache = new Map(); const entries = []; const blocked = [];
   for (const { shape, declaration } of candidates) {
+    const linkage = symbolEvidence.declarations[declaration.id];
+    if (!linkage) throw new Error(`dmSDK symbol evidence is missing ${declaration.id}`);
     const result = await typeSpec(declaration.returns, declaration, policy, evidenceCache);
     const parameters = await Promise.all(declaration.parameters.map(async (parameter) => ({ ...await typeSpec(parameter.type, declaration, policy, evidenceCache), name: parameter.name, source: parameter.type })));
-    const blocker = result.blocked ?? parameters.find(({ blocked: reason }) => reason)?.blocked;
+    const symbolBlocker = linkage.linkage === "header-only" || (linkage.linkage === "external" && linkage.availability === "all-targets-all-variants")
+      ? null : `native-symbol-${linkage.linkage === "external" ? linkage.availability : linkage.linkage}`;
+    const reviewedSymbolBlocker = symbolBlocker ? reviewedSymbolBlockers.get(declaration.id) : null;
+    if (symbolBlocker && (reviewedSymbolBlocker?.blocker !== symbolBlocker || !/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/u.test(reviewedSymbolBlocker.issue ?? ""))) {
+      throw new Error(`${declaration.id}: ${symbolBlocker} requires a matching reviewed issue in symbolEvidenceBlockers`);
+    }
+    const blockerReasons = orderedBlockingReasons({
+      symbolBlocker,
+      resultBlocker: result.blocked,
+      parameterBlockers: parameters.map(({ blocked }) => blocked)
+    });
+    const blocker = blockerReasons[0];
     const header = await readFile(resolve(repositoryRoot, declaration.header), "utf8");
-    const common = { declarationId: declaration.id, symbol: declaration.name, nativeSignature: declaration.type, shape: shape.shape, include: includeFor(declaration.header), headerEvidence: { path: declaration.header, ...declarationEvidence(header, declaration, policy), sha256: digest(header) } };
-    if (blocker) { blocked.push({ ...common, emitted: false, blocker }); continue; }
+    const common = {
+      declarationId: declaration.id, symbol: declaration.name, nativeSignature: declaration.type, shape: shape.shape,
+      include: includeFor(declaration.header),
+      headerEvidence: { path: declaration.header, ...declarationEvidence(header, declaration, policy), sha256: digest(header) },
+      symbolEvidence: { path: reportedSymbolEvidencePath, sha256: digest(symbolEvidenceContent), linkage: linkage.linkage, availability: linkage.availability, linkedIn: linkage.linkedIn }
+    };
+    if (blocker) {
+      blocked.push({
+        ...common,
+        emitted: false,
+        blocker,
+        ...(blockerReasons.length > 1 ? { blockerReasons } : {}),
+        ...(reviewedSymbolBlocker ? { issue: reviewedSymbolBlocker.issue } : {})
+      });
+      continue;
+    }
     const bindingId = entries.length; const wrapper = wrapperName(declaration);
     const recipe = { bindingId, declarationId: declaration.id, symbol: declaration.name, wrapper, include: common.include, result, parameters };
     entries.push({ ...common, ...recipe, exactVectorSha256: digest(canonicalJson(recipe)) });
   }
+  if (blocked.filter(({ issue }) => issue).length !== reviewedSymbolBlockers.size) throw new Error("Named-scalar policy contains a stale symbol-evidence blocker review");
   if (entries.length !== policy.expectedCoverage.generated || blocked.length !== policy.expectedCoverage.blocked || candidates.length !== policy.expectedCoverage.candidates) throw new Error("Named-scalar structural coverage drifted from reviewed expectations");
   const artifacts = new Map([
     [outputPaths.header, renderHeader(entries)], [outputPaths.runtimeHeader, renderRuntimeHeader()], [outputPaths.runtime, renderRuntime(entries)],
@@ -421,15 +465,26 @@ export async function build({ irPath = defaultIrPath, shapesPath = defaultShapes
   ]);
   const declarations = [...entries.map((entry) => ({
     id: entry.declarationId, symbol: entry.symbol, nativeSignature: entry.nativeSignature, shape: entry.shape, emitted: true, bindingId: entry.bindingId, wrapper: entry.wrapper, preferredLowering: false,
-    recipe: { include: entry.include, result: entry.result, parameters: entry.parameters, exactVectorSha256: entry.exactVectorSha256 }, headerEvidence: entry.headerEvidence,
-    stages: { generated: { status: "complete", evidence: outputPaths.runtime }, compiled: { status: "covered-by-reproducible-test", evidence: "tests/dmsdk-named-scalar-bindings.test.mjs" }, linked: { status: "covered-by-reproducible-test", evidence: outputPaths.exact }, conformant: { status: "covered-by-reproducible-test", evidence: outputPaths.exact }, allocation: { status: "100000-warmed-dispatch-zero-cpp-allocations", evidence: "native/dmsdk_named_scalar_runtime_test.cpp" }, typescriptCallable: { status: "not-applicable", evidence: outputPaths.typescript } }
-  })), ...blocked.map((entry) => ({ id: entry.declarationId, symbol: entry.symbol, nativeSignature: entry.nativeSignature, shape: entry.shape, emitted: false, blocker: entry.blocker, headerEvidence: entry.headerEvidence }))];
+    recipe: { include: entry.include, result: entry.result, parameters: entry.parameters, exactVectorSha256: entry.exactVectorSha256 }, headerEvidence: entry.headerEvidence, symbolEvidence: entry.symbolEvidence,
+    stages: { generated: { status: "complete", evidence: outputPaths.runtime }, compiled: { status: "covered-by-reproducible-test", evidence: "tests/dmsdk-named-scalar-bindings.test.mjs" }, linked: { status: "covered-by-reproducible-test", evidence: reportedSymbolEvidencePath }, conformant: { status: "covered-by-reproducible-test", evidence: outputPaths.exact }, allocation: { status: "100000-warmed-dispatch-zero-cpp-allocations", evidence: "native/dmsdk_named_scalar_runtime_test.cpp" }, typescriptCallable: { status: "not-applicable", evidence: outputPaths.typescript } }
+  })), ...blocked.map((entry) => ({
+    id: entry.declarationId,
+    symbol: entry.symbol,
+    nativeSignature: entry.nativeSignature,
+    shape: entry.shape,
+    emitted: false,
+    blocker: entry.blocker,
+    ...(entry.blockerReasons ? { blockerReasons: entry.blockerReasons } : {}),
+    issue: entry.issue,
+    headerEvidence: entry.headerEvidence,
+    symbolEvidence: entry.symbolEvidence
+  }))];
   const report = {
     schemaVersion: 1, policyVersion: policy.policyVersion, defoldRevision: ir.defoldRevision, sourceShapeCensus: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
-    scope: "All declarations structurally classified as next-named-scalar-direct. Admission is derived from source-resolved scalar ABI facts; engine semantics do not suppress a callable C ABI.",
+    scope: "All declarations structurally classified as next-named-scalar-direct. Admission requires source-resolved scalar ABI facts and a symbol that the pinned Defold target archives expose across all build variants; absent or target-partial symbols fail closed.",
     universalFallback: { preserved: true, catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json", mutation: "none" },
     coverage: { reviewed: candidates.length, generated: entries.length, policyBlocked: blocked.length, signatureCompileCovered: entries.length, linked: entries.length, behaviorCovered: entries.length, exactCallCovered: entries.length, typescriptCallable: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 },
-    sourceHashes: { ir: digest(irContent), shapes: digest(shapesContent), policy: digest(policyContent) },
+    sourceHashes: { ir: digest(irContent), shapes: digest(shapesContent), symbolEvidence: digest(symbolEvidenceContent), policy: digest(policyContent) },
     artifactHashes: Object.fromEntries([...artifacts].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, digest(content)])), artifacts: [...artifacts.keys()].sort(), declarations
   };
   artifacts.set(outputReportPath, `${JSON.stringify(report, null, 2)}\n`);
@@ -443,8 +498,8 @@ async function writeOrCheck(outRoot, relativePath, content, check) {
 }
 
 export async function run(argv = process.argv.slice(2)) {
-  const { outRoot, check, irPath, shapesPath, policyPath } = parseArguments(argv);
-  const { artifacts, report } = await build({ irPath, shapesPath, policyPath });
+  const { outRoot, check, irPath, shapesPath, symbolEvidencePath, policyPath } = parseArguments(argv);
+  const { artifacts, report } = await build({ irPath, shapesPath, symbolEvidencePath, policyPath });
   for (const [path, content] of artifacts) await writeOrCheck(outRoot, path, content, check);
   process.stdout.write(`${check ? "Verified" : "Generated"} ${report.coverage.generated}/${report.coverage.reviewed} named-scalar bindings; ${report.coverage.policyBlocked} ABI-blocked.\n`);
   return report;

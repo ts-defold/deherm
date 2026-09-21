@@ -24,7 +24,18 @@ Selection remains structural. Four exact ABI-shape recipes cover the five
 declarations; the C and C++ canonical-path declarations share one recipe. The
 generator verifies the pinned header text that defines each capacity,
 termination, result-length, or bytes-written contract before emitting code.
-There is no symbol allowlist in the selection step.
+There is no symbol allowlist in the selection step. The same structural
+selection is joined to the revision-matched generated archive census; a row is
+promoted only when it is header-only or externally linked in every target and
+debug, release, and headless variant. The exact census content is hashed into
+the family report.
+
+The callable-route promotion joins those same five recipe identities into the
+generated-adapter call index. The complete dmSDK release partition therefore
+moves from 566 universal-ready, 59 generated-adapter, and 736
+specialization-required recipes to 566, 64, and 731 respectively. Universal
+recipe coverage remains 1,361/1,361 with zero silent omissions; the five
+usage-materialized fallback recipes remain present as a fail-safe path.
 
 The complete partition changed from 12 declarations covered by prior waves and
 67 blocked declarations to 12 prior-wave declarations, five generated C-string
@@ -49,9 +60,11 @@ call. Generated code contains no heap allocation primitive. A thread-local
 active guard rejects same-thread nested dispatch before shared scratch is
 modified, so reentrancy cannot corrupt the outer call.
 
-Each generated row explicitly leaves the universal usage-materialized recipe
-as its preferred lowering. The direct arena path is additive and does not turn
-unsupported shapes into silent omissions.
+Each generated row now prefers the direct arena dispatcher after the generated
+report, production implementation, and exact twin agree on its family-local
+ID. The universal usage-materialized recipe remains in the catalog as a
+fallback. Unsupported shapes remain specialization-required and are not
+silently omitted.
 
 # Verification boundary
 
@@ -62,8 +75,18 @@ Focused tests compile the production calls against pinned SDK headers, compile
 and link the exact twins with ABI-compatible fake callees, execute every vector
 under AddressSanitizer and UndefinedBehaviorSanitizer, and cover same-buffer
 and partial-overlap input staging, embedded-NUL failure clearing, plus
-nested-dispatch rejection. A clean-room test reproduces all owned artifacts
-byte-for-byte and rejects source-evidence drift.
+nested-dispatch rejection. Every successful vector checks native status,
+visible output length, and required length; URI required length includes its
+terminating NUL. A controllable `RESULT_TOO_SMALL_BUFFER` fake also proves that
+native failure clears the complete output arena and result record. A clean-room
+test reproduces all owned artifacts byte-for-byte and rejects source or symbol
+evidence drift.
 
-This is exact bridge and source-ABI evidence. It does not claim packaged-engine
-behavior, target symbol availability, or browser/Static Hermes projections.
+The authenticated generated-adapter corpus also covers all five family-local
+IDs and binds their production dispatcher, native ABI, and shape mode to exact
+vectors. A focused sanitizer harness runs 100,000 warmed dispatches while
+counting C++ heap allocation and requires zero allocations.
+
+This is exact bridge, source-ABI, and generated all-target archive-census
+evidence. It does not claim packaged-engine behavior or browser/Static Hermes
+projections.

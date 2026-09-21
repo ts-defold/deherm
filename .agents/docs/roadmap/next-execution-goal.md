@@ -75,8 +75,8 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
 
 1. Keep every concrete reachable usage emitting both its production wrapper
    and exact verification contract from the same resolved
-   recipe/substitutions. The 486 universal-ready declarations reached this gate
-   in `2cf15fd`.
+   recipe/substitutions. The initial 486 universal-ready declarations reached
+   this gate in `2cf15fd`; the current generated partition has 566.
 2. Generate ABI-compatible fake callees that exercise the compile-time-selected
    call expression and record receiver, ordered native arguments, call count,
    and result. Ownership remains a declared contract unless an independent
@@ -87,7 +87,7 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
    generic by-value records fail-closed until a typed size, alignment, and
    lifetime provider exists; the catalog recipe remains public meanwhile.
 4. Run the same vectors through C ABI, JSI, Static Hermes, and browser/Wasm
-   adapters wherever that call is emitted. The current 486-vector
+   adapters wherever that call is emitted. The current 566-vector
    universal-ready partition executes in all four transports with complete
    applicability accounting; future specialized shapes must join the same
    contract as they begin emitting.

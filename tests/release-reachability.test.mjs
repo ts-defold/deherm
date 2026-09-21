@@ -85,8 +85,8 @@ test("every dmSDK recipe has a checker-resolvable overload identity", () => {
   assert.equal(dmSdkIndex.overloadCount, 1335);
   assert.equal(dmSdkIndex.ambiguousOverloadCount, 21);
   assert.equal(dmSdkIndex.universalReadyCount, 566);
-  assert.equal(dmSdkIndex.generatedAdapterCount, 59);
-  assert.equal(dmSdkIndex.specializationRequiredCount, 736);
+  assert.equal(dmSdkIndex.generatedAdapterCount, 64);
+  assert.equal(dmSdkIndex.specializationRequiredCount, 731);
   assert.equal(Object.keys(dmSdkIndex.markers).length, dmSdkIndex.overloadCount);
   assert.match(dmSdkIndex.indexSha256, /^[0-9a-f]{64}$/);
 });

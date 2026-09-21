@@ -48,13 +48,13 @@
       "loweringEvidence": {
         "scalar": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
         "enumValue": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555",
-        "namedScalar": "f68467b39791e67bf8288a73d6e6540e4b1a1ac73331b7e161488cae8a586a12",
+        "namedScalar": "fd128d866f95e34448d49e5d53e7412ab15bd59f821306b48fddce2dcffb6794",
         "fixedDigest": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
         "base64Span": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
         "astcProbe": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
         "xteaSpan": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
         "hashSpan": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
-        "arenaSpan": "0f9d8dab7f54e82e25e6ab4bf038915c49568bd3089718f128ffa24fbea515ad"
+        "arenaSpan": "84e3101830f4b069e576d781e0829b7ea9182c6fe5d4a4888ad69b62578b0b22"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",
@@ -160,8 +160,8 @@
     "unprojectedDeclarations": 0,
     "silentUnknowns": 0,
     "generatedAdapters": 45,
-    "policyBlocked": 70,
-    "loweringPending": 1246
+    "policyBlocked": 71,
+    "loweringPending": 1245
   },
   "constructorSummary": {
     "callback": 114,
@@ -210,13 +210,13 @@
   },
   "loweringStateSummary": {
     "generated-adapter": 45,
-    "lowering-pending": 1246,
-    "policy-blocked": 70
+    "lowering-pending": 1245,
+    "policy-blocked": 71
   },
   "loweringSummary": {
     "generated-adapter": 45,
-    "lowering-pending": 1246,
-    "policy-blocked": 70
+    "lowering-pending": 1245,
+    "policy-blocked": 71
   },
   "semanticTokenSummary": {
     "call-thread-affinity": 1361,
@@ -186814,13 +186814,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "lowering-pending",
-        "family": null,
+        "state": "policy-blocked",
+        "family": "namedScalar",
         "wrapper": null,
-        "policy": null,
+        "policy": "native-symbol-absent",
         "stages": null
       },
-      "loweringState": "lowering-pending"
+      "loweringState": "policy-blocked"
     },
     {
       "id": "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480",

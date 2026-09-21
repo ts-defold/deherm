@@ -264,6 +264,58 @@ target_include_directories(defold-hermes-static-special-call-test PRIVATE
 target_link_libraries(defold-hermes-static-special-call-test PRIVATE
   defold-hermes-runtime)
 
+set(DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR
+  "${CMAKE_CURRENT_BINARY_DIR}/generated/static-script-exact")
+set(DEFOLD_HERMES_STATIC_SCRIPT_EXACT_C
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR}/static-script-exact.c")
+set(DEFOLD_HERMES_STATIC_SCRIPT_EXACT_CPP
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR}/static_script_exact_fixture.cpp")
+set(DEFOLD_HERMES_STATIC_SCRIPT_EXACT_H
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR}/static_script_exact_fixture.h")
+set(DEFOLD_HERMES_STATIC_SCRIPT_EXACT_EVIDENCE
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR}/static-script-exact-evidence.json")
+add_custom_command(
+  OUTPUT
+    "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_C}"
+    "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_CPP}"
+    "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_H}"
+    "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_EVIDENCE}"
+  COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-script-exact-verification.mjs"
+    --shermes "$<TARGET_FILE:shermes>"
+    --output-dir "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR}"
+  DEPENDS
+    shermes
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-script-exact-verification.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate-script-universal-value-bindings.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/script-static-exact-verification.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/script-recording-engine.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-script-recording-engine.json"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-value-layouts.json"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  VERBATIM)
+set_source_files_properties(
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_C}"
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_CPP}"
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_H}"
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_EVIDENCE}"
+  PROPERTIES GENERATED TRUE)
+add_executable(defold-hermes-static-script-exact-test
+  native/static_script_exact_test.cpp
+  tests/fixtures/generated_script_recording_provider.cpp
+  tests/fixtures/generated_script_recording_tables.cpp
+  defold/defold_hermes/src/generated_script_universal_value_capi.cpp
+  defold/defold_hermes/src/generated_script_universal_static_frame.cpp
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_C}"
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_CPP}")
+target_compile_features(defold-hermes-static-script-exact-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-static-script-exact-test PRIVATE
+  defold/defold_hermes/include
+  tests/fixtures
+  "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR}")
+target_link_libraries(defold-hermes-static-script-exact-test PRIVATE
+  defold-hermes-runtime)
+
 set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR
   "${CMAKE_CURRENT_BINARY_DIR}/generated/static-dmsdk-exact")
 set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_C

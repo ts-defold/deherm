@@ -235,6 +235,34 @@ export const scriptGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" })
 ]);
 
+// Build-directory exact verification is executable evidence, not a committed
+// clean-room artifact. Keep its ownership explicit without pretending the
+// script clean-room copies and executes this CMake/shermes lane.
+export const staticScriptExactVerificationGenerator = Object.freeze({
+  sources: Object.freeze([
+    "scripts/build-static-script-exact-verification.mjs",
+    "scripts/generate-script-universal-value-bindings.mjs",
+    "packages/compiler/src/script-static-exact-verification.mjs",
+    "packages/compiler/src/script-recording-engine.mjs",
+    "native/static_script_exact_test.cpp"
+  ]),
+  pinnedInputs: Object.freeze([
+    "packages/bindings/generated/defold-script-recording-engine.json",
+    "packages/bindings/generated/defold-value-layouts.json"
+  ]),
+  buildOutputs: Object.freeze([
+    "static-script-exact.c",
+    "static_script_exact_fixture.cpp",
+    "static_script_exact_fixture.h",
+    "static-script-exact-evidence.json"
+  ]),
+  execution: Object.freeze({
+    cmakeTarget: "defold-hermes-static-script-exact-test",
+    packageScript: "test:static-script-exact",
+    sanitizerPackageScript: "test:static-script-exact-sanitize"
+  })
+});
+
 // The Lua-registration ground-truth lane. It derives a target's REGISTERED Lua
 // surface from that target's whole C/C++ source tree and diffs it against the
 // DECLARED surface, so `.script_api` and reference documentation are treated as

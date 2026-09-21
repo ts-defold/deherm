@@ -27,19 +27,19 @@
     "scriptHandleLowering": "2996c4ac53c90dc4e34471383550bd4f6d49171227f8fe09155440b6f0067a2d",
     "scriptUniversalValue": "e970edce9d5f6ac31ddb49ed7e14dfd1505c66469142dd5a05634b43ddb1848f",
     "defoldValueLayouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
-    "dmsdkProjection": "d66e04d0bc3f5369af6526481068fdd0c7cc7f6aa79a2859ed3b8bf1dbfc82ee",
-    "dmsdkUniversal": "5b60fa69e4d4c277330dfdaccc01d378c29262737a87d72ab6bb24c4204678d0",
+    "dmsdkProjection": "0b217c772541014c2406aaa84d3bd8a00bd46e71fb6dda56c8acff6b911f8cee",
+    "dmsdkUniversal": "8233a78e12b200f924eba9f92f839ce2ab7d8ce9b6fa219e175fc696c129aade",
     "dmsdkScalarThunks": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
     "dmsdkEnumValues": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555",
-    "dmsdkNamedScalars": "f68467b39791e67bf8288a73d6e6540e4b1a1ac73331b7e161488cae8a586a12",
+    "dmsdkNamedScalars": "fd128d866f95e34448d49e5d53e7412ab15bd59f821306b48fddce2dcffb6794",
     "dmsdkFixedDigests": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
     "dmsdkBase64Spans": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
     "dmsdkAstcProbes": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
     "dmsdkXteaSpans": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
     "dmsdkHashSpans": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
-    "dmsdkArenaSpanBlockers": "0f9d8dab7f54e82e25e6ab4bf038915c49568bd3089718f128ffa24fbea515ad",
-    "dmsdkCStringValue": "51d00bd80166ea00ec19f9072edd1548a6159fde6915f1215f747a96a6d13ef4",
-    "dmsdkBorrowedHandle": "659fdbe2e5afc38b435c6f2c3d88b862fbc32f59fa74af48bf667666ca049293",
+    "dmsdkArenaSpanBlockers": "84e3101830f4b069e576d781e0829b7ea9182c6fe5d4a4888ad69b62578b0b22",
+    "dmsdkCStringValue": "a66ab28e8a0dac5ab0daee4911391921312e3d3479e42464d19d4b41c20c8f5d",
+    "dmsdkBorrowedHandle": "fdc27d455c11356ed5c6a715ce447eb8e2df05ee27d73bb1f3ca9b4f6c02b466",
     "semanticPolicies": "cf28bf3e4ff1eaba22661cbf01f0e74620013a25b920ff092f1297227aaf6ec2",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
     "dynamicHermesJsi": "32be0b54b6bda4396d9c3bacfffa05292de96977cca1e8b17266622906751ee3",
@@ -63,19 +63,19 @@
     "scriptHandleLowering": "5bb16bd361d8bd0a61645d26497fd43386809e1b9d1d401cd4207ab3fe9deaaf",
     "scriptUniversalValue": "27cf3b74aee2ae1e024ccb31e2b815ed9ad2918cb20580674400a430c3b1d3c3",
     "defoldValueLayouts": "e7dfbb78eec1c3fbd432080161989576915d554668f0d8b009fe420167325d29",
-    "dmsdkProjection": "2f9281f9ead61a213377df4cb40ed41da592c6946140b782f21990d55691ff06",
-    "dmsdkUniversal": "4483cf7c2c1c17d92ca7732aae97124815330708af897a1e157f3eaed78f7453",
+    "dmsdkProjection": "d48fb3313140e01b0769378caddd46365b799789409aa6e03b69a9be8b19c558",
+    "dmsdkUniversal": "83675054ac702bde2df5c3151c211a3b9a386da0f10ce76431545d7ba4096ff3",
     "dmsdkScalarThunks": "80dcddd4811260d4fede04879b1189cef8c4fdaed0f59128e08421a7f46f5d5d",
     "dmsdkEnumValues": "50a427a641ddc85ab90df562985dd187dcdb7fd2de16f4cee2bb091ce902a469",
-    "dmsdkNamedScalars": "6446a9fc3bbd75f0f102eedae84691ac57641c2a0fe6de76795a42806bda6a5e",
+    "dmsdkNamedScalars": "d4fd24c6f833b007af62d6390b0b1beda257c29bdd0f8b480c62c06cfdad1cca",
     "dmsdkFixedDigests": "699237c09b58d510e84a781ecc5ec213bac2c1dc534f4a7bd9c679824bea69ca",
     "dmsdkBase64Spans": "0a7812546dbc23db3adb28fceab27006eb376c62c63b4846942063992f1c3d61",
     "dmsdkAstcProbes": "bc7636f392811e2efafee578289f30fa06681902e0c033e80afc029a9139b4f1",
     "dmsdkXteaSpans": "97ea2754e2e3cba048ac24aae7f937a9815c2f9c53d2b5d42eb9425333969f83",
     "dmsdkHashSpans": "11ef7ba26dc076f717d097af1f3cd27f050f56299cd7016e40383b6a71abe7c3",
-    "dmsdkArenaSpanBlockers": "b0bf8748316d44052c6f4fe6f406f29d0f3ff287c39a1e4776f048930497df47",
-    "dmsdkCStringValue": "2d5d042bb28fa65b7986050908e260c5f9459dee6ed19427325f94bbbf4ff3de",
-    "dmsdkBorrowedHandle": "f427ae983f9f0eb2c1c3c35a3c926816005da362b22489765f2862f0b226d2c3",
+    "dmsdkArenaSpanBlockers": "d3242e9223236e21fde0cd7a366b7e0c68c68ec82a4d8ff2317a93e54c31963a",
+    "dmsdkCStringValue": "8b527408895d600b6c7fb5a2461021c4e49c1bf7312e54bf1f14b64b4bfd768f",
+    "dmsdkBorrowedHandle": "4edef2b1fbb24d425eafd7d8de4165fdf65b8c04def0fde266eb6c05357e81cc",
     "semanticPolicies": "47af97340ecb38ea3744ae2595d41d5b73a1d02986e26a5fa04bdf493b753ae5",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
     "dynamicHermesJsi": "2888cfa7afbc9caf7bfdc3de1771a5dd7639ff3b16a14dfe09adf44b604c7b1a",
@@ -24996,7 +24996,7 @@
         "lowering:policy-gated"
       ],
       [
-        "lowering:pending",
+        "lowering:policy-gated",
         "native-symbol-linkage",
         "target-feature-symbol-matrix"
       ],
@@ -26694,12 +26694,12 @@
         "lowering:policy-gated"
       ],
       [
-        "call-thread-affinity",
-        "lowering:pending",
+        "lowering:policy-gated",
         "native-symbol-linkage",
         "target-feature-symbol-matrix"
       ],
       [
+        "call-thread-affinity",
         "lowering:pending",
         "native-symbol-linkage",
         "target-feature-symbol-matrix"
@@ -46129,22 +46129,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 7,
+          "reportRow": 20,
           "reportState": {
-            "emitted": true
+            "emitted": false,
+            "blocker": "native-symbol-absent"
           },
-          "generationIdentity": {
-            "bindingId": 7,
-            "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_bool"
-          },
-          "evidenceClaims": {
-            "allocation": "100000-warmed-dispatch-zero-cpp-allocations",
-            "compiled": "covered-by-reproducible-test",
-            "conformant": "covered-by-reproducible-test",
-            "generated": "complete",
-            "linked": "covered-by-reproducible-test",
-            "typescriptCallable": "not-applicable"
-          }
+          "generationIdentity": {}
         },
         {
           "lane": "dmsdk-universal",
@@ -46252,12 +46242,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 8,
+          "reportRow": 7,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 8,
+            "bindingId": 7,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f32"
           },
           "evidenceClaims": {
@@ -46375,12 +46365,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 9,
+          "reportRow": 8,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 9,
+            "bindingId": 8,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f64"
           },
           "evidenceClaims": {
@@ -46498,12 +46488,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 10,
+          "reportRow": 9,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 10,
+            "bindingId": 9,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s32"
           },
           "evidenceClaims": {
@@ -46621,12 +46611,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 11,
+          "reportRow": 10,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 11,
+            "bindingId": 10,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s64"
           },
           "evidenceClaims": {
@@ -46744,12 +46734,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 12,
+          "reportRow": 11,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 12,
+            "bindingId": 11,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u32"
           },
           "evidenceClaims": {
@@ -46867,12 +46857,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 13,
+          "reportRow": 12,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 13,
+            "bindingId": 12,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u64"
           },
           "evidenceClaims": {
@@ -46990,12 +46980,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 14,
+          "reportRow": 13,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 14,
+            "bindingId": 13,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_bool"
           },
           "evidenceClaims": {
@@ -47113,12 +47103,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 15,
+          "reportRow": 14,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 15,
+            "bindingId": 14,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f32"
           },
           "evidenceClaims": {
@@ -47236,12 +47226,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 16,
+          "reportRow": 15,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 16,
+            "bindingId": 15,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f64"
           },
           "evidenceClaims": {
@@ -47359,12 +47349,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 17,
+          "reportRow": 16,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 17,
+            "bindingId": 16,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s32"
           },
           "evidenceClaims": {
@@ -47482,12 +47472,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 18,
+          "reportRow": 17,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 18,
+            "bindingId": 17,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s64"
           },
           "evidenceClaims": {
@@ -47605,12 +47595,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 19,
+          "reportRow": 18,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 19,
+            "bindingId": 18,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u32"
           },
           "evidenceClaims": {
@@ -47728,12 +47718,12 @@
       [
         {
           "lane": "dmsdk-named-scalars",
-          "reportRow": 20,
+          "reportRow": 19,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 20,
+            "bindingId": 19,
             "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u64"
           },
           "evidenceClaims": {
@@ -53077,8 +53067,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "arenaCString",
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 4,
+              "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -170747,8 +170745,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "arenaCString",
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 0,
+              "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -200584,8 +200590,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "arenaCString",
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 1,
+              "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -200843,8 +200857,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "arenaCString",
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 2,
+              "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -206921,8 +206943,16 @@
             }
           },
           "preferredLowering": {
-            "state": "universal-fallback",
-            "family": "universal-recipe"
+            "state": "generated-adapter",
+            "family": "arenaCString",
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 3,
+              "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -312047,10 +312077,10 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 55,
       "sourceState": {
         "loweringFamily": "enum-handle",
-        "loweringState": "lowering-pending",
+        "loweringState": "policy-blocked",
         "accountingCategory": "projected",
         "linkage": "absent",
         "availability": "unlinked"
@@ -312062,35 +312092,35 @@
           "marshallingProgram": 0,
           "blockerSet": 0,
           "resolvedTokenSet": 1,
-          "unresolvedTokenSet": 58
+          "unresolvedTokenSet": 57
         },
         "dynamicHermesJsi": {
           "selection": "blocked-semantic",
           "marshallingProgram": 0,
           "blockerSet": 31,
           "resolvedTokenSet": 1,
-          "unresolvedTokenSet": 58
+          "unresolvedTokenSet": 57
         },
         "staticHermesCAbi": {
           "selection": "blocked-semantic",
           "marshallingProgram": 0,
           "blockerSet": 31,
           "resolvedTokenSet": 1,
-          "unresolvedTokenSet": 58
+          "unresolvedTokenSet": 57
         },
         "luaStack": {
           "selection": "blocked-capability",
           "marshallingProgram": 0,
           "blockerSet": 2,
           "resolvedTokenSet": 1,
-          "unresolvedTokenSet": 58
+          "unresolvedTokenSet": 57
         },
         "browserWasmHost": {
           "selection": "blocked-semantic",
           "marshallingProgram": 0,
           "blockerSet": 31,
           "resolvedTokenSet": 1,
-          "unresolvedTokenSet": 58
+          "unresolvedTokenSet": 57
         }
       }
     },
@@ -312133,7 +312163,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312219,7 +312249,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312305,7 +312335,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312391,7 +312421,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312477,7 +312507,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312563,7 +312593,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312649,7 +312679,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312735,7 +312765,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312821,7 +312851,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312907,7 +312937,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -312993,7 +313023,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -313079,7 +313109,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -313165,7 +313195,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -336439,7 +336469,7 @@
         "named",
         "scalar"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -395951,7 +395981,7 @@
         "named",
         "scalar"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -397760,7 +397790,7 @@
         "named",
         "scalar"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -399548,7 +399578,7 @@
         "named",
         "scalar"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -399634,7 +399664,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -399720,7 +399750,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -399805,7 +399835,7 @@
         "named",
         "scalar"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -399977,7 +400007,7 @@
         "scalar",
         "void"
       ],
-      "unresolvedTokenSet": 57,
+      "unresolvedTokenSet": 58,
       "sourceState": {
         "loweringFamily": "enum-handle",
         "loweringState": "lowering-pending",
@@ -492171,5 +492201,5 @@
       }
     }
   ],
-  "planSha256": "0291519b6dd97499989f4c3bd2c4bc38d8674a4f8afd69b6f4220de25de22ab5"
+  "planSha256": "e510cc3782732d8ad4d19f196e0aa404bb378bc23a7103826cf481f497ea4875"
 }

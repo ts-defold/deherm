@@ -48,6 +48,15 @@ body. In particular, generated JSON bodies never enter SQLite. This makes the
 index useful for discovering the authority behind a generated artifact without
 turning large evidence or policy files into retrieval context.
 
+`knowledge:metadata` retrieves one document's bounded top-level single-line
+frontmatter fields, title, description, type, and content digest without
+returning the Markdown body. Nested block arrays and mappings remain
+discoverable through graph edges where applicable, rather than being returned
+as metadata. If two distinct keys would collide after bounded key projection,
+the query fails closed instead of silently hiding a field. Frontmatter remains
+authored in the canonical document; the JSON stored in SQLite is only a
+disposable query projection.
+
 The bounded `knowledge:links` command exposes references originating in one
 document. `knowledge:backlinks` includes references to the document itself and
 to any of its heading nodes, so section-level Markdown links remain
@@ -74,25 +83,29 @@ authoritative or its SQL connections writable.
 
 Search returns at most 50 rows, outline returns at most 200 headings, and a
 section returns at most 200 lines. Every textual cell and section line also has
-a byte cap, and a complete result cannot exceed 64 KiB. SQL blobs are reduced
-to length plus a 64-byte hexadecimal prefix rather than serialized byte by
-byte. The defaults are smaller. The optional SQL escape hatch opens a
-physically read-only SQLite connection, accepts one `SELECT`, non-recursive
-`WITH`, or `EXPLAIN QUERY PLAN` statement of at most 16 KiB, and stops iteration
-at 50 rows. It is intended for agents that need a precise graph join, not as a
-path around bounded context retrieval.
+a byte cap, and a complete result cannot exceed 64 KiB. Truncated cells reserve
+space for their ellipsis and stop at a complete UTF-8 code-point boundary, so
+the marker cannot overflow the cap or introduce a replacement character. SQL
+blobs are reduced to length plus a 64-byte hexadecimal prefix rather than
+serialized byte by byte. The defaults are smaller. The optional SQL escape
+hatch opens a physically read-only SQLite connection, accepts one `SELECT`,
+non-recursive `WITH`, or `EXPLAIN QUERY PLAN` statement of at most 16 KiB, and
+stops iteration at 50 rows. It is intended for agents that need a precise graph
+join, not as a path around bounded context retrieval.
 
 # Verification boundary
 
-`tests/okf-graph.test.mjs` proves content-addressed reuse, one-document
-invalidation, independent source-digest refresh, stable line-independent
+`tests/okf-graph.test.mjs` proves content-addressed reuse, structured
+frontmatter retrieval without document bodies, one-document invalidation,
+independent source-digest refresh, stable line-independent
 section identities, fragment-link resolution, all supported edge families,
 heading-aware backlink retrieval, metadata-only handling for generated JSON,
-output bounds, and rejection of SQL writes. It also covers CRLF parity,
-old-schema cache recreation, single-line section flooding, BLOB reduction,
-recursive-query rejection, and deterministic write-lock contention from a
-concurrent process. The first implementation uses deterministic Markdown
-structure and explicit path language. A later
+output bounds across multibyte UTF-8 boundaries, rejection of projected-key
+collisions, and rejection of SQL writes.
+It also covers CRLF parity, old-schema cache recreation, single-line section
+flooding, BLOB reduction, recursive-query rejection, and deterministic
+write-lock contention from a concurrent process. The first implementation uses
+deterministic Markdown structure and explicit path language. A later
 Tree-sitter adapter may add symbol-level source nodes, but it must preserve the
 same bounded query contract and cannot make the cache necessary for
 correctness.

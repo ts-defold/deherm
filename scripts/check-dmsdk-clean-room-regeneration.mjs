@@ -244,10 +244,10 @@ async function validateReports(root) {
     projection.coverage?.unprojectedDeclarations === 0 &&
     projection.coverage?.silentUnknowns === 0 &&
     projection.coverage?.generatedAdapters === 45 &&
-    projection.coverage?.policyBlocked === 70 &&
+    projection.coverage?.policyBlocked === 71 &&
     projection.coverage?.mechanicallyProjected === 1361 &&
       projection.coverage?.projectionGaps === 0 &&
-      projection.coverage?.loweringPending === 1246,
+      projection.coverage?.loweringPending === 1245,
   "dmSDK projection IR does not have a complete fail-closed 1,361-declaration projection");
   assert(scalar.coverage.reviewed === 31 && scalar.coverage.generated === 26 && scalar.coverage.blocked === 5,
     "scalar report does not have the pinned 26/31 disposition");
@@ -262,9 +262,9 @@ async function validateReports(root) {
   assert(enumValue.coverage.discovered === 10 && enumValue.coverage.emitted === 7 &&
     enumValue.coverage.blocked === 3 && enumValue.coverage.remainingWithoutGeneratedAdapters === 1328,
   "enum-value report does not have the pinned 7/10 disposition or 1,328 remainder");
-  assert(namedScalar.coverage.reviewed === 21 && namedScalar.coverage.generated === 21 &&
-    namedScalar.coverage.policyBlocked === 0 && namedScalar.coverage.exactCallCovered === 21,
-  "named-scalar report does not have the pinned 21/21 exact-call disposition");
+  assert(namedScalar.coverage.reviewed === 21 && namedScalar.coverage.generated === 20 &&
+    namedScalar.coverage.policyBlocked === 1 && namedScalar.coverage.exactCallCovered === 20,
+  "named-scalar report does not have the pinned 20 generated / 1 symbol-blocked disposition");
   assert(fixedDigest.coverage.discovered === 4 && fixedDigest.coverage.emitted === 4 &&
     fixedDigest.coverage.policyBlocked === 0 && fixedDigest.coverage.remainingWithoutGeneratedAdapters === 1324,
   "fixed-digest report does not have the pinned 4/4 disposition or 1,324 remainder");

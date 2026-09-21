@@ -15,7 +15,6 @@ void deherm_dmsdk_named_scalar_dm_thread_detach(uintptr_t thread);
 void deherm_dmsdk_named_scalar_dm_thread_free_tls(uintptr_t key);
 uintptr_t deherm_dmsdk_named_scalar_dm_thread_get_current_thread(void);
 void deherm_dmsdk_named_scalar_dm_thread_join(uintptr_t thread);
-void deherm_dmsdk_named_scalar_profile_property_add_bool(uint64_t idx, int32_t v);
 void deherm_dmsdk_named_scalar_profile_property_add_f32(uint64_t idx, float v);
 void deherm_dmsdk_named_scalar_profile_property_add_f64(uint64_t idx, double v);
 void deherm_dmsdk_named_scalar_profile_property_add_s32(uint64_t idx, int32_t v);

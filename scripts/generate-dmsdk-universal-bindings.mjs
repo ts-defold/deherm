@@ -20,6 +20,7 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const defaultProjectionPath = "packages/bindings/generated/defold-dmsdk-projection-ir.json";
 const defaultSdkIrPath = "packages/bindings/generated/defold-sdk-ir.json";
 const defaultSpecializedReportPaths = Object.freeze({
+  arenaCString: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
   borrowedHandle: "packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json",
   scratchScalarOut: "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json",
   cstringValue: "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
@@ -357,7 +358,10 @@ export async function buildUniversalDmSdkBindings({
       },
     }]));
   for (const [family, , report] of specializedReports) {
-    for (const declaration of report.declarations ?? []) {
+    for (const declaration of [
+      ...(report.declarations ?? []),
+      ...(report.generatedDeclarations ?? []),
+    ]) {
       if (!projectionIds.has(declaration.id) ||
           !["generated", "generated-provider-boundary"].includes(declaration.disposition)) continue;
       const callable = declaration.disposition === "generated";
@@ -369,7 +373,9 @@ export async function buildUniversalDmSdkBindings({
           id: callable ? declaration.denseId : declaration.bindingId,
           dispatcher: callable && family === "cstringValue"
             ? "deherm_dmsdk_cstring_value_dispatch"
-            : null,
+            : callable && family === "arenaCString"
+              ? "deherm_dmsdk_arena_cstring_dispatch"
+              : null,
           blockers: callable ? [] : [...new Set(declaration.engineProviderBlockers ?? [])].sort(),
         },
       });

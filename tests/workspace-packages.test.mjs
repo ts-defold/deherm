@@ -130,6 +130,15 @@ test("every first-level example is a private workspace consumer", async () => {
     assert.ok(manifest.exports && Object.hasOwn(manifest.exports, "."));
   }
 
+  const runtimeSmokeTsconfig = JSON.parse(await readFile(path.join(
+    repositoryRoot, "examples", "runtime-smoke", "tsconfig.json"
+  ), "utf8"));
+  assert.equal(
+    runtimeSmokeTsconfig.extends,
+    "../../tsconfig.json",
+    "the runtime smoke must inherit the repository's revision-derived public SDK aliases"
+  );
+
   const workspace = await readFile(path.join(repositoryRoot, "pnpm-workspace.yaml"), "utf8");
   assert.match(workspace, /- "packages\/\*"/);
   assert.match(workspace, /- "examples\/\*"/);

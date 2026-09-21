@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   defaultOkfCachePath,
+  metadataOkfIndex,
   outlineOkfIndex,
   queryOkfSql,
   referencesOkfIndex,
@@ -23,6 +24,7 @@ function usage(write = console.error) {
   write("  node .agents/okf-index.mjs search <terms> [--max N]");
   write("  node .agents/okf-index.mjs search --query <terms> [--limit N]");
   write("  node .agents/okf-index.mjs outline <relative-document.md> [--max N]");
+  write("  node .agents/okf-index.mjs metadata <relative-document.md>");
   write("  node .agents/okf-index.mjs section <relative-document.md> <heading terms> [--max-lines N]");
   write("  node .agents/okf-index.mjs links <relative-document.md> [--max N]");
   write("  node .agents/okf-index.mjs backlinks <relative-document.md> [--max N]");
@@ -45,7 +47,7 @@ const databasePath = path.resolve(process.env.DEHERM_OKF_CACHE || defaultOkfCach
 
 if (["help", "--help", "-h"].includes(command) || commandHelp) {
   usage(console.log);
-} else if (!command || !["refresh", "search", "outline", "section", "links", "backlinks", "sql"].includes(command)) {
+} else if (!command || !["refresh", "search", "outline", "metadata", "section", "links", "backlinks", "sql"].includes(command)) {
   usage();
   process.exitCode = 2;
 } else {
@@ -68,6 +70,10 @@ if (["help", "--help", "-h"].includes(command) || commandHelp) {
     const rows = await outlineOkfIndex({ databasePath, document, max });
     for (const row of rows) console.log(`${row.path}:${row.line}\t${"  ".repeat(row.depth - 1)}${row.title}`);
     console.error(`OKF graph outline: ${rows.length} bounded headings.`);
+  } else if (command === "metadata") {
+    const document = args.shift();
+    if (!document || args.length > 0) throw new Error("metadata requires one relative document path");
+    console.log(JSON.stringify(await metadataOkfIndex({ databasePath, document }), null, 2));
   } else if (command === "section") {
     const document = args.shift();
     if (!document || args.length === 0) throw new Error("section requires a document and heading terms");

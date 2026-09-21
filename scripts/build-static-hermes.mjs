@@ -24,8 +24,16 @@ const generatedVmath = await readFile(typedNativeSource, "utf8");
 const generatedUniversal = (await readFile("packages/static-hermes/src/generated/script-universal-value.ts", "utf8"))
   .replace(/^export \{.*\};$/m, "");
 const universalReport = JSON.parse(await readFile("packages/bindings/generated/defold-script-universal-value-bindings.json", "utf8"));
-const universalProbe = universalReport.bindings.find((binding) => binding.minimumArgumentCount <= 1 && binding.maximumArgumentCount >= 1 && binding.resultCount === 1 && !binding.shapeKinds.includes("callback"));
-assert.ok(universalProbe, "Static Hermes universal probe needs a one-argument/one-result route");
+const universalProbe = universalReport.bindings.find((binding) =>
+  binding.minimumArgumentCount <= 1 &&
+  binding.maximumArgumentCount >= 1 &&
+  binding.resultCount === 1 &&
+  !binding.shapeKinds.includes("callback") &&
+  binding.frameContract.inputEntryCapacity >= 9 &&
+  binding.frameContract.matrix4Arena &&
+  binding.frameContract.urlArena);
+assert.ok(universalProbe,
+  "Static Hermes universal probe needs a one-argument/one-result route with table, Matrix4, and URL input capacity");
 const typedSource = `${generatedFfi}\n\nconst __ffi_deherm_static_probe_report = $SHBuiltin.extern_c(\n  {include: "defold_hermes/static_probe.h"},\n  function defold_hermes_static_probe_report(value: c_f64): void { throw 0; }\n);\n\n__ffi_deherm_static_probe_report(__ffi_ExampleMath_add(20, 22));\n`;
 const typedInput = path.join(outputDirectory, "static-ffi.js");
 const typedOutput = path.join(outputDirectory, "static-ffi.c");
@@ -78,7 +86,10 @@ compile([
   "-o", typedOutput
 ]);
 compile([
-  "-fno-std-globals", "-parse-ts", "-typed", "-strict", "-O", "-emit-c",
+  // Sound TypeScript is the input language here. The ts2flow compatibility
+  // pass leaves return annotations on extern_c and class methods behind; feed
+  // the same sound-typed grammar used by the generated exact-call units.
+  "-fno-std-globals", "-typed", "-strict", "-O", "-emit-c",
   "-exported-unit=deherm_static_app",
   "packages/static-hermes/src/typed-app.ts",
   "-o", appOutput

@@ -26,11 +26,11 @@ void operator delete(void* pointer, std::size_t) noexcept { std::free(pointer); 
 int main()
 {
     if (dmsdk_named_scalar_c_abi_header_check() != 0) return 1;
-    if (deherm_dmsdk_named_scalar_count() != UINT32_C(21)) return 1;
+    if (deherm_dmsdk_named_scalar_count() != UINT32_C(20)) return 1;
     if (deherm_dmsdk_named_scalar_descriptors() == nullptr) return 1;
     if (deherm_dmsdk_named_scalar_exact_verify() != 0) return 1;
     uint64_t result = 0;
-    if (deherm_dmsdk_named_scalar_dispatch(UINT16_C(21), nullptr, 0, &result) != DEHERM_DMSDK_NAMED_SCALAR_UNKNOWN_ID) return 1;
+    if (deherm_dmsdk_named_scalar_dispatch(UINT16_C(20), nullptr, 0, &result) != DEHERM_DMSDK_NAMED_SCALAR_UNKNOWN_ID) return 1;
     g_allocations.store(0, std::memory_order_relaxed);
     g_count_allocations.store(true, std::memory_order_relaxed);
     for (uint32_t index = 0; index < UINT32_C(100000); ++index)

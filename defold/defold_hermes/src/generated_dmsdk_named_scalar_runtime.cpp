@@ -11,7 +11,6 @@
 #include <cstring>
 #include <type_traits>
 
-void ProfilePropertyAddBool(ProfileIdx idx, int v);
 void ProfilePropertyAddF32(ProfileIdx idx, float v);
 void ProfilePropertyAddF64(ProfileIdx idx, double v);
 void ProfilePropertyAddS32(ProfileIdx idx, int32_t v);
@@ -39,34 +38,32 @@ using DehermNamedScalarSignature5=dmThread::Thread (*)(void);
 static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature5>(&dmThread::GetCurrentThread)),DehermNamedScalarSignature5>::value,"dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612");
 using DehermNamedScalarSignature6=void (*)(dmThread::Thread);
 static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature6>(&dmThread::Join)),DehermNamedScalarSignature6>::value,"dmsdk:dmThread::Join@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:102:606");
-using DehermNamedScalarSignature7=void (*)(ProfileIdx, int);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature7>(&ProfilePropertyAddBool)),DehermNamedScalarSignature7>::value,"dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468");
-using DehermNamedScalarSignature8=void (*)(ProfileIdx, float);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature8>(&ProfilePropertyAddF32)),DehermNamedScalarSignature8>::value,"dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480");
-using DehermNamedScalarSignature9=void (*)(ProfileIdx, double);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature9>(&ProfilePropertyAddF64)),DehermNamedScalarSignature9>::value,"dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492");
-using DehermNamedScalarSignature10=void (*)(ProfileIdx, int32_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature10>(&ProfilePropertyAddS32)),DehermNamedScalarSignature10>::value,"dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472");
-using DehermNamedScalarSignature11=void (*)(ProfileIdx, int64_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature11>(&ProfilePropertyAddS64)),DehermNamedScalarSignature11>::value,"dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484");
-using DehermNamedScalarSignature12=void (*)(ProfileIdx, uint32_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature12>(&ProfilePropertyAddU32)),DehermNamedScalarSignature12>::value,"dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476");
-using DehermNamedScalarSignature13=void (*)(ProfileIdx, uint64_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature13>(&ProfilePropertyAddU64)),DehermNamedScalarSignature13>::value,"dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488");
-using DehermNamedScalarSignature14=void (*)(ProfileIdx, int);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature14>(&ProfilePropertySetBool)),DehermNamedScalarSignature14>::value,"dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467");
-using DehermNamedScalarSignature15=void (*)(ProfileIdx, float);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature15>(&ProfilePropertySetF32)),DehermNamedScalarSignature15>::value,"dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479");
-using DehermNamedScalarSignature16=void (*)(ProfileIdx, double);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature16>(&ProfilePropertySetF64)),DehermNamedScalarSignature16>::value,"dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491");
-using DehermNamedScalarSignature17=void (*)(ProfileIdx, int32_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature17>(&ProfilePropertySetS32)),DehermNamedScalarSignature17>::value,"dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471");
-using DehermNamedScalarSignature18=void (*)(ProfileIdx, int64_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature18>(&ProfilePropertySetS64)),DehermNamedScalarSignature18>::value,"dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483");
-using DehermNamedScalarSignature19=void (*)(ProfileIdx, uint32_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature19>(&ProfilePropertySetU32)),DehermNamedScalarSignature19>::value,"dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475");
-using DehermNamedScalarSignature20=void (*)(ProfileIdx, uint64_t);
-static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature20>(&ProfilePropertySetU64)),DehermNamedScalarSignature20>::value,"dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487");
+using DehermNamedScalarSignature7=void (*)(ProfileIdx, float);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature7>(&ProfilePropertyAddF32)),DehermNamedScalarSignature7>::value,"dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480");
+using DehermNamedScalarSignature8=void (*)(ProfileIdx, double);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature8>(&ProfilePropertyAddF64)),DehermNamedScalarSignature8>::value,"dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492");
+using DehermNamedScalarSignature9=void (*)(ProfileIdx, int32_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature9>(&ProfilePropertyAddS32)),DehermNamedScalarSignature9>::value,"dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472");
+using DehermNamedScalarSignature10=void (*)(ProfileIdx, int64_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature10>(&ProfilePropertyAddS64)),DehermNamedScalarSignature10>::value,"dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484");
+using DehermNamedScalarSignature11=void (*)(ProfileIdx, uint32_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature11>(&ProfilePropertyAddU32)),DehermNamedScalarSignature11>::value,"dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476");
+using DehermNamedScalarSignature12=void (*)(ProfileIdx, uint64_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature12>(&ProfilePropertyAddU64)),DehermNamedScalarSignature12>::value,"dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488");
+using DehermNamedScalarSignature13=void (*)(ProfileIdx, int);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature13>(&ProfilePropertySetBool)),DehermNamedScalarSignature13>::value,"dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467");
+using DehermNamedScalarSignature14=void (*)(ProfileIdx, float);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature14>(&ProfilePropertySetF32)),DehermNamedScalarSignature14>::value,"dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479");
+using DehermNamedScalarSignature15=void (*)(ProfileIdx, double);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature15>(&ProfilePropertySetF64)),DehermNamedScalarSignature15>::value,"dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491");
+using DehermNamedScalarSignature16=void (*)(ProfileIdx, int32_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature16>(&ProfilePropertySetS32)),DehermNamedScalarSignature16>::value,"dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471");
+using DehermNamedScalarSignature17=void (*)(ProfileIdx, int64_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature17>(&ProfilePropertySetS64)),DehermNamedScalarSignature17>::value,"dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483");
+using DehermNamedScalarSignature18=void (*)(ProfileIdx, uint32_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature18>(&ProfilePropertySetU32)),DehermNamedScalarSignature18>::value,"dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475");
+using DehermNamedScalarSignature19=void (*)(ProfileIdx, uint64_t);
+static_assert(std::is_same<decltype(static_cast<DehermNamedScalarSignature19>(&ProfilePropertySetU64)),DehermNamedScalarSignature19>::value,"dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487");
 
 namespace {
 const DehermDmSdkNamedScalarDescriptor kDescriptors[] = {
@@ -77,20 +74,19 @@ const DehermDmSdkNamedScalarDescriptor kDescriptors[] = {
   { UINT16_C(4), UINT8_C(1), "dmsdk:dmThread::FreeTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:126:609", "dmThread::FreeTls" },
   { UINT16_C(5), UINT8_C(0), "dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612", "dmThread::GetCurrentThread" },
   { UINT16_C(6), UINT8_C(1), "dmsdk:dmThread::Join@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:102:606", "dmThread::Join" },
-  { UINT16_C(7), UINT8_C(2), "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468", "ProfilePropertyAddBool" },
-  { UINT16_C(8), UINT8_C(2), "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480", "ProfilePropertyAddF32" },
-  { UINT16_C(9), UINT8_C(2), "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492", "ProfilePropertyAddF64" },
-  { UINT16_C(10), UINT8_C(2), "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472", "ProfilePropertyAddS32" },
-  { UINT16_C(11), UINT8_C(2), "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484", "ProfilePropertyAddS64" },
-  { UINT16_C(12), UINT8_C(2), "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476", "ProfilePropertyAddU32" },
-  { UINT16_C(13), UINT8_C(2), "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488", "ProfilePropertyAddU64" },
-  { UINT16_C(14), UINT8_C(2), "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467", "ProfilePropertySetBool" },
-  { UINT16_C(15), UINT8_C(2), "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479", "ProfilePropertySetF32" },
-  { UINT16_C(16), UINT8_C(2), "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491", "ProfilePropertySetF64" },
-  { UINT16_C(17), UINT8_C(2), "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471", "ProfilePropertySetS32" },
-  { UINT16_C(18), UINT8_C(2), "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483", "ProfilePropertySetS64" },
-  { UINT16_C(19), UINT8_C(2), "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475", "ProfilePropertySetU32" },
-  { UINT16_C(20), UINT8_C(2), "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487", "ProfilePropertySetU64" }
+  { UINT16_C(7), UINT8_C(2), "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480", "ProfilePropertyAddF32" },
+  { UINT16_C(8), UINT8_C(2), "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492", "ProfilePropertyAddF64" },
+  { UINT16_C(9), UINT8_C(2), "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472", "ProfilePropertyAddS32" },
+  { UINT16_C(10), UINT8_C(2), "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484", "ProfilePropertyAddS64" },
+  { UINT16_C(11), UINT8_C(2), "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476", "ProfilePropertyAddU32" },
+  { UINT16_C(12), UINT8_C(2), "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488", "ProfilePropertyAddU64" },
+  { UINT16_C(13), UINT8_C(2), "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467", "ProfilePropertySetBool" },
+  { UINT16_C(14), UINT8_C(2), "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479", "ProfilePropertySetF32" },
+  { UINT16_C(15), UINT8_C(2), "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491", "ProfilePropertySetF64" },
+  { UINT16_C(16), UINT8_C(2), "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471", "ProfilePropertySetS32" },
+  { UINT16_C(17), UINT8_C(2), "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483", "ProfilePropertySetS64" },
+  { UINT16_C(18), UINT8_C(2), "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475", "ProfilePropertySetU32" },
+  { UINT16_C(19), UINT8_C(2), "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487", "ProfilePropertySetU64" }
 };
 float unpack_f32(uint64_t raw){uint32_t bits=static_cast<uint32_t>(raw);float value=0;std::memcpy(&value,&bits,sizeof(value));return value;}
 double unpack_f64(uint64_t raw){double value=0;std::memcpy(&value,&raw,sizeof(value));return value;}
@@ -135,11 +131,6 @@ uintptr_t deherm_dmsdk_named_scalar_dm_thread_get_current_thread(void)
 void deherm_dmsdk_named_scalar_dm_thread_join(uintptr_t thread)
 {
   dmThread::Join(static_cast<dmThread::Thread>(thread));
-}
-
-void deherm_dmsdk_named_scalar_profile_property_add_bool(uint64_t idx, int32_t v)
-{
-  ProfilePropertyAddBool(static_cast<ProfileIdx>(idx), static_cast<int>(v));
 }
 
 void deherm_dmsdk_named_scalar_profile_property_add_f32(uint64_t idx, float v)
@@ -207,7 +198,7 @@ void deherm_dmsdk_named_scalar_profile_property_set_u64(uint64_t idx, uint64_t v
   ProfilePropertySetU64(static_cast<ProfileIdx>(idx), v);
 }
 
-uint32_t deherm_dmsdk_named_scalar_count(void){return UINT32_C(21);}
+uint32_t deherm_dmsdk_named_scalar_count(void){return UINT32_C(20);}
 const DehermDmSdkNamedScalarDescriptor* deherm_dmsdk_named_scalar_descriptors(void){return kDescriptors;}
 
 DehermDmSdkNamedScalarStatus deherm_dmsdk_named_scalar_dispatch(
@@ -246,66 +237,61 @@ DehermDmSdkNamedScalarStatus deherm_dmsdk_named_scalar_dispatch(
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
     case 7:
-      if (arguments[1] != static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(arguments[1])))) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
-      deherm_dmsdk_named_scalar_profile_property_add_bool(static_cast<uint64_t>(arguments[0]), unpack_i32(arguments[1]));
-      *result = UINT64_C(0);
-      return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 8:
       if (arguments[1] > UINT32_MAX) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
       deherm_dmsdk_named_scalar_profile_property_add_f32(static_cast<uint64_t>(arguments[0]), unpack_f32(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 9:
+    case 8:
       deherm_dmsdk_named_scalar_profile_property_add_f64(static_cast<uint64_t>(arguments[0]), unpack_f64(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 10:
+    case 9:
       if (arguments[1] != static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(arguments[1])))) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
       deherm_dmsdk_named_scalar_profile_property_add_s32(static_cast<uint64_t>(arguments[0]), unpack_i32(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 11:
+    case 10:
       deherm_dmsdk_named_scalar_profile_property_add_s64(static_cast<uint64_t>(arguments[0]), unpack_i64(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 12:
+    case 11:
       if (arguments[1] > UINT32_MAX) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
       deherm_dmsdk_named_scalar_profile_property_add_u32(static_cast<uint64_t>(arguments[0]), static_cast<uint32_t>(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 13:
+    case 12:
       deherm_dmsdk_named_scalar_profile_property_add_u64(static_cast<uint64_t>(arguments[0]), static_cast<uint64_t>(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 14:
+    case 13:
       if (arguments[1] != static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(arguments[1])))) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
       deherm_dmsdk_named_scalar_profile_property_set_bool(static_cast<uint64_t>(arguments[0]), unpack_i32(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 15:
+    case 14:
       if (arguments[1] > UINT32_MAX) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
       deherm_dmsdk_named_scalar_profile_property_set_f32(static_cast<uint64_t>(arguments[0]), unpack_f32(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 16:
+    case 15:
       deherm_dmsdk_named_scalar_profile_property_set_f64(static_cast<uint64_t>(arguments[0]), unpack_f64(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 17:
+    case 16:
       if (arguments[1] != static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(arguments[1])))) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
       deherm_dmsdk_named_scalar_profile_property_set_s32(static_cast<uint64_t>(arguments[0]), unpack_i32(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 18:
+    case 17:
       deherm_dmsdk_named_scalar_profile_property_set_s64(static_cast<uint64_t>(arguments[0]), unpack_i64(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 19:
+    case 18:
       if (arguments[1] > UINT32_MAX) return DEHERM_DMSDK_NAMED_SCALAR_RANGE;
       deherm_dmsdk_named_scalar_profile_property_set_u32(static_cast<uint64_t>(arguments[0]), static_cast<uint32_t>(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;
-    case 20:
+    case 19:
       deherm_dmsdk_named_scalar_profile_property_set_u64(static_cast<uint64_t>(arguments[0]), static_cast<uint64_t>(arguments[1]));
       *result = UINT64_C(0);
       return DEHERM_DMSDK_NAMED_SCALAR_OK;

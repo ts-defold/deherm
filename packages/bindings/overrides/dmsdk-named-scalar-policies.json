@@ -1,10 +1,17 @@
 {
   "schemaVersion": 2,
   "policyVersion": "2026-09-21.1",
-  "expectedCoverage": { "candidates": 21, "generated": 21, "blocked": 0 },
+  "expectedCoverage": { "candidates": 21, "generated": 20, "blocked": 1 },
   "declarationEvidenceRules": [
     { "symbolPattern": "^ProfilePropertySet", "anchor": "void ProfilePropertySet##stype" },
     { "symbolPattern": "^ProfilePropertyAdd", "anchor": "void ProfilePropertyAdd##stype" }
+  ],
+  "symbolEvidenceBlockers": [
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468",
+      "blocker": "native-symbol-absent",
+      "issue": "https://github.com/ts-defold/deherm/issues/117"
+    }
   ],
   "namedTypes": {
     "dmhash_t": {

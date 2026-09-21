@@ -120,10 +120,13 @@ test("the Bob matrix prints and preserves the target's Extender failure log", as
 
 test("the Bob matrix consumes the package's pinned Hermes public headers", async () => {
   const workflow = await readFile(new URL("../.github/workflows/end-to-end.yml", import.meta.url), "utf8");
-  assert.match(workflow, /extension-headers:/u);
-  assert.match(workflow, /bootstrap-upstreams\.sh hermes/u);
-  assert.match(workflow, /stage-hermes-public-headers\.mjs/u);
-  assert.match(workflow, /name: pinned-hermes-public-headers/u);
+  const headers = workflow.slice(workflow.indexOf("  extension-headers:"), workflow.indexOf("  bob:"));
+  assert.match(headers, /actions\/setup-node@v7[\s\S]*cache: 'pnpm'/u);
+  assert.match(
+    headers,
+    /pnpm\/action-setup@v6[\s\S]*actions\/setup-node@v7[\s\S]*pnpm install --frozen-lockfile --ignore-scripts[\s\S]*bootstrap-upstreams\.sh hermes[\s\S]*stage-hermes-public-headers\.mjs/u
+  );
+  assert.match(headers, /name: pinned-hermes-public-headers/u);
   assert.match(workflow, /needs: \[local, extension-headers\]/u);
   assert.match(workflow, /path: defold\/defold_hermes\/include/u);
 });

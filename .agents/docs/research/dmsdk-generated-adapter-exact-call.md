@@ -1,7 +1,7 @@
 ---
 type: Design and Verification Report
 title: dmSDK callable generated-adapter exact-call corpus
-description: Same-recipe C ABI and JSI verification twins for the 59 callable generated-adapter routes, plus the 21-row named-scalar sibling ABI, without changing the 1,361-recipe universal catalog.
+description: Same-recipe C ABI and JSI verification twins for the 64 callable generated-adapter routes, plus the 21-row named-scalar sibling census with 20 linked adapters and one explicit symbol blocker, without changing the 1,361-recipe universal catalog.
 tags: [dmsdk, generated-adapter, named-scalar, exact-call, jsi, c-abi, verification]
 status: active
 generated: { by: codex, at: 2026-09-20T00:00:00-04:00 }
@@ -9,32 +9,48 @@ generated: { by: codex, at: 2026-09-20T00:00:00-04:00 }
 
 # Outcome
 
-The 59 callable `generated-adapter` dmSDK rows now have a deterministic exact
-corpus derived from the same 1,361 production recipes and the eight owning
+The 64 callable `generated-adapter` dmSDK rows now have a deterministic exact
+corpus derived from the same 1,361 production recipes and the nine owning
 family reports. The derivative joins every recipe to its family-local adapter
 ID and production C ABI dispatcher, records ordered native arguments and the
-result ABI, and hashes each vector independently. It does not mutate or reseal
-the policy-owned universal catalog.
+result ABI, and hashes each vector independently. Before adding exact-only
+callee and dispatcher metadata, generation requires the production
+named-wrapper or family-dispatch identity to agree exactly with the owning
+report. It does not overwrite, correct, mutate, or reseal the policy-owned
+universal catalog.
 
 The direct-adapter partition is total: 26 scalar, seven enum-value, fourteen C-string/value,
-four fixed-digest, two hash-span, two base64-span, two XTEA-span, and two ASTC
+five arena C-string, four fixed-digest, two hash-span, two base64-span, two XTEA-span, and two ASTC
 probe vectors. No recipe is removed: the source catalog remains 1,361 recipes,
-with 59 callable generated adapters, 566 universal-ready rows, and 736 rows
+with 64 callable generated adapters, 566 universal-ready rows, and 731 rows
 that still fail closed pending specialization.
 
-The separate named-scalar family now derives 21 typed C wrappers, raw-cell
-dispatcher cases, descriptors, and exact-call fake callees from one structural
-recipe per declaration. Its earlier 21 policy blockers were semantic prose
-over fully known scalar ABIs. The generator instead resolves `dmhash_t` and
+The separate named-scalar family reviews 21 structural candidates and derives
+20 typed C wrappers, raw-cell dispatcher cases, descriptors, and exact-call
+fake callees from one structural recipe per admitted declaration. Its earlier
+21 policy blockers were semantic prose over fully known scalar ABIs. The
+generator resolves `dmhash_t` and
 `ProfileIdx` to `uint64_t`, `Thread` and `TlsKey` to `uintptr_t`, and admits the
-built-in signed, unsigned, boolean, float, double, and void lanes. An absent or
-unresolved source alias remains the only admission blocker. This sibling family
-deliberately leaves all 21 universal recipes on their universal fallback and
-therefore does not alter the 59-row generated-adapter corpus above.
+built-in signed, unsigned, boolean, float, double, and void lanes only when the
+pinned symbol-evidence pass also proves the native symbol is header-only or
+external in every target and build variant. This sibling family deliberately
+leaves all 21 universal recipes on their universal fallback and therefore does
+not alter the 64-row generated-adapter corpus above.
+
+The remaining candidate, `ProfilePropertyAddBool`, exposes a pinned-source
+contradiction: `profile.h` macro-expands its declaration, but neither
+`profile.cpp` nor `profile_null.cpp` defines it, and the Defold archive census
+records `linkage: absent`, `availability: unlinked`. The specialized adapter
+therefore fails closed as `native-symbol-absent`; the universal recipe and its
+public TypeScript stable-ID route remain present rather than being silently
+removed from the catalog. The stable named-scalar policy input attaches
+[issue #117](https://github.com/ts-defold/deherm/issues/117) to this blocker,
+and the generated declaration report carries that URL without embedding issue
+identity in generated source.
 
 # Production boundaries
 
-All 59 vectors bind the production family C ABI dispatcher and its exact
+All 64 vectors bind the production family C ABI dispatcher and its exact
 family-local ID. The generated native executable links all eight production
 dispatcher implementations to generated recording/fake callees. It invokes
 every dispatcher, compares position-distinct native argument sentinels, checks
@@ -54,26 +70,35 @@ C-string/span/digest/probe vectors make no production JSI claim.
 
 `scripts/generate-dmsdk-generated-adapter-exact.mjs` performs the family join
 from generated reports. Duplicate family ownership, absent local IDs, family
-disagreement, missing descriptor contracts, catalog/index digest drift, and
-stale committed outputs are errors. Tests generate only into a temporary root
-and byte-compare all three committed artifacts, so a test run cannot self-heal
-the checkout. The exact derivative records both the
-unchanged production catalog hash and its own enriched exact-catalog hash.
+or adapter-identity disagreement, missing descriptor contracts, catalog/index
+digest drift, and stale committed outputs are errors. A mutation test changes a
+family-local report ID and requires generation to reject it instead of silently
+correcting the production route. Tests generate only into a temporary root and
+byte-compare all three committed artifacts, so a test run cannot self-heal the
+checkout. The exact derivative records both the unchanged production catalog
+hash and its own enriched exact-catalog hash, plus the path and content hash of
+every consumed family report.
 
 # Evidence
 
-`tests/dmsdk-universal-bindings.test.mjs` verifies the 59-vector census,
+`tests/dmsdk-universal-bindings.test.mjs` verifies the 64-vector census,
 per-family partition, unique vector hashes, all 1,361 source recipes, zero
 silent omissions, byte-identical temporary-root regeneration, linked execution
-of all 59 production C ABI dispatcher routes, and execution of all 33 installed
+of all 64 production C ABI dispatcher routes, and execution of all 33 installed
 JSI vectors through real Hermes and the production host modules.
 
 `tests/dmsdk-named-scalar-bindings.test.mjs` separately regenerates all seven
 named-scalar artifacts into a temporary root, compiles the production wrapper
-and dispatcher against the pinned packaged SDK, links all 21 generated fake
+and dispatcher against the pinned packaged SDK, links all 20 generated fake
 callees, checks argument order and result bits for every lane, validates
 descriptor identity, and observes zero C++ allocations across 100,000 warmed
-dispatches. It makes no JavaScript, engine-semantic, or packaged-engine claim.
+dispatches. It separately checks the header/source contradiction against the
+pinned archive symbol evidence and proves that the generated production runtime
+contains no reference to the absent symbol. Fake-callee execution remains ABI
+transport evidence, not Defold implementation semantics; packaged-engine
+linkage is claimed only from the pinned symbol census and the headless link.
+An alternate symbol-evidence-path fixture also proves that report provenance
+names and hashes the actual input rather than a default-path label.
 
 The focused dmSDK runtime suite compiles and executes the production families,
 including the separately generated borrowed-handle provider boundary, and

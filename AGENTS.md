@@ -15,6 +15,8 @@ and Hermes runtime integration for Defold.
   `pnpm knowledge:outline -- <relative-document.md>`, then retrieve only the
   needed section with
   `pnpm knowledge:section -- <relative-document.md> <heading terms>`.
+- Inspect bounded frontmatter without the document body with
+  `pnpm knowledge:metadata -- <relative-document.md>`.
 - Inspect its explicit graph edges with
   `pnpm knowledge:links -- <relative-document.md>` and find documents that
   reference it or one of its headings with

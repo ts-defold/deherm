@@ -87,8 +87,8 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     browserDirectMemoryMetadata: 1361,
     typescriptStableIds: 1361,
     silentlyOmitted: 0,
-    preferredSpecialized: 66,
-    usageMaterializedFallback: 1295,
+    preferredSpecialized: 71,
+    usageMaterializedFallback: 1290,
     universalReadyExactVectors: 566,
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
@@ -129,17 +129,22 @@ test("generated adapter call plans preserve the callable/provider boundary", () 
   const plans = dmSdkUniversalRecipes
     .map(resolveDmSdkConcreteCallPlan)
     .filter(Boolean);
-  assert.equal(plans.length, 66);
+  assert.equal(plans.length, 71);
   const callable = plans.filter(({ state }) => state === "generated-adapter");
   const providerRequired = plans.filter(({ state }) => state === "specialization-required");
-  assert.equal(callable.length, 59);
+  assert.equal(callable.length, 64);
   assert.equal(providerRequired.length, 7);
   assert.equal(callable.filter(({ adapterKind }) => adapterKind === "named-wrapper").length, 45);
-  const cstring = callable.filter(({ adapterKind }) => adapterKind === "family-dispatch");
+  const cstring = callable.filter(({ family }) => family === "cstringValue");
   assert.equal(cstring.length, 14);
   assert.deepEqual(cstring.map(({ adapterId }) => adapterId), Array.from({ length: 14 }, (_, index) => index));
   assert.ok(cstring.every(({ family, symbol }) =>
     family === "cstringValue" && symbol === "deherm_dmsdk_cstring_value_dispatch"));
+  const arenaCString = callable.filter(({ family }) => family === "arenaCString");
+  assert.equal(arenaCString.length, 5);
+  assert.deepEqual(arenaCString.map(({ adapterId }) => adapterId), Array.from({ length: 5 }, (_, index) => index));
+  assert.ok(arenaCString.every(({ adapterKind, symbol }) =>
+    adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_arena_cstring_dispatch"));
   assert.equal(providerRequired.filter(({ family }) => family === "borrowedHandle").length, 0);
   assert.equal(providerRequired.filter(({ family }) => family === "scratchScalarOut").length, 7);
   assert.ok(providerRequired.every(({ requirements, applicability }) =>
@@ -208,13 +213,22 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     await rm(temporary, { recursive: true, force: true });
   }
   const usages = corpus.usages;
-  assert.equal(usages.length, 59);
+  assert.equal(usages.length, 64);
   assert.equal(corpus.report.recipeCount, 1361);
-  assert.equal(corpus.report.generatedAdapterCount, 59);
+  assert.equal(corpus.report.generatedAdapterCount, 64);
   assert.equal(corpus.report.silentlyOmitted, 0);
-  assert.equal(corpus.report.verification.vectorCount, 59);
+  assert.equal(corpus.report.verification.vectorCount, 64);
   assert.equal(corpus.report.verification.jsiVectorCount, 33);
+  assert.deepEqual(Object.keys(corpus.report.sourceHashes.familyReports).sort(), [
+    "arenaCString", "astcProbe", "base64Span", "cstringValue", "enumValue",
+    "fixedDigest", "hashSpan", "scalar", "xteaSpan",
+  ]);
+  for (const evidence of Object.values(corpus.report.sourceHashes.familyReports)) {
+    assert.match(evidence.sha256, /^[0-9a-f]{64}$/u);
+    assert.equal(sha256(await readFile(path.resolve(root, evidence.path), "utf8")), evidence.sha256);
+  }
   assert.deepEqual(corpus.report.familyCounts, {
+    arenaCString: 5,
     astcProbe: 2,
     base64Span: 2,
     cstringValue: 14,
@@ -235,7 +249,7 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     assert.equal(vector.transports.cAbi.applicability, "callable");
     assert.ok(Number.isSafeInteger(vector.adapterId));
   }
-  assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, 59);
+  assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, 64);
   assert.deepEqual(
     [...new Set(corpus.report.verification.vectors
       .filter(({ transports }) => transports.dynamicHermesJsi.applicability === "callable")
@@ -269,7 +283,7 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
       "-isystem", path.join(sdkRoot, "ext/include"),
       ...[
         "scalar_runtime", "enum_value_runtime", "fixed_digest_runtime", "hash_span_runtime", "base64_span_runtime",
-        "xtea_span_runtime", "astc_probe_runtime", "cstring_value_runtime", "cstring_value",
+        "xtea_span_runtime", "astc_probe_runtime", "cstring_value_runtime", "cstring_value", "arena_cstring",
       ].map((name) => `defold/defold_hermes/src/generated_dmsdk_${name}.cpp`),
       path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.verificationSource), harness,
       "-o", executable,
@@ -303,6 +317,27 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     }
   } else {
     context.diagnostic(`generated-adapter JSI runtime skipped: no packaged Hermes archive for ${process.platform}-${process.arch}`);
+  }
+});
+
+test("generated-adapter exact generation rejects family-report route drift instead of correcting production identity", async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-adapter-route-drift-"));
+  try {
+    const source = JSON.parse(await readFile(path.join(root,
+      "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"), "utf8"));
+    source.generatedDeclarations[0].denseId = source.generatedDeclarations.length;
+    const report = path.join(directory, "arena.json");
+    await writeFile(report, `${JSON.stringify(source, null, 2)}\n`);
+    await assert.rejects(
+      buildDmSdkGeneratedAdapterExact({
+        root,
+        outRoot: path.join(directory, "out"),
+        familyReportPaths: { arenaCString: report },
+      }),
+      /production family-dispatch identity disagrees with its report/,
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
   }
 });
 

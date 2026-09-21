@@ -57,11 +57,15 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
   ]);
   for (const declaration of report.generatedDeclarations) {
     assert.equal(declaration.disposition, "generated");
-    assert.equal(declaration.preferredLowering, false);
+    assert.equal(declaration.preferredLowering, true);
     assert.equal(declaration.universalFallback, "retained-usage-materialized-recipe");
     assert.equal(declaration.stages.generated, "production-and-exact-from-one-recipe");
     assert.ok(declaration.sourceEvidence.length > 0);
+    assert.equal(declaration.symbolEvidence.path, "packages/bindings/generated/defold-dmsdk-symbol-evidence.json");
+    assert.ok(declaration.symbolEvidence.linkage === "header-only" ||
+      (declaration.symbolEvidence.linkage === "external" && declaration.symbolEvidence.availability === "all-targets-all-variants"));
   }
+  assert.match(report.sourceHashes.symbolEvidence, /^[0-9a-f]{64}$/u);
   for (const declaration of report.declarations) {
     assert.equal(declaration.disposition, "blocked");
     assert.equal(declaration.stages.generated, "not-applicable");
@@ -88,6 +92,25 @@ test("arena cstring production and exact twins compile, and exact vectors execut
     const sanitizerFlags = process.platform === "win32" ? [] : ["-fsanitize=address,undefined", "-fno-omit-frame-pointer"];
     execFileSync(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...sanitizerFlags, ...includes, "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp", main, "-o", executable], { cwd: repository, stdio: "pipe" });
     execFileSync(executable, [], { cwd: repository, stdio: "pipe", env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" } });
+    const allocationMain = path.join(directory, "allocation.cpp");
+    await writeFile(allocationMain, `
+#include <defold_hermes/generated_dmsdk_arena_cstring.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <new>
+static uint64_t allocations=0;static bool tracking=false;
+void* operator new(std::size_t size){if(tracking)++allocations;if(void* value=std::malloc(size))return value;throw std::bad_alloc();}
+void operator delete(void* value)noexcept{std::free(value);}void operator delete(void* value,std::size_t)noexcept{std::free(value);}
+extern "C" DehermDmSdkArenaCStringStatus deherm_dmsdk_arena_cstring_exact_dispatch(uint16_t,const uint8_t*,uint32_t,uint64_t,char*,uint32_t,DehermDmSdkArenaCStringResult*);
+int main(){const char input[]="arena_0";char output[64]{};DehermDmSdkArenaCStringResult result{};
+if(deherm_dmsdk_arena_cstring_exact_dispatch(0,reinterpret_cast<const uint8_t*>(input),7,0,output,64,&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK)return 1;
+tracking=true;for(uint32_t i=0;i<UINT32_C(100000);++i){std::memset(output,0,sizeof(output));result={};if(deherm_dmsdk_arena_cstring_exact_dispatch(0,reinterpret_cast<const uint8_t*>(input),7,0,output,64,&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK||std::strcmp(output,"result_0")!=0)return 2;}tracking=false;return allocations==0?0:3;}
+`);
+    const allocationExecutable = path.join(directory, process.platform === "win32" ? "allocation.exe" : "allocation");
+    execFileSync(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...sanitizerFlags, ...includes, "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp", allocationMain, "-o", allocationExecutable], { cwd: repository, stdio: "pipe" });
+    execFileSync(allocationExecutable, [], { cwd: repository, stdio: "pipe", env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" } });
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -130,6 +153,17 @@ test("arena-span blocker generator rejects schema, revision, provenance, and dup
     ...inputs,
     shapesText: withJson(inputs.shapesText, (shapes) => { shapes.rows.push(structuredClone(shapes.rows[0])); })
   }), /contains duplicate/);
+  assert.throws(() => generate({
+    ...inputs,
+    symbolEvidenceText: withJson(inputs.symbolEvidenceText, (evidence) => { evidence.defoldRevision = "0".repeat(40); })
+  }), /symbol evidence is invalid or revision-mismatched/);
+  const generatedId = generate(inputs).report.generatedDeclarations[0].id;
+  assert.throws(() => generate({
+    ...inputs,
+    symbolEvidenceText: withJson(inputs.symbolEvidenceText, (evidence) => {
+      evidence.declarations[generatedId].availability = "target-subset";
+    })
+  }), /native symbol is not available in every target and build variant/);
 });
 
 test("arena-span blocker policy must exactly name generated prior-wave symbols", async () => {

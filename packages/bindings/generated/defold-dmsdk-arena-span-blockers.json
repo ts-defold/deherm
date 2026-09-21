@@ -5,6 +5,7 @@
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "symbolEvidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
     "policy": "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
     "output": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
     "priorWaveReports": [
@@ -18,6 +19,7 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
     "policy": "417173a096bcb9e49b3422e7d431844c1920e193b9770c3388503b7795bde5e0",
     "priorWaveReports": {
       "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
@@ -157,7 +159,7 @@
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_arena_cstring.h": "b17074fda83fe196250888861748c2b9fe9611f3fe62a3dd3659a4578c992a31",
     "defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp": "4130202009c7eda12f1a23dba6d25eda18882c1233de9a14cb0698dc015edbd5",
-    "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp": "1eb0d83549011d4548202c086b34b0704269725c1d3220b01402c4d03a6d72e5"
+    "tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp": "e642baed0e19ce2f95ae5c2225318f24de19b5852e9ddb76693f6ced79ea2a31"
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_arena_cstring.h",
@@ -214,7 +216,7 @@
         "span-element-unit-and-copy-policy"
       ],
       "disposition": "generated",
-      "preferredLowering": false,
+      "preferredLowering": true,
       "denseId": 0,
       "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
       "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
@@ -241,10 +243,59 @@
           "text": " * @param buf_len [type: uint32_t] the size of the output buffer"
         }
       ],
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": "production-and-exact-from-one-recipe",
         "compiled": "pinned-header-production-and-exact-object-tests",
-        "linked": "exact-recording-callee",
+        "linked": "all-target-all-variant-symbol-census-plus-exact-recording-callee",
         "runtime": "exact-dispatch-all-vectors",
         "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
       }
@@ -298,7 +349,7 @@
         "span-element-unit-and-copy-policy"
       ],
       "disposition": "generated",
-      "preferredLowering": false,
+      "preferredLowering": true,
       "denseId": 1,
       "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
       "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
@@ -320,10 +371,59 @@
           "text": " * @return a null-terminated error message"
         }
       ],
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": "production-and-exact-from-one-recipe",
         "compiled": "pinned-header-production-and-exact-object-tests",
-        "linked": "exact-recording-callee",
+        "linked": "all-target-all-variant-symbol-census-plus-exact-recording-callee",
         "runtime": "exact-dispatch-all-vectors",
         "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
       }
@@ -377,7 +477,7 @@
         "span-element-unit-and-copy-policy"
       ],
       "disposition": "generated",
-      "preferredLowering": false,
+      "preferredLowering": true,
       "denseId": 2,
       "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
       "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
@@ -399,10 +499,59 @@
           "text": " * @return Length of the trimmed source string. If the return value is greater"
         }
       ],
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": "production-and-exact-from-one-recipe",
         "compiled": "pinned-header-production-and-exact-object-tests",
-        "linked": "exact-recording-callee",
+        "linked": "all-target-all-variant-symbol-census-plus-exact-recording-callee",
         "runtime": "exact-dispatch-all-vectors",
         "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
       }
@@ -465,7 +614,7 @@
         "span-element-unit-and-copy-policy"
       ],
       "disposition": "generated",
-      "preferredLowering": false,
+      "preferredLowering": true,
       "denseId": 3,
       "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
       "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
@@ -492,10 +641,59 @@
           "text": "     * @note If dst=0 the bytes_written will return the number of required bytes (including null character)"
         }
       ],
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": "production-and-exact-from-one-recipe",
         "compiled": "pinned-header-production-and-exact-object-tests",
-        "linked": "exact-recording-callee",
+        "linked": "all-target-all-variant-symbol-census-plus-exact-recording-callee",
         "runtime": "exact-dispatch-all-vectors",
         "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
       }
@@ -549,7 +747,7 @@
         "span-element-unit-and-copy-policy"
       ],
       "disposition": "generated",
-      "preferredLowering": false,
+      "preferredLowering": true,
       "denseId": 4,
       "wrapper": "deherm_dmsdk_arena_cstring_dispatch",
       "exactWrapper": "deherm_dmsdk_arena_cstring_exact_dispatch",
@@ -576,10 +774,59 @@
           "text": " * @param buf_len [type: uint32_t] the size of the output buffer"
         }
       ],
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": "production-and-exact-from-one-recipe",
         "compiled": "pinned-header-production-and-exact-object-tests",
-        "linked": "exact-recording-callee",
+        "linked": "all-target-all-variant-symbol-census-plus-exact-recording-callee",
         "runtime": "exact-dispatch-all-vectors",
         "allocation": "bounded-thread-local-input-scratch-no-heap-primitives"
       }

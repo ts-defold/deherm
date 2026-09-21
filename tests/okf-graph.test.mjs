@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  metadataOkfIndex,
   outlineOkfIndex,
   queryOkfSql,
   referencesOkfIndex,
@@ -132,6 +133,11 @@ test("OKF CLI supports subcommand help and bounded query aliases", async () => {
     });
     assert.doesNotMatch(literalHelp, /Usage: node \.agents\/okf-index\.mjs/);
     assert.equal(literalHelp.trim().split("\n").filter(Boolean).length, 1);
+    const metadata = JSON.parse(execFileSync(process.execPath, [
+      cli, "metadata", "research/okf-semantic-retrieval-index.md"
+    ], { cwd: repositoryRoot, env: environment, encoding: "utf8" }));
+    assert.equal(metadata.type, "Design and Verification Report");
+    assert.equal(Object.hasOwn(metadata, "content"), false);
   } finally {
     await rm(cacheRoot, { recursive: true, force: true });
   }
@@ -156,6 +162,58 @@ test("OKF graph refresh is content-addressed and updates source digests incremen
     const changedSource = await refreshOkfIndex(value);
     assert.equal(changedSource.indexed, 0);
     assert.equal(changedSource.sourceUpdated, 1);
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("OKF graph exposes structured document frontmatter without reading document bodies", async () => {
+  const value = await fixture();
+  try {
+    await refreshOkfIndex(value);
+    const metadata = await metadataOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/a.md"
+    });
+    assert.equal(metadata.path, "research/a.md");
+    assert.equal(metadata.type, "Note");
+    assert.equal(metadata.title, "Alpha graph");
+    assert.equal(metadata.description, "Graph fixture.");
+    assert.match(metadata.digest, /^[a-f0-9]{64}$/);
+    assert.deepEqual(metadata.metadata, {
+      type: "Note",
+      title: "Alpha graph",
+      description: "Graph fixture."
+    });
+    assert.equal(Object.hasOwn(metadata, "content"), false);
+    await assert.rejects(
+      metadataOkfIndex({ databasePath: value.databasePath, document: "research/missing.md" }),
+      /unknown OKF document/
+    );
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("bounded metadata projection fails closed when distinct keys truncate to the same name", async () => {
+  const value = await fixture();
+  try {
+    const shared = "k".repeat(256);
+    await writeFile(path.join(value.docs, "collision.md"), `---
+type: Note
+title: Collision
+description: Bounded-key collision fixture.
+${shared}a: first
+${shared}b: second
+---
+
+# Collision
+`);
+    await refreshOkfIndex(value);
+    await assert.rejects(
+      metadataOkfIndex({ databasePath: value.databasePath, document: "research/collision.md" }),
+      /metadata keys collide after bounded projection/
+    );
   } finally {
     await rm(value.root, { recursive: true, force: true });
   }
@@ -359,6 +417,7 @@ test("section and SQL byte budgets reject context-volume bypasses", async () => 
 type: Note
 title: Large line
 description: Byte-bound fixture.
+owner: ${"y".repeat(250_000)}
 ---
 
 # Large
@@ -375,6 +434,13 @@ ${"x".repeat(250_000)}
     assert.equal(section.truncated, true);
     assert.ok(Buffer.byteLength(section.content, "utf8") <= 64 * 1_024);
     assert.ok(Math.max(...section.content.split("\n").map((line) => Buffer.byteLength(line, "utf8"))) <= 4_096);
+
+    const metadata = await metadataOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/large.md"
+    });
+    assert.ok(Buffer.byteLength(metadata.metadata.owner, "utf8") <= 4_096);
+    assert.ok(Buffer.byteLength(JSON.stringify(metadata), "utf8") <= 64 * 1_024);
 
     const rows = await queryOkfSql({
       databasePath: value.databasePath,
@@ -396,6 +462,62 @@ ${"x".repeat(250_000)}
       }),
       /not authorized|authorization denied/u
     );
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("bounded text output truncates only at UTF-8 code point boundaries", async () => {
+  const value = await fixture();
+  try {
+    await writeFile(path.join(value.docs, "multibyte.md"), `---
+type: Note
+title: Multibyte boundaries
+description: UTF-8 boundary fixture.
+owner: ${"é".repeat(5_000)}
+---
+
+# Multibyte
+
+${"😀".repeat(5_000)}
+
+## ${"界".repeat(2_000)}
+`);
+    await refreshOkfIndex(value);
+
+    const assertBounded = (text, maximumBytes) => {
+      assert.ok(Buffer.byteLength(text, "utf8") <= maximumBytes);
+      assert.doesNotMatch(text, /\uFFFD/u);
+      assert.ok(text.endsWith("…"));
+    };
+
+    const metadata = await metadataOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/multibyte.md"
+    });
+    assertBounded(metadata.metadata.owner, 4_096);
+
+    const section = await sectionOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/multibyte.md",
+      terms: ["multibyte"],
+      maxLines: 200
+    });
+    assertBounded(section.content.split("\n")[2], 4_096);
+
+    const outline = await outlineOkfIndex({
+      databasePath: value.databasePath,
+      document: "research/multibyte.md",
+      max: 200
+    });
+    assertBounded(outline[1].title, 1_024);
+
+    const [row] = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT content FROM nodes WHERE kind = 'heading' AND path = 'research/multibyte.md' AND label = 'Multibyte'",
+      max: 1
+    });
+    assertBounded(row.content, 4_096);
   } finally {
     await rm(value.root, { recursive: true, force: true });
   }

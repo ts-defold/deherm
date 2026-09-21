@@ -13,6 +13,7 @@ import {
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reportPaths = Object.freeze({
+  arenaCString: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
   scalar: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
   enumValue: "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
   fixedDigest: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
@@ -23,6 +24,7 @@ const reportPaths = Object.freeze({
   cstringValue: "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
 });
 const dispatchers = Object.freeze({
+  arenaCString: "deherm_dmsdk_arena_cstring_dispatch",
   scalar: "deherm_dmsdk_scalar_dispatch",
   enumValue: "deherm_dmsdk_enum_dispatch",
   fixedDigest: "deherm_dmsdk_fixed_digest_dispatch",
@@ -59,19 +61,25 @@ function emitted(declaration) {
     (typeof declaration.wrapper === "string" && Number.isSafeInteger(declaration.denseId ?? declaration.bindingId));
 }
 
-export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, outRoot = root } = {}) {
+export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, outRoot = root, familyReportPaths = {} } = {}) {
+  const effectiveReportPaths = { ...reportPaths, ...familyReportPaths };
   const [catalogSource, irSource, reports] = await Promise.all([
     readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-universal-bindings.json"), "utf8"),
     readFile(path.join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"),
-    Promise.all(Object.entries(reportPaths).map(async ([family, relative]) =>
-      [family, JSON.parse(await readFile(path.join(root, relative), "utf8"))])),
+    Promise.all(Object.entries(effectiveReportPaths).map(async ([family, relative]) => {
+      const source = await readFile(path.resolve(root, relative), "utf8");
+      return [family, relative, source, JSON.parse(source)];
+    })),
   ]);
   const productionCatalog = JSON.parse(catalogSource);
   const ir = JSON.parse(irSource);
   const routeByDeclaration = new Map();
   const declarationByFamilyId = new Map();
-  for (const [family, report] of reports) {
-    for (const declaration of report.declarations ?? []) {
+  for (const [family, , , report] of reports) {
+    for (const declaration of [
+      ...(report.declarations ?? []),
+      ...(report.generatedDeclarations ?? []),
+    ]) {
       if (!emitted(declaration)) continue;
       const id = declaration.denseId ?? declaration.bindingId;
       if (!Number.isSafeInteger(id)) throw new Error(`${declaration.id} has no family-local adapter id`);
@@ -87,10 +95,12 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
         family,
         id,
         dispatcher: dispatchers[family],
-        callee: declaration.wrapper ?? declaration.symbol,
+        callee: family === "arenaCString"
+          ? declaration.symbol
+          : declaration.wrapper ?? declaration.symbol,
         digestBytes: declaration.digestBytes ?? null,
         resultBits: declaration.resultBits ?? null,
-        mode: declaration.mode ?? null,
+        mode: declaration.mode ?? declaration.recipe?.kind ?? null,
       });
     }
   }
@@ -102,12 +112,27 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
     if (route.family !== recipe.preferredLowering.family) {
       throw new Error(`${recipe.declarationId} family report disagrees with the production recipe`);
     }
+    const production = recipe.preferredLowering.adapter;
+    if (production?.applicability !== "callable") {
+      throw new Error(`${recipe.declarationId} production adapter is not callable`);
+    }
+    if (production.kind === "family-dispatch") {
+      if (production.id !== route.id || production.dispatcher !== route.dispatcher) {
+        throw new Error(`${recipe.declarationId} production family-dispatch identity disagrees with its report`);
+      }
+    } else if (production.kind === "named-wrapper") {
+      if (recipe.preferredLowering.wrapper !== route.callee) {
+        throw new Error(`${recipe.declarationId} production named-wrapper identity disagrees with its report`);
+      }
+    } else {
+      throw new Error(`${recipe.declarationId} has unsupported production adapter kind ${production.kind}`);
+    }
     consumedRoutes.add(recipe.declarationId);
     return {
       ...recipe,
       preferredLowering: {
         ...recipe.preferredLowering,
-        adapter: {
+        exactAdapter: {
           applicability: "callable",
           kind: "family-dispatch",
           id: route.id,
@@ -143,6 +168,8 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
     sourceHashes: {
       productionCatalog: sha256(catalogSource),
       sdkIr: sha256(irSource),
+      familyReports: Object.fromEntries(reports.map(([family, relative, source]) =>
+        [family, { path: relative, sha256: sha256(source) }])),
     },
   };
   const report = { ...reportBody, corpusSha256: sha256(canonicalJson(reportBody)) };

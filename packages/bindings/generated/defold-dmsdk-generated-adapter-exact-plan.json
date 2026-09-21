@@ -3,14 +3,15 @@
   "source": "deherm-dmsdk-generated-adapter-exact-corpus",
   "ordering": "numeric-id-ascending",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b",
-  "symbolIndexSha256": "7c42e4d959d55b4d27e4337ba219ded9cdc62dcc1df6e1adfe108b12b8753de4",
+  "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6",
+  "symbolIndexSha256": "1566790a0be8011eb871431cd4bd3fd7a4b9c552fc6e80ac2d1d052f755320b5",
   "recipeCount": 1361,
-  "generatedAdapterCount": 59,
+  "generatedAdapterCount": 64,
   "universalReadyCount": 566,
-  "specializationRequiredCount": 736,
+  "specializationRequiredCount": 731,
   "silentlyOmitted": 0,
   "familyCounts": {
+    "arenaCString": 5,
     "astcProbe": 2,
     "base64Span": 2,
     "cstringValue": 14,
@@ -24,9 +25,9 @@
     "schemaVersion": 1,
     "source": "deherm-dmsdk-generated-adapter-call-plan",
     "evidenceBoundary": "Each exact vector is derived from the same authenticated recipe and concrete family-dispatch plan as the production relocation. It fixes the production C ABI symbol, family-local adapter id, ordered native ABI, result contract, and emitted JSI module where one exists. Family runtime tests execute the C ABI vectors; JSI is applicable only to families that emit a production JSI module. Provider-boundary families remain excluded until their policy providers exist.",
-    "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b",
+    "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6",
     "retain": "deherm_dmsdk_generated_adapter_corpus_retain_generated_adapters",
-    "callCount": 59,
+    "callCount": 64,
     "calls": [
       {
         "declarationId": "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
@@ -46,21 +47,21 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99",
         "numericId": 177,
         "recipeId": "dmsdk-projection:dedcdad6a6ee1c5e5e38a118",
         "family": "enumValue",
-        "adapterKind": "family-dispatch",
-        "adapterId": 0,
-        "symbol": "deherm_dmsdk_enum_dispatch",
-        "planSha256": "299f677579477c87a60610f5ec09523e889c0586199572b2bf0ec41fa6d05b2f",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_enum_dm_buffer_get_size_for_value_type_i32",
+        "planSha256": "92605dc49f0e7efe2f4ba4babb17869fa88461891d70da9464f469931d78037d",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_buffer_get_size_for_value_type_i32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -68,7 +69,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
@@ -88,181 +89,181 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
         "numericId": 204,
         "recipeId": "dmsdk-projection:425b861d0925f9cbc4691042",
         "family": "base64Span",
-        "adapterKind": "family-dispatch",
-        "adapterId": 0,
-        "symbol": "deherm_dmsdk_base64_span_dispatch",
-        "planSha256": "99ad04d1078389e7093f81c8f3ed895e6c49583bef7ddfb0e6d228f3c2a8f0f5",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_base64_span_dm_crypt_base64_decode",
+        "planSha256": "4ac1597171d750bd1c30e0f7320ff1f1cfd41ee5ca702aa78abe98029c16459e",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_base64_span_dispatch"
+            "symbol": "deherm_dmsdk_base64_span_dm_crypt_base64_decode"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
         "numericId": 205,
         "recipeId": "dmsdk-projection:46a68b6b277fcb081c6e5a4d",
         "family": "base64Span",
-        "adapterKind": "family-dispatch",
-        "adapterId": 1,
-        "symbol": "deherm_dmsdk_base64_span_dispatch",
-        "planSha256": "5cc28ff1fb4bc9488f1e31e30b27ad36d1ed41ceec97fdbc24f11d79eaa8807f",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_base64_span_dm_crypt_base64_encode",
+        "planSha256": "8dce014c42203181d27a6cf5b62d5ae6cdba20e135fe00bb9bacb66c97430e07",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_base64_span_dispatch"
+            "symbol": "deherm_dmsdk_base64_span_dm_crypt_base64_encode"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
         "numericId": 206,
         "recipeId": "dmsdk-projection:b5749782c77bc310cad23e96",
         "family": "xteaSpan",
-        "adapterKind": "family-dispatch",
-        "adapterId": 0,
-        "symbol": "deherm_dmsdk_xtea_span_dispatch",
-        "planSha256": "a427c2e30957b63af604c7e1c6e1c76924ca852f9ab8b5f4501f7ff47f3ebb02",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_xtea_span_dm_crypt_decrypt",
+        "planSha256": "985e077d94b9b5396d15da8082c70324c85d3c750396afac62a5946aa0e3dca6",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_xtea_span_dispatch"
+            "symbol": "deherm_dmsdk_xtea_span_dm_crypt_decrypt"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
         "numericId": 207,
         "recipeId": "dmsdk-projection:a674bc9948c833780c93ae70",
         "family": "xteaSpan",
-        "adapterKind": "family-dispatch",
-        "adapterId": 1,
-        "symbol": "deherm_dmsdk_xtea_span_dispatch",
-        "planSha256": "0e5c2a37c12fed6faa870888b0ff22f5c7fbb363e020f64cef3147a17b1a9c30",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_xtea_span_dm_crypt_encrypt",
+        "planSha256": "cf8fc0ccc87cc23e1656c0744327b4857eb07d91ce89aabd3a84bb07dcba5aa8",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_xtea_span_dispatch"
+            "symbol": "deherm_dmsdk_xtea_span_dm_crypt_encrypt"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
         "numericId": 208,
         "recipeId": "dmsdk-projection:44a0ff580b15365ff40420a0",
         "family": "fixedDigest",
-        "adapterKind": "family-dispatch",
-        "adapterId": 0,
-        "symbol": "deherm_dmsdk_fixed_digest_dispatch",
-        "planSha256": "cb4b7211871ef1dc7e987c7b416c142e1804a70d0c4139f0a662ebb1d691060a",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_md5",
+        "planSha256": "bccd418ff1b318f8f2ad24c826639dc5d3f3318847c8e32b35aa784efeb9b811",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_md5"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
         "numericId": 209,
         "recipeId": "dmsdk-projection:d4a799e685183a70a80fb541",
         "family": "fixedDigest",
-        "adapterKind": "family-dispatch",
-        "adapterId": 1,
-        "symbol": "deherm_dmsdk_fixed_digest_dispatch",
-        "planSha256": "c1c82056079e68c0e7830932e4433dccbdc978f4dcb943fb6dcbcbde28daa557",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha1",
+        "planSha256": "bc4c66c2078a7ca1657ed9751b890e62506910952c8313f6c5f6f8cbc0d027a9",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha1"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
         "numericId": 210,
         "recipeId": "dmsdk-projection:a8370554e7e394de6befb9c6",
         "family": "fixedDigest",
-        "adapterKind": "family-dispatch",
-        "adapterId": 2,
-        "symbol": "deherm_dmsdk_fixed_digest_dispatch",
-        "planSha256": "db4e7dd19ea26dc7c9e6bcb52f7b782fe32017f3cd77d4bd6babe7c870f834b7",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha256",
+        "planSha256": "1b969faf8abbc6207f265cdf09718d1bc063b2671a506e39117c2a2d038108c6",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha256"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
         "numericId": 211,
         "recipeId": "dmsdk-projection:e561d06d4ce522548bb539b2",
         "family": "fixedDigest",
-        "adapterKind": "family-dispatch",
-        "adapterId": 3,
-        "symbol": "deherm_dmsdk_fixed_digest_dispatch",
-        "planSha256": "08b82dc7549e60505abe7cd5fa10c679898d9fbe011517239435a69f9673097a",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha512",
+        "planSha256": "40ac9d5de6e454c482e248c7d9c7305d98b107d465b509f1d8fed83ecb029f42",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha512"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
         "numericId": 226,
         "recipeId": "dmsdk-projection:d2e432b1eecb7c0209272971",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 10,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "b304c1aba60c3d47dd6dad5fae2b18267f193e5172a011bc7523f0e67560cdb5",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_byte_swap_u16",
+        "planSha256": "3b0d84325d85ba9911d4aef928b06fd7fcf5cff49b637faa118be8f34b52b47d",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_byte_swap_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -270,21 +271,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
         "numericId": 227,
         "recipeId": "dmsdk-projection:bbfcd886978439c8ec27ed25",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 11,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "15b1e50c579b44a0103a19afdea65240d4a2adfcd65d994d7c43383aa2cd3a23",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_byte_swap_u32",
+        "planSha256": "c858476659adb8ba5db35ac4543422110e749c1c5a24bebaf62ee168d7a4920e",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_byte_swap_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -292,21 +293,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
         "numericId": 228,
         "recipeId": "dmsdk-projection:eb6645dd5732d3537e2fbfce",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 12,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "4a32ec3ed47d953d1090fd9f2b4c4dfb048bb52e6088cdb5d7eb64f108206a24",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_byte_swap_u64",
+        "planSha256": "f1e4649ddedc167a1725b94a0a10cdf352762751234f782f2e6503b3c5f846a3",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_byte_swap_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -314,21 +315,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
         "numericId": 229,
         "recipeId": "dmsdk-projection:6d4b37e0ac7003955fc64a5f",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 13,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "c3bdd4bccb49c1304a32e3c372d12b3b97bda51de907dbb2f78a09e44148d00a",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_to_host_u32",
+        "planSha256": "ad38de9690bf26994808b90ca4e5ad775dc36f2f10e9e7f3a953f211f79a3294",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_host_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -336,21 +337,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
         "numericId": 230,
         "recipeId": "dmsdk-projection:226674ace354cfdf99a35321",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 14,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "25925a603ef80cc7d124243043059b750da8040b8cfa49e1c4d8dbf40ef9c189",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_to_host_u64",
+        "planSha256": "1c4d146f1e5a6f6e626ce1d42bbae72fccf83c97593f1c629cf02b8c7933f061",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_host_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -358,21 +359,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
         "numericId": 231,
         "recipeId": "dmsdk-projection:7a5463f0e21e4ccd4a60eba8",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 15,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "7201a3dc848d1ee8bc0943df5049937c80536c0b4f84de8976ccfd4cb38f5080",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_to_host_u16",
+        "planSha256": "e783a032cc233fa2ccca30f4ccaf73eb456442ebb3fd341996d9e044181d17c8",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_host_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -380,21 +381,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
         "numericId": 232,
         "recipeId": "dmsdk-projection:9e7bfa8337d85f49bc2b14f4",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 16,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "b9fa85adcfccc1025fbbe34afdcada54ef27c94ca20aa2e3e18d3b1feced237c",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_to_network_u64",
+        "planSha256": "fd2be398c54cf57da06abc3c6ba541d5053bb5f65bb8daa9bfbf01576f51cf19",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_network_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -402,21 +403,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
         "numericId": 233,
         "recipeId": "dmsdk-projection:4679d2d837dcbf7b581beea0",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 17,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "3e6a50cdc7cda2ab9b066fa8b6168e5b0f249d12383a5ed39a106e03902c4802",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_to_network_u16",
+        "planSha256": "9e43bcdec1c6da01243b821be90f7fa493920f256b5c37bdb422a3add45474c2",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_network_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -424,21 +425,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
         "numericId": 234,
         "recipeId": "dmsdk-projection:d84254b3b1dba1ef70be3118",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 18,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "8ddacc1ebeeb3aceffdfbe29772b6c0058974d6a8758fc97e7419724aba5323f",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_endian_to_network_u32",
+        "planSha256": "6214abf1f3e7d236060c83f0fc012957a3c3b9f74277a566f720b47ba2f4c6f6",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_network_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -446,21 +447,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398",
         "numericId": 510,
         "recipeId": "dmsdk-projection:76a67fc56930de16dc5d4427",
         "family": "enumValue",
-        "adapterKind": "family-dispatch",
-        "adapterId": 1,
-        "symbol": "deherm_dmsdk_enum_dispatch",
-        "planSha256": "84dba50507a2a552c69f5099b74cf0f7f3c915c2a134e56a1660b5a8ebf0d4a1",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_enum_dm_graphics_get_installed_adapter_family_v",
+        "planSha256": "b5ecd7f72f5857ff85efed30c6612d2b7adc0d67545dbbe0d313f587d07ab3bd",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_graphics_get_installed_adapter_family_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -468,7 +469,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
@@ -488,7 +489,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
@@ -508,47 +509,47 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
         "numericId": 650,
         "recipeId": "dmsdk-projection:fa127264cbeb81bd9a81a9ea",
         "family": "hashSpan",
-        "adapterKind": "family-dispatch",
-        "adapterId": 0,
-        "symbol": "deherm_dmsdk_hash_span_dispatch",
-        "planSha256": "ea57031c294cf835fb213e3a6a5cd35df37d2e78eec5a547887a39245dfdac5a",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_hash_span_dm_hash_buffer32",
+        "planSha256": "d382d06082e8e2775a8b306f41c40cafd61cfeaa68d5402bd9a03499beb92b14",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_hash_span_dispatch"
+            "symbol": "deherm_dmsdk_hash_span_dm_hash_buffer32"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
         "numericId": 651,
         "recipeId": "dmsdk-projection:09cba3a3737b15ef6aba2381",
         "family": "hashSpan",
-        "adapterKind": "family-dispatch",
-        "adapterId": 1,
-        "symbol": "deherm_dmsdk_hash_span_dispatch",
-        "planSha256": "aeb32e18b477a232acfa0cc76f940f8b77cecaf2fa628719431d5a5abc682a6f",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_hash_span_dm_hash_buffer64",
+        "planSha256": "6a64846e13d620136672f36fb44eaea2a596d8d95e8221b186d52f5d619dc699",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_hash_span_dispatch"
+            "symbol": "deherm_dmsdk_hash_span_dm_hash_buffer64"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
@@ -568,7 +569,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
@@ -588,61 +589,61 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
         "numericId": 717,
         "recipeId": "dmsdk-projection:4d796d3903534d1bcd508e0c",
         "family": "astcProbe",
-        "adapterKind": "family-dispatch",
-        "adapterId": 0,
-        "symbol": "deherm_dmsdk_astc_probe_dispatch",
-        "planSha256": "31b25c3dd1ef5812bd005f3d9b2051aae92c0870c1fa54ee1c636524393d9c39",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size",
+        "planSha256": "c903d9e7b6b6f685d1fd258363911a1e7235d14978fe0e865d7de58d2e3a9c38",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_astc_probe_dispatch"
+            "symbol": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
         "numericId": 718,
         "recipeId": "dmsdk-projection:4b9d06d0e135ecff1e3a615d",
         "family": "astcProbe",
-        "adapterKind": "family-dispatch",
-        "adapterId": 1,
-        "symbol": "deherm_dmsdk_astc_probe_dispatch",
-        "planSha256": "975b125045345524b2484133ee5bab818bb744dda2adfea0362036dbe60ae975",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions",
+        "planSha256": "4bc5d06723e517c6f7c74b7a57b1119c31155d7967dde09e798138973592c116",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_astc_probe_dispatch"
+            "symbol": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397",
         "numericId": 735,
         "recipeId": "dmsdk-projection:38d7400f7bffbc6b92369e34",
         "family": "enumValue",
-        "adapterKind": "family-dispatch",
-        "adapterId": 2,
-        "symbol": "deherm_dmsdk_enum_dispatch",
-        "planSha256": "f478461af03b19f98095a9c2654b3d5e0f7b15fbbb7fbba698d79e6285fd0984",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_enum_dm_log_setlevel_i32",
+        "planSha256": "b3af1967b10bb006687ee65b902a6eabc0c1113d44328ee9844ff4ed1939dcb5",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_log_setlevel_i32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -650,21 +651,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391",
         "numericId": 738,
         "recipeId": "dmsdk-projection:794fff3ffce798d4bbb27489",
         "family": "enumValue",
-        "adapterKind": "family-dispatch",
-        "adapterId": 3,
-        "symbol": "deherm_dmsdk_enum_dispatch",
-        "planSha256": "7d13e22a57df30220dbe0f02e53ff642d6fc16a0ec1284d9d95c603c11a1dae0",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_enum_dm_log_get_level_v",
+        "planSha256": "cd97e6e081cafa858842f83f32332f9ac65d5fe76cf47161557aaec361d2b9da",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_log_get_level_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -672,21 +673,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390",
         "numericId": 741,
         "recipeId": "dmsdk-projection:30efd5d4926f3c037099810f",
         "family": "enumValue",
-        "adapterKind": "family-dispatch",
-        "adapterId": 4,
-        "symbol": "deherm_dmsdk_enum_dispatch",
-        "planSha256": "2d7ab8ea82855f5ab44c20b6fdcf9e2edb0db7618e6f61cb91ef57f1a99f4f6d",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_enum_dm_log_set_level_i32",
+        "planSha256": "ef4d4b90091b1948585484ef9dac98878e52b55b025ba24d1dbe6660598b93bf",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_log_set_level_i32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -694,7 +695,27 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+      },
+      {
+        "declarationId": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
+        "numericId": 843,
+        "recipeId": "dmsdk-projection:45a2b3fce45ad1bc00b1502a",
+        "family": "arenaCString",
+        "adapterKind": "family-dispatch",
+        "adapterId": 0,
+        "symbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "planSha256": "59b850c57ac8b686b03c0e1438fae6e229eaa5b11afafb572d0cff0d9369cd3e",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
@@ -714,7 +735,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
@@ -734,21 +755,21 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
         "numericId": 1011,
         "recipeId": "dmsdk-projection:549ff1eb44c1dea2eac757ce",
         "family": "enumValue",
-        "adapterKind": "family-dispatch",
-        "adapterId": 5,
-        "symbol": "deherm_dmsdk_enum_dispatch",
-        "planSha256": "77168baad8285fc12662e2c5796ded8417f25892a2adee47a5ff889d0d69399c",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_enum_dm_sound_set_group_mute_u64_bool",
+        "planSha256": "56e65bea9e32f950ebb817c45b74b45cd246a7d19522a0e09171f33c0e4cb3ac",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_sound_set_group_mute_u64_bool"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -756,21 +777,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
         "numericId": 1012,
         "recipeId": "dmsdk-projection:46a17da647e9f6d96373d317",
         "family": "enumValue",
-        "adapterKind": "family-dispatch",
-        "adapterId": 6,
-        "symbol": "deherm_dmsdk_enum_dispatch",
-        "planSha256": "1ed571ccfff7bbd5e0c184852724abf5c27f4d7f8aafdeadc97867fe632e9c3f",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_enum_dm_sound_toggle_group_mute_u64",
+        "planSha256": "cfd057eda8520fa600a7f185c4b880f39f1892e71c1b99e3244c4c7c2fa463a7",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_sound_toggle_group_mute_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -778,7 +799,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
@@ -798,7 +819,47 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+      },
+      {
+        "declarationId": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
+        "numericId": 1025,
+        "recipeId": "dmsdk-projection:3be356745596fc38357afa3b",
+        "family": "arenaCString",
+        "adapterKind": "family-dispatch",
+        "adapterId": 1,
+        "symbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "planSha256": "ffd9b6e8ba5f8c61d989ea49a4427c0b58abaeb0d3111aa1116374b2fa415833",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+      },
+      {
+        "declarationId": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
+        "numericId": 1029,
+        "recipeId": "dmsdk-projection:b39153092ce4eb6f47eec1b9",
+        "family": "arenaCString",
+        "adapterKind": "family-dispatch",
+        "adapterId": 2,
+        "symbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "planSha256": "2e759c7048d4a6cab7ee94fac2c3e4ed0f3ae9a808d5983a1bb12c647d9d613a",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
@@ -818,7 +879,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
@@ -838,7 +899,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
@@ -858,21 +919,21 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
         "numericId": 1045,
         "recipeId": "dmsdk-projection:2adb7bb11467bcbedeeb5f29",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 19,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "028f4cbdb366105019e17d4f5e05ab1ae220aedb80f869773198f1d38ec8d61d",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_time_get_monotonic_time_v",
+        "planSha256": "a1e0a3c0fd159299d5f6f8cba416067a9ab34237e904f4da90a4f1078400f816",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_time_get_monotonic_time_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -880,21 +941,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
         "numericId": 1046,
         "recipeId": "dmsdk-projection:01e0eade7ef2428a3a313f4d",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 20,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "d47f7b027183e2fc4b39dd344821db0ec23d473451c7b311e55d20414b7d3a65",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_time_get_time_v",
+        "planSha256": "37c0ef8f68a90a48444ee1ba3b64e67aff33489295304f527e307539ac4d8b7d",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_time_get_time_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -902,21 +963,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
         "numericId": 1047,
         "recipeId": "dmsdk-projection:e4372f4bb1caab018240522e",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 21,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "364894596f0f414ad42d8a406fc8c3224269f974a23aa8cc5100577cff82b7ed",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_time_sleep_u32",
+        "planSha256": "53ab6659f8f7402f0bc20ab0fc01e14c62f2f63966a611f7ee05ade82df74dde",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_time_sleep_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -924,21 +985,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
         "numericId": 1074,
         "recipeId": "dmsdk-projection:76dd808455339ae5929ec71c",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 22,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "5c18edd6c75c0c7d4fb2bf56a986ddda40e6f52486736dfcaba3aa4a6020f52a",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_trig_lookup_cos_f32",
+        "planSha256": "77383d8a028d8bd13365037c5bf91758a1feb0027698200ce8ff67ed534817c3",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_trig_lookup_cos_f32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -946,21 +1007,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
         "numericId": 1075,
         "recipeId": "dmsdk-projection:e53e72770d0cf281d3891b22",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 23,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "0323c214231a418b21cd8823f8189a4a4ed94761a5fd1888f1b7a0f8286f31ae",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_trig_lookup_sin_f32",
+        "planSha256": "9305b7ab6fc4d9549855523d6468e0de1995d71ce39a3d7404fba66f1a1bd16f",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_trig_lookup_sin_f32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -968,21 +1029,41 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+      },
+      {
+        "declarationId": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
+        "numericId": 1077,
+        "recipeId": "dmsdk-projection:09b2c906d290437d993f99ae",
+        "family": "arenaCString",
+        "adapterKind": "family-dispatch",
+        "adapterId": 3,
+        "symbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "planSha256": "fc5cbb8f3466f56fc1e70380bcd7c4384a72101681d29bd5f9eb6181d9d5eb5a",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
         "numericId": 1079,
         "recipeId": "dmsdk-projection:eff774419f2b8c82bb32b666",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 24,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "92d811bb3d51d86281d9efd1911966400ffef64e0bf39c3d1cd20cf860ace360",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_utf8_is_breaking_u32",
+        "planSha256": "732367b12fb6851bf2b350f28c26297e2bde80b6082a868f46f962a0fad75fc4",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_utf8_is_breaking_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -990,21 +1071,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
         "numericId": 1080,
         "recipeId": "dmsdk-projection:fb210499ce39f74d521bb8df",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 25,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "361ba78e6a37fcad4f28280ea7fe647a5b312847b34c6bf8999d960f72d77451",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_dm_utf8_is_white_space_u32",
+        "planSha256": "f094cb8badd9226efec16bdcb9ddab9aec956501f6e424f9a5e7502c78b0e49c",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_utf8_is_white_space_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1012,7 +1093,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
@@ -1032,21 +1113,21 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
         "numericId": 1128,
         "recipeId": "dmsdk-projection:bcc8cf6e3d2f97bbe6307f3d",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 0,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "c172e291002aa8d288a14074de0117bf2d08c907c1ddf81a2cf2945ceb59bd46",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_swap16_u16",
+        "planSha256": "bd3f85273fa28ac8768c7611de2f093baafd32a65f4cd494e9654f92c72722e5",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_swap16_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1054,21 +1135,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
         "numericId": 1129,
         "recipeId": "dmsdk-projection:3f6c2f71ffec3af6fd5ab9f2",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 1,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "236dd85331b1adc227f519b647a0129c5f39d4fdb705b6a337efd491442d0a86",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_swap32_u32",
+        "planSha256": "4dd9d8f38afdb0bbf44f068ec19246d087d9d9b76492a8b0f05dc9aa73431152",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_swap32_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1076,21 +1157,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
         "numericId": 1130,
         "recipeId": "dmsdk-projection:5d71b09d68fad2ee71f6c6a2",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 2,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "5c6bd5cce99b46a3733942248beb85c215c90a6b7d688b42cd669605f662d2e0",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_swap64_u64",
+        "planSha256": "56acef395fd7b8986fc2d8559b2b73aa4bfbcb1f90077d17598bbca7bdafd055",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_swap64_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1098,21 +1179,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
         "numericId": 1131,
         "recipeId": "dmsdk-projection:7923c8ecc51b7eea2c2cfb36",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 3,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "ee46b60f0a1ca93a0c0f1813260dd8d0418fec7b562c45b717ef69c7df4363f5",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_to_host16_u16",
+        "planSha256": "5f6378f0a682e890b3d5290a15a93eb70afdafd9540783f96c2cb390c27f4790",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_host16_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1120,21 +1201,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
         "numericId": 1132,
         "recipeId": "dmsdk-projection:be0e69044d6fda7558bd221b",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 4,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "3e7c0a10a6e1e18e36d4d45d8fe966840926f0ab9eeaf7fce79e4220f8bd9860",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_to_host32_u32",
+        "planSha256": "160f53cbe7e68a766f9cd644fe9bd1b9726511e3776fa5be84efed288645303e",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_host32_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1142,21 +1223,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
         "numericId": 1133,
         "recipeId": "dmsdk-projection:22a0613566edd0723fa75e23",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 5,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "ff60b77c1d4fb4d97ba82efe3814a4e985c4efa839cd0305f21dfd0266f03efe",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_to_host64_u64",
+        "planSha256": "a37af63e69104d9f48a1f59473ee1fd55613a24200720ef7eecb1f06de5775c7",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_host64_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1164,21 +1245,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
         "numericId": 1134,
         "recipeId": "dmsdk-projection:398604899fe3e1a33aa2d673",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 6,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "22f958b013913f87966de3f9dc49029bc112a3dfc01d746172b2772f35d24c33",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_to_network16_u16",
+        "planSha256": "5f27004ef823e550f7d2a1c164d82d481ddbc17b9d9e2b4aa0783aa52f34c879",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_network16_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1186,21 +1267,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
         "numericId": 1135,
         "recipeId": "dmsdk-projection:aa2dd946759dc4806ffcda8c",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 7,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "aef10a410c3c36be8d1b608bbcff41e8dd86a11df44838253003926570efbb94",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_to_network32_u32",
+        "planSha256": "0d7140fc48ffbb37aaa5a7f0db8bf3ae7cbc5f5eea7421278cfcdfd601180786",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_network32_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1208,21 +1289,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
         "numericId": 1136,
         "recipeId": "dmsdk-projection:36db7f5f699c8559cd0107ed",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 8,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "6a17d05ad2e80fda269bf63d1524892ff7ebd4d69ddc90562f182bb2a8e65b6a",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_endian_to_network64_u64",
+        "planSha256": "55cdf316853b6fdb4003943ecafb713d159a3f97e660d2da99994db1b8ff3230",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_network64_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1230,21 +1311,21 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
         "numericId": 1244,
         "recipeId": "dmsdk-projection:2d7da7ca38ec2fef5d641926",
         "family": "scalar",
-        "adapterKind": "family-dispatch",
-        "adapterId": 9,
-        "symbol": "deherm_dmsdk_scalar_dispatch",
-        "planSha256": "c8b65c9164aac55284c109166b9f00636855dbef101302df314d5eb6dc1cb845",
+        "adapterKind": "named-wrapper",
+        "adapterId": null,
+        "symbol": "deherm_dmsdk_profile_is_initialized_v",
+        "planSha256": "1c49c44e99d7ca356e87377a20d8853468ffdf07c512ae99b50310f1755df79e",
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_profile_is_initialized_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1252,7 +1333,27 @@
             "method": "call"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+      },
+      {
+        "declarationId": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
+        "numericId": 1292,
+        "recipeId": "dmsdk-projection:86f71dd9580a7e7a87d51a36",
+        "family": "arenaCString",
+        "adapterKind": "family-dispatch",
+        "adapterId": 4,
+        "symbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "planSha256": "a96db86c63a1b93cb77bac6cab156bc62dfde65ab58ce83010e9fb4c8bc57c60",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       },
       {
         "declarationId": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
@@ -1272,10 +1373,10 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b"
+        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
       }
     ],
-    "vectorCount": 59,
+    "vectorCount": 64,
     "jsiVectorCount": 33,
     "vectors": [
       {
@@ -1512,7 +1613,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_buffer_get_size_for_value_type_i32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -1526,7 +1627,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "7dab4efbf3a72bf0cbf8a379cf72673c83e263508abafe3fea4cdf20aa6fc203"
+        "vectorSha256": "dada0ebd13c249995a589ce4d38ef429d503d780982d8be21f41cc34af28c9b5"
       },
       {
         "schemaVersion": 1,
@@ -1762,7 +1863,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_base64_span_dispatch"
+            "symbol": "deherm_dmsdk_base64_span_dm_crypt_base64_decode"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -1774,7 +1875,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c3d3cc6aa033e71720accadc3569f2b908afdd0729b5da52326cc3a1921b5080"
+        "vectorSha256": "7c0b8567665c48e20071a6e5217cf6a51f32db490dbaf89e0ba67d12b645d402"
       },
       {
         "schemaVersion": 1,
@@ -1889,7 +1990,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_base64_span_dispatch"
+            "symbol": "deherm_dmsdk_base64_span_dm_crypt_base64_encode"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -1901,7 +2002,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a0ef14682643072b80c54ef3ad091bd478416a7b78e29ee799d899f1f3928de7"
+        "vectorSha256": "9525fdbf395131c880a7dee1ee16957ef2664b8675696b548955e49c0ceaa92e"
       },
       {
         "schemaVersion": 1,
@@ -2051,7 +2152,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_xtea_span_dispatch"
+            "symbol": "deherm_dmsdk_xtea_span_dm_crypt_decrypt"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -2063,7 +2164,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "ec421cdca7f4ffd89ec13a62a0d4d55890e1ebe65a214d983b7c4095471b35e0"
+        "vectorSha256": "6c383f64bf0d31549d749baff971d589b44b4ea7afdf5476ca1ad0fa8f60c8a5"
       },
       {
         "schemaVersion": 1,
@@ -2213,7 +2314,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_xtea_span_dispatch"
+            "symbol": "deherm_dmsdk_xtea_span_dm_crypt_encrypt"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -2225,7 +2326,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "da6ba432381408dd6aeedbd78be08059e9bcc75bd1c109d56059bc1c1ae83112"
+        "vectorSha256": "530904abcea0ad2df33c5ad6e11795149ef5a8a809994ef8e0e78b42561d0e60"
       },
       {
         "schemaVersion": 1,
@@ -2320,7 +2421,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_md5"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -2332,7 +2433,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "79f6f6f3cc705ccfc530af0e2dda651d35d6e10d852ccef0c1f66338494ab6a3"
+        "vectorSha256": "5313ed683f31497b7ba84f03798f80c70a7ad94adb5a6b3e3eea93df6afcbdf0"
       },
       {
         "schemaVersion": 1,
@@ -2427,7 +2528,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha1"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -2439,7 +2540,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b1e7d2453cdc5aff66b5b888fb8ae649abee1d916c1bad066c8c27ade119c316"
+        "vectorSha256": "213475dc6acc85abbdf37630eac01327d34184a390fdb843ced070dcc851b6ae"
       },
       {
         "schemaVersion": 1,
@@ -2534,7 +2635,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha256"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -2546,7 +2647,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "09ef384ef12d2ddfa4c0f7a5234e8d217f12706a9da10e40559f1eaa91121700"
+        "vectorSha256": "edc75b640aa0a8d60cbb541c2da2bf188f60a53053acff69959fab1a4646e58c"
       },
       {
         "schemaVersion": 1,
@@ -2641,7 +2742,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_fixed_digest_dispatch"
+            "symbol": "deherm_dmsdk_fixed_digest_dm_crypt_hash_sha512"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -2653,7 +2754,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c52274b3ac5fb02685c122d0f520137f21212f03d62d5f18fedc0f9735c7a9dd"
+        "vectorSha256": "42bc6f3957277d288b7ca75c5868b3de26e9ddfb007d6ae5e710c653c6032a55"
       },
       {
         "schemaVersion": 1,
@@ -2711,7 +2812,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_byte_swap_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -2725,7 +2826,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b5590e41ced4cd481e31dd4da5a10477c49e04c535c02deb478669c75a173637"
+        "vectorSha256": "72fde0b8034b9f478a6dd35447bc9a89940d805d4d31636b4da98feed41cb2d3"
       },
       {
         "schemaVersion": 1,
@@ -2783,7 +2884,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_byte_swap_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -2797,7 +2898,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8412e985d6aa047a89399d1819d508870caa91581e5ed5c85d534c96209c6a35"
+        "vectorSha256": "20df8e3713bc01407a5c5020747fc365e9b5ae55ce809017c5f3fa709f5ce533"
       },
       {
         "schemaVersion": 1,
@@ -2855,7 +2956,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_byte_swap_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -2869,7 +2970,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0533ad33ffd94c5d1a23fe468919a2ca1ff2088680611bed634364a3b6fdbefe"
+        "vectorSha256": "9b820e68fc8c6c3ccbaa423048e181135043b70ecfaba9ec1fc5006489a54fe4"
       },
       {
         "schemaVersion": 1,
@@ -2927,7 +3028,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_host_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -2941,7 +3042,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "f44c8867f1a5ef499a645795ea309e26cb7c30d27d1e77b718e7650113a4f964"
+        "vectorSha256": "9633f604720892d259211bee7199af8d6353cffcfb8ad7dc61957d7c43909c16"
       },
       {
         "schemaVersion": 1,
@@ -2999,7 +3100,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_host_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -3013,7 +3114,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a4538951884557665a445f1ddde4e2446bf428c373a799bd78e8bdd7dbdda6c5"
+        "vectorSha256": "aaeb0efa2b56b8047e278f3ba33e59529c38cc6731e62706768da04f0a33a6c1"
       },
       {
         "schemaVersion": 1,
@@ -3071,7 +3172,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_host_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -3085,7 +3186,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c979e21bb84035452bcbbba2245684c310055c8e97b9b9facd863d81fe684076"
+        "vectorSha256": "6340f207750ad3030b81ca59d807485461e8c736ec3677e03e6e929458b9ffa6"
       },
       {
         "schemaVersion": 1,
@@ -3143,7 +3244,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_network_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -3157,7 +3258,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "323e14b0a82af942832e7f961fec8680ee095822694b701992d671b1c34f67b5"
+        "vectorSha256": "77eccfab0842ab239aa3d5776de7ef7435f27f8f51c268896f1eee17fca26fe9"
       },
       {
         "schemaVersion": 1,
@@ -3215,7 +3316,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_network_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -3229,7 +3330,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9b0b610a09272a66bf930fcb6da31615f5ab479a993f745776cf1f3056ae5089"
+        "vectorSha256": "3fa1f42b9fc3562a54520e21de6392f6c36c5e639cac00c651e12039574c123d"
       },
       {
         "schemaVersion": 1,
@@ -3287,7 +3388,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_endian_to_network_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -3301,7 +3402,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "50b18b002bbaa1ebdadf64c9918ace08c12416a39291199c9a46c3d1c4f420de"
+        "vectorSha256": "f55bd09234933754a80e798a4497d9386a62bae5b36c402d0d2b387b876052bb"
       },
       {
         "schemaVersion": 1,
@@ -3391,7 +3492,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_graphics_get_installed_adapter_family_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -3405,7 +3506,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c9493f95540c84ad494e75fca708b1421aa1846ea4f8bd68882d67c9b5cf77e4"
+        "vectorSha256": "05a755a2e5a05146518425622ae77940de960ddef2dba7a864968fdb05e90d7b"
       },
       {
         "schemaVersion": 1,
@@ -3875,7 +3976,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_hash_span_dispatch"
+            "symbol": "deherm_dmsdk_hash_span_dm_hash_buffer32"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -3887,7 +3988,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8738819b2120c83b85cc768db8309e4e6f13cd2f49dd6a6ce786c207c538f3ba"
+        "vectorSha256": "70fa166e13ba85f9318653b2cc7ce11ea7900062a5e76ab9560ccd84d9b40711"
       },
       {
         "schemaVersion": 1,
@@ -3963,7 +4064,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_hash_span_dispatch"
+            "symbol": "deherm_dmsdk_hash_span_dm_hash_buffer64"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -3975,7 +4076,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "5c5cdbe771a5c4b2954fb0ba302db7848568fc4b6d724d4f18ca32743bff885f"
+        "vectorSha256": "3fbe1a521710579718701c7c18725209ea6d034a0ffe0b7e2a26624718639047"
       },
       {
         "schemaVersion": 1,
@@ -4256,7 +4357,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_astc_probe_dispatch"
+            "symbol": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -4268,7 +4369,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "116a6410580be07156cfbc077a20f1f1931dda9845418ae96f97c5a1447df520"
+        "vectorSha256": "8d18f9eb588f2857b658950b0ed8c7c3eb0c4e84ac723e321b4c88af5e8df5cc"
       },
       {
         "schemaVersion": 1,
@@ -4401,7 +4502,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_astc_probe_dispatch"
+            "symbol": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions"
           },
           "dynamicHermesJsi": {
             "applicability": "not-emitted"
@@ -4413,7 +4514,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "bcdfd89de8673f2fc068ce1eb2baf38f1bc53d38edca5aca92facd0f34bcf045"
+        "vectorSha256": "a9450714fa8a125c151b927b42efabc7590c84126487c98d3140b4724c38369a"
       },
       {
         "schemaVersion": 1,
@@ -4503,7 +4604,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_log_setlevel_i32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -4517,7 +4618,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a58a68c5f58bf16b8b879336f16449f7d75c13fae7b0d9d2d0ad90f3ceb7086e"
+        "vectorSha256": "5b96b9b3758003712ca98236d10d19c2e9337269f8cb60856d29ad0a3d8adfb1"
       },
       {
         "schemaVersion": 1,
@@ -4595,7 +4696,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_log_get_level_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -4609,7 +4710,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "abf50bebc130baa599ff0a5220429f2ba95e0e8c129ee4ebf11667aa41587abf"
+        "vectorSha256": "46821404658c8b7afd0cf799b5151bbb36b3acc189769b0c3eae8184edcd134c"
       },
       {
         "schemaVersion": 1,
@@ -4699,7 +4800,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_log_set_level_i32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -4713,7 +4814,109 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "80f032d95c034699a2179d764fb4427b937a1387b76f6dba2f0b98ed7f5ce38d"
+        "vectorSha256": "476fe6cecc37dc1ea9ec2989a0138c4844e2d954700f2748de3bb97ab1c79873"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
+        "numericId": 843,
+        "recipeId": "dmsdk-projection:45a2b3fce45ad1bc00b1502a",
+        "family": "arenaCString",
+        "adapterId": 0,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "exactCallee": "dmResource::GetCanonicalPath",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": "canonical-path"
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmResource::GetCanonicalPath",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "scalar",
+          "resultNativeType": "uint32_t",
+          "resultShape": {
+            "kind": "scalar",
+            "name": "u32"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "path",
+              "nativeType": "const char *",
+              "direction": "in",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "buf",
+              "nativeType": "char *",
+              "direction": "inout",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 2,
+              "name": "buf_len",
+              "nativeType": "uint32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "2e169be6e693a810a344bf1c1d20146d973051db81db213d8d5072d8ef477b1a"
       },
       {
         "schemaVersion": 1,
@@ -5177,7 +5380,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_sound_set_group_mute_u64_bool"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -5191,7 +5394,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "e098696b87d6e5bc4170ca80299bf17e731a0c7ccc3c500fcb16303be9d22988"
+        "vectorSha256": "dfc85e3ea75082d6665ac6b2f83e5e2463cfb4e256a2736c5580eded47f44b10"
       },
       {
         "schemaVersion": 1,
@@ -5350,7 +5553,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_enum_dispatch"
+            "symbol": "deherm_dmsdk_enum_dm_sound_toggle_group_mute_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -5364,7 +5567,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "eb2b6ca6eea081fbe542bb3623ea85e586cd550ec25f746098b1181a04fb6246"
+        "vectorSha256": "dd24069fdf888e76bed4dc781ebac62105e7c27520cf890d556ee5d19a69c042"
       },
       {
         "schemaVersion": 1,
@@ -5455,6 +5658,205 @@
           "failClosed": true
         },
         "vectorSha256": "72e4691362cb009d42ec389efca31db384b752fc92d85f3c331bfdec1d965ebf"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
+        "numericId": 1025,
+        "recipeId": "dmsdk-projection:3be356745596fc38357afa3b",
+        "family": "arenaCString",
+        "adapterId": 1,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "exactCallee": "dmStrError",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": "error-string"
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmStrError",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "dst",
+              "nativeType": "char *",
+              "direction": "out",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "size",
+              "nativeType": "size_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "usize"
+              },
+              "requirements": []
+            },
+            {
+              "position": 2,
+              "name": "err",
+              "nativeType": "int",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "i32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "a58765c7746732c5f7a934d0cce048fc62765c019fc7d5ed7465c0aaa22d855d"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
+        "numericId": 1029,
+        "recipeId": "dmsdk-projection:b39153092ce4eb6f47eec1b9",
+        "family": "arenaCString",
+        "adapterId": 2,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "exactCallee": "dmStrTrim",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": "trimmed-string"
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmStrTrim",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "scalar",
+          "resultNativeType": "size_t",
+          "resultShape": {
+            "kind": "scalar",
+            "name": "usize"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "dst",
+              "nativeType": "char *",
+              "direction": "out",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "dst_size",
+              "nativeType": "size_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "usize"
+              },
+              "requirements": []
+            },
+            {
+              "position": 2,
+              "name": "src",
+              "nativeType": "const char *",
+              "direction": "in",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "fdfcd20c8ab01ef36841525ffc7d76cf0cab01a0558af4ad6a20827d580b9158"
       },
       {
         "schemaVersion": 1,
@@ -6027,7 +6429,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_time_get_monotonic_time_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6041,7 +6443,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "1f8d64cc94ef3d2c568797f146f10ebcbbf9ac7b874f766d968496690383baaf"
+        "vectorSha256": "660704e71f0b44c4d95bb2531b07529c0af11ca31379fc0266c05d368e1861e3"
       },
       {
         "schemaVersion": 1,
@@ -6086,7 +6488,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_time_get_time_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6100,7 +6502,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "2bb08c6843d7b6ec6e15bed879d2eb93292da605d2c60e1c7549b266381ccd25"
+        "vectorSha256": "7d210bc83703dd99af4cbd697ae681ede6c0a0264273e969fe1a0e8d32e48921"
       },
       {
         "schemaVersion": 1,
@@ -6157,7 +6559,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_time_sleep_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6171,7 +6573,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "12df159dca9d5846c0e2f905288bac02daea5d3aec0cc6ccdc60a97202f8abcb"
+        "vectorSha256": "b72d86cf81c7f75d2e70b4c89dae63e18db9c852c99b1cb9ed46f3c0719674e6"
       },
       {
         "schemaVersion": 1,
@@ -6229,7 +6631,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_trig_lookup_cos_f32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6243,7 +6645,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a464667f9bc72a7cf4da7bd02b1039b17f4c90c1564eca48b196aef6664793b4"
+        "vectorSha256": "b188b0f59d823b250ab50c21b819d641266858789ea29d97d7ee386d7ba03033"
       },
       {
         "schemaVersion": 1,
@@ -6301,7 +6703,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_trig_lookup_sin_f32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6315,7 +6717,145 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0d0c2f5c464f9bb6e771a66d22f31d090db61284b69aac9737dae0cac99ba03c"
+        "vectorSha256": "4b6f8ef4b0144e5685b9f761de33e692a2a20648b35fc8483e2c458e80dc2e97"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
+        "numericId": 1077,
+        "recipeId": "dmsdk-projection:09b2c906d290437d993f99ae",
+        "family": "arenaCString",
+        "adapterId": 3,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "exactCallee": "dmURI::Encode",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": "uri-encode"
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmURI::Encode",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 4,
+          "resultKind": "enum",
+          "resultNativeType": "Result",
+          "resultShape": {
+            "kind": "enum",
+            "name": "dmURI::Result",
+            "width": "unspecified",
+            "domain": "declared-values"
+          },
+          "resultEnumeration": {
+            "declarationId": "dmsdk:dmURI::Result@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:36:648",
+            "nativeName": "dmURI::Result",
+            "domain": "declared-values",
+            "members": [
+              {
+                "name": "RESULT_OK",
+                "value": 0
+              },
+              {
+                "name": "RESULT_TOO_SMALL_BUFFER",
+                "value": 1
+              }
+            ]
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "src",
+              "nativeType": "const char *",
+              "direction": "in",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "dst",
+              "nativeType": "char *",
+              "direction": "out",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 2,
+              "name": "dst_size",
+              "nativeType": "uint32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u32"
+              },
+              "requirements": []
+            },
+            {
+              "position": 3,
+              "name": "bytes_written",
+              "nativeType": "uint32_t *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "scalar",
+                  "name": "u32"
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "bf781de777ef4e53aeb6ee1b63be9f988f381bb42166ddbef6ece2ce16a625a1"
       },
       {
         "schemaVersion": 1,
@@ -6373,7 +6913,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_utf8_is_breaking_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6387,7 +6927,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d1029b4c9a1c953c6875f3c2734b6236474a5a0c6f8190051af9f4b80e5a09c3"
+        "vectorSha256": "beb701cd98e3f7537b9f304753d50802f18fb70a44e05cc104166a06110e0371"
       },
       {
         "schemaVersion": 1,
@@ -6445,7 +6985,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_dm_utf8_is_white_space_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6459,7 +6999,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3e6311b5b7d2652099046a2c86c7a0bff5d337b6e678656d91965916e531aef1"
+        "vectorSha256": "370e4bbf63565ab8d2bab06b9a3a99e1c04f8e44a18fcd5150f981d5cb6e878e"
       },
       {
         "schemaVersion": 1,
@@ -6591,7 +7131,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_swap16_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6605,7 +7145,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "6febec3ea8db428e0d94ee3237e4e0462ef60fe6c18075266709f16c39f20788"
+        "vectorSha256": "235afa24e6172bae7ab6f5c54d6b28ccb5695a035b9801aecfd3ba4f13a6d365"
       },
       {
         "schemaVersion": 1,
@@ -6663,7 +7203,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_swap32_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6677,7 +7217,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8a7a08bdf7cdc888e0e84d54b958d3b6cf51a7b9f6d3b0e44792bf7a64266b81"
+        "vectorSha256": "c138b6015168558431b17ab7f097581c5a49bfbd1bff0e7f6a805e92d5b57b3d"
       },
       {
         "schemaVersion": 1,
@@ -6735,7 +7275,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_swap64_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6749,7 +7289,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3f97290fcbe7c278f560da2fc4569a3fb0f64110ec1eb0b3e3bce884ba10b46d"
+        "vectorSha256": "c227f44fa6ae6558cb4737db38d5803500ca0f0c13f03368ad1ec715bc367df8"
       },
       {
         "schemaVersion": 1,
@@ -6807,7 +7347,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_host16_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6821,7 +7361,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a13b3a48d5c4546f001a97ac881c14cb966da076fe1de058e1de91be49521eca"
+        "vectorSha256": "c91935f437ee18b75800e905e76832fd8e2dd3c7402e2caec864a00aef7cc825"
       },
       {
         "schemaVersion": 1,
@@ -6879,7 +7419,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_host32_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6893,7 +7433,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "ad1206dd9a1d38d617dd5fb0813b9d1681ae96a8a835f75f09acbd9a184683dd"
+        "vectorSha256": "3177b84218c33e903f3c38ac383c0a5e68ec72fb972421da387231d82009ce43"
       },
       {
         "schemaVersion": 1,
@@ -6951,7 +7491,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_host64_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -6965,7 +7505,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "62c2f79ba76664a9a5f6a06f0d3a25b9705d374d516ee823aa4a30197b9e4d83"
+        "vectorSha256": "3f861c5b7806c0bad8e3f18043bcff00f5cc9e96b503b939c29292d27a434449"
       },
       {
         "schemaVersion": 1,
@@ -7023,7 +7563,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_network16_u16"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -7037,7 +7577,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "1da4e2b2d9c1f88d94954787da4866581ba615209cf7b941a920493225566451"
+        "vectorSha256": "bf7b55256d26b75213b67ec61c3ba4d44ff1a22e7a2a08504cf6daf1b05213a3"
       },
       {
         "schemaVersion": 1,
@@ -7095,7 +7635,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_network32_u32"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -7109,7 +7649,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "94d16b8c1f9072e96030cf5277ab9e65e5ce7b5f885362ce67f7f414adc5d0c0"
+        "vectorSha256": "46da9b9fe970f4b74ce23c8f9654121daa56b9e69285d91ef438cb8f0adbcaaa"
       },
       {
         "schemaVersion": 1,
@@ -7167,7 +7707,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_endian_to_network64_u64"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -7181,7 +7721,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0f64bcaf3828b48b504c9fa99c71c1172293533699c148f1c3e194fe347195b3"
+        "vectorSha256": "bdc4e707cf0c4f46abc2cd8481d3917c0a02da87db65fccdb26a9e2718b4553c"
       },
       {
         "schemaVersion": 1,
@@ -7226,7 +7766,7 @@
         "transports": {
           "cAbi": {
             "applicability": "callable",
-            "symbol": "deherm_dmsdk_scalar_dispatch"
+            "symbol": "deherm_dmsdk_profile_is_initialized_v"
           },
           "dynamicHermesJsi": {
             "applicability": "callable",
@@ -7240,7 +7780,109 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "f8938a7c9b0e17f0b014f5d9c0056dcad370d8454040d57894aa395a0548d558"
+        "vectorSha256": "991bb1323f36ce8321cce1f4ab51591743b7059d38d40d4d2a8daf0ec0ed4ac1"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
+        "numericId": 1292,
+        "recipeId": "dmsdk-projection:86f71dd9580a7e7a87d51a36",
+        "family": "arenaCString",
+        "adapterId": 4,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_arena_cstring_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_arena_cstring.h",
+        "exactCallee": "ResourceGetCanonicalPath",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": "canonical-path"
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "ResourceGetCanonicalPath",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "scalar",
+          "resultNativeType": "uint32_t",
+          "resultShape": {
+            "kind": "scalar",
+            "name": "u32"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "path",
+              "nativeType": "const char *",
+              "direction": "in",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "buf",
+              "nativeType": "char *",
+              "direction": "inout",
+              "cellKind": "cstring",
+              "shape": {
+                "kind": "cstring",
+                "encoding": "utf8-or-byte-string-unspecified",
+                "mutable": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 2,
+              "name": "buf_len",
+              "nativeType": "uint32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_arena_cstring_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "c4320437839edf96a9639842f722449297a8692df485b46d67b7c913cffa7189"
       },
       {
         "schemaVersion": 1,
@@ -7319,23 +7961,61 @@
         "vectorSha256": "320c54bbbff7b3dd1ed1e9757c15bc3aee4510b23082a165c1c8bb727356f0cd"
       }
     ],
-    "manifestSha256": "98b13a52e9a972e62c1006b80914a141b88f6f3c0e0472be95b128e1851cd4ab"
+    "manifestSha256": "a6d6b72a38659aa5660b8e5e51a740da0492ca1b7100618b1c5fb3edae8724ef"
   },
   "artifacts": {
     "verificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
-      "sha256": "5ca7bed5392a623c662724df73a0bdb4b1a0e6b486110b1a8e4bba34d4ba6447"
+      "sha256": "0c58a3b5c61ec9f48d0602af0f888087ee1b5fd0229b0403c27fe9556d92fb02"
     },
     "jsiVerificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp",
       "sha256": "dad3426f5dc45ba4f561d432c80a7e7902082e420102566436d4575b90deeb9c"
     }
   },
-  "productionCatalogSha256": "8fe44b7cd39449530dd63ecafb1a492642ecb85d93cc0d80c7caef6a2cab68c1",
-  "exactCatalogSha256": "ce33878611f5a47ea77882796bcc89188acf1822431591d9b3fd69c834ffe41b",
+  "productionCatalogSha256": "e022158624fd769c4be6e957e86b8cd91c740626c5da625b738e4089de2cc571",
+  "exactCatalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6",
   "sourceHashes": {
-    "productionCatalog": "5b60fa69e4d4c277330dfdaccc01d378c29262737a87d72ab6bb24c4204678d0",
-    "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc"
+    "productionCatalog": "8233a78e12b200f924eba9f92f839ce2ab7d8ce9b6fa219e175fc696c129aade",
+    "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "familyReports": {
+      "arenaCString": {
+        "path": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
+        "sha256": "84e3101830f4b069e576d781e0829b7ea9182c6fe5d4a4888ad69b62578b0b22"
+      },
+      "scalar": {
+        "path": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
+        "sha256": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43"
+      },
+      "enumValue": {
+        "path": "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
+        "sha256": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555"
+      },
+      "fixedDigest": {
+        "path": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
+        "sha256": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3"
+      },
+      "hashSpan": {
+        "path": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
+        "sha256": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051"
+      },
+      "base64Span": {
+        "path": "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
+        "sha256": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb"
+      },
+      "xteaSpan": {
+        "path": "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
+        "sha256": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817"
+      },
+      "astcProbe": {
+        "path": "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
+        "sha256": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d"
+      },
+      "cstringValue": {
+        "path": "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
+        "sha256": "a66ab28e8a0dac5ab0daee4911391921312e3d3479e42464d19d4b41c20c8f5d"
+      }
+    }
   },
-  "corpusSha256": "f25b20aed1c524f5183c27c5c9a89b1372855c65412774064f8452dd323a7e81"
+  "corpusSha256": "f77bf6f4287aa09e153d278c39a4d4974224a401b01c26fdba804d4da49cfc8c"
 }

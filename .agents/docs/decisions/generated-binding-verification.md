@@ -4,7 +4,7 @@ title: Generated binding verification stops at the exact bridge contract
 description: Every emitted Lua or dmSDK call carries a generated twin that verifies exact symbol selection, signature, ABI layout, argument and result ordering, bounds, and lifetime behavior; Defold remains authoritative for implementation semantics.
 tags: [decision, generator, verification, lua, dmsdk, abi, ci, wasm]
 status: accepted
-generated: { by: codex, at: 2026-09-20T00:00:00-04:00 }
+generated: { by: codex, at: 2026-09-21T00:00:00-04:00 }
 sources:
   - id: never-gate
     resource: ./generate-report-never-gate.md
@@ -99,6 +99,32 @@ lifetime semantics such as persistent replacement and terminal one-shot
 invalidation remain separate engine-lifecycle evidence; this gate proves the
 common callback token transport, not those policies.
 
+The first total three-target exact-call audit counts only rows that the
+lowering plan emits; the eight compiler-only property routes are present in the
+926-route partition but are not misreported as transport gaps. Before the
+Static expansion, Dynamic Hermes was 916/916 exact (913 universal plus three
+timer routes), browser/Wasm was 914/914 (911 universal plus three timers), and
+Static Hermes was 3/328 (the timer routes only): 1,833/2,158 emitted
+target-route cells. The largest concrete missing Static family was
+`defold-value`, 127 emitted routes, ahead of scalar at 90 and Lua-table at 70.
+A generator-owned sound-typed unit now replays those 127 exact vectors through
+`dispatchScriptUniversalValue`, the production bounded Static frame, and the
+recording provider. Its build-directory transport is rendered from the same
+generator as the production transport but adds exact accessors only to that
+verification unit; shipped Static classes carry no test-only methods. Argument
+constructors and result predicates consume the interned exact values rather
+than rebuilding the recording provider's shape sentinels. Generation rejects
+missing, cross-target, or wrong Static lanes, mismatched contract values,
+capacity and required-arena drift, and any release expectation the runner does
+not implement. The native observer checks the target stable ID, ordered
+arguments, arity, result decode, violation count, and 127/127 runtime census,
+and the same executable has a repeatable ASan/UBSan package gate. Per-route
+negative exhaustion remains bounded-frame evidence rather than a claim of this
+happy-path census. The matrix is now
+1,960/2,158: Static is 130/328, with 198 emitted rows remaining across scalar
+(90), Lua-table (70), dynamic-values (14), multi-result (12), and
+overload-dispatch (12). Non-emitted Static rows remain applicability, not debt.
+
 The remaining eleven script routes now have their own generated exact-call
 report and C verification header. The emitter exact-set joins the accounting
 rows to the component compiler capability and to both timer schemas; either
@@ -174,15 +200,16 @@ generated callable type at those escape sites and records a source-located
 unresolved call until a mechanically modeled indirect-call contract exists.
 
 The checker manifest proves total declaration selection and classifies the
-executable lowering at the call site. Of the current 1,361 recipes, 486 are
-universal-ready from declaration identity alone, 59 have a concrete callable
-generated-adapter route, and 816 require specialization. The 59 callable rows
-are 45 named wrappers plus 14 stable-ID C-string family-dispatch rows. Their
+executable lowering at the call site. Of the current 1,361 recipes, 566 are
+universal-ready from declaration identity alone, 64 have a concrete callable
+generated-adapter route, and 731 require specialization. The 64 callable rows
+are 45 named wrappers, 14 stable-ID C-string family-dispatch rows, and five
+bounded arena C-string rows. Their
 shared concrete-call plan authenticates declaration, recipe, family, wrapper or
 dispatcher identity, header, and dense family ID, and the materializer emits a
-linker-retention source and manifest for only the reached rows. Another 87
+linker-retention source and manifest for only the reached rows. Another seven
 preferred adapter rows retain their generated provider-boundary blockers; they
-are not promoted merely because source exists. The remaining 729 rows require
+are not promoted merely because source exists. The remaining 724 rows require
 call-site facts such as template arguments, receiver types, callback contracts,
 or layout/storage policy. All declarations remain generated and addressable.
 Release checking rejects a reached specialization-required declaration at its
@@ -200,7 +227,7 @@ classified from the generated target-conditional report as opaque handles.
 That structural rule covers WebGPU's native integer aliases and Emscripten
 pointer handles without a WebGPU symbol allowlist.
 
-The compiler derives one canonical, numeric-ID-ordered corpus for all 486 ready
+The compiler derives one canonical, numeric-ID-ordered corpus for all 566 ready
 recipes from the authenticated catalog and release-call symbol index. Its
 committed plan, production source, and verification source are clean-room-owned
 generated artifacts; the plan authenticates the index, ordered vector hashes,
@@ -247,9 +274,9 @@ support.
 
 The browser-target dmSDK lane has a separate target gate because host-native
 execution is not wasm32 evidence. `pnpm test:dmsdk-browser-exact-call`
-materializes the canonical 486-call corpus through the same exact-call
+materializes the canonical 566-call corpus through the same exact-call
 generator and derives a complete browser applicability partition from each
-vector's wire tags and arity. All 486 current vectors fit the generated
+vector's wire tags and arity. All 566 current vectors fit the generated
 15-argument arena and supported value tags; a future gap remains in the census
 with a machine-readable reason instead of disappearing. The gate compiles the
 generated provider, recording callees, observations, and universal dispatcher
@@ -257,7 +284,7 @@ with pinned Emscripten, then a Chrome ES module imports the production generated
 `browser-arena.ts` codec. It encodes every applicable value into the live
 Emscripten heap, invokes `deherm_dmsdk_universal_dispatch` through direct
 exports, and compares generated call, failure, and result observations. The
-observed run executed 486 vectors, balanced 994 scratch allocations/releases in
+observed run executed 566 vectors, balanced 994 scratch allocations/releases in
 reverse order, and peaked at 240 active bytes. Emscripten memory growth is
 enabled; a deterministic unit grows memory during string allocation and proves
 the codec recreates its view after the old buffer detaches. C-string inputs
@@ -267,10 +294,10 @@ applicability partition. It uses no mock memory, Embind, `ccall`, or `cwrap`.
 Missing pinned Emscripten activation or a real browser is a named prerequisite
 failure, not a skipped or downgraded test. This proves the
 declaration-only ready JavaScript-arena/wasm32 bridge contract; it does not
-cover the 875 usage-specialized recipes or execute a Defold implementation.
+cover the 795 non-universal recipes or execute a Defold implementation.
 
 The Dynamic Hermes lane generates a C++ runner from the generator-owned
-canonical 486-call corpus, creates a real packaged Hermes runtime, installs the production
+canonical 566-call corpus, creates a real packaged Hermes runtime, installs the production
 `DmSdkUniversal.call` JSI host function, and verifies native recording-callee
 observations and decoded JavaScript results for every declaration-only ready
 recipe. That runner now belongs to `@deherm/compiler` and accepts any
@@ -280,7 +307,7 @@ one atomic output set. Callback-tagged vectors remain explicitly unsupported
 rather than being counted as executed. Callable generated-adapter rows are
 retained by their concrete plan and continue to rely on their family-owned
 exact-call tests until those family vectors are normalized into the shared JSI
-runner. The 816 specialization-required recipes remain selected only when a
+runner. The 731 specialization-required recipes remain selected only when a
 release program supplies their missing call-site facts.
 
 The Static Hermes lane uses a generated, thread-local four-frame pool rather
@@ -289,13 +316,13 @@ frame owns 32 24-byte argument cells and one result cell; that capacity and the
 frame emitter are a versioned package capability, while a policy carries and
 cross-checks its recipe-derived maximum (currently fifteen). Acquire, cell
 copy, dispatch, result access, and release are the only Static Hermes FFI
-operations. A strict `shermes` unit reports 486 planned, 486 applicable, 486
+operations. A strict `shermes` unit reports 566 planned, 566 applicable, 566
 runtime-executed, and zero blocked vectors, then checks the generated fake
 observations and bounded frame transport. The observed maximum arity is nine;
 argument tags cover bool/i64/u64/f64/address and results cover those plus void.
 This does
 not prove Defold implementation semantics or retained handle/callback lifetime
-policy for the 875 recipes that require call-site specialization.
+policy for the 731 recipes that require call-site specialization.
 
 # Integration tests are sentinels
 

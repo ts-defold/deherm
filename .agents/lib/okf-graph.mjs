@@ -11,7 +11,7 @@ const MAX_LABEL_BYTES = 1_024;
 const MAX_RESPONSE_BYTES = 64 * 1_024;
 const MAX_SQL_BYTES = 16 * 1_024;
 const CACHE_BUSY_TIMEOUT_MS = 5_000;
-const INDEX_VERSION = "5";
+const INDEX_VERSION = "6";
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -44,9 +44,13 @@ function frontmatter(source) {
   return end < 0 ? "" : source.slice(4, end);
 }
 
-function scalar(metadata, name) {
-  const match = new RegExp(`^${name}:\\s*(.+)$`, "m").exec(metadata);
-  return match ? match[1].trim().replace(/^(['"])(.*)\1$/, "$2") : "";
+function frontmatterScalars(metadata) {
+  const parsed = Object.create(null);
+  for (const match of metadata.matchAll(/^([A-Za-z][\w.-]*):(?:[ \t]*(.*))?$/gm)) {
+    if (!match[2]) continue;
+    parsed[match[1]] = match[2].trim().replace(/^(['"])(.*)\1$/, "$2");
+  }
+  return parsed;
 }
 
 function headingSlug(title) {
@@ -227,7 +231,9 @@ function createSchema(database) {
       path TEXT PRIMARY KEY,
       digest TEXT NOT NULL,
       title TEXT NOT NULL,
-      description TEXT NOT NULL
+      description TEXT NOT NULL,
+      type TEXT NOT NULL,
+      metadata TEXT NOT NULL
     ) STRICT;
     CREATE TABLE IF NOT EXISTS nodes (
       id TEXT PRIMARY KEY,
@@ -279,7 +285,11 @@ function truncateUtf8(value, maximumBytes) {
   const text = String(value);
   const bytes = Buffer.from(text, "utf8");
   if (bytes.byteLength <= maximumBytes) return { value: text, truncated: false };
-  return { value: `${bytes.subarray(0, Math.max(0, maximumBytes - 3)).toString("utf8")}…`, truncated: true };
+  const ellipsis = Buffer.from("…", "utf8");
+  if (maximumBytes < ellipsis.byteLength) return { value: "", truncated: true };
+  let end = maximumBytes - ellipsis.byteLength;
+  while (end > 0 && (bytes[end] & 0xc0) === 0x80) --end;
+  return { value: `${bytes.subarray(0, end).toString("utf8")}…`, truncated: true };
 }
 
 function boundedRows(rows, fields) {
@@ -347,13 +357,16 @@ function boundedSqlRow(row, remainingBytes) {
 
 function replaceDocument(database, record) {
   const { relative, digest, source, metadata, parsedHeadings, references } = record;
-  const title = scalar(metadata, "title") || parsedHeadings[0]?.title || path.basename(relative);
-  const description = scalar(metadata, "description");
+  const parsedMetadata = frontmatterScalars(metadata);
+  const title = parsedMetadata.title || parsedHeadings[0]?.title || path.basename(relative);
+  const description = parsedMetadata.description || "";
+  const type = parsedMetadata.type || "";
   database.prepare("DELETE FROM edges WHERE source_doc = ?").run(relative);
   database.prepare("DELETE FROM nodes WHERE owner_doc = ?").run(relative);
   database.prepare("DELETE FROM files WHERE path = ?").run(relative);
-  database.prepare("INSERT INTO files (path, digest, title, description) VALUES (?, ?, ?, ?)")
-    .run(relative, digest, title, description);
+  database.prepare(`INSERT INTO files
+    (path, digest, title, description, type, metadata) VALUES (?, ?, ?, ?, ?, ?)`)
+    .run(relative, digest, title, description, type, JSON.stringify(parsedMetadata));
   database.prepare(`INSERT INTO nodes
     (id, kind, path, label, line, level, digest, content, owner_doc)
     VALUES (?, 'document', ?, ?, 1, 0, ?, ?, ?)`)
@@ -476,6 +489,38 @@ export async function outlineOkfIndex({ databasePath, document, max }) {
   try {
     return boundedRows(database.prepare(`SELECT path, label AS title, line, level AS depth
       FROM nodes WHERE kind = 'heading' AND path = ? ORDER BY line LIMIT ?`).all(document, limit), ["path", "title"]);
+  } finally {
+    database.close();
+  }
+}
+
+export async function metadataOkfIndex({ databasePath, document }) {
+  const database = await openDatabase(databasePath, true);
+  try {
+    const row = database.prepare(`SELECT path, digest, title, description, type, metadata
+      FROM files WHERE path = ?`).get(document);
+    if (!row) throw new Error(`unknown OKF document ${document}`);
+    const output = {
+      path: row.path,
+      digest: row.digest,
+      title: truncateUtf8(row.title, MAX_LABEL_BYTES).value,
+      description: truncateUtf8(row.description, MAX_CELL_BYTES).value,
+      type: truncateUtf8(row.type, MAX_LABEL_BYTES).value,
+      metadata: {}
+    };
+    for (const [rawKey, rawValue] of Object.entries(JSON.parse(row.metadata))) {
+      const key = truncateUtf8(rawKey, 256).value;
+      if (Object.hasOwn(output.metadata, key)) {
+        throw new Error(`OKF metadata keys collide after bounded projection: ${JSON.stringify(key)}`);
+      }
+      output.metadata[key] = truncateUtf8(rawValue, MAX_CELL_BYTES).value;
+      if (Buffer.byteLength(JSON.stringify(output), "utf8") > MAX_RESPONSE_BYTES) {
+        delete output.metadata[key];
+        output.metadata.__truncated__ = true;
+        break;
+      }
+    }
+    return output;
   } finally {
     database.close();
   }

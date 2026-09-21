@@ -848,7 +848,7 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(840), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(841), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(842), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(843), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(843), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(844), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(845), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(846), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
@@ -1030,11 +1030,11 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(1022), UINT16_C(4), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1023), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1024), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
-  {UINT32_C(1025), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(1025), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1026), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1027), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1028), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(1029), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(1029), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1030), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1031), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1032), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
@@ -1082,7 +1082,7 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(1074), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1075), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1076), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(1077), UINT16_C(4), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(1077), UINT16_C(4), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1078), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1079), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1080), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
@@ -1297,7 +1297,7 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(1289), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1290), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1291), UINT16_C(4), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(1292), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(1292), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1293), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1294), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1295), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
@@ -1373,7 +1373,7 @@ void* g_context = nullptr;
 
 extern "C" {
 uint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(1361); }
-const char* deherm_dmsdk_universal_catalog_sha256(void) { return "8fe44b7cd39449530dd63ecafb1a492642ecb85d93cc0d80c7caef6a2cab68c1"; }
+const char* deherm_dmsdk_universal_catalog_sha256(void) { return "e022158624fd769c4be6e957e86b8cd91c740626c5da625b738e4089de2cc571"; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {
   return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;

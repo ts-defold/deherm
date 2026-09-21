@@ -10,6 +10,7 @@ export const dmSdkGeneratedAdapterCorpusArtifacts = Object.freeze({
 });
 
 const familyDescriptor = Object.freeze({
+  arenaCString: { count: "deherm_dmsdk_arena_cstring_count", descriptors: "deherm_dmsdk_arena_cstring_descriptors", id: "id", declaration: "declaration_id" },
   scalar: { count: "deherm_dmsdk_scalar_count", descriptors: "deherm_dmsdk_scalar_descriptors", id: "id", declaration: "declaration_id" },
   enumValue: { count: "deherm_dmsdk_enum_count", descriptors: "deherm_dmsdk_enum_descriptors", id: "id", declaration: "declaration_id" },
   fixedDigest: { count: "deherm_dmsdk_fixed_digest_count", descriptors: "deherm_dmsdk_fixed_digest_descriptors", id: "id", declaration: "declaration_id" },
@@ -67,6 +68,7 @@ export function dmSdkGeneratedAdapterUsages(index, catalog) {
 const familyCode = Object.freeze({
   scalar: 0, enumValue: 1, fixedDigest: 2, hashSpan: 3,
   base64Span: 4, xteaSpan: 5, astcProbe: 6, cstringValue: 7,
+  arenaCString: 8,
 });
 
 function enumValue(parameter, seed) {
@@ -156,6 +158,26 @@ function renderFamilyFake(vector) {
   const id = vector.adapterId;
   const code = familyCode[vector.family];
   const name = vector.exactCallee;
+  if (vector.family === "arenaCString") {
+    const mode = vector.familyContract.mode;
+    const output = JSON.stringify(`result_${id}`);
+    const input = JSON.stringify(`arena_${id}`);
+    const prefix = `++g_calls[${code}][${id}];`;
+    const write = `if(output&&capacity){const char* value=${output};const size_t length=strlen(value);const size_t copied=length<capacity-1?length:capacity-1;memcpy(output,value,copied);output[copied]='\\0';}`;
+    if (mode === "canonical-path") {
+      return `uint32_t ${name}(const char* value,char* output,uint32_t capacity){${prefix}if(!value||strcmp(value,${input})!=0||!output||capacity!=UINT32_C(64))++g_failures[${code}][${id}];${write}return UINT32_C(${500 + id});}`;
+    }
+    if (mode === "error-string") {
+      return `void ${name}(char* output,size_t capacity,int error){${prefix}if(!output||capacity!=size_t(64)||error!=${100 + id})++g_failures[${code}][${id}];${write}}`;
+    }
+    if (mode === "trimmed-string") {
+      return `size_t ${name}(char* output,size_t capacity,const char* value){${prefix}if(!value||strcmp(value,${input})!=0||!output||capacity!=size_t(64))++g_failures[${code}][${id}];${write}return size_t(${500 + id});}`;
+    }
+    if (mode === "uri-encode") {
+      return `dmURI::Result ${name}(const char* value,char* output,uint32_t capacity,uint32_t* written){${prefix}if(!value||strcmp(value,${input})!=0||!output||capacity!=UINT32_C(64)||!written)++g_failures[${code}][${id}];${write}if(written)*written=UINT32_C(${`result_${id}`.length + 1});return g_arena_uri_failure?dmURI::RESULT_TOO_SMALL_BUFFER:dmURI::RESULT_OK;}`;
+    }
+    throw new Error(`${vector.declarationId} has unsupported arena cstring mode ${mode}`);
+  }
   if (vector.family === "fixedDigest") {
     const bytes = vector.familyContract.digestBytes;
     return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t capacity){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${5 + id})||capacity<UINT32_C(${bytes}))++g_failures[${code}][${id}];for(uint32_t i=0;i<UINT32_C(${bytes});++i)output[i]=static_cast<uint8_t>(UINT8_C(${0x70 + id})+i);return UINT8_C(1);}`;
@@ -181,6 +203,15 @@ function renderDispatchCheck(vector, failure) {
   const id = vector.adapterId;
   const code = familyCode[vector.family];
   const common = `if(g_calls[${code}][${id}]!=UINT32_C(1)||g_failures[${code}][${id}]!=UINT32_C(0))return ${failure};`;
+  if (vector.family === "arenaCString") {
+    const mode = vector.familyContract.mode;
+    const needsInput = mode === "error-string" ? 0 : 1;
+    const scalar = mode === "error-string" ? 100 + id : 0;
+    const input = `arena_${id}`;
+    const nativeResult = mode === "error-string" || mode === "uri-encode" ? 0 : 500 + id;
+    const requiredLength = mode === "error-string" ? 0 : mode === "uri-encode" ? `result_${id}`.length + 1 : 500 + id;
+    return `{const uint8_t* input=${needsInput ? `reinterpret_cast<const uint8_t*>(${JSON.stringify(input)})` : "nullptr"};uint8_t output[64]={};DehermDmSdkArenaCStringResult result{};if(deherm_dmsdk_arena_cstring_dispatch(UINT16_C(${id}),input,UINT32_C(${needsInput ? input.length : 0}),UINT64_C(${scalar}),reinterpret_cast<char*>(output),UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK)return ${failure};${common}if(strcmp(reinterpret_cast<const char*>(output),${JSON.stringify(`result_${id}`)})!=0||result.output_length!=UINT32_C(${`result_${id}`.length})||result.required_length!=UINT32_C(${requiredLength})||result.native_result!=UINT64_C(${nativeResult}))return ${failure};}`;
+  }
   if (vector.family === "scalar" || vector.family === "enumValue") {
     const isScalar = vector.family === "scalar";
     const args = vector.abi.parameters.map((parameter, position) => parameter.shape.kind === "enum"
@@ -220,8 +251,8 @@ function renderDispatchCheck(vector, failure) {
 
 function renderVerificationSource(generated) {
   const vectors = generated.verification.vectors;
-  const headers = [...new Set(vectors.flatMap(({ productionHeader, family }) => [productionHeader, `defold_hermes/generated_dmsdk_${({ enumValue: "enum_value", fixedDigest: "fixed_digest", hashSpan: "hash_span", base64Span: "base64_span", xteaSpan: "xtea_span", astcProbe: "astc_probe", scalar: "scalar", cstringValue: "cstring_value" })[family]}.h`]))].sort(compareCodeUnits);
-  const sdkHeaders = ["dmsdk/dlib/buffer.h", "dmsdk/dlib/dstrings.h", "dmsdk/dlib/hash.h", "dmsdk/dlib/socket.h", "dmsdk/dlib/sys.h", "dmsdk/dlib/utf8.h", "dmsdk/graphics/graphics.h", "dmsdk/resource/resource.h", "dmsdk/resource/resource.hpp"];
+  const headers = [...new Set(vectors.flatMap(({ productionHeader, family }) => [productionHeader, `defold_hermes/generated_dmsdk_${({ arenaCString: "arena_cstring", enumValue: "enum_value", fixedDigest: "fixed_digest", hashSpan: "hash_span", base64Span: "base64_span", xteaSpan: "xtea_span", astcProbe: "astc_probe", scalar: "scalar", cstringValue: "cstring_value" })[family]}.h`]))].sort(compareCodeUnits);
+  const sdkHeaders = ["dmsdk/dlib/buffer.h", "dmsdk/dlib/dstrings.h", "dmsdk/dlib/hash.h", "dmsdk/dlib/socket.h", "dmsdk/dlib/sys.h", "dmsdk/dlib/uri.h", "dmsdk/dlib/utf8.h", "dmsdk/graphics/graphics.h", "dmsdk/resource/resource.h", "dmsdk/resource/resource.hpp"];
   const descriptorChecks = [];
   let failure = 1;
   for (const [family, descriptor] of Object.entries(familyDescriptor)) {
@@ -236,6 +267,8 @@ function renderVerificationSource(generated) {
     }
   }
   const calls = vectors.map((vector) => renderDispatchCheck(vector, failure++)).join("\n");
+  const uri = vectors.find((vector) => vector.family === "arenaCString" && vector.familyContract.mode === "uri-encode");
+  const nativeFailure = uri ? `{char output[64];memset(output,'x',sizeof(output));DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};g_arena_uri_failure=true;const char input[]=${JSON.stringify(`arena_${uri.adapterId}`)};const auto status=deherm_dmsdk_arena_cstring_dispatch(UINT16_C(${uri.adapterId}),reinterpret_cast<const uint8_t*>(input),UINT32_C(${`arena_${uri.adapterId}`.length}),UINT64_C(0),output,UINT32_C(64),&result);g_arena_uri_failure=false;if(status!=DEHERM_DMSDK_ARENA_CSTRING_NATIVE_FAILURE||result.native_result!=0||result.output_length!=0||result.required_length!=0)return ${failure++};for(char value:output)if(value!='\\0')return ${failure++};}` : "";
   const vectorRows = vectors.map((vector) => ` {UINT32_C(${vector.numericId}),UINT16_C(${vector.adapterId}),${JSON.stringify(vector.family)},${JSON.stringify(vector.vectorSha256)}}`).join(",\n");
   const fakes = vectors.map((vector) => vector.family === "cstringValue" ? renderCStringFake(vector) : renderFamilyFake(vector)).join("\n");
   return `// Generated by @deherm/compiler dmSDK generated-adapter exact corpus. Do not edit.
@@ -243,7 +276,7 @@ ${headers.map((header) => `#include <${header}>`).join("\n")}
 ${sdkHeaders.map((header) => `#include <${header}>`).join("\n")}
 #include <stdint.h>
 #include <string.h>
-namespace {uint32_t g_calls[8][32]{};uint32_t g_failures[8][32]{};uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
+namespace {uint32_t g_calls[9][32]{};uint32_t g_failures[9][32]{};bool g_arena_uri_failure=false;uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
 ${fakes}
 struct DehermDmSdkAdapterExactVector{uint32_t recipe_id;uint16_t adapter_id;const char* family;const char* sha256;};
 static const DehermDmSdkAdapterExactVector kVectors[]={
@@ -254,6 +287,7 @@ extern \"C\" const DehermDmSdkAdapterExactVector* deherm_dmsdk_generated_adapter
 extern \"C\" int deherm_dmsdk_run_generated_adapter_exact_verification(void){
 ${descriptorChecks.join("\n")}
 ${calls}
+${nativeFailure}
 return 0;}
 `;
 }

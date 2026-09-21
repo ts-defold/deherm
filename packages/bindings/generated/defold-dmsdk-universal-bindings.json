@@ -2,15 +2,16 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "d66e04d0bc3f5369af6526481068fdd0c7cc7f6aa79a2859ed3b8bf1dbfc82ee",
+    "projection": "0b217c772541014c2406aaa84d3bd8a00bd46e71fb6dda56c8acff6b911f8cee",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "specialized": {
-      "borrowedHandle": "659fdbe2e5afc38b435c6f2c3d88b862fbc32f59fa74af48bf667666ca049293",
-      "scratchScalarOut": "e97e2bf00a253706850d510cb9183f6721baad378022239fba1c3d8e53d383aa",
-      "cstringValue": "51d00bd80166ea00ec19f9072edd1548a6159fde6915f1215f747a96a6d13ef4"
+      "arenaCString": "84e3101830f4b069e576d781e0829b7ea9182c6fe5d4a4888ad69b62578b0b22",
+      "borrowedHandle": "fdc27d455c11356ed5c6a715ce447eb8e2df05ee27d73bb1f3ca9b4f6c02b466",
+      "scratchScalarOut": "f7a2c92ca62be9c057ca1db3cb1b27f4a0dc6fffac93bd559f99f3b210987869",
+      "cstringValue": "a66ab28e8a0dac5ab0daee4911391921312e3d3479e42464d19d4b41c20c8f5d"
     },
-    "aggregate": "f7c8182f8c0dbac06550eb0024780e6b92714a2b630ec47e817048c2c7b0eb4e",
-    "catalog": "8fe44b7cd39449530dd63ecafb1a492642ecb85d93cc0d80c7caef6a2cab68c1"
+    "aggregate": "4fcdb39a84044e70db8a67cd26f096fefa8b0a57dc16851c1b4a45daf59d83d0",
+    "catalog": "e022158624fd769c4be6e957e86b8cd91c740626c5da625b738e4089de2cc571"
   },
   "coverage": {
     "declarations": 1361,
@@ -21,8 +22,8 @@
     "browserDirectMemoryMetadata": 1361,
     "typescriptStableIds": 1361,
     "silentlyOmitted": 0,
-    "preferredSpecialized": 66,
-    "usageMaterializedFallback": 1295,
+    "preferredSpecialized": 71,
+    "usageMaterializedFallback": 1290,
     "universalReadyExactVectors": 566
   },
   "abi": {
@@ -108734,8 +108735,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "arenaCString",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 0,
+          "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -135291,8 +135300,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "arenaCString",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 1,
+          "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -135766,8 +135783,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "arenaCString",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 2,
+          "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -140949,8 +140974,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "arenaCString",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 3,
+          "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -166681,8 +166714,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "arenaCString",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 4,
+          "dispatcher": "deherm_dmsdk_arena_cstring_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",

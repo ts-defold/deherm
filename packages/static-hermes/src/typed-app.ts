@@ -1,5 +1,5 @@
 // Sound-typed Static Hermes lifecycle proof. This is intentionally ordinary
-// TypeScript syntax accepted through -parse-ts + -typed; the production ttsc
+// TypeScript syntax accepted directly by the sound `-typed` frontend; the production ttsc
 // backend will generate this shape from defineDefoldApp authoring code.
 "use strict";
 

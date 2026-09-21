@@ -66,10 +66,10 @@ UTF-8 strings, and releases every arena allocation in reverse order. A
 forced-growth WebAssembly-memory harness executes bigint and string calls,
 detaches the old buffer during string allocation, and verifies the codec creates
 its `DataView` only after allocation. The pinned Emscripten/Chrome exact gate
-runs all 486 current universal-ready calls through this production adapter with
+runs all 566 current universal-ready calls through this production adapter with
 994 balanced reverse-order releases and a 240-byte peak.
 
 The transport still needs to be installed by the packaged HTML5 extension and
 backed by its bounded Wasm scratch allocator. The standalone adapter proof does
 not claim a rebuilt Defold HTML5 bundle, Defold implementation semantics, or the
-875 dmSDK recipes that still require call-site specialization.
+731 dmSDK recipes that still require call-site specialization.

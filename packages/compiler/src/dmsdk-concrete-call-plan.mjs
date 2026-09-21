@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { isDeepStrictEqual } from "node:util";
 
 const adapterWrapperHeaders = Object.freeze({
+  arenaCString: "defold_hermes/generated_dmsdk_arena_cstring.h",
   astcProbe: "defold_hermes/generated_dmsdk_astc_probe.h",
   base64Span: "defold_hermes/generated_dmsdk_base64_span.h",
   cstringValue: "defold_hermes/generated_dmsdk_cstring_value.h",
@@ -13,6 +14,7 @@ const adapterWrapperHeaders = Object.freeze({
 });
 
 const adapterRuntimeHeaders = Object.freeze({
+  arenaCString: "defold_hermes/generated_dmsdk_arena_cstring.h",
   astcProbe: "defold_hermes/generated_dmsdk_astc_probe_runtime.h",
   base64Span: "defold_hermes/generated_dmsdk_base64_span_runtime.h",
   cstringValue: "defold_hermes/generated_dmsdk_cstring_value.h",
@@ -210,21 +212,30 @@ export function materializeDmSdkGeneratedAdapterUsages(usages, options = {}) {
   }));
   const vectors = plans.map((plan) => {
     const recipe = byId.get(plan.declarationId);
+    const exactAdapter = recipe.preferredLowering.exactAdapter ?? null;
+    const verificationAdapter = exactAdapter ?? recipe.preferredLowering.adapter;
+    const verificationHeader = exactAdapter
+      ? adapterRuntimeHeaders[plan.family]
+      : plan.header;
+    if (exactAdapter && (!verificationHeader || exactAdapter.kind !== "family-dispatch" ||
+        !Number.isSafeInteger(exactAdapter.id) || typeof exactAdapter.dispatcher !== "string")) {
+      throw new Error(`${plan.declarationId} has an invalid exact family adapter route`);
+    }
     const vector = {
       schemaVersion: 1,
       declarationId: plan.declarationId,
       numericId: plan.numericId,
       recipeId: plan.recipeId,
       family: plan.family,
-      adapterId: plan.adapterId,
-      adapterKind: plan.adapterKind,
-      productionSymbol: plan.symbol,
-      productionHeader: plan.header,
-      exactCallee: recipe.preferredLowering.adapter.callee ?? recipe.preferredLowering.wrapper ?? recipe.invocation.nativeSymbol,
+      adapterId: exactAdapter ? exactAdapter.id : plan.adapterId,
+      adapterKind: exactAdapter ? exactAdapter.kind : plan.adapterKind,
+      productionSymbol: exactAdapter ? exactAdapter.dispatcher : plan.symbol,
+      productionHeader: verificationHeader,
+      exactCallee: verificationAdapter.callee ?? recipe.preferredLowering.wrapper ?? recipe.invocation.nativeSymbol,
       familyContract: {
-        digestBytes: recipe.preferredLowering.adapter.digestBytes ?? null,
-        resultBits: recipe.preferredLowering.adapter.resultBits ?? null,
-        mode: recipe.preferredLowering.adapter.mode ?? null,
+        digestBytes: verificationAdapter.digestBytes ?? null,
+        resultBits: verificationAdapter.resultBits ?? null,
+        mode: verificationAdapter.mode ?? null,
       },
       invocation: recipe.invocation,
       abi: recipe.abi,

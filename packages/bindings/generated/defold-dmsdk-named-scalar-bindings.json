@@ -3,7 +3,7 @@
   "policyVersion": "2026-09-21.1",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceShapeCensus": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
-  "scope": "All declarations structurally classified as next-named-scalar-direct. Admission is derived from source-resolved scalar ABI facts; engine semantics do not suppress a callable C ABI.",
+  "scope": "All declarations structurally classified as next-named-scalar-direct. Admission requires source-resolved scalar ABI facts and a symbol that the pinned Defold target archives expose across all build variants; absent or target-partial symbols fail closed.",
   "universalFallback": {
     "preserved": true,
     "catalog": "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
@@ -11,12 +11,12 @@
   },
   "coverage": {
     "reviewed": 21,
-    "generated": 21,
-    "policyBlocked": 0,
-    "signatureCompileCovered": 21,
-    "linked": 21,
-    "behaviorCovered": 21,
-    "exactCallCovered": 21,
+    "generated": 20,
+    "policyBlocked": 1,
+    "signatureCompileCovered": 20,
+    "linked": 20,
+    "behaviorCovered": 20,
+    "exactCallCovered": 20,
     "typescriptCallable": 0,
     "warmedDispatchIterations": 100000,
     "warmedDispatchObservedCppAllocations": 0
@@ -24,16 +24,17 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "5cdcc854a41f214425923422c977a13acfd6268ca1ab0604f9b7c1c3dc00de70"
+    "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+    "policy": "0995b6972b4a145fb94f8079e31f21a630b95239ff21abcf7c284f6a0de3500d"
   },
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_jsi.hpp": "395c2380c5c6c7de863cca44e4a0bed822b381bac73226ceaabba40d23b3b254",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_runtime.h": "8d227c9eb682d6523cc7e081acb51810ef3320ce89a0c479cdc44e7b36a28c31",
-    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h": "7840f1ad098b177b3456c891cca5e04c36e3fe858c02f325d176fae92b14ddc0",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h": "ad99b90a767e054659da5aa9c6fd15cbfbebbc4463e6300a12e5aec67e6e650b",
     "defold/defold_hermes/src/generated_dmsdk_named_scalar_jsi.cpp": "343147a302688a8a6b51a50b8d08da32df7b2c86e84ba739bb282af63a6bb15a",
-    "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp": "4059c8f284dbd1e272ceb20e98e8965e25b276ad58f8abad1006a52f0988a0d3",
+    "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp": "86d03003a02f3c364f97be791cb799b209dcbd2adf393e5d112146486e6d1d3f",
     "packages/sdk/src/generated/dmsdk/named-scalar.ts": "9f7e8f268f497e7f504544e63702e0ed61bd86f8177af0cb2f8209215fc20cbe",
-    "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp": "fbe4ae5b6cfe274639085a8b27a54e7ef49dba9605b1821fb12baaa72ee54f01"
+    "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp": "a75eb0c1902112c18b52f4519b07abe212a81d603cab5c0730bb93b62ae830a2"
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h",
@@ -78,6 +79,56 @@
         "text": "dmhash_t CreateInstanceId();",
         "sha256": "701956b449821267f15db3bef2bf83a606c471e2f1b3efc1f9be9809443b0d62"
       },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": {
           "status": "complete",
@@ -89,7 +140,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -148,6 +199,56 @@
         "text": "bool IsGroupMuted(dmhash_t group);",
         "sha256": "8a2ddebd25f8de8ccc54637cef5c0e5908e89616d55137120c1c83a02fb04c17"
       },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": {
           "status": "complete",
@@ -159,7 +260,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -208,6 +309,56 @@
         "text": "TlsKey AllocTls();",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": {
           "status": "complete",
@@ -219,7 +370,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -278,6 +429,56 @@
         "text": "* thread specified by thread must be joinable (see Detach()).",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": {
           "status": "complete",
@@ -289,7 +490,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -348,6 +549,56 @@
         "text": "void FreeTls(TlsKey key);",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": {
           "status": "complete",
@@ -359,7 +610,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -408,6 +659,56 @@
         "text": "Thread GetCurrentThread();",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
+      },
       "stages": {
         "generated": {
           "status": "complete",
@@ -419,7 +720,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -478,84 +779,55 @@
         "text": "*     dmThread::Join(thread);",
         "sha256": "0f2f1f3c9de645fb3cc9a06e1b744f5dbacc2d222382c41996901e33d9a005e3"
       },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-named-scalar-bindings.test.mjs"
-        },
-        "linked": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
-        },
-        "conformant": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
-        },
-        "allocation": {
-          "status": "100000-warmed-dispatch-zero-cpp-allocations",
-          "evidence": "native/dmsdk_named_scalar_runtime_test.cpp"
-        },
-        "typescriptCallable": {
-          "status": "not-applicable",
-          "evidence": "packages/sdk/src/generated/dmsdk/named-scalar.ts"
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
         }
-      }
-    },
-    {
-      "id": "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468",
-      "symbol": "ProfilePropertyAddBool",
-      "nativeSignature": "void (ProfileIdx, int)",
-      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
-      "emitted": true,
-      "bindingId": 7,
-      "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_bool",
-      "preferredLowering": false,
-      "recipe": {
-        "include": "dmsdk/dlib/profile.h",
-        "result": {
-          "c": "void",
-          "lane": "void",
-          "source": "void",
-          "underlying": "void",
-          "native": "void",
-          "evidence": null
-        },
-        "parameters": [
-          {
-            "c": "uint64_t",
-            "lane": "u64",
-            "source": "ProfileIdx",
-            "underlying": "uint64_t",
-            "native": "ProfileIdx",
-            "evidence": {
-              "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-              "line": 33,
-              "text": "typedef uint64_t ProfileIdx;",
-              "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
-            },
-            "name": "idx"
-          },
-          {
-            "c": "int32_t",
-            "lane": "i32",
-            "source": "int",
-            "underlying": "int",
-            "native": "int",
-            "evidence": null,
-            "name": "v"
-          }
-        ],
-        "exactVectorSha256": "1fd2c90b6ff0f4c92a6ccbcb6d796369aab3f41a8d297b6ae0007df8a81daf08"
-      },
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "line": 166,
-        "text": "void ProfilePropertyAdd##stype(ProfileIdx idx, type v);",
-        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
       },
       "stages": {
         "generated": {
@@ -568,7 +840,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -590,7 +862,7 @@
       "nativeSignature": "void (ProfileIdx, float)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:f32)",
       "emitted": true,
-      "bindingId": 8,
+      "bindingId": 7,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f32",
       "preferredLowering": false,
       "recipe": {
@@ -628,13 +900,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "c9a42acf434c48bdc9b9f9d5d9c02536902a50eee24aafb355e72b947aeea7e2"
+        "exactVectorSha256": "471b9be6203703f1cc4d7a968b50347e4c1deb4df24ad1a9d652f10ffecb1b51"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 215,
         "text": "#define DM_PROPERTY_ADD_F32(name, add_value)    ProfilePropertyAddF32(*name##_p, add_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -647,7 +969,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -669,7 +991,7 @@
       "nativeSignature": "void (ProfileIdx, double)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:f64)",
       "emitted": true,
-      "bindingId": 9,
+      "bindingId": 8,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_f64",
       "preferredLowering": false,
       "recipe": {
@@ -707,13 +1029,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "6806f9891a82b3d041d001515761ccaa8808d41eedb1f7c40c64d6a8d42b5f33"
+        "exactVectorSha256": "10474f23104a971f9165f6c4f8b52831bc1d15fb52cf0cbe076ce2c30bf92452"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 218,
         "text": "#define DM_PROPERTY_ADD_F64(name, add_value)    ProfilePropertyAddF64(*name##_p, add_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -726,7 +1098,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -748,7 +1120,7 @@
       "nativeSignature": "void (ProfileIdx, int32_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
       "emitted": true,
-      "bindingId": 10,
+      "bindingId": 9,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s32",
       "preferredLowering": false,
       "recipe": {
@@ -786,13 +1158,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "45a513a684efe2bf9911cebe725f20dd9360f975891041b02b6ad8b7681c6d77"
+        "exactVectorSha256": "d94b50e4176a8fbdbf871c56d132810068f02bb25c0b7183704319fdbbb86549"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 213,
         "text": "#define DM_PROPERTY_ADD_S32(name, add_value)    ProfilePropertyAddS32(*name##_p, add_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -805,7 +1227,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -827,7 +1249,7 @@
       "nativeSignature": "void (ProfileIdx, int64_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:i64)",
       "emitted": true,
-      "bindingId": 11,
+      "bindingId": 10,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_s64",
       "preferredLowering": false,
       "recipe": {
@@ -865,13 +1287,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "546dc6bfe0902f1b7133b4750664df6f095e1413a0756ad3078bd377cd70988e"
+        "exactVectorSha256": "f853954e54638e871a6da7f9b8f694045eb3f8456f9ab3ea810e0bb940645306"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 216,
         "text": "#define DM_PROPERTY_ADD_S64(name, add_value)    ProfilePropertyAddS64(*name##_p, add_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -884,7 +1356,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -906,7 +1378,7 @@
       "nativeSignature": "void (ProfileIdx, uint32_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:u32)",
       "emitted": true,
-      "bindingId": 12,
+      "bindingId": 11,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u32",
       "preferredLowering": false,
       "recipe": {
@@ -944,13 +1416,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "b37043445f30f1e6ba9501262d10c6c7c3992bb7493e0ac2f447168f2b639b24"
+        "exactVectorSha256": "695d260aaf3c4472ca38b150b9daed5aeb2696a0597da1dbefe0a7b0fa4b2250"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 214,
         "text": "#define DM_PROPERTY_ADD_U32(name, add_value)    ProfilePropertyAddU32(*name##_p, add_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -963,7 +1485,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -985,7 +1507,7 @@
       "nativeSignature": "void (ProfileIdx, uint64_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:u64)",
       "emitted": true,
-      "bindingId": 13,
+      "bindingId": 12,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_add_u64",
       "preferredLowering": false,
       "recipe": {
@@ -1023,13 +1545,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "b467e943c2f4d5808a7629529697c6628e26365330c3cc7fff661888616dd9a7"
+        "exactVectorSha256": "2edf52e250d95c5e650d3c4afa6438a7f1ae43ab74be84e7c4a494b03d01c14b"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 217,
         "text": "#define DM_PROPERTY_ADD_U64(name, add_value)    ProfilePropertyAddU64(*name##_p, add_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1042,7 +1614,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1064,7 +1636,7 @@
       "nativeSignature": "void (ProfileIdx, int)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
       "emitted": true,
-      "bindingId": 14,
+      "bindingId": 13,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_bool",
       "preferredLowering": false,
       "recipe": {
@@ -1102,13 +1674,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "3ac4c1fb99a54337dd9d052854917ffd5211e474217bb92b9b5201478212d061"
+        "exactVectorSha256": "50ab85193bea75294f7d627eb4cf186bdeeaa3197a743afa16a2f6dc23cf5d36"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 204,
         "text": "#define DM_PROPERTY_SET_BOOL(name, set_value)   ProfilePropertySetBool(*name##_p, set_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1121,7 +1743,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1143,7 +1765,7 @@
       "nativeSignature": "void (ProfileIdx, float)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:f32)",
       "emitted": true,
-      "bindingId": 15,
+      "bindingId": 14,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f32",
       "preferredLowering": false,
       "recipe": {
@@ -1181,13 +1803,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "a475f239d1141629187a04c73912c9c245d3ec46ab96284eecd032e02fb6f1d9"
+        "exactVectorSha256": "4faac7a30bc00390745a8e7e6b4712057ce285347c5651b467332efb385218a4"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 207,
         "text": "#define DM_PROPERTY_SET_F32(name, set_value)    ProfilePropertySetF32(*name##_p, set_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1200,7 +1872,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1222,7 +1894,7 @@
       "nativeSignature": "void (ProfileIdx, double)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:f64)",
       "emitted": true,
-      "bindingId": 16,
+      "bindingId": 15,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_f64",
       "preferredLowering": false,
       "recipe": {
@@ -1260,13 +1932,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "989d244af7972de164371347af3eba3c651e467d51ba4182be44b94ab452b562"
+        "exactVectorSha256": "0c239ef147df879ffaa7d1aac4271734b1daa5c1d6913a57e730c23662a36d4d"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 210,
         "text": "#define DM_PROPERTY_SET_F64(name, set_value)    ProfilePropertySetF64(*name##_p, set_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1279,7 +2001,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1301,7 +2023,7 @@
       "nativeSignature": "void (ProfileIdx, int32_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
       "emitted": true,
-      "bindingId": 17,
+      "bindingId": 16,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s32",
       "preferredLowering": false,
       "recipe": {
@@ -1339,13 +2061,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "2eacfbb8505f923afe3842c368d64ecaf3ff1445a0b96e6471d0fc6509335f09"
+        "exactVectorSha256": "677cc29ce9223ba27d48b073242c662dd529109c3ac9d2dc60f8d7430992369f"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 205,
         "text": "#define DM_PROPERTY_SET_S32(name, set_value)    ProfilePropertySetS32(*name##_p, set_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1358,7 +2130,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1380,7 +2152,7 @@
       "nativeSignature": "void (ProfileIdx, int64_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:i64)",
       "emitted": true,
-      "bindingId": 18,
+      "bindingId": 17,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_s64",
       "preferredLowering": false,
       "recipe": {
@@ -1418,13 +2190,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "c9ba8d5782ea7a8d7db638f9e2d9eeb58fe6fa07586de429ca95e61668f1c364"
+        "exactVectorSha256": "f6330c1275088c8824e0b9e723e048200ce51a612c686e0199f55fb937ad9b77"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 208,
         "text": "#define DM_PROPERTY_SET_S64(name, set_value)    ProfilePropertySetS64(*name##_p, set_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1437,7 +2259,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1459,7 +2281,7 @@
       "nativeSignature": "void (ProfileIdx, uint32_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:u32)",
       "emitted": true,
-      "bindingId": 19,
+      "bindingId": 18,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u32",
       "preferredLowering": false,
       "recipe": {
@@ -1497,13 +2319,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "8111e695cdec5fad2f32ac05c416199edcaef132aac97907e543ddf9e5d5a803"
+        "exactVectorSha256": "8bdb81fd66286f766b94b48de57b3ea6b1b4b3aa226ccbc1584dc450ca27e48d"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 206,
         "text": "#define DM_PROPERTY_SET_U32(name, set_value)    ProfilePropertySetU32(*name##_p, set_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1516,7 +2388,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1538,7 +2410,7 @@
       "nativeSignature": "void (ProfileIdx, uint64_t)",
       "shape": "scalar:void(value:scalar:u64,value:scalar:u64)",
       "emitted": true,
-      "bindingId": 20,
+      "bindingId": 19,
       "wrapper": "deherm_dmsdk_named_scalar_profile_property_set_u64",
       "preferredLowering": false,
       "recipe": {
@@ -1576,13 +2448,63 @@
             "name": "v"
           }
         ],
-        "exactVectorSha256": "16d14361a3d71d57b534283082adaacf1874c15beeb67e335a63a342366728e9"
+        "exactVectorSha256": "f99baaf541552ecd528c885f619548098ce4dba5c129a4ce7a10a7e025c5fb72"
       },
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
         "line": 209,
         "text": "#define DM_PROPERTY_SET_U64(name, set_value)    ProfilePropertySetU64(*name##_p, set_value)",
         "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "external",
+        "availability": "all-targets-all-variants",
+        "linkedIn": {
+          "debug": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "release": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ],
+          "headless": [
+            "arm64-android",
+            "arm64-ios",
+            "arm64-linux",
+            "arm64-osx",
+            "arm64_sim-ios",
+            "armv7-android",
+            "wasm-web",
+            "wasm_pthread-web",
+            "x86_64-android",
+            "x86_64-linux",
+            "x86_64-osx",
+            "x86_64-win32"
+          ]
+        }
       },
       "stages": {
         "generated": {
@@ -1595,7 +2517,7 @@
         },
         "linked": {
           "status": "covered-by-reproducible-test",
-          "evidence": "tests/fixtures/generated_dmsdk_named_scalar_exact_verification.cpp"
+          "evidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json"
         },
         "conformant": {
           "status": "covered-by-reproducible-test",
@@ -1609,6 +2531,28 @@
           "status": "not-applicable",
           "evidence": "packages/sdk/src/generated/dmsdk/named-scalar.ts"
         }
+      }
+    },
+    {
+      "id": "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468",
+      "symbol": "ProfilePropertyAddBool",
+      "nativeSignature": "void (ProfileIdx, int)",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
+      "emitted": false,
+      "blocker": "native-symbol-absent",
+      "issue": "https://github.com/ts-defold/deherm/issues/117",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "line": 166,
+        "text": "void ProfilePropertyAdd##stype(ProfileIdx idx, type v);",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "symbolEvidence": {
+        "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+        "sha256": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+        "linkage": "absent",
+        "availability": "unlinked",
+        "linkedIn": {}
       }
     }
   ]

@@ -37,9 +37,11 @@ Agents and contributors should query the OKF bundle instead of loading it as a
 single prompt. `pnpm knowledge:search -- <terms>` returns at most twelve ranked
 document locations by default; open only the matched documents and relevant
 sections. `pnpm knowledge:outline -- <document>` returns only its headings and
-line numbers; `pnpm knowledge:section -- <document> <heading terms>` returns one
-matching section, bounded to 200 lines. The index is for navigation work, not
-mandatory startup context.
+line numbers; `pnpm knowledge:metadata -- <document>` returns bounded,
+top-level single-line frontmatter fields plus the document's content digest
+without its body. `pnpm knowledge:section -- <document> <heading terms>`
+returns one matching section, bounded to 200 lines. The index is for navigation
+work, not mandatory startup context.
 
 For callers that compose one query string, `pnpm knowledge:search --query
 "<terms>" --limit <n>` is equivalent to positional terms plus `--max <n>`.
