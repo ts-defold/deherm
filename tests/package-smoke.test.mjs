@@ -107,6 +107,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   assert.equal(packedFiles.has("packages/compiler/src/generated/dmsdk-universal-recipes.mjs"), false,
     "the package must not ship a pinned Defold dmSDK catalog as realization authority");
   for (const relative of [
+    "packages/compiler/src/dmsdk-universal-jsi-exact-runner.mjs",
     "packages/compiler/src/dmsdk-universal-static-frame.mjs",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
     "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
@@ -131,6 +132,11 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
 
   const packageRoot = path.join(installRoot, "package");
   await symlink(path.join(repositoryRoot, "node_modules"), path.join(installRoot, "node_modules"), "dir");
+  const packedManifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
+  assert.equal(
+    packedManifest.exports["./compiler/dmsdk-universal-jsi-exact-runner"].import,
+    "./packages/compiler/src/dmsdk-universal-jsi-exact-runner.mjs"
+  );
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "binding-identity.mjs"), "utf8");
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "component-proxy-generator.mjs"), "utf8");
   await assert.rejects(
@@ -142,6 +148,10 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   )));
   const emittedStaticFrame = staticFrame.emitDmSdkUniversalStaticFrame();
   assert.equal(emittedStaticFrame.argumentCapacity, 32);
+  const jsiExactRunner = await import(pathToFileURL(path.join(
+    packageRoot, "packages", "compiler", "src", "dmsdk-universal-jsi-exact-runner.mjs"
+  )));
+  assert.equal(typeof jsiExactRunner.renderDmSdkUniversalJsiExactRunner, "function");
   assert.equal(await readFile(path.join(
     packageRoot, "defold", "defold_hermes", "include", "defold_hermes", "generated_dmsdk_universal_static_frame.h"
   ), "utf8"), emittedStaticFrame.header);
@@ -223,6 +233,18 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   await readFile(`${packedProvider}.json`, "utf8");
   await readFile(packedProvider.replace(/\.cpp$/, ".verify.cpp"), "utf8");
   await readFile(packedProvider.replace(/\.cpp$/, ".verify.json"), "utf8");
+  const packedJsiVerification = await readFile(
+    packedProvider.replace(/\.cpp$/, ".verify.jsi.cpp"),
+    "utf8"
+  );
+  assert.match(packedJsiVerification, /#include "packed-dmsdk-provider\.verify\.cpp"/);
+  assert.match(packedJsiVerification, /installDmSdkUniversalModule/);
+  const packedJsiReport = JSON.parse(await readFile(
+    packedProvider.replace(/\.cpp$/, ".verify.jsi.json"),
+    "utf8"
+  ));
+  assert.equal(packedJsiReport.transport, "dynamic-hermes-jsi");
+  assert.equal(packedJsiReport.executableVectorCount, 1);
   run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),
     "materialize-dmsdk",

@@ -2,6 +2,10 @@ import { createHash } from "node:crypto";
 
 import { createTypeRenderer, dmSdkRuntimeOverloads } from "./sdk/dmsdk-sdk.mjs";
 import { materializeDmSdkUsages } from "./dmsdk-universal-materializer.mjs";
+import {
+  materializationFromDmSdkConcreteCallPlan,
+  resolveDmSdkConcreteCallPlan,
+} from "./dmsdk-concrete-call-plan.mjs";
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -20,15 +24,7 @@ function compareCodeUnits(left, right) {
 
 function bareMaterialization(recipe, catalog) {
   if (recipe.preferredLowering?.state === "generated-adapter") {
-    return {
-      state: "specialization-required",
-      family: recipe.preferredLowering.family,
-      wrapper: recipe.preferredLowering.wrapper ?? null,
-      requirements: ["generated-adapter-route"],
-      diagnostic: recipe.preferredLowering.wrapper
-        ? `generated adapter ${recipe.preferredLowering.wrapper} has no release reachability route from the universal dmSDK bridge`
-        : `generated ${recipe.preferredLowering.family} provider boundary has no installed production provider and release reachability route`
-    };
+    return materializationFromDmSdkConcreteCallPlan(resolveDmSdkConcreteCallPlan(recipe));
   }
   try {
     materializeDmSdkUsages([{ declarationId: recipe.declarationId }], {
@@ -50,7 +46,15 @@ function validMaterialization(value) {
   if (value.state === "universal-ready") {
     return Array.isArray(value.requirements) && value.requirements.length === 0 && value.diagnostic === undefined;
   }
-  if (value.state === "generated-adapter") return typeof value.family === "string" && value.family.length > 0;
+  if (value.state === "generated-adapter") {
+    return typeof value.family === "string" && value.family.length > 0 &&
+      Array.isArray(value.requirements) && value.requirements.length === 0 &&
+      value.route?.applicability === "callable" &&
+      ["named-wrapper", "family-dispatch"].includes(value.route.kind) &&
+      typeof value.route.symbol === "string" && value.route.symbol.length > 0 &&
+      typeof value.route.header === "string" && value.route.header.length > 0 &&
+      /^[0-9a-f]{64}$/.test(value.route.planSha256 ?? "");
+  }
   return value.state === "specialization-required" &&
     Array.isArray(value.requirements) && typeof value.diagnostic === "string" && value.diagnostic.length > 0;
 }

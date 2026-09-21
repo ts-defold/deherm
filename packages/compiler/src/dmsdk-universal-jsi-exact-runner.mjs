@@ -11,6 +11,13 @@ function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function quotedLocalInclude(value) {
+  if (typeof value !== "string" || !value || /[\0\n\r]/.test(value)) {
+    throw new Error(`JSI exact-call verification include is not a local filename: ${value}`);
+  }
+  return JSON.stringify(value);
+}
+
 function tagConstant(tag) {
   const tags = {
     void: "DEHERM_DMSDK_UNIVERSAL_VOID",
@@ -100,10 +107,11 @@ export function renderDmSdkUniversalJsiExactRunner(generated, options = {}) {
     }
     return source;
   }).filter(Boolean);
-  if (!rendered.length) throw new Error("JSI exact-call runner has no executable verification vectors");
-
+  const verificationInclude = options.verificationInclude === undefined
+    ? ""
+    : `#include ${quotedLocalInclude(options.verificationInclude)}\n`;
   const source = `// Generated dynamic Hermes/JSI dmSDK exact-call runner. Do not edit.
-#include <defold_hermes/generated_dmsdk_universal.h>
+${verificationInclude}#include <defold_hermes/generated_dmsdk_universal.h>
 #include <defold_hermes/generated_dmsdk_universal_jsi.hpp>
 #include <hermes/hermes.h>
 #include <jsi/jsi.h>
@@ -172,6 +180,7 @@ extern "C" int ${names.runner}(void){
     executableVectorCount: rendered.length,
     unsupported,
     function: names.runner,
+    verificationInclude: options.verificationInclude ?? null,
     sourceSha256: sha256(source),
   };
   return Object.freeze({ source, report: Object.freeze(report) });

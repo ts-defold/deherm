@@ -4,6 +4,8 @@ import path from "node:path";
 import { isDeepStrictEqual } from "node:util";
 
 import { verifyDmSdkCallSymbolIndex } from "../../compiler/src/dmsdk-call-symbol-index.mjs";
+import { materializeDmSdkGeneratedAdapterUsages } from "../../compiler/src/dmsdk-concrete-call-plan.mjs";
+import { renderDmSdkUniversalJsiExactRunner } from "../../compiler/src/dmsdk-universal-jsi-exact-runner.mjs";
 import { materializeDmSdkUsages } from "../../compiler/src/dmsdk-universal-materializer.mjs";
 import { findProjectRoot } from "./project.mjs";
 
@@ -147,6 +149,8 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
   const outputStem = outputExtension ? outputPath.slice(0, -outputExtension.length) : outputPath;
   const verificationSourcePath = `${outputStem}.verify${outputExtension || ".cpp"}`;
   const verificationReportPath = `${outputStem}.verify.json`;
+  const jsiVerificationSourcePath = `${outputStem}.verify.jsi${outputExtension || ".cpp"}`;
+  const jsiVerificationReportPath = `${outputStem}.verify.jsi.json`;
   const catalogPath = await resolveCatalogPath({ catalog, project, usagePath });
   const [usageSource, catalogSource] = await Promise.all([
     readFile(usagePath, "utf8"),
@@ -166,9 +170,9 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
   const materializerUsages = checkerGenerated
     ? document.usages.filter(({ materialization }) => materialization.state === "universal-ready")
     : document.usages;
-  const generatedAdapterCount = checkerGenerated
-    ? document.usages.length - materializerUsages.length
-    : 0;
+  const generatedAdapterUsages = checkerGenerated
+    ? document.usages.filter(({ materialization }) => materialization.state === "generated-adapter")
+    : [];
   let catalogDocument;
   try {
     catalogDocument = JSON.parse(catalogSource);
@@ -180,11 +184,30 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     catalog: catalogDocument,
     catalogSha256: document.catalogSha256
   });
-  const source = generated.source.endsWith("\n") ? generated.source : `${generated.source}\n`;
-  const verificationSource = generated.verificationSource.endsWith("\n")
-    ? generated.verificationSource
-    : `${generated.verificationSource}\n`;
-  const verificationReport = `${JSON.stringify(generated.verification, null, 2)}\n`;
+  const generatedAdapters = materializeDmSdkGeneratedAdapterUsages(generatedAdapterUsages, {
+    ...(document.options ?? {}),
+    recipes: catalogDocument.recipes,
+    catalogSha256: document.catalogSha256
+  });
+  const sourceBody = `${generated.source}${generatedAdapters.source}`;
+  const source = sourceBody.endsWith("\n") ? sourceBody : `${sourceBody}\n`;
+  const verificationSourceBody = `${generated.verificationSource}${generatedAdapters.source}`;
+  const verificationSource = verificationSourceBody.endsWith("\n")
+    ? verificationSourceBody
+    : `${verificationSourceBody}\n`;
+  const verification = {
+    ...generated.verification,
+    materializedCallCount: generated.manifest.length + generatedAdapters.manifest.length,
+    generatedAdapters: generatedAdapters.verification,
+  };
+  const verificationReport = `${JSON.stringify(verification, null, 2)}\n`;
+  const jsiVerification = renderDmSdkUniversalJsiExactRunner(generated, {
+    verificationInclude: path.basename(verificationSourcePath),
+  });
+  const jsiVerificationSource = jsiVerification.source.endsWith("\n")
+    ? jsiVerification.source
+    : `${jsiVerification.source}\n`;
+  const jsiVerificationReport = `${JSON.stringify(jsiVerification.report, null, 2)}\n`;
   const report = `${JSON.stringify({
     schemaVersion: 1,
     source: "deherm-dmsdk-usage-materializer",
@@ -195,18 +218,32 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     verificationOutputSha256: sha256(verificationSource),
     verificationReportSha256: sha256(verificationReport),
     verificationManifestSha256: generated.verification.manifestSha256,
+    generatedAdapterManifestSha256: generatedAdapters.verification.manifestSha256,
+    jsiVerificationOutputSha256: sha256(jsiVerificationSource),
+    jsiVerificationReportSha256: sha256(jsiVerificationReport),
     catalogSha256: generated.catalogSha256,
     provider: generated.provider,
-    materializedCount: generated.manifest.length,
-    generatedAdapterCount,
-    declarations: generated.manifest,
+    materializedCount: generated.manifest.length + generatedAdapters.manifest.length,
+    universalMaterializedCount: generated.manifest.length,
+    generatedAdapterCount: generatedAdapters.manifest.length,
+    declarations: [...generated.manifest, ...generatedAdapters.manifest]
+      .sort((left, right) => left.numericId - right.numericId),
   }, null, 2)}\n`;
   if (check) {
-    const [existingSource, existingReport, existingVerificationSource, existingVerificationReport] = await Promise.all([
+    const [
+      existingSource,
+      existingReport,
+      existingVerificationSource,
+      existingVerificationReport,
+      existingJsiVerificationSource,
+      existingJsiVerificationReport,
+    ] = await Promise.all([
       readFile(outputPath, "utf8"),
       readFile(reportPath, "utf8"),
       readFile(verificationSourcePath, "utf8"),
       readFile(verificationReportPath, "utf8"),
+      readFile(jsiVerificationSourcePath, "utf8"),
+      readFile(jsiVerificationReportPath, "utf8"),
     ]);
     if (existingSource !== source) throw new Error(`${outputPath} is stale; rerun dmSDK materialization`);
     if (existingReport !== report) throw new Error(`${reportPath} is stale; rerun dmSDK materialization`);
@@ -216,11 +253,19 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     if (existingVerificationReport !== verificationReport) {
       throw new Error(`${verificationReportPath} is stale; rerun dmSDK materialization`);
     }
+    if (existingJsiVerificationSource !== jsiVerificationSource) {
+      throw new Error(`${jsiVerificationSourcePath} is stale; rerun dmSDK materialization`);
+    }
+    if (existingJsiVerificationReport !== jsiVerificationReport) {
+      throw new Error(`${jsiVerificationReportPath} is stale; rerun dmSDK materialization`);
+    }
   } else {
     await writePublishedSet([
       [outputPath, source],
       [verificationSourcePath, verificationSource],
       [verificationReportPath, verificationReport],
+      [jsiVerificationSourcePath, jsiVerificationSource],
+      [jsiVerificationReportPath, jsiVerificationReport],
       [reportPath, report],
     ], reportPath);
   }
@@ -231,10 +276,13 @@ export async function materializeDmSdkUsageFile({ usage, output, catalog, projec
     report: reportPath,
     verificationSource: verificationSourcePath,
     verificationReport: verificationReportPath,
+    jsiVerificationSource: jsiVerificationSourcePath,
+    jsiVerificationReport: jsiVerificationReportPath,
     provider: generated.provider,
     verificationProvider: generated.verification.provider,
-    materializedCount: generated.manifest.length,
-    generatedAdapterCount,
+    materializedCount: generated.manifest.length + generatedAdapters.manifest.length,
+    universalMaterializedCount: generated.manifest.length,
+    generatedAdapterCount: generatedAdapters.manifest.length,
     checked: check,
   };
 }

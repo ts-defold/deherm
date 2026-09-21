@@ -69,6 +69,19 @@ HTML5 callback registry or JSI fallback, and two routes return functions that
 only JSI emits. Static URL and Matrix4 arguments are exercised through their
 real bounded frame helpers rather than skipped by the harness.
 
+The recording artifact now separates generic harness capability from canonical
+target applicability. Four dense per-route lane IDs are derived from the same
+lowering selections that emit production code: Dynamic Hermes emits 882
+JSI/Lua-stack routes plus 31 native-POD routes and omits two profile routes;
+Static Hermes emits 325 typed-native routes; browser/Wasm emits 888
+direct-memory routes plus 23 callback-registry routes and retains two explicit
+closure-result blockers; Lua emits 911 routes and retains those same two
+blockers. Exact input/result vectors are interned into 406 contracts rather
+than copied into 915 rows. A generated real-Hermes driver now executes all 31
+Dynamic-Hermes native-POD routes through the production value-binding
+dispatcher. The 23 browser callback-registry rows are now a precise executable
+obligation, not a generic recorder skip; their registry driver remains open.
+
 The remaining eleven script routes now have their own generated exact-call
 report and C verification header. The emitter exact-set joins the accounting
 rows to the component compiler capability and to both timer schemas; either
@@ -145,13 +158,18 @@ unresolved call until a mechanically modeled indirect-call contract exists.
 
 The checker manifest proves total declaration selection and classifies the
 executable lowering at the call site. Of the current 1,361 recipes, 486 are
-universal-ready from declaration identity alone and 875 require generated
-specialization. The latter includes 146 preferred specialized-adapter recipes
-that still require a generated selected route from the universal bridge. They
-are not called executable merely because source exists.
-All declarations remain generated and addressable. Release checking rejects a
-reached specialization-required declaration at its source location rather than
-writing an apparently complete manifest.
+universal-ready from declaration identity alone, 59 have a concrete callable
+generated-adapter route, and 816 require specialization. The 59 callable rows
+are 45 named wrappers plus 14 stable-ID C-string family-dispatch rows. Their
+shared concrete-call plan authenticates declaration, recipe, family, wrapper or
+dispatcher identity, header, and dense family ID, and the materializer emits a
+linker-retention source and manifest for only the reached rows. Another 87
+preferred adapter rows retain their generated provider-boundary blockers; they
+are not promoted merely because source exists. The remaining 729 rows require
+call-site facts such as template arguments, receiver types, callback contracts,
+or layout/storage policy. All declarations remain generated and addressable.
+Release checking rejects a reached specialization-required declaration at its
+source location rather than writing an apparently complete manifest.
 
 The declaration parse resolves public source headers against the exact,
 checksum-pinned Defold SDK support headers for the same revision. Only the 91
@@ -218,13 +236,19 @@ browser-loaded wasm32 C ABI. It does not yet drive those cells through the
 production JavaScript browser arena/dispatcher, cover the 875
 usage-specialized recipes, or execute a Defold engine implementation.
 
-The Dynamic Hermes lane generates a C++ runner from generator-owned,
-the canonical 486-call corpus, creates a real packaged Hermes runtime,
-installs the production
+The Dynamic Hermes lane generates a C++ runner from the generator-owned
+canonical 486-call corpus, creates a real packaged Hermes runtime, installs the production
 `DmSdkUniversal.call` JSI host function, and verifies native recording-callee
 observations and decoded JavaScript results for every declaration-only ready
-recipe. The 875 usage-specialized recipes remain selected and generated only
-when a release program supplies their missing call-site facts.
+recipe. That runner now belongs to `@deherm/compiler` and accepts any
+materialized usage vector set; `deherm materialize-dmsdk` emits its JSI source
+and report beside the native production/exact sources and checks all of them as
+one atomic output set. Callback-tagged vectors remain explicitly unsupported
+rather than being counted as executed. Callable generated-adapter rows are
+retained by their concrete plan and continue to rely on their family-owned
+exact-call tests until those family vectors are normalized into the shared JSI
+runner. The 816 specialization-required recipes remain selected only when a
+release program supplies their missing call-site facts.
 
 The Static Hermes lane uses a generated, thread-local four-frame pool rather
 than exposing the raw universal-dispatch pointer ABI to sound TypeScript. Each

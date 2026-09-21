@@ -195,7 +195,8 @@ function buildRecipe(row, declaration, numericId, specialized, context) {
   if (hasReceiver) requirements.add("receiver-native-type");
   const templates = templateParameters(row);
   if (kind === "function-template" && templates.length === 0) requirements.add("explicit-template-arguments");
-  const specializedFamily = specialized.get(row.id);
+  const specializedEntry = specialized.get(row.id);
+  const specializedFamily = specializedEntry?.family;
   return {
     numericId,
     declarationId: row.id,
@@ -244,7 +245,12 @@ function buildRecipe(row, declaration, numericId, specialized, context) {
       typescript: { path: "generated-stable-id-api" },
     },
     preferredLowering: specializedFamily
-      ? (row.loweringState === "generated-adapter" ? row.lowering : { state: "generated-adapter", family: specializedFamily, wrapper: null })
+      ? {
+        ...(row.loweringState === "generated-adapter"
+          ? row.lowering
+          : { state: "generated-adapter", family: specializedFamily, wrapper: null }),
+        adapter: specializedEntry.adapter,
+      }
       : { state: "universal-fallback", family: "universal-recipe" },
     fallback: {
       state: "materializable",
@@ -352,10 +358,33 @@ export async function buildUniversalDmSdkBindings({
   const projectionIds = new Set(projection.rows.map((row) => row.id));
   const specialized = new Map(projection.rows
     .filter((row) => row.loweringState === "generated-adapter")
-    .map((row) => [row.id, row.lowering.family]));
+    .map((row) => [row.id, {
+      family: row.lowering.family,
+      adapter: {
+        applicability: "callable",
+        kind: "named-wrapper",
+        id: null,
+        dispatcher: null,
+        blockers: [],
+      },
+    }]));
   for (const [family, , report] of specializedReports) {
     for (const declaration of report.declarations ?? []) {
-      if (projectionIds.has(declaration.id) && ["generated", "generated-provider-boundary"].includes(declaration.disposition)) specialized.set(declaration.id, family);
+      if (!projectionIds.has(declaration.id) ||
+          !["generated", "generated-provider-boundary"].includes(declaration.disposition)) continue;
+      const callable = declaration.disposition === "generated";
+      specialized.set(declaration.id, {
+        family,
+        adapter: {
+          applicability: callable ? "callable" : "provider-required",
+          kind: callable ? "family-dispatch" : "provider-boundary",
+          id: callable ? declaration.denseId : declaration.bindingId,
+          dispatcher: callable && family === "cstringValue"
+            ? "deherm_dmsdk_cstring_value_dispatch"
+            : null,
+          blockers: callable ? [] : [...new Set(declaration.engineProviderBlockers ?? [])].sort(),
+        },
+      });
     }
   }
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));

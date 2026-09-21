@@ -1,5 +1,39 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Exact-call applicability now follows production emission
+
+The script recording engine no longer treats generic harness drivability as a
+claim about what each target emits. A compact catalog derives four canonical
+lane IDs per each of the 915 universal routes from the lowering plan and interns
+their exact argument/result obligations into 406 vectors. The resulting target
+partition is Dynamic Hermes 882 JSI/Lua-stack + 31 native-POD + two omitted,
+Static Hermes 325 typed-native + 588 blocked + two omitted, browser/Wasm 888
+direct-memory + 23 callback-registry + two blocked + two omitted, and Lua 911 +
+two blocked + two omitted. A generated driver executed all 31 native-POD routes
+through a real Hermes runtime and the production value-binding dispatcher. The
+generic 915-route recorder and 882-route Lua adapter also remained green. This
+is exact bridge evidence; the 23 browser callback-registry routes remain an
+explicit next execution obligation.
+
+dmSDK release reachability now preserves three distinct states instead of
+treating every preferred adapter as unresolved. The complete 1,361-recipe
+surface partitions into 486 universal-ready calls, 59 callable generated
+adapters (45 named wrappers plus 14 C-string dispatcher IDs), and 816
+specialization-required calls. The shared concrete-call plan authenticates and
+materializes only callable reached adapter identities. It keeps 87 generated
+provider boundaries blocked by their original policy and leaves 729 rows for
+mechanical call-site specialization. Usage materialization also emits a
+compiler-owned Dynamic Hermes/JSI runner and report beside its native sources;
+the canonical 486 vectors execute through the real production JSI host
+function. Family-owned adapters are retained and reported but are not falsely
+counted as JSI exact vectors yet.
+
+The policy engine job now builds and runs the generic recorder, Lua adapter,
+native-POD driver, Lua bridge, Dynamic Hermes end-to-end executable, Static
+special-call executable, and browser runtime tests. Local execution passed all
+of those targets. This strengthens CI evidence without promoting it to Defold
+implementation semantics or packaged-engine conformance.
+
 ## 2026-09-20 - End-to-end scaffolding uses the policy revision it verifies
 
 Push run `35546616318` resolved the committed policy successfully, then failed
@@ -852,6 +886,7 @@ the authoritative input the generator already requires.
 * **Plan**: Defined a contract-first native/browser vertical slice and deferred first-class Defold script components.
 * **Compile-time Defold hash literals**: Added checker-bound `hashLiteral("#name")` authoring that the actual ttsc program-plugin host lowers to exact padded uint64 bigint constants. Pinned native `dmHashString64`/`dmHashBufferNoReverse64` probes validate ASCII and Unicode vectors; War Battles dogfoods nine action constants and its real incremental esbuild bundle contains no runtime hash call. Dynamic Hermes bytecode and sound-typed Static Hermes constant compilation pass, while automatic Static universal-handle materialization remains explicitly open.
 * **Universal dmSDK completion path**: Added a generator-owned recipe, fixed caller-owned C ABI dispatch path, TypeScript stable-ID API, Dynamic Hermes registration metadata, Static Hermes extern-C declaration, and Embind-free browser/Wasm metadata for all 1,361 runtime declarations with zero silent omissions. The user-project compiler can now materialize reachable direct functions, methods, constructors, destructors, and template specializations from usage plus explicit semantic/type inputs. Clean-room regeneration passes, the common dispatcher builds into the native runtime, and a mixed generated `dmEndian`/`dmMath::Clamp<int32_t>`/`dmArray<uint32_t>` selection compiles, links, and runs against pinned headers. This is a complete generation path, not a claim that all 1,361 engine implementations have been linked or behavior-tested.
+* **Reproducible dehermc artifacts**: `toolchains/go/build-dehermc.sh` now selects the host-matched Go binary shipped by the pinned `ttsc` package instead of a floating `go` from `PATH`. The packed-install smoke exposed the mismatch when Go 1.26.5 and the package's Go 1.26.8 produced different bytes from identical source. All five host digests are rebuilt from the package-pinned toolchain; the content-addressed release tag therefore describes the same bytes local smoke and CI publish.
 * **Arbitrary extension C ABI lane**: Added an npm/CLI-exposed Clang JSON-AST generator that turns public C11 extension headers into deterministic IR, TypeScript, and 24-byte universal-cell C++ dispatch. Scalar, enum, and C-string free-function routes compile/link/run; records and unsafe pointers are cataloged with exact blockers. Added a generated browser dmSDK arena adapter with wasm32 bounds, catalog identity, UTF-8 scratch, exact bigint tags, and balanced release evidence.
 * **Policy delivery is one automatic pipeline, not four workflows or a review queue**: `.github/workflows/policy.yml` is the single visible graph for channel discovery, Linux derivation, Linux/macOS/Windows byte parity, real-engine compile/link/runtime evidence, and publication. Nightly stable/beta/alpha policies accumulate in the content-addressed store and publish directly to `deherm-policy-site`; a policy PR is not a checkpoint. Defold's declarations are authoritative, reviewed lowering knowledge is advisory, conservative/default transports preserve usability, and moved reviews or unproven routes become reports and deterministic issues rather than suppressing unrelated APIs. Pull requests run the same evidence graph but cannot publish. The accepted contract is recorded in `decisions/continuous-policy-publication.md`.
 * **Clean-runner Hermes header closure**: Policy run `35508523084` proved the Dynamic Hermes exact-call runner still depended on a local include-path accident after the JSI header fix: pinned `API/hermes/hermes.h` reaches `public/hermes/Public/HermesExport.h`. The test now declares all three pinned roots (`API`, `API/jsi`, and `public`) explicitly; required packaged-Hermes compilation, linking, and execution pass locally. Linux policy evidence remains pending until the follow-up pushed run is green.

@@ -81,7 +81,7 @@ test("the recording engine is generated from the same IR as the bindings, and is
   // JSI emits every universal row. Two documented input handle kinds have no
   // public constructor/return path, so deterministic provider fixtures mint
   // genuine HostObjects through the bridge before the census begins.
-  assert.deepEqual(report.summary.byTransport.jsi, { exercised: 915, skipped: 0 });
+  assert.deepEqual(report.summary.harnessByTransport.jsi, { exercised: 915, skipped: 0 });
   assert.deepEqual(
     report.handleSeeds.map(({ name }) => name),
     ["box2d-shape", "graphics-texture"],
@@ -94,8 +94,8 @@ test("the recording engine is generated from the same IR as the bindings, and is
   // harness limitation. Only callback rows remain transport-inapplicable:
   // browser callbacks need the HTML5 registry and Static Hermes falls back to
   // JSI for function values.
-  assert.deepEqual(report.summary.byTransport["direct-memory"], { exercised: 890, skipped: 25 });
-  assert.deepEqual(report.summary.byTransport["typed-native"], { exercised: 890, skipped: 25 });
+  assert.deepEqual(report.summary.harnessByTransport["direct-memory"], { exercised: 890, skipped: 25 });
+  assert.deepEqual(report.summary.harnessByTransport["typed-native"], { exercised: 890, skipped: 25 });
   assert.deepEqual(report.summary.luaAdapter, {
     profile: "generated-runtime-profile-union",
     installed: 915,
@@ -103,12 +103,62 @@ test("the recording engine is generated from the same IR as the bindings, and is
     skipped: 33,
     failureSchema: "deherm-script-lua-exact-failure/v1"
   });
-  assert.deepEqual(report.summary.dynamicHermesExactPartition, {
-    emitted: 913,
-    luaStackExact: 882,
-    nativePodExactPending: 31,
-    sourceProfileOmitted: 2
+  assert.deepEqual(report.summary.targetApplicability["dynamic-hermes"], {
+    status: { exercise: 913, blocked: 0, omit: 2 },
+    lanes: {
+      "dynamic-hermes-jsi-lua-stack": 882,
+      "dynamic-hermes-native-pod": 31,
+      "not-emitted": 2
+    }
   });
+  assert.deepEqual(report.summary.targetApplicability["browser-wasm"], {
+    status: { exercise: 911, blocked: 2, omit: 2 },
+    lanes: {
+      "browser-wasm-direct-memory": 888,
+      "browser-wasm-callback-registry": 23,
+      "not-emitted": 4
+    }
+  });
+  assert.deepEqual(report.summary.targetApplicability["static-hermes"], {
+    status: { exercise: 325, blocked: 588, omit: 2 },
+    lanes: { "static-hermes-typed-native": 325, "not-emitted": 590 }
+  });
+  assert.deepEqual(report.summary.targetApplicability["lua-stack"], {
+    status: { exercise: 911, blocked: 2, omit: 2 },
+    lanes: { "lua-stack": 911, "not-emitted": 4 }
+  });
+  assert.equal(report.applicabilityCatalog.schema, "deherm-script-target-applicability/v1");
+  assert.deepEqual(report.applicabilityCatalog.targets,
+    ["dynamic-hermes", "static-hermes", "browser-wasm", "lua-stack"]);
+  assert.equal(report.applicabilityCatalog.routeCount, 915);
+  assert.equal(report.applicabilityCatalog.rule,
+    "canonical-lowering-selection-plus-generated-adapter-specialization");
+  assert.equal(report.applicabilityCatalog.lanes.reduce((count, lane) => count + lane.routeCount, 0),
+    915 * report.applicabilityCatalog.targets.length);
+  const applicability = (route, target) => {
+    const targetIndex = report.applicabilityCatalog.targets.indexOf(target);
+    return report.applicabilityCatalog.lanes[route.applicability[targetIndex]];
+  };
+  const nativePodRoutes = report.routes.filter((route) =>
+    applicability(route, "dynamic-hermes").lane === "dynamic-hermes-native-pod");
+  assert.equal(nativePodRoutes.length, 31);
+  assert.ok(nativePodRoutes.every((route) =>
+    applicability(route, "dynamic-hermes").status === "exercise" &&
+    route.exactVector.laneOverride?.lane === "dynamic-hermes-native-pod" &&
+    route.exactVector.laneOverride.arguments && route.exactVector.laneOverride.expectation));
+  const browserCallbackRoutes = report.routes.filter((route) =>
+    applicability(route, "browser-wasm").lane === "browser-wasm-callback-registry");
+  assert.equal(browserCallbackRoutes.length, 23);
+  assert.ok(browserCallbackRoutes.every((route) =>
+    applicability(route, "browser-wasm").status === "exercise"));
+  assert.equal(report.exactVectorCatalog.schema, "deherm-script-exact-vector/v1");
+  assert.ok(report.routes.every((route) =>
+    Array.isArray(route.runtimeModulePath) &&
+    typeof route.runtimeMember === "string" &&
+    report.exactVectorCatalog.vectors[route.exactVector.contract].argumentValues.length ===
+      route.argumentShapes.length &&
+    report.exactVectorCatalog.vectors[route.exactVector.contract].resultValues.length ===
+      route.resultShapes.length));
   assert.deepEqual(Object.fromEntries([...new Set(report.routes
     .filter(({ luaAdapter }) => luaAdapter.status === "skip")
     .map(({ luaAdapter }) => luaAdapter.reason))].map((reason) => [reason, report.routes
@@ -156,8 +206,8 @@ test("the expected trace is derived from the contract and covers every drivable 
     path.join(root, "tests/fixtures/generated_script_recording_expected_trace.txt"), "utf8");
   const lines = trace.split("\n").filter((line) => line && !line.startsWith("#"));
   const expectedLines = report.transports.drivable.reduce((total, transport) => {
-    const exercised = report.summary.byTransport[transport].exercised;
-    const skipped = report.summary.byTransport[transport].skipped;
+    const exercised = report.summary.harnessByTransport[transport].exercised;
+    const skipped = report.summary.harnessByTransport[transport].skipped;
     return total + exercised * 3 + skipped;
   }, 0);
   assert.equal(lines.length, expectedLines);

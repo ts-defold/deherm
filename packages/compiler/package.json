@@ -16,8 +16,10 @@
     "./sdk/dmsdk": "./src/sdk/dmsdk-sdk.mjs",
     "./names": "./src/names.mjs",
     "./dmsdk-universal-materializer": "./src/dmsdk-universal-materializer.mjs",
+    "./dmsdk-universal-jsi-exact-runner": "./src/dmsdk-universal-jsi-exact-runner.mjs",
     "./dmsdk-universal-static-frame": "./src/dmsdk-universal-static-frame.mjs",
     "./dmsdk-call-symbol-index": "./src/dmsdk-call-symbol-index.mjs",
+    "./dmsdk-concrete-call-plan": "./src/dmsdk-concrete-call-plan.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"

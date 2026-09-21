@@ -68,6 +68,26 @@ fi
 ttsc_version="$(node -e 'process.stdout.write(require(process.argv[1] + "/package.json").version)' "$ttsc_dir")"
 deherm_version="$(node -e 'process.stdout.write(require(process.argv[1] + "/package.json").version)' "$repo_root")"
 
+# ttsc ships a host-matched Go toolchain beside its compiler package. Use that
+# exact binary by default instead of whatever `go` happens to be on PATH: Go
+# patch releases can produce different bytes, which would make the recorded
+# cross-platform digests and content-addressed release tag non-reproducible.
+# DEHERM_GO_BINARY remains an explicit escape hatch for toolchain work, while
+# normal local, package-smoke, and CI builds all consume the npm-pinned tool.
+go_binary="${DEHERM_GO_BINARY:-$(node -e '
+  const path = require("node:path");
+  const { createRequire } = require("node:module");
+  const packageRequire = createRequire(require.resolve(process.argv[1] + "/package.json"));
+  const host = `${process.platform}-${process.arch}`;
+  const hostPackage = packageRequire.resolve(`@ttsc/${host}/package.json`);
+  process.stdout.write(path.join(path.dirname(hostPackage), "bin", "go", "bin", process.platform === "win32" ? "go.exe" : "go"));
+' "$ttsc_dir")}"
+
+if [ ! -x "$go_binary" ]; then
+  echo "build-dehermc.sh: pinned Go toolchain is not executable at $go_binary" >&2
+  exit 1
+fi
+
 work_dir="$(mktemp -d)"
 trap 'rm -rf "$work_dir"' EXIT
 go_work="$work_dir/go.work"
@@ -108,7 +128,7 @@ env \
   GOARM64=v8.0 \
   GOEXPERIMENT= \
   CGO_ENABLED=0 \
-  go build \
+  "$go_binary" build \
     -C "$module_dir" \
     -trimpath \
     -buildvcs=false \

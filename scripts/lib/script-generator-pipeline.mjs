@@ -38,6 +38,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/lib/binding-identity.mjs",
   "packages/compiler/src/binding-identity.mjs",
   "packages/compiler/src/component-proxy-contract.mjs",
+  "packages/compiler/src/defold-hash.mjs",
   "packages/compiler/src/script-special-call-verification.mjs",
   "packages/compiler/src/script-recording-engine.mjs",
   "scripts/lib/script-generator-pipeline.mjs",
@@ -192,6 +193,8 @@ export const generatedScriptArtifacts = Object.freeze([
   "tests/fixtures/generated_script_recording_tables.cpp",
   "tests/fixtures/generated_script_recording_provider.cpp",
   "tests/fixtures/generated_script_recording_lua_adapter.cpp",
+  "tests/fixtures/generated_script_recording_native_pod_driver.cpp",
+  "tests/fixtures/generated_script_recording_native_pod_driver.js",
   "tests/fixtures/generated_script_recording_driver.cpp",
   "tests/fixtures/generated_script_recording_driver.js",
   "tests/fixtures/generated_script_recording_expected_trace.txt"

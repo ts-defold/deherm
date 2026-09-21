@@ -9,6 +9,11 @@ import test from "node:test";
 import { materializeDmSdkUsages } from "../packages/compiler/src/dmsdk-universal-materializer.mjs";
 import { buildDmSdkCallSymbolIndex } from "../packages/compiler/src/dmsdk-call-symbol-index.mjs";
 import {
+  materializationFromDmSdkConcreteCallPlan,
+  materializeDmSdkGeneratedAdapterUsages,
+  resolveDmSdkConcreteCallPlan,
+} from "../packages/compiler/src/dmsdk-concrete-call-plan.mjs";
+import {
   dmSdkUniversalReadyCorpusArtifacts,
   dmSdkUniversalReadyUsages,
   materializeDmSdkUniversalReadyCorpus,
@@ -100,6 +105,73 @@ test("universal dmSDK recipes cover every declaration and every target", async (
   const templateReceiver = recipe(report, "dmArray::dmArray::Capacity");
   assert.equal(templateReceiver.invocation.receiver.nativeType, null);
   assert.equal(templateReceiver.invocation.receiver.source, "usage-substitution-required");
+});
+
+test("generated adapter call plans preserve the callable/provider boundary", () => {
+  const plans = dmSdkUniversalRecipes
+    .map(resolveDmSdkConcreteCallPlan)
+    .filter(Boolean);
+  assert.equal(plans.length, 146);
+  const callable = plans.filter(({ state }) => state === "generated-adapter");
+  const providerRequired = plans.filter(({ state }) => state === "specialization-required");
+  assert.equal(callable.length, 59);
+  assert.equal(providerRequired.length, 87);
+  assert.equal(callable.filter(({ adapterKind }) => adapterKind === "named-wrapper").length, 45);
+  const cstring = callable.filter(({ adapterKind }) => adapterKind === "family-dispatch");
+  assert.equal(cstring.length, 14);
+  assert.deepEqual(cstring.map(({ adapterId }) => adapterId), Array.from({ length: 14 }, (_, index) => index));
+  assert.ok(cstring.every(({ family, symbol }) =>
+    family === "cstringValue" && symbol === "deherm_dmsdk_cstring_value_dispatch"));
+  assert.equal(providerRequired.filter(({ family }) => family === "borrowedHandle").length, 80);
+  assert.equal(providerRequired.filter(({ family }) => family === "scratchScalarOut").length, 7);
+  assert.ok(providerRequired.every(({ requirements, applicability }) =>
+    applicability === "provider-required" && requirements.length > 0));
+  assert.ok(plans.every(({ planSha256 }) => /^[0-9a-f]{64}$/.test(planSha256)));
+});
+
+test("callable generated adapter selections emit compile-valid exact linker identities", async () => {
+  const selected = ["scalar", "cstringValue"].map((family) => {
+    const recipe = dmSdkUniversalRecipes.find((candidate) =>
+      candidate.preferredLowering?.family === family);
+    assert.ok(recipe, `missing ${family} adapter recipe`);
+    const plan = resolveDmSdkConcreteCallPlan(recipe);
+    return {
+      declarationId: recipe.declarationId,
+      materialization: materializationFromDmSdkConcreteCallPlan(plan),
+    };
+  });
+  const generated = materializeDmSdkGeneratedAdapterUsages(selected, {
+    recipes: dmSdkUniversalRecipes,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+    installName: "deherm_adapter_plan_test_install",
+  });
+  assert.equal(generated.manifest.length, 2);
+  assert.deepEqual(generated.manifest.map(({ adapterKind }) => adapterKind).sort(), [
+    "family-dispatch",
+    "named-wrapper",
+  ]);
+  assert.match(generated.source, /deherm_dmsdk_cstring_value_dispatch/);
+  const directory = await mkdtemp(path.join(tmpdir(), "deherm-adapter-call-plan-"));
+  try {
+    const source = path.join(directory, "adapter-plan.cpp");
+    await writeFile(source, generated.source);
+    run(compiler, [
+      "-std=c++17",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "-c", source,
+      "-o", path.join(directory, "adapter-plan.o"),
+    ]);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+  const blockedRecipe = dmSdkUniversalRecipes.find((candidate) =>
+    candidate.preferredLowering?.family === "borrowedHandle");
+  await assert.rejects(async () => materializeDmSdkGeneratedAdapterUsages([{
+    declarationId: blockedRecipe.declarationId,
+  }], {
+    recipes: dmSdkUniversalRecipes,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+  }), /has no callable generated adapter route/);
 });
 
 test("universal dmSDK artifacts regenerate byte-for-byte", async () => {

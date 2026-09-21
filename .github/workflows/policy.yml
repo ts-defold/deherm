@@ -327,6 +327,27 @@ jobs:
         run: pnpm check:exact-call-materializers
       - name: Configure the native exact-call targets
         run: pnpm configure:native
+      - name: Compile and run generated Lua/script exact-call twins
+        run: |
+          cmake --build build/native --target \
+            defold-hermes-script-recording-engine \
+            defold-hermes-script-recording-lua-adapter \
+            defold-hermes-script-recording-native-pod \
+            defold-hermes-lua-bridge-test \
+            defold-hermes-lua-hermes-e2e \
+            defold-hermes-static-special-call-test \
+            --parallel
+          build/native/defold-hermes-script-recording-engine \
+            tests/fixtures/generated_script_recording_driver.js \
+            tests/fixtures/generated_script_recording_expected_trace.txt \
+            build/script-recording-engine-trace.txt
+          build/native/defold-hermes-script-recording-lua-adapter
+          build/native/defold-hermes-script-recording-native-pod \
+            tests/fixtures/generated_script_recording_native_pod_driver.js
+          build/native/defold-hermes-lua-bridge-test
+          build/native/defold-hermes-lua-hermes-e2e
+          build/native/defold-hermes-static-special-call-test
+          node --test tests/web-library.test.mjs
       - name: Compile and run the bounded Static Hermes exact-call unit
         run: |
           cmake --build build/native --target defold-hermes-static-dmsdk-exact-test --parallel

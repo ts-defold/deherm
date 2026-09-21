@@ -14,6 +14,8 @@
 
 import { createHash } from "node:crypto";
 
+import { hashDefoldString64 } from "./defold-hash.mjs";
+
 const SHAPE = Object.freeze({
   undefined: 0,
   null: 1,
@@ -39,6 +41,13 @@ const SHAPE = Object.freeze({
 export const shapeCodes = SHAPE;
 
 export const transportOrder = Object.freeze(["jsi", "direct-memory", "typed-native"]);
+
+export const targetOrder = Object.freeze([
+  "dynamic-hermes",
+  "static-hermes",
+  "browser-wasm",
+  "lua-stack"
+]);
 
 export const luaAdapterProfile = "generated-runtime-profile-union";
 
@@ -173,6 +182,72 @@ function childSentinel(seed, index) {
 
 function u64Sentinel(seed) {
   return (BigInt(seed + 0x10000) << 32n) | BigInt(seed);
+}
+
+/**
+ * Exact native-POD vectors are owned by the same value-binding row that owns
+ * the production implementation. Older structural templates predate explicit
+ * probes, so fill those six templates by operation shape rather than route ID.
+ */
+function nativePodVerificationVector(binding) {
+  if (binding.generatedProbe) return {
+    source: "generated-value-binding-probe",
+    key: binding.generatedProbe.key,
+    arguments: binding.generatedProbe.arguments,
+    expectation: binding.generatedProbe.expectation
+  };
+  const template = binding.operation?.template;
+  const parameters = binding.operation?.parameters ?? {};
+  if (template === "quaternion-axis-rotation") {
+    const axis = parameters.axis;
+    assert(["x", "y", "z"].includes(axis), `${binding.id}: unsupported quaternion axis '${axis}'`);
+    return {
+      source: "operation-template-default",
+      key: `quaternion-axis-rotation.${axis}`,
+      arguments: [Math.PI],
+      expectation: {
+        kind: "components",
+        values: axis === "x" ? [1, 0, 0, 0] : axis === "y" ? [0, 1, 0, 0] : [0, 0, 1, 0],
+        tolerance: 0.000001
+      }
+    };
+  }
+  if (template === "value-unary" && parameters.operator === "length") return {
+    source: "operation-template-default",
+    key: "value-unary.length",
+    arguments: [{ codec: "Vector3", components: [3, 4, 0] }],
+    expectation: { kind: "number", value: 5, tolerance: 0 }
+  };
+  if (template === "value-unary" && parameters.operator === "normalize") return {
+    source: "operation-template-default",
+    key: "value-unary.normalize",
+    arguments: [{ codec: "Vector3", components: [3, 4, 0] }],
+    expectation: { kind: "components", values: [0.6, 0.8, 0], tolerance: 0.000001 }
+  };
+  if (template === "value-constructor") {
+    if (parameters.kind === "Quaternion") return {
+      source: "operation-template-default",
+      key: "value-constructor.quaternion-identity",
+      arguments: [],
+      expectation: { kind: "components", values: [0, 0, 0, 1], tolerance: 0 }
+    };
+    if (parameters.kind === "Vector3") return {
+      source: "operation-template-default",
+      key: "value-constructor.vector3-zero",
+      arguments: [],
+      expectation: { kind: "components", values: [0, 0, 0], tolerance: 0 }
+    };
+  }
+  if (template === "hash-string") {
+    const input = "deherm_native_pod_exact";
+    return {
+      source: "operation-template-default",
+      key: "hash-string.utf8",
+      arguments: [input],
+      expectation: { kind: "hash", value: hashDefoldString64(input).toString(), tolerance: 0 }
+    };
+  }
+  throw new Error(`${binding.id}: generated native-POD route has no exact verification vector`);
 }
 
 export function renderShapeSpec(shapes, index, semanticNames, seed = 1) {
@@ -441,11 +516,18 @@ export function buildRecordingEngineModel(inputs) {
       id: binding.id,
       stableId: binding.stableId,
       canonical: binding.id.slice("script:".length),
+      runtimeModulePath: row.runtimeModulePath,
+      runtimeMember: row.runtimeMember,
       loweringFamily: binding.loweringFamily,
       contract: unit.contractDetails,
       contractTokens: unit.contract,
       marshallingPrograms: Object.fromEntries(Object.entries(unit.backends)
         .map(([backend, disposition]) => [backend, disposition.marshallingProgram])),
+      backendSelections: Object.fromEntries(Object.entries(unit.backends)
+        .map(([backend, disposition]) => [backend, {
+          selection: disposition.selection ?? "emit",
+          blockerSet: disposition.blockerSet ?? 0
+        }])),
       dynamicHermesSelection: unit.backends.dynamicHermesJsi?.selection ?? "emit",
       loweringPlanEvidence: canonicalUnit ? "canonical-plan" : "projection-derived-unverified-fallback",
       context: row.context?.token ?? "unspecified",
@@ -627,6 +709,124 @@ export function buildRecordingEngineModel(inputs) {
     }
   }
 
+  const canonicalApplicability = (selection, emittedLane) => {
+    if (selection === "emit") return { status: "exercise", lane: emittedLane, reason: "" };
+    if (selection === "omit-profile") {
+      return { status: "omit", lane: "not-emitted", reason: "canonical-lowering-plan-omit-profile" };
+    }
+    return {
+      status: "blocked",
+      lane: "not-emitted",
+      reason: `canonical-lowering-plan-${selection}`
+    };
+  };
+
+  // Normalize target applicability separately from what the generic recording
+  // harness happens to be able to call. This prevents a structurally encodable
+  // route from being counted as emitted by a target whose lowering plan blocks
+  // it (the old typed-native 890/25 split had this exact ambiguity).
+  for (const route of routes) {
+    const universalRow = universalRows.get(route.id);
+    const valueBindingRow = valueBindingRows.get(route.id);
+    const dynamicSelection = route.backendSelections.dynamicHermesJsi.selection;
+    const staticSelection = route.backendSelections.staticHermesCAbi.selection;
+    const browserSelection = route.backendSelections.browserWasmHost.selection;
+    const luaSelection = route.backendSelections.luaStack.selection;
+    const nativePod = valueBindingRow?.targetSupport?.arm64DynamicHermes?.backend === "generated-native-pod";
+    const browserCallback = universalRow?.browserCallback?.registryEligible === true;
+    route.targetApplicability = {
+      "dynamic-hermes": canonicalApplicability(
+        dynamicSelection,
+        nativePod ? "dynamic-hermes-native-pod" : "dynamic-hermes-jsi-lua-stack"
+      ),
+      "static-hermes": canonicalApplicability(staticSelection, "static-hermes-typed-native"),
+      "browser-wasm": canonicalApplicability(
+        browserSelection,
+        browserCallback ? "browser-wasm-callback-registry" : "browser-wasm-direct-memory"
+      ),
+      "lua-stack": canonicalApplicability(luaSelection, "lua-stack")
+    };
+    route.exactVector = {
+      argumentValues: route.argumentShapes.map((index, slot) =>
+        renderShapeSpec(shapeList, index, semanticNames, slot + 1)),
+      resultValues: route.resultShapes.map((index, slot) =>
+        renderShapeSpec(shapeList, index, semanticNames, 257 + slot)),
+      bounds: universalRow?.frameContract ?? null,
+      releaseExpectation: resultsHave(route,
+        (shape) => shape.code === SHAPE.handle || shape.code === SHAPE.guiNode || shape.code === SHAPE.userdata)
+        ? "generated-owned-handle-release"
+        : "no-retained-result-release"
+    };
+    if (nativePod && dynamicSelection === "emit") {
+      route.exactVector.laneOverride = {
+        lane: "dynamic-hermes-native-pod",
+        ...nativePodVerificationVector(valueBindingRow)
+      };
+    }
+  }
+
+  const targetApplicability = Object.fromEntries(targetOrder.map((target) => {
+    const rows = routes.map((route) => route.targetApplicability[target]);
+    const lanes = {};
+    const status = { exercise: 0, blocked: 0, omit: 0 };
+    for (const row of rows) {
+      status[row.status] += 1;
+      lanes[row.lane] = (lanes[row.lane] ?? 0) + 1;
+    }
+    return [target, { status, lanes }];
+  }));
+
+  const nativePodCount = routes.filter((route) =>
+    route.targetApplicability["dynamic-hermes"].lane === "dynamic-hermes-native-pod").length;
+  const declaredNativePodCount = [...valueBindingRows.values()].filter((binding) =>
+    binding.targetSupport?.arm64DynamicHermes?.backend === "generated-native-pod").length;
+  assert(nativePodCount === declaredNativePodCount,
+    `dynamic native-POD applicability drifted: ${nativePodCount} != ${declaredNativePodCount}`);
+  const browserCallbackCount = routes.filter((route) =>
+    route.targetApplicability["browser-wasm"].lane === "browser-wasm-callback-registry").length;
+  const declaredBrowserCallbackCount = [...universalRows.values()].filter((binding) =>
+    binding.browserCallback?.registryEligible === true).length;
+  assert(browserCallbackCount === declaredBrowserCallbackCount,
+    `browser callback-registry applicability drifted: ${browserCallbackCount} != ${declaredBrowserCallbackCount}`);
+
+  // Normalize repeated target dispositions into one lane dictionary and four
+  // dense lane IDs per route. The report stays compact while still making the
+  // total target partition mechanically enumerable.
+  const applicabilityLanes = [];
+  const applicabilityLaneIds = new Map();
+  for (const route of routes) {
+    route.applicability = targetOrder.map((target) => {
+      const disposition = route.targetApplicability[target];
+      const identity = canonicalJson({ target, ...disposition });
+      let laneId = applicabilityLaneIds.get(identity);
+      if (laneId === undefined) {
+        laneId = applicabilityLanes.length;
+        applicabilityLaneIds.set(identity, laneId);
+        applicabilityLanes.push({ id: laneId, target, ...disposition, routeCount: 0 });
+      }
+      applicabilityLanes[laneId].routeCount += 1;
+      return laneId;
+    });
+    delete route.targetApplicability;
+    delete route.backendSelections;
+  }
+
+  const exactVectors = [];
+  const exactVectorIds = new Map();
+  for (const route of routes) {
+    const { laneOverride, ...contract } = route.exactVector;
+    const identity = canonicalJson(contract);
+    let contractId = exactVectorIds.get(identity);
+    if (contractId === undefined) {
+      contractId = exactVectors.length;
+      exactVectorIds.set(identity, contractId);
+      exactVectors.push({ id: contractId, ...contract });
+    }
+    route.exactVector = laneOverride === undefined
+      ? { contract: contractId }
+      : { contract: contractId, laneOverride };
+  }
+
   const summary = {
     routeCount: routes.length,
     shapeCount: shapeList.length,
@@ -634,10 +834,11 @@ export function buildRecordingEngineModel(inputs) {
     marshallingProgramCount: new Set(routes.map((route) => route.marshallingPrograms.dynamicHermesJsi)).size,
     handleKindsMintedByRecordedResults: [...pool].sort((a, b) => a - b).map(handleName),
     handleKindsMintedByGeneratedFixtures: handleSeeds.map(({ name }) => name),
-    byTransport: Object.fromEntries(transportOrder.map((transport) => [transport, {
+    harnessByTransport: Object.fromEntries(transportOrder.map((transport) => [transport, {
       exercised: routes.filter((route) => route.transports[transport].status === "exercise").length,
       skipped: routes.filter((route) => route.transports[transport].status === "skip").length
     }])),
+    targetApplicability,
     luaAdapter: {
       profile: luaAdapterProfile,
       installed: routes.length,
@@ -645,20 +846,11 @@ export function buildRecordingEngineModel(inputs) {
       skipped: routes.filter((route) => route.luaAdapter.status === "skip").length,
       failureSchema: "deherm-script-lua-exact-failure/v1"
     },
-    dynamicHermesExactPartition: {
-      emitted: routes.filter((route) =>
-        route.luaAdapter.reason !== "canonical-dynamic-hermes-route-omitted").length,
-      luaStackExact: routes.filter((route) => route.luaAdapter.status === "exercise").length,
-      nativePodExactPending: routes.filter((route) =>
-        route.luaAdapter.reason === "route-uses-native-pod-not-lua-stack").length,
-      sourceProfileOmitted: routes.filter((route) =>
-        route.luaAdapter.reason === "canonical-dynamic-hermes-route-omitted").length
-    },
     blockerCount: blockers.length
   };
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     defoldRevision: projection.defoldRevision,
     scope: "generated-script-recording-engine",
     evidenceBoundary: [
@@ -691,6 +883,17 @@ export function buildRecordingEngineModel(inputs) {
     transports: {
       drivable: transportOrder,
       undrivable: undrivableTransports
+    },
+    applicabilityCatalog: {
+      schema: "deherm-script-target-applicability/v1",
+      targets: targetOrder,
+      routeCount: routes.length,
+      rule: "canonical-lowering-selection-plus-generated-adapter-specialization",
+      lanes: applicabilityLanes
+    },
+    exactVectorCatalog: {
+      schema: "deherm-script-exact-vector/v1",
+      vectors: exactVectors
     },
     semanticHandleKindNames: semanticNames,
     handleSeeds,

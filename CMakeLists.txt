@@ -614,6 +614,27 @@ target_link_libraries(defold-hermes-script-recording-lua-adapter PRIVATE
   defold-hermes-lua-bridge
 )
 
+# Generated exact-call twin for the 31 production Dynamic Hermes native-POD
+# routes. The generated JavaScript vectors enter through the real Hermes/JSI
+# bridge and terminate in the generated value-binding dispatcher.
+add_executable(defold-hermes-script-recording-native-pod
+  tests/fixtures/generated_script_recording_native_pod_driver.cpp
+)
+target_compile_features(defold-hermes-script-recording-native-pod PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-script-recording-native-pod PRIVATE
+  defold/defold_hermes/include
+  tests/fixtures
+)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-recording-native-pod PRIVATE
+    -Wall -Wextra -Werror -Wno-zero-length-array
+  )
+endif()
+target_link_libraries(defold-hermes-script-recording-native-pod PRIVATE
+  defold-hermes-runtime
+  defold-hermes-lua-bridge
+)
+
 add_executable(defold-hermes-script-handle-router-test
   native/script_handle_router_test.cpp
 )

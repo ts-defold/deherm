@@ -24,6 +24,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/lib/reviewed-revision.mjs",
   "scripts/lib/revision-audit.mjs",
   "packages/compiler/src/dmsdk-call-symbol-index.mjs",
+  "packages/compiler/src/dmsdk-concrete-call-plan.mjs",
   "packages/compiler/src/dmsdk-universal-ready-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-materializer-core.mjs",
   "packages/compiler/src/dmsdk-universal-materializer.mjs",

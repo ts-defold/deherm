@@ -27,11 +27,21 @@ type dmSdkIndexDeclaration struct {
 }
 
 type dmSdkMaterialization struct {
-	State        string   `json:"state"`
-	Family       string   `json:"family,omitempty"`
-	Wrapper      *string  `json:"wrapper,omitempty"`
-	Requirements []string `json:"requirements,omitempty"`
-	Diagnostic   string   `json:"diagnostic,omitempty"`
+	State        string             `json:"state"`
+	Family       string             `json:"family,omitempty"`
+	Wrapper      *string            `json:"wrapper,omitempty"`
+	Route        *dmSdkAdapterRoute `json:"route,omitempty"`
+	Requirements []string           `json:"requirements,omitempty"`
+	Diagnostic   string             `json:"diagnostic,omitempty"`
+}
+
+type dmSdkAdapterRoute struct {
+	Applicability string  `json:"applicability"`
+	Kind          string  `json:"kind"`
+	ID            *uint32 `json:"id"`
+	Symbol        string  `json:"symbol,omitempty"`
+	Header        string  `json:"header,omitempty"`
+	PlanSha256    string  `json:"planSha256"`
 }
 
 type dmSdkIndexOverload struct {
@@ -79,7 +89,10 @@ func validDmSdkMaterialization(value dmSdkMaterialization) bool {
 	case "universal-ready":
 		return len(value.Requirements) == 0 && value.Diagnostic == ""
 	case "generated-adapter":
-		return value.Family != ""
+		return value.Family != "" && len(value.Requirements) == 0 && value.Route != nil &&
+			value.Route.Applicability == "callable" &&
+			(value.Route.Kind == "named-wrapper" || value.Route.Kind == "family-dispatch") &&
+			value.Route.Symbol != "" && value.Route.Header != "" && len(value.Route.PlanSha256) == 64
 	case "specialization-required":
 		return value.Diagnostic != ""
 	default:

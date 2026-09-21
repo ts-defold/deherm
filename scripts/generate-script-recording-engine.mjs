@@ -34,6 +34,8 @@ const relativePaths = Object.freeze({
   tables: "tests/fixtures/generated_script_recording_tables.cpp",
   provider: "tests/fixtures/generated_script_recording_provider.cpp",
   luaAdapter: "tests/fixtures/generated_script_recording_lua_adapter.cpp",
+  nativePodDriver: "tests/fixtures/generated_script_recording_native_pod_driver.cpp",
+  nativePodDriverJs: "tests/fixtures/generated_script_recording_native_pod_driver.js",
   driver: "tests/fixtures/generated_script_recording_driver.cpp",
   driverJs: "tests/fixtures/generated_script_recording_driver.js",
   expectedTrace: "tests/fixtures/generated_script_recording_expected_trace.txt"
@@ -145,6 +147,7 @@ function renderHeader(model, native, counts) {
 #define DEHERM_RECORDING_HANDLE_SEED_STORAGE_COUNT ${Math.max(1, model.handleSeeds.length)}u
 #define DEHERM_RECORDING_LUA_EXACT_COUNT ${model.summary.luaAdapter.exercised}u
 #define DEHERM_RECORDING_LUA_SKIP_COUNT ${model.summary.luaAdapter.skipped}u
+#define DEHERM_RECORDING_DYNAMIC_NATIVE_POD_COUNT ${model.summary.targetApplicability["dynamic-hermes"].lanes["dynamic-hermes-native-pod"]}u
 
 enum DehermRecordingShapeCode {
 ${codes}
@@ -2008,6 +2011,161 @@ int main(){
 `;
 }
 
+function renderNativePodDriver(model) {
+  return `${banner}
+// Executes every Dynamic Hermes native-POD exact vector through the real JSI
+// bridge and the generated value-binding dispatcher. Defold implementation
+// semantics are outside this test; the vector checks the generated contract.
+
+#include "generated_script_recording_engine.h"
+
+#include <defold_hermes/generated_script_value_bindings.hpp>
+#include <defold_hermes/script_bridge_capi.hpp>
+#include <defold_hermes/script_jsi_bridge.hpp>
+
+#include <hermes/hermes.h>
+#include <jsi/jsi.h>
+
+#include <cstdio>
+#include <cstring>
+#include <fstream>
+#include <memory>
+#include <sstream>
+#include <string>
+
+namespace jsi = facebook::jsi;
+namespace value_binding = defold_hermes::value_binding;
+
+namespace {
+char gError[512]{};
+
+bool Dispatch(void*, defold_hermes::ScriptCallFrame* frame) noexcept {
+  const auto status = value_binding::dispatch(frame, gError, sizeof(gError));
+  if (status == value_binding::DispatchStatus::kSuccess) return true;
+  if (status == value_binding::DispatchStatus::kMissing) {
+    std::snprintf(gError, sizeof(gError), "native-POD exact vector selected a non-value route");
+  }
+  return false;
+}
+
+const char* LastError(void*) noexcept { return gError; }
+
+std::string readFile(const char* path) {
+  std::ifstream stream(path);
+  if (!stream) return {};
+  std::ostringstream contents;
+  contents << stream.rdbuf();
+  return contents.str();
+}
+}  // namespace
+
+int main(int argc, char** argv) {
+  if (argc != 2) {
+    std::fprintf(stderr, "usage: %s <native-pod-driver.js>\\n", argv[0]);
+    return 2;
+  }
+  const std::string source = readFile(argv[1]);
+  if (source.empty()) {
+    std::fprintf(stderr, "script-native-pod-exact:error:driver-is-missing\\n");
+    return 2;
+  }
+  uint32_t exercised = 0;
+  defold_hermes::installScriptBridgeApi({nullptr, Dispatch, LastError, nullptr});
+  try {
+    auto runtime = facebook::hermes::makeHermesRuntime();
+    auto lifetime = defold_hermes::installScriptJsiBridge(*runtime);
+    auto complete = jsi::Function::createFromHostFunction(
+        *runtime, jsi::PropNameID::forAscii(*runtime, "__dehermNativePodComplete"), 1,
+        [&exercised](jsi::Runtime& runtime, const jsi::Value&, const jsi::Value* args, size_t count) {
+          if (count != 1 || !args[0].isNumber()) {
+            throw jsi::JSError(runtime, "native-POD completion expects one numeric count");
+          }
+          exercised = static_cast<uint32_t>(args[0].asNumber());
+          return jsi::Value::undefined();
+        });
+    runtime->global().setProperty(*runtime, "__dehermNativePodComplete", std::move(complete));
+    runtime->evaluateJavaScript(
+        std::make_shared<jsi::StringBuffer>(source), "deherm://script-native-pod-exact.js");
+    defold_hermes::shutdownScriptJsiBridge(lifetime);
+  } catch (const std::exception& error) {
+    defold_hermes::uninstallScriptBridgeApi();
+    std::fprintf(stderr, "script-native-pod-exact:error:%s\\n", error.what());
+    return 1;
+  }
+  defold_hermes::uninstallScriptBridgeApi();
+  if (exercised != DEHERM_RECORDING_DYNAMIC_NATIVE_POD_COUNT) {
+    std::fprintf(stderr, "script-native-pod-exact:error:count %u != %u\\n",
+        exercised, DEHERM_RECORDING_DYNAMIC_NATIVE_POD_COUNT);
+    return 1;
+  }
+  std::printf("{\\"schema\\":\\"deherm-script-native-pod-exact-result/v1\\","
+      "\\"exercised\\":%u,\\"transport\\":\\"dynamic-hermes-jsi\\"}\\n", exercised);
+  std::puts("script-native-pod-exact:ok");
+  return 0;
+}
+`;
+}
+
+function renderNativePodDriverJs(model) {
+  const vectors = model.routes
+    .filter((route) => route.exactVector.laneOverride?.lane === "dynamic-hermes-native-pod")
+    .map((route) => ({
+      id: route.id,
+      stableId: route.stableId,
+      ...route.exactVector.laneOverride
+    }));
+  return `${banner}
+// Generated exact vectors for the production Dynamic Hermes native-POD lane.
+const VECTORS = ${JSON.stringify(vectors)};
+const bridge = globalThis.__defoldScriptBridgeV1;
+if (!bridge || typeof bridge.call !== "function") throw new Error("script bridge is not installed");
+
+function argument(value) {
+  if (value === null || typeof value !== "object" || !value.codec) return value;
+  if (value.codec === "Matrix4") return value.components.slice();
+  const names = ["x", "y", "z", "w"];
+  const kind = value.codec === "Quaternion" ? "quaternion" : value.codec.toLowerCase();
+  const result = { __dehermValueKind: kind };
+  for (let index = 0; index < value.components.length; ++index) result[names[index]] = value.components[index];
+  return result;
+}
+
+function components(value, count) {
+  if (Array.isArray(value)) return value.slice(0, count);
+  const names = ["x", "y", "z", "w"];
+  return names.slice(0, count).map((name) => value[name]);
+}
+
+function near(actual, expected, tolerance, label) {
+  if (typeof actual !== "number" || !Number.isFinite(actual) ||
+      Math.abs(actual - expected) > tolerance) {
+    throw new Error(label + ": " + actual + " != " + expected + " +/- " + tolerance);
+  }
+}
+
+for (const vector of VECTORS) {
+  const result = bridge.call(vector.stableId, vector.arguments.map(argument));
+  const expectation = vector.expectation;
+  if (expectation.kind === "number") {
+    near(result, expectation.value, expectation.tolerance, vector.id);
+  } else if (expectation.kind === "hash") {
+    if (typeof result !== "bigint" || result.toString() !== expectation.value) {
+      throw new Error(vector.id + ": " + result + " != " + expectation.value);
+    }
+  } else if (expectation.kind === "components") {
+    const actual = components(result, expectation.values.length);
+    if (actual.length !== expectation.values.length) throw new Error(vector.id + ": component count differs");
+    for (let index = 0; index < actual.length; ++index) {
+      near(actual[index], expectation.values[index], expectation.tolerance, vector.id + "[" + index + "]");
+    }
+  } else {
+    throw new Error(vector.id + ": unknown expectation " + expectation.kind);
+  }
+}
+__dehermNativePodComplete(VECTORS.length);
+`;
+}
+
 function renderDriverJs(model) {
   const routeIndex = new Map(model.routes.map((route, order) => [route.id, order]));
   const shapes = model.shapes.map((shape) =>
@@ -2222,6 +2380,8 @@ export function generateRecordingEngine(inputs) {
   const header = renderHeader(model, native, counts);
   const tables = renderTables(model, native, shapeRefs);
   const luaAdapter = renderLuaAdapter(model);
+  const nativePodDriver = renderNativePodDriver(model);
+  const nativePodDriverJs = renderNativePodDriverJs(model);
   const driverJs = renderDriverJs(model);
 
   const report = {
@@ -2236,13 +2396,19 @@ export function generateRecordingEngine(inputs) {
       tables: sha256(tables),
       provider: sha256(providerSource),
       luaAdapter: sha256(luaAdapter),
+      nativePodDriver: sha256(nativePodDriver),
+      nativePodDriverJs: sha256(nativePodDriverJs),
       driver: sha256(driverSource),
       driverJs: sha256(driverJs),
       expectedTrace: counts.expectedTraceSha256
     }
   };
 
-  return { report, header, tables, provider: providerSource, luaAdapter, driver: driverSource, driverJs, expectedTrace };
+  return {
+    report, header, tables, provider: providerSource, luaAdapter,
+    nativePodDriver, nativePodDriverJs,
+    driver: driverSource, driverJs, expectedTrace
+  };
 }
 
 async function writeOrCheck(root, relative, content, check) {
@@ -2263,6 +2429,8 @@ export async function runRecordingEngineGenerator(options = {}) {
   await writeOrCheck(outputRoot, relativePaths.tables, generated.tables, options.check);
   await writeOrCheck(outputRoot, relativePaths.provider, generated.provider, options.check);
   await writeOrCheck(outputRoot, relativePaths.luaAdapter, generated.luaAdapter, options.check);
+  await writeOrCheck(outputRoot, relativePaths.nativePodDriver, generated.nativePodDriver, options.check);
+  await writeOrCheck(outputRoot, relativePaths.nativePodDriverJs, generated.nativePodDriverJs, options.check);
   await writeOrCheck(outputRoot, relativePaths.driver, generated.driver, options.check);
   await writeOrCheck(outputRoot, relativePaths.driverJs, generated.driverJs, options.check);
   await writeOrCheck(outputRoot, relativePaths.expectedTrace, generated.expectedTrace, options.check);

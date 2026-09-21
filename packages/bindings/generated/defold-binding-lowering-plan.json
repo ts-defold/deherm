@@ -28,7 +28,7 @@
     "scriptUniversalValue": "33144a8632477a55246ecb1878bc1fc7384d4c6ac5bb5a7fd754138c235afd79",
     "defoldValueLayouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
     "dmsdkProjection": "ccde0d5efee6829232e288a923a1eb40bee78eb8ffa451118d1a100ea37f72f0",
-    "dmsdkUniversal": "a9ecb1b1bc83a04d3195e8aebe8fd7794fd23ed8bd2aa0ff1b4195223ac3d984",
+    "dmsdkUniversal": "e144263aa409480b10b1adc7b691970e8e69dca9412ff8eade11a30330c2235f",
     "dmsdkScalarThunks": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
     "dmsdkEnumValues": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555",
     "dmsdkNamedScalars": "f320be6a9e4d49b9099c231874831d8fa31e6a722e50c8c104c20396926d4312",
@@ -64,7 +64,7 @@
     "scriptUniversalValue": "9e2b326d6d8cc6356bcc9e07c66972e3eae8e1b973bfacfdde56660e8dfae426",
     "defoldValueLayouts": "e7dfbb78eec1c3fbd432080161989576915d554668f0d8b009fe420167325d29",
     "dmsdkProjection": "419314a04e57b4448713b0084afb69101b581fc6ce75fb3e4135e43119ae283e",
-    "dmsdkUniversal": "fb0af6a204668b4e133df96995a24cff593388227c2da5cf868c4fca2b42591e",
+    "dmsdkUniversal": "68098c8488bd9ccf7c57779c89bf388e27f53d9e305336590b0d0e3211fa5816",
     "dmsdkScalarThunks": "80dcddd4811260d4fede04879b1189cef8c4fdaed0f59128e08421a7f46f5d5d",
     "dmsdkEnumValues": "50a427a641ddc85ab90df562985dd187dcdb7fd2de16f4cee2bb091ce902a469",
     "dmsdkNamedScalars": "f06a555286c444c0b451924590ad33b4e78c1236b5d79011af8bc88776092ca7",
@@ -30376,6 +30376,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -30517,6 +30524,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -30658,6 +30672,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -30799,6 +30820,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -30940,6 +30968,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -31081,6 +31116,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -31222,6 +31264,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -31363,6 +31412,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -31504,6 +31560,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -34614,7 +34677,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 58,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -35227,7 +35302,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 59,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -35377,7 +35464,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 60,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -35885,7 +35984,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 61,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -36035,7 +36146,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 62,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -36278,7 +36401,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 63,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -36416,7 +36551,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 64,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -36566,7 +36713,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 65,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -43112,7 +43271,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 66,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -45828,6 +45999,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -50896,7 +51074,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 67,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -51290,7 +51480,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 68,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -53531,7 +53733,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 13,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -56765,7 +56974,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 69,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -56903,7 +57124,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 70,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -57041,7 +57274,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 71,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -59490,7 +59735,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 72,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -59760,7 +60017,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 73,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -60030,7 +60299,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 74,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -60432,7 +60713,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 75,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -61006,7 +61299,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 76,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -62020,7 +62325,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 77,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -62158,7 +62475,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 78,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -62529,7 +62858,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 79,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -69074,7 +69415,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 0,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -69245,6 +69593,13 @@
               "compiled": "packaged-sdk-object-test",
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-runtime-test"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -69939,7 +70294,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 1,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -70072,7 +70434,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 0,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -72591,7 +72965,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 1,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -73567,6 +73953,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-canonical-dispatch-zero-cpp-operator-new"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -73750,6 +74143,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-canonical-dispatch-zero-cpp-operator-new"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -73944,6 +74344,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-operator-new"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -74163,6 +74570,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-operator-new"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -74351,6 +74765,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -74514,6 +74935,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -74677,6 +75105,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -74840,6 +75275,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -76871,6 +77313,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77012,6 +77461,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77153,6 +77609,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77294,6 +77757,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77435,6 +77905,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77576,6 +78053,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77717,6 +78201,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77858,6 +78349,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -77999,6 +78497,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -82393,7 +82898,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 2,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -87134,7 +87651,20 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "scratchScalarOut",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 0,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "enum-domain-to-native-success-policy-unresolved",
+                "handle-provenance-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -87289,7 +87819,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 3,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -87567,7 +88109,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 4,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -87709,7 +88263,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 5,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -88413,7 +88979,20 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "scratchScalarOut",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 1,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "enum-domain-to-native-success-policy-unresolved",
+                "handle-provenance-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -88635,7 +89214,20 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "scratchScalarOut",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 2,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "enum-domain-to-native-success-policy-unresolved",
+                "handle-provenance-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -88861,7 +89453,20 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "scratchScalarOut",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 3,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "enum-domain-to-native-success-policy-unresolved",
+                "handle-provenance-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -90356,7 +90961,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 6,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -90557,7 +91174,20 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "scratchScalarOut",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 4,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "enum-domain-to-native-success-policy-unresolved",
+                "handle-provenance-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -90763,7 +91393,20 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "scratchScalarOut",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 5,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "enum-domain-to-native-success-policy-unresolved",
+                "handle-provenance-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -91162,7 +91805,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 7,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -92053,7 +92708,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 8,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -92272,7 +92939,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 9,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -101296,7 +101975,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 10,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -101450,7 +102141,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 11,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -104590,7 +105293,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 12,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -104753,7 +105468,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 13,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -109263,7 +109990,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 14,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -120045,7 +120784,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 15,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -120183,7 +120934,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 16,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -120336,6 +121099,13 @@
               "compiled": "packaged-sdk-object-test",
               "linked": "extension-link-pending",
               "runtime": "engine-context-pending"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -120560,7 +121330,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 17,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -120698,7 +121480,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 18,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -120836,7 +121630,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 19,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -122546,7 +123352,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 20,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -123395,7 +124213,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 21,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -124355,7 +125185,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 2,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -124938,7 +125775,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 22,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -125095,7 +125944,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 23,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -125473,7 +126334,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 3,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -125631,7 +126499,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 24,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -125926,7 +126806,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 25,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -126269,7 +127161,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 26,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -126407,7 +127311,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 27,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -126545,7 +127461,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 28,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -139445,7 +140373,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 29,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -139606,7 +140546,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 30,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -139763,7 +140715,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 31,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -140275,7 +141239,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 32,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -144066,7 +145042,20 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "scratchScalarOut",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 6,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "enum-domain-to-native-success-policy-unresolved",
+                "handle-provenance-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -146310,6 +147299,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-operator-new-with-reverse-hashing-default-disabled"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -146452,6 +147448,13 @@
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-operator-new-with-reverse-hashing-default-disabled"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -148190,7 +149193,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 4,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -148319,7 +149329,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 5,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -151523,6 +152540,13 @@
               "linked": "pinned-source-host-link-test",
               "runtime": "pinned-source-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -151724,6 +152748,13 @@
               "linked": "pinned-source-host-link-test",
               "runtime": "pinned-source-host-behavior-test",
               "allocation": "100000-warmed-dispatch-zero-cpp-allocations"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -151992,7 +153023,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 33,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -152279,7 +153322,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 34,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -153980,6 +155035,13 @@
               "compiled": "packaged-sdk-object-test",
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-runtime-test"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -154336,6 +155398,13 @@
               "compiled": "packaged-sdk-object-test",
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-runtime-test"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -154705,6 +155774,13 @@
               "compiled": "packaged-sdk-object-test",
               "linked": "packaged-sdk-host-link-test",
               "runtime": "packaged-sdk-host-runtime-test"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -156334,7 +157410,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 35,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -156470,7 +157558,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 36,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -158614,7 +159714,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 37,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -161246,7 +162358,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 38,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -161864,7 +162988,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 39,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -162018,7 +163154,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 40,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -162156,7 +163304,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 41,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -162795,7 +163955,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 42,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -170106,7 +171278,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 6,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -170353,7 +171532,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 44,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -170500,7 +171691,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 43,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -171716,7 +172919,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 45,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -177206,7 +178421,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 46,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -177344,7 +178571,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 47,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -177494,7 +178733,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 48,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -177632,7 +178883,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 49,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -177918,7 +179181,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 50,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -178060,7 +179335,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 51,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -178338,7 +179625,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 52,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -178619,7 +179918,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 53,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -178757,7 +180068,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 54,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -179258,7 +180581,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 55,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -179830,7 +181165,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 56,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -192689,7 +194036,19 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "borrowedHandle",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "provider-required",
+              "kind": "provider-boundary",
+              "id": 57,
+              "dispatcher": null,
+              "blockers": [
+                "call-thread-affinity-unresolved",
+                "handle-ownership-nullability-lifetime-unresolved",
+                "native-symbol-linkage-unverified",
+                "target-feature-symbol-matrix-unverified"
+              ]
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -194220,7 +195579,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 7,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -198020,6 +199386,13 @@
               "compiled": "packaged-sdk-object-test",
               "linked": "extension-link-pending",
               "runtime": "engine-context-pending"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -198241,6 +199614,13 @@
               "compiled": "packaged-sdk-object-test",
               "linked": "extension-link-pending",
               "runtime": "engine-context-pending"
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -198963,7 +200343,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 8,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -199763,7 +201150,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 9,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -200053,7 +201447,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 10,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -200785,7 +202186,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 11,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -201909,6 +203317,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -202037,6 +203452,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -202177,6 +203599,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes only; browser host rejects this stable ID."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -204990,6 +206419,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -205131,6 +206567,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -205700,6 +207143,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -205841,6 +207291,13 @@
                 "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
                 "note": "Available on native Hermes and browser host."
               }
+            },
+            "adapter": {
+              "applicability": "callable",
+              "kind": "named-wrapper",
+              "id": null,
+              "dispatcher": null,
+              "blockers": []
             }
           },
           "fallback": {
@@ -206069,7 +207526,14 @@
           "preferredLowering": {
             "state": "generated-adapter",
             "family": "cstringValue",
-            "wrapper": null
+            "wrapper": null,
+            "adapter": {
+              "applicability": "callable",
+              "kind": "family-dispatch",
+              "id": 12,
+              "dispatcher": "deherm_dmsdk_cstring_value_dispatch",
+              "blockers": []
+            }
           },
           "fallback": {
             "state": "materializable",
@@ -490651,5 +492115,5 @@
       }
     }
   ],
-  "planSha256": "2897ef0ac8bc513b170c580ede10ef90401641f61a9809538d5d63785e8b9243"
+  "planSha256": "e38fc13d3c98c509c68505b7effbb92b120a53b52f4e90c80b3814c9dc2c019f"
 }

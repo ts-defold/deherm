@@ -85,8 +85,8 @@ test("every dmSDK recipe has a checker-resolvable overload identity", () => {
   assert.equal(dmSdkIndex.overloadCount, 1335);
   assert.equal(dmSdkIndex.ambiguousOverloadCount, 21);
   assert.equal(dmSdkIndex.universalReadyCount, 486);
-  assert.equal(dmSdkIndex.generatedAdapterCount, 0);
-  assert.equal(dmSdkIndex.specializationRequiredCount, 875);
+  assert.equal(dmSdkIndex.generatedAdapterCount, 59);
+  assert.equal(dmSdkIndex.specializationRequiredCount, 816);
   assert.equal(Object.keys(dmSdkIndex.markers).length, dmSdkIndex.overloadCount);
   assert.match(dmSdkIndex.indexSha256, /^[0-9a-f]{64}$/);
 });
@@ -315,23 +315,19 @@ test("release reachability refuses dmSDK overloads collapsed by TypeScript", asy
   assert.equal(manifest.ambiguousSites[0].declarationIds.length, 2);
 });
 
-test("an exact selector resolves a collapsed overload before enforcing its adapter route", async () => {
-  let failure = null;
-  try {
-    runTtsc("tsconfig.dmsdk-exact.json");
-  } catch (error) {
-    failure = `${error.stdout ?? ""}${error.stderr ?? ""}`;
-  }
-  assert.ok(failure, "the selected adapter must not be treated as linked before its release route exists");
-  assert.match(failure, /requires generated usage specialization before release materialization/);
+test("an exact selector resolves a collapsed overload to its concrete generated adapter route", async () => {
+  runTtsc("tsconfig.dmsdk-exact.json");
   const manifest = JSON.parse(await readFile(
     path.join(fixture, ".deherm/generated/dmsdk-usage.exact.json"), "utf8"));
-  assert.equal(manifest.usageCount, 0);
+  assert.equal(manifest.usageCount, 1);
   assert.deepEqual(manifest.ambiguousSites, []);
-  assert.equal(manifest.specializationRequiredSites.length, 1);
-  assert.equal(manifest.specializationRequiredSites[0].declarationId,
+  assert.deepEqual(manifest.specializationRequiredSites, []);
+  assert.equal(manifest.usages[0].declarationId,
     "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195");
-  assert.match(manifest.specializationRequiredSites[0].diagnostic, /has no release reachability route/);
+  assert.equal(manifest.usages[0].materialization.state, "generated-adapter");
+  assert.equal(manifest.usages[0].materialization.family, "scalar");
+  assert.equal(manifest.usages[0].materialization.route.kind, "named-wrapper");
+  assert.equal(manifest.usages[0].materialization.route.applicability, "callable");
 });
 
 test("release reachability diagnoses calls that need generated specialization", async () => {

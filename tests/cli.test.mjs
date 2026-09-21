@@ -202,12 +202,22 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   assert.match(await readFile(output, "utf8"), /fixture_to_network/);
   const verificationSource = output.replace(/\.cpp$/, ".verify.cpp");
   const verificationReport = output.replace(/\.cpp$/, ".verify.json");
+  const jsiVerificationSource = output.replace(/\.cpp$/, ".verify.jsi.cpp");
+  const jsiVerificationReport = output.replace(/\.cpp$/, ".verify.jsi.json");
   assert.match(await readFile(verificationSource, "utf8"), /fixture_to_network__exact_callee/);
   const verification = JSON.parse(await readFile(verificationReport, "utf8"));
   assert.equal(verification.vectorCount, 1);
   assert.equal(verification.vectors[0].nativeSymbol, "dmEndian::ToNetwork");
   assert.equal(verification.vectors[0].parameters[0].resolvedNativeType, "uint32_t");
   assert.match(verification.vectors[0].vectorSha256, /^[0-9a-f]{64}$/);
+  assert.match(await readFile(jsiVerificationSource, "utf8"), /#include "dmsdk-provider\.verify\.cpp"/);
+  assert.match(await readFile(jsiVerificationSource, "utf8"), /installDmSdkUniversalModule/);
+  const jsiVerification = JSON.parse(await readFile(jsiVerificationReport, "utf8"));
+  assert.equal(jsiVerification.transport, "dynamic-hermes-jsi");
+  assert.equal(jsiVerification.vectorCount, 1);
+  assert.equal(jsiVerification.executableVectorCount, 1);
+  assert.deepEqual(jsiVerification.unsupported, []);
+  assert.equal(jsiVerification.verificationInclude, "dmsdk-provider.verify.cpp");
   const report = JSON.parse(await readFile(`${output}.json`, "utf8"));
   assert.equal(report.materializedCount, 1);
   assert.equal(report.declarations[0].declarationId, recipe.declarationId);
@@ -215,6 +225,14 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   assert.equal(
     report.verificationReportSha256,
     createHash("sha256").update(await readFile(verificationReport, "utf8")).digest("hex"),
+  );
+  assert.equal(
+    report.jsiVerificationOutputSha256,
+    createHash("sha256").update(await readFile(jsiVerificationSource, "utf8")).digest("hex"),
+  );
+  assert.equal(
+    report.jsiVerificationReportSha256,
+    createHash("sha256").update(await readFile(jsiVerificationReport, "utf8")).digest("hex"),
   );
   const checked = await materializeDmSdkUsageFile({ usage, output, check: true });
   assert.equal(checked.checked, true);
@@ -228,6 +246,18 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
   await assert.rejects(
     materializeDmSdkUsageFile({ usage, output, check: true }),
     /dmsdk-provider\.verify\.json is stale/,
+  );
+  await materializeDmSdkUsageFile({ usage, output });
+  await writeFile(jsiVerificationSource, "// stale JSI exact-call runner\n");
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage, output, check: true }),
+    /dmsdk-provider\.verify\.jsi\.cpp is stale/,
+  );
+  await materializeDmSdkUsageFile({ usage, output });
+  await writeFile(jsiVerificationReport, "{}\n");
+  await assert.rejects(
+    materializeDmSdkUsageFile({ usage, output, check: true }),
+    /dmsdk-provider\.verify\.jsi\.json is stale/,
   );
   await materializeDmSdkUsageFile({ usage, output });
   await writeFile(`${output}.json`, "{}\n");
@@ -335,10 +365,15 @@ test("dmSDK usage materialization is deterministic and checkable", async () => {
     sites: [{ file: "src/game.ts", line: 2, column: 1 }]
   };
   await writeFile(checkerUsage, `${JSON.stringify(checkerDocument("release", [adapterUsage]))}\n`);
-  await assert.rejects(
-    materializeDmSdkUsageFile({ usage: checkerUsage, output: path.join(root, "generated", "adapter.cpp") }),
-    /has no executable lowering state/,
-  );
+  const adapterOutput = path.join(root, "generated", "adapter.cpp");
+  const adapterGenerated = await materializeDmSdkUsageFile({ usage: checkerUsage, output: adapterOutput });
+  assert.equal(adapterGenerated.materializedCount, 1);
+  assert.equal(adapterGenerated.universalMaterializedCount, 0);
+  assert.equal(adapterGenerated.generatedAdapterCount, 1);
+  assert.match(await readFile(adapterOutput, "utf8"), new RegExp(adapterRecipe.preferredLowering.adapter.dispatcher ?? adapterRecipe.preferredLowering.wrapper));
+  const adapterReport = JSON.parse(await readFile(`${adapterOutput}.json`, "utf8"));
+  assert.equal(adapterReport.declarations[0].family, adapterRecipe.preferredLowering.family);
+  assert.match(adapterReport.declarations[0].planSha256, /^[0-9a-f]{64}$/);
 });
 
 test("project discovery resolves nearest and bounded descendant projects deterministically", async () => {

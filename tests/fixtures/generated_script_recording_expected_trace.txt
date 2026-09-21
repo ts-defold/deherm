@@ -1,6 +1,6 @@
-# generated-script-recording-engine v1
+# generated-script-recording-engine v2
 # defold-revision 7f0f554f41f9dce1e0ddff99bf08200657d1ee05
-# lowering-plan 2897ef0ac8bc513b170c580ede10ef90401641f61a9809538d5d63785e8b9243
+# lowering-plan e38fc13d3c98c509c68505b7effbb92b120a53b52f4e90c80b3814c9dc2c019f
 # expectation derived from the declared contract; not engine conformance
 call b2d.get_body jsi c147 arity=1 args=[str:d1] ctx=game-object-instance
 recv b2d.get_body jsi c147 results=1 [h:box2d-body]
