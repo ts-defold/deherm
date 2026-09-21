@@ -367,9 +367,11 @@ function fixturePlan({ shape, slot, seed, prefix, nativeAlias, enumValues, expre
       const fixture = `${prefix}_cstring_${slot}`;
       declarations.push(`static const char ${fixture}[]="deherm_exact_${seed}";`);
       setup.push(`${prefix}_arguments[${slot}].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(${fixture}));`);
+      setup.push(`${prefix}_arguments[${slot}].auxiliary=UINT64_C(sizeof(${fixture})-1);`);
       setup.push(`${prefix}_arguments[${slot}].tag=${tag};`);
       cell.fixture = "cstring";
       cell.value = `deherm_exact_${seed}`;
+      cell.auxiliary = Buffer.byteLength(cell.value);
     } else if (shape.kind === "reference") {
       const fixture = `${prefix}_reference_${slot}`;
       const initializer = constructorArguments?.length ? `(${constructorArguments.join(",")})` : "{}";

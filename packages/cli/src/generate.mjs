@@ -30,6 +30,7 @@ import {
 import { safeParameterIdentifier } from "./names.mjs";
 import { hostDefoldPlatform } from "./toolchains.mjs";
 import { checkProject, loadDehermPluginConfig } from "./transform-compiler.mjs";
+import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } from "./native-extension-api.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const require = createRequire(import.meta.url);
@@ -119,18 +120,24 @@ async function revisionOutputDigest(repositoryRoot) {
   return hash.digest("hex");
 }
 
-async function projectGenerationIdentity({ inventory, outputDirectory, core, engineProfiles }) {
+async function projectGenerationIdentity({ inventory, outputDirectory, core, engineProfiles, nativeExtensionClang }) {
   const projectGeneratorSha256 = sha256(await readFile(fileURLToPath(import.meta.url)));
+  const nativeExtensionGeneratorSha256 = sha256(Buffer.concat(await Promise.all([
+    readFile(path.join(packageRoot, "packages", "cli", "src", "native-extension-api.mjs")),
+    readFile(path.join(packageRoot, "packages", "compiler", "src", "native-extension-generator.mjs"))
+  ])));
   const cacheKey = sha256(JSON.stringify({
     schemaVersion: 1,
     projectGeneratorSha256,
+    nativeExtensionGeneratorSha256,
     outputDirectory: outputDirectory.split(path.sep).join("/"),
     packageVersion: core.packageVersion,
     coreInputs: core.inputs,
     engineProfiles,
+    nativeExtensionClang,
     inventory
   }));
-  return { schemaVersion: 1, projectGeneratorSha256, cacheKey };
+  return { schemaVersion: 1, projectGeneratorSha256, nativeExtensionGeneratorSha256, nativeExtensionClang, cacheKey };
 }
 
 function compareCodeUnits(left, right) {
@@ -596,7 +603,7 @@ const authoredContexts = [
 
 function generatedOutputPaths() {
   return {
-    output: ["script-contexts.json", ...authoredContexts.map(({ id }) => `sdk/contexts/${id}.ts`)],
+    output: ["script-contexts.json", "generated/native-extensions/index.json", ...authoredContexts.map(({ id }) => `sdk/contexts/${id}.ts`)],
     project: [
       "tsconfig.deherm.base.json",
       ...authoredContexts.map(({ id }) => `tsconfig.deherm.${id}.json`),
@@ -1330,13 +1337,15 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const core = await coreSdkForRevision(defoldRevision, { projectRoot: inventory.projectRoot, env: options.env });
   const toolchain = core.toolchain;
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
+  const nativeExtensionClang = resolveNativeExtensionClang({ inventory, clang: options.clang });
   const portableInventory = { ...inventory, projectRoot: "." };
   const bindingIr = buildProjectBindingIr(inventory, core.valueLayouts);
   const generation = await projectGenerationIdentity({
     inventory: portableInventory,
     outputDirectory: relativeRoot,
     core,
-    engineProfiles
+    engineProfiles,
+    nativeExtensionClang
   });
   const generationKey = generation.cacheKey;
   // The Defold revision and the native input set are independent cache keys.
@@ -1351,14 +1360,23 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   });
   if (options.force !== true) {
     try {
-      const [manifestSource, lockSource] = await Promise.all([
+      const [manifestSource, lockSource, nativeIndexSource] = await Promise.all([
         readConfinedFile(resolvedOutputRoot, "manifest.json", "Generated manifest"),
-        readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock")
+        readConfinedFile(resolvedProjectRoot, "deherm.lock", "deherm.lock"),
+        readConfinedFile(resolvedOutputRoot, "generated/native-extensions/index.json", "Generated native-extension index")
       ]);
       const previousManifest = JSON.parse(manifestSource.toString("utf8"));
       const previousLock = JSON.parse(lockSource.toString("utf8"));
       if (previousManifest.generation?.cacheKey === generationKey &&
-          previousLock.generation?.cacheKey === generationKey) {
+          previousLock.generation?.cacheKey === generationKey &&
+          previousManifest.generatedOutputs?.output?.["generated/native-extensions/index.json"] === sha256(nativeIndexSource)) {
+        const nativeIndex = JSON.parse(nativeIndexSource.toString("utf8"));
+        if (nativeIndex.keyedOutput !== path.posix.join(core.revision, generationKey)) throw new Error("Cached native-extension index has a stale generation key");
+        await readConfinedFile(
+          resolvedOutputRoot,
+          path.posix.join("generated/native-extensions", nativeIndex.keyedOutput, "report.json"),
+          "Cached native-extension report"
+        );
         return {
           root,
           defoldRevision: core.revision,
@@ -1372,6 +1390,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
           typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),
           cached: true,
           generationKey,
+          nativeExtensions: previousManifest.nativeExtensions,
           created: { tsconfig: false, vscodeExtensions: false, vscodeSettings: false },
           migrated: { tsconfig: false }
         };
@@ -1380,6 +1399,14 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
     }
   }
+  const nativeExtensions = await materializeProjectNativeExtensionApis({
+    inventory,
+    outputRoot: root,
+    defoldRevision: core.revision,
+    generationKey,
+    clang: nativeExtensionClang.command
+  });
+  const nativeExtensionsIndexSource = await readFile(path.join(root, "generated", "native-extensions", "index.json"), "utf8");
   await writeFile(path.join(root, "extensions.json"), `${JSON.stringify(portableInventory, null, 2)}\n`);
   await writeFile(path.join(root, "bindings.ir.json"), `${JSON.stringify(bindingIr, null, 2)}\n`);
   const irRoot = path.join(root, "ir");
@@ -1477,6 +1504,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const generatedOutputs = {
     output: Object.fromEntries(Object.entries({
       "script-contexts.json": scriptContextsSource,
+      "generated/native-extensions/index.json": nativeExtensionsIndexSource,
       ...contextSources
     }).map(([relative, source]) => [relative, sha256(source)])),
     project: Object.fromEntries(Object.entries(projectConfigSources).map(([relative, source]) => [relative, sha256(source)]))
@@ -1501,6 +1529,13 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     inputs: core.inputs,
     generatedOutputs,
     generatedSdkSha256,
+    nativeExtensions: {
+      headerCount: nativeExtensions.index.headerCount,
+      generatedRouteCount: nativeExtensions.index.generatedRouteCount,
+      blockedRouteCount: nativeExtensions.index.blockedRouteCount,
+      keyedOutput: nativeExtensions.index.keyedOutput,
+      treeSha256: nativeExtensions.treeSha256
+    },
     engineProfiles,
     loweringPlan: {
       sha256: core.loweringPlan.planSha256,
@@ -1572,6 +1607,13 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     inputs: core.inputs,
     generatedOutputs,
     generatedSdkSha256,
+    nativeExtensions: {
+      headerCount: nativeExtensions.index.headerCount,
+      generatedRouteCount: nativeExtensions.index.generatedRouteCount,
+      blockedRouteCount: nativeExtensions.index.blockedRouteCount,
+      keyedOutput: nativeExtensions.index.keyedOutput,
+      treeSha256: nativeExtensions.treeSha256
+    },
     engineProfiles,
     ...(previousBuildArtifacts ? { buildArtifacts: previousBuildArtifacts } : {})
   }, null, 2)}\n`);
@@ -1603,6 +1645,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     projection: bindingIr.coverage,
     cached: false,
     generationKey,
+    nativeExtensions: nativeExtensions.index,
     typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),
     created: {
       tsconfig: tsconfigState.created,
@@ -1667,11 +1710,16 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   }
   const inventorySource = await readConfinedFile(resolvedOutputRoot, "extensions.json", "Generated extension inventory");
   const inventory = JSON.parse(inventorySource.toString("utf8"));
+  const nativeExtensionClang = resolveNativeExtensionClang({
+    inventory,
+    clang: manifest.generation?.nativeExtensionClang?.command
+  });
   const expectedGeneration = await projectGenerationIdentity({
     inventory,
     outputDirectory: relativeRoot,
     core,
-    engineProfiles: manifest.engineProfiles
+    engineProfiles: manifest.engineProfiles,
+    nativeExtensionClang
   });
   if (JSON.stringify(manifest.generation) !== JSON.stringify(expectedGeneration)) {
     throw new Error("Generated manifest project-generation key is stale or invalid");
@@ -1717,6 +1765,36 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
       }
       verified[`${rootName}:${relative}`] = actual;
     }
+  }
+  const nativeIndex = JSON.parse((await readConfinedFile(
+    resolvedOutputRoot,
+    "generated/native-extensions/index.json",
+    "Generated native-extension index"
+  )).toString("utf8"));
+  const expectedNativeOutput = path.posix.join(manifest.defoldRevision, manifest.generation.cacheKey);
+  if (nativeIndex.defoldRevision !== manifest.defoldRevision ||
+      nativeIndex.projectGenerationKey !== manifest.generation.cacheKey ||
+      nativeIndex.keyedOutput !== expectedNativeOutput) {
+    throw new Error("Generated native-extension index is not keyed to this project generation and Defold revision");
+  }
+  const nativeOwnerRoot = path.join(resolvedOutputRoot, "generated", "native-extensions");
+  const ownerEntries = await readdir(nativeOwnerRoot, { withFileTypes: true });
+  const ownerShape = ownerEntries.map((entry) => `${entry.isDirectory() ? "d" : entry.isFile() ? "f" : "x"}:${entry.name}`).sort();
+  const expectedOwnerShape = [`d:${manifest.defoldRevision}`, "f:index.json"].sort();
+  if (JSON.stringify(ownerShape) !== JSON.stringify(expectedOwnerShape)) {
+    throw new Error("Generated native-extension owner root contains stale or unsupported files");
+  }
+  const revisionEntries = await readdir(path.join(nativeOwnerRoot, manifest.defoldRevision), { withFileTypes: true });
+  const revisionShape = revisionEntries.map((entry) => `${entry.isDirectory() ? "d" : "x"}:${entry.name}`).sort();
+  if (JSON.stringify(revisionShape) !== JSON.stringify([`d:${manifest.generation.cacheKey}`])) {
+    throw new Error("Generated native-extension revision root contains stale project generations");
+  }
+  const nativeTreeSha256 = await directoryDigest(path.join(
+    nativeOwnerRoot,
+    ...nativeIndex.keyedOutput.split("/")
+  ));
+  if (nativeTreeSha256 !== nativeIndex.treeSha256 || nativeTreeSha256 !== manifest.nativeExtensions?.treeSha256) {
+    throw new Error("Generated native-extension tree does not match its output sentinel; regenerate the project");
   }
   const generatedSdkSha256 = await directoryDigest(path.join(resolvedOutputRoot, "sdk"));
   if (manifest.generatedSdkSha256 !== generatedSdkSha256) {
@@ -1770,6 +1848,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
       JSON.stringify(lock.inputs) !== JSON.stringify(manifest.inputs) ||
       JSON.stringify(lock.generatedOutputs) !== JSON.stringify(manifest.generatedOutputs) ||
       lock.generatedSdkSha256 !== manifest.generatedSdkSha256 ||
+      JSON.stringify(lock.nativeExtensions) !== JSON.stringify(manifest.nativeExtensions) ||
       JSON.stringify(lock.engineProfiles) !== JSON.stringify(manifest.engineProfiles)) {
     throw new Error("deherm.lock does not match the generated manifest contract");
   }

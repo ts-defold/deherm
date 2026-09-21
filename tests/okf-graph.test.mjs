@@ -53,8 +53,11 @@ sources:
 # Alpha
 
 [Beta](b.md)
+[Shared beta section](b.md#shared-heading)
 
 ## Ownership
+
+[This section](#ownership)
 
 This document owns \`src/owned.ts\`.
 It generates \`generated/data.json\`.
@@ -105,6 +108,8 @@ test("OKF graph connects links, declared sources, and semantic ownership edges w
       max: 50
     });
     assert.ok(edges.some((edge) => edge.kind === "links" && edge.target === "doc:research/b.md"));
+    assert.ok(edges.some((edge) => edge.kind === "links" && edge.target === "heading:research/b.md#shared-heading"));
+    assert.ok(edges.some((edge) => edge.kind === "links" && edge.target === "heading:research/a.md#ownership"));
     assert.ok(edges.some((edge) => edge.kind === "source" && edge.target === "source:src/engine.ts"));
     assert.ok(edges.some((edge) => edge.kind === "owns" && edge.target === "source:src/owned.ts"));
     assert.ok(edges.some((edge) => edge.kind === "generates" && edge.target === "source:generated/data.json"));
@@ -118,6 +123,59 @@ test("OKF graph connects links, declared sources, and semantic ownership edges w
     assert.equal(generated.path, "generated/data.json");
     assert.match(generated.digest, /^[a-f0-9]{64}$/);
     assert.equal(generated.content, "", "generated JSON bodies must not enter the index");
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("heading identities are line-independent anchors with deterministic duplicate ordinals", async () => {
+  const value = await fixture();
+  try {
+    const documentPath = path.join(value.docs, "a.md");
+    await writeFile(documentPath, `${await readFile(documentPath, "utf8")}\n## Ownership\n\nDuplicate.\n`);
+    await refreshOkfIndex(value);
+    const before = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT id, line FROM nodes WHERE kind = 'heading' AND path = 'research/a.md' ORDER BY line",
+      max: 20
+    });
+    assert.ok(before.some((heading) => heading.id === "heading:research/a.md#ownership"));
+    assert.ok(before.some((heading) => heading.id === "heading:research/a.md#ownership-2"));
+    const ownershipLine = before.find((heading) => heading.id === "heading:research/a.md#ownership").line;
+
+    const source = await readFile(documentPath, "utf8");
+    await writeFile(documentPath, source.replace("# Alpha\n", "# Alpha\n\nInserted prose does not rename sections.\n"));
+    await refreshOkfIndex(value);
+    const after = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT id, line FROM nodes WHERE kind = 'heading' AND path = 'research/a.md' ORDER BY line",
+      max: 20
+    });
+    assert.deepEqual(after.map((heading) => heading.id), before.map((heading) => heading.id));
+    assert.equal(after.find((heading) => heading.id === "heading:research/a.md#ownership").line, ownershipLine + 2);
+  } finally {
+    await rm(value.root, { recursive: true, force: true });
+  }
+});
+
+test("heading identities do not alias duplicate ordinals with literal suffixed headings", async () => {
+  const value = await fixture();
+  try {
+    const documentPath = path.join(value.docs, "a.md");
+    await writeFile(documentPath, `${await readFile(documentPath, "utf8")}\n## Ownership\n\nDuplicate body.\n\n## Ownership-2\n\nLiteral suffix body.\n`);
+    await refreshOkfIndex(value);
+    const headings = await queryOkfSql({
+      databasePath: value.databasePath,
+      sql: "SELECT id, content FROM nodes WHERE kind = 'heading' AND path = 'research/a.md' AND id LIKE 'heading:research/a.md#ownership%' ORDER BY line",
+      max: 20
+    });
+    assert.deepEqual(headings.map(({ id }) => id), [
+      "heading:research/a.md#ownership",
+      "heading:research/a.md#ownership-2",
+      "heading:research/a.md#ownership-2-2"
+    ]);
+    assert.match(headings[1].content, /Duplicate body/);
+    assert.match(headings[2].content, /Literal suffix body/);
   } finally {
     await rm(value.root, { recursive: true, force: true });
   }

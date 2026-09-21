@@ -101,6 +101,16 @@ generator owns their layout or facade policy.
   expression/overload and checks ABI carrier, receiver, ordered native
   arguments, and result encoding. A negative test proves generic by-value
   `dmSocket::Address` transport fails closed without a typed provider.
+- The compiler-owned Static Hermes applicability partition accounts for all
+  486 universal-ready exact vectors from the same manifest. All 486 currently
+  fit the 32-cell frame and its declared wire-tag set, so the strict sound-typed
+  unit executes each through acquire/set/dispatch/result/release, checks exact
+  call/failure observations, and compares all six result-cell fields. Future
+  over-capacity or unknown-tag vectors remain in the report with
+  machine-readable `blocked-capability` reasons.
+  The runtime report independently records 486 executed vectors, a maximum
+  exercised arity of nine, argument tag mask `0x3e`, and result tag mask
+  `0x3f`; planned/applicable counts are not promoted to runtime evidence.
 - The native harness exercises unsigned narrowing rejection, receiver-backed
   construction/member/destruction, and uses `std::destroy_at` for deterministic
   destructor generation. Negative generator tests cover catalog drift,
@@ -109,6 +119,17 @@ generator owns their layout or facade policy.
   and `ToHost(uint32_t)` materialized thunks through the installed JSI module
   and common C dispatcher, and verifies the bigint round trip. This proves the
   two selected usage-materialized routes, not all catalog recipes.
+- The canonical 486-vector universal-ready corpus now has a generated browser
+  applicability partition derived from wire tags and arity. All 486 current
+  vectors are applicable. A pinned Emscripten 4.0.6 module and Chrome run import
+  the production generated `browser-arena.ts` adapter, encode every vector into
+  the live Emscripten heap, call the common dispatcher through direct exports,
+  and compare the generated call count, failure count, and decoded result.
+  The run balanced 994 scratch allocations with 994 reverse-order releases and
+  observed a 240-byte peak; it uses no mock memory, Embind, `ccall`, or `cwrap`.
+  Memory growth is enabled. A forced-growth regression proves string allocation
+  cannot leave a detached `DataView`, and exact C-string fixtures now carry and
+  verify their UTF-8 byte length in the universal auxiliary field.
 
 This does not claim that all 1,361 native engine implementations have been
 linked or behavior-tested. Most are recipes awaiting a real project's reachable
@@ -118,9 +139,11 @@ code-generation path instead of silently dropping those declarations.
 The emitted production transports remain the common native C ABI provider,
 the generic Dynamic Hermes `DmSdkUniversal` module, Static Hermes direct-memory
 C ABI, browser/Wasm direct memory, and TypeScript stable-ID surface. The exact
-twin added here is a native verification transport. It does not add
-usage-specific Static Hermes or browser fake-callee runners, nor does the
-arbitrary extension-header lane install JSI, Static Hermes, or browser modules.
+twin is consumed by both the native verification transport and the real-browser
+JavaScript arena runner for the declaration-only ready corpus. It does not add
+usage-specific Static Hermes or browser runners for the 875 recipes that still
+need call-site specialization, nor does the arbitrary extension-header lane
+install JSI, Static Hermes, or browser modules.
 
 Remaining blockers are explicit: callback trampolines still need a project
 callback registry; all generic by-value record arguments/results and

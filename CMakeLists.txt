@@ -283,6 +283,7 @@ add_custom_command(
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-ready-corpus.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-materializer.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-materializer-core.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-static-exact-applicability.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/dmsdk-universal-static-frame.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/compiler/src/generated/dmsdk-universal-recipes.mjs"
     "${CMAKE_CURRENT_SOURCE_DIR}/packages/bindings/generated/defold-sdk-ir.json"

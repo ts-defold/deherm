@@ -12,7 +12,7 @@ import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCap
 import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
 import { writeProjectDmSdkCallSymbolIndex, writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../packages/cli/src/resource-symbols.mjs";
 import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
-import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
+import { PUBLIC_EXTENSION_ZIP_LIMITS, discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 
@@ -34,7 +34,15 @@ async function fixture() {
   await mkdir(path.join(root, ".internal", "lib"), { recursive: true });
   await writeFile(path.join(root, "game.project"), `[project]\ntitle = Fixture\ndependencies#0 = https://token:secret@example.com/math.zip?signature=private#fragment\n\n[defold_hermes]\ndefold_sdk = ${bundledDefoldRevision}\n`);
   await writeFile(path.join(root, "camera", "ext.manifest"), `name: Camera\nplatforms:\n  arm64-osx: {}\n`);
-  await writeFile(path.join(root, "camera", "include", "camera.h"), "bool CameraStart(void);\n");
+  await writeFile(path.join(root, "camera", "include", "camera.h"), [
+    "#include <stdint.h>",
+    '#include "camera_types.inc"',
+    "uint32_t camera_accumulate(uint32_t value, int32_t delta);",
+    "typedef struct CameraPoint { float x; float y; } CameraPoint;",
+    "CameraPoint camera_translate(CameraPoint point, float x, float y);",
+    ""
+  ].join("\n"));
+  await writeFile(path.join(root, "camera", "include", "camera_types.inc"), "#define CAMERA_FIXTURE 1\n");
   await writeFile(path.join(root, "camera", "src", "camera.cpp"), "// fixture\n");
   await writeFile(path.join(root, "camera", "camera.script_api"), `
 - name: camera
@@ -55,10 +63,11 @@ async function fixture() {
           type: string|hash|url
 `);
   const archive = zipSync({
-    "math/ext.manifest": strToU8("name: XMath\n"),
-    "math/include/xmath.h": strToU8("double XMathDot(double left, double right);\n"),
-    "math/src/xmath.cpp": strToU8("// fixture\n"),
-    "math/xmath.script_api": strToU8(`
+    "./math/ext.manifest": strToU8("name: XMath\n"),
+    "./math/api/include/xmath.h": strToU8("#include <xmath_common.inc>\ndouble XMathDot(double left, double right, XMathMode mode);\nXMathPoint XMathTranslate(XMathPoint point);\n"),
+    "./math/common/include/xmath_common.inc": strToU8("typedef enum XMathMode { XMATH_ADD = 0, XMATH_MULTIPLY = 1 } XMathMode;\ntypedef struct XMathPoint { double x; double y; } XMathPoint;\ndouble SharedHelper(double value);\n"),
+    "./math/src/xmath.cpp": strToU8("// fixture\n"),
+    "./math/xmath.script_api": strToU8(`
 - name: xmath
   type: table
   members:
@@ -425,12 +434,65 @@ test("project inspection finds local and resolved dependency extensions", async 
   });
   assert.deepEqual(inventory.extensions[0].publicHeaders, ["camera/include/camera.h"]);
   assert.deepEqual(inventory.extensions[0].sourceFiles, ["camera/src/camera.cpp"]);
-  assert.deepEqual(inventory.extensions[1].publicHeaders, ["math.zip:math/include/xmath.h"]);
+  assert.deepEqual(inventory.extensions[1].publicHeaders, ["math.zip:math/api/include/xmath.h"]);
+  assert.ok(inventory.extensions.every(({ publicHeaderDetails }) =>
+    publicHeaderDetails.length === 1 && /^[0-9a-f]{64}$/.test(publicHeaderDetails[0].sha256)));
+  assert.ok(inventory.extensions.every(({ publicIncludeTreeSha256 }) => /^[0-9a-f]{64}$/.test(publicIncludeTreeSha256)));
+  assert.deepEqual(inventory.extensions.map(({ publicIncludeRoots }) => publicIncludeRoots), [["include"], ["api/include", "common/include"]]);
   assert.deepEqual(inventory.extensions.map(({ bindingStatus: status }) => status), [
     "script-api+native-schema-required",
     "script-api+native-schema-required"
   ]);
   assert.deepEqual(inventory.diagnostics, []);
+});
+
+test("dependency header discovery uses exact include segments and rejects unsafe or oversized ZIP entries", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-extension-zip-guards-"));
+  await mkdir(path.join(project, ".internal", "lib"), { recursive: true });
+  await writeFile(path.join(project, "game.project"), "[project]\ntitle = ZIP guards\n");
+  await writeFile(path.join(project, ".internal", "lib", "false-positive.zip"), zipSync({
+    "false/ext.manifest": strToU8("name: FalsePositive\n"),
+    "false/myinclude/not_public.h": strToU8("void nope(void);\n")
+  }));
+  await writeFile(path.join(project, ".internal", "lib", "backslash.zip"), zipSync({
+    "bad\\ext.manifest": strToU8("name: Bad\n")
+  }));
+  await writeFile(path.join(project, ".internal", "lib", "duplicate.zip"), zipSync({
+    "duplicate/ext.manifest": strToU8("name: First\n"),
+    "./duplicate/ext.manifest": strToU8("name: Second\n")
+  }));
+  await writeFile(path.join(project, ".internal", "lib", "oversized.zip"), zipSync({
+    "huge/ext.manifest": strToU8("name: Huge\n"),
+    "huge/include/huge.h": new Uint8Array(PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes + 1)
+  }, { level: 0 }));
+
+  const inventory = await inspectDefoldProject({ project });
+  const falsePositive = inventory.extensions.find(({ name }) => name === "FalsePositive");
+  assert.ok(falsePositive);
+  assert.deepEqual(falsePositive.publicHeaders, []);
+  assert.ok(inventory.diagnostics.some(({ path: file, message }) => file.endsWith("backslash.zip") && /Unsafe dependency archive entry/.test(message)));
+  assert.ok(inventory.diagnostics.some(({ path: file, message }) => file.endsWith("duplicate.zip") && /duplicate canonical entry/.test(message)));
+  assert.ok(inventory.diagnostics.some(({ path: file, message }) => file.endsWith("oversized.zip") && /exceeds/.test(message)));
+});
+
+test("project native header generation requires executable Clang and catalogs only source parse failures", async () => {
+  const missingToolProject = await fixture();
+  const missingToolInventory = await inspectDefoldProject({ project: missingToolProject });
+  await assert.rejects(
+    writeGeneratedProject(missingToolInventory, ".deherm", { clang: path.join(missingToolProject, "missing-clang") }),
+    /requires an executable Clang tool/
+  );
+  await assert.rejects(readFile(path.join(missingToolProject, ".deherm", "manifest.json"), "utf8"), /ENOENT/);
+
+  const parseProject = await fixture();
+  await writeFile(path.join(parseProject, "camera", "include", "camera.h"), "#include <stdint.h>\nuint32_t camera_broken(\n");
+  const parseInventory = await inspectDefoldProject({ project: parseProject });
+  const parsed = await writeGeneratedProject(parseInventory);
+  const camera = parsed.nativeExtensions.headers.find(({ extension }) => extension === "Camera");
+  assert.deepEqual(camera.blockers, [{ code: "header-parse-failed", message: "Clang rejected this discovered public C header" }]);
+  assert.equal(camera.blockedRouteCount, 1);
+  const cameraRoot = path.join(parsed.root, "generated", "native-extensions", ...camera.output.split("/"));
+  assert.deepEqual(await readdir(cameraRoot), ["extension.ir.json"]);
 });
 
 test("project inspection follows symlinked extensions without duplicate traversal", async () => {
@@ -483,6 +545,31 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   const saved = await readFile(path.join(output.root, "extensions.d.ts"), "utf8");
   assert.equal(saved, types);
   assert.deepEqual(JSON.parse(await readFile(path.join(output.root, "bindings.ir.json"), "utf8")), ir);
+  const nativeIndex = JSON.parse(await readFile(path.join(output.root, "generated", "native-extensions", "index.json"), "utf8"));
+  assert.equal(nativeIndex.headerCount, 2);
+  assert.equal(nativeIndex.generatedRouteCount, 2);
+  assert.equal(nativeIndex.blockedRouteCount, 2);
+  assert.equal(nativeIndex.keyedOutput, `${output.defoldRevision}/${output.generationKey}`);
+  assert.match(nativeIndex.treeSha256, /^[0-9a-f]{64}$/);
+  const cameraNative = nativeIndex.headers.find(({ extension }) => extension === "Camera");
+  assert.ok(cameraNative);
+  const cameraNativeRoot = path.join(output.root, "generated", "native-extensions", ...cameraNative.output.split("/"));
+  assert.match(await readFile(path.join(cameraNativeRoot, "camera_glue.cpp"), "utf8"), /camera_accumulate/);
+  assert.match(await readFile(path.join(cameraNativeRoot, "camera_glue.verify.cpp"), "utf8"), new RegExp(`deherm_ext_${cameraNative.generatedNamespace}_exact_dispatch`));
+  assert.match(await readFile(path.join(cameraNativeRoot, "camera_glue.verify.json"), "utf8"), /compileTimeResolution/);
+  const xmathNative = nativeIndex.headers.find(({ extension }) => extension === "XMath");
+  const xmathNativeRoot = path.join(output.root, "generated", "native-extensions", ...xmathNative.output.split("/"));
+  const xmathIr = JSON.parse(await readFile(path.join(xmathNativeRoot, "extension.ir.json"), "utf8"));
+  assert.equal(xmathIr.symbolPrefix, null);
+  assert.deepEqual(xmathIr.routes.map(({ symbol, memberName, disposition }) => [symbol, memberName, disposition]), [
+    ["XMathDot", "XMathDot", "generated-c-abi"],
+    ["XMathTranslate", "XMathTranslate", "cataloged-needs-layout"]
+  ]);
+  assert.deepEqual(xmathIr.enums.map(({ name }) => name), ["XMathMode"]);
+  assert.deepEqual(xmathIr.records.map(({ name }) => name), ["XMathPoint"]);
+  assert.equal(xmathIr.routes[0].parameters[2].type.kind, "enum");
+  assert.match(xmathIr.routes[1].blockers[0], /record:XMathPoint/);
+  assert.doesNotMatch(await readFile(path.join(xmathNativeRoot, "xmath.ts"), "utf8"), /SharedHelper/);
   const camera = await readFile(path.join(output.root, "sdk", "modules", "camera.ts"), "utf8");
   assert.match(camera, /export const camera: CameraExtension/);
   assert.match(camera, /callExtension\("camera", "start", \[facing\]\)/);
@@ -493,6 +580,9 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(index, /export \* from "\.\/generated\/dmsdk\/scalar\.js"/);
   assert.match(index, /export \{ camera \} from "\.\/modules\/camera\.js"/);
   const manifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
+  assert.equal(manifest.generation.nativeExtensionClang.required, true);
+  assert.match(manifest.generation.nativeExtensionClang.versionSha256, /^[0-9a-f]{64}$/);
+  assert.match(manifest.generation.nativeExtensionGeneratorSha256, /^[0-9a-f]{64}$/);
   assert.match(manifest.defoldRevision, /^[a-f0-9]{40}$/);
   assert.equal(manifest.coverage.script.functions, 926);
   assert.equal(manifest.coverage.script.typeSurfaceUnresolved, 0);
@@ -567,7 +657,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.deepEqual(lock.generatedOutputs, manifest.generatedOutputs);
   assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
   const verified = await verifyGeneratedProject(project);
-  assert.equal(verified.checkedFiles, 27);
+  assert.equal(verified.checkedFiles, 28);
   assert.equal(verified.planSha256, loweringPlan.planSha256);
   const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
     cwd: process.cwd(),
@@ -575,6 +665,15 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   });
   assert.equal(verifiedCli.status, 0, `${verifiedCli.stdout}\n${verifiedCli.stderr}`);
   assert.equal(JSON.parse(verifiedCli.stdout).planSha256, loweringPlan.planSha256);
+
+  const cameraGlue = path.join(cameraNativeRoot, "camera_glue.cpp");
+  await writeFile(cameraGlue, `${await readFile(cameraGlue, "utf8")} `);
+  await assert.rejects(verifyGeneratedProject(project), /native-extension tree does not match its output sentinel/);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
+  const staleNativeRoot = path.join(output.root, "generated", "native-extensions", "stale-revision");
+  await mkdir(staleNativeRoot, { recursive: true });
+  await assert.rejects(verifyGeneratedProject(project), /owner root contains stale or unsupported files/);
+  await writeGeneratedProject(inventory, ".deherm", { force: true });
 
   const dispatchPath = path.join(output.root, "ir", "script-scalar-dispatch.json");
   await writeFile(dispatchPath, `${await readFile(dispatchPath, "utf8")} `);
@@ -742,6 +841,22 @@ test("project generation uses an input key and does not rewrite current outputs"
   assert.equal(second.cached, true);
   assert.equal(second.generationKey, first.generationKey);
   assert.equal(after.mtimeMs, before.mtimeMs);
+
+  await unlink(path.join(first.root, "generated", "native-extensions", "index.json"));
+  const repaired = await writeGeneratedProject(inventory);
+  assert.equal(repaired.cached, false, "a missing native-extension sentinel must bypass the fast cache path");
+
+  await writeFile(path.join(project, "camera", "include", "camera_types.inc"), "#define CAMERA_FIXTURE 2\n");
+  await assert.rejects(
+    writeGeneratedProject(inventory, ".deherm", { force: true }),
+    /Public include tree changed after project discovery/
+  );
+  await readFile(path.join(first.root, "generated", "native-extensions", "index.json"), "utf8");
+  assert.deepEqual((await readdir(path.join(first.root, "generated"))).filter((name) => name.startsWith(".native-extensions-stage-")), []);
+  const changedInventory = await inspectDefoldProject({ project });
+  const changed = await writeGeneratedProject(changedInventory);
+  assert.equal(changed.cached, false);
+  assert.notEqual(changed.generationKey, first.generationKey);
 });
 
 test("script context projection requires an exact route-id bijection and records unknown tokens as unresolved", async () => {

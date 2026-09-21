@@ -5,6 +5,12 @@ import path from "node:path";
 
 function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
 function safeName(value, label) { if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw new Error(`${label} must be an identifier`); return value; }
+function mainHeaderDeclaration(node, absolute) {
+  const location = node.loc ?? {};
+  if (location.includedFrom) return false;
+  if (location.file) return path.resolve(location.file) === absolute;
+  return Number.isInteger(location.line);
+}
 function walk(node, visit) { visit(node); for (const child of node.inner ?? []) walk(child, visit); }
 function resultSpelling(node) { return node.type.qualType.replace(/\s*\([^()]*\)$/, "").trim(); }
 
@@ -46,14 +52,20 @@ function routeIdentity(module, symbol, parameters, result, variadic) {
   };
 }
 
-export function ingestNativeExtensionHeader({ header, moduleName, clang = process.env.CLANG ?? "clang", include = [] }) {
+export function ingestNativeExtensionHeader({ header, moduleName, symbolPrefix = `${moduleName}_`, clang = process.env.CLANG ?? "clang", include = [] }) {
   const absolute = path.resolve(header), module = safeName(moduleName, "moduleName");
-  const ast = JSON.parse(execFileSync(clang, ["-x", "c", "-std=c11", "-Wno-pragma-once-outside-header", ...include.flatMap((entry) => ["-I", path.resolve(entry)]), "-Xclang", "-ast-dump=json", "-fsyntax-only", absolute], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }));
+  if (symbolPrefix !== null && (typeof symbolPrefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(symbolPrefix))) {
+    throw new Error("symbolPrefix must be null or a C identifier prefix");
+  }
+  const ast = JSON.parse(execFileSync(clang, ["-x", "c", "-std=c11", "-Wno-pragma-once-outside-header", ...include.flatMap((entry) => ["-I", path.resolve(entry)]), "-Xclang", "-ast-dump=json", "-fsyntax-only", absolute], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] }));
   const enums = new Map(), records = new Map(), functions = [];
   walk(ast, (node) => {
-    if (node.kind === "EnumDecl" && node.name && node.loc?.file === absolute) enums.set(node.name, { name: node.name, values: enumValues(node.inner ?? []) });
-    if (node.kind === "RecordDecl" && node.name && (node.loc?.file === absolute || node.loc?.line)) records.set(node.name, { name: node.name, fields: (node.inner ?? []).filter((item) => item.kind === "FieldDecl").map((item) => ({ name: item.name, nativeType: item.type.qualType })) });
-    if (node.kind === "FunctionDecl" && node.name && node.name.startsWith(`${module}_`) && (node.loc?.file === absolute || node.loc?.line)) functions.push(node);
+    // Type facts may live in transitive public headers even though only the
+    // selected header owns callable surface declarations. Referenced-type
+    // filtering below keeps unrelated transitive types out of emitted IR.
+    if (node.kind === "EnumDecl" && node.name) enums.set(node.name, { name: node.name, values: enumValues(node.inner ?? []) });
+    if (node.kind === "RecordDecl" && node.name) records.set(node.name, { name: node.name, fields: (node.inner ?? []).filter((item) => item.kind === "FieldDecl").map((item) => ({ name: item.name, nativeType: item.type.qualType })) });
+    if (node.kind === "FunctionDecl" && node.name && (symbolPrefix === null || node.name.startsWith(symbolPrefix)) && mainHeaderDeclaration(node, absolute)) functions.push(node);
   });
   const candidates = functions.sort((a, b) => a.loc.line - b.loc.line || a.name.localeCompare(b.name)).map((node) => {
     const parameters = (node.inner ?? []).filter((item) => item.kind === "ParmVarDecl").map((item, position) => ({ position, name: item.name || `arg${position}`, type: normalizeType(item.type.qualType, enums, records) }));
@@ -65,7 +77,7 @@ export function ingestNativeExtensionHeader({ header, moduleName, clang = proces
       ...(variadic ? ["variadic:requires-typed-nonvariadic-facade"] : []),
     ];
     const identity = routeIdentity(module, node.name, parameters, result, variadic);
-    return { id: identity.numericId, ...identity, symbol: node.name, line: node.loc.line, variadic, parameters, result, disposition: blockers.length ? "cataloged-needs-layout" : "generated-c-abi", blockers };
+    return { id: identity.numericId, ...identity, symbol: node.name, memberName: symbolPrefix === null ? node.name : node.name.slice(symbolPrefix.length), line: node.loc.line, variadic, parameters, result, disposition: blockers.length ? "cataloged-needs-layout" : "generated-c-abi", blockers };
   });
   const stableRoutes = new Map();
   for (const route of candidates) {
@@ -80,7 +92,7 @@ export function ingestNativeExtensionHeader({ header, moduleName, clang = proces
   }
   const referencedRecords = new Set(routes.flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)]).filter(({ kind }) => kind === "record").map(({ name }) => name));
   const referencedEnums = new Set(routes.flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)]).filter(({ kind }) => kind === "enum").map(({ name }) => name));
-  return { schemaVersion: 1, module, header: path.basename(absolute), headerSha256: sha256(readFileSync(absolute)), enums: [...enums.values()].filter(({ name }) => referencedEnums.has(name)).sort((a, b) => a.name.localeCompare(b.name)), records: [...records.values()].filter(({ name }) => referencedRecords.has(name)).sort((a, b) => a.name.localeCompare(b.name)), routes };
+  return { schemaVersion: 1, module, symbolPrefix, header: path.basename(absolute), headerSha256: sha256(readFileSync(absolute)), enums: [...enums.values()].filter(({ name }) => referencedEnums.has(name)).sort((a, b) => a.name.localeCompare(b.name)), records: [...records.values()].filter(({ name }) => referencedRecords.has(name)).sort((a, b) => a.name.localeCompare(b.name)), routes };
 }
 
 function tag(type) { if (type.kind === "bool") return "DEHERM_DMSDK_UNIVERSAL_BOOL"; if (["f32", "f64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_F64"; if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_I64"; if (["u8", "u16", "u32", "u64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_U64"; if (type.kind === "cstring") return "DEHERM_DMSDK_UNIVERSAL_ADDRESS"; return type.kind === "void" ? "DEHERM_DMSDK_UNIVERSAL_VOID" : null; }
@@ -94,12 +106,12 @@ function encodeResult(type, call) { if (type.kind === "void") return `${call}; r
   if (type.kind === "cstring") return `const char* value=${call};result->tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;result->payload=reinterpret_cast<uintptr_t>(value);result->auxiliary=value?strlen(value):0;`;
 }
 
-function routeNames(ir, route) {
+function routeNames(namespace, route) {
   const suffix = route.signatureSha256.slice(0, 16);
   return {
-    productionWrapper: `deherm_ext_${ir.module}_route_${suffix}`,
-    exactWrapper: `deherm_ext_${ir.module}_route_${suffix}__exact_call`,
-    fakeCallee: `deherm_ext_${ir.module}_route_${suffix}__exact_callee`,
+    productionWrapper: `deherm_ext_${namespace}_route_${suffix}`,
+    exactWrapper: `deherm_ext_${namespace}_route_${suffix}__exact_call`,
+    fakeCallee: `deherm_ext_${namespace}_route_${suffix}__exact_callee`,
   };
 }
 
@@ -206,15 +218,16 @@ function renderVerificationDriver(ir, routes, exactDispatch) {
   return { source, fakeDefinitionsSha256: sha256(fakeDefinitions) };
 }
 
-export function renderNativeExtensionBindings(ir, { headerInclude = path.basename(ir.header) } = {}) {
-  const generated = ir.routes.filter((route) => route.disposition === "generated-c-abi").map((route) => ({ ...route, names: routeNames(ir, route) }));
+export function renderNativeExtensionBindings(ir, { headerInclude = path.basename(ir.header), namespace = ir.module } = {}) {
+  const generatedNamespace = safeName(namespace, "namespace");
+  const generated = ir.routes.filter((route) => route.disposition === "generated-c-abi").map((route) => ({ ...route, names: routeNames(generatedNamespace, route) }));
   const enumLines = ir.enums.flatMap((item) => [`export const ${item.name}={${item.values.map((value) => `${value.name}:${value.value}`).join(",")}} as const;`, `export type ${item.name}=typeof ${item.name}[keyof typeof ${item.name}];`]);
   const recordLines = ir.records.map((item) => `export interface ${item.name}{${item.fields.map((field) => `readonly ${field.name}:number`).join(";")}}`);
-  const functions = ir.routes.map((route) => route.disposition === "generated-c-abi" ? `  ${route.symbol.slice(ir.module.length + 1)}(${route.parameters.map((parameter) => `${parameter.name}:${parameter.type.ts}`).join(",")}):${route.result.ts};` : `  /** blocked: ${route.blockers.join(", ")} */ readonly ${route.symbol.slice(ir.module.length + 1)}:never;`);
+  const functions = ir.routes.map((route) => route.disposition === "generated-c-abi" ? `  ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}(${route.parameters.map((parameter) => `${parameter.name}:${parameter.type.ts}`).join(",")}):${route.result.ts};` : `  /** blocked: ${route.blockers.join(", ")} */ readonly ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}:never;`);
   const typescript = `// Generated by @deherm/compiler native-extension-generator. Do not edit.\nexport type NativeAddress=bigint;\n${enumLines.join("\n")}\n${recordLines.join("\n")}\nexport interface ${ir.module[0].toUpperCase()+ir.module.slice(1)}NativeExtension {\n${functions.join("\n")}\n}\n`;
   const preamble = `#include <defold_hermes/generated_dmsdk_universal.h>\n#include <${headerInclude}>\n#include <stdint.h>\n#include <string.h>\n[[maybe_unused]] static int64_t deherm_ext_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}\n[[maybe_unused]] static double deherm_ext_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}\n`;
-  const productionDispatch = `deherm_ext_${ir.module}_dispatch`;
-  const exactDispatch = `deherm_ext_${ir.module}_exact_dispatch`;
+  const productionDispatch = `deherm_ext_${generatedNamespace}_dispatch`;
+  const exactDispatch = `deherm_ext_${generatedNamespace}_exact_dispatch`;
   const productionWrappers = generated.map((route) => renderWrapper(route, ir, route.names.productionWrapper, route.symbol));
   const exactWrappers = generated.map((route) => renderWrapper(route, ir, route.names.exactWrapper, route.names.fakeCallee));
   const source = `// Generated by @deherm/compiler native-extension-generator. Do not edit.\n${preamble}${productionWrappers.join("\n")}\n${renderDispatcher(productionDispatch, generated, "productionWrapper")}\n`;

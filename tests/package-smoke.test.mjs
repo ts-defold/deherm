@@ -311,6 +311,46 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   const help = run(process.execPath, [path.join(packageRoot, "bin", "deherm.mjs"), "--help"]);
   assert.match(help.stdout, /deherm <command>/);
 
+  const extensionProject = path.join(root, "extension-project");
+  await mkdir(path.join(extensionProject, "packed", "include"), { recursive: true });
+  await writeFile(path.join(extensionProject, "game.project"), [
+    "[project]",
+    "title = Packed extension project",
+    "custom_resources = /deherm",
+    "[script]",
+    "shared_state = 1",
+    "[library]",
+    "include_dirs = defold_hermes",
+    "[defold_hermes]",
+    "app = /deherm/app.dehermc",
+    `defold_sdk = ${entry.defoldRevision}`,
+    ""
+  ].join("\n"));
+  await writeFile(path.join(extensionProject, "packed", "ext.manifest"), "name: packed\n");
+  await writeFile(path.join(extensionProject, "packed", "include", "packed.h"), [
+    "#include <stdint.h>",
+    "uint32_t packed_add(uint32_t left, uint32_t right);",
+    ""
+  ].join("\n"));
+  const packedProjectGeneration = run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "generate",
+    "--project", extensionProject,
+    "--json",
+    "--force"
+  ], { cwd: root, env: { ...process.env, DEHERM_CACHE_HOME: dehermCacheHome } });
+  const packedProjectSummary = JSON.parse(packedProjectGeneration.stdout);
+  assert.equal(packedProjectSummary.nativeExtensions.generatedRouteCount, 1);
+  assert.equal(packedProjectSummary.nativeExtensions.blockedRouteCount, 0);
+  const packedProjectIndex = JSON.parse(await readFile(path.join(
+    extensionProject, ".deherm", "generated", "native-extensions", "index.json"
+  ), "utf8"));
+  assert.equal(packedProjectIndex.keyedOutput, `${entry.defoldRevision}/${packedProjectSummary.generationKey}`);
+  const packedHeader = packedProjectIndex.headers[0];
+  await readFile(path.join(
+    extensionProject, ".deherm", "generated", "native-extensions", ...packedHeader.output.split("/"), "packed_glue.cpp"
+  ), "utf8");
+
   const conformanceRoot = path.join(root, "conformance");
   const conformance = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),

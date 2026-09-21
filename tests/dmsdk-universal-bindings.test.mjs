@@ -19,11 +19,17 @@ import {
   dmSdkUniversalReadyUsages,
   materializeDmSdkUniversalReadyCorpus,
 } from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
+import { partitionDmSdkUniversalStaticExactVectors } from
+  "../packages/compiler/src/dmsdk-universal-static-exact-applicability.mjs";
 import {
+  DMSDK_UNIVERSAL_STATIC_FRAME_ARGUMENT_WIRE_TAGS,
   DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
+  DMSDK_UNIVERSAL_STATIC_FRAME_RESULT_WIRE_TAGS,
+  dmSdkUniversalStaticFrameCapability,
   emitDmSdkUniversalStaticFrame,
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
+import { generateDmSdkBrowserArena } from "../packages/compiler/src/sdk/support-sdk.mjs";
 import { buildUniversalDmSdkBindings } from "../scripts/generate-dmsdk-universal-bindings.mjs";
 import { buildDmSdkGeneratedAdapterExact } from "../scripts/generate-dmsdk-generated-adapter-exact.mjs";
 
@@ -320,6 +326,8 @@ test("Static Hermes dmSDK frame artifacts come from the stable compiler capabili
   const emitted = emitDmSdkUniversalStaticFrame();
   assert.equal(emitted.argumentCapacity, 32);
   assert.equal(DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY, 32);
+  assert.deepEqual(emitted.wireTags.arguments, DMSDK_UNIVERSAL_STATIC_FRAME_ARGUMENT_WIRE_TAGS);
+  assert.deepEqual(emitted.wireTags.results, DMSDK_UNIVERSAL_STATIC_FRAME_RESULT_WIRE_TAGS);
   assert.match(emitted.header, /DEHERM_DMSDK_STATIC_FRAME_ARGUMENT_CAPACITY UINT32_C\(32\)/);
   assert.match(emitted.source, /DEHERM_DMSDK_STATIC_FRAME_ARGUMENT_CAPACITY/);
   assert.match(emitted.staticHermes, /DMSDK_UNIVERSAL_MAX_ARGUMENTS=32/);
@@ -332,6 +340,65 @@ test("Static Hermes dmSDK frame artifacts come from the stable compiler capabili
     header: emitted.header,
     source: emitted.source,
     staticHermes: emitted.staticHermes,
+  });
+});
+
+test("Static Hermes applicability accounts for every canonical universal-ready exact vector", async () => {
+  const plan = JSON.parse(await readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.plan), "utf8"));
+  const vectors = plan.verification.vectors;
+  const partition = partitionDmSdkUniversalStaticExactVectors(vectors);
+  assert.equal(partition.vectorCount, 486);
+  assert.equal(partition.applicableVectorCount, 486);
+  assert.equal(partition.blockedVectorCount, 0);
+  assert.equal(partition.vectors.length, partition.vectorCount);
+  assert.match(partition.partitionSha256, /^[0-9a-f]{64}$/u);
+  assert.ok(partition.vectors.every(({ disposition, blockers }) =>
+    disposition === "execute" && blockers.length === 0));
+  assert.deepEqual(
+    partition.vectors.map(({ vectorIndex, numericId, vectorSha256 }) =>
+      ({ vectorIndex, numericId, vectorSha256 })),
+    vectors.map(({ numericId, vectorSha256 }, vectorIndex) =>
+      ({ vectorIndex, numericId, vectorSha256 })),
+  );
+  assert.deepEqual(
+    partitionDmSdkUniversalStaticExactVectors(vectors),
+    partition,
+    "the applicability partition must be deterministic",
+  );
+});
+
+test("Static Hermes applicability retains unsupported vectors with machine-readable blockers", () => {
+  const capability = dmSdkUniversalStaticFrameCapability();
+  const vector = {
+    declarationId: "fixture:unsupported",
+    numericId: 7,
+    vectorSha256: "a".repeat(64),
+    argumentCount: capability.argumentCapacity + 1,
+    wireArguments: Array.from(
+      { length: capability.argumentCapacity },
+      (_, slot) => ({ tag: slot === 3 ? "future-wire-tag" : "u64" }),
+    ),
+    result: { fakeReturn: { tag: "future-result-tag" } },
+  };
+  const partition = partitionDmSdkUniversalStaticExactVectors([vector]);
+  assert.equal(partition.vectorCount, 1);
+  assert.equal(partition.applicableVectorCount, 0);
+  assert.equal(partition.blockedVectorCount, 1);
+  assert.deepEqual(partition.vectors[0], {
+    vectorIndex: 0,
+    declarationId: vector.declarationId,
+    numericId: vector.numericId,
+    vectorSha256: vector.vectorSha256,
+    argumentCount: vector.argumentCount,
+    argumentWireTags: vector.wireArguments.map(({ tag }) => tag),
+    resultWireTag: "future-result-tag",
+    disposition: "blocked-capability",
+    blockers: [
+      `static-frame-arity-exceeds-capacity:${capability.argumentCapacity + 1}:${capability.argumentCapacity}`,
+      `static-frame-wire-argument-count-mismatch:${capability.argumentCapacity}:${capability.argumentCapacity + 1}`,
+      "static-frame-argument-wire-tag-unsupported:3:future-wire-tag",
+      "static-frame-result-wire-tag-unsupported:future-result-tag",
+    ],
   });
 });
 
@@ -501,14 +568,32 @@ test("universal dmSDK runtime bridge is generated, catalog-authenticated, and di
 });
 
 test("browser arena adapter executes typed direct-memory cells with balanced scratch releases", async () => {
+  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  assert.equal(
+    generateDmSdkBrowserArena(report),
+    await readFile(path.join(root, "packages/sdk/src/generated/dmsdk/browser-arena.ts"), "utf8"),
+    "the repository owner and package materializer must share the browser arena emitter",
+  );
   const { createBrowserDmSdkUniversalBridge } = await import("../packages/sdk/src/generated/dmsdk/browser-arena.ts");
   const memory = new WebAssembly.Memory({ initial: 1 });
   let cursor = 64;
+  let grewDuringStringEncoding = false;
   const released = [];
   const transport = {
     memory,
     catalogSha256: dmSdkUniversalCatalogSha256,
-    allocate(size, alignment) { cursor = (cursor + alignment - 1) & ~(alignment - 1); const result = cursor; cursor += size; return result; },
+    allocate(size, alignment) {
+      cursor = (cursor + alignment - 1) & ~(alignment - 1);
+      const result = cursor;
+      cursor += size;
+      if (alignment === 1 && !grewDuringStringEncoding) {
+        const priorBuffer = memory.buffer;
+        memory.grow(1);
+        assert.equal(priorBuffer.byteLength, 0, "WebAssembly.Memory.grow must detach the pre-allocation view buffer");
+        grewDuringStringEncoding = true;
+      }
+      return result;
+    },
     release(address, size, alignment) { released.push([address, size, alignment]); },
     dispatch(id, args, count, result) {
       const view = new DataView(memory.buffer);
@@ -532,8 +617,24 @@ test("browser arena adapter executes typed direct-memory cells with balanced scr
   const bridge = createBrowserDmSdkUniversalBridge(transport);
   assert.equal(bridge.call(7, [41n]), 42n);
   assert.equal(bridge.call(8, ["arena"]), true);
+  assert.equal(grewDuringStringEncoding, true);
   assert.ok(released.length >= 5);
   assert.throws(() => createBrowserDmSdkUniversalBridge({ ...transport, catalogSha256: "0".repeat(64) }), /catalog identity mismatch/);
+});
+
+test("exact C-string fixtures carry their UTF-8 byte length in the universal auxiliary field", async () => {
+  const plan = JSON.parse(await readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.plan), "utf8"));
+  const vector = plan.verification.vectors.find(({ wireArguments }) =>
+    wireArguments.some(({ fixture }) => fixture === "cstring"));
+  assert.ok(vector, "canonical exact corpus must contain a C-string argument");
+  const cstring = vector.wireArguments.find(({ fixture }) => fixture === "cstring");
+  assert.equal(cstring.auxiliary, Buffer.byteLength(cstring.value));
+  assert.match(plan.artifacts.verificationSource.sha256, /^[0-9a-f]{64}$/);
+  const generated = materializeDmSdkUniversalReadyCorpus(
+    buildDmSdkCallSymbolIndex(JSON.parse(await readFile(sdkIrPath, "utf8")), policyCatalog),
+    policyCatalog,
+  ).generated;
+  assert.match(generated.verificationSource, /\.auxiliary=UINT64_C\(sizeof\(deherm_exact_vector_\d+_cstring_\d+\)-1\)/);
 });
 
 test("usage materializer compiles, links, and runs direct, function-template, constructor, method, and destructor recipes", async () => {

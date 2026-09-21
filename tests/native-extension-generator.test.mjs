@@ -116,6 +116,27 @@ test("arbitrary extension headers deterministically produce ABI IR, TypeScript, 
   } finally { await rm(output, { recursive: true, force: true }); }
 });
 
+test("automatic header ingestion keeps exact C names and excludes transitive declarations", async (t) => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-native-extension-unfiltered-"));
+  t.after(() => rm(output, { recursive: true, force: true }));
+  await writeFile(path.join(output, "shared.inc"), "double SharedHelper(double value);\n");
+  const header = path.join(output, "xmath.h");
+  await writeFile(header, "#include <shared.inc>\ndouble XMathDot(double left, double right);\n");
+
+  const ir = ingestNativeExtensionHeader({
+    header,
+    moduleName: "xmath",
+    symbolPrefix: null,
+    include: [output]
+  });
+  assert.equal(ir.symbolPrefix, null);
+  assert.deepEqual(ir.routes.map(({ symbol, memberName }) => [symbol, memberName]), [["XMathDot", "XMathDot"]]);
+  const generated = renderNativeExtensionBindings(ir);
+  assert.match(generated.typescript, /XMathDot\(left:number,right:number\):number/);
+  assert.doesNotMatch(generated.typescript, /SharedHelper/);
+  assert.match(generated.source, /XMathDot\(/);
+});
+
 test("CLI exposes header-to-IR generation and reports layout blockers", async () => {
   const output = await mkdtemp(path.join(tmpdir(), "deherm-native-extension-cli-"));
   try {

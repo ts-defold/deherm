@@ -15,6 +15,12 @@ const projectDiscoveryIgnoredDirectories = new Set([
 ]);
 const textDecoder = new TextDecoder();
 const defaultEngineProfileId = "default-legacy-bullet";
+export const PUBLIC_EXTENSION_ZIP_LIMITS = Object.freeze({
+  archiveBytes: 64 * 1024 * 1024,
+  entries: 10_000,
+  selectedEntryBytes: 8 * 1024 * 1024,
+  selectedTotalBytes: 32 * 1024 * 1024
+});
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -339,8 +345,45 @@ export async function resolveEngineProfiles(projectRoot, properties) {
   };
 }
 
+export function assertSafeArchiveEntryName(value) {
+  if (typeof value !== "string" || !value || value.includes("\\") || value.includes("\0")) {
+    throw new Error(`Unsafe dependency archive entry: ${value}`);
+  }
+  const normalized = path.posix.normalize(value);
+  if (value.startsWith("/") || normalized === ".." || normalized.startsWith("../")) {
+    throw new Error(`Unsafe dependency archive entry: ${value}`);
+  }
+  return normalized;
+}
+
+export function publicIncludeSuffix(relative) {
+  const segments = String(relative).split("/");
+  const index = segments.indexOf("include");
+  return index >= 0 && index < segments.length - 1 ? segments.slice(index + 1).join("/") : null;
+}
+
+export function publicIncludeRoot(relative) {
+  const segments = String(relative).split("/");
+  const index = segments.indexOf("include");
+  return index >= 0 ? segments.slice(0, index + 1).join("/") : null;
+}
+
 function isPublicHeader(relative) {
-  return /(^|\/)include\/.*\.(?:h|hh|hpp|hxx)$/i.test(relative);
+  const suffix = publicIncludeSuffix(relative);
+  return suffix !== null && /\.(?:h|hh|hpp|hxx)$/i.test(suffix);
+}
+
+function isPublicIncludeFile(relative) {
+  return publicIncludeSuffix(relative) !== null;
+}
+
+function fileSetSha256(files) {
+  const hash = createHash("sha256");
+  for (const { path: file, bytes } of files.sort((left, right) => left.path < right.path ? -1 : left.path > right.path ? 1 : 0)) {
+    hash.update(`f\0${file}\0${bytes.byteLength}\0`);
+    hash.update(bytes);
+  }
+  return hash.digest("hex");
 }
 
 function isNativeSource(relative) {
@@ -364,6 +407,7 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
     const relative = portable(path.relative(root, file));
     return isPublicHeader(relative) || isNativeSource(relative);
   }, false, diagnostics);
+  const includeFiles = await walk(root, (file) => isPublicIncludeFile(portable(path.relative(root, file))), false, diagnostics);
   const scriptApis = [];
   for (const file of files) {
     const relative = portable(path.relative(projectRoot, file));
@@ -373,13 +417,22 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
     });
   }
   const publicHeaders = [];
+  const publicHeaderDetails = [];
   const sourceFiles = [];
   for (const file of nativeFiles) {
     const relativeToExtension = portable(path.relative(root, file));
     const relativeToProject = portable(path.relative(projectRoot, file));
-    if (isPublicHeader(relativeToExtension)) publicHeaders.push(relativeToProject);
+    if (isPublicHeader(relativeToExtension)) {
+      publicHeaders.push(relativeToProject);
+      publicHeaderDetails.push({ path: relativeToProject, sha256: sha256(await readFile(file)) });
+    }
     if (isNativeSource(relativeToExtension)) sourceFiles.push(relativeToProject);
   }
+  const publicIncludeTreeSha256 = fileSetSha256(await Promise.all(includeFiles.map(async (file) => ({
+    path: portable(path.relative(root, file)),
+    bytes: await readFile(file)
+  }))));
+  const publicIncludeRoots = [...new Set(includeFiles.map((file) => publicIncludeRoot(portable(path.relative(root, file)))))].sort();
   return {
     kind: "local",
     name: typeof manifest.name === "string" ? manifest.name : path.basename(root),
@@ -388,6 +441,9 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
     platforms: Object.keys(manifest.platforms ?? {}).sort(),
     scriptApis,
     publicHeaders,
+    publicHeaderDetails,
+    publicIncludeTreeSha256,
+    publicIncludeRoots,
     sourceFiles,
     bindingStatus: bindingStatus(scriptApis, publicHeaders)
   };
@@ -398,14 +454,42 @@ function zipEntries(bytes) {
   // full entry listing so an archive that defines no extension can say what it
   // actually contained instead of yielding nothing.
   const listing = [];
+  const seenNames = new Set();
+  let entryCount = 0;
+  let selectedBytes = 0;
+  if (bytes.byteLength > PUBLIC_EXTENSION_ZIP_LIMITS.archiveBytes) {
+    throw new Error(`Dependency archive exceeds ${PUBLIC_EXTENSION_ZIP_LIMITS.archiveBytes} bytes`);
+  }
   const entries = unzipSync(new Uint8Array(bytes), {
     filter(file) {
-      listing.push(file.name);
-      return file.name.endsWith("/ext.manifest") || file.name === "ext.manifest" || file.name.endsWith(".script_api") ||
-        isPublicHeader(file.name) || isNativeSource(file.name);
+      const name = assertSafeArchiveEntryName(file.name);
+      if (seenNames.has(name)) throw new Error(`Dependency archive contains duplicate canonical entry: ${name}`);
+      seenNames.add(name);
+      entryCount += 1;
+      if (entryCount > PUBLIC_EXTENSION_ZIP_LIMITS.entries) {
+        throw new Error(`Dependency archive exceeds ${PUBLIC_EXTENSION_ZIP_LIMITS.entries} entries`);
+      }
+      listing.push(name);
+      const selected = name.endsWith("/ext.manifest") || name === "ext.manifest" || name.endsWith(".script_api") ||
+        isPublicIncludeFile(name) || isNativeSource(name);
+      if (!selected) return false;
+      if (file.originalSize > PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes) {
+        throw new Error(`Dependency archive entry ${name} exceeds ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes} bytes`);
+      }
+      selectedBytes += file.originalSize;
+      if (selectedBytes > PUBLIC_EXTENSION_ZIP_LIMITS.selectedTotalBytes) {
+        throw new Error(`Selected dependency archive entries exceed ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedTotalBytes} bytes`);
+      }
+      return true;
     }
   });
-  return { entries, listing };
+  const canonicalEntries = Object.create(null);
+  for (const [rawName, value] of Object.entries(entries)) {
+    const name = assertSafeArchiveEntryName(rawName);
+    if (Object.hasOwn(canonicalEntries, name)) throw new Error(`Dependency archive contains duplicate canonical entry: ${name}`);
+    canonicalEntries[name] = value;
+  }
+  return { entries: canonicalEntries, listing };
 }
 
 async function dependencyExtensions(projectRoot, diagnostics) {
@@ -466,6 +550,15 @@ async function dependencyExtensions(projectRoot, diagnostics) {
       const publicHeaders = names
         .filter((name) => withinExtension(name) && isPublicHeader(relativeToExtension(name)))
         .map((name) => `${archive}:${name}`);
+      const publicHeaderDetails = names
+        .filter((name) => withinExtension(name) && isPublicHeader(relativeToExtension(name)))
+        .map((name) => ({ path: `${archive}:${name}`, sha256: sha256(entries[name]) }));
+      const publicIncludeTreeSha256 = fileSetSha256(names
+        .filter((name) => withinExtension(name) && isPublicIncludeFile(relativeToExtension(name)) && !name.endsWith("/"))
+        .map((name) => ({ path: relativeToExtension(name), bytes: entries[name] })));
+      const publicIncludeRoots = [...new Set(names
+        .filter((name) => withinExtension(name) && isPublicIncludeFile(relativeToExtension(name)))
+        .map((name) => publicIncludeRoot(relativeToExtension(name))))].sort();
       const sourceFiles = names
         .filter((name) => withinExtension(name) && isNativeSource(relativeToExtension(name)))
         .map((name) => `${archive}:${name}`);
@@ -478,6 +571,9 @@ async function dependencyExtensions(projectRoot, diagnostics) {
         platforms: Object.keys(manifest.platforms ?? {}).sort(),
         scriptApis,
         publicHeaders,
+        publicHeaderDetails,
+        publicIncludeTreeSha256,
+        publicIncludeRoots,
         sourceFiles,
         bindingStatus: bindingStatus(scriptApis, publicHeaders)
       });

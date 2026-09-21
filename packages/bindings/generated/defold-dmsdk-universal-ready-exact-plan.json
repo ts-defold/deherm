@@ -13,7 +13,7 @@
     },
     "verificationSource": {
       "path": "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
-      "sha256": "04550ae8fda7ca13a7620dfe08c6c72f70adffa193cecd9ed09cbde2b0b5a66f"
+      "sha256": "3e0631fc40360b60971b3b48c33d9366681006dd4c042350fd0c92222cea6da9"
     }
   },
   "production": {
@@ -29,7 +29,7 @@
         "wrapper": "deherm_dmsdk_usage_7",
         "exactWrapper": "deherm_dmsdk_usage_7__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_7__exact_callee",
-        "verificationVectorSha256": "9c73edbaad86b27db7a5fd8fa02c28a872d754658bcc8972c3400c760f5785c8",
+        "verificationVectorSha256": "3c285cd022d529e3f28ca487013089b8cefe23abc0d42c86349d334f66f56403",
         "recipeId": "dmsdk-projection:34a52a9fcfb63b878bf6e855",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -40,7 +40,7 @@
         "wrapper": "deherm_dmsdk_usage_8",
         "exactWrapper": "deherm_dmsdk_usage_8__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_8__exact_callee",
-        "verificationVectorSha256": "90d6fa546ee11aa1e833c42b6424e4769d546bfd105d58de408808278861af6c",
+        "verificationVectorSha256": "696c57cd99924fd15c3b165e0f4209cca8a2c3d80efba1f880f44747b829f606",
         "recipeId": "dmsdk-projection:5f11ff8edd5de30f7ae3f304",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -51,7 +51,7 @@
         "wrapper": "deherm_dmsdk_usage_9",
         "exactWrapper": "deherm_dmsdk_usage_9__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_9__exact_callee",
-        "verificationVectorSha256": "0936de33b1d23e8b614256874d9b6ff93a7e10ced390b5bb8b502beaf9426d1b",
+        "verificationVectorSha256": "59248eb8fd28c5abd3a23d164877cecd80f549b18c8281d273932af50602a390",
         "recipeId": "dmsdk-projection:966a69f5e25ae10dc89a3c0e",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -62,7 +62,7 @@
         "wrapper": "deherm_dmsdk_usage_11",
         "exactWrapper": "deherm_dmsdk_usage_11__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_11__exact_callee",
-        "verificationVectorSha256": "ce6fc463b5c13ed4f896f3301e0501a95b6eaf7ff7f3528d14e6515d8f67efe4",
+        "verificationVectorSha256": "43cbb9c0f9508871b21c9e072231239a0c3b86b5aa061b01a204fc3b3a5548c1",
         "recipeId": "dmsdk-projection:9e64636b8123afae7cfecafc",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -205,7 +205,7 @@
         "wrapper": "deherm_dmsdk_usage_190",
         "exactWrapper": "deherm_dmsdk_usage_190__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_190__exact_callee",
-        "verificationVectorSha256": "f7c2a9ddb0c96c2b87cf2e4c36bcded722d8c982da5adb99c0ef24b768d4f6b5",
+        "verificationVectorSha256": "3855a728ce307257de4a7191dbda77b1026ea76ba441f93b60a99589001801b5",
         "recipeId": "dmsdk-projection:0ba3e4e81a7c2aa1dd8ae7b8",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -216,7 +216,7 @@
         "wrapper": "deherm_dmsdk_usage_191",
         "exactWrapper": "deherm_dmsdk_usage_191__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_191__exact_callee",
-        "verificationVectorSha256": "d449bfba50d48c07907b50acf2d2a2c717478766293de8ca00aaac2ee6212a70",
+        "verificationVectorSha256": "7d54d2fdc08e3885bb85d05d9a38185118054e747ae7b9b6a52dc1862e8ad536",
         "recipeId": "dmsdk-projection:7f0c2ef9cc75ca7c2fc38ece",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -227,7 +227,7 @@
         "wrapper": "deherm_dmsdk_usage_192",
         "exactWrapper": "deherm_dmsdk_usage_192__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_192__exact_callee",
-        "verificationVectorSha256": "4346d99143f62a8a5ae3ab2bbf66ae7eda09a4d78955c9801f7236bdaf44df0a",
+        "verificationVectorSha256": "f5317017afdb47221469a462e1cff1fe4da66b66b00aac25cb8d185d0628fa2e",
         "recipeId": "dmsdk-projection:29177ab472ca6de4f91a963f",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -458,7 +458,7 @@
         "wrapper": "deherm_dmsdk_usage_302",
         "exactWrapper": "deherm_dmsdk_usage_302__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_302__exact_callee",
-        "verificationVectorSha256": "b87e8e8bebb05acab27ade219854e1d87ff3493e894423bc0f86b2edb329d43d",
+        "verificationVectorSha256": "50dd4589fb8fd18587cf34c61734245a555a0b341ec39606a24936ed162194c0",
         "recipeId": "dmsdk-projection:77698e986f5b193c83143cc8",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -579,7 +579,7 @@
         "wrapper": "deherm_dmsdk_usage_340",
         "exactWrapper": "deherm_dmsdk_usage_340__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_340__exact_callee",
-        "verificationVectorSha256": "14af1116e67e5b921ed1ad54b7b75d27f669b4b36f20ded616f237b346365b91",
+        "verificationVectorSha256": "2f320f6e1ac8f20ca30f889ae06f5e60f9c7cca4bfcddf3de1dffad6a1566753",
         "recipeId": "dmsdk-projection:cfa1ce080b3f05e546c591b6",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -722,7 +722,7 @@
         "wrapper": "deherm_dmsdk_usage_354",
         "exactWrapper": "deherm_dmsdk_usage_354__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_354__exact_callee",
-        "verificationVectorSha256": "6c5cfaa28d0f599fb4c9c86d99977c87d773801fbda910bfd61c183981a68944",
+        "verificationVectorSha256": "decbfc9c75a2740fba6e813e0d0e4ce2323737334bb544e0f4ad68dfed90210d",
         "recipeId": "dmsdk-projection:8c3e2a3817a1ede57e5df069",
         "argumentCount": 4,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -733,7 +733,7 @@
         "wrapper": "deherm_dmsdk_usage_355",
         "exactWrapper": "deherm_dmsdk_usage_355__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_355__exact_callee",
-        "verificationVectorSha256": "1daec5d081745f6e0d8795cdeea577d0a95e17e562408d027db11b7551fee1bb",
+        "verificationVectorSha256": "1e7c66e9425b24ae42d7503c6a1df7b7179da787976e39e99093720e48cc92d1",
         "recipeId": "dmsdk-projection:fc3808423c75ca2645da055c",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -744,7 +744,7 @@
         "wrapper": "deherm_dmsdk_usage_356",
         "exactWrapper": "deherm_dmsdk_usage_356__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_356__exact_callee",
-        "verificationVectorSha256": "04550b03670f052c5cf0b52c3a44317d0a9f05d470ba79bc234e6b2b9994a8aa",
+        "verificationVectorSha256": "0df902d9608e8eac7962f527269cd6e5675a4fde5fa2b2b6a28b8f8b0d4c7a43",
         "recipeId": "dmsdk-projection:4fb6b3095fbd5869343a12ca",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -865,7 +865,7 @@
         "wrapper": "deherm_dmsdk_usage_371",
         "exactWrapper": "deherm_dmsdk_usage_371__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_371__exact_callee",
-        "verificationVectorSha256": "3377432cdc46f55cccdc81e6473f8226bced7d1808a81e9601ee270dafb74046",
+        "verificationVectorSha256": "f472a3508ff2065d4d0ec1231ec838620d52f90e1b0f1303a0e4f1fb22dffe54",
         "recipeId": "dmsdk-projection:6e60ba9525ffb7ac7e09d433",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -953,7 +953,7 @@
         "wrapper": "deherm_dmsdk_usage_383",
         "exactWrapper": "deherm_dmsdk_usage_383__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_383__exact_callee",
-        "verificationVectorSha256": "b45c1d80354eeda913c185dfc1b2a87b6994f861e6991d6ae581c1f2efb0ab79",
+        "verificationVectorSha256": "63bc84c6487634af093863e80e264b1e52a14b965612bae1a69d67b8783c38e9",
         "recipeId": "dmsdk-projection:91ec706b0ef9ca7bbadbe5b1",
         "argumentCount": 4,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -986,7 +986,7 @@
         "wrapper": "deherm_dmsdk_usage_391",
         "exactWrapper": "deherm_dmsdk_usage_391__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_391__exact_callee",
-        "verificationVectorSha256": "b37eefb23edaca5ae2a035776c25826d191309fefbffeeb9302bd66a6fbce7a5",
+        "verificationVectorSha256": "d15b66a0dd065e30a638f8375f25400ff26376df0fd29edcd8bf1ac6b268b1d4",
         "recipeId": "dmsdk-projection:a6fdcfc685e9c4dc8a0c1e15",
         "argumentCount": 8,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -1272,7 +1272,7 @@
         "wrapper": "deherm_dmsdk_usage_477",
         "exactWrapper": "deherm_dmsdk_usage_477__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_477__exact_callee",
-        "verificationVectorSha256": "bcdc0cb05cedf7636ef56f6c49089865d9ed9bcfb7a881285e49384b47b3ce86",
+        "verificationVectorSha256": "4276fbad27a1e0cc7dc0cdfa0d47a122c396783504c43046644c814a00fc4bac",
         "recipeId": "dmsdk-projection:2ef24f16a22d213b5ac7b172",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -1580,7 +1580,7 @@
         "wrapper": "deherm_dmsdk_usage_505",
         "exactWrapper": "deherm_dmsdk_usage_505__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_505__exact_callee",
-        "verificationVectorSha256": "b0a0c0c3758f8504d49d01802a3b2db97963580cdf88fd0850d3465d1abc31c9",
+        "verificationVectorSha256": "7c342af40187061eebae5950766099d770fdd95d3616847d5e81f27fd965d75e",
         "recipeId": "dmsdk-projection:45d794d5b55eb5ddc512ea9f",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -1602,7 +1602,7 @@
         "wrapper": "deherm_dmsdk_usage_507",
         "exactWrapper": "deherm_dmsdk_usage_507__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_507__exact_callee",
-        "verificationVectorSha256": "dba484b116a3d04f94f4ff18961a39be26a203820a032d6762e389352bf7260b",
+        "verificationVectorSha256": "1506e941eeaae649ab345985433626eff2aa6fb9d35cd40ef19b613742c77019",
         "recipeId": "dmsdk-projection:08bbfafab6827f13554fa1ad",
         "argumentCount": 1,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -1921,7 +1921,7 @@
         "wrapper": "deherm_dmsdk_usage_557",
         "exactWrapper": "deherm_dmsdk_usage_557__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_557__exact_callee",
-        "verificationVectorSha256": "60bc1e88f0e0d6b868c0b52cede5030d79389c73e25f96ccd315c24365c51b68",
+        "verificationVectorSha256": "927aeaa8a5f93304e579f679c89eb593e72128c4eb2ef3d5c796b36cf5973196",
         "recipeId": "dmsdk-projection:4cfbde62eddd03034333d787",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -3538,7 +3538,7 @@
         "wrapper": "deherm_dmsdk_usage_834",
         "exactWrapper": "deherm_dmsdk_usage_834__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_834__exact_callee",
-        "verificationVectorSha256": "d7681c8bcc69b9f5219ccc1d625ae20e6c0fb38feb4a30072a66cd4c97d4934c",
+        "verificationVectorSha256": "eeb32a97bf71e579ce3f6afb2aead3a5bba78ddec3cda7d63d5ca75124b6a39e",
         "recipeId": "dmsdk-projection:c1dc20948107ff6a18230e74",
         "argumentCount": 4,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -3549,7 +3549,7 @@
         "wrapper": "deherm_dmsdk_usage_835",
         "exactWrapper": "deherm_dmsdk_usage_835__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_835__exact_callee",
-        "verificationVectorSha256": "cac69cd1510ba970e58932f06d5c3c52afcfa283fb0672a189e1a1a0116385ab",
+        "verificationVectorSha256": "17fa67ad86f4258afa3ebfc368128a290252675596383b3f32c5e75367c51757",
         "recipeId": "dmsdk-projection:45003aee5f32cac5616c0677",
         "argumentCount": 4,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -3560,7 +3560,7 @@
         "wrapper": "deherm_dmsdk_usage_836",
         "exactWrapper": "deherm_dmsdk_usage_836__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_836__exact_callee",
-        "verificationVectorSha256": "b52616dd80a940ec7764e27074d55ca2d2b00926e4f9aaabe57c69c76e2c355d",
+        "verificationVectorSha256": "f7ab65766454ceeed678858b0798f62489736ca8093347cc285df5cbbe25edb6",
         "recipeId": "dmsdk-projection:2f12e7db1672e1531a70de9d",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -3648,7 +3648,7 @@
         "wrapper": "deherm_dmsdk_usage_864",
         "exactWrapper": "deherm_dmsdk_usage_864__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_864__exact_callee",
-        "verificationVectorSha256": "f0566fd20d1479f601d428d623599e682f40a147797911107583f32b701f8335",
+        "verificationVectorSha256": "4f411228a6ad4eb05aba1fbedd366312a577bd20cca035fdda6712a1c01adf80",
         "recipeId": "dmsdk-projection:b837bc8bac5b690f6490b0b6",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -3659,7 +3659,7 @@
         "wrapper": "deherm_dmsdk_usage_865",
         "exactWrapper": "deherm_dmsdk_usage_865__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_865__exact_callee",
-        "verificationVectorSha256": "27df8127de6b7df3fa74a43aae4b851adfa997f4ac6dc92d42569837c7f4c70a",
+        "verificationVectorSha256": "c4616678e4dd5355c4bf6a161668bed7b4f0121c2d174f53f541beec8ee2108a",
         "recipeId": "dmsdk-projection:7ae818420e2cccaf84684d0c",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -3670,7 +3670,7 @@
         "wrapper": "deherm_dmsdk_usage_871",
         "exactWrapper": "deherm_dmsdk_usage_871__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_871__exact_callee",
-        "verificationVectorSha256": "fce48db9eef3efadd7b12553a9c3c17b0f9fc305e775ea2e5d0ed55f86d883fa",
+        "verificationVectorSha256": "b9ec5c2d893a5f3004299cd1dd93a40062f3d07dd25de36a86c329f1124e28ff",
         "recipeId": "dmsdk-projection:8a74b19ce4a43ff9eecdb74a",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -3681,7 +3681,7 @@
         "wrapper": "deherm_dmsdk_usage_872",
         "exactWrapper": "deherm_dmsdk_usage_872__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_872__exact_callee",
-        "verificationVectorSha256": "933c2b690abb79567a49e98e20130c70bb9691947152580830d713b1fc0410f9",
+        "verificationVectorSha256": "60b4a7692d828346980e51e468e19c354ea16f4786fc2a5b087b69049a054dbe",
         "recipeId": "dmsdk-projection:cb1d370b280a1e0bb3879b27",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4165,7 +4165,7 @@
         "wrapper": "deherm_dmsdk_usage_1043",
         "exactWrapper": "deherm_dmsdk_usage_1043__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1043__exact_callee",
-        "verificationVectorSha256": "af04efcb20ad1900818630f3ede519847a078c486faa6c8ce9f2b9c997498763",
+        "verificationVectorSha256": "4686cce04b105ec5e8dfbe7a9655e0f28fb25c0b18791ecd08ab850b0dc94e02",
         "recipeId": "dmsdk-projection:2a484ebd81dd7ee210af1e91",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4275,7 +4275,7 @@
         "wrapper": "deherm_dmsdk_usage_1118",
         "exactWrapper": "deherm_dmsdk_usage_1118__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1118__exact_callee",
-        "verificationVectorSha256": "928017e2dcf855acf7b53be806c3ff2aa865726073aa0faaf1b0656e511b3b9a",
+        "verificationVectorSha256": "4efb45c007fd1e0f372f27a9d80a02ccef1f045bd5f754a5c051fa250d688f82",
         "recipeId": "dmsdk-projection:af2375f218e2fecc83fcd03d",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4286,7 +4286,7 @@
         "wrapper": "deherm_dmsdk_usage_1121",
         "exactWrapper": "deherm_dmsdk_usage_1121__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1121__exact_callee",
-        "verificationVectorSha256": "32e6fce5cf9fa048172a234a7a4b38f0cfa998235ae5c81978cbe3168368c74a",
+        "verificationVectorSha256": "490e7ca55d0eb42ff41f967e51641273f429e4ebd1a98501b3cf9307113c6202",
         "recipeId": "dmsdk-projection:8b66f4008593c121e364f3d9",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4396,7 +4396,7 @@
         "wrapper": "deherm_dmsdk_usage_1178",
         "exactWrapper": "deherm_dmsdk_usage_1178__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1178__exact_callee",
-        "verificationVectorSha256": "0f9615a4776497c9ccbb77b77483d542650b9c92bd02f9ece70b6cd634070ed9",
+        "verificationVectorSha256": "b9ebbd53900bb246b0da61f8d78ea97402b54f1a107f83b2bfeb68acf47aa9f1",
         "recipeId": "dmsdk-projection:994bba457de605b20a553fb9",
         "argumentCount": 1,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4682,7 +4682,7 @@
         "wrapper": "deherm_dmsdk_usage_1232",
         "exactWrapper": "deherm_dmsdk_usage_1232__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1232__exact_callee",
-        "verificationVectorSha256": "bbb06f0bae272225147448938ae6f37dfe3480aef6e619cff6389b604cd0671f",
+        "verificationVectorSha256": "89c598bf8edc9a78d50c69f4cbdffbffba93781fa4d8d9fdf216a594fdad4a21",
         "recipeId": "dmsdk-projection:182a2925fff8b9ac14c31420",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4693,7 +4693,7 @@
         "wrapper": "deherm_dmsdk_usage_1233",
         "exactWrapper": "deherm_dmsdk_usage_1233__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1233__exact_callee",
-        "verificationVectorSha256": "70da024077c7718dd769633d6f359919210a5d3a0841a6edefea1f648a1bd486",
+        "verificationVectorSha256": "1ee70dd256dbf93d39a50622ef4151ee91cf3740bcb6bdabc147afd74726e884",
         "recipeId": "dmsdk-projection:ee94947b89030f22df59a4e2",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4704,7 +4704,7 @@
         "wrapper": "deherm_dmsdk_usage_1234",
         "exactWrapper": "deherm_dmsdk_usage_1234__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1234__exact_callee",
-        "verificationVectorSha256": "794c67d0ad99c7fa509f73483ccc28631f55ebf3b17622c5c1a1babaa61741d3",
+        "verificationVectorSha256": "24429264000dc00b184a3d2f622b48be97ef53c5fb50456bb99ab02bf428cb58",
         "recipeId": "dmsdk-projection:b392181395edb3bbbc725009",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4715,7 +4715,7 @@
         "wrapper": "deherm_dmsdk_usage_1235",
         "exactWrapper": "deherm_dmsdk_usage_1235__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1235__exact_callee",
-        "verificationVectorSha256": "958429c36f3a559c193942d87b8ea2aa9ddaa4b471700d9744a43f94f3708671",
+        "verificationVectorSha256": "e653785ed3a198e0b51794b665897af20c518ffc970dd37c88cbd4caa788f7c8",
         "recipeId": "dmsdk-projection:8a60c2628b02d81af499def4",
         "argumentCount": 3,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4726,7 +4726,7 @@
         "wrapper": "deherm_dmsdk_usage_1236",
         "exactWrapper": "deherm_dmsdk_usage_1236__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1236__exact_callee",
-        "verificationVectorSha256": "48222876c23be09d5cf0bf2234ef82aa21d1741c5ffbfcd82bacb4b89d18257c",
+        "verificationVectorSha256": "017e33e7f493aca64983e931f84e50e7c714a83eb5cb2da5e897571f58144065",
         "recipeId": "dmsdk-projection:bc965eee1e53787ef5b0616d",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4737,7 +4737,7 @@
         "wrapper": "deherm_dmsdk_usage_1237",
         "exactWrapper": "deherm_dmsdk_usage_1237__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1237__exact_callee",
-        "verificationVectorSha256": "c2a4a7e14c6ddb4e7f54b4f77a7e11b19b222444e875d4649559dfaba6434207",
+        "verificationVectorSha256": "14b5968220020bd8ea4fe92bda1beadcf119d9af2c94bdb5bbfa0426cb0aed87",
         "recipeId": "dmsdk-projection:4a2fd7d58fd5b9372eb0a225",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4748,7 +4748,7 @@
         "wrapper": "deherm_dmsdk_usage_1238",
         "exactWrapper": "deherm_dmsdk_usage_1238__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1238__exact_callee",
-        "verificationVectorSha256": "aae52179223bdbc31a113287a55668ddb85f108f82da5a26dd5f2606a1d60fff",
+        "verificationVectorSha256": "e5bc9cbba65def66877a93d9dcf4fa4d0bc03c4c76c8aecb499cd3cbc9c01c0d",
         "recipeId": "dmsdk-projection:45f37d11f6a9c1147fb8ad30",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4759,7 +4759,7 @@
         "wrapper": "deherm_dmsdk_usage_1239",
         "exactWrapper": "deherm_dmsdk_usage_1239__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1239__exact_callee",
-        "verificationVectorSha256": "058b34ed7e67a29c1d0d6bc781e6b61027e445e22e967e78967794f0493c01e8",
+        "verificationVectorSha256": "d91b0c40db7685bd38a23bc3c81c585db0c1df8941b72bacad0a4ab908fdb8ca",
         "recipeId": "dmsdk-projection:557d0d7bddf51091aa6bd62b",
         "argumentCount": 5,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4968,7 +4968,7 @@
         "wrapper": "deherm_dmsdk_usage_1270",
         "exactWrapper": "deherm_dmsdk_usage_1270__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1270__exact_callee",
-        "verificationVectorSha256": "0e5e204bac9dc16f07e8cc00efca2884e4ba1945cc1bbd81840e8614191b8dd1",
+        "verificationVectorSha256": "f560170e3b50b12dcfb38fdb1ea3d84d7ae9b1e9a6f15f7afcaa4498a9960c1e",
         "recipeId": "dmsdk-projection:cad5c27ce5a2eead2fd94a1d",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -4990,7 +4990,7 @@
         "wrapper": "deherm_dmsdk_usage_1273",
         "exactWrapper": "deherm_dmsdk_usage_1273__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1273__exact_callee",
-        "verificationVectorSha256": "1245ba0bc86da438f322918df24bd93d683d78666f6e2e119e39f658400e7a8b",
+        "verificationVectorSha256": "55908928284f5ee7af8e96760057d2d8c54e997da3976f352a43a171455c7cff",
         "recipeId": "dmsdk-projection:56bb51880fe19b0ef289a62f",
         "argumentCount": 1,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -5001,7 +5001,7 @@
         "wrapper": "deherm_dmsdk_usage_1274",
         "exactWrapper": "deherm_dmsdk_usage_1274__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1274__exact_callee",
-        "verificationVectorSha256": "500a91a853a914b57d6f655f1183901f21f4c265381855dfef2dea6f8ed2c2bb",
+        "verificationVectorSha256": "7807eb6debcb7987e22cbe8a4199305a8b8530e3ffcdbaefc34eb27aa3d252f9",
         "recipeId": "dmsdk-projection:ae64b7acb8143edbdeac8857",
         "argumentCount": 1,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -5012,7 +5012,7 @@
         "wrapper": "deherm_dmsdk_usage_1278",
         "exactWrapper": "deherm_dmsdk_usage_1278__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1278__exact_callee",
-        "verificationVectorSha256": "ddc93a22120817ae2a6a4599594f492f3f75b103f3e89f44d59076a2b49a269a",
+        "verificationVectorSha256": "c45423a9aee80d739c7e83933c03e01e28f8bf0cfae7b3965098972d3ce05b28",
         "recipeId": "dmsdk-projection:eac1d28eecbca98068139cb1",
         "argumentCount": 4,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -5078,7 +5078,7 @@
         "wrapper": "deherm_dmsdk_usage_1302",
         "exactWrapper": "deherm_dmsdk_usage_1302__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1302__exact_callee",
-        "verificationVectorSha256": "1c703c1827456ac5d65bfe34af941b5514096ed6d72bba6474e2a023028a5878",
+        "verificationVectorSha256": "baa6f6bf5be19005c85011812864cad6c1075fcc2ea634018ccdc0cce0efef52",
         "recipeId": "dmsdk-projection:38afedf92ebc65741a871dc6",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -5089,7 +5089,7 @@
         "wrapper": "deherm_dmsdk_usage_1308",
         "exactWrapper": "deherm_dmsdk_usage_1308__exact_call",
         "fakeCallee": "deherm_dmsdk_usage_1308__exact_callee",
-        "verificationVectorSha256": "a7a86f35527d795ad404c37ee2fc5fe782a27e7eb9ea391546d343e7d7bc571b",
+        "verificationVectorSha256": "17e5e771c0240d5bb15009582e11aeba14a8b1a51bcd5258c38e78566ffa9e0c",
         "recipeId": "dmsdk-projection:6d112dcf290d7f5235b6625b",
         "argumentCount": 2,
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2"
@@ -5383,7 +5383,7 @@
     "driver": {
       "function": "deherm_dmsdk_universal_ready_provider_install_run_exact_verification",
       "transport": "native-c-abi",
-      "sourceSha256": "555d1cc70abe737b6cec2667c13eb4e67fb486dbb41b1497daf5ca543b7eed85"
+      "sourceSha256": "83ad52e73a113588673f39be5d7e7284e5192b9f54726d33b2f902c9dac25231"
     },
     "observations": {
       "reset": "deherm_dmsdk_universal_ready_provider_install_reset_exact_observations",
@@ -5497,7 +5497,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_138"
+            "value": "deherm_exact_138",
+            "auxiliary": 16
           },
           {
             "slot": 2,
@@ -5567,7 +5568,7 @@
         "fakeCalleeDeclarationSha256": "b5aa553bb128175cf1caab335b967f94eea888fcbc36c73b656de1eebacacf24",
         "fakeCalleeDefinitionSha256": "b347f598a7f859d52bd7cd6ea5b92420f29b34d444549b24db956ffbe2a1eea4",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "9c73edbaad86b27db7a5fd8fa02c28a872d754658bcc8972c3400c760f5785c8"
+        "vectorSha256": "3c285cd022d529e3f28ca487013089b8cefe23abc0d42c86349d334f66f56403"
       },
       {
         "schemaVersion": 1,
@@ -5673,7 +5674,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_155"
+            "value": "deherm_exact_155",
+            "auxiliary": 16
           },
           {
             "slot": 2,
@@ -5743,7 +5745,7 @@
         "fakeCalleeDeclarationSha256": "2f33be8a91ccfdb46a00ade46ec2401d3ae50b49b156ceeff769079f4665e265",
         "fakeCalleeDefinitionSha256": "4bcbdb6d5fbcda58ecc6a6688aa81b6873d8417b57394e8d18ad2f817b975a18",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "90d6fa546ee11aa1e833c42b6424e4769d546bfd105d58de408808278861af6c"
+        "vectorSha256": "696c57cd99924fd15c3b165e0f4209cca8a2c3d80efba1f880f44747b829f606"
       },
       {
         "schemaVersion": 1,
@@ -5854,13 +5856,15 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_172"
+            "value": "deherm_exact_172",
+            "auxiliary": 16
           },
           {
             "slot": 2,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_173"
+            "value": "deherm_exact_173",
+            "auxiliary": 16
           }
         ],
         "result": {
@@ -5928,7 +5932,7 @@
         "fakeCalleeDeclarationSha256": "38386201f0197cfe8ffb46bdd205719be987d8c0872d4f4dc5aa49dedc795e16",
         "fakeCalleeDefinitionSha256": "6d8397068fdad71f243909340251e802566e37a4f7a4f003a3ccc1f60583641b",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "0936de33b1d23e8b614256874d9b6ff93a7e10ced390b5bb8b502beaf9426d1b"
+        "vectorSha256": "59248eb8fd28c5abd3a23d164877cecd80f549b18c8281d273932af50602a390"
       },
       {
         "schemaVersion": 1,
@@ -6018,7 +6022,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_206"
+            "value": "deherm_exact_206",
+            "auxiliary": 16
           }
         ],
         "result": {
@@ -6081,7 +6086,7 @@
         "fakeCalleeDeclarationSha256": "6c38722cafedc42a9e30e1cd8b4ac1f05ba12f3d4d6963944eac908dbf3ed462",
         "fakeCalleeDefinitionSha256": "ab639e5d22e1ef8a467258f643650be2d8c5c0930bca3c21b2fcf6a0983c770a",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "ce6fc463b5c13ed4f896f3301e0501a95b6eaf7ff7f3528d14e6515d8f67efe4"
+        "vectorSha256": "43cbb9c0f9508871b21c9e072231239a0c3b86b5aa061b01a204fc3b3a5548c1"
       },
       {
         "schemaVersion": 1,
@@ -7737,7 +7742,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_3249"
+            "value": "deherm_exact_3249",
+            "auxiliary": 17
           },
           {
             "slot": 2,
@@ -7807,7 +7813,7 @@
         "fakeCalleeDeclarationSha256": "5198ef1a1f9352f86e356610ae3cecca0e3f9a16c21d96d467f84feda2662511",
         "fakeCalleeDefinitionSha256": "18fb7b50ed91f15d71c015b7ac545c01242ece1aadde5afc0ed904af8d635d2a",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "f7c2a9ddb0c96c2b87cf2e4c36bcded722d8c982da5adb99c0ef24b768d4f6b5"
+        "vectorSha256": "3855a728ce307257de4a7191dbda77b1026ea76ba441f93b60a99589001801b5"
       },
       {
         "schemaVersion": 1,
@@ -7918,7 +7924,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_3266"
+            "value": "deherm_exact_3266",
+            "auxiliary": 17
           },
           {
             "slot": 2,
@@ -7988,7 +7995,7 @@
         "fakeCalleeDeclarationSha256": "8dea65305226d986e4cc1847ebb9b42f0fe523accaf0bb5b7ad97670806dd1f1",
         "fakeCalleeDefinitionSha256": "a99d771e002c3f6a1ea4ce99bbac488ee60363837816fc5bf17085efae8ca298",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "d449bfba50d48c07907b50acf2d2a2c717478766293de8ca00aaac2ee6212a70"
+        "vectorSha256": "7d54d2fdc08e3885bb85d05d9a38185118054e747ae7b9b6a52dc1862e8ad536"
       },
       {
         "schemaVersion": 1,
@@ -8104,13 +8111,15 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_3283"
+            "value": "deherm_exact_3283",
+            "auxiliary": 17
           },
           {
             "slot": 2,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_3284"
+            "value": "deherm_exact_3284",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -8178,7 +8187,7 @@
         "fakeCalleeDeclarationSha256": "0d05fb702c74b3143ff6de318fd66a398e39245b690a2e236fb741197ba06bc0",
         "fakeCalleeDefinitionSha256": "0468571d93259f87e75473636b422c1380c4377f94cf369947cfafd86f6c1b6e",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "4346d99143f62a8a5ae3ab2bbf66ae7eda09a4d78955c9801f7236bdaf44df0a"
+        "vectorSha256": "f5317017afdb47221469a462e1cff1fe4da66b66b00aac25cb8d185d0628fa2e"
       },
       {
         "schemaVersion": 1,
@@ -10838,7 +10847,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_5153"
+            "value": "deherm_exact_5153",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -10901,7 +10911,7 @@
         "fakeCalleeDeclarationSha256": "b70d4d4f2968cae59290540150115e7b03f1a10546499b2b7c3f1e5e108fc7af",
         "fakeCalleeDefinitionSha256": "0891d012e61b0cb130795394cc7daed1f16db924970de861b95c80146fc77b8e",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "b87e8e8bebb05acab27ade219854e1d87ff3493e894423bc0f86b2edb329d43d"
+        "vectorSha256": "50dd4589fb8fd18587cf34c61734245a555a0b341ec39606a24936ed162194c0"
       },
       {
         "schemaVersion": 1,
@@ -12400,7 +12410,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_5799"
+            "value": "deherm_exact_5799",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -12470,7 +12481,7 @@
         "fakeCalleeDeclarationSha256": "720acaa73c60f2be3dcae83c50359ae1029afe2e9494652424efb39e06173eec",
         "fakeCalleeDefinitionSha256": "533bbafae2d7726d3a7fc7e6f5771bf9ead89ad9537241daa65a3c8136e6c7ad",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "14af1116e67e5b921ed1ad54b7b75d27f669b4b36f20ded616f237b346365b91"
+        "vectorSha256": "2f320f6e1ac8f20ca30f889ae06f5e60f9c7cca4bfcddf3de1dffad6a1566753"
       },
       {
         "schemaVersion": 1,
@@ -14503,7 +14514,8 @@
             "slot": 2,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_6038"
+            "value": "deherm_exact_6038",
+            "auxiliary": 17
           },
           {
             "slot": 3,
@@ -14578,7 +14590,7 @@
         "fakeCalleeDeclarationSha256": "052c913031d2bf91234760faea0d675dc5f09840438632184a8027a8041513b4",
         "fakeCalleeDefinitionSha256": "5215006389d9d34b7fcc5ae87f8cc7eddbb8abaa90ba38bc64d7fc6e65631cd8",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "6c5cfaa28d0f599fb4c9c86d99977c87d773801fbda910bfd61c183981a68944"
+        "vectorSha256": "decbfc9c75a2740fba6e813e0d0e4ce2323737334bb544e0f4ad68dfed90210d"
       },
       {
         "schemaVersion": 1,
@@ -14693,7 +14705,8 @@
             "slot": 2,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_6055"
+            "value": "deherm_exact_6055",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -14756,7 +14769,7 @@
         "fakeCalleeDeclarationSha256": "9a1ae11ba32ee775e78a64453708c30d0cb045ef52c072970b3b48e532800460",
         "fakeCalleeDefinitionSha256": "e2534aa52a6ab4cbcb0cea38acba086563fe05b0d5fa5b843644c342f692e49e",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "1daec5d081745f6e0d8795cdeea577d0a95e17e562408d027db11b7551fee1bb"
+        "vectorSha256": "1e7c66e9425b24ae42d7503c6a1df7b7179da787976e39e99093720e48cc92d1"
       },
       {
         "schemaVersion": 1,
@@ -14871,7 +14884,8 @@
             "slot": 2,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_6072"
+            "value": "deherm_exact_6072",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -14934,7 +14948,7 @@
         "fakeCalleeDeclarationSha256": "bd3da9d730baf2bceda12dd5b302647118583c9dd238f4cc957c196d14b68413",
         "fakeCalleeDefinitionSha256": "ff92d09e789f6359594efeaf74e1dc14bc9c257960ea298f4015c473a86b6fdb",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "04550b03670f052c5cf0b52c3a44317d0a9f05d470ba79bc234e6b2b9994a8aa"
+        "vectorSha256": "0df902d9608e8eac7962f527269cd6e5675a4fde5fa2b2b6a28b8f8b0d4c7a43"
       },
       {
         "schemaVersion": 1,
@@ -16166,7 +16180,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_6326"
+            "value": "deherm_exact_6326",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -16221,7 +16236,7 @@
         "fakeCalleeDeclarationSha256": "de1da7001a237dd54764da1ebbd8744deb32fad0301e7ad57d75a12ce6c1b6aa",
         "fakeCalleeDefinitionSha256": "e46cb7c302e26b3eabf6ef998f5425bea54ab92f84c757765f7509f641090ef2",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "3377432cdc46f55cccdc81e6473f8226bced7d1808a81e9601ee270dafb74046"
+        "vectorSha256": "f472a3508ff2065d4d0ec1231ec838620d52f90e1b0f1303a0e4f1fb22dffe54"
       },
       {
         "schemaVersion": 1,
@@ -17690,7 +17705,8 @@
             "slot": 3,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_6532"
+            "value": "deherm_exact_6532",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -17764,7 +17780,7 @@
         "fakeCalleeDeclarationSha256": "de18c6bdf9b8aefd2ea7cc58f333edfe27f8c67eb92d70b3a88f27b1076edcf4",
         "fakeCalleeDefinitionSha256": "6db1bde27b5329cdcacf662a747af4f31379cb1ca63413139e85efcde4fdcd86",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "b45c1d80354eeda913c185dfc1b2a87b6994f861e6991d6ae581c1f2efb0ab79"
+        "vectorSha256": "63bc84c6487634af093863e80e264b1e52a14b965612bae1a69d67b8783c38e9"
       },
       {
         "schemaVersion": 1,
@@ -18328,7 +18344,8 @@
             "slot": 2,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_6667"
+            "value": "deherm_exact_6667",
+            "auxiliary": 17
           },
           {
             "slot": 3,
@@ -18460,7 +18477,7 @@
         "fakeCalleeDeclarationSha256": "370759634a4b26afeb295ce326dfdea8f0f0941e51d961b6438649657cde0c86",
         "fakeCalleeDefinitionSha256": "f654c3650a042bee286b39f8b11b014b89b09921d09e762f9c974c154e456367",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "b37eefb23edaca5ae2a035776c25826d191309fefbffeeb9302bd66a6fbce7a5"
+        "vectorSha256": "d15b66a0dd065e30a638f8375f25400ff26376df0fd29edcd8bf1ac6b268b1d4"
       },
       {
         "schemaVersion": 1,
@@ -22106,7 +22123,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_8128"
+            "value": "deherm_exact_8128",
+            "auxiliary": 17
           },
           {
             "slot": 2,
@@ -22198,7 +22216,7 @@
         "fakeCalleeDeclarationSha256": "6b2296b4fadf5c67a981c87e47d1de93991fb3a45db6a2ded30778685fa11839",
         "fakeCalleeDefinitionSha256": "4ec043b8fb71c37afaa9d5736304f77225ba7d859a4f209e9916c6f8807ae16d",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "bcdc0cb05cedf7636ef56f6c49089865d9ed9bcfb7a881285e49384b47b3ce86"
+        "vectorSha256": "4276fbad27a1e0cc7dc0cdfa0d47a122c396783504c43046644c814a00fc4bac"
       },
       {
         "schemaVersion": 1,
@@ -26782,7 +26800,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_8604"
+            "value": "deherm_exact_8604",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -26846,7 +26865,7 @@
         "fakeCalleeDeclarationSha256": "499072b06cf2e4d368c219cbed90156c25a40019d0bf4dd18681dc2e7ea79c0c",
         "fakeCalleeDefinitionSha256": "adbcf41b3a898e45fe8378c0aa1d9e64b67c22937fe0357e17ce23b1ff9172ae",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "b0a0c0c3758f8504d49d01802a3b2db97963580cdf88fd0850d3465d1abc31c9"
+        "vectorSha256": "7c342af40187061eebae5950766099d770fdd95d3616847d5e81f27fd965d75e"
       },
       {
         "schemaVersion": 1,
@@ -27013,7 +27032,8 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_8637"
+            "value": "deherm_exact_8637",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -27067,7 +27087,7 @@
         "fakeCalleeDeclarationSha256": "a2ca9c0d996279fd22ea8fcef52d8ef44107f4e51b01e9783921a555245deef9",
         "fakeCalleeDefinitionSha256": "1f80b9f111d4c5f589d9066dadf84beeacfb161ada0c861610d22b585bf7fa4f",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "dba484b116a3d04f94f4ff18961a39be26a203820a032d6762e389352bf7260b"
+        "vectorSha256": "1506e941eeaae649ab345985433626eff2aa6fb9d35cd40ef19b613742c77019"
       },
       {
         "schemaVersion": 1,
@@ -30587,7 +30607,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_9488"
+            "value": "deherm_exact_9488",
+            "auxiliary": 17
           }
         ],
         "result": {
@@ -30646,7 +30667,7 @@
         "fakeCalleeDeclarationSha256": "cdee323e5799452548f8cc242b0d77de8c269a9f05f79be7550d511d0e53a309",
         "fakeCalleeDefinitionSha256": "f9e1d7c79240e5893ae96dfc9fc2a8152810b47922d5b6ce0cb8bd5f804e15b5",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "60bc1e88f0e0d6b868c0b52cede5030d79389c73e25f96ccd315c24365c51b68"
+        "vectorSha256": "927aeaa8a5f93304e579f679c89eb593e72128c4eb2ef3d5c796b36cf5973196"
       },
       {
         "schemaVersion": 1,
@@ -55804,7 +55825,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_14197"
+            "value": "deherm_exact_14197",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -55889,7 +55911,7 @@
         "fakeCalleeDeclarationSha256": "38e5ce8db9c8ec024e92a2da3610cc5e5c7135e6d07ae4c7479f81df0dd5d367",
         "fakeCalleeDefinitionSha256": "e1d688bd8c7c70ef386aa78fcf96c393a78ec1f7375e34ce20bbac607e53fb27",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "d7681c8bcc69b9f5219ccc1d625ae20e6c0fb38feb4a30072a66cd4c97d4934c"
+        "vectorSha256": "eeb32a97bf71e579ce3f6afb2aead3a5bba78ddec3cda7d63d5ca75124b6a39e"
       },
       {
         "schemaVersion": 1,
@@ -56018,7 +56040,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_14214"
+            "value": "deherm_exact_14214",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -56103,7 +56126,7 @@
         "fakeCalleeDeclarationSha256": "c16e6f99450d6599e1c9d712ab92947bf7fc143e186a29caa15d825f503789af",
         "fakeCalleeDefinitionSha256": "26d475bd03321b77551e9975f9a2f02fee3fcb1fbd28003eb1fa200829624784",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "cac69cd1510ba970e58932f06d5c3c52afcfa283fb0672a189e1a1a0116385ab"
+        "vectorSha256": "17fa67ad86f4258afa3ebfc368128a290252675596383b3f32c5e75367c51757"
       },
       {
         "schemaVersion": 1,
@@ -56193,7 +56216,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_14231"
+            "value": "deherm_exact_14231",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -56263,7 +56287,7 @@
         "fakeCalleeDeclarationSha256": "94c8512e30219033cc95836e18665e7feeb598e3b3ee531ce901c38ee91a0fa0",
         "fakeCalleeDefinitionSha256": "5f4cbd35489835145c69051a122969e36ad1e8e286ea95851d1de0a791ff69f2",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "b52616dd80a940ec7764e27074d55ca2d2b00926e4f9aaabe57c69c76e2c355d"
+        "vectorSha256": "f7ab65766454ceeed678858b0798f62489736ca8093347cc285df5cbbe25edb6"
       },
       {
         "schemaVersion": 1,
@@ -57283,7 +57307,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_14707"
+            "value": "deherm_exact_14707",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -57342,7 +57367,7 @@
         "fakeCalleeDeclarationSha256": "2b846822bb2786d1525ff7632bc8e947297f1dd2ebe44f4d3182dee3be3893ce",
         "fakeCalleeDefinitionSha256": "2aa43ddac8712342c9423e1f00ece66bc3ecdd4e3ad68fb21537607eafa31798",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "f0566fd20d1479f601d428d623599e682f40a147797911107583f32b701f8335"
+        "vectorSha256": "4f411228a6ad4eb05aba1fbedd366312a577bd20cca035fdda6712a1c01adf80"
       },
       {
         "schemaVersion": 1,
@@ -57432,7 +57457,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_14724"
+            "value": "deherm_exact_14724",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -57491,7 +57517,7 @@
         "fakeCalleeDeclarationSha256": "0101e5ff79c758a1b4572dbd6107991df09426c1cdd5198bed969e92d01aa819",
         "fakeCalleeDefinitionSha256": "8fd18914074867117ffeb17801a26f58a43c50e09b8a9ad4364c58bd208b46d5",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "27df8127de6b7df3fa74a43aae4b851adfa997f4ac6dc92d42569837c7f4c70a"
+        "vectorSha256": "c4616678e4dd5355c4bf6a161668bed7b4f0121c2d174f53f541beec8ee2108a"
       },
       {
         "schemaVersion": 1,
@@ -57581,7 +57607,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_14826"
+            "value": "deherm_exact_14826",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -57643,7 +57670,7 @@
         "fakeCalleeDeclarationSha256": "453d82225954d1455e8db3db0be054305fd6ca314fdf1bc1ff371f4039629602",
         "fakeCalleeDefinitionSha256": "062ce8a5370af949f3ffcd1674bf549b3c60f0a4428f513ad257e1dc3abdd270",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "fce48db9eef3efadd7b12553a9c3c17b0f9fc305e775ea2e5d0ed55f86d883fa"
+        "vectorSha256": "b9ec5c2d893a5f3004299cd1dd93a40062f3d07dd25de36a86c329f1124e28ff"
       },
       {
         "schemaVersion": 1,
@@ -57733,7 +57760,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_14843"
+            "value": "deherm_exact_14843",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -57795,7 +57823,7 @@
         "fakeCalleeDeclarationSha256": "b6dd42e6ef230cf5ee514a90fd1cc288a25ba51b419718eeb5e3deaa46c3ca8b",
         "fakeCalleeDefinitionSha256": "d4dfcea9f0a7e59c8061e82e1650ce67608dcf4f42570a7f942b4a6461b39231",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "933c2b690abb79567a49e98e20130c70bb9691947152580830d713b1fc0410f9"
+        "vectorSha256": "60b4a7692d828346980e51e468e19c354ea16f4786fc2a5b087b69049a054dbe"
       },
       {
         "schemaVersion": 1,
@@ -63277,7 +63305,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_17750"
+            "value": "deherm_exact_17750",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -63332,7 +63361,7 @@
         "fakeCalleeDeclarationSha256": "564e5a0a8e6166ce13285a234b27dd2b1d475a3c0d8d9a79728b49b5f0c7c147",
         "fakeCalleeDefinitionSha256": "a3c9a4149d50ee7c17e63aafd3e1b66f4145bdf596f363949d978ffaac5941c8",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "af04efcb20ad1900818630f3ede519847a078c486faa6c8ce9f2b9c997498763"
+        "vectorSha256": "4686cce04b105ec5e8dfbe7a9655e0f28fb25c0b18791ecd08ab850b0dc94e02"
       },
       {
         "schemaVersion": 1,
@@ -64322,7 +64351,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_19025"
+            "value": "deherm_exact_19025",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -64398,7 +64428,7 @@
         "fakeCalleeDeclarationSha256": "56a2ba63af19b426e5f0a017d308abf07019a64c11957e38e5d5b47f9b389ed0",
         "fakeCalleeDefinitionSha256": "7aab3a1f1fcab4aac71d736facf942c153e7c0df7d4e4f081d6a152cfef43e1d",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "928017e2dcf855acf7b53be806c3ff2aa865726073aa0faaf1b0656e511b3b9a"
+        "vectorSha256": "4efb45c007fd1e0f372f27a9d80a02ccef1f045bd5f754a5c051fa250d688f82"
       },
       {
         "schemaVersion": 1,
@@ -64488,7 +64518,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_19076"
+            "value": "deherm_exact_19076",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -64550,7 +64581,7 @@
         "fakeCalleeDeclarationSha256": "1eeae20873f36ef39339cfb2cd15b98eac3f42f2f9b7659349ec1409e050a129",
         "fakeCalleeDefinitionSha256": "02d757748fbbb0c21fb801995268cb2a8f4a8ab419c48636b8ca3a0a246639de",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "32e6fce5cf9fa048172a234a7a4b38f0cfa998235ae5c81978cbe3168368c74a"
+        "vectorSha256": "490e7ca55d0eb42ff41f967e51641273f429e4ebd1a98501b3cf9307113c6202"
       },
       {
         "schemaVersion": 1,
@@ -65692,7 +65723,8 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_20044"
+            "value": "deherm_exact_20044",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -65756,7 +65788,7 @@
         "fakeCalleeDeclarationSha256": "287c72ddd5513c94906b0c7fd54f508dc2323dc8931e029de0a1d5d61144661a",
         "fakeCalleeDefinitionSha256": "5cbc4be7101d021fa3d5af52c9bc8c655ad581a70ff60bea288aaa83e5ba551e",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "0f9615a4776497c9ccbb77b77483d542650b9c92bd02f9ece70b6cd634070ed9"
+        "vectorSha256": "b9ebbd53900bb246b0da61f8d78ea97402b54f1a107f83b2bfeb68acf47aa9f1"
       },
       {
         "schemaVersion": 1,
@@ -68882,13 +68914,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_20962"
+            "value": "deherm_exact_20962",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_20963"
+            "value": "deherm_exact_20963",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -68982,7 +69016,7 @@
         "fakeCalleeDeclarationSha256": "c4bc62cb24ffd87e56c155f0d18378b6a82a99bc7417e217ca0609cdbab430a0",
         "fakeCalleeDefinitionSha256": "5843d180bd5f17689bf18cf4a2d30ee191b849dae25f6396bad5b891b75c8ce3",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "bbb06f0bae272225147448938ae6f37dfe3480aef6e619cff6389b604cd0671f"
+        "vectorSha256": "89c598bf8edc9a78d50c69f4cbdffbffba93781fa4d8d9fdf216a594fdad4a21"
       },
       {
         "schemaVersion": 1,
@@ -69110,13 +69144,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_20979"
+            "value": "deherm_exact_20979",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_20980"
+            "value": "deherm_exact_20980",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -69210,7 +69246,7 @@
         "fakeCalleeDeclarationSha256": "359cfec11a0fb8b64bda17ace01c8590b22af2d6f7f9dec879c29ad1e01b48d2",
         "fakeCalleeDefinitionSha256": "59924049726244b47f93a9dc91468c6753dba9025ff117be28dd910d666e6839",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "70da024077c7718dd769633d6f359919210a5d3a0841a6edefea1f648a1bd486"
+        "vectorSha256": "1ee70dd256dbf93d39a50622ef4151ee91cf3740bcb6bdabc147afd74726e884"
       },
       {
         "schemaVersion": 1,
@@ -69338,13 +69374,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_20996"
+            "value": "deherm_exact_20996",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_20997"
+            "value": "deherm_exact_20997",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -69438,7 +69476,7 @@
         "fakeCalleeDeclarationSha256": "03aac44ec342057707e5388cf6a15b53025285a758e53ac1250e9bdbc60a4e90",
         "fakeCalleeDefinitionSha256": "37d591feb7e869259e42183781a28b4162206358be00351e042ffaa00b23a49c",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "794c67d0ad99c7fa509f73483ccc28631f55ebf3b17622c5c1a1babaa61741d3"
+        "vectorSha256": "24429264000dc00b184a3d2f622b48be97ef53c5fb50456bb99ab02bf428cb58"
       },
       {
         "schemaVersion": 1,
@@ -69534,13 +69572,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21013"
+            "value": "deherm_exact_21013",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21014"
+            "value": "deherm_exact_21014",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -69612,7 +69652,7 @@
         "fakeCalleeDeclarationSha256": "6e312b771de7dcce7214531bba39b4d175f3336404fe3d2e81abfd144de22b39",
         "fakeCalleeDefinitionSha256": "c39bd5a7132d706759c2959383f376c43bcfa47b4cbc8f6a2dd1b97e28fef1d5",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "958429c36f3a559c193942d87b8ea2aa9ddaa4b471700d9744a43f94f3708671"
+        "vectorSha256": "e653785ed3a198e0b51794b665897af20c518ffc970dd37c88cbd4caa788f7c8"
       },
       {
         "schemaVersion": 1,
@@ -69740,13 +69780,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21030"
+            "value": "deherm_exact_21030",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21031"
+            "value": "deherm_exact_21031",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -69840,7 +69882,7 @@
         "fakeCalleeDeclarationSha256": "aa411ef4b82fc1f24a93d9970fefc6cb597c7e5dae5c46d7c461d852ea40a87b",
         "fakeCalleeDefinitionSha256": "193f7ee50eeeda7b4a1efff9a8528709ed5e20c838567299131fd60f64dfaf42",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "48222876c23be09d5cf0bf2234ef82aa21d1741c5ffbfcd82bacb4b89d18257c"
+        "vectorSha256": "017e33e7f493aca64983e931f84e50e7c714a83eb5cb2da5e897571f58144065"
       },
       {
         "schemaVersion": 1,
@@ -69968,13 +70010,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21047"
+            "value": "deherm_exact_21047",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21048"
+            "value": "deherm_exact_21048",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -70068,7 +70112,7 @@
         "fakeCalleeDeclarationSha256": "776f98caca89a46e11cf99d6795ff1601d13cd5302c2f246fe5932dcd7c3149d",
         "fakeCalleeDefinitionSha256": "be92099470e7232b9fd3805da93a39390063e5544f8511c95a1d80377f52a9a7",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "c2a4a7e14c6ddb4e7f54b4f77a7e11b19b222444e875d4649559dfaba6434207"
+        "vectorSha256": "14b5968220020bd8ea4fe92bda1beadcf119d9af2c94bdb5bbfa0426cb0aed87"
       },
       {
         "schemaVersion": 1,
@@ -70196,13 +70240,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21064"
+            "value": "deherm_exact_21064",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21065"
+            "value": "deherm_exact_21065",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -70296,7 +70342,7 @@
         "fakeCalleeDeclarationSha256": "6d75be81d529ec08cffe0dbc9f0c6e261f3a3466caee99a1137cc8e869ad0815",
         "fakeCalleeDefinitionSha256": "1bda0073dac8b1378788db067a70bdcd434c626e298192e0bd4ff9cd1a2b8d82",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "aae52179223bdbc31a113287a55668ddb85f108f82da5a26dd5f2606a1d60fff"
+        "vectorSha256": "e5bc9cbba65def66877a93d9dcf4fa4d0bc03c4c76c8aecb499cd3cbc9c01c0d"
       },
       {
         "schemaVersion": 1,
@@ -70424,13 +70470,15 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21081"
+            "value": "deherm_exact_21081",
+            "auxiliary": 18
           },
           {
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21082"
+            "value": "deherm_exact_21082",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -70524,7 +70572,7 @@
         "fakeCalleeDeclarationSha256": "30dbd0e0749c43dc7f48ce1edb90cbf0711b79329d881944c8eca581f55c4421",
         "fakeCalleeDefinitionSha256": "8fe8cc8f8385677788d3f1b9592c9b56739197d5a7439b55a6ddfd96cf24da46",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "058b34ed7e67a29c1d0d6bc781e6b61027e445e22e967e78967794f0493c01e8"
+        "vectorSha256": "d91b0c40db7685bd38a23bc3c81c585db0c1df8941b72bacad0a4ab908fdb8ca"
       },
       {
         "schemaVersion": 1,
@@ -72636,7 +72684,8 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21608"
+            "value": "deherm_exact_21608",
+            "auxiliary": 18
           },
           {
             "slot": 1,
@@ -72701,7 +72750,7 @@
         "fakeCalleeDeclarationSha256": "73cf78dda9119cbd2189d3bec9e59a7cdeb2e7fe9b4b8e796ce6f6028c93e590",
         "fakeCalleeDefinitionSha256": "f0eedb1fe83f176085e9433d86207bbd88a7e5fc67f467beeaecb83cc9eb2063",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "0e5e204bac9dc16f07e8cc00efca2884e4ba1945cc1bbd81840e8614191b8dd1"
+        "vectorSha256": "f560170e3b50b12dcfb38fdb1ea3d84d7ae9b1e9a6f15f7afcaa4498a9960c1e"
       },
       {
         "schemaVersion": 1,
@@ -72836,7 +72885,8 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21659"
+            "value": "deherm_exact_21659",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -72890,7 +72940,7 @@
         "fakeCalleeDeclarationSha256": "ddc89e3d6f551c58aa036445a9d75f6927cf2783dd903ff9e06cb61a3ebaab11",
         "fakeCalleeDefinitionSha256": "9994cecc748b314fdbcd2b6795c8b46ff1f712e63edbc66be009bad899fe2f83",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "1245ba0bc86da438f322918df24bd93d683d78666f6e2e119e39f658400e7a8b"
+        "vectorSha256": "55908928284f5ee7af8e96760057d2d8c54e997da3976f352a43a171455c7cff"
       },
       {
         "schemaVersion": 1,
@@ -72945,7 +72995,8 @@
             "slot": 0,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21676"
+            "value": "deherm_exact_21676",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -72994,7 +73045,7 @@
         "fakeCalleeDeclarationSha256": "6d50ddbf23055f8afc88c252f52df738b35baefb8a0fe26561ec7aa46de44fd5",
         "fakeCalleeDefinitionSha256": "f8d1b42be2e6259c03bc38f485f4dd862de1658f973388d54f4a87fa97917d98",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "500a91a853a914b57d6f655f1183901f21f4c265381855dfef2dea6f8ed2c2bb"
+        "vectorSha256": "7807eb6debcb7987e22cbe8a4199305a8b8530e3ffcdbaefc34eb27aa3d252f9"
       },
       {
         "schemaVersion": 1,
@@ -73123,7 +73174,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_21745"
+            "value": "deherm_exact_21745",
+            "auxiliary": 18
           },
           {
             "slot": 2,
@@ -73208,7 +73260,7 @@
         "fakeCalleeDeclarationSha256": "a559a38c45a247904803415cc4537435421d013b406cb0818983c5ba62aeff51",
         "fakeCalleeDefinitionSha256": "0a393c60a2dce64db1adf277e483bf398f37b440c77d609c4fe2c55400210a25",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "ddc93a22120817ae2a6a4599594f492f3f75b103f3e89f44d59076a2b49a269a"
+        "vectorSha256": "c45423a9aee80d739c7e83933c03e01e28f8bf0cfae7b3965098972d3ce05b28"
       },
       {
         "schemaVersion": 1,
@@ -73955,7 +74007,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_22153"
+            "value": "deherm_exact_22153",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -74014,7 +74067,7 @@
         "fakeCalleeDeclarationSha256": "17f32e511acc637a5136d80b150e948820a9c75b1a05a1892ab3bd868e622c20",
         "fakeCalleeDefinitionSha256": "0c29979bddb2bcc92aef8fd862b6c6db921f457f746889315cda6999f5b6d578",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "1c703c1827456ac5d65bfe34af941b5514096ed6d72bba6474e2a023028a5878"
+        "vectorSha256": "baa6f6bf5be19005c85011812864cad6c1075fcc2ea634018ccdc0cce0efef52"
       },
       {
         "schemaVersion": 1,
@@ -74104,7 +74157,8 @@
             "slot": 1,
             "tag": "address",
             "fixture": "cstring",
-            "value": "deherm_exact_22255"
+            "value": "deherm_exact_22255",
+            "auxiliary": 18
           }
         ],
         "result": {
@@ -74166,7 +74220,7 @@
         "fakeCalleeDeclarationSha256": "76968d3859c17c33154d5575cf6497bac3e9b2a7497a628f0e245019c23ff722",
         "fakeCalleeDefinitionSha256": "c5458db1ec484b97a9ec37d3902f0cff1bce80e9390f4e436ed439df8934b62c",
         "catalogSha256": "73a681ee952a7f026e019af3cf0ea89e650db2cd5292aef00f62d7637520add2",
-        "vectorSha256": "a7a86f35527d795ad404c37ee2fc5fe782a27e7eb9ea391546d343e7d7bc571b"
+        "vectorSha256": "17e5e771c0240d5bb15009582e11aeba14a8b1a51bcd5258c38e78566ffa9e0c"
       },
       {
         "schemaVersion": 1,
@@ -77403,8 +77457,8 @@
         "vectorSha256": "16073ecab909f9f0e47e4c0c519c135ac2d634b6722a3990a4c5b24075c3f90b"
       }
     ],
-    "manifestSha256": "c85cc6ae6c7ed0cbcbb31673938a97b5ce58a6e38006108d327b1e6420980953",
-    "sourceSha256": "04550ae8fda7ca13a7620dfe08c6c72f70adffa193cecd9ed09cbde2b0b5a66f"
+    "manifestSha256": "a730a1fc667de6d81fc2ac52cfd81f22ec38375d6a3e94fd3a9564f52bfd0466",
+    "sourceSha256": "3e0631fc40360b60971b3b48c33d9366681006dd4c042350fd0c92222cea6da9"
   },
-  "corpusSha256": "62a55fd5f37ef88796c11e4b4a0c01df9d895c9007914dc8c11a3600b5db55c1"
+  "corpusSha256": "e60c6100e4cffd361a8cb46581485a40b583546613664afb11f748d803514b9a"
 }

@@ -10,7 +10,7 @@ const MAX_CELL_BYTES = 4_096;
 const MAX_LABEL_BYTES = 1_024;
 const MAX_RESPONSE_BYTES = 64 * 1_024;
 const MAX_SQL_BYTES = 16 * 1_024;
-const INDEX_VERSION = "3";
+const INDEX_VERSION = "5";
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -48,12 +48,43 @@ function scalar(metadata, name) {
   return match ? match[1].trim().replace(/^(['"])(.*)\1$/, "$2") : "";
 }
 
+function headingSlug(title) {
+  const slug = title
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/<[^>]*>/g, "")
+    .replace(/[`*_~]/g, "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{Letter}\p{Number}\s-]/gu, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+  return slug || "section";
+}
+
 function headings(source) {
   const lines = source.split(/\r?\n/);
   const found = [];
+  const nextSuffix = new Map();
+  const usedAnchors = new Set();
   for (let index = 0; index < lines.length; ++index) {
     const match = /^(#{1,6})\s+(.+?)\s*$/.exec(lines[index]);
-    if (match) found.push({ depth: match[1].length, title: match[2], line: index + 1 });
+    if (match) {
+      const base = headingSlug(match[2]);
+      let anchor = base;
+      let suffix = nextSuffix.get(base) ?? 2;
+      while (usedAnchors.has(anchor)) anchor = `${base}-${suffix++}`;
+      nextSuffix.set(base, suffix);
+      usedAnchors.add(anchor);
+      found.push({
+        anchor,
+        depth: match[1].length,
+        title: match[2],
+        line: index + 1
+      });
+    }
   }
   return found.map((heading, index) => {
     const following = found.slice(index + 1).find((candidate) => candidate.depth <= heading.depth);
@@ -98,16 +129,34 @@ function currentHeadingId(docPath, parsedHeadings, line) {
 }
 
 function headingId(docPath, heading) {
-  return `heading:${docPath}:${heading.line}`;
+  return `heading:${docPath}#${heading.anchor}`;
 }
 
 function canonicalReference(root, docAbsolute, raw, relation) {
-  if (/^[a-z][a-z+.-]*:/i.test(raw) || raw.startsWith("#")) {
-    return raw.startsWith("#")
-      ? { id: `doc:${path.relative(path.join(root, ".agents/docs"), docAbsolute)}`, path: raw, kind: "anchor" }
-      : { id: `external:${raw}`, path: raw, kind: "external" };
+  const docsRoot = path.join(root, ".agents/docs");
+  const currentDocument = path.relative(docsRoot, docAbsolute).split(path.sep).join("/");
+  if (/^[a-z][a-z+.-]*:/i.test(raw)) {
+    return { id: `external:${raw}`, path: raw, kind: "external" };
   }
-  const withoutFragment = raw.split("#", 1)[0];
+  if (raw.startsWith("#")) {
+    const fragment = raw.slice(1);
+    if (!fragment) return { id: `doc:${currentDocument}`, path: currentDocument, kind: "document" };
+    let decoded = fragment;
+    try {
+      decoded = decodeURIComponent(fragment);
+    } catch {
+      // Keep malformed percent escapes literal; the edge remains deterministic.
+    }
+    const anchor = headingSlug(decoded);
+    return {
+      id: `heading:${currentDocument}#${anchor}`,
+      path: `${currentDocument}#${anchor}`,
+      kind: "anchor"
+    };
+  }
+  const separator = raw.indexOf("#");
+  const withoutFragment = separator < 0 ? raw : raw.slice(0, separator);
+  const fragment = separator < 0 ? "" : raw.slice(separator + 1);
   const documentRelative = relation === "links" || /^\.{1,2}\//.test(withoutFragment) ||
     (!withoutFragment.includes("/") && withoutFragment.endsWith(".md"));
   let absolute = path.resolve(documentRelative ? path.dirname(docAbsolute) : root, withoutFragment);
@@ -119,6 +168,20 @@ function canonicalReference(root, docAbsolute, raw, relation) {
   const docsPrefix = ".agents/docs/";
   if (relative.startsWith(docsPrefix) && relative.endsWith(".md")) {
     const docPath = relative.slice(docsPrefix.length);
+    if (fragment) {
+      let decoded = fragment;
+      try {
+        decoded = decodeURIComponent(fragment);
+      } catch {
+        // Keep malformed percent escapes literal; the edge remains deterministic.
+      }
+      const anchor = headingSlug(decoded);
+      return {
+        id: `heading:${docPath}#${anchor}`,
+        path: `${docPath}#${anchor}`,
+        kind: "anchor"
+      };
+    }
     return { id: `doc:${docPath}`, path: docPath, kind: "document" };
   }
   return { id: `source:${relative}`, path: relative, absolute, kind: "source" };

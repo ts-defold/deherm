@@ -1,5 +1,67 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - Integrated API wave closes review defects and repository gate
+
+The generated dmSDK exact-call corpus now executes 486/486 applicable vectors
+through the rebuilt Static Hermes executable, the production JSI host function,
+and the real Emscripten heap/direct-export browser lane. Project generation also
+discovers local and dependency public extension headers automatically, retains
+exact C symbol names, builds deterministic IR/TypeScript/glue/exact twins, and
+passes the packed npm consumer smoke.
+
+Independent adversarial review found two reproducible P2 defects outside the
+binding corpus. The OKF graph could alias a duplicate heading with a literal
+ordinal-suffixed heading; its anchor allocator now reserves every emitted anchor
+globally and schema version 5 forces disposable indexes to rebuild. ZIP entry
+filters normalized names without normalizing the returned entry map; discovery
+and materialization now share canonical names and reject duplicate canonical
+paths. A `./`-prefixed dependency fixture exercises the latter through project
+generation.
+
+Evidence: the focused post-review suite passed 62/62 tests; the Static Hermes
+executable reported 486 runtime-executed, zero blocked, maximum arity 9, bounded
+frame, argument tag mask `0x3e`, and result tag mask `0x3f`; the complete
+`pnpm check` repository gate passed after both corrections. These exact-call
+tests prove generated name/signature/order transport, not the semantic behavior
+of every Defold engine operation.
+
+## 2026-09-20 - dmSDK browser arena exact calls cover the ready corpus
+
+The browser gate now uses a real Chrome runner that imports the production
+generated JavaScript arena codec and drives all 486 universal-ready vectors
+through the live Emscripten heap and common dispatcher. The wire-tag/arity
+partition is 486 applicable and zero unsupported, while preserving structured
+blockers for future gaps. Generated call/failure/result observations pass; 994
+scratch allocations have 994 reverse-order releases with a 240-byte peak and
+no mock memory, Embind, `ccall`, or `cwrap`.
+
+## 2026-09-20 - Project discovery owns native extension exact-twin generation
+
+`deherm generate` now feeds every discovered local and dependency-ZIP public C
+header into the compiler-owned native-extension generator. Header and complete
+public include-tree bytes join the project cache identity; outputs live under a
+Defold-revision/project-generation key and include normalized IR, TypeScript,
+production C++ glue, the exact-call
+twin/driver, and a machine-readable report. Unsupported signatures, parse
+failures, and prefix mismatches remain explicit blockers. `verify-generated`
+checks both the index and the complete owned tree. The installed-package smoke
+exercises this flow from a consumer project without the isolated header command;
+this is generation and fake-callee exact-call evidence, not Defold extension
+linkage or behavior evidence.
+
+## 2026-09-20 - Static Hermes exact replay covers the complete current partition
+
+The Static Hermes dmSDK exact runner now derives an applicability partition
+from the canonical 486-vector universal-ready plan and the compiler-owned
+32-cell/wire-tag frame capability. All 486 current vectors are applicable and
+execute through the production bounded frame API in strict sound-typed output;
+the native harness checks one recording-callee call, zero argument failures,
+and all six result-cell fields for every vector. The generated evidence retains
+every canonical row with an `execute` or `blocked-capability` disposition;
+synthetic over-capacity and unknown-tag regressions prove future unsupported
+rows receive machine-readable blockers instead of disappearing. This is Static
+transport evidence, not Defold implementation or retained ownership evidence.
+
 ## 2026-09-20 - OKF retrieval becomes an incremental SQLite graph
 
 The canonical Markdown bundle now has a disposable, digest-keyed SQLite
@@ -625,11 +687,12 @@ the authoritative input the generator already requires.
   adapter tests. This is real-browser wasm32 C-ABI evidence; the production
   JavaScript browser arena remains a separate transport gate.
 
-* **Dynamic and Static Hermes now replay generator-owned dmSDK vectors**: the
+* **Dynamic and Static Hermes replay generator-owned dmSDK vectors**: the
   Dynamic runner uses a real packaged Hermes runtime and the production JSI
   host function for five non-callback vector families. The Static runner emits
   strict C from sound TypeScript and crosses a generated four-deep bounded
-  frame for nine scalar, value, handle, reference, and callback vectors.
+  frame for all 486 vectors in the current compiler-owned capacity/tag
+  applicability partition.
   Both assert exact native call counts and argument observations. Dynamic JSI
   asserts decoded result signatures; Static asserts all six result-cell fields
   and C-string address identity. The package owns a 32-cell frame capability;
@@ -1028,3 +1091,4 @@ the authoritative input the generator already requires.
 * **Arbitrary extension C ABI lane**: Added an npm/CLI-exposed Clang JSON-AST generator that turns public C11 extension headers into deterministic IR, TypeScript, and 24-byte universal-cell C++ dispatch. Scalar, enum, and C-string free-function routes compile/link/run; records and unsafe pointers are cataloged with exact blockers. Added a generated browser dmSDK arena adapter with wasm32 bounds, catalog identity, UTF-8 scratch, exact bigint tags, and balanced release evidence.
 * **Policy delivery is one automatic pipeline, not four workflows or a review queue**: `.github/workflows/policy.yml` is the single visible graph for channel discovery, Linux derivation, Linux/macOS/Windows byte parity, real-engine compile/link/runtime evidence, and publication. Nightly stable/beta/alpha policies accumulate in the content-addressed store and publish directly to `deherm-policy-site`; a policy PR is not a checkpoint. Defold's declarations are authoritative, reviewed lowering knowledge is advisory, conservative/default transports preserve usability, and moved reviews or unproven routes become reports and deterministic issues rather than suppressing unrelated APIs. Pull requests run the same evidence graph but cannot publish. The accepted contract is recorded in `decisions/continuous-policy-publication.md`.
 * **Clean-runner Hermes header closure**: Policy run `35508523084` proved the Dynamic Hermes exact-call runner still depended on a local include-path accident after the JSI header fix: pinned `API/hermes/hermes.h` reaches `public/hermes/Public/HermesExport.h`. The test now declares all three pinned roots (`API`, `API/jsi`, and `public`) explicitly; required packaged-Hermes compilation, linking, and execution pass locally. Linux policy evidence remains pending until the follow-up pushed run is green.
+* **Cross-target dmSDK and project-extension realization wave**: The canonical 486 universal-ready dmSDK vectors now run through native C ABI, real Hermes/production JSI, sound-typed Static Hermes, and the production browser JavaScript arena. Static reports planned/applicable/runtime-executed separately (`486/486/486`, zero blocked), maximum exercised arity nine, argument tag mask `0x3e`, and result tag mask `0x3f`. The real pinned Emscripten/Chrome lane runs with memory growth enabled, observes 486 calls, balances 994 reverse-order releases against 994 allocations with a 240-byte peak, and refuses evidence whose runtime counts disagree with its generated applicability partition. That gate exposed a real generator defect: C-string exact fixtures populated their address but left `auxiliary` zero. The materializer now emits the UTF-8 byte length, the browser preflight checks length and content without pretending host/wasm pointer identity is stable, and the rerun passed all 486 calls. The shared browser arena emitter now constructs its `DataView` only after any nested allocation; a forced `WebAssembly.Memory.grow` test proves the old buffer can detach without corrupting encoding. `deherm generate` also consumes every discovered local/dependency-ZIP public C header automatically, accepts exact unprefixed symbols such as `XMathDot`, retains transitive enum/record facts without leaking helper functions, passes every exact include root, and emits atomically staged revision/project-keyed IR, TypeScript, production glue, exact twins, drivers, and reports. Clang/generator/include-tree identity participates in the cache key; missing tools, drift, confinement, unsafe/bounded ZIP failures, missing sentinels, and stale owned files fail explicitly. The packed npm consumer generated extension glue from this path successfully. This remains bridge and generated-call evidence, not execution of all Defold implementations or support for the 875 dmSDK recipes still requiring call-site specialization.

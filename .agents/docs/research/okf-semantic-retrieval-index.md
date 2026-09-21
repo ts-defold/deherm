@@ -31,12 +31,16 @@ refreshes it first. The default database lives under the ignored
 # Graph model
 
 The graph has document, heading, local-source, external-source, and anchor
-nodes. A document owns its heading nodes through `contains` edges. Markdown
-links and frontmatter `sources[].resource` values become `links` and `source`
-edges. Lines that explicitly say a backticked path is owned, generated, or
-verified become `owns`, `generates`, or `verifies` edges from the nearest
-heading. This is intentionally a narrow semantic grammar: the tool does not
-infer architectural authority from proximity or naming alone.
+nodes. Document identities use their path relative to `.agents/docs/`.
+Heading identities use that document path plus a normalized heading anchor and
+a deterministic ordinal for duplicate headings; the recorded line is location
+metadata, not identity. A document owns its heading nodes through `contains`
+edges, and Markdown fragment links resolve directly to those stable heading
+nodes. Markdown links and frontmatter `sources[].resource` values become
+`links` and `source` edges. Lines that explicitly say a backticked path is
+owned, generated, or verified become `owns`, `generates`, or `verifies` edges
+from the nearest heading. This is intentionally a narrow semantic grammar: the
+tool does not infer architectural authority from proximity or naming alone.
 
 Document nodes and heading sections carry searchable Markdown. Referenced
 source nodes carry a normalized path and current SHA-256 digest but no source
@@ -67,7 +71,8 @@ path around bounded context retrieval.
 # Verification boundary
 
 `tests/okf-graph.test.mjs` proves content-addressed reuse, one-document
-invalidation, independent source-digest refresh, all supported edge families,
+invalidation, independent source-digest refresh, stable line-independent
+section identities, fragment-link resolution, all supported edge families,
 metadata-only handling for generated JSON, output bounds, and rejection of SQL
 writes. It also covers CRLF parity, old-schema cache recreation, single-line
 section flooding, BLOB reduction, and recursive-query rejection. The first

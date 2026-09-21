@@ -680,6 +680,7 @@ export async function run(argv = process.argv.slice(2)) {
     if (options.json) console.log(JSON.stringify({ ...output, nativeExtension, componentCount, resourceSymbols: { resources: resourceSymbols.table.resourceCount }, routeSymbols: { routes: routeSymbols.index.routeCount }, dmSdkSymbols: { recipes: dmSdkSymbols.index.recipeCount, overloads: dmSdkSymbols.index.overloadCount }, summary: inventory.summary }, null, 2));
     else {
       console.log(`${output.cached ? "Current" : "Generated"} extension inventory, types, and ${output.moduleCount} SDK module(s) in ${path.relative(process.cwd(), output.root) || "."}`);
+      console.log(`${output.cached ? "Current" : "Generated"} ${output.nativeExtensions?.generatedRouteCount ?? 0} native extension C route(s); ${output.nativeExtensions?.blockedRouteCount ?? 0} blocked route(s) remain explicit`);
       console.log(`${nativeExtension.installed ? "Installed" : "Current"} native extension in ${path.relative(process.cwd(), nativeExtension.root) || "."}`);
       console.log(`Generated ${componentCount} TypeScript component proxy resource(s)`);
       if (output.projection?.blocked) {

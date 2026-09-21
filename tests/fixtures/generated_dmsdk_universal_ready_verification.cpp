@@ -9323,6 +9323,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_0_arguments[0].payload=UINT64_C(137);
  deherm_exact_vector_0_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_0_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_0_cstring_1));
+ deherm_exact_vector_0_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_0_cstring_1)-1);
  deherm_exact_vector_0_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  { const double value = 139.25; memcpy(&deherm_exact_vector_0_arguments[2].payload,&value,sizeof(value)); }
  deherm_exact_vector_0_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_F64;
@@ -9341,6 +9342,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_1_arguments[0].payload=UINT64_C(154);
  deherm_exact_vector_1_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_1_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_1_cstring_1));
+ deherm_exact_vector_1_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_1_cstring_1)-1);
  deherm_exact_vector_1_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_1_arguments[2].payload=static_cast<uint64_t>(INT64_C(-156));
  deherm_exact_vector_1_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_I64;
@@ -9359,8 +9361,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_2_arguments[0].payload=UINT64_C(171);
  deherm_exact_vector_2_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_2_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_2_cstring_1));
+ deherm_exact_vector_2_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_2_cstring_1)-1);
  deherm_exact_vector_2_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_2_arguments[2].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_2_cstring_2));
+ deherm_exact_vector_2_arguments[2].auxiliary=UINT64_C(sizeof(deherm_exact_vector_2_cstring_2)-1);
  deherm_exact_vector_2_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_2_result{};
  if(!(deherm_exact_vector_2_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(2),UINT32_C(9));
@@ -9378,6 +9382,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_3_arguments[0].payload=UINT64_C(205);
  deherm_exact_vector_3_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_3_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_3_cstring_1));
+ deherm_exact_vector_3_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_3_cstring_1)-1);
  deherm_exact_vector_3_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_3_result{};
  if(!(deherm_exact_vector_3_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(3),UINT32_C(11));
@@ -9538,6 +9543,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_16_arguments[0].payload=UINT64_C(3248);
  deherm_exact_vector_16_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_16_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_16_cstring_1));
+ deherm_exact_vector_16_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_16_cstring_1)-1);
  deherm_exact_vector_16_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  { const double value = 3250.25; memcpy(&deherm_exact_vector_16_arguments[2].payload,&value,sizeof(value)); }
  deherm_exact_vector_16_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_F64;
@@ -9556,6 +9562,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_17_arguments[0].payload=UINT64_C(3265);
  deherm_exact_vector_17_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_17_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_17_cstring_1));
+ deherm_exact_vector_17_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_17_cstring_1)-1);
  deherm_exact_vector_17_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_17_arguments[2].payload=static_cast<uint64_t>(INT64_C(-3267));
  deherm_exact_vector_17_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_I64;
@@ -9574,8 +9581,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_18_arguments[0].payload=UINT64_C(3282);
  deherm_exact_vector_18_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_18_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_18_cstring_1));
+ deherm_exact_vector_18_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_18_cstring_1)-1);
  deherm_exact_vector_18_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_18_arguments[2].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_18_cstring_2));
+ deherm_exact_vector_18_arguments[2].auxiliary=UINT64_C(sizeof(deherm_exact_vector_18_cstring_2)-1);
  deherm_exact_vector_18_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_18_result{};
  if(!(deherm_exact_vector_18_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(18),UINT32_C(192));
@@ -9845,6 +9854,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_39_arguments[0].payload=UINT64_C(5152);
  deherm_exact_vector_39_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_39_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_39_cstring_1));
+ deherm_exact_vector_39_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_39_cstring_1)-1);
  deherm_exact_vector_39_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_39_result{};
  if(!(deherm_exact_vector_39_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(39),UINT32_C(302));
@@ -9991,6 +10001,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_50_arguments[0].payload=UINT64_C(5798);
  deherm_exact_vector_50_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_50_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_50_cstring_1));
+ deherm_exact_vector_50_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_50_cstring_1)-1);
  deherm_exact_vector_50_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_50_result{};
  if(!(deherm_exact_vector_50_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(50),UINT32_C(340));
@@ -10196,6 +10207,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_63_arguments[1].payload=UINT64_C(6037);
  deherm_exact_vector_63_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_U64;
  deherm_exact_vector_63_arguments[2].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_63_cstring_2));
+ deherm_exact_vector_63_arguments[2].auxiliary=UINT64_C(sizeof(deherm_exact_vector_63_cstring_2)-1);
  deherm_exact_vector_63_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_63_arguments[3].payload=UINT64_C(6039);
  deherm_exact_vector_63_arguments[3].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -10217,6 +10229,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_64_arguments[1].payload=UINT64_C(6054);
  deherm_exact_vector_64_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_U64;
  deherm_exact_vector_64_arguments[2].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_64_cstring_2));
+ deherm_exact_vector_64_arguments[2].auxiliary=UINT64_C(sizeof(deherm_exact_vector_64_cstring_2)-1);
  deherm_exact_vector_64_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_64_result{};
  if(!(deherm_exact_vector_64_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(64),UINT32_C(355));
@@ -10235,6 +10248,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_65_arguments[1].payload=UINT64_C(6071);
  deherm_exact_vector_65_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_U64;
  deherm_exact_vector_65_arguments[2].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_65_cstring_2));
+ deherm_exact_vector_65_arguments[2].auxiliary=UINT64_C(sizeof(deherm_exact_vector_65_cstring_2)-1);
  deherm_exact_vector_65_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_65_result{};
  if(!(deherm_exact_vector_65_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(65),UINT32_C(356));
@@ -10383,6 +10397,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_76_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_76_receiver_storage));
  deherm_exact_vector_76_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_76_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_76_cstring_1));
+ deherm_exact_vector_76_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_76_cstring_1)-1);
  deherm_exact_vector_76_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_76_result{};
  if(!(deherm_exact_vector_76_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && deherm_exact_vector_76_arguments[0].payload != 0 && deherm_dmsdk_address_fits(deherm_exact_vector_76_arguments[0].payload) && deherm_exact_vector_76_arguments[0].payload % alignof(dmGameObject::PropertyVar) == 0))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(76),UINT32_C(371));
@@ -10529,6 +10544,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_84_arguments[2].payload=UINT64_C(6531);
  deherm_exact_vector_84_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
  deherm_exact_vector_84_arguments[3].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_84_cstring_3));
+ deherm_exact_vector_84_arguments[3].auxiliary=UINT64_C(sizeof(deherm_exact_vector_84_cstring_3)-1);
  deherm_exact_vector_84_arguments[3].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_84_result{};
  if(!(deherm_exact_vector_84_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(84),UINT32_C(383));
@@ -10579,6 +10595,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_87_arguments[1].payload=UINT64_C(6666);
  deherm_exact_vector_87_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_87_arguments[2].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_87_cstring_2));
+ deherm_exact_vector_87_arguments[2].auxiliary=UINT64_C(sizeof(deherm_exact_vector_87_cstring_2)-1);
  deherm_exact_vector_87_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_87_arguments[3].payload=UINT64_C(6668);
  deherm_exact_vector_87_arguments[3].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -10956,6 +10973,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_113_arguments[0].payload=UINT64_C(8127);
  deherm_exact_vector_113_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_113_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_113_cstring_1));
+ deherm_exact_vector_113_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_113_cstring_1)-1);
  deherm_exact_vector_113_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_113_arguments[2].payload=UINT64_C(8129);
  deherm_exact_vector_113_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -11402,6 +11420,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_141_arguments[0].payload=UINT64_C(8603);
  deherm_exact_vector_141_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_U64;
  deherm_exact_vector_141_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_141_cstring_1));
+ deherm_exact_vector_141_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_141_cstring_1)-1);
  deherm_exact_vector_141_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_141_result{};
  if(!(deherm_exact_vector_141_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_U64))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(141),UINT32_C(505));
@@ -11425,6 +11444,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_142_result.tag==DEHERM_DMSDK_UNIVERSAL_VOID))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(142),UINT32_C(506));
  memset(deherm_exact_vector_143_arguments,0,sizeof(deherm_exact_vector_143_arguments));
  deherm_exact_vector_143_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_143_cstring_0));
+ deherm_exact_vector_143_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_143_cstring_0)-1);
  deherm_exact_vector_143_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_143_result{};
  if(!(deherm_exact_vector_143_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(143),UINT32_C(507));
@@ -11739,6 +11759,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_172_arguments[0].payload=UINT64_C(9487);
  deherm_exact_vector_172_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_172_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_172_cstring_1));
+ deherm_exact_vector_172_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_172_cstring_1)-1);
  deherm_exact_vector_172_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_172_result{};
  if(!(deherm_exact_vector_172_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(172),UINT32_C(557));
@@ -13987,6 +14008,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_319_arguments[0].payload=UINT64_C(14196);
  deherm_exact_vector_319_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_319_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_319_cstring_1));
+ deherm_exact_vector_319_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_319_cstring_1)-1);
  deherm_exact_vector_319_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_319_arguments[2].payload=UINT64_C(14198);
  deherm_exact_vector_319_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -14009,6 +14031,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_320_arguments[0].payload=UINT64_C(14213);
  deherm_exact_vector_320_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_320_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_320_cstring_1));
+ deherm_exact_vector_320_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_320_cstring_1)-1);
  deherm_exact_vector_320_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_320_arguments[2].payload=UINT64_C(14215);
  deherm_exact_vector_320_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -14031,6 +14054,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_321_arguments[0].payload=UINT64_C(14230);
  deherm_exact_vector_321_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_321_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_321_cstring_1));
+ deherm_exact_vector_321_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_321_cstring_1)-1);
  deherm_exact_vector_321_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_321_result{};
  if(!(deherm_exact_vector_321_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(321),UINT32_C(836));
@@ -14131,6 +14155,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_329_arguments[0].payload=UINT64_C(14706);
  deherm_exact_vector_329_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_329_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_329_cstring_1));
+ deherm_exact_vector_329_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_329_cstring_1)-1);
  deherm_exact_vector_329_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_329_result{};
  if(!(deherm_exact_vector_329_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(329),UINT32_C(864));
@@ -14146,6 +14171,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_330_arguments[0].payload=UINT64_C(14723);
  deherm_exact_vector_330_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_330_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_330_cstring_1));
+ deherm_exact_vector_330_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_330_cstring_1)-1);
  deherm_exact_vector_330_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_330_result{};
  if(!(deherm_exact_vector_330_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(330),UINT32_C(865));
@@ -14161,6 +14187,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_331_arguments[0].payload=UINT64_C(14825);
  deherm_exact_vector_331_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_331_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_331_cstring_1));
+ deherm_exact_vector_331_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_331_cstring_1)-1);
  deherm_exact_vector_331_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_331_result{};
  if(!(deherm_exact_vector_331_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(331),UINT32_C(871));
@@ -14176,6 +14203,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_332_arguments[0].payload=UINT64_C(14842);
  deherm_exact_vector_332_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_332_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_332_cstring_1));
+ deherm_exact_vector_332_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_332_cstring_1)-1);
  deherm_exact_vector_332_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_332_result{};
  if(!(deherm_exact_vector_332_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(332),UINT32_C(872));
@@ -14734,6 +14762,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_376_arguments[0].payload=UINT64_C(17749);
  deherm_exact_vector_376_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_U64;
  deherm_exact_vector_376_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_376_cstring_1));
+ deherm_exact_vector_376_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_376_cstring_1)-1);
  deherm_exact_vector_376_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_376_result{};
  if(!(deherm_exact_vector_376_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_U64))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(376),UINT32_C(1043));
@@ -14848,6 +14877,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_386_arguments[0].payload=UINT64_C(19024);
  deherm_exact_vector_386_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_386_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_386_cstring_1));
+ deherm_exact_vector_386_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_386_cstring_1)-1);
  deherm_exact_vector_386_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_386_arguments[2].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(&deherm_exact_vector_386_address_2));
  deherm_exact_vector_386_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
@@ -14867,6 +14897,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_387_arguments[0].payload=UINT64_C(19075);
  deherm_exact_vector_387_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_387_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_387_cstring_1));
+ deherm_exact_vector_387_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_387_cstring_1)-1);
  deherm_exact_vector_387_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_387_result{};
  if(!(deherm_exact_vector_387_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(387),UINT32_C(1121));
@@ -14986,6 +15017,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_396_result.tag==DEHERM_DMSDK_UNIVERSAL_VOID))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(396),UINT32_C(1176));
  memset(deherm_exact_vector_397_arguments,0,sizeof(deherm_exact_vector_397_arguments));
  deherm_exact_vector_397_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_397_cstring_0));
+ deherm_exact_vector_397_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_397_cstring_0)-1);
  deherm_exact_vector_397_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_397_result{};
  if(!(deherm_exact_vector_397_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(397),UINT32_C(1178));
@@ -15291,8 +15323,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_422_result.tag==DEHERM_DMSDK_UNIVERSAL_VOID))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(422),UINT32_C(1225));
  memset(deherm_exact_vector_423_arguments,0,sizeof(deherm_exact_vector_423_arguments));
  deherm_exact_vector_423_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_423_cstring_0));
+ deherm_exact_vector_423_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_423_cstring_0)-1);
  deherm_exact_vector_423_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_423_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_423_cstring_1));
+ deherm_exact_vector_423_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_423_cstring_1)-1);
  deherm_exact_vector_423_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_423_arguments[2].payload=static_cast<uint64_t>(INT64_C(-20964));
  deherm_exact_vector_423_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_I64;
@@ -15315,8 +15349,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_423_result.tag==DEHERM_DMSDK_UNIVERSAL_U64 && deherm_exact_vector_423_result.payload==UINT64_C(30428)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(423),UINT32_C(1232));
  memset(deherm_exact_vector_424_arguments,0,sizeof(deherm_exact_vector_424_arguments));
  deherm_exact_vector_424_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_424_cstring_0));
+ deherm_exact_vector_424_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_424_cstring_0)-1);
  deherm_exact_vector_424_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_424_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_424_cstring_1));
+ deherm_exact_vector_424_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_424_cstring_1)-1);
  deherm_exact_vector_424_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  { const double value = 20981.25; memcpy(&deherm_exact_vector_424_arguments[2].payload,&value,sizeof(value)); }
  deherm_exact_vector_424_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_F64;
@@ -15339,8 +15375,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_424_result.tag==DEHERM_DMSDK_UNIVERSAL_U64 && deherm_exact_vector_424_result.payload==UINT64_C(30447)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(424),UINT32_C(1233));
  memset(deherm_exact_vector_425_arguments,0,sizeof(deherm_exact_vector_425_arguments));
  deherm_exact_vector_425_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_425_cstring_0));
+ deherm_exact_vector_425_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_425_cstring_0)-1);
  deherm_exact_vector_425_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_425_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_425_cstring_1));
+ deherm_exact_vector_425_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_425_cstring_1)-1);
  deherm_exact_vector_425_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  { const double value = 20998.25; memcpy(&deherm_exact_vector_425_arguments[2].payload,&value,sizeof(value)); }
  deherm_exact_vector_425_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_F64;
@@ -15363,8 +15401,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_425_result.tag==DEHERM_DMSDK_UNIVERSAL_U64 && deherm_exact_vector_425_result.payload==UINT64_C(30466)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(425),UINT32_C(1234));
  memset(deherm_exact_vector_426_arguments,0,sizeof(deherm_exact_vector_426_arguments));
  deherm_exact_vector_426_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_426_cstring_0));
+ deherm_exact_vector_426_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_426_cstring_0)-1);
  deherm_exact_vector_426_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_426_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_426_cstring_1));
+ deherm_exact_vector_426_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_426_cstring_1)-1);
  deherm_exact_vector_426_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_426_arguments[2].payload=UINT64_C(21015);
  deherm_exact_vector_426_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -15381,8 +15421,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_426_result.tag==DEHERM_DMSDK_UNIVERSAL_U64 && deherm_exact_vector_426_result.payload==UINT64_C(30485)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(426),UINT32_C(1235));
  memset(deherm_exact_vector_427_arguments,0,sizeof(deherm_exact_vector_427_arguments));
  deherm_exact_vector_427_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_427_cstring_0));
+ deherm_exact_vector_427_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_427_cstring_0)-1);
  deherm_exact_vector_427_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_427_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_427_cstring_1));
+ deherm_exact_vector_427_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_427_cstring_1)-1);
  deherm_exact_vector_427_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_427_arguments[2].payload=static_cast<uint64_t>(INT64_C(-21032));
  deherm_exact_vector_427_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_I64;
@@ -15405,8 +15447,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_427_result.tag==DEHERM_DMSDK_UNIVERSAL_U64 && deherm_exact_vector_427_result.payload==UINT64_C(30504)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(427),UINT32_C(1236));
  memset(deherm_exact_vector_428_arguments,0,sizeof(deherm_exact_vector_428_arguments));
  deherm_exact_vector_428_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_428_cstring_0));
+ deherm_exact_vector_428_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_428_cstring_0)-1);
  deherm_exact_vector_428_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_428_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_428_cstring_1));
+ deherm_exact_vector_428_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_428_cstring_1)-1);
  deherm_exact_vector_428_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_428_arguments[2].payload=static_cast<uint64_t>(INT64_C(-21049));
  deherm_exact_vector_428_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_I64;
@@ -15429,8 +15473,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_428_result.tag==DEHERM_DMSDK_UNIVERSAL_U64 && deherm_exact_vector_428_result.payload==UINT64_C(30523)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(428),UINT32_C(1237));
  memset(deherm_exact_vector_429_arguments,0,sizeof(deherm_exact_vector_429_arguments));
  deherm_exact_vector_429_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_429_cstring_0));
+ deherm_exact_vector_429_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_429_cstring_0)-1);
  deherm_exact_vector_429_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_429_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_429_cstring_1));
+ deherm_exact_vector_429_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_429_cstring_1)-1);
  deherm_exact_vector_429_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_429_arguments[2].payload=UINT64_C(21066);
  deherm_exact_vector_429_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -15453,8 +15499,10 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_429_result.tag==DEHERM_DMSDK_UNIVERSAL_U64 && deherm_exact_vector_429_result.payload==UINT64_C(30542)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(429),UINT32_C(1238));
  memset(deherm_exact_vector_430_arguments,0,sizeof(deherm_exact_vector_430_arguments));
  deherm_exact_vector_430_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_430_cstring_0));
+ deherm_exact_vector_430_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_430_cstring_0)-1);
  deherm_exact_vector_430_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_430_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_430_cstring_1));
+ deherm_exact_vector_430_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_430_cstring_1)-1);
  deherm_exact_vector_430_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_430_arguments[2].payload=UINT64_C(21083);
  deherm_exact_vector_430_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -15693,6 +15741,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_448_result.tag==DEHERM_DMSDK_UNIVERSAL_VOID))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(448),UINT32_C(1259));
  memset(deherm_exact_vector_449_arguments,0,sizeof(deherm_exact_vector_449_arguments));
  deherm_exact_vector_449_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_449_cstring_0));
+ deherm_exact_vector_449_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_449_cstring_0)-1);
  deherm_exact_vector_449_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_449_arguments[1].payload=UINT64_C(21609);
  deherm_exact_vector_449_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -15717,6 +15766,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_450_result.tag==DEHERM_DMSDK_UNIVERSAL_VOID))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(450),UINT32_C(1271));
  memset(deherm_exact_vector_451_arguments,0,sizeof(deherm_exact_vector_451_arguments));
  deherm_exact_vector_451_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_451_cstring_0));
+ deherm_exact_vector_451_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_451_cstring_0)-1);
  deherm_exact_vector_451_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_451_result{};
  if(!(deherm_exact_vector_451_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(451),UINT32_C(1273));
@@ -15728,6 +15778,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  if(!(deherm_exact_vector_451_result.tag==DEHERM_DMSDK_UNIVERSAL_I64 && deherm_dmsdk_unpack_i64(deherm_exact_vector_451_result.payload)==INT64_C(0)))return deherm_dmsdk_universal_ready_provider_install_exact_failure("result",UINT32_C(451),UINT32_C(1273));
  memset(deherm_exact_vector_452_arguments,0,sizeof(deherm_exact_vector_452_arguments));
  deherm_exact_vector_452_arguments[0].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_452_cstring_0));
+ deherm_exact_vector_452_arguments[0].auxiliary=UINT64_C(sizeof(deherm_exact_vector_452_cstring_0)-1);
  deherm_exact_vector_452_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_452_result{};
  if(!(deherm_exact_vector_452_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(452),UINT32_C(1274));
@@ -15741,6 +15792,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_453_arguments[0].payload=UINT64_C(21744);
  deherm_exact_vector_453_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_453_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_453_cstring_1));
+ deherm_exact_vector_453_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_453_cstring_1)-1);
  deherm_exact_vector_453_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_453_arguments[2].payload=UINT64_C(21746);
  deherm_exact_vector_453_arguments[2].tag=DEHERM_DMSDK_UNIVERSAL_U64;
@@ -15825,6 +15877,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_459_arguments[0].payload=UINT64_C(22152);
  deherm_exact_vector_459_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_459_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_459_cstring_1));
+ deherm_exact_vector_459_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_459_cstring_1)-1);
  deherm_exact_vector_459_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_459_result{};
  if(!(deherm_exact_vector_459_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(459),UINT32_C(1302));
@@ -15840,6 +15893,7 @@ extern "C" int deherm_dmsdk_universal_ready_provider_install_run_exact_verificat
  deherm_exact_vector_460_arguments[0].payload=UINT64_C(22254);
  deherm_exact_vector_460_arguments[0].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  deherm_exact_vector_460_arguments[1].payload=static_cast<uint64_t>(reinterpret_cast<uintptr_t>(deherm_exact_vector_460_cstring_1));
+ deherm_exact_vector_460_arguments[1].auxiliary=UINT64_C(sizeof(deherm_exact_vector_460_cstring_1)-1);
  deherm_exact_vector_460_arguments[1].tag=DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  DehermDmSdkUniversalValue deherm_exact_vector_460_result{};
  if(!(deherm_exact_vector_460_arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS))return deherm_dmsdk_universal_ready_provider_install_exact_failure("precondition-0",UINT32_C(460),UINT32_C(1308));

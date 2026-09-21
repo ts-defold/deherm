@@ -220,25 +220,41 @@ header cannot renumber calls. Repeated compatible declarations deduplicate;
 variadic declarations remain visible but require a typed non-variadic facade.
 The generated production dispatcher, ABI-compatible fake dispatcher, runnable
 driver, and content-addressed verification report all consume that normalized
-route plan. `deherm generate-extension-api` writes all four artifacts. The
-current parser is deliberately a single-header C11 lane: C++ methods/templates,
-multi-header project assembly, records, unsafe pointers, and callback ownership
-remain explicit follow-on shape work rather than implied support.
+route plan. `deherm generate-extension-api` writes all four artifacts, while
+ordinary `deherm generate` discovers every local and dependency-ZIP public
+header, accepts its exact C function names without imposing an extension-name
+prefix, and emits a revision/project-generation-keyed tree. Clang identity,
+the complete public include trees, and the generator sources participate in
+that key. Missing Clang, confinement/drift, and I/O failures abort generation;
+only actual Clang parse diagnostics become per-header blockers. The current
+parser is deliberately a C11 free-function lane: C++ methods/templates,
+cross-header declaration reconciliation, by-value records, unsafe pointers,
+and callback ownership remain explicit follow-on shape work rather than implied
+support.
 
 The browser-target dmSDK lane has a separate target gate because host-native
 execution is not wasm32 evidence. `pnpm test:dmsdk-browser-exact-call`
 materializes the canonical 486-call corpus through the same exact-call
-generator, compiles the generated provider, recording callees, observations,
-driver, and universal dispatcher with the pinned Emscripten toolchain, and runs
-the emitted `.wasm` from a
-loopback page in Chrome. Success is a manifest-bound marker printed by code
-executing inside that Wasm module. The gate never substitutes a JavaScript
-`WebAssembly.Memory` or a mock heap. Missing pinned Emscripten activation or a
-real browser is a named prerequisite failure, not a skipped or downgraded test.
-This proves all declaration-only ready exact-call vectors in a real
-browser-loaded wasm32 C ABI. It does not yet drive those cells through the
-production JavaScript browser arena/dispatcher, cover the 875
-usage-specialized recipes, or execute a Defold engine implementation.
+generator and derives a complete browser applicability partition from each
+vector's wire tags and arity. All 486 current vectors fit the generated
+15-argument arena and supported value tags; a future gap remains in the census
+with a machine-readable reason instead of disappearing. The gate compiles the
+generated provider, recording callees, observations, and universal dispatcher
+with pinned Emscripten, then a Chrome ES module imports the production generated
+`browser-arena.ts` codec. It encodes every applicable value into the live
+Emscripten heap, invokes `deherm_dmsdk_universal_dispatch` through direct
+exports, and compares generated call, failure, and result observations. The
+observed run executed 486 vectors, balanced 994 scratch allocations/releases in
+reverse order, and peaked at 240 active bytes. Emscripten memory growth is
+enabled; a deterministic unit grows memory during string allocation and proves
+the codec recreates its view after the old buffer detaches. C-string inputs
+compare content and auxiliary byte length, not host/wasm pointer identity, and
+the runtime report is rejected unless its counts agree with the generated
+applicability partition. It uses no mock memory, Embind, `ccall`, or `cwrap`.
+Missing pinned Emscripten activation or a real browser is a named prerequisite
+failure, not a skipped or downgraded test. This proves the
+declaration-only ready JavaScript-arena/wasm32 bridge contract; it does not
+cover the 875 usage-specialized recipes or execute a Defold implementation.
 
 The Dynamic Hermes lane generates a C++ runner from the generator-owned
 canonical 486-call corpus, creates a real packaged Hermes runtime, installs the production
@@ -260,8 +276,11 @@ frame owns 32 24-byte argument cells and one result cell; that capacity and the
 frame emitter are a versioned package capability, while a policy carries and
 cross-checks its recipe-derived maximum (currently fifteen). Acquire, cell
 copy, dispatch, result access, and release are the only Static Hermes FFI
-operations. A strict `shermes` unit replays the canonical 486-call corpus and
-checks the generated fake observations and bounded frame transport. This does
+operations. A strict `shermes` unit reports 486 planned, 486 applicable, 486
+runtime-executed, and zero blocked vectors, then checks the generated fake
+observations and bounded frame transport. The observed maximum arity is nine;
+argument tags cover bool/i64/u64/f64/address and results cover those plus void.
+This does
 not prove Defold implementation semantics or retained handle/callback lifetime
 policy for the 875 recipes that require call-site specialization.
 
