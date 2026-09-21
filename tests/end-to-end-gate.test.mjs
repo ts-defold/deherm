@@ -6,6 +6,7 @@ import {
   buildLedger,
   buildServerForDefoldRef,
   readLedger,
+  scaffoldArguments,
   stageNames
 } from "../scripts/check-end-to-end.mjs";
 
@@ -24,6 +25,22 @@ test("every declared bundle target is either exercised or declined by name", asy
     }
   }
   assert.ok(rows.some((row) => row.disposition === "exercise"), "the gate exercises nothing at all");
+});
+
+test("the scaffold is pinned to the policy revision instead of racing Defold latest", async () => {
+  const { defoldRevision } = await readLedger();
+  assert.deepEqual(scaffoldArguments({ project: "build/example", defoldRevision }), [
+    "create",
+    "build/example",
+    "--name",
+    "deherm end to end",
+    "--defold-sdk",
+    defoldRevision
+  ]);
+  assert.throws(
+    () => scaffoldArguments({ project: "build/example", defoldRevision: "stable" }),
+    /requires the exact policy Defold revision/u
+  );
 });
 
 test("a bundle target Defold adds is a failure, not a missing row", () => {

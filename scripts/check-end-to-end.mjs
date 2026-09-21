@@ -107,6 +107,13 @@ export const scratchProject = "build/end-to-end/project";
 
 export const stageNames = Object.freeze(["policy", "host-tools", "target-archives", "scaffold", "generate", "bob"]);
 
+export function scaffoldArguments({ project, defoldRevision, name = "deherm end to end" }) {
+  if (!/^[a-f0-9]{40}$/u.test(defoldRevision ?? "")) {
+    throw new Error(`End-to-end scaffold requires the exact policy Defold revision, got ${JSON.stringify(defoldRevision)}`);
+  }
+  return ["create", project, "--name", name, "--defold-sdk", defoldRevision];
+}
+
 async function readJson(relative) {
   return JSON.parse(await readFile(path.join(root, relative), "utf8"));
 }
@@ -240,7 +247,7 @@ const stages = {
     // `deherm create` refuses a non-empty directory, which is the behaviour a
     // user wants and the opposite of what a repeatable gate wants.
     await rm(path.join(root, context.project), { recursive: true, force: true });
-    const { stdout } = await node("bin/deherm.mjs", ["create", context.project, "--name", "deherm end to end"]);
+    const { stdout } = await node("bin/deherm.mjs", scaffoldArguments(context));
     return { detail: stdout.trim().split("\n")[0] ?? `created ${context.project}` };
   },
 
@@ -333,6 +340,7 @@ export async function main(argv) {
     rows,
     project,
     projectWasGiven,
+    defoldRevision,
     buildServer,
     targetResult(target, stage, result) {
       if (!targetResults.has(target)) targetResults.set(target, {});

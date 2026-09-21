@@ -1,5 +1,18 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - End-to-end scaffolding uses the policy revision it verifies
+
+Push run `35546616318` resolved the committed policy successfully, then failed
+because its scaffold independently selected Defold's newer live stable SHA
+`574678c7d44be490d874fbed2d0ae6211feec4d9` before the policy workflow had
+published that revision. The end-to-end gate now passes its own exact
+policy/artifact revision to `deherm create --defold-sdk`, so policy resolution,
+scaffolding, generation, target artifacts, and Bob answer for one engine instead
+of racing two authorities. The focused gate tests pass, and the corrected local
+scaffold plus generation/type-check stages completed with zero failures against
+`7f0f554f41f9dce1e0ddff99bf08200657d1ee05`. This is consumer generation and
+type-check evidence, not Bob linkage or runtime evidence.
+
 ## 2026-09-20 - The npm package is revision-neutral and target archives are fetched
 
 The accepted policy/materializer ownership boundary is now enforced against the
