@@ -44,6 +44,13 @@ Large generated policies, inventories, and evidence objects stay behind their
 owner commands, which should report bounded summaries rather than print the
 objects themselves.
 
+These commands refresh a disposable SQLite graph below
+`.deherm/cache/okf-index.sqlite`. Documents and headings are content-addressed;
+local source references carry only their path and digest. Explicit Markdown,
+frontmatter, ownership, generation, and verification references become graph
+edges. `pnpm knowledge:sql -- <query>` exposes a bounded, physically read-only
+SQL escape hatch for precise joins without injecting the corpus into context.
+
 # Commands that work now
 
 | Intent | Command | Result |

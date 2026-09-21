@@ -1,5 +1,22 @@
 # Defold Hermes knowledge log
 
+## 2026-09-20 - OKF retrieval becomes an incremental SQLite graph
+
+The canonical Markdown bundle now has a disposable, digest-keyed SQLite
+retrieval index under `.deherm/cache/`. It represents documents, headings,
+declared sources, explicit links, and narrow owns/generates/verifies relations;
+referenced generated JSON contributes only its path and digest. Search, outline,
+section, and physically read-only SQL interfaces enforce result and content
+bounds. A second refresh of the real 91-document bundle reparsed zero documents
+and reused all 91. Tests cover incremental invalidation, graph edges,
+metadata-only generated data, output limits, and rejection of SQL writes.
+Adversarial review then reproduced byte-volume bypasses, stale-schema startup
+failure, CRLF frontmatter loss, and an inaccurate Node floor. The tool now caps
+cells, lines, queries, and complete responses by bytes; reduces BLOBs to bounded
+metadata; rejects recursive SQL; recreates mismatched schemas before indexing;
+normalizes Markdown newlines; and requires Node 22.13 or newer. Regression
+fixtures reproduce every corrected failure.
+
 ## 2026-09-20 - Exact-call review corrections and artifact delivery close locally
 
 Adversarial review found two evidence problems in the integrated wave and two

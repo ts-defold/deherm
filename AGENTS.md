@@ -15,6 +15,9 @@ and Hermes runtime integration for Defold.
   `pnpm knowledge:outline -- <relative-document.md>`, then retrieve only the
   needed section with
   `pnpm knowledge:section -- <relative-document.md> <heading terms>`.
+- The disposable SQLite graph lives below `.deherm/cache/`; use
+  `pnpm knowledge:sql -- <read-only-query>` for unusual joins. Query results are
+  bounded, and the cache is never an authority or correctness dependency.
 - Read `.agents/docs/index.md` only when navigation or bundle structure is the
   task. Read large generated policy/evidence files through their owning summary
   or verification commands; do not dump them into agent context.

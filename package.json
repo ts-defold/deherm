@@ -87,7 +87,7 @@
     "README.md"
   ],
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13.0"
   },
   "repository": {
     "type": "git",
@@ -268,10 +268,12 @@
     "check:profile-shipped-default": "node scripts/check-profile-compile-out.mjs --shipped-default",
     "check:war-battles-projections": "node examples/war-battles-online/integration/check-projection-evidence.mjs",
     "check:commit-provenance": "node scripts/check-commit-provenance.mjs HEAD",
-    "check:knowledge": "node .agents/check-okf.mjs",
-    "knowledge:search": "node .agents/search-okf.mjs",
-    "knowledge:outline": "node .agents/search-okf.mjs --outline",
-    "knowledge:section": "node .agents/search-okf.mjs --section",
+    "check:knowledge": "node .agents/check-okf.mjs && node --test tests/okf-graph.test.mjs",
+    "knowledge:refresh": "node .agents/okf-index.mjs refresh",
+    "knowledge:search": "node .agents/okf-index.mjs search",
+    "knowledge:outline": "node .agents/okf-index.mjs outline",
+    "knowledge:section": "node .agents/okf-index.mjs section",
+    "knowledge:sql": "node .agents/okf-index.mjs sql",
     "check:package-revision-boundary": "node scripts/check-package-revision-boundary.mjs",
     "check:policy-surface-fixture": "node scripts/capture-policy-surface-old-pipeline.mjs",
     "capture:policy-surface-fixture": "node scripts/capture-policy-surface-old-pipeline.mjs --update",
