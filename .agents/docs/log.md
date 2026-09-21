@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-09-21 - User caches follow native host conventions without destructive migration
+
+The shared policy, realized-surface, toolchain, and native-artifact roots now
+resolve beneath the same host-native cache home: `~/Library/Caches/deherm` on
+macOS, `%LOCALAPPDATA%/deherm/cache` on Windows, and `~/.cache/deherm` on Linux.
+`DEHERM_CACHE_HOME` and `XDG_CACHE_HOME/deherm` remain higher-priority explicit
+overrides. When Windows does not expose `LOCALAPPDATA`, the deterministic
+fallback is `~/AppData/Local/deherm/cache` rather than the roaming profile.
+
+macOS and Windows resolution keeps the former `~/.cache/deherm` root as a
+lower-priority, read-only compatibility layer. No implicit move or rewrite can
+damage a valid cache, new writes always use the native root, and an explicit
+override never consults the fallback. Cross-platform path tests inject platform,
+home, and environment values rather than depending on the runner OS.
+
 ## 2026-09-21 - Browser exact calls cover every emitted script route
 
 The generated browser exact-call driver now executes all 911 emitted script

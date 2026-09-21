@@ -72,10 +72,42 @@ export function defoldSurfaceCacheHome(env = process.env, platform = process.pla
   if (env.XDG_CACHE_HOME) return path.join(path.resolve(env.XDG_CACHE_HOME), "deherm");
   if (platform === "darwin") return path.join(userHome, "Library", "Caches", "deherm");
   if (platform === "win32") {
-    const windowsCache = env.LOCALAPPDATA || env.APPDATA;
-    if (windowsCache) return path.join(path.resolve(windowsCache), "deherm");
+    const windowsCache = env.LOCALAPPDATA
+      ? path.resolve(env.LOCALAPPDATA)
+      : path.join(userHome, "AppData", "Local");
+    return path.join(windowsCache, "deherm", "cache");
   }
   return path.join(userHome, ".cache", "deherm");
+}
+
+/**
+ * The pre-native-default cache location, read-only and lower priority.
+ *
+ * Existing macOS and Windows caches are not moved or rewritten implicitly.
+ * A successful read keeps an older installation usable while every new write
+ * goes to the native cache root. Explicit DEHERM/XDG roots are authoritative
+ * and never acquire an implicit fallback.
+ */
+export function defoldSurfaceLegacyCacheHome(
+  env = process.env,
+  platform = process.platform,
+  userHome = homedir()
+) {
+  if (env.DEHERM_CACHE_HOME || env.XDG_CACHE_HOME) return null;
+  if (platform !== "darwin" && platform !== "win32") return null;
+  return path.join(userHome, ".cache", "deherm");
+}
+
+function cacheSurfaceLayer(layer, cacheHome, revision) {
+  const root = path.join(cacheHome, "surfaces", revision);
+  return {
+    layer,
+    root,
+    irRoot: path.join(root, "ir"),
+    sdkRoot: path.join(root, "sdk"),
+    repositoryRoot: path.join(root, "repository"),
+    descriptor: path.join(root, "surface.json")
+  };
 }
 
 /**
@@ -89,15 +121,15 @@ export function defoldSurfaceSearchPath(revision, options = {}) {
   const packageRoot = options.packageRoot;
   const projectRoot = options.projectRoot;
   const layers = [];
-  const cacheHome = defoldSurfaceCacheHome(options.env ?? process.env);
-  layers.push({
-    layer: "user-cache",
-    root: path.join(cacheHome, "surfaces", revision),
-    irRoot: path.join(cacheHome, "surfaces", revision, "ir"),
-    sdkRoot: path.join(cacheHome, "surfaces", revision, "sdk"),
-    repositoryRoot: path.join(cacheHome, "surfaces", revision, "repository"),
-    descriptor: path.join(cacheHome, "surfaces", revision, "surface.json")
-  });
+  const env = options.env ?? process.env;
+  const platform = options.platform ?? process.platform;
+  const userHome = options.userHome ?? homedir();
+  const cacheHome = defoldSurfaceCacheHome(env, platform, userHome);
+  layers.push(cacheSurfaceLayer("user-cache", cacheHome, revision));
+  const legacyCacheHome = defoldSurfaceLegacyCacheHome(env, platform, userHome);
+  if (legacyCacheHome && path.resolve(legacyCacheHome) !== path.resolve(cacheHome)) {
+    layers.push(cacheSurfaceLayer("legacy-user-cache", legacyCacheHome, revision));
+  }
   if (projectRoot) {
     const root = path.join(projectRoot, ".deherm", "cache", "surfaces", revision);
     layers.push({

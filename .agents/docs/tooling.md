@@ -332,7 +332,8 @@ The npm package contains no platform `.a`/`.lib` archive and no generated
 `libhermesvm-config.h`. A generated project locks the Defold-owned target matrix
 and the published release mapping. The first native build downloads only the
 selected target archive into the normal per-user déherm cache
-(`DEHERM_CACHE_HOME`, XDG, macOS Library/Caches, or Windows LocalAppData),
+(`DEHERM_CACHE_HOME`, XDG, macOS Library/Caches, or
+`%LOCALAPPDATA%/deherm/cache` on Windows),
 installs its release library, debugger library, and matching generated config
 into the project extension, and records every member hash. Later projects reuse
 the cached archive.

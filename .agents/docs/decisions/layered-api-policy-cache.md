@@ -503,11 +503,17 @@ alone, across three roots, stopping at the first that holds a complete surface
 for that exact revision:
 
 1. **user cache** - `$DEHERM_CACHE_HOME`, `$XDG_CACHE_HOME/deherm`,
-   `~/Library/Caches/deherm` on macOS, `%LOCALAPPDATA%/deherm` on Windows, or
+   `~/Library/Caches/deherm` on macOS,
+   `%LOCALAPPDATA%/deherm/cache` on Windows, or
    `~/.cache/deherm` on Linux, under `surfaces/<revision>/`;
-2. **project cache** - `<project>/.deherm/cache/surfaces/<revision>/`, so a
+2. **legacy user cache** - `~/.cache/deherm` on macOS and Windows, read only
+   when neither explicit override is set and only after the native root misses.
+   Existing bytes are never moved or rewritten implicitly; every new write goes
+   to the native root. Windows without `LOCALAPPDATA` uses
+   `~/AppData/Local/deherm/cache` as its deterministic native fallback;
+3. **project cache** - `<project>/.deherm/cache/surfaces/<revision>/`, so a
    checkout can be self-contained for CI.
-3. **repository checkout** - the checked-in generated tree, only when a
+4. **repository checkout** - the checked-in generated tree, only when a
    workspace marker proves this is the source repository rather than an npm
    install.
 

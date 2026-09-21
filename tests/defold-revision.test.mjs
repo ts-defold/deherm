@@ -16,6 +16,7 @@ import {
 import {
   buildGenerationMerkle,
   defoldSurfaceCacheHome,
+  defoldSurfaceLegacyCacheHome,
   defoldSurfaceSearchPath,
   resolveDefoldSurface
 } from "../packages/cli/src/defold-surface.mjs";
@@ -217,8 +218,44 @@ test("the shared surface cache follows host conventions with explicit overrides 
   assert.equal(defoldSurfaceCacheHome({ DEHERM_CACHE_HOME: "/explicit" }, "darwin", "/Users/test"), "/explicit");
   assert.equal(defoldSurfaceCacheHome({ XDG_CACHE_HOME: "/xdg" }, "darwin", "/Users/test"), "/xdg/deherm");
   assert.equal(defoldSurfaceCacheHome({}, "darwin", "/Users/test"), "/Users/test/Library/Caches/deherm");
-  assert.equal(defoldSurfaceCacheHome({ LOCALAPPDATA: "C:\\Users\\test\\AppData\\Local" }, "win32", "C:\\Users\\test"), path.join(path.resolve("C:\\Users\\test\\AppData\\Local"), "deherm"));
+  assert.equal(defoldSurfaceCacheHome({ LOCALAPPDATA: "C:\\Users\\test\\AppData\\Local" }, "win32", "C:\\Users\\test"), path.join(path.resolve("C:\\Users\\test\\AppData\\Local"), "deherm", "cache"));
+  assert.equal(defoldSurfaceCacheHome({}, "win32", "/Users/test"), "/Users/test/AppData/Local/deherm/cache");
   assert.equal(defoldSurfaceCacheHome({}, "linux", "/home/test"), "/home/test/.cache/deherm");
+
+  assert.equal(defoldSurfaceLegacyCacheHome({}, "darwin", "/Users/test"), "/Users/test/.cache/deherm");
+  assert.equal(defoldSurfaceLegacyCacheHome({}, "win32", "/Users/test"), "/Users/test/.cache/deherm");
+  assert.equal(defoldSurfaceLegacyCacheHome({}, "linux", "/home/test"), null);
+  assert.equal(defoldSurfaceLegacyCacheHome({ DEHERM_CACHE_HOME: "/explicit" }, "darwin", "/Users/test"), null);
+  assert.equal(defoldSurfaceLegacyCacheHome({ XDG_CACHE_HOME: "/xdg" }, "win32", "/Users/test"), null);
+});
+
+test("native cache roots read an existing legacy cache without moving or rewriting it", () => {
+  const revision = otherRevision;
+  const mac = defoldSurfaceSearchPath(revision, {
+    platform: "darwin",
+    userHome: "/Users/test",
+    env: {},
+    projectRoot: "/project"
+  });
+  assert.deepEqual(mac.map(({ layer }) => layer), ["user-cache", "legacy-user-cache", "project-cache"]);
+  assert.equal(mac[0].root, `/Users/test/Library/Caches/deherm/surfaces/${revision}`);
+  assert.equal(mac[1].root, `/Users/test/.cache/deherm/surfaces/${revision}`);
+
+  const windows = defoldSurfaceSearchPath(revision, {
+    platform: "win32",
+    userHome: "/Users/test",
+    env: { LOCALAPPDATA: "/Users/test/AppData/Local" }
+  });
+  assert.deepEqual(windows.map(({ layer }) => layer), ["user-cache", "legacy-user-cache"]);
+  assert.equal(windows[0].root, `/Users/test/AppData/Local/deherm/cache/surfaces/${revision}`);
+  assert.equal(windows[1].root, `/Users/test/.cache/deherm/surfaces/${revision}`);
+
+  const explicit = defoldSurfaceSearchPath(revision, {
+    platform: "darwin",
+    userHome: "/Users/test",
+    env: { DEHERM_CACHE_HOME: "/explicit" }
+  });
+  assert.deepEqual(explicit.map(({ layer }) => layer), ["user-cache"]);
 });
 
 test("the generation Merkle root keys the Defold revision and the native input set independently", () => {
