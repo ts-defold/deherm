@@ -44,11 +44,13 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "policy.content-addressed-graph.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-surface.references.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.copy-json.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "policy.compiler-document.binding-lowering-plan.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.defold-value-layouts.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.dmsdk-universal.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.index.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.browser-arena.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "sdk.dmsdk.named-scalar.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.scalar.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.runtime.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.dmsdk.types.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
@@ -60,7 +62,11 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "sdk.script.runtime.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.types.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.script.universal-value.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "sdk.script.url-target-support.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "sdk.script.value-target-support.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "output.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "output.dmsdk-universal-jsi-header.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "output.stable-template.render.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "binding.raw-unverified-fallback.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   [DMSDK_UNIVERSAL_STATIC_FRAME_CAPABILITY]: Object.freeze({
     introducedInVersion: "0.0.0",
@@ -581,6 +587,7 @@ export function buildPolicy(inputs) {
         recipe: compilerSurface.realizationRecipes.sdk[name],
         inputs: [...(record.inputs ?? [])]
       };
+      if (record.recipeInput !== undefined) manifestRecord.recipeInput = record.recipeInput;
       if (typeof record.source === "string") {
         const namespace = `${COMPILER_SDK_SUBTREE_PREFIX}${name}`;
         subtrees[namespace] = seal({
@@ -596,24 +603,32 @@ export function buildPolicy(inputs) {
     }
     const outputManifest = {};
     for (const [name, record] of Object.entries(normalizedOutputs).sort(([left], [right]) => left < right ? -1 : 1)) {
-      if (record.mode !== "authenticated-compatibility-source" ||
-          typeof record.source !== "string" || hashBytes(record.source) !== record.sha256) {
-        throw new Error(`${name}: compiler output must be an authenticated revision-abstracted source`);
+      if (!/^[0-9a-f]{64}$/u.test(record.sha256 ?? "")) {
+        throw new Error(`${name}: compiler output has no canonical SHA-256`);
       }
-      const namespace = `${COMPILER_OUTPUT_SUBTREE_PREFIX}${name}`;
-      subtrees[namespace] = seal({
-        schemaVersion: POLICY_SCHEMA_VERSION,
-        kind: "deherm.policy.compiler-output-source",
-        namespace,
-        name,
-        source: record.source
-      });
-      outputManifest[name] = {
+      const manifestRecord = {
         mode: record.mode,
         sha256: record.sha256,
         recipe: compilerSurface.realizationRecipes.outputs[name],
-        sourceObject: namespace
+        inputs: [...(record.inputs ?? [])]
       };
+      if (record.mode === "authenticated-compatibility-source") {
+        if (typeof record.source !== "string" || hashBytes(record.source) !== record.sha256) {
+          throw new Error(`${name}: compiler output must be an authenticated revision-abstracted source`);
+        }
+        const namespace = `${COMPILER_OUTPUT_SUBTREE_PREFIX}${name}`;
+        subtrees[namespace] = seal({
+          schemaVersion: POLICY_SCHEMA_VERSION,
+          kind: "deherm.policy.compiler-output-source",
+          namespace,
+          name,
+          source: record.source
+        });
+        manifestRecord.sourceObject = namespace;
+      } else if (record.mode !== "render-and-verify" || record.source !== undefined) {
+        throw new Error(`${name}: compiler output has an unsupported realization mode`);
+      }
+      outputManifest[name] = manifestRecord;
     }
     subtrees[COMPILER_SUBTREE] = seal({
       schemaVersion: POLICY_SCHEMA_VERSION,

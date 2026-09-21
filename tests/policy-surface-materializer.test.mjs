@@ -1,11 +1,17 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { materializePolicySurface } from "../packages/compiler/src/policy-surface-materializer.mjs";
+import {
+  BINDING_LOWERING_RECIPE_CAPABILITY,
+  BINDING_LOWERING_RECIPE_EMITTER,
+  BINDING_LOWERING_RECIPE_NAME
+} from "../packages/compiler/src/binding-lowering-plan-recipe.mjs";
+import { LOCALLY_RENDERED_OUTPUT_RECIPES } from "../packages/compiler/src/revision-output-emitter.mjs";
 import { derivePolicy, discoverCompilerSurfaceOutputs } from "../scripts/generate-api-policy.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
@@ -47,24 +53,34 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.equal(Object.keys(first.descriptor.outputs).length, 114);
 
   const compiler = policy.objects.get("@compiler");
+  assert.ok(policy.policy.realizer.requiredCapabilities.includes(BINDING_LOWERING_RECIPE_CAPABILITY),
+    "policy root must advertise the package lowering-recipe interpreter it requires");
   assert.ok(Buffer.byteLength(JSON.stringify(compiler.value)) < 5_000_000,
     "the compiler manifest must stay below the 5 MB transfer budget");
+  const documentEntries = compiler.value.documents.entries;
+  assert.ok(documentEntries[BINDING_LOWERING_RECIPE_NAME],
+    "policy must carry compact lowering recipe facts");
+  assert.equal(documentEntries["defold-binding-lowering-plan.json"], undefined,
+    "policy must not copy the derived lowering plan");
+  assert.equal(documentEntries["defold-binding-lowering-plan.sentinel.json"], undefined,
+    "policy must not copy checkout cache metadata");
+  const recipeObject = policy.objects.get(documentEntries[BINDING_LOWERING_RECIPE_NAME].object);
+  assert.ok(Buffer.byteLength(JSON.stringify(recipeObject.value)) < 3_000_000,
+    "authenticated lowering recipe facts must stay below 3 MB");
 
   const rendered = Object.entries(first.descriptor.sdk)
     .filter(([, record]) => record.mode === "render-and-verify").map(([name]) => name).sort();
   const snapshots = Object.entries(first.descriptor.sdk)
     .filter(([, record]) => record.mode === "authenticated-compatibility-source").map(([name]) => name).sort();
-  assert.equal(rendered.length, 13);
+  assert.equal(rendered.length, 16);
   assert.deepEqual(snapshots, [
     "dmsdk/borrowed-handle.ts", "dmsdk/cstring-value.ts",
-    "dmsdk/enum-value.ts", "dmsdk/named-scalar.ts",
+    "dmsdk/enum-value.ts",
     "dmsdk/scratch-scalar-out.ts",
     "script/callback-lifecycle.ts", "script/copied-value-record-blockers.ts",
     "script/dynamic-values.ts", "script/fixed-tuple-target-support.ts",
     "script/opaque-record-blockers.ts", "script/overload-dispatch-target-support.ts",
-    "script/table-record-bindings.ts",
-    "script/url-target-support.ts", "script/value-tail-target-support.ts",
-    "script/value-target-support.ts"
+    "script/table-record-bindings.ts", "script/value-tail-target-support.ts"
   ]);
   const bytesByMode = { rendered: 0, snapshots: 0 };
 
@@ -76,20 +92,25 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_790_371, snapshots: 79_846 },
+  assert.deepEqual(bytesByMode, { rendered: 3_791_819, snapshots: 78_435 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const expectedOutputs = await discoverCompilerSurfaceOutputs();
   assert.deepEqual(Object.keys(first.descriptor.outputs).sort(), expectedOutputs,
     "policy output manifest must own every revision-generated ABI, Static Hermes, native, and browser file");
-  let outputBytes = 0;
+  const renderedOutputs = Object.entries(first.descriptor.outputs)
+    .filter(([, record]) => record.mode === "render-and-verify").map(([name]) => name).sort();
+  assert.deepEqual(renderedOutputs, Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).sort(),
+    "package-owned revision-output emitters changed without updating their explicit inventory");
+  const outputBytesByMode = { rendered: 0, snapshots: 0 };
   for (const relative of expectedOutputs) {
     const actual = await readFile(path.join(outputRoot, "repository", relative));
     const expected = await readFile(path.join(repositoryRoot, relative));
     assert.equal(sha256(actual), sha256(expected), `${relative} drifted from the source pipeline`);
-    outputBytes += actual.length;
+    outputBytesByMode[first.descriptor.outputs[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.equal(outputBytes, 1_535_653, "revision-generated policy-output bytes changed");
+  assert.deepEqual(outputBytesByMode, { rendered: 5_385, snapshots: 1_531_519 },
+    "package-emitter versus revision-output snapshot debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));
   assert.equal(scriptIr.defoldRevision, policy.revision);
@@ -98,8 +119,21 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.equal(toolchain.bob.urlTemplate, "https://d.defold.com/archive/{defoldRevision}/bob/bob.jar");
   assert.match(toolchain.bob.sha256, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.toolchainSha256, /^[0-9a-f]{64}$/u);
+  const planBytes = await readFile(path.join(outputRoot, "ir", "defold-binding-lowering-plan.json"));
+  const expectedPlan = oldPipelineFixture.documents["defold-binding-lowering-plan.json"];
+  assert.equal(planBytes.byteLength, expectedPlan.bytes,
+    "policy-only realization changed old-pipeline lowering-plan byte count");
+  assert.equal(sha256(planBytes), expectedPlan.sha256,
+    "policy-only realization changed old-pipeline lowering-plan bytes");
+  const sentinelPath = path.join(outputRoot, "ir", "defold-binding-lowering-plan.sentinel.json");
+  const sentinelBytes = await readFile(sentinelPath);
+  const sentinel = JSON.parse(sentinelBytes);
+  assert.equal(sentinel.generator, BINDING_LOWERING_RECIPE_EMITTER);
+  assert.match(sentinel.cacheKey, /^[0-9a-f]{64}$/u);
   const second = await materializePolicySurface(policy, { outputRoot });
   assert.deepEqual(second.written, [], "materialization must be idempotent when policy and compiler are unchanged");
+  assert.deepEqual(await readFile(sentinelPath), sentinelBytes,
+    "keyed lowering-plan realization must preserve its sentinel bytes");
 });
 
 test("policy materialization fails closed when the dmSDK catalog exceeds the package frame", async () => {
@@ -120,4 +154,53 @@ test("policy materialization fails closed when the dmSDK catalog exceeds the pac
     materializePolicySurface(oversized, { outputRoot }),
     /requires 33 arguments.*supports 32.*upgrade @ts-defold\/deherm/u
   );
+});
+
+test("package-owned SDK and revision-output recipes fail closed on manifest drift", async () => {
+  const policy = await currentResolvedPolicy();
+  const compiler = policy.objects.get("@compiler");
+
+  const badSdkValue = structuredClone(compiler.value);
+  badSdkValue.sdk.entries["dmsdk/named-scalar.ts"].recipeInput.emittedCount = 1;
+  const badSdk = {
+    ...policy,
+    objects: new Map(policy.objects).set("@compiler", { ...compiler, value: badSdkValue })
+  };
+  await assert.rejects(
+    materializePolicySurface(badSdk, {
+      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-sdk-recipe-drift-test-"))
+    }),
+    /named-scalar SDK recipe requires an approved callable emitter/
+  );
+
+  const badOutputValue = structuredClone(compiler.value);
+  const outputName = "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp";
+  badOutputValue.outputs.entries[outputName].sourceObject = "@compiler:output:unexpected";
+  const badOutput = {
+    ...policy,
+    objects: new Map(policy.objects).set("@compiler", { ...compiler, value: badOutputValue })
+  };
+  await assert.rejects(
+    materializePolicySurface(badOutput, {
+      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-output-recipe-drift-test-"))
+    }),
+    /unsupported compiler-output realization recipe/
+  );
+});
+
+test("project surface materialization refuses symlink traversal outside its boundary", async () => {
+  const policy = await currentResolvedPolicy();
+  const boundary = await mkdtemp(path.join(tmpdir(), "deherm-policy-symlink-boundary-"));
+  const external = await mkdtemp(path.join(tmpdir(), "deherm-policy-symlink-external-"));
+  await writeFile(path.join(external, "sentinel.txt"), "unchanged\n");
+  await mkdir(path.join(boundary, ".deherm", "cache"), { recursive: true });
+  await symlink(external, path.join(boundary, ".deherm", "cache", "surfaces"), "dir");
+  await assert.rejects(
+    materializePolicySurface(policy, {
+      outputBoundary: boundary,
+      outputRoot: path.join(boundary, ".deherm", "cache", "surfaces", policy.revision)
+    }),
+    /refuses symbolic link/u
+  );
+  assert.equal(await readFile(path.join(external, "sentinel.txt"), "utf8"), "unchanged\n");
 });

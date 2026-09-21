@@ -1,5 +1,69 @@
 # Defold Hermes knowledge log
 
+## 2026-09-21 - Mutable publication pointers stay outside the immutable object cache
+
+Online policy resolution now revalidates the per-revision index entry and
+artifact mapping instead of treating their revision-keyed paths as immutable.
+The content-addressed roots and compiler objects remain cache-first and are
+reused by digest; explicit offline resolution consumes the last validated
+pointer. Receipts are keyed by both revision and policy root, so a newer
+generator can publish a more complete projection for an unchanged Defold
+revision without overwriting the evidence for an earlier root. Focused coverage
+replaces one revision pointer and proves that only its new content closure is
+transferred.
+
+The integration review also found that project-local realization trusted
+lexical confinement while filesystem symlinks could redirect a generated write.
+The materializer now enforces an explicit output boundary and rejects symlinks
+in every existing destination component before directory creation and again
+before reading or writing a file. The CLI binds project pins to the project root
+and shared surfaces to the selected user cache root. The same review found the
+lowering-recipe extractor absent from the policy generator fingerprint; it is
+now an owned generator source, so changing recipe semantics rotates provenance.
+
+## 2026-09-21 - Policy realization transfers lazily and pins project surfaces
+
+* `deherm policy` now authenticates the exact revision index and root before
+  transferring only `@compiler`, `@toolchain`, and compiler-manifest references;
+  unrelated Lua namespace objects stay remote. Content-addressed policy objects
+  are shared across revisions and projects, warm resolution works with
+  `DEHERM_OFFLINE=1`, and corrupt cached bytes fail instead of falling back to
+  the network or another revision.
+* `deherm policy --project-cache` (or `--pin`) explicitly realizes into
+  `<project>/.deherm/cache/surfaces/<revision>/` while policy evidence remains in
+  the user cache. CLI and JSON output report cache hits, misses, writes, transfer
+  bytes, and surface writes independently. Focused coverage exercises cold
+  transfer, warm offline resolution, cross-project reuse, corruption rejection,
+  and idempotent population.
+
+## 2026-09-21 - Stable output templates and compact SDK facts replace 15 snapshots
+
+The policy materializer now reconstructs three SDK support files from compact
+manifest facts and 12 repository outputs from package-owned compiler emitters.
+The SDK boundary moves from 13 rendered / 15 copied files to 16 rendered
+(3,791,819 bytes) / 12 copied (78,435 bytes). The 114-output boundary moves
+from 114 copied files (1,536,904 bytes) to 12 rendered (5,385 bytes) / 102 copied
+(1,531,519 bytes). Eleven output recipes are invariant templates; the universal
+dmSDK JSI header consumes only the authenticated recipe count. All outputs
+remain byte-identical to the frozen source-pipeline evidence, a second pass is
+write-free, and malformed SDK facts or source objects on local output recipes
+fail closed. The remaining snapshots are explicitly treated as revision facts
+until their semantic projections are extracted; unchanged bytes alone are not
+used as evidence that an output is package-stable.
+
+## 2026-09-21 - Lowering plans materialize from compact recipe facts
+
+The policy compiler surface no longer authenticates copied
+`defold-binding-lowering-plan.json` and sentinel documents. It authenticates a
+2,560,034-byte schema/string-interned recipe-fact object; the package-owned
+`binding-lowering-plan-recipe.mjs` emitter reconstructs the frozen
+16,750,538-byte old-pipeline plan byte-for-byte and emits cache metadata keyed
+by the emitter and exact lowering input identities. The replaced plan policy
+object was 10,507,488 bytes, so this tranche removes 7,947,454 bytes (75.64%)
+without moving Defold names, contracts, backend selections, or dispositions
+into package code. Focused tests cover canonical policy serialization,
+policy-only realization, old-pipeline equivalence, and keyed idempotence.
+
 ## 2026-09-21 - User caches follow native host conventions without destructive migration
 
 The shared policy, realized-surface, toolchain, and native-artifact roots now

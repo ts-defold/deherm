@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fixturePath = path.join(repositoryRoot, "tests", "fixtures", "policy-surface-old-pipeline", "manifest.json");
 const generatedRoot = path.join(repositoryRoot, "packages", "sdk", "src", "generated");
+const loweringPlanPath = path.join(repositoryRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.json");
 const policyIndexPath = path.join(repositoryRoot, "packages", "bindings", "generated", "defold-policy-index.json");
 
 function sha256(bytes) {
@@ -28,16 +29,23 @@ async function capture() {
     aggregate.update(digest);
     aggregate.update("\0");
   }
+  const loweringPlan = await readFile(loweringPlanPath);
   return {
     schemaVersion: 2,
     kind: "deherm.fixture.old-pipeline-sdk",
     defoldRevision: policyIndex.entries[0].defoldRevision,
     treeSha256: aggregate.digest("hex"),
     source:
-      "Frozen SHA-256 golden captured from the checkout-backed packages/sdk/src/generated tree produced by the source pipeline. " +
+      "Frozen SHA-256 golden captured from the checkout-backed generated SDK and canonical lowering plan produced by the source pipeline. " +
       "It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. " +
       "It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
-    files
+    files,
+    documents: {
+      "defold-binding-lowering-plan.json": {
+        bytes: loweringPlan.byteLength,
+        sha256: sha256(loweringPlan)
+      }
+    }
   };
 }
 

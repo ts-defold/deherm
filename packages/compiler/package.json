@@ -10,6 +10,7 @@
     "./bundle-fingerprint": "./src/bundle-fingerprint.mjs",
     "./component-proxy-generator": "./src/component-proxy-generator.mjs",
     "./binding-lowering-plan": "./src/generate-binding-lowering-plan.mjs",
+    "./binding-lowering-plan-recipe": "./src/binding-lowering-plan-recipe.mjs",
     "./policy": "./src/api-policy.mjs",
     "./policy/materializer": "./src/policy-surface-materializer.mjs",
     "./sdk/script": "./src/sdk/script-sdk.mjs",

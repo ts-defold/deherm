@@ -117,7 +117,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(engine, /defold-hermes-static-dmsdk-exact-test/u);
   assert.match(engine, /bash scripts\/bootstrap-emsdk\.sh/u);
   assert.match(engine, /pnpm test:dmsdk-browser-exact-call/u);
-  assert.match(engine, /pnpm test:script-browser-callback-exact-call/u);
+  assert.match(engine, /pnpm test:script-browser-exact-call/u);
   assert.match(engine, /continue-on-error: true/u);
   assert.match(engine, /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u);
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);

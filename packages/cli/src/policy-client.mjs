@@ -1,9 +1,6 @@
 // Resolve one immutable Defold API policy from the published Pages index.
-//
-// The package ships only a revision-neutral publication locator. Defold
-// publishes revisions after an npm package is released, so the exact revision
-// entry is always fetched from Pages, followed by the content-addressed policy
-// and objects. No revision entry or generated surface is an npm resource.
+// Policy evidence is kept in a content-addressed user cache; realized compiler
+// output is written to a separate, explicitly selected surface root.
 
 import { randomBytes } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
@@ -15,6 +12,7 @@ import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 
 const defaultSiteConfig = new URL("../../bindings/policy-site.json", import.meta.url);
+const DIGEST_PATTERN = /^[0-9a-f]{64}$/u;
 
 export function policyLocatorFromSiteConfig(config) {
   if (config?.schemaVersion !== 1 || typeof config.baseUrl !== "string" ||
@@ -79,10 +77,7 @@ const SEMVER = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-([0-9A-Za-z-]+(?:\.
 function parseSemver(value, label) {
   const match = SEMVER.exec(String(value ?? ""));
   if (!match) throw new Error(`${label} is not a valid semantic version: ${JSON.stringify(value)}`);
-  return {
-    core: match.slice(1, 4).map(Number),
-    prerelease: match[4]?.split(".") ?? []
-  };
+  return { core: match.slice(1, 4).map(Number), prerelease: match[4]?.split(".") ?? [] };
 }
 
 function compareSemver(left, right) {
@@ -164,10 +159,22 @@ async function atomicWrite(file, bytes) {
   try {
     await rename(temporary, file);
   } catch (error) {
-    // Another process may have won the same immutable write. Accept only the
-    // exact bytes we already authenticated.
     const winner = await readFile(file).catch(() => null);
     if (!winner?.equals(bytes)) throw error;
+  } finally {
+    await rm(temporary, { force: true });
+  }
+  return true;
+}
+
+async function atomicReplace(file, bytes) {
+  await mkdir(path.dirname(file), { recursive: true });
+  const current = await readFile(file).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+  if (current?.equals(bytes)) return false;
+  const temporary = `${file}.tmp-${process.pid}-${randomBytes(6).toString("hex")}`;
+  await writeFile(temporary, bytes, { flag: "wx" });
+  try {
+    await rename(temporary, file);
   } finally {
     await rm(temporary, { force: true });
   }
@@ -180,10 +187,40 @@ async function fetchBytes(url, fetchImpl) {
   return Buffer.from(await response.arrayBuffer());
 }
 
+function parseJson(bytes, label) {
+  try {
+    return JSON.parse(bytes.toString("utf8"));
+  } catch (error) {
+    throw new Error(`${label}: invalid JSON (${error.message})`);
+  }
+}
+
+function referencedCompilerObjects(compiler, subtrees) {
+  const references = new Set();
+  const visit = (value) => {
+    if (typeof value === "string") {
+      // Match authenticated root keys instead of fixed manifest field names so
+      // compatible manifest revisions can add and remove compiler entries.
+      if (value.startsWith("@compiler:") && Object.hasOwn(subtrees, value)) references.add(value);
+      return;
+    }
+    if (Array.isArray(value)) {
+      for (const item of value) visit(item);
+      return;
+    }
+    if (value && typeof value === "object") {
+      for (const item of Object.values(value)) visit(item);
+    }
+  };
+  visit(compiler);
+  return [...references].sort();
+}
+
 /**
- * Fetch, authenticate and cache the policy for an exact Defold revision.
- * This does not substitute a nearby revision and does not trust HTTP cache
- * metadata: the content-addressed hashes are the authority.
+ * Fetch, authenticate and cache the realization closure for an exact Defold
+ * revision. Ordinary API namespace objects are intentionally not transferred:
+ * the authenticated @compiler manifest names the document/source objects the
+ * shipped realizer actually consumes.
  */
 export async function resolvePublishedPolicy(revision, options = {}) {
   revision = String(revision).toLowerCase();
@@ -194,23 +231,81 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   if (!index?.base?.url || !index?.base?.index || !index?.base?.policy || !index?.base?.object) {
     throw new Error("The shipped policy index has no complete publication base");
   }
+  const environment = options.env ?? process.env;
+  const offline = options.offline ?? environment.DEHERM_OFFLINE === "1";
   const fetchImpl = options.fetchImpl ?? ((url) => fetch(url, { signal: AbortSignal.timeout(30_000) }));
   const base = policyBase(index);
-  const fetchRelative = async (relative) => ({
-    relative,
-    bytes: await fetchBytes(`${base}/${relative}`, fetchImpl)
-  });
+  const cacheHome = path.resolve(options.cacheHome ?? defoldSurfaceCacheHome(environment));
+  const cacheRoot = path.join(cacheHome, "policies", index.base.layoutVersion ?? "v1");
+  const transfer = { cacheHits: 0, cacheMisses: 0, cacheWrites: 0, transferBytes: 0 };
 
-  const entryResult = await fetchRelative(expand(index.base.index, { defoldRevision: revision }));
-  const entry = JSON.parse(entryResult.bytes.toString("utf8"));
-  if (entry.kind !== "deherm.policy.index-entry" || entry.defoldRevision !== revision ||
-      !/^[0-9a-f]{64}$/.test(entry.policyRoot ?? "")) {
-    throw new Error(`${entryResult.relative}: invalid policy index entry for ${revision}`);
-  }
-  validateRealizer(entry.realizer, entryResult.relative);
-  // This happens before the root or any object is fetched: a package that
-  // cannot realize the policy should not download the large authenticated
-  // surface only to discover that fact afterwards.
+  const cachedFetch = async ({ relative, file, label, validate }) => {
+    const cached = await readFile(file).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+    if (cached) {
+      try {
+        const value = validate(cached, relative);
+        transfer.cacheHits += 1;
+        return { relative, bytes: cached, value, source: "cache" };
+      } catch (error) {
+        throw new Error(`Corrupt authenticated policy cache entry ${file}: ${error.message}`);
+      }
+    }
+    transfer.cacheMisses += 1;
+    if (offline) {
+      throw new Error(`No authenticated cached ${label} for Defold ${revision} at ${file}; DEHERM_OFFLINE=1`);
+    }
+    const url = `${base}/${relative}`;
+    const bytes = await fetchBytes(url, fetchImpl);
+    transfer.transferBytes += bytes.length;
+    const value = validate(bytes, relative);
+    if (await atomicWrite(file, bytes)) transfer.cacheWrites += 1;
+    return { relative, bytes, value, source: url };
+  };
+
+  // Revision entries and artifact mappings are replaceable publication
+  // pointers, not content-addressed objects. Revalidate them from the site
+  // whenever networking is allowed, while retaining the last validated copy
+  // for explicit offline use.
+  const refreshableFetch = async ({ relative, file, label, validate }) => {
+    if (offline) {
+      const cached = await readFile(file).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+      if (!cached) {
+        transfer.cacheMisses += 1;
+        throw new Error(`No cached ${label} for Defold ${revision} at ${file}; DEHERM_OFFLINE=1`);
+      }
+      try {
+        const value = validate(cached, relative);
+        transfer.cacheHits += 1;
+        return { relative, bytes: cached, value, source: "cache" };
+      } catch (error) {
+        throw new Error(`Corrupt cached ${label} ${file}: ${error.message}`);
+      }
+    }
+    transfer.cacheMisses += 1;
+    const url = `${base}/${relative}`;
+    const bytes = await fetchBytes(url, fetchImpl);
+    transfer.transferBytes += bytes.length;
+    const value = validate(bytes, relative);
+    if (await atomicReplace(file, bytes)) transfer.cacheWrites += 1;
+    return { relative, bytes, value, source: url };
+  };
+
+  const entryRelative = expand(index.base.index, { defoldRevision: revision });
+  const entryResult = await refreshableFetch({
+    relative: entryRelative,
+    file: path.join(cacheRoot, "index", `${revision}.json`),
+    label: "policy index entry",
+    validate(bytes, label) {
+      const entry = parseJson(bytes, label);
+      if (entry.kind !== "deherm.policy.index-entry" || entry.defoldRevision !== revision ||
+          !DIGEST_PATTERN.test(entry.policyRoot ?? "")) {
+        throw new Error(`${label}: invalid policy index entry for ${revision}`);
+      }
+      validateRealizer(entry.realizer, label);
+      return entry;
+    }
+  });
+  const entry = entryResult.value;
   await assertCompatibleRealizer(revision, entry.realizer, options);
   const shipped = index.entries?.find((candidate) => candidate.defoldRevision === revision);
   if (shipped && (shipped.policyRoot !== entry.policyRoot || shipped.generator !== entry.generator ||
@@ -218,67 +313,104 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     throw new Error(`${revision}: published entry contradicts this package's shipped index`);
   }
 
-  let artifacts = null;
-  if (index.base.artifacts) {
-    const artifactsResult = await fetchRelative(expand(index.base.artifacts, { defoldRevision: revision }));
-    artifacts = JSON.parse(artifactsResult.bytes.toString("utf8"));
-    if (artifacts.kind !== "deherm.policy.artifacts" || artifacts.defoldRevision !== revision ||
-        artifacts.artifacts?.["native-artifacts"]?.indexedBy !== "bundleTarget") {
-      throw new Error(`${artifactsResult.relative}: invalid artifact mapping for ${revision}`);
+  const rootRelative = expand(index.base.policy, { policyRoot: entry.policyRoot });
+  const rootResult = await cachedFetch({
+    relative: rootRelative,
+    file: path.join(cacheRoot, "policy", `${entry.policyRoot}.json`),
+    label: "policy root",
+    validate(bytes, label) {
+      if (hashBytes(bytes) !== entry.policyRoot) throw new Error(`${label}: policy bytes do not hash to ${entry.policyRoot}`);
+      const policy = parseJson(bytes, label);
+      if (policy.kind !== "deherm.policy.root" || policy.generator !== entry.generator || !policy.subtrees) {
+        throw new Error(`${label}: invalid policy root`);
+      }
+      validateRealizer(policy.realizer, label);
+      if (!sameRealizer(policy.realizer, entry.realizer)) {
+        throw new Error(`${label}: policy realizer contract does not match its index entry`);
+      }
+      return policy;
     }
-    artifacts.releaseAsset = index.base.releaseAsset ?? null;
-  }
-
-  const rootResult = await fetchRelative(expand(index.base.policy, { policyRoot: entry.policyRoot }));
-  if (hashBytes(rootResult.bytes) !== entry.policyRoot) {
-    throw new Error(`${rootResult.relative}: policy bytes do not hash to ${entry.policyRoot}`);
-  }
-  const policy = JSON.parse(rootResult.bytes.toString("utf8"));
-  if (policy.kind !== "deherm.policy.root" || policy.generator !== entry.generator || !policy.subtrees) {
-    throw new Error(`${rootResult.relative}: invalid policy root`);
-  }
-  validateRealizer(policy.realizer, rootResult.relative);
-  if (!sameRealizer(policy.realizer, entry.realizer)) {
-    throw new Error(`${rootResult.relative}: policy realizer contract does not match its index entry`);
-  }
+  });
+  const policy = rootResult.value;
 
   const objects = new Map();
-  for (const [namespace, digest] of Object.entries(policy.subtrees)) {
-    if (!/^[0-9a-f]{64}$/.test(digest)) throw new Error(`${rootResult.relative}: ${namespace} has invalid object digest`);
-    const result = await fetchRelative(expand(index.base.object, { subtreeHash: digest }));
-    if (hashBytes(result.bytes) !== digest) throw new Error(`${result.relative}: object bytes do not hash to ${digest}`);
-    const object = JSON.parse(result.bytes.toString("utf8"));
-    if (object.namespace !== namespace && namespace !== "@profiles" && namespace !== "@toolchain") {
-      throw new Error(`${result.relative}: object names namespace ${object.namespace}, expected ${namespace}`);
+  const loadObject = async (namespace) => {
+    if (objects.has(namespace)) return objects.get(namespace);
+    const digest = policy.subtrees[namespace];
+    if (!DIGEST_PATTERN.test(digest ?? "")) {
+      throw new Error(`${rootResult.relative}: ${namespace} has invalid or missing object digest`);
     }
-    objects.set(namespace, { digest, bytes: result.bytes, value: object });
+    const relative = expand(index.base.object, { subtreeHash: digest });
+    const result = await cachedFetch({
+      relative,
+      file: path.join(cacheRoot, "object", `${digest}.json`),
+      label: `${namespace} policy object`,
+      validate(bytes, label) {
+        if (hashBytes(bytes) !== digest) throw new Error(`${label}: object bytes do not hash to ${digest}`);
+        const object = parseJson(bytes, label);
+        if (object.namespace !== namespace && namespace !== "@profiles" && namespace !== "@toolchain") {
+          throw new Error(`${label}: object names namespace ${object.namespace}, expected ${namespace}`);
+        }
+        return object;
+      }
+    });
+    const record = { digest, bytes: result.bytes, value: result.value };
+    objects.set(namespace, record);
+    return record;
+  };
+
+  const compiler = await loadObject("@compiler");
+  await loadObject("@toolchain");
+  for (const namespace of referencedCompilerObjects(compiler.value, policy.subtrees)) await loadObject(namespace);
+
+  let artifacts = null;
+  if (index.base.artifacts) {
+    const relative = expand(index.base.artifacts, { defoldRevision: revision });
+    const result = await refreshableFetch({
+      relative,
+      file: path.join(cacheRoot, "artifacts", `${revision}.json`),
+      label: "artifact mapping",
+      validate(bytes, label) {
+        const value = parseJson(bytes, label);
+        if (value.kind !== "deherm.policy.artifacts" || value.defoldRevision !== revision ||
+            value.artifacts?.["native-artifacts"]?.indexedBy !== "bundleTarget") {
+          throw new Error(`${label}: invalid artifact mapping for ${revision}`);
+        }
+        return value;
+      }
+    });
+    artifacts = { ...result.value, releaseAsset: index.base.releaseAsset ?? null };
   }
 
-  const cacheHome = path.resolve(options.cacheHome ?? defoldSurfaceCacheHome(options.env));
-  const cacheRoot = path.join(cacheHome, "policies", index.base.layoutVersion ?? "v1");
-  const writes = [];
-  writes.push(await atomicWrite(path.join(cacheRoot, "index", `${revision}.json`), entryResult.bytes));
-  writes.push(await atomicWrite(path.join(cacheRoot, "policy", `${entry.policyRoot}.json`), rootResult.bytes));
-  for (const { digest, bytes } of objects.values()) {
-    writes.push(await atomicWrite(path.join(cacheRoot, "object", `${digest}.json`), bytes));
-  }
   const receipt = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     kind: "deherm.policy.receipt",
     defoldRevision: revision,
     policyRoot: entry.policyRoot,
     generator: entry.generator,
-    objectCount: objects.size
+    objects: Object.fromEntries([...objects].map(([namespace, { digest }]) => [namespace, digest]))
   };
+  const receiptFile = path.join(cacheRoot, "receipt", revision, `${entry.policyRoot}.json`);
+  const priorReceipt = await readFile(receiptFile, "utf8")
+    .then((source) => JSON.parse(source), (error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+  if (priorReceipt && (priorReceipt.defoldRevision !== revision || priorReceipt.policyRoot !== entry.policyRoot)) {
+    throw new Error(`Corrupt authenticated policy receipt ${receiptFile}: revision or policy root mismatch`);
+  }
   const receiptBytes = Buffer.from(`${JSON.stringify(receipt, null, 2)}\n`);
-  writes.push(await atomicWrite(path.join(cacheRoot, "receipt", `${revision}.json`), receiptBytes));
+  // Schema-1 receipts from eager clients remain valid evidence for the same
+  // exact revision/root. Do not rewrite immutable evidence merely to add the
+  // smaller realization-closure inventory introduced by schema 2.
+  if (!priorReceipt && await atomicWrite(receiptFile, receiptBytes)) transfer.cacheWrites += 1;
 
-  const surfaceRoot = path.join(cacheHome, "surfaces", revision);
-  const surface = objects.has("@compiler")
-    ? await materializePolicySurface(
-        { revision, entry, policy, objects },
-        { revision, outputRoot: surfaceRoot, artifacts }
-      )
+  const surfaceRoot = path.resolve(options.surfaceRoot ?? path.join(cacheHome, "surfaces", revision));
+  const materialize = options.materializeImpl === false ? null : options.materializeImpl ?? materializePolicySurface;
+  const surface = materialize
+    ? await materialize({ revision, entry, policy, objects }, {
+        revision,
+        outputRoot: surfaceRoot,
+        outputBoundary: path.resolve(options.surfaceBoundary ?? cacheHome),
+        artifacts
+      })
     : null;
 
   return {
@@ -288,9 +420,10 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     objects,
     artifacts,
     cacheRoot,
-    receipt: path.join(cacheRoot, "receipt", `${revision}.json`),
+    receipt: receiptFile,
     surface,
-    written: writes.filter(Boolean).length,
-    source: `${base}/${entryResult.relative}`
+    transfer,
+    written: transfer.cacheWrites,
+    source: `${base}/${entryRelative}`
   };
 }

@@ -82,6 +82,8 @@ Options:
   --shermes <path>   Static Hermes compiler override for assemble-typed-native
   --check            Verify materialized output without writing it
   --force            Regenerate owned project outputs even when the input key is current
+  --project-cache    For policy, pin the realized surface into <project>/.deherm/cache
+  --pin              Alias for --project-cache
   --recompute        For verify-bundle, re-bundle current sources to name the fingerprint they produce
   --allow-unbound    For verify-bundle, report an unrecorded or absent artifact without failing
   --json             Print machine-readable JSON
@@ -112,6 +114,7 @@ export function parseArguments(argv) {
     else if (value === "--reconcile") options.reconcile = true;
     else if (value === "--shermes") options.shermes = args.shift();
     else if (value === "--force") options.force = true;
+    else if ((value === "--project-cache" || value === "--pin") && options.command === "policy") options.projectCache = true;
     else if (value === "--recompute") options.recompute = true;
     else if (value === "--allow-unbound") options.allowUnbound = true;
     else if (value === "--once") options.once = true;
@@ -590,7 +593,17 @@ export async function run(argv = process.argv.slice(2)) {
       bob: options.bob
     });
     const revision = assertResolvedDefoldRevision(resolution);
-    const result = await resolvePublishedPolicy(revision, { index: await readPolicyLocator() });
+    if (options.projectCache && !projectRoot) {
+      throw new Error("deherm policy --project-cache requires a Defold project; pass --project <path>");
+    }
+    const surfaceRoot = options.projectCache
+      ? path.join(projectRoot, ".deherm", "cache", "surfaces", revision)
+      : undefined;
+    const result = await resolvePublishedPolicy(revision, {
+      index: await readPolicyLocator(),
+      surfaceRoot,
+      surfaceBoundary: options.projectCache ? projectRoot : undefined
+    });
     const summary = {
       schemaVersion: 1,
       defoldRevision: result.revision,
@@ -599,15 +612,20 @@ export async function run(argv = process.argv.slice(2)) {
       namespaces: Object.keys(result.policy.subtrees).filter((name) => !name.startsWith("@")).length,
       objects: result.objects.size,
       written: result.written,
+      transfer: result.transfer,
       cacheRoot: result.cacheRoot,
+      surfaceRoot: result.surface?.outputRoot ?? null,
+      surfaceWritten: result.surface?.written.length ?? 0,
+      pinnedProjectCache: Boolean(options.projectCache),
       source: result.source,
       revisionSource: resolution.source
     };
     if (options.json) console.log(JSON.stringify(summary, null, 2));
     else {
       console.log(`Verified Defold ${summary.defoldRevision} -> policy ${summary.policyRoot.slice(0, 12)}`);
-      console.log(`${summary.namespaces} namespaces, ${summary.objects} authenticated objects; ${summary.written} cache file(s) written`);
-      console.log(`Cache: ${summary.cacheRoot}`);
+      console.log(`${summary.namespaces} namespaces, ${summary.objects} realization objects authenticated`);
+      console.log(`Policy cache: ${summary.transfer.cacheHits} hit(s), ${summary.transfer.cacheMisses} miss(es), ${summary.transfer.cacheWrites} write(s), ${summary.transfer.transferBytes} byte(s) transferred`);
+      console.log(`Evidence: ${summary.cacheRoot}`);
       if (result.surface) console.log(`Surface: ${result.surface.outputRoot} (${result.surface.written.length} file(s) updated)`);
     }
     return 0;

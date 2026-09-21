@@ -102,20 +102,22 @@ receive revision modules through their generated `@deherm/project` surface.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now a **64,150-byte manifest**, not a
-21 MB container. It references 17 independently content-addressed semantic
-documents, a 28-entry SDK manifest, and 114 revision-output compatibility
-sources. This keeps each object shareable and makes the remaining migration
+The authenticated `@compiler` subtree is now a **64,441-byte manifest**, not a
+21 MB container. It references 16 independently content-addressed semantic
+documents, a 28-entry SDK manifest, and a 114-entry revision-output manifest.
+Of those outputs, 12 are package-rendered and 102 remain compatibility sources.
+This keeps each object shareable and makes the remaining migration
 debt enumerable; it does not pretend the referenced bytes have disappeared.
 The current complete object store is 32,019,304 bytes until the lowering-plan,
 support-source, and revision-output emitters replace those objects.
 
 `packages/compiler/src/policy-surface-materializer.mjs` owns the public
 realization contract. It restores the selected revision, resolves and validates
-the manifest's authenticated references, regenerates thirteen script and
-dmSDK TypeScript files from IR, verifies their policy SHA-256 values, writes 15
-SDK support files and 114 revision outputs from explicitly labelled
-authenticated compatibility sources, and records a revision-keyed
+the manifest's authenticated references, regenerates sixteen script and
+dmSDK TypeScript files from semantic documents or compact manifest facts,
+verifies their policy SHA-256 values, writes 12 SDK support files and 102
+revision outputs from explicitly labelled authenticated compatibility sources,
+renders 12 revision outputs from package machinery, and records a revision-keyed
 `surface.json` descriptor. The repository generator owns extraction and policy
 production; it no longer owns the public materialization contract.
 
@@ -132,7 +134,7 @@ the document is a minimal policy input.
 
 | Document | Compact bytes | Current role | Required steady-state change |
 | --- | ---: | --- | --- |
-| `defold-binding-lowering-plan.json` | 10,214,303 | copied derived aggregate | rebuild from normalized lowering recipes |
+| `defold-binding-lowering-recipe-facts.json` | 2,560,034 | normalized source-derived lowering selections | package emitter rebuilds the plan byte-for-byte |
 | `defold-dmsdk-universal-bindings.json` | 2,985,651 | copied recipe catalog | normalize catalog facts and emit locally |
 | `defold-sdk-ir.json` | 2,706,350 | source-derived dmSDK semantics | retain as policy facts or normalize without loss |
 | `defold-script-api-ir.json` | 1,350,464 | source-derived script semantics | retain as policy facts or normalize without loss |
@@ -143,9 +145,20 @@ the document is a minimal policy input.
 | `defold-dmsdk-scalar-thunks.json` | 80,331 | copied recipe catalog | normalize and emit locally |
 | `defold-script-scalar-dispatch.json` | 50,068 | copied dispatch product | rebuild from route facts |
 | `defold-value-layouts.json` | 8,074 | ABI/layout facts | retain as policy facts |
-| `defold-binding-lowering-plan.sentinel.json` | 6,415 | copied output cache metadata | regenerate locally beside the plan |
 
-The existing thirteen SDK renderers consume the two primary IR documents, the
+The lowering-plan cut replaces a 10,507,488-byte authenticated copy of the
+derived aggregate with the 2,560,034-byte recipe-fact object above, a reduction
+of 7,947,454 policy bytes (75.64%). The frozen old-pipeline plan itself is
+16,750,538 pretty-printed bytes. `@deherm/compiler` owns the
+`policy.compiler-document.binding-lowering-plan.v1` interpreter: it expands the
+interned strings and object shapes, restores the historical property order, and
+recreates those plan bytes exactly. The policy no longer contains either the
+plan document or its checkout cache sentinel. Materialization creates both;
+the sentinel key covers the package emitter bytes, source input hashes, and
+source input paths, so an unchanged policy/compiler pair writes nothing while
+an emitter or input-identity change gets a different key.
+
+The existing sixteen SDK renderers consume the two primary IR documents, the
 handle-lowering report, and the script/dmSDK universal recipe catalogs. Six
 support emitters now live in `packages/compiler/src/sdk/support-sdk.mjs`:
 script handle-lowering types, script universal-value metadata, dmSDK universal
@@ -155,6 +168,22 @@ about the old 21 MB blob—shows that the current locally rendered SDK can be
 driven entirely by semantic documents already present in the policy. The other documents remain available because
 `deherm generate` still consumes them; deleting them before their local recipe
 emitters exist would create a smaller policy that cannot build a game.
+
+Three compact manifest recipes now replace SDK source snapshots:
+`dmsdk/named-scalar.ts` carries only the emitted declaration count,
+`script/url-target-support.ts` carries the route count and three target states,
+and `script/value-target-support.ts` carries only browser-blocked route IDs.
+The 12 remaining SDK snapshots are revision fact projections:
+`dmsdk/{borrowed-handle,cstring-value,enum-value,scratch-scalar-out}.ts` and
+`script/{callback-lifecycle,copied-value-record-blockers,dynamic-values,fixed-tuple-target-support,opaque-record-blockers,overload-dispatch-target-support,table-record-bindings,value-tail-target-support}.ts`.
+
+`revision-output-emitter.mjs` is the exact package-owned output inventory. Eleven
+entries are zero-input stable templates (JSI declarations, three Static Hermes
+dispatch shims, and named-scalar empty-wave support); the universal dmSDK JSI
+header is the twelfth and consumes only the authenticated catalog recipe count.
+Every other one of the 114 outputs remains explicitly classified as a
+revision-source snapshot until its semantic input projection is extracted; the
+materializer does not infer stability from coincidentally unchanged bytes.
 
 # The SDK manifest
 
@@ -166,6 +195,7 @@ is keyed by a confined POSIX-relative `.ts` output path. Each entry carries:
 * `sha256`: the digest of revision-abstracted output bytes;
 * `recipe`: the exact package capability that realizes the entry;
 * `inputs`: the compiler-document names consumed by a local renderer; and
+* `recipeInput`: optional compact revision facts for a local renderer; and
 * `sourceObject` only for a compatibility source, naming its independently
   authenticated policy object.
 
@@ -190,17 +220,17 @@ implementation-independent equivalence proof. A deliberate semantic change first
 `packages/sdk/src/generated` through the source pipeline and then runs
 `scripts/capture-policy-surface-old-pipeline.mjs --update`; the capture command
 has a check-only default and records the Defold revision plus an aggregate tree
-digest. Thirteen files (3,790,371 bytes) are locally rendered; 15 files
-(79,846 bytes) remain authenticated compatibility sources, and the test names
-all 15 so migration debt cannot change silently. A second pass requires zero
+digest. Sixteen files (3,791,819 bytes) are locally rendered; 12 files
+(78,435 bytes) remain authenticated compatibility sources, and the test names
+all 12 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
-no Defold checkout. The same test requires all 114 revision outputs (1,535,653
-bytes) to match the source pipeline byte for byte.
+no Defold checkout. The same test requires all 114 revision outputs (1,536,904
+bytes) to match the source pipeline byte for byte: 12 package-rendered files
+(5,385 bytes) and 102 authenticated snapshots (1,531,519 bytes).
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 64,150
+The `<5 MB` compiler-object budget is enforced; the current manifest is 64,441
 bytes. This is a structural transfer boundary, not yet a total-size victory.
-The 10.21 MB canonical lowering plan is still a referenced derived output and
-must be rebuilt locally from normalized recipe facts. The 15 support-source
-objects must likewise be replaced by compiler-owned emitters. Those changes
+The 12 SDK support-source objects and 102 revision-output objects must still be
+replaced by compiler-owned emitters over compact semantic facts. Those changes
 will reduce total transfer size without changing the consumer contract; the
 work is tracked in [#93](https://github.com/ts-defold/deherm/issues/93).

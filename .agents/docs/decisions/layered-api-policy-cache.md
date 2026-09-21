@@ -282,16 +282,17 @@ hash the bytes, compare to the path. A hostile or corrupted mirror cannot
 substitute content without changing the hash, so the transport needs no trust
 beyond availability.
 
-The index is **not one mutable file**, and it is not shipped as an authority.
-It is one small immutable document per Defold revision:
+The index is **not one global mutable file**, and it is not shipped as an
+authority. It is one small replaceable pointer per Defold revision:
 
 ```
 <base>/v1/index/<defold-sha>.json -> { "policyRoot": "<hash>", "generator": "<rev>" }
 ```
 
-Keyed by a sha Defold has already published, each entry's `policyRoot` is
-written once and never rewritten, because a given revision's declaration inputs
-are fixed forever. The caller resolves the sha it needs from
+Keyed by a sha Defold has already published, each entry's `policyRoot` may be
+replaced when a newer generator proves a more complete projection of the same
+fixed inputs. The roots and objects it names remain immutable by digest. The
+caller resolves the sha it needs from
 `d.defold.com/<channel>/info.json` and fetches exactly that one document.
 
 This is the point on which an earlier draft of this decision was wrong. It said
@@ -306,8 +307,8 @@ So the index is fetched, and its trust comes from the same place the objects'
 does. An entry names a `policyRoot`, and the policy it names is content-addressed
 and therefore self-verifying: a substituted policy fails its own hash check. What
 an index entry can still do is point at the *wrong* valid policy for a revision,
-which is why the sha-to-root half of an entry is immutable and the nightly job
-never rewrites one.
+which is why online clients revalidate the revision pointer and then authenticate
+the root it names. Explicit offline use consumes the last validated pointer.
 
 ## The entry also answers "what do I download?"
 
@@ -475,21 +476,31 @@ say. Runtime conformance remains the headless engine harness's job.
 
 `deherm policy` is the explicit network boundary. It resolves the project's
 exact Defold SHA (or `--defold-sdk <sha>`), fetches that SHA's entry using the
-base and templates in the shipped publication locator, authenticates the policy root and
-every namespace object against the digest in its path, and writes only those
-verified bytes beneath the native per-user cache root (or
-`DEHERM_CACHE_HOME`/`XDG_CACHE_HOME`). A second resolution performs no cache
-writes. The package carries no revision catalogue: an existing npm release can
-resolve a Defold revision published after it by fetching
-`v1/index/<sha>.json` directly.
+base and templates in the shipped publication locator, authenticates the policy
+root, then fetches only `@compiler`, `@toolchain`, and the content-addressed
+objects named by the compiler manifest. Ordinary Lua namespace subtrees are not
+part of realization and are not transferred. The manifest is scanned by
+authenticated subtree reference rather than by a fixed entry list, so adding or
+removing compiler-owned documents does not require a client allowlist. Verified
+evidence is shared beneath the native per-user cache root (or
+`DEHERM_CACHE_HOME`/`XDG_CACHE_HOME`); identical object digests are reused across
+revisions. Cache hits, misses, writes, and network bytes are reported separately.
+The package carries no revision catalogue: an existing npm release can resolve a
+Defold revision published after it by fetching `v1/index/<sha>.json` directly.
 
 The policy cache and the generated-surface cache are intentionally distinct.
 The policy is source-derived API evidence; the surface additionally contains
 the revision-specific TypeScript SDK and executable lowering products consumed
 by `deherm generate`. `deherm policy` now authenticates the policy and invokes
-the compiler-owned deterministic materializer into the user surface cache. A
-remote machine therefore needs the npm realizer plus the policy, not a Defold
-checkout, `ref-doc.zip`, or a previously generated SDK tree.
+the compiler-owned deterministic materializer into the user surface cache.
+`deherm policy --project-cache` (also `--pin`) is the explicit writable project
+boundary: it keeps authenticated evidence in the shared policy cache while
+realizing directly into
+`<project>/.deherm/cache/surfaces/<revision>/`. A second population is
+idempotent, and another project can populate its own surface offline from the
+same authenticated object cache. A remote machine therefore needs the npm
+realizer plus the policy, not a Defold checkout, `ref-doc.zip`, or a previously
+generated SDK tree.
 
 Native target archives use a third cache beneath the same per-user root:
 `artifacts/<release-tag>/<bundle-target>/`. A native build reads the target
@@ -606,18 +617,11 @@ complete the layered cache:
 * Public headers and native sources are currently named in the project Merkle
   tree but not content-digested. Same-path byte edits must move `nativeRoot`
   before extension caching is sound.
-* The compiler manifest names the document/source objects a materializer needs,
-  but the client still eagerly downloads the entire policy closure. A future
-  layout may fetch the manifest first and then only its required subtrees.
-  Track this with project-cache population in
-  [#94](https://github.com/ts-defold/deherm/issues/94).
 * The 10.21 MB canonical lowering plan and 15 TypeScript compatibility sources
   remain referenced derived objects. Compiler-owned recipe emitters must replace
   them before the policy is a compact result rather than a correctness-first
   transition artifact. Track the ownership/size migration in
   [#93](https://github.com/ts-defold/deherm/issues/93).
-* A project-cache population command is still needed; today `deherm policy`
-  writes the shared user cache and project cache is read-only.
 
 Layer 0's content-addressed publication and materialization are implemented and
 tested, but accepting the whole layered-cache decision waits on those items.

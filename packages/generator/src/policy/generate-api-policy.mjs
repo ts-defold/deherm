@@ -50,9 +50,18 @@ import {
   nativeArtifactCompatibility
 } from "../../../compiler/src/defold-toolchain-pins.mjs";
 import {
+  LOCALLY_RENDERED_OUTPUT_INPUTS,
+  LOCALLY_RENDERED_OUTPUT_RECIPES
+} from "../../../compiler/src/revision-output-emitter.mjs";
+import {
   REVISION_OUTPUT_ROOTS,
   STABLE_GENERATED_OUTPUTS
 } from "../../../compiler/src/revision-output-layout.mjs";
+import {
+  BINDING_LOWERING_RECIPE_CAPABILITY,
+  BINDING_LOWERING_RECIPE_NAME,
+  createBindingLoweringRecipeFacts
+} from "../../../compiler/src/binding-lowering-plan-recipe.mjs";
 import { releaseAssetUrlTemplate } from "../../../cli/src/release-assets.mjs";
 import { artifactFamilies, artifactFamilyNames, familyRelease, publishedAssets } from "../../../../scripts/lib/artifact-releases.mjs";
 import { apiPolicyGenerator } from "../../../../scripts/lib/script-generator-pipeline.mjs";
@@ -80,8 +89,7 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-script-universal-value-bindings.json": "defold-script-universal-value-bindings.json",
   "defold-script-route-availability-profiles.json": "defold-script-route-availability-profiles.json",
   "defold-script-handle-lowering.json": "defold-script-handle-lowering.json",
-  "defold-binding-lowering-plan.json": "defold-binding-lowering-plan.json",
-  "defold-binding-lowering-plan.sentinel.json": "defold-binding-lowering-plan.sentinel.json",
+  [BINDING_LOWERING_RECIPE_NAME]: null,
   "defold-dmsdk-scalar-thunks.json": "defold-dmsdk-scalar-thunks.json",
   "defold-dmsdk-universal-bindings.json": "defold-dmsdk-universal-bindings.json",
   "defold-resource-declaration-schema.json": "defold-resource-declaration-schema.json",
@@ -104,6 +112,12 @@ const locallyRenderedSdkSources = new Set([
   "dmsdk/browser-arena.ts"
 ]);
 
+for (const relative of [
+  "dmsdk/named-scalar.ts",
+  "script/url-target-support.ts",
+  "script/value-target-support.ts"
+]) locallyRenderedSdkSources.add(relative);
+
 const locallyRenderedSdkRecipes = Object.freeze({
   "script/types.ts": "sdk.script.types.render.v1",
   "script/modules.ts": "sdk.script.modules.render.v1",
@@ -117,7 +131,10 @@ const locallyRenderedSdkRecipes = Object.freeze({
   "script/browser-target-support.ts": "sdk.script.browser-target-support.render.v1",
   "dmsdk/scalar.ts": "sdk.dmsdk.scalar.render.v1",
   "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
-  "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1"
+  "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1",
+  "dmsdk/named-scalar.ts": "sdk.dmsdk.named-scalar.render.v1",
+  "script/url-target-support.ts": "sdk.script.url-target-support.render.v1",
+  "script/value-target-support.ts": "sdk.script.value-target-support.render.v1"
 });
 
 const locallyRenderedSdkInputs = Object.freeze({
@@ -133,12 +150,16 @@ const locallyRenderedSdkInputs = Object.freeze({
   "script/browser-target-support.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),
   "dmsdk/scalar.ts": Object.freeze(["defold-dmsdk-scalar-thunks.json", "defold-sdk-ir.json"]),
   "dmsdk/universal.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"]),
-  "dmsdk/browser-arena.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"])
+  "dmsdk/browser-arena.ts": Object.freeze(["defold-dmsdk-universal-bindings.json"]),
+  "dmsdk/named-scalar.ts": Object.freeze([]),
+  "script/url-target-support.ts": Object.freeze([]),
+  "script/value-target-support.ts": Object.freeze([])
 });
 
 const compilerDocumentRecipes = Object.freeze({
   "defold-value-layouts.json": "policy.compiler-document.defold-value-layouts.v1",
-  "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1"
+  "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1",
+  [BINDING_LOWERING_RECIPE_NAME]: BINDING_LOWERING_RECIPE_CAPABILITY
 });
 
 export const compilerSurfaceSdkSources = Object.freeze([
@@ -421,11 +442,36 @@ export async function derivePolicy(options = {}) {
   const reconciliation = reconcileLocalPins({ lock, pins: toolchain.pins });
 
   const compilerOutputPaths = await discoverCompilerSurfaceOutputs(sourceRoot);
+  const [namedScalarReport, valueBindingsReport, urlBindingsReport] = await Promise.all([
+    readJson(path.join(artifacts, "defold-dmsdk-named-scalar-bindings.json")),
+    readJson(path.join(artifacts, "defold-script-value-bindings.json")),
+    readJson(path.join(artifacts, "defold-script-url-address-classification.json"))
+  ]);
+  const sdkRecipeInputs = Object.freeze({
+    "dmsdk/named-scalar.ts": {
+      emittedCount: namedScalarReport.coverage?.generated
+    },
+    "script/url-target-support.ts": {
+      routeCount: urlBindingsReport.routeCount,
+      targetSupport: urlBindingsReport.targetSupport
+    },
+    "script/value-target-support.ts": {
+      browserUnsupported: valueBindingsReport.bindings
+        .filter(({ targetSupport }) => targetSupport?.html5BrowserHost?.status === "not-executable")
+        .map(({ id, stableId }) => ({ id, stableId }))
+    }
+  });
   const compilerSurface = {
-    documents: Object.fromEntries(await Promise.all(Object.entries(compilerSurfaceDocuments).map(async ([name, relative]) => [
-      name,
-      await readJson(path.join(artifacts, relative))
-    ]))),
+    documents: Object.fromEntries(await Promise.all(Object.entries(compilerSurfaceDocuments).map(async ([name, relative]) => {
+      if (name === BINDING_LOWERING_RECIPE_NAME) {
+        const [plan, sentinel] = await Promise.all([
+          readJson(path.join(artifacts, "defold-binding-lowering-plan.json")),
+          readJson(path.join(artifacts, "defold-binding-lowering-plan.sentinel.json"))
+        ]);
+        return [name, createBindingLoweringRecipeFacts(plan, sentinel)];
+      }
+      return [name, await readJson(path.join(artifacts, relative))];
+    }))),
     sdk: Object.fromEntries(await Promise.all(compilerSurfaceSdkSources.map(async (relative) => {
       const source = await readFile(path.join(sourceRoot, "packages", "sdk", "src", "generated", relative), "utf8");
       const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
@@ -433,6 +479,7 @@ export async function derivePolicy(options = {}) {
         mode: locallyRenderedSdkSources.has(relative) ? "render-and-verify" : "authenticated-compatibility-source",
         sha256: createHash("sha256").update(canonicalSource).digest("hex"),
         inputs: locallyRenderedSdkInputs[relative] ?? [],
+        recipeInput: sdkRecipeInputs[relative],
         source: locallyRenderedSdkSources.has(relative) ? undefined : canonicalSource
       }];
     }))),
@@ -440,9 +487,12 @@ export async function derivePolicy(options = {}) {
       const source = await readFile(path.join(sourceRoot, relative), "utf8");
       const canonicalSource = canonicalizePolicyText(source).split(defoldRevision).join(DEFOLD_REVISION_TOKEN);
       return [relative, {
-        mode: "authenticated-compatibility-source",
+        mode: LOCALLY_RENDERED_OUTPUT_RECIPES[relative]
+          ? "render-and-verify"
+          : "authenticated-compatibility-source",
         sha256: createHash("sha256").update(canonicalSource).digest("hex"),
-        source: canonicalSource
+        inputs: LOCALLY_RENDERED_OUTPUT_INPUTS[relative] ?? [],
+        source: LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ? undefined : canonicalSource
       }];
     }))),
     realizationRecipes: {
@@ -454,7 +504,7 @@ export async function derivePolicy(options = {}) {
       ])),
       outputs: Object.fromEntries(compilerOutputPaths.map((relative) => [
         relative,
-        "output.compatibility-source.copy.v1"
+        LOCALLY_RENDERED_OUTPUT_RECIPES[relative] ?? "output.compatibility-source.copy.v1"
       ]))
     }
   };

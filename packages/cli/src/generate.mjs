@@ -16,6 +16,7 @@ import {
   isRevisionOutput,
   isTargetNativeOutput
 } from "../../compiler/src/revision-output-layout.mjs";
+import { BINDING_LOWERING_RECIPE_EMITTER } from "../../compiler/src/binding-lowering-plan-recipe.mjs";
 import { verifyProjectBuildArtifacts } from "./build-artifacts.mjs";
 import {
   assertResolvedDefoldRevision,
@@ -971,7 +972,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     env: options.env
   };
   let unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
-  if (unresolved.blocker && options.env?.DEHERM_OFFLINE !== "1" && process.env.DEHERM_OFFLINE !== "1") {
+  if (unresolved.blocker) {
     const { readPolicyLocator, resolvePublishedPolicy } = await import("./policy-client.mjs");
     await resolvePublishedPolicy(requestedRevision, {
       index: await readPolicyLocator(),
@@ -991,11 +992,13 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   // The lowering-plan generator is package code, not engine surface: it is the
   // program that produced the plan, and its digest authenticates the plan
   // whichever revision the plan describes.
-  const loweringPlanGeneratorPath = path.join(packageRoot, "packages", "compiler", "src", "generate-binding-lowering-plan.mjs");
+  const sourcePlanGenerator = "packages/compiler/src/generate-binding-lowering-plan.mjs";
+  const loweringPlanGeneratorPath = path.join(packageRoot, sourcePlanGenerator);
+  const loweringPlanRecipeEmitterPath = path.join(packageRoot, BINDING_LOWERING_RECIPE_EMITTER);
   const toolchainSourcePromise = surface.toolchain
     ? Promise.resolve(Buffer.from(`${JSON.stringify(surface.toolchain, null, 2)}\n`))
     : readFile(toolchainPath);
-  const [valueLayoutsSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptPatternsSource, dmsdkPatternsSource, scriptProbesSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, dmsdkThunksSource, dmsdkUniversalSource, resourceSchemaSource, resourceNamespacesSource, toolchainSource, packageSource] = await Promise.all([
+  const [valueLayoutsSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptPatternsSource, dmsdkPatternsSource, scriptProbesSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, loweringPlanRecipeEmitterSource, dmsdkThunksSource, dmsdkUniversalSource, resourceSchemaSource, resourceNamespacesSource, toolchainSource, packageSource] = await Promise.all([
     readFile(valueLayoutsPath),
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
@@ -1009,6 +1012,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     readFile(loweringPlanPath),
     readFile(loweringPlanSentinelPath),
     readFile(loweringPlanGeneratorPath),
+    readFile(loweringPlanRecipeEmitterPath),
     readFile(dmsdkThunksPath),
     readFile(dmsdkUniversalPath),
     readFile(resourceSchemaPath),
@@ -1046,9 +1050,13 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   if (sha256(JSON.stringify(planBody)) !== planSha256) {
     throw new Error("Packaged canonical lowering plan has an invalid internal digest");
   }
-  if (loweringPlanSentinel.schemaVersion !== 1 ||
-      loweringPlanSentinel.generator !== "packages/compiler/src/generate-binding-lowering-plan.mjs" ||
-      loweringPlanSentinel.generatorSha256 !== sha256(loweringPlanGeneratorSource) ||
+  const loweringPlanGeneratorSources = new Map([
+    [sourcePlanGenerator, loweringPlanGeneratorSource],
+    [BINDING_LOWERING_RECIPE_EMITTER, loweringPlanRecipeEmitterSource]
+  ]);
+  const loweringPlanAuthenticatingSource = loweringPlanGeneratorSources.get(loweringPlanSentinel.generator);
+  if (loweringPlanSentinel.schemaVersion !== 1 || !loweringPlanAuthenticatingSource ||
+      loweringPlanSentinel.generatorSha256 !== sha256(loweringPlanAuthenticatingSource) ||
       loweringPlanSentinel.outputSha256 !== sha256(loweringPlanSource) ||
       loweringPlanSentinel.outputBytes !== loweringPlanSource.byteLength ||
       loweringPlanSentinel.planSha256 !== planSha256 ||

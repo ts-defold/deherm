@@ -4,6 +4,7 @@ export * from "./component-proxy-generator.mjs";
 // inputs. Repository path loading and the CLI runner remain available only via
 // the repository command shim.
 export { generateBindingLoweringPlan } from "./generate-binding-lowering-plan.mjs";
+export * from "./binding-lowering-plan-recipe.mjs";
 export * from "./dmsdk-universal-materializer.mjs";
 export * from "./dmsdk-universal-jsi-exact-runner.mjs";
 export * from "./dmsdk-universal-static-frame.mjs";

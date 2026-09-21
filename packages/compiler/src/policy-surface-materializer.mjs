@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { lstat, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import {
@@ -17,17 +17,30 @@ import {
 } from "./sdk/dmsdk-sdk.mjs";
 import {
   generateDmSdkBrowserArena,
+  generateDmSdkNamedScalar,
   generateDmSdkScalar,
   generateDmSdkUniversal,
   generateScriptBrowserTargetSupport,
   generateScriptHandleLowering,
-  generateScriptUniversalValue
+  generateScriptUrlTargetSupport,
+  generateScriptUniversalValue,
+  generateScriptValueTargetSupport
 } from "./sdk/support-sdk.mjs";
 import { DEFOLD_REVISION_TOKEN, restoreDefoldRevision } from "./api-policy.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
 import { assertDmSdkUniversalStaticFrameCapacity } from "./dmsdk-universal-static-frame.mjs";
 import { isRevisionOutput } from "./revision-output-layout.mjs";
 import { nativeArtifactCompatibility } from "./defold-toolchain-pins.mjs";
+import {
+  generateRevisionOutput,
+  LOCALLY_RENDERED_OUTPUT_RECIPES
+} from "./revision-output-emitter.mjs";
+import {
+  BINDING_LOWERING_RECIPE_CAPABILITY,
+  BINDING_LOWERING_RECIPE_NAME,
+  emitBindingLoweringPlan,
+  emitBindingLoweringPlanSentinel
+} from "./binding-lowering-plan-recipe.mjs";
 
 const SCRIPT_IR = "defold-script-api-ir.json";
 const DMSDK_IR = "defold-sdk-ir.json";
@@ -35,6 +48,7 @@ const HANDLE_LOWERING = "defold-script-handle-lowering.json";
 const DOCUMENT_RECIPE = "policy.compiler-document.copy-json.v1";
 const DOCUMENT_RECIPES = new Set([
   DOCUMENT_RECIPE,
+  BINDING_LOWERING_RECIPE_CAPABILITY,
   "policy.compiler-document.defold-value-layouts.v1",
   "policy.compiler-document.dmsdk-universal.v1"
 ]);
@@ -52,7 +66,10 @@ const SDK_RECIPES = Object.freeze({
   "script/browser-target-support.ts": "sdk.script.browser-target-support.render.v1",
   "dmsdk/scalar.ts": "sdk.dmsdk.scalar.render.v1",
   "dmsdk/universal.ts": "sdk.dmsdk.universal.render.v1",
-  "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1"
+  "dmsdk/browser-arena.ts": "sdk.dmsdk.browser-arena.render.v1",
+  "dmsdk/named-scalar.ts": "sdk.dmsdk.named-scalar.render.v1",
+  "script/url-target-support.ts": "sdk.script.url-target-support.render.v1",
+  "script/value-target-support.ts": "sdk.script.value-target-support.render.v1"
 });
 
 function sha256(value) {
@@ -201,6 +218,9 @@ export function resolveCompilerSurface(resolvedPolicy, revision) {
     }
     let source;
     if (record.mode === "authenticated-compatibility-source") {
+      if (record.recipeInput !== undefined) {
+        throw new Error(`${relative}: compatibility SDK source may not carry a recipe input`);
+      }
       const object = referencedObject(
         resolvedPolicy, record.sourceObject, "deherm.policy.compiler-sdk-source", relative);
       source = restoreDefoldRevision(object.source, revision);
@@ -216,14 +236,23 @@ export function resolveCompilerSurface(resolvedPolicy, revision) {
   const outputs = {};
   for (const [relative, record] of Object.entries(outputEntries)) {
     confinedOutputPath(relative);
-    if (!record || record.mode !== "authenticated-compatibility-source" ||
-        !/^[0-9a-f]{64}$/u.test(record.sha256 ?? "") ||
-        record.recipe !== recipes.outputs?.[relative] || record.recipe !== OUTPUT_RECIPE) {
+    const inputs = record?.inputs ?? [];
+    if (!record || !/^[0-9a-f]{64}$/u.test(record.sha256 ?? "") ||
+        record.recipe !== recipes.outputs?.[relative] || !Array.isArray(inputs) ||
+        inputs.some((input) => !(input in documentEntries))) {
       throw new Error(`${relative}: invalid compiler-output manifest record`);
     }
-    const object = referencedObject(
-      resolvedPolicy, record.sourceObject, "deherm.policy.compiler-output-source", relative);
-    outputs[relative] = { ...record, source: restoreDefoldRevision(object.source, revision) };
+    if (record.mode === "authenticated-compatibility-source" && record.recipe === OUTPUT_RECIPE) {
+      const object = referencedObject(
+        resolvedPolicy, record.sourceObject, "deherm.policy.compiler-output-source", relative);
+      outputs[relative] = { ...record, inputs, source: restoreDefoldRevision(object.source, revision) };
+    } else if (record.mode === "render-and-verify" &&
+        record.recipe === LOCALLY_RENDERED_OUTPUT_RECIPES[relative] &&
+        record.sourceObject === undefined) {
+      outputs[relative] = { ...record, inputs };
+    } else {
+      throw new Error(`${relative}: unsupported compiler-output realization recipe ${JSON.stringify(record.recipe)}`);
+    }
   }
   const staleOutputRecipes = Object.keys(recipes.outputs ?? {}).filter((name) => !(name in outputEntries));
   if (staleOutputRecipes.length > 0) {
@@ -232,8 +261,30 @@ export function resolveCompilerSurface(resolvedPolicy, revision) {
   return { ...compiler, documents, sdk, outputs };
 }
 
-async function writeStable(file, source) {
+async function assertNoSymlinkComponents(boundary, target) {
+  const boundaryStatus = await lstat(boundary)
+    .catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+  if (boundaryStatus?.isSymbolicLink()) {
+    throw new Error(`Policy materialization refuses symbolic link ${boundary}`);
+  }
+  const relative = path.relative(boundary, target);
+  if (relative === "" || relative === ".") return;
+  if (relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error(`Policy materialization target escapes its output boundary: ${target}`);
+  }
+  let cursor = boundary;
+  for (const component of relative.split(path.sep)) {
+    cursor = path.join(cursor, component);
+    const status = await lstat(cursor).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+    if (!status) break;
+    if (status.isSymbolicLink()) throw new Error(`Policy materialization refuses symbolic link ${cursor}`);
+  }
+}
+
+async function writeStable(file, source, boundary) {
+  await assertNoSymlinkComponents(boundary, file);
   await mkdir(path.dirname(file), { recursive: true });
+  await assertNoSymlinkComponents(boundary, file);
   const current = await readFile(file, "utf8").catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
   if (current === source) return false;
   await writeFile(file, source);
@@ -244,6 +295,15 @@ async function realizeCompilerDocuments(input) {
   const documents = structuredClone(input);
   const planName = "defold-binding-lowering-plan.json";
   const sentinelName = "defold-binding-lowering-plan.sentinel.json";
+  const recipeFacts = documents[BINDING_LOWERING_RECIPE_NAME];
+  if (recipeFacts) {
+    const emitted = emitBindingLoweringPlan(recipeFacts);
+    const emitterSource = await readFile(new URL("./binding-lowering-plan-recipe.mjs", import.meta.url));
+    delete documents[BINDING_LOWERING_RECIPE_NAME];
+    documents[planName] = emitted.plan;
+    documents[sentinelName] = emitBindingLoweringPlanSentinel(recipeFacts, emitted, emitterSource);
+    return documents;
+  }
   const plan = documents[planName];
   const previousSentinel = documents[sentinelName];
   if (!plan || !previousSentinel) return documents;
@@ -290,6 +350,8 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   const revision = String(options.revision ?? resolvedPolicy?.revision ?? "").toLowerCase();
   if (!/^[0-9a-f]{40}$/.test(revision)) throw new Error(`Invalid Defold revision ${JSON.stringify(revision)}`);
   const outputRoot = path.resolve(options.outputRoot);
+  const outputBoundary = path.resolve(options.outputBoundary ?? outputRoot);
+  await assertNoSymlinkComponents(outputBoundary, outputRoot);
   const compiler = resolveCompilerSurface(resolvedPolicy, revision);
   const toolchain = toolchainObject(resolvedPolicy, revision);
   const documents = await realizeCompilerDocuments(compiler.documents ?? {});
@@ -300,7 +362,12 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   }
   assertDmSdkUniversalStaticFrameCapacity(documents["defold-dmsdk-universal-bindings.json"]);
   for (const name of Object.keys(documents)) {
-    if (!DOCUMENT_RECIPES.has(recipes.documents?.[name])) {
+    const loweringOutput = name === "defold-binding-lowering-plan.json" ||
+      name === "defold-binding-lowering-plan.sentinel.json";
+    const recipe = loweringOutput && recipes.documents?.[BINDING_LOWERING_RECIPE_NAME]
+      ? recipes.documents[BINDING_LOWERING_RECIPE_NAME]
+      : recipes.documents?.[name];
+    if (!DOCUMENT_RECIPES.has(recipe)) {
       throw new Error(`${name}: unsupported compiler-document recipe ${JSON.stringify(recipes.documents?.[name])}`);
     }
   }
@@ -311,6 +378,15 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     "script/handle-lowering.ts": generateScriptHandleLowering(documents[HANDLE_LOWERING]),
     "script/universal-value-bindings.ts": generateScriptUniversalValue(documents["defold-script-universal-value-bindings.json"]),
     "script/browser-target-support.ts": generateScriptBrowserTargetSupport(documents["defold-script-universal-value-bindings.json"]),
+    ...(compiler.sdk?.["script/url-target-support.ts"]?.mode === "render-and-verify" ? {
+      "script/url-target-support.ts": generateScriptUrlTargetSupport(compiler.sdk["script/url-target-support.ts"].recipeInput)
+    } : {}),
+    ...(compiler.sdk?.["script/value-target-support.ts"]?.mode === "render-and-verify" ? {
+      "script/value-target-support.ts": generateScriptValueTargetSupport(compiler.sdk["script/value-target-support.ts"].recipeInput)
+    } : {}),
+    ...(compiler.sdk?.["dmsdk/named-scalar.ts"]?.mode === "render-and-verify" ? {
+      "dmsdk/named-scalar.ts": generateDmSdkNamedScalar(compiler.sdk["dmsdk/named-scalar.ts"].recipeInput)
+    } : {}),
     "dmsdk/scalar.ts": generateDmSdkScalar(documents["defold-dmsdk-scalar-thunks.json"], documents[DMSDK_IR]),
     "dmsdk/universal.ts": generateDmSdkUniversal(documents["defold-dmsdk-universal-bindings.json"]),
     "dmsdk/browser-arena.ts": generateDmSdkBrowserArena(documents["defold-dmsdk-universal-bindings.json"])
@@ -331,13 +407,13 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     const canonicalSource = source.split(revision).join(DEFOLD_REVISION_TOKEN);
     const actual = sha256(canonicalSource);
     if (actual !== record.sha256) throw new Error(`${relative}: materialized SHA-256 ${actual} does not match policy ${record.sha256}`);
-    if (await writeStable(path.join(outputRoot, "sdk", "generated", relative), source)) writes.push(`sdk/generated/${relative}`);
+    if (await writeStable(path.join(outputRoot, "sdk", "generated", relative), source, outputBoundary)) writes.push(`sdk/generated/${relative}`);
   }
   for (const [relative, value] of Object.entries(documents).sort(([left], [right]) => left.localeCompare(right))) {
-    if (await writeStable(path.join(outputRoot, "ir", relative), json(value))) writes.push(`ir/${relative}`);
+    if (await writeStable(path.join(outputRoot, "ir", relative), json(value), outputBoundary)) writes.push(`ir/${relative}`);
   }
   const toolchainSource = json(toolchain);
-  if (await writeStable(path.join(outputRoot, "ir", "defold-toolchain.json"), toolchainSource)) {
+  if (await writeStable(path.join(outputRoot, "ir", "defold-toolchain.json"), toolchainSource, outputBoundary)) {
     writes.push("ir/defold-toolchain.json");
   }
   let artifactsSource = null;
@@ -351,22 +427,23 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
       throw new Error("Published native artifacts are incompatible with the selected Defold toolchain policy");
     }
     artifactsSource = json(options.artifacts);
-    if (await writeStable(path.join(outputRoot, "ir", "defold-artifacts.json"), artifactsSource)) {
+    if (await writeStable(path.join(outputRoot, "ir", "defold-artifacts.json"), artifactsSource, outputBoundary)) {
       writes.push("ir/defold-artifacts.json");
     }
   }
   const outputs = compiler.outputs ?? {};
   for (const [relative, record] of Object.entries(outputs).sort(([left], [right]) => left.localeCompare(right))) {
-    if (record.recipe !== OUTPUT_RECIPE || typeof record.source !== "string") {
-      throw new Error(`${relative}: unsupported compiler-output recipe ${JSON.stringify(record.recipe)}`);
-    }
-    const canonicalSource = record.source.split(revision).join(DEFOLD_REVISION_TOKEN);
+    const source = record.mode === "render-and-verify"
+      ? generateRevisionOutput(relative, record.recipe, documents)
+      : record.source;
+    if (typeof source !== "string") throw new Error(`${relative}: compiler-output recipe has no source`);
+    const canonicalSource = source.split(revision).join(DEFOLD_REVISION_TOKEN);
     const actual = sha256(canonicalSource);
     if (actual !== record.sha256) {
       throw new Error(`${relative}: materialized SHA-256 ${actual} does not match policy ${record.sha256}`);
     }
     const destination = path.join(outputRoot, "repository", relative);
-    if (await writeStable(destination, record.source)) writes.push(`repository/${relative}`);
+    if (await writeStable(destination, source, outputBoundary)) writes.push(`repository/${relative}`);
   }
 
   const descriptor = {
@@ -389,6 +466,6 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     sdkTreeSha256: manifestTreeSha256(sdk),
     outputTreeSha256: manifestTreeSha256(outputs)
   };
-  if (await writeStable(path.join(outputRoot, "surface.json"), json(descriptor))) writes.push("surface.json");
+  if (await writeStable(path.join(outputRoot, "surface.json"), json(descriptor), outputBoundary)) writes.push("surface.json");
   return { revision, outputRoot, descriptor, written: writes };
 }
