@@ -133,7 +133,7 @@ must total 913 routes:
 | Exact twin | Routes | Current evidence |
 |---|---:|---|
 | Real Lua 5.1 through `ScriptAdapter::api()` | 882 | exact lookup, arguments, results, call count, stack restoration, instance restoration, and missing-member failure |
-| Native POD specialization | 31 | next exact-twin obligation; deliberately not mislabeled as Lua-stack evidence |
+| Native POD specialization | 31 | generated real-Hermes exact driver executes the production adapter with exact stable-ID, argument, result, and failure-contract checks; deliberately not mislabeled as Lua-stack evidence |
 | Source/profile omission | 2 | omitted by the canonical profile and retained as machine-readable skips |
 
 The Lua companion still installs providers for all 915 routes. Its success line

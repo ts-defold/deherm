@@ -181,8 +181,9 @@ function pointerCheck(parameter, slot, usage) {
   const shape = parameter.shape;
   if (!["cstring", "pointer", "reference", "opaque"].includes(shape.kind) &&
       !(shape.kind === "handle" && !scalarName(shape))) return null;
-  const nullable = usage.nullableParameters?.includes(parameter.position);
-  const base = nativeType(shape, parameter.nativeType, usage.typeSubstitutions)
+  const nullable = shape.kind !== "reference" && usage.nullableParameters?.includes(parameter.position);
+  const resolved = nativeType(shape, parameter.nativeType, usage.typeSubstitutions);
+  const base = resolved
     .replace(/\s*&&?\s*$/, "")
     .replace(/\*+\s*$/, "");
   const alignment = containsUnalignablePointee(shape)
@@ -485,7 +486,52 @@ function renderRecordingFake({ fakeCallee, wrapper, kind, receiverType, paramete
   }
   const condition = comparisons.length ? comparisons.join(" && ") : "true";
   return `${returnAlias} ${fakeCallee}(${argumentsList.join(",")}){\n` +
-    ` ++${plan.prefix}_calls; if(!(${condition})) ++${plan.prefix}_failures; ${plan.result.statement}\n}`;
+    ` ++${plan.prefix}_calls; ` +
+    `if(!(${condition})) ++${plan.prefix}_failures; ${plan.result.statement}\n}`;
+}
+
+function declaredOwnershipEffect(shape, direction, role) {
+  if (shape.kind === "void") return { transport: "none", direction: direction ?? "value", effect: "no-result" };
+  const transport = shape.kind === "callback" ? "callback" :
+    shape.kind === "handle" ? "handle" :
+      ["cstring", "pointer", "reference", "opaque"].includes(shape.kind) ? "address" : "value";
+  const effect = role === "result"
+    ? transport === "value" ? "copied-result" : "returned-identity-unowned"
+    : transport === "callback" ? "callback-identity-passed" :
+      transport === "handle" ? "handle-identity-borrowed" :
+        transport === "address" ? `${direction ?? "value"}-address-borrowed-for-call` :
+          "copied-value";
+  return { transport, direction: direction ?? "value", effect };
+}
+
+function declaredOwnershipContract(recipe, parameters, resultShape, receiverType) {
+  const receiverEffect = !receiverType ? null : {
+    mode: recipe.invocation.receiver?.mode ?? "object",
+    effect: recipe.invocation.kind === "placement-constructor" ? "construct-in-caller-storage" :
+      recipe.invocation.kind === "explicit-destructor" ? "destroy-caller-owned-object" : "borrow-receiver-for-call",
+  };
+  const parameterEffects = parameters.map((parameter) => ({
+    position: parameter.position,
+    ...declaredOwnershipEffect(parameter.shape, parameter.direction, "parameter"),
+  }));
+  const result = declaredOwnershipEffect(resultShape, "return", "result");
+  const unresolvedRequirements = recipe.fallback.requirements.filter((requirement) =>
+    /(ownership|lifetime|callback-registration|receiver-provenance|out-storage|scratch)/.test(requirement));
+  return { receiver: receiverEffect, parameters: parameterEffects, result, unresolvedRequirements };
+}
+
+function declaredOwnershipEffectMask(contract) {
+  let mask = 0;
+  if (contract.receiver?.effect === "borrow-receiver-for-call") mask |= 1;
+  if (contract.receiver?.effect === "construct-in-caller-storage") mask |= 2;
+  if (contract.receiver?.effect === "destroy-caller-owned-object") mask |= 4;
+  for (const parameter of contract.parameters) {
+    if (parameter.transport === "callback") mask |= 8;
+    if (parameter.transport === "address") mask |= 16;
+    if (parameter.transport === "handle") mask |= 32;
+  }
+  if (["address", "handle", "callback"].includes(contract.result.transport)) mask |= 128;
+  return mask >>> 0;
 }
 
 function constructorLiteral(parameter, seed) {
@@ -654,6 +700,13 @@ export function materializeDmSdkUsages(usages, options = {}) {
         throw new Error(`${usage.declarationId} parameters must use contiguous positions`);
       }
     });
+    const byValueRecord = sourceParameters.find(({ shape }) =>
+      ["record", "template-record"].includes(shape.kind));
+    if (byValueRecord) {
+      throw new Error(
+        `${usage.declarationId} generic by-value record parameter ${byValueRecord.position} requires a typed size/alignment/lifetime provider`,
+      );
+    }
     const offset = recipe.abi.argumentOffset;
     const invocationConsumesReceiver = [
       "member-function",
@@ -733,6 +786,11 @@ export function materializeDmSdkUsages(usages, options = {}) {
     const effective = usage.resultShape
       ? { ...recipe, abi: { ...recipe.abi, resultShape: usage.resultShape } }
       : recipe;
+    if (["record", "template-record"].includes(effective.abi.resultShape.kind)) {
+      throw new Error(
+        `${usage.declarationId} generic by-value record result requires a typed size/alignment/lifetime provider`,
+      );
+    }
     const resultType = nativeType(
       effective.abi.resultShape,
       usage.resultCppType ?? recipe.abi.resultNativeType,
@@ -838,6 +896,8 @@ export function materializeDmSdkUsages(usages, options = {}) {
       throw new Error(`${usage.declarationId} exact-call driver cannot derive a fake result for ${effective.abi.resultShape.kind}${detail}`);
     }
     plan.declarations.push(...plan.result.declarations);
+    plan.declaredOwnership = declaredOwnershipContract(recipe, parameters, effective.abi.resultShape, receiverType);
+    plan.declaredOwnershipEffectMask = declaredOwnershipEffectMask(plan.declaredOwnership);
     const recordingFakeSource = renderRecordingFake({
       fakeCallee,
       wrapper,
@@ -871,6 +931,14 @@ export function materializeDmSdkUsages(usages, options = {}) {
       receiver: receiverType
         ? { slot: 0, cppType: receiverType, mode: recipe.invocation.receiver?.mode ?? "object" }
         : null,
+      compileTimeResolution: {
+        declaredNativeSymbol: usage.nativeSymbol ?? recipe.symbol,
+        sourceDefined: recipe.invocation.sourceDefined,
+        callExpression: productionCall,
+        returnCppType: verificationReturnType(recipe.invocation.kind, resultType, receiverType),
+        receiverCppType: receiverType ?? null,
+        parameterCppTypes: parameters.map(({ resolvedNativeType }) => resolvedNativeType),
+      },
       argumentCount,
       preconditions: [...checks],
       parameters,
@@ -881,6 +949,8 @@ export function materializeDmSdkUsages(usages, options = {}) {
         customExpression: usage.resultExpression ?? null,
         fakeReturn: copy(plan.result.cell),
       },
+      declaredOwnership: copy(plan.declaredOwnership),
+      declaredOwnershipEffectMask: plan.declaredOwnershipEffectMask,
       requirements: copy(recipe.fallback.requirements),
       productionWrapper: wrapper,
       exactWrapper,
@@ -966,7 +1036,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
   const verification = {
     schemaVersion: 1,
     source: "deherm-dmsdk-exact-call-verification",
-    evidenceBoundary: "Generated recording fake callees and the native C-ABI driver execute the exact-call contract for wrapper selection, precondition checks, deterministic wire inputs, decoded native arguments, receiver transport, and fake-result encoding; C-ABI observation accessors expose per-vector call and mismatch counts to other transport runners. This does not execute Defold implementation semantics or prove handle/callback ownership lifecycles.",
+    evidenceBoundary: "Generated recording fake callees and the native C-ABI driver execute the exact-call contract for compile-time call-expression/overload resolution, precondition checks, deterministic wire inputs, decoded native arguments, receiver transport, and result encoding; C-ABI observation accessors expose per-vector call and argument-mismatch counts to other transport runners. The fake proves ABI carrier, order, and result handling; it does not prove actual Defold-library linkage, does not execute Defold implementation semantics, and provides no runtime ownership lifecycle evidence. Ownership metadata is a declared contract only.",
     catalogSha256,
     provider: { function: exactProviderName, install: exactInstallName },
     driver: { function: exactDriverName, transport: "native-c-abi", sourceSha256: sha256(verificationDriver) },

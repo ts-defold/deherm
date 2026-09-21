@@ -759,7 +759,7 @@ int main(){return deherm_dmsdk_generated_provider_install_run_exact_verification
   }
 });
 
-test("generated exact-call driver owns deterministic scalar, pointer-like, callback, and reference fixtures", async () => {
+test("generated exact-call driver owns deterministic scalar, pointer-like, callback, span, and reference fixtures", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const boolean = recipe(report, "dmUtf8::IsWhiteSpace");
   const floating = recipe(report, "dmTrigLookup::Cos");
@@ -769,6 +769,7 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
   const pointerHandle = recipe(report, "ConfigFileGetFloat");
   const reference = recipe(report, "dmArray::dmArray::Push");
   const callback = recipe(report, "dmLog::RegisterLogListener");
+  const span = recipe(report, "dmHashBuffer32");
   const bypass = { generatedAdapterBypass: { reason: "exercise exact universal decoding", evidence: "generated native driver records the native call and result" } };
   const generated = materializeDmSdkUsages([
     { declarationId: boolean.declarationId, wrapper: "verify_bool", acknowledgements: bypass },
@@ -804,6 +805,11 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
         callbackTrampoline: { reason: "exercise exact callback transport", evidence: "generated typed trampoline identity is recorded by the native driver" },
       },
     },
+    {
+      declarationId: span.declarationId,
+      wrapper: "verify_span",
+      acknowledgements: bypass,
+    },
   ], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
   assert.deepEqual(
     generated.verification.vectors.map((vector) => ({
@@ -819,6 +825,7 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
       { arguments: ["address", "cstring", "f64"], result: "f64" },
       { arguments: ["aligned-receiver-storage", "value-object"], result: "void" },
       { arguments: ["fixed-trampoline"], result: "void" },
+      { arguments: ["aligned-address-token", "u64"], result: "u64" },
     ],
   );
   assert.match(generated.verification.evidenceBoundary, /does not execute Defold implementation semantics/);
@@ -831,6 +838,16 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
   });
   assert.match(generated.verification.observations.sourceSha256, /^[0-9a-f]{64}$/);
   assert.match(generated.verification.driver.sourceSha256, /^[0-9a-f]{64}$/);
+  assert.ok(generated.verification.vectors.every(({
+    compileTimeResolution,
+    declaredOwnership,
+    declaredOwnershipEffectMask,
+  }) =>
+    compileTimeResolution.declaredNativeSymbol && compileTimeResolution.callExpression &&
+    compileTimeResolution.returnCppType && Array.isArray(compileTimeResolution.parameterCppTypes) &&
+    declaredOwnership.result && Number.isSafeInteger(declaredOwnershipEffectMask)));
+  assert.match(generated.verification.evidenceBoundary, /does not prove actual Defold-library linkage/);
+  assert.match(generated.verification.evidenceBoundary, /Ownership metadata is a declared contract only/);
   assert.match(generated.source, /extern std::remove_pointer_t<DehermCallback_verify_callback_Arg0> native_log_listener/);
   assert.match(generated.verificationSource, /#define native_log_listener \(&DehermExactCallbackFixture<DehermCallback_verify_callback_Arg0>::call\)/);
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-exact-shapes-"));
@@ -919,12 +936,12 @@ test("usage materializer fails closed on catalog drift, unsafe bypass, arity ove
   assert.throws(() => materializeDmSdkUsages([{
     declarationId: recordArgument.declarationId,
     typeSubstitutions: { Socket: "dmSocket::Socket", Address: "dmSocket::Address", Result: "dmSocket::Result" },
-    argumentExpressions: { 1: "dmSocket::Address{}" },
     resultEnumValue: 0,
     acknowledgements: {
       recordLayout: { reason: "exercise unsupported exact record boundary", evidence: "materializer must fail before claiming a wire representation" },
     },
-  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /wire fixture.*record/);
+  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }),
+  /generic by-value record parameter 1 requires a typed size\/alignment\/lifetime provider/);
 
   const configUsage = { declarationId: configFloat.declarationId };
   const nonNull = materializeDmSdkUsages([configUsage], {

@@ -53,19 +53,54 @@ and native alignment. Enum arguments fail closed until the usage supplies an
 explicit finite domain. Scalar-backed handles use their scalar cell tag;
 address-backed handles use the address tag.
 
+Every emitted production wrapper now has a same-resolution exact twin. Both
+are derived in one pass from the selected recipe, receiver type, template
+arguments, type substitutions, enum domains, callback trampoline, custom
+argument expressions, and result override. The verification manifest records
+the compile-time call expression and overload ABI, receiver mode, ordered
+native parameters, fake result, and declared transport-level ownership
+contract. Its native driver installs the exact provider, calls the common
+production dispatcher, and requires one ABI-compatible recording-fake call
+with matching receiver/arguments and result cell. This demonstrates ABI
+carrier, order, and result handling, not linkage to the Defold library or
+runtime ownership lifecycle effects.
+
+Generic by-value record arguments and results fail closed until a typed
+size/alignment/lifetime provider exists. Pointer/span pairs retain distinct
+ordered pointer and length observations.
+Constructor and destructor vectors preserve the caller-storage receiver ABI
+and carry declared construct/destroy contracts, but the fake does not execute
+or observe an object-lifetime transition. Callback and handle vectors check
+identity transport without claiming that unresolved semantic lifetime or
+ownership policy has been solved.
+
+The arbitrary C extension-header generator follows the same manifest contract
+for every unblocked route: compile-time `extern "C"` call/signature identity,
+ordered arguments, result, and call/failure counters. Its ownership metadata
+is a declared contract and is not recorded as a runtime effect. Record, pointer,
+and variadic extension declarations remain explicitly blocked until that
+generator owns their layout or facade policy.
+
 ## Current evidence
 
 - 1,361 unique declaration IDs produce 1,361 recipes and stable numeric IDs.
 - All 1,361 have C ABI, Dynamic Hermes metadata, Static Hermes, browser direct
   memory, and TypeScript projections; the omission count is zero.
-- 148 declarations prefer an existing specialized generated family; the other
-  1,213 retain the universal usage-materialized path.
+- 146 declarations prefer an existing specialized generated family; the other
+  1,215 retain the universal usage-materialized path. Of those 146, 59 have a
+  callable generated adapter and 87 remain provider-gated.
 - Clean-room regeneration reproduces all universal artifacts byte-for-byte.
 - The generated common dispatcher is compiled into the local native runtime.
 - A mixed usage selection generates, compiles, links, and executes pinned
   `dmEndian` direct calls, a monomorphized `dmMath::Clamp<int32_t>`, plus
   `dmArray<uint32_t>` construction, member access, and destruction through the
   common C ABI dispatcher.
+- The generated recording driver also executes representative enum, scalar and
+  pointer-backed handles, callback trampoline, C string, reference/value, and
+  pointer/length span routes. Each vector compiles the selected call
+  expression/overload and checks ABI carrier, receiver, ordered native
+  arguments, and result encoding. A negative test proves generic by-value
+  `dmSocket::Address` transport fails closed without a typed provider.
 - The native harness exercises unsigned narrowing rejection, receiver-backed
   construction/member/destruction, and uses `std::destroy_at` for deterministic
   destructor generation. Negative generator tests cover catalog drift,
@@ -80,8 +115,17 @@ linked or behavior-tested. Most are recipes awaiting a real project's reachable
 usage and semantic policy. It does prove that the compiler has a deterministic
 code-generation path instead of silently dropping those declarations.
 
+The emitted production transports remain the common native C ABI provider,
+the generic Dynamic Hermes `DmSdkUniversal` module, Static Hermes direct-memory
+C ABI, browser/Wasm direct memory, and TypeScript stable-ID surface. The exact
+twin added here is a native verification transport. It does not add
+usage-specific Static Hermes or browser fake-callee runners, nor does the
+arbitrary extension-header lane install JSI, Static Hermes, or browser modules.
+
 Remaining blockers are explicit: callback trampolines still need a project
-callback registry; record and out-storage recipes need per-shape layout/storage
-providers; enum domains should eventually be harvested directly from the SDK
-IR instead of supplied by reachable usage; and the full catalog has not yet
-been linked and behavior-tested against every engine feature/target matrix.
+callback registry; all generic by-value record arguments/results and
+out-storage recipes need per-shape typed size/alignment/lifetime providers;
+enum domains should eventually be
+harvested directly from the SDK IR instead of supplied by reachable usage; and
+the full catalog has not yet been linked and behavior-tested against every
+engine feature/target matrix.

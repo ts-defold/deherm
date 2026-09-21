@@ -40,6 +40,7 @@ test("arbitrary extension headers deterministically produce ABI IR, TypeScript, 
   assert.match(generated.verificationSource, /deherm_ext_sample_exact_dispatch/);
   assert.match(generated.verificationDriver, /native-extension exact-call driver/);
   assert.match(generated.verificationDriver, /return deherm_exact_fail\("dispatch"/);
+  assert.doesNotMatch(generated.verificationDriver, /ownership-effects|deherm_exact_effects/);
   assert.doesNotMatch(generated.verificationDriver, /return (?:[1-9][0-9]{2,}|256);/);
   for (const digest of Object.values(generated.verification.artifacts)) assert.match(digest, /^[0-9a-f]{64}$/);
   assert.equal(generated.verification.artifacts.productionSourceSha256, createHash("sha256").update(generated.source).digest("hex"));
@@ -48,6 +49,18 @@ test("arbitrary extension headers deterministically produce ABI IR, TypeScript, 
   assert.match(generated.typescript, /accumulate\(value:number,delta:number\):number/);
   assert.match(generated.typescript, /blocked: parameter-0:record:SamplePoint/);
   assert.match(generated.source, /deherm_ext_sample_dispatch/);
+  assert.ok(generated.verification.vectors.every(({
+    compileTimeResolution,
+    declaredOwnership,
+    declaredOwnershipEffectMask,
+  }) =>
+    compileTimeResolution.callingConvention === "extern-c" && compileTimeResolution.signatureSha256 &&
+    compileTimeResolution.callExpression && Array.isArray(compileTimeResolution.parameterCppTypes) &&
+    declaredOwnership.result && Number.isSafeInteger(declaredOwnershipEffectMask)));
+  assert.equal(
+    generated.verification.vectors.find(({ symbol }) => symbol === "sample_label").declaredOwnership.result.effect,
+    "returned-identity-unowned",
+  );
 
   const output = await mkdtemp(path.join(tmpdir(), "deherm-native-extension-"));
   try {
