@@ -3,12 +3,12 @@
   "source": "deherm-dmsdk-generated-adapter-exact-corpus",
   "ordering": "numeric-id-ascending",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6",
-  "symbolIndexSha256": "1566790a0be8011eb871431cd4bd3fd7a4b9c552fc6e80ac2d1d052f755320b5",
+  "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325",
+  "symbolIndexSha256": "800189dc37c57e764df48a543bf64a2b87dd122dec7260a5894c86cba59b3db6",
   "recipeCount": 1361,
-  "generatedAdapterCount": 64,
+  "generatedAdapterCount": 74,
   "universalReadyCount": 566,
-  "specializationRequiredCount": 731,
+  "specializationRequiredCount": 721,
   "silentlyOmitted": 0,
   "familyCounts": {
     "arenaCString": 5,
@@ -18,6 +18,7 @@
     "enumValue": 7,
     "fixedDigest": 4,
     "hashSpan": 2,
+    "hashState": 10,
     "scalar": 26,
     "xteaSpan": 2
   },
@@ -25,9 +26,9 @@
     "schemaVersion": 1,
     "source": "deherm-dmsdk-generated-adapter-call-plan",
     "evidenceBoundary": "Each exact vector is derived from the same authenticated recipe and concrete family-dispatch plan as the production relocation. It fixes the production C ABI symbol, family-local adapter id, ordered native ABI, result contract, and emitted JSI module where one exists. Family runtime tests execute the C ABI vectors; JSI is applicable only to families that emit a production JSI module. Provider-boundary families remain excluded until their policy providers exist.",
-    "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6",
+    "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325",
     "retain": "deherm_dmsdk_generated_adapter_corpus_retain_generated_adapters",
-    "callCount": 64,
+    "callCount": 74,
     "calls": [
       {
         "declarationId": "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
@@ -47,7 +48,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99",
@@ -69,7 +70,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
@@ -89,7 +90,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
@@ -109,7 +110,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
@@ -129,7 +130,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
@@ -149,7 +150,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
@@ -169,7 +170,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
@@ -189,7 +190,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
@@ -209,7 +210,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
@@ -229,7 +230,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
@@ -249,7 +250,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
@@ -271,7 +272,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
@@ -293,7 +294,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
@@ -315,7 +316,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
@@ -337,7 +338,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
@@ -359,7 +360,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
@@ -381,7 +382,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
@@ -403,7 +404,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
@@ -425,7 +426,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
@@ -447,7 +448,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398",
@@ -469,7 +470,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
@@ -489,7 +490,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
@@ -509,7 +510,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
@@ -529,7 +530,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
@@ -549,7 +550,167 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
+        "numericId": 652,
+        "recipeId": "dmsdk-projection:57aca3c0f4d3dcd6df3b39a6",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 0,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "103c1d066321c0846e44e81be0ff43c13b14022ae17fc5d51346ea6d38b07558",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
+        "numericId": 653,
+        "recipeId": "dmsdk-projection:74df611302ed83acffc8a39e",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 1,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "3b93b7daf644fb113faa903715f8938d8a8e6b635c35b1ab23e52abc559fc301",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
+        "numericId": 654,
+        "recipeId": "dmsdk-projection:daa03f1e9d9125a364c7ba66",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 2,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "a7238f7d8bfaca1cdddfb385ef1d07b769fdfc06349bf0ce0152e3e75d47bc2a",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
+        "numericId": 655,
+        "recipeId": "dmsdk-projection:58ce7a8b69349cc9a8e0c13e",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 3,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "47925ce025a6bc13c6be1bb5503115f404e7928a8d169dd46dee5bb1d4ea4ee9",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
+        "numericId": 656,
+        "recipeId": "dmsdk-projection:520f3b4a635578c973ddc661",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 4,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "f214cdd005c29d87d42778c6825558adacf6c5a4d0f42150fee3626ab2dcb4d1",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
+        "numericId": 657,
+        "recipeId": "dmsdk-projection:74da7004762814ef3937ac25",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 5,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "5e4e4efe41dc0d98317f943f0df1500a106574954d7af6656558fbc63e777024",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
+        "numericId": 658,
+        "recipeId": "dmsdk-projection:ec9204badce98a0954a984b9",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 6,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "9e5701c19d3b4aec3e749408966ac0827128ced8af55e5515bf9360ba2236291",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
+        "numericId": 659,
+        "recipeId": "dmsdk-projection:db92767de3c8e5800db03837",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 7,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "cbf559c3f1766261d18ae0dda5c84f9a53472f2174ea9d60039e4dfef5019ec0",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
@@ -569,7 +730,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
@@ -589,7 +750,47 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
+        "numericId": 692,
+        "recipeId": "dmsdk-projection:1e07bbbe8623ffc0160ce6be",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 8,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "94e2f18ca59b1dfeb2ba9837d9e85ee6da56890ab62d3b124fd7691445252fb8",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
+      },
+      {
+        "declarationId": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
+        "numericId": 693,
+        "recipeId": "dmsdk-projection:b375102e2519b5c03c47b640",
+        "family": "hashState",
+        "adapterKind": "family-dispatch",
+        "adapterId": 9,
+        "symbol": "deherm_dmsdk_hash_state_dispatch",
+        "planSha256": "1a3fdd53a5dc648a62743be691519fc5f53b52fa94bfc045af93cab3f76a2a7c",
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
@@ -609,7 +810,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
@@ -629,7 +830,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397",
@@ -651,7 +852,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391",
@@ -673,7 +874,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390",
@@ -695,7 +896,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
@@ -715,7 +916,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
@@ -735,7 +936,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
@@ -755,7 +956,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
@@ -777,7 +978,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
@@ -799,7 +1000,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
@@ -819,7 +1020,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
@@ -839,7 +1040,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
@@ -859,7 +1060,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
@@ -879,7 +1080,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
@@ -899,7 +1100,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
@@ -919,7 +1120,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
@@ -941,7 +1142,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
@@ -963,7 +1164,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
@@ -985,7 +1186,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
@@ -1007,7 +1208,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
@@ -1029,7 +1230,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
@@ -1049,7 +1250,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
@@ -1071,7 +1272,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
@@ -1093,7 +1294,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
@@ -1113,7 +1314,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
@@ -1135,7 +1336,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
@@ -1157,7 +1358,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
@@ -1179,7 +1380,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
@@ -1201,7 +1402,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
@@ -1223,7 +1424,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
@@ -1245,7 +1446,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
@@ -1267,7 +1468,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
@@ -1289,7 +1490,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
@@ -1311,7 +1512,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
@@ -1333,7 +1534,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
@@ -1353,7 +1554,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       },
       {
         "declarationId": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
@@ -1373,10 +1574,10 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6"
+        "catalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325"
       }
     ],
-    "vectorCount": 64,
+    "vectorCount": 74,
     "jsiVectorCount": 33,
     "vectors": [
       {
@@ -1393,7 +1594,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -1506,7 +1709,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "6c87914e58826b2e49c8feaf1472f8aa7252f6339277402fc303155ed8ea0a3b"
+        "vectorSha256": "1f3e7486bd57aadf3c0672557b29ba2f9248d1e9746d97cfb40d2f7b68f496fb"
       },
       {
         "schemaVersion": 1,
@@ -1522,7 +1725,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -1627,7 +1832,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "dada0ebd13c249995a589ce4d38ef429d503d780982d8be21f41cc34af28c9b5"
+        "vectorSha256": "fb0e3cf280b100e5cb57c9c159c4f1bb5372bfde309cf6a1f5e042524d99c1d1"
       },
       {
         "schemaVersion": 1,
@@ -1643,7 +1848,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -1748,7 +1955,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "19760ac481934ec91aecae319d4d324ea5c38a5df398bac351c2e40c6c9c2564"
+        "vectorSha256": "0c5c31feace0ff8dc9961dd0d7d0f76ffff227887906788edaf5c3ea2091b884"
       },
       {
         "schemaVersion": 1,
@@ -1764,7 +1971,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "decode"
+          "mode": "decode",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -1875,7 +2084,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "7c0b8567665c48e20071a6e5217cf6a51f32db490dbaf89e0ba67d12b645d402"
+        "vectorSha256": "11ff047c8b27904f393ff9eee5acb10f607e83c7ed764bff6de2a36082112391"
       },
       {
         "schemaVersion": 1,
@@ -1891,7 +2100,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "encode"
+          "mode": "encode",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2002,7 +2213,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9525fdbf395131c880a7dee1ee16957ef2664b8675696b548955e49c0ceaa92e"
+        "vectorSha256": "418b66cd4e72d450906f68a4d46c29350b1c9fb492e95d06a0b926cb89d417bc"
       },
       {
         "schemaVersion": 1,
@@ -2018,7 +2229,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "decrypt"
+          "mode": "decrypt",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2164,7 +2377,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "6c383f64bf0d31549d749baff971d589b44b4ea7afdf5476ca1ad0fa8f60c8a5"
+        "vectorSha256": "b7f1da977773769c900fa44f8b1ab188a1d6e08fbb53c029bbb0eab8f6e9054a"
       },
       {
         "schemaVersion": 1,
@@ -2180,7 +2393,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "encrypt"
+          "mode": "encrypt",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2326,7 +2541,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "530904abcea0ad2df33c5ad6e11795149ef5a8a809994ef8e0e78b42561d0e60"
+        "vectorSha256": "a881041f5d3417bcda11edb5d37e37e8e62812dc04a032bd91d7f85fbd736090"
       },
       {
         "schemaVersion": 1,
@@ -2342,7 +2557,9 @@
         "familyContract": {
           "digestBytes": 16,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2433,7 +2650,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "5313ed683f31497b7ba84f03798f80c70a7ad94adb5a6b3e3eea93df6afcbdf0"
+        "vectorSha256": "c72268de6b33739152b0cffcbf8611183f9a595e72533507a7b5e21741d7df0a"
       },
       {
         "schemaVersion": 1,
@@ -2449,7 +2666,9 @@
         "familyContract": {
           "digestBytes": 20,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2540,7 +2759,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "213475dc6acc85abbdf37630eac01327d34184a390fdb843ced070dcc851b6ae"
+        "vectorSha256": "7d6dcf3cd2d1735c2c131fdad41f68c7785dd5317c67643e691e0bb78f6a7122"
       },
       {
         "schemaVersion": 1,
@@ -2556,7 +2775,9 @@
         "familyContract": {
           "digestBytes": 32,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2647,7 +2868,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "edc75b640aa0a8d60cbb541c2da2bf188f60a53053acff69959fab1a4646e58c"
+        "vectorSha256": "69f6d2544c54eff6f5559e234184f49e768e8cb36db7f95174563016e656e2c3"
       },
       {
         "schemaVersion": 1,
@@ -2663,7 +2884,9 @@
         "familyContract": {
           "digestBytes": 64,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2754,7 +2977,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "42bc6f3957277d288b7ca75c5868b3de26e9ddfb007d6ae5e710c653c6032a55"
+        "vectorSha256": "699d21f2f6f104b1b14f1ebd0cc2a7477f6ca93f816901bbb900362612d05ac3"
       },
       {
         "schemaVersion": 1,
@@ -2770,7 +2993,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2826,7 +3051,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "72fde0b8034b9f478a6dd35447bc9a89940d805d4d31636b4da98feed41cb2d3"
+        "vectorSha256": "d6c35e358ef0359f537d5303759110baa5572664ea763d653a6ea9db13c9dc6d"
       },
       {
         "schemaVersion": 1,
@@ -2842,7 +3067,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2898,7 +3125,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "20df8e3713bc01407a5c5020747fc365e9b5ae55ce809017c5f3fa709f5ce533"
+        "vectorSha256": "72c3ceb36cd3dc91b3b427b9d85a3044c6df8d39f41da70cf0a130fbedaae7f7"
       },
       {
         "schemaVersion": 1,
@@ -2914,7 +3141,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -2970,7 +3199,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9b820e68fc8c6c3ccbaa423048e181135043b70ecfaba9ec1fc5006489a54fe4"
+        "vectorSha256": "3e960a25cd91accaa15952108ecdaabf47fc942435d906593f3173f05a10ea69"
       },
       {
         "schemaVersion": 1,
@@ -2986,7 +3215,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3042,7 +3273,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9633f604720892d259211bee7199af8d6353cffcfb8ad7dc61957d7c43909c16"
+        "vectorSha256": "0a87b0ed48d8af9ecf5f2b20c9d88ff405190213d4ecf718c3c82d332e17c655"
       },
       {
         "schemaVersion": 1,
@@ -3058,7 +3289,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3114,7 +3347,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "aaeb0efa2b56b8047e278f3ba33e59529c38cc6731e62706768da04f0a33a6c1"
+        "vectorSha256": "4d65ef6f11bc06421835042ad38a6b3f7e638832dc569aca68e1764f906054f5"
       },
       {
         "schemaVersion": 1,
@@ -3130,7 +3363,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3186,7 +3421,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "6340f207750ad3030b81ca59d807485461e8c736ec3677e03e6e929458b9ffa6"
+        "vectorSha256": "ca7af2a4d02f67528f9369eb68ea9172ce3e9e54e250e3718e8ba8afbe98e1e7"
       },
       {
         "schemaVersion": 1,
@@ -3202,7 +3437,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3258,7 +3495,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "77eccfab0842ab239aa3d5776de7ef7435f27f8f51c268896f1eee17fca26fe9"
+        "vectorSha256": "297c7b129e23d37426853ed6b0f8654512bb6581b9263314e18f71359c7bd6ae"
       },
       {
         "schemaVersion": 1,
@@ -3274,7 +3511,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3330,7 +3569,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3fa1f42b9fc3562a54520e21de6392f6c36c5e639cac00c651e12039574c123d"
+        "vectorSha256": "920de2486355d3731cd1c0bf170902928c39203c8b0de8b38e52d71feed66671"
       },
       {
         "schemaVersion": 1,
@@ -3346,7 +3585,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3402,7 +3643,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "f55bd09234933754a80e798a4497d9386a62bae5b36c402d0d2b387b876052bb"
+        "vectorSha256": "24baabd990c237f891e0f8eef12711d17233285efb71a80833850bd7647ec48a"
       },
       {
         "schemaVersion": 1,
@@ -3418,7 +3659,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3506,7 +3749,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "05a755a2e5a05146518425622ae77940de960ddef2dba7a864968fdb05e90d7b"
+        "vectorSha256": "51190c83bf8489c563da9f203912fefbc2fe58bfe1803f0074fe1a68498b0ca6"
       },
       {
         "schemaVersion": 1,
@@ -3522,7 +3765,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3775,7 +4020,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9415bf09afb18831503a1508c998ddafc240299b1cb00d5aad45a4a534b8d521"
+        "vectorSha256": "c9a438d47fd32daf402475ece7988bd3f93ecde12b3ce079fcdd499349fef433"
       },
       {
         "schemaVersion": 1,
@@ -3791,7 +4036,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3900,7 +4147,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c077d2a3c21f90bf26618bc57c281d46738c862362fd39bf0b89340f98bfd567"
+        "vectorSha256": "9629ab7b194c825d16c621d420690e8839ca4e0d87a24f045dfeef3a1b1c0854"
       },
       {
         "schemaVersion": 1,
@@ -3916,7 +4163,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": 32,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -3988,7 +4237,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "70fa166e13ba85f9318653b2cc7ce11ea7900062a5e76ab9560ccd84d9b40711"
+        "vectorSha256": "992022e12b5bca158d4710cd500722ccb00d5af969b0480e71b1cc9a3602deb5"
       },
       {
         "schemaVersion": 1,
@@ -4004,7 +4253,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": 64,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4076,7 +4327,729 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3fbe1a521710579718701c7c18725209ea6d034a0ffe0b7e2a26624718639047"
+        "vectorSha256": "c0b29b458d289dd2cb919992d48d72d3c299c7bec4ad4c38eb5ce315ac73763f"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
+        "numericId": 652,
+        "recipeId": "dmsdk-projection:57aca3c0f4d3dcd6df3b39a6",
+        "family": "hashState",
+        "adapterId": 0,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashClone32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Clone",
+          "width": 32
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashClone32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState32 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState32",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "source_hash_state",
+              "nativeType": "const HashState32 *",
+              "direction": "in",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState32",
+                  "complete": true
+                },
+                "constPointee": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 2,
+              "name": "reverse_hash",
+              "nativeType": "bool",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "bool"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "d74f3cc9c4594dfbc7840855c45485ac5f9b32967a99a209bacf3fe4a14f300e"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
+        "numericId": 653,
+        "recipeId": "dmsdk-projection:74df611302ed83acffc8a39e",
+        "family": "hashState",
+        "adapterId": 1,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashClone64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Clone",
+          "width": 64
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashClone64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState64 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState64",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "source_hash_state",
+              "nativeType": "const HashState64 *",
+              "direction": "in",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState64",
+                  "complete": true
+                },
+                "constPointee": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 2,
+              "name": "reverse_hash",
+              "nativeType": "bool",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "bool"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "d3ace7251b449eaf57fc1c54b11940d309f624ec46800812534845caa804c9ae"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
+        "numericId": 654,
+        "recipeId": "dmsdk-projection:daa03f1e9d9125a364c7ba66",
+        "family": "hashState",
+        "adapterId": 2,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashFinal32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Final",
+          "width": 32
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashFinal32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "scalar",
+          "resultNativeType": "uint32_t",
+          "resultShape": {
+            "kind": "scalar",
+            "name": "u32"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState32 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState32",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "2f2e03ac118cb0a017b4637e00d0735a022a5ba61e46e3c13714ea78f86b8a8c"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
+        "numericId": 655,
+        "recipeId": "dmsdk-projection:58ce7a8b69349cc9a8e0c13e",
+        "family": "hashState",
+        "adapterId": 3,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashFinal64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Final",
+          "width": 64
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashFinal64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "scalar",
+          "resultNativeType": "uint64_t",
+          "resultShape": {
+            "kind": "scalar",
+            "name": "u64"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState64 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState64",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "94100b43489ccf8e22580e9c3ccc89ab4dec39fb9565e7114ec63ebe3e708206"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
+        "numericId": 656,
+        "recipeId": "dmsdk-projection:520f3b4a635578c973ddc661",
+        "family": "hashState",
+        "adapterId": 4,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashInit32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Init",
+          "width": 32
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashInit32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState32 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState32",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "reverse_hash",
+              "nativeType": "bool",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "bool"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "3305f02dd6791f56d30e396ff5dc95238578be236b49f8b5e9b8f39bc988365d"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
+        "numericId": 657,
+        "recipeId": "dmsdk-projection:74da7004762814ef3937ac25",
+        "family": "hashState",
+        "adapterId": 5,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashInit64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Init",
+          "width": 64
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashInit64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 2,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState64 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState64",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "reverse_hash",
+              "nativeType": "bool",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "bool"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "5a1495ba8056d102e42f6e9cd52c91328379ceb571b4d28f70e625a2c46cce10"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
+        "numericId": 658,
+        "recipeId": "dmsdk-projection:ec9204badce98a0954a984b9",
+        "family": "hashState",
+        "adapterId": 6,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashRelease32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Release",
+          "width": 32
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashRelease32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState32 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState32",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "71ee5271d26fb708ad1edcdd930818ff089a96b9e7efd3a952be94d6b2a6a931"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
+        "numericId": 659,
+        "recipeId": "dmsdk-projection:db92767de3c8e5800db03837",
+        "family": "hashState",
+        "adapterId": 7,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashRelease64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "Release",
+          "width": 64
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashRelease64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 1,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState64 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState64",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "2596483d4e9a98965f1404f3a56eae3b0a1b43e74803e7b5bb6feb6ebaedd964"
       },
       {
         "schemaVersion": 1,
@@ -4092,7 +5065,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4150,7 +5125,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "7f5f3fa6e5ef02bfb587bda5d88743bfb4a7e1c31b9deb2132e2356423f94f33"
+        "vectorSha256": "34d21fa0d5e22cdf1008ac0961299e51d5946f6b95fcb5a40d93c1e744752ba5"
       },
       {
         "schemaVersion": 1,
@@ -4166,7 +5141,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4224,7 +5201,225 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c30d9a7d5aecfbe0d400be314727ce245929ec0cbb05ceccf1fd3fece11c6e77"
+        "vectorSha256": "bc12c56a9bf7fb9e2055dba8bbab8760177b2d4d299177c5324e1ec51c542617"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
+        "numericId": 692,
+        "recipeId": "dmsdk-projection:1e07bbbe8623ffc0160ce6be",
+        "family": "hashState",
+        "adapterId": 8,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashUpdateBuffer32",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "UpdateBuffer",
+          "width": 32
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashUpdateBuffer32",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState32 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState32",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "buffer",
+              "nativeType": "const void *",
+              "direction": "in",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "void"
+                },
+                "constPointee": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 2,
+              "name": "buffer_len",
+              "nativeType": "uint32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "1a80a0cdde3d00af15c518f560d92472cd1839d8d94f5a3a7745d0c955fc8d7a"
+      },
+      {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
+        "numericId": 693,
+        "recipeId": "dmsdk-projection:b375102e2519b5c03c47b640",
+        "family": "hashState",
+        "adapterId": 9,
+        "adapterKind": "family-dispatch",
+        "productionSymbol": "deherm_dmsdk_hash_state_dispatch",
+        "productionHeader": "defold_hermes/generated_dmsdk_hash_state.h",
+        "exactCallee": "dmHashUpdateBuffer64",
+        "familyContract": {
+          "digestBytes": null,
+          "resultBits": null,
+          "mode": null,
+          "operation": "UpdateBuffer",
+          "width": 64
+        },
+        "invocation": {
+          "kind": "direct-function",
+          "nativeSymbol": "dmHashUpdateBuffer64",
+          "sourceDefined": false,
+          "member": null,
+          "receiver": null,
+          "templateArguments": {
+            "names": [],
+            "source": "usage-required-when-unresolved"
+          },
+          "monomorphization": null
+        },
+        "abi": {
+          "argumentOffset": 0,
+          "argumentCount": 3,
+          "resultKind": "void",
+          "resultNativeType": "void",
+          "resultShape": {
+            "kind": "void"
+          },
+          "parameters": [
+            {
+              "position": 0,
+              "name": "hash_state",
+              "nativeType": "HashState64 *",
+              "direction": "inout",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "record",
+                  "name": "HashState64",
+                  "complete": true
+                },
+                "constPointee": false,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 1,
+              "name": "buffer",
+              "nativeType": "const void *",
+              "direction": "in",
+              "cellKind": "pointer",
+              "shape": {
+                "kind": "pointer",
+                "to": {
+                  "kind": "void"
+                },
+                "constPointee": true,
+                "nullable": "unspecified"
+              },
+              "requirements": [
+                "pointer-lifetime"
+              ]
+            },
+            {
+              "position": 2,
+              "name": "buffer_len",
+              "nativeType": "uint32_t",
+              "direction": "value",
+              "cellKind": "scalar",
+              "shape": {
+                "kind": "scalar",
+                "name": "u32"
+              },
+              "requirements": []
+            }
+          ],
+          "frame": "DehermDmSdkUniversalFrame/v1"
+        },
+        "transports": {
+          "cAbi": {
+            "applicability": "callable",
+            "symbol": "deherm_dmsdk_hash_state_dispatch"
+          },
+          "dynamicHermesJsi": {
+            "applicability": "not-emitted"
+          }
+        },
+        "expectations": {
+          "selection": "exact-family-adapter-id",
+          "arguments": "ordered-native-abi",
+          "result": "family-adapter-result-contract",
+          "failClosed": true
+        },
+        "vectorSha256": "1c3063509e4b675b2c5b36bb4a67e67e33fc385e0624309fb16b1db321479753"
       },
       {
         "schemaVersion": 1,
@@ -4240,7 +5435,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "block-size"
+          "mode": "block-size",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4369,7 +5566,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8d18f9eb588f2857b658950b0ed8c7c3eb0c4e84ac723e321b4c88af5e8df5cc"
+        "vectorSha256": "c5b7afa9cf228404cc03c35f91d62b59e93287034d31418ec4057ea5de22f9a2"
       },
       {
         "schemaVersion": 1,
@@ -4385,7 +5582,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "dimensions"
+          "mode": "dimensions",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4514,7 +5713,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a9450714fa8a125c151b927b42efabc7590c84126487c98d3140b4724c38369a"
+        "vectorSha256": "94797289a3253f3c494cda3b56939358455340628b6cb529921930d508beb5dc"
       },
       {
         "schemaVersion": 1,
@@ -4530,7 +5729,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4618,7 +5819,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "5b96b9b3758003712ca98236d10d19c2e9337269f8cb60856d29ad0a3d8adfb1"
+        "vectorSha256": "913d3333fe207e7a4c16877fcc4d1d6462dd14842a227d7a039e9a58a222bf53"
       },
       {
         "schemaVersion": 1,
@@ -4634,7 +5835,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4710,7 +5913,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "46821404658c8b7afd0cf799b5151bbb36b3acc189769b0c3eae8184edcd134c"
+        "vectorSha256": "0b46993bfa1bc58448af7ae88463edd39e553187df5c1276d58010e77614af4c"
       },
       {
         "schemaVersion": 1,
@@ -4726,7 +5929,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4814,7 +6019,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "476fe6cecc37dc1ea9ec2989a0138c4844e2d954700f2748de3bb97ab1c79873"
+        "vectorSha256": "20f038c4904981172fafd5bd47e0a09828fec83020d72641569069c427bbdd81"
       },
       {
         "schemaVersion": 1,
@@ -4830,7 +6035,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "canonical-path"
+          "mode": "canonical-path",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4916,7 +6123,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "2e169be6e693a810a344bf1c1d20146d973051db81db213d8d5072d8ef477b1a"
+        "vectorSha256": "004c8a3ef13b56bb4228c76d021dcc7f9ece164f2b163544e52fec2e9835aabd"
       },
       {
         "schemaVersion": 1,
@@ -4932,7 +6139,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -4992,7 +6201,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "cd12bbd63045034eb6d326148319e22355b7d8cd40edbb43735e2fafc3dfc5dd"
+        "vectorSha256": "c5c965b467411b975bc4430a4dc85a2f0df0e7ba1ed9dc7d23790b3610ca72e8"
       },
       {
         "schemaVersion": 1,
@@ -5008,7 +6217,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -5209,7 +6420,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "4aa8de6877d1654f701e40b82fc67f657ea13b97bd749e8732fb39669f3324f1"
+        "vectorSha256": "b41631e37aad0ec92469f2559bfb1b9c8eec41b2cf6e029e01d06a56bf06c517"
       },
       {
         "schemaVersion": 1,
@@ -5225,7 +6436,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -5394,7 +6607,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "dfc85e3ea75082d6665ac6b2f83e5e2463cfb4e256a2736c5580eded47f44b10"
+        "vectorSha256": "6da75ff1635784b755528a136688c621986c6706347f2ae7cd4e6476744b54c8"
       },
       {
         "schemaVersion": 1,
@@ -5410,7 +6623,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -5567,7 +6782,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "dd24069fdf888e76bed4dc781ebac62105e7c27520cf890d556ee5d19a69c042"
+        "vectorSha256": "64588dcf5a01e927dcc6c859dafb2a15a7094214e817cd011dba82aa6ff90fa2"
       },
       {
         "schemaVersion": 1,
@@ -5583,7 +6798,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -5657,7 +6874,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "72e4691362cb009d42ec389efca31db384b752fc92d85f3c331bfdec1d965ebf"
+        "vectorSha256": "9c2f231bd16fc35ec5dc3410240ffb84d51bff17df553518aba1e0217d80b152"
       },
       {
         "schemaVersion": 1,
@@ -5673,7 +6890,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "error-string"
+          "mode": "error-string",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -5754,7 +6973,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a58765c7746732c5f7a934d0cce048fc62765c019fc7d5ed7465c0aaa22d855d"
+        "vectorSha256": "58d176d0c3ceda7e81820d9b1f1e510636b1afd044e590fbf34be371c1f27302"
       },
       {
         "schemaVersion": 1,
@@ -5770,7 +6989,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "trimmed-string"
+          "mode": "trimmed-string",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -5856,7 +7077,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "fdfcd20c8ab01ef36841525ffc7d76cf0cab01a0558af4ad6a20827d580b9158"
+        "vectorSha256": "b52f06fb853abb0253de3703fa5f3e4ac84e3fc9f562ec33873d9369b9b2f02f"
       },
       {
         "schemaVersion": 1,
@@ -5872,7 +7093,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -5930,7 +7153,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "9979c6241fd36bc91f1b326bf246735451b7094d56c1f3989dbd34f538c4f4a0"
+        "vectorSha256": "8c0477bef7ec47afe0bf1dcdd8c7011536b9e82f8d89fcb1dac6880c33eca8ad"
       },
       {
         "schemaVersion": 1,
@@ -5946,7 +7169,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6165,7 +7390,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "8ba02bb5c41e25b86f1f7bc9c926200f6d3ced8c8414c8d7a2990b0f2fc0ee82"
+        "vectorSha256": "e05b318f08b73ae295417913a5160e80e7a8bb75f24016bed533f7b4ff679f6b"
       },
       {
         "schemaVersion": 1,
@@ -6181,7 +7406,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6384,7 +7611,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "568c2d0c53c50e4b65f04e98a0fbd4139e1d9330a86da5e724ea5276cad0e1fc"
+        "vectorSha256": "06e7a1e4cd2324433e9edd327dcf11e642d95682ad7d7195a9553f32b9596131"
       },
       {
         "schemaVersion": 1,
@@ -6400,7 +7627,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6443,7 +7672,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "660704e71f0b44c4d95bb2531b07529c0af11ca31379fc0266c05d368e1861e3"
+        "vectorSha256": "4577778578dc57728a7e255a726c26f0c01c46c2e2e22bea75b56bb8c3211e0c"
       },
       {
         "schemaVersion": 1,
@@ -6459,7 +7688,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6502,7 +7733,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "7d210bc83703dd99af4cbd697ae681ede6c0a0264273e969fe1a0e8d32e48921"
+        "vectorSha256": "d90e8d9013e49431f9199b5560dfab0015c20f7dc8c0b6c3ce98b6707a593050"
       },
       {
         "schemaVersion": 1,
@@ -6518,7 +7749,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6573,7 +7806,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b72d86cf81c7f75d2e70b4c89dae63e18db9c852c99b1cb9ed46f3c0719674e6"
+        "vectorSha256": "f6a5491e7c61e1c7f83dc3c6d400d0c10b897270c906b852ec73cdbb4d925858"
       },
       {
         "schemaVersion": 1,
@@ -6589,7 +7822,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6645,7 +7880,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "b188b0f59d823b250ab50c21b819d641266858789ea29d97d7ee386d7ba03033"
+        "vectorSha256": "d93d75be647cf6f8bacf12007fc4bbc58a186bacca657e9931420553b9fff549"
       },
       {
         "schemaVersion": 1,
@@ -6661,7 +7896,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6717,7 +7954,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "4b6f8ef4b0144e5685b9f761de33e692a2a20648b35fc8483e2c458e80dc2e97"
+        "vectorSha256": "c0b237aab423a361a2ea3fe94d49906b2df831539483dbaa1a1e9c224ec655ab"
       },
       {
         "schemaVersion": 1,
@@ -6733,7 +7970,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "uri-encode"
+          "mode": "uri-encode",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6855,7 +8094,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "bf781de777ef4e53aeb6ee1b63be9f988f381bb42166ddbef6ece2ce16a625a1"
+        "vectorSha256": "8d086552932e78bd3733d0b9199986a0d6d317a672a4ad8063d768b27dcc1193"
       },
       {
         "schemaVersion": 1,
@@ -6871,7 +8110,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6927,7 +8168,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "beb701cd98e3f7537b9f304753d50802f18fb70a44e05cc104166a06110e0371"
+        "vectorSha256": "4b605e2bbdabf7cb1fce55b5385157b96268959aee0929396351beec1a9823a7"
       },
       {
         "schemaVersion": 1,
@@ -6943,7 +8184,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -6999,7 +8242,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "370e4bbf63565ab8d2bab06b9a3a99e1c04f8e44a18fcd5150f981d5cb6e878e"
+        "vectorSha256": "d1b04a0c74d879b454387d6737235a3cf1dbd82b65360f328e1080e5ae4b1218"
       },
       {
         "schemaVersion": 1,
@@ -7015,7 +8258,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7073,7 +8318,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "a29b1094694c11d5a884bbb3a8f0320b1b931413377fcb8ac27efbc140aadfae"
+        "vectorSha256": "dc422be9526af0a9a94d99a4ead1fe242ba4f97852c138bb55406fed83edb733"
       },
       {
         "schemaVersion": 1,
@@ -7089,7 +8334,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7145,7 +8392,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "235afa24e6172bae7ab6f5c54d6b28ccb5695a035b9801aecfd3ba4f13a6d365"
+        "vectorSha256": "e679c13a84609f7f249fd083520dc099930bf2362172efb620bbd9cd25ae1316"
       },
       {
         "schemaVersion": 1,
@@ -7161,7 +8408,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7217,7 +8466,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c138b6015168558431b17ab7f097581c5a49bfbd1bff0e7f6a805e92d5b57b3d"
+        "vectorSha256": "62c88daa1abfd3466661cb2acb34bb616e04c5f6b0971cdfae250a5c920f958f"
       },
       {
         "schemaVersion": 1,
@@ -7233,7 +8482,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7289,7 +8540,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c227f44fa6ae6558cb4737db38d5803500ca0f0c13f03368ad1ec715bc367df8"
+        "vectorSha256": "2ccef4249ca7636300b2ce3b6f648a2d3930e92d41917e3f6a13a008fd136374"
       },
       {
         "schemaVersion": 1,
@@ -7305,7 +8556,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7361,7 +8614,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c91935f437ee18b75800e905e76832fd8e2dd3c7402e2caec864a00aef7cc825"
+        "vectorSha256": "d6daa3e93b89e3cb054a6a1309bf8776f0124216b522645ab31c0417f2fa398d"
       },
       {
         "schemaVersion": 1,
@@ -7377,7 +8630,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7433,7 +8688,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3177b84218c33e903f3c38ac383c0a5e68ec72fb972421da387231d82009ce43"
+        "vectorSha256": "7eea825b1b95eba1afe7de86d8a1ed5ed9cbd3395403041b60ae76d2166e3680"
       },
       {
         "schemaVersion": 1,
@@ -7449,7 +8704,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7505,7 +8762,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3f861c5b7806c0bad8e3f18043bcff00f5cc9e96b503b939c29292d27a434449"
+        "vectorSha256": "e89857f86a1399b277980858703537b8f5ebf25537aa08a65d035a51efb7ed53"
       },
       {
         "schemaVersion": 1,
@@ -7521,7 +8778,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7577,7 +8836,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "bf7b55256d26b75213b67ec61c3ba4d44ff1a22e7a2a08504cf6daf1b05213a3"
+        "vectorSha256": "d592a8f3147daf05e6c5d0b6eb580838ac254669617a64d92569548c2e1eead5"
       },
       {
         "schemaVersion": 1,
@@ -7593,7 +8852,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7649,7 +8910,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "46da9b9fe970f4b74ce23c8f9654121daa56b9e69285d91ef438cb8f0adbcaaa"
+        "vectorSha256": "d6d5bc327db52e4b6012e7ede4f1db42080988d75d41b3a78b711779d30fcdac"
       },
       {
         "schemaVersion": 1,
@@ -7665,7 +8926,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7721,7 +8984,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "bdc4e707cf0c4f46abc2cd8481d3917c0a02da87db65fccdb26a9e2718b4553c"
+        "vectorSha256": "93e113df1c39f071200ec932d309825c0d24664fbd209129614eb2c6f5b4026c"
       },
       {
         "schemaVersion": 1,
@@ -7737,7 +9000,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7780,7 +9045,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "991bb1323f36ce8321cce1f4ab51591743b7059d38d40d4d2a8daf0ec0ed4ac1"
+        "vectorSha256": "fe85da34418667c99b4e2419c249f30c4f15e78479c95223dda56757bad89153"
       },
       {
         "schemaVersion": 1,
@@ -7796,7 +9061,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": "canonical-path"
+          "mode": "canonical-path",
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7882,7 +9149,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c4320437839edf96a9639842f722449297a8692df485b46d67b7c913cffa7189"
+        "vectorSha256": "b473f67331549954522ad856bbac2943c1ac4f8e0788a96aa0a227e7522afece"
       },
       {
         "schemaVersion": 1,
@@ -7898,7 +9165,9 @@
         "familyContract": {
           "digestBytes": null,
           "resultBits": null,
-          "mode": null
+          "mode": null,
+          "operation": null,
+          "width": null
         },
         "invocation": {
           "kind": "direct-function",
@@ -7958,30 +9227,30 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "320c54bbbff7b3dd1ed1e9757c15bc3aee4510b23082a165c1c8bb727356f0cd"
+        "vectorSha256": "b4e8f9abe735d11654401dd2c23c1e9e4167592f333993ae2c4ebb2d6eebf9ef"
       }
     ],
-    "manifestSha256": "a6d6b72a38659aa5660b8e5e51a740da0492ca1b7100618b1c5fb3edae8724ef"
+    "manifestSha256": "1824e6826745056332f9bca0de00c6e2ff696208fb1a9e312de539b5c418c164"
   },
   "artifacts": {
     "verificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
-      "sha256": "0c58a3b5c61ec9f48d0602af0f888087ee1b5fd0229b0403c27fe9556d92fb02"
+      "sha256": "84b657d34a3681c1d490d6b15db14e8077443a420c8c6f24552a94fedf5849e4"
     },
     "jsiVerificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp",
       "sha256": "dad3426f5dc45ba4f561d432c80a7e7902082e420102566436d4575b90deeb9c"
     }
   },
-  "productionCatalogSha256": "e022158624fd769c4be6e957e86b8cd91c740626c5da625b738e4089de2cc571",
-  "exactCatalogSha256": "4d6b5ae9419a054efc048e5b306a3c1c892c028d79ffc2a09b5c2b52e61e17f6",
+  "productionCatalogSha256": "be7d6d8bf8563cd052e57a96346fd025e61f3798ee3189d0a7a0cd731e1016f2",
+  "exactCatalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325",
   "sourceHashes": {
-    "productionCatalog": "8233a78e12b200f924eba9f92f839ce2ab7d8ce9b6fa219e175fc696c129aade",
+    "productionCatalog": "c2dd03c45f16898831792fec17459d0358d52fcbd394de0b2c65790cf3087aaa",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "familyReports": {
       "arenaCString": {
         "path": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
-        "sha256": "84e3101830f4b069e576d781e0829b7ea9182c6fe5d4a4888ad69b62578b0b22"
+        "sha256": "5d7e4def887574e34fae8e9ed880a90ebf45ba6c05dfca97552b79ae10f3b845"
       },
       "scalar": {
         "path": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
@@ -8013,9 +9282,13 @@
       },
       "cstringValue": {
         "path": "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
-        "sha256": "a66ab28e8a0dac5ab0daee4911391921312e3d3479e42464d19d4b41c20c8f5d"
+        "sha256": "e68a58450d6bbc6a242ef1acf6f96269e87a6e709a65d98de2b4ddfc91a41f07"
+      },
+      "hashState": {
+        "path": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
+        "sha256": "66325311eeb4c07d867e021b32c00cb2036a84cb4b9725ac3eddcb581e6c93b9"
       }
     }
   },
-  "corpusSha256": "f77bf6f4287aa09e153d278c39a4d4974224a401b01c26fdba804d4da49cfc8c"
+  "corpusSha256": "e66094f0b9cc3203483322ed67cae3f5bc2c35cd763ec8f6a7a431e0ee3d91b0"
 }

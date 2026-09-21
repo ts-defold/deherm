@@ -1,5 +1,34 @@
 # Defold Hermes knowledge log
 
+## 2026-09-21 - Named-enum tail result validation
+
+`liveupdate.remove_mount` now derives its accepted numeric result domain from
+the pinned `dmLiveUpdate::Result` declaration and the `LIVEUPDATE_*` constants
+actually exported by `script_liveupdate.cpp`. The generated value-tail
+route carries compact offsets/counts in generated parallel tables and
+rejects any numeric result outside that exact domain. The existing GUI/render
+wrong-context probes already prove pre-Lua fail-closed behavior; the recording
+Lua-adapter fixture is already discovered and byte-compared by clean-room
+regeneration. The shared GUI-node handle type remains one lifecycle identity,
+and the underlying fixed handle-pool test now proves duplicate releases are
+rejected before drain.
+
+The same adversarial pass found that Static exact verification did not require
+a provider-recorded marker for zero-argument routes. The native executable now
+requires a non-empty recorded context for every one of its 325 vectors, the
+family audit cross-checks the route-derived census against the applicability
+lane census, and cyclic shapes reach the explicit fail-closed cycle guard.
+
+The dmHash review also removed revision-wave partition arithmetic and allocation
+claims from the family report: the aggregate exact plan now owns the current
+566/74/721 partition, while zero warmed C++ allocations remain runtime-test
+evidence only. Update lengths above `INT32_MAX` fail before Defold's signed cast;
+the generated corpus now verifies reverse-hash Init, cloned state, transported
+UpdateBuffer bytes, and consumes every temporary registry slot. Dense IDs and
+fake counters derive from the same code-unit-sorted entry set. Both generator
+check modes use OS temporary directories, so interrupted multi-agent checks no
+longer leave repository-root residue.
+
 ## 2026-09-21 - Generated dmSDK fast-path wave expands and ships
 
 The borrowed-handle generator now admits 158 of 348 structurally compatible
@@ -1276,8 +1305,10 @@ the authoritative input the generator already requires.
 
 ## 2026-09-21
 
+* **dmSDK hash-state lifecycle wave**: Added a structural, revision- and archive-evidence-gated generator for all ten `dmHash{Init,Clone,UpdateBuffer,Final,Release}{32,64}` declarations. It emits a fixed-capacity-per-width, generation-tagged opaque-handle registry; stale, foreign, exhausted, double-consumed, malformed, and irrelevant uniform-dispatch arguments fail closed without raw pointer exposure. The generated exact twin compiles and runs under ASan/UBSan and observes zero C++ allocations across 100,000 warmed iterations. This is exact bridge/native ABI evidence, not packaged-engine implementation semantics. The aggregate dmSDK recipe partition is now 566 universal-ready, 74 callable generated-adapter, and 721 specialization-required; the arena ledger is 14 prior-wave, five C-string arena, and 60 explicitly blocked declarations with zero overlap/unaccounted rows.
+
 * **Static script exact-call wave**: Generator-owned sound-typed Static Hermes callers now execute 127 `defold-value` script routes through the production universal frame and native adapter, moving Static exact coverage to 130/328 and the cross-target exact matrix to 1,960/2,158. Constructors and result predicates consume the interned canonical vector tokens; target/lane ownership, arity, frame capacities, required Matrix4/URL arenas, and release policy fail closed before a vector counts. Verification-only value inspectors are emitted only into the build-directory runner and do not enlarge the production Static transport. The 127-vector executable also passes a repeatable ASan/UBSan build and run. This is compiler/link/runtime evidence for generated call identity, argument/result shape, and transport behavior; it is not a claim that every Defold engine implementation was behavior-tested in a live game.
-* **dmSDK bounded C-string adapters**: Promoted five declarations across four structural recipes into allocation-bounded generated adapters while retaining universal fallbacks for all declarations. The current 1,361-declaration partition is 566 universal-ready, 64 callable generated-adapter, and 731 specialization-required. Exact generation now rejects any production/report adapter-identity disagreement and hashes all nine family reports instead of correcting a stale production route. Arena admission consumes revision-matched all-target symbol evidence; both exact drivers verify native result, visible output length, NUL-inclusive required length, and zeroed state on native failure. Native exact vectors pass 64/64, ASan/UBSan passes, and 100,000 warmed adapter calls request zero C++ allocations; those results do not promote the remaining specialization-required declarations to adapter-executed evidence.
+* **dmSDK bounded C-string adapters**: Promoted five declarations across four structural recipes into allocation-bounded generated adapters while retaining universal fallbacks for all declarations. At that wave's close, the 1,361-declaration partition was 566 universal-ready, 64 callable generated-adapter, and 731 specialization-required. Exact generation now rejects any production/report adapter-identity disagreement and hashes all nine family reports instead of correcting a stale production route. Arena admission consumes revision-matched all-target symbol evidence; both exact drivers verify native result, visible output length, NUL-inclusive required length, and zeroed state on native failure. Native exact vectors pass 64/64, ASan/UBSan passes, and 100,000 warmed adapter calls request zero C++ allocations; those results do not promote the remaining specialization-required declarations to adapter-executed evidence.
 * **Source/linkage contradiction handling**: `ProfilePropertyAddBool` remains in the public TypeScript and universal recipe surface, but its optimized named-scalar adapter is machine-blocked because the pinned headers declare it while shipped symbol evidence reports no linked implementation. The generator now requires revision-matched symbol evidence for that adapter family, and issue [#117](https://github.com/ts-defold/deherm/issues/117) tracks the upstream contradiction instead of suppressing the API or failing unrelated policy publication.
 * **Integrated runtime and CI closure**: The Static Hermes lifecycle build now uses the direct sound `-typed` frontend; its universal probe chooses a generated frame with the required bounded table/Matrix4/URL capacity. Runtime-smoke TypeScript inherits the root revision-derived SDK aliases. The end-to-end extension-header job installs the pinned pnpm dependency graph before staging Hermes headers. Local `pnpm check` and `pnpm test:static-hermes` pass; the CI workflow changes remain unproven on a fresh hosted runner until the pushed workflow completes.
 * **Bounded OKF metadata retrieval**: Extended the existing disposable SQLite knowledge index with top-level structured frontmatter metadata and a bounded `knowledge:metadata` command. The source Markdown remains authoritative; schema changes rebuild the cache, cells and responses are size-limited, and truncation backs up to a complete UTF-8 code-point boundary before adding its ellipsis. The 15-test graph suite covers metadata, sections, outlines, and read-only SQL with two-, three-, and four-byte text. Nested YAML and full Markdown AST semantics remain intentionally outside this deterministic projection.

@@ -120,10 +120,24 @@ not implement. The native observer checks the target stable ID, ordered
 arguments, arity, result decode, violation count, and 127/127 runtime census,
 and the same executable has a repeatable ASan/UBSan package gate. Per-route
 negative exhaustion remains bounded-frame evidence rather than a claim of this
-happy-path census. The matrix is now
-1,960/2,158: Static is 130/328, with 198 emitted rows remaining across scalar
-(90), Lua-table (70), dynamic-values (14), multi-result (12), and
-overload-dispatch (12). Non-emitted Static rows remain applicability, not debt.
+happy-path census. The scalar expansion reuses that exact generated Static
+transport rather than adding a second scalar ABI: all 90 scalar routes are
+selected from the same recording IR, encoded into the same bounded frame,
+dispatched through the production bridge, and checked by the recording
+provider. Their contracts are primitive-only (no table-entry, Matrix4, or URL
+scratch), while the normal frame's existing reentrancy and bounds checks remain
+authoritative. The scalar wave's native exact unit executed 217 routes (127
+`defold-value` plus 90 `scalar`). The tail expansion now uses one recursive
+shape-tree plan for Lua-table records, sequences, and maps, separates driven
+arity from the larger dynamic/overload frame capacity, and checks ordered
+multi-results. The same generated unit executes all 325 Static-emitted
+universal routes: Lua-table 70, dynamic-values 14, multi-result 12, and
+overload-dispatch 12 join the earlier 217. Its normal and ASan/UBSan targets
+pass with zero recording violations or result mismatches. The emitted-target
+matrix is now 2,158/2,158: Static is 328/328 including the three timer routes.
+This exact runner does not instrument allocations, execute Defold
+implementation semantics, or prove every dynamic/overload alternative.
+Non-emitted Static rows remain applicability, not debt.
 
 The remaining eleven script routes now have their own generated exact-call
 report and C verification header. The emitter exact-set joins the accounting
@@ -201,15 +215,19 @@ unresolved call until a mechanically modeled indirect-call contract exists.
 
 The checker manifest proves total declaration selection and classifies the
 executable lowering at the call site. Of the current 1,361 recipes, 566 are
-universal-ready from declaration identity alone, 64 have a concrete callable
-generated-adapter route, and 731 require specialization. The 64 callable rows
-are 45 named wrappers, 14 stable-ID C-string family-dispatch rows, and five
-bounded arena C-string rows. Their
+universal-ready from declaration identity alone, 74 have a concrete callable
+generated-adapter route, and 721 require specialization. The 74 callable rows
+are 26 scalar, seven enum-value, fourteen C-string/value, five bounded arena
+C-string, four fixed-digest, two each hash-span/base64-span/XTEA/ASTC-probe,
+and ten generation-tagged hash-state routes. The generic projection's 45-row
+`generated-adapter` classifier remains a separate structural state; the
+family reports add a preferred exact route without suppressing its universal
+fallback. Their
 shared concrete-call plan authenticates declaration, recipe, family, wrapper or
 dispatcher identity, header, and dense family ID, and the materializer emits a
 linker-retention source and manifest for only the reached rows. Another seven
 preferred adapter rows retain their generated provider-boundary blockers; they
-are not promoted merely because source exists. The remaining 724 rows require
+are not promoted merely because source exists. The remaining 714 rows require
 call-site facts such as template arguments, receiver types, callback contracts,
 or layout/storage policy. All declarations remain generated and addressable.
 Release checking rejects a reached specialization-required declaration at its
@@ -307,7 +325,7 @@ one atomic output set. Callback-tagged vectors remain explicitly unsupported
 rather than being counted as executed. Callable generated-adapter rows are
 retained by their concrete plan and continue to rely on their family-owned
 exact-call tests until those family vectors are normalized into the shared JSI
-runner. The 731 specialization-required recipes remain selected only when a
+runner. The 721 specialization-required recipes remain selected only when a
 release program supplies their missing call-site facts.
 
 The Static Hermes lane uses a generated, thread-local four-frame pool rather

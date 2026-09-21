@@ -2,16 +2,17 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "0b217c772541014c2406aaa84d3bd8a00bd46e71fb6dda56c8acff6b911f8cee",
+    "projection": "bbe895d62582cc9f1955d619b5b879d75be7bf6b572c38d8553300e7edace0c0",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "specialized": {
-      "arenaCString": "84e3101830f4b069e576d781e0829b7ea9182c6fe5d4a4888ad69b62578b0b22",
-      "borrowedHandle": "fdc27d455c11356ed5c6a715ce447eb8e2df05ee27d73bb1f3ca9b4f6c02b466",
-      "scratchScalarOut": "f7a2c92ca62be9c057ca1db3cb1b27f4a0dc6fffac93bd559f99f3b210987869",
-      "cstringValue": "a66ab28e8a0dac5ab0daee4911391921312e3d3479e42464d19d4b41c20c8f5d"
+      "arenaCString": "5d7e4def887574e34fae8e9ed880a90ebf45ba6c05dfca97552b79ae10f3b845",
+      "borrowedHandle": "7459b5c12d36645320a3c8401b7bf02f326c584af86e9ff1bf8329f753510937",
+      "scratchScalarOut": "2d162ae8d2b3632533b9656e5d9616063b1e6210690650193996bd1be2348990",
+      "cstringValue": "e68a58450d6bbc6a242ef1acf6f96269e87a6e709a65d98de2b4ddfc91a41f07",
+      "hashState": "66325311eeb4c07d867e021b32c00cb2036a84cb4b9725ac3eddcb581e6c93b9"
     },
-    "aggregate": "4fcdb39a84044e70db8a67cd26f096fefa8b0a57dc16851c1b4a45daf59d83d0",
-    "catalog": "e022158624fd769c4be6e957e86b8cd91c740626c5da625b738e4089de2cc571"
+    "aggregate": "3cf232cfd4e805401a4b03e5e7c64fa1ad45c4d6c0eebef62f177f6152f970f1",
+    "catalog": "be7d6d8bf8563cd052e57a96346fd025e61f3798ee3189d0a7a0cd731e1016f2"
   },
   "coverage": {
     "declarations": 1361,
@@ -22,8 +23,8 @@
     "browserDirectMemoryMetadata": 1361,
     "typescriptStableIds": 1361,
     "silentlyOmitted": 0,
-    "preferredSpecialized": 71,
-    "usageMaterializedFallback": 1290,
+    "preferredSpecialized": 81,
+    "usageMaterializedFallback": 1280,
     "universalReadyExactVectors": 566
   },
   "abi": {
@@ -85585,8 +85586,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 0,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -85708,8 +85717,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 1,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -85800,8 +85817,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 2,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -85892,8 +85917,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 3,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -85995,8 +86028,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 4,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -86098,8 +86139,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 5,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -86189,8 +86238,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 6,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -86280,8 +86337,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 7,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -89322,8 +89387,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 8,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",
@@ -89444,8 +89517,16 @@
         }
       },
       "preferredLowering": {
-        "state": "universal-fallback",
-        "family": "universal-recipe"
+        "state": "generated-adapter",
+        "family": "hashState",
+        "wrapper": null,
+        "adapter": {
+          "applicability": "callable",
+          "kind": "family-dispatch",
+          "id": 9,
+          "dispatcher": "deherm_dmsdk_hash_state_dispatch",
+          "blockers": []
+        }
       },
       "fallback": {
         "state": "materializable",

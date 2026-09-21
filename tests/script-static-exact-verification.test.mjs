@@ -5,6 +5,7 @@ import test from "node:test";
 import {
   auditStaticScriptExactFamilies,
   materializeStaticScriptExactVectors,
+  planStaticScriptExactValue,
 } from "../packages/compiler/src/script-static-exact-verification.mjs";
 import { renderStaticHermes } from "../scripts/generate-script-universal-value-bindings.mjs";
 import { staticScriptExactVerificationGenerator } from "../scripts/lib/script-generator-pipeline.mjs";
@@ -30,22 +31,38 @@ function firstImplementedRoute(candidate, predicate = () => true) {
   return route;
 }
 
+function firstFamilyRoute(candidate, family, predicate = () => true) {
+  const target = candidate.applicabilityCatalog.targets.indexOf("static-hermes");
+  const lanes = new Map(candidate.applicabilityCatalog.lanes.map((lane) => [lane.id, lane]));
+  const route = candidate.routes.find((row) => row.loweringFamily === family &&
+    lanes.get(row.applicability[target])?.status === "exercise" && predicate(row));
+  assert.ok(route, `test fixture has no matching Static Hermes ${family} route`);
+  return route;
+}
+
 function contractFor(candidate, route) {
   const contract = candidate.exactVectorCatalog.vectors.find(({ id }) => id === route.exactVector.contract);
   assert.ok(contract, `${route.id}: test fixture contract missing`);
   return contract;
 }
 
-test("the emitted three-target matrix excludes compiler-only routes and names the largest missing family", () => {
+function emittedTargetCount(target) {
+  return recording.applicabilityCatalog.lanes
+    .filter((lane) => lane.target === target && lane.status === "exercise")
+    .reduce((sum, lane) => sum + lane.routeCount, 0) + special.counts.separateModule;
+}
+
+test("the emitted three-target matrix excludes compiler-only routes and closes every Static family", () => {
   assert.equal(accounting.functionCount, 926);
   assert.equal(recording.summary.routeCount + special.counts.total, 926);
   assert.equal(special.counts.componentPropertyCompiler, 8);
   assert.equal(special.counts.separateModule, 3);
 
   const before = {
-    dynamicHermes: { emitted: 913 + 3, exact: 913 + 3, missing: 0 },
-    staticHermes: { emitted: 325 + 3, exact: 3, missing: 325 },
-    browserWasm: { emitted: 911 + 3, exact: 911 + 3, missing: 0 },
+    dynamicHermes: { emitted: emittedTargetCount("dynamic-hermes"), exact: emittedTargetCount("dynamic-hermes"), missing: 0 },
+    staticHermes: { emitted: emittedTargetCount("static-hermes"), exact: special.counts.separateModule,
+      missing: emittedTargetCount("static-hermes") - special.counts.separateModule },
+    browserWasm: { emitted: emittedTargetCount("browser-wasm"), exact: emittedTargetCount("browser-wasm"), missing: 0 },
   };
   assert.deepEqual(before, {
     dynamicHermes: { emitted: 916, exact: 916, missing: 0 },
@@ -57,36 +74,75 @@ test("the emitted three-target matrix excludes compiler-only routes and names th
   assert.deepEqual(families.map(({ family, emittedRouteCount, exactVectorCount, missingVectorCount }) =>
     ({ family, emittedRouteCount, exactVectorCount, missingVectorCount })), [
     { family: "defold-value", emittedRouteCount: 127, exactVectorCount: 127, missingVectorCount: 0 },
-    { family: "scalar", emittedRouteCount: 90, exactVectorCount: 0, missingVectorCount: 90 },
-    { family: "lua-table", emittedRouteCount: 70, exactVectorCount: 0, missingVectorCount: 70 },
-    { family: "dynamic-values", emittedRouteCount: 14, exactVectorCount: 0, missingVectorCount: 14 },
-    { family: "multi-result", emittedRouteCount: 12, exactVectorCount: 0, missingVectorCount: 12 },
-    { family: "overload-dispatch", emittedRouteCount: 12, exactVectorCount: 0, missingVectorCount: 12 },
+    { family: "scalar", emittedRouteCount: 90, exactVectorCount: 90, missingVectorCount: 0 },
+    { family: "lua-table", emittedRouteCount: 70, exactVectorCount: 70, missingVectorCount: 0 },
+    { family: "dynamic-values", emittedRouteCount: 14, exactVectorCount: 14, missingVectorCount: 0 },
+    { family: "multi-result", emittedRouteCount: 12, exactVectorCount: 12, missingVectorCount: 0 },
+    { family: "overload-dispatch", emittedRouteCount: 12, exactVectorCount: 12, missingVectorCount: 0 },
   ]);
 });
 
-test("Static Hermes defold-value vectors are generator-owned and complete", () => {
+test("all Static Hermes vectors are generator-owned and complete", () => {
   const { report, vectors } = materializeStaticScriptExactVectors(recording);
   assert.equal(report.transport, "static-hermes-typed-native");
-  assert.equal(report.family, "defold-value");
-  assert.equal(report.emittedRouteCount, 127);
-  assert.equal(report.exactVectorCount, 127);
+  assert.deepEqual(report.implementedFamilies, [
+    "defold-value", "scalar", "lua-table", "dynamic-values", "multi-result", "overload-dispatch"
+  ]);
+  assert.equal(report.emittedRouteCount, 325);
+  assert.equal(report.exactVectorCount, 325);
   assert.match(report.vectorSha256, /^[0-9a-f]{64}$/);
-  assert.equal(vectors.length, 127);
-  assert.equal(new Set(vectors.map(({ id }) => id)).size, 127);
+  assert.equal(vectors.length, 325);
+  assert.equal(new Set(vectors.map(({ id }) => id)).size, 325);
   assert.ok(vectors.every(({ loweringFamily, argumentShapes, resultShapes, argumentValues, resultValues }) =>
-    loweringFamily === "defold-value" &&
+    report.implementedFamilies.includes(loweringFamily) &&
     argumentShapes.length === argumentValues.length &&
     resultShapes.length === resultValues.length));
+  assert.deepEqual(Object.fromEntries(report.implementedFamilies.map((family) => [
+    family, vectors.filter(({ loweringFamily }) => loweringFamily === family).length
+  ])), {
+    "defold-value": 127,
+    scalar: 90,
+    "lua-table": 70,
+    "dynamic-values": 14,
+    "multi-result": 12,
+    "overload-dispatch": 12,
+  });
+  const scalar = vectors.filter(({ loweringFamily }) => loweringFamily === "scalar");
+  assert.ok(scalar.every(({ bounds }) =>
+    bounds.inputEntryCapacity === 0 && bounds.outputEntryCapacity === 0 &&
+    !bounds.matrix4Arena && !bounds.urlArena));
+  assert.match(report.evidenceBoundary, /does not .*instrument allocator calls/u);
 
   const after = {
-    dynamicHermes: { emitted: 916, exact: 916, missing: 0 },
-    staticHermes: { emitted: 328, exact: 130, missing: 198 },
-    browserWasm: { emitted: 914, exact: 914, missing: 0 },
+    dynamicHermes: { emitted: emittedTargetCount("dynamic-hermes"), exact: emittedTargetCount("dynamic-hermes"), missing: 0 },
+    staticHermes: { emitted: emittedTargetCount("static-hermes"), exact: report.exactVectorCount + special.counts.separateModule, missing: 0 },
+    browserWasm: { emitted: emittedTargetCount("browser-wasm"), exact: emittedTargetCount("browser-wasm"), missing: 0 },
   };
   assert.equal(Object.values(after).reduce((sum, row) => sum + row.emitted, 0), 2158);
-  assert.equal(Object.values(after).reduce((sum, row) => sum + row.exact, 0), 1960);
-  assert.equal(Object.values(after).reduce((sum, row) => sum + row.missing, 0), 198);
+  assert.equal(Object.values(after).reduce((sum, row) => sum + row.exact, 0), 2158);
+  assert.equal(Object.values(after).reduce((sum, row) => sum + row.missing, 0), 0);
+});
+
+test("recursive exact plans preserve container kind, keys, and canonical child sentinels", () => {
+  const route = firstFamilyRoute(recording, "lua-table", ({ resultShapes }) =>
+    resultShapes.some((index) => recording.shapes[index].code === 15 &&
+      recording.shapes[index].children.length > 0));
+  const plan = planStaticScriptExactValue(recording, route.resultShapes[0], 257);
+  assert.equal(plan.kind, "record");
+  assert.ok(plan.fields.length > 0);
+  assert.deepEqual(plan.fields.map(({ key }) => key),
+    recording.shapes[route.resultShapes[0]].children.map((index) => recording.shapes[index].keyText));
+  assert.equal(plan.specification, contractFor(recording, route).resultValues[0]);
+});
+
+test("recursive exact plans reject a cyclic shape with the declared fail-closed error", () => {
+  const mutation = cloneRecording();
+  const route = firstFamilyRoute(mutation, "lua-table", ({ resultShapes }) =>
+    resultShapes.some((index) => [14, 15, 16].includes(mutation.shapes[index].code)));
+  const shapeIndex = route.resultShapes.find((index) => [14, 15, 16].includes(mutation.shapes[index].code));
+  mutation.shapes[shapeIndex].children = [shapeIndex];
+  assert.throws(() => planStaticScriptExactValue(mutation, shapeIndex, 257),
+    new RegExp(`Static Hermes exact shape ${shapeIndex} is cyclic`));
 });
 
 test("Static exact generation fails closed on applicability lane corruption", () => {
@@ -108,6 +164,20 @@ test("Static exact generation fails closed on applicability lane corruption", ()
     ({ id }) => id === wrongLaneRoute.applicability[targetIndex]);
   selected.lane = "browser-wasm-direct-memory";
   assert.throws(() => auditStaticScriptExactFamilies(wrongLane), /expected static-hermes-typed-native/);
+
+  const wrongCensus = cloneRecording();
+  const exerciseLane = wrongCensus.applicabilityCatalog.lanes.find(({ target, status }) =>
+    target === "static-hermes" && status === "exercise");
+  exerciseLane.routeCount -= 1;
+  assert.throws(() => auditStaticScriptExactFamilies(wrongCensus), /differs from applicability lanes/);
+});
+
+test("Static exact generation rejects an exercised lowering family without an emitter", () => {
+  const mutation = cloneRecording();
+  const route = firstFamilyRoute(mutation, "multi-result");
+  route.loweringFamily = "future-family";
+  assert.throws(() => materializeStaticScriptExactVectors(mutation),
+    /no emitter for exercised families: future-family\(1\)/);
 });
 
 test("Static exact generation rejects value, frame-bound, arena, and release drift", () => {
@@ -120,6 +190,19 @@ test("Static exact generation rejects value, frame-bound, arena, and release dri
   const capacityRoute = firstImplementedRoute(capacityMutation);
   contractFor(capacityMutation, capacityRoute).bounds.argumentCapacity += 1;
   assert.throws(() => materializeStaticScriptExactVectors(capacityMutation), /argument capacity drifted/);
+
+  const tableCapacityMutation = cloneRecording();
+  const tableCapacityRoute = firstFamilyRoute(tableCapacityMutation, "lua-table", ({ argumentShapes }) =>
+    argumentShapes.some((index) => [14, 15, 16].includes(tableCapacityMutation.shapes[index].code)));
+  contractFor(tableCapacityMutation, tableCapacityRoute).bounds.inputEntryCapacity = 255;
+  assert.throws(() => materializeStaticScriptExactVectors(tableCapacityMutation),
+    /table-entry capacity drifted/);
+
+  const recursiveMutation = cloneRecording();
+  const recursiveRoute = firstFamilyRoute(recursiveMutation, "lua-table", ({ resultShapes }) =>
+    resultShapes.some((index) => [14, 15, 16].includes(recursiveMutation.shapes[index].code)));
+  contractFor(recursiveMutation, recursiveRoute).resultValues[0] = "rec(corrupt=num:1)";
+  assert.throws(() => materializeStaticScriptExactVectors(recursiveMutation), /exact result value drifted/);
 
   const arenaMutation = cloneRecording();
   const arenaRoute = firstImplementedRoute(arenaMutation, ({ argumentShapes, resultShapes }) =>
@@ -135,11 +218,16 @@ test("Static exact generation rejects value, frame-bound, arena, and release dri
 
 test("verification accessors exist only in the build-flavored Static transport", () => {
   assert.equal(renderStaticHermes(layouts), productionStaticTransport);
-  assert.doesNotMatch(productionStaticTransport, /exact(?:Tag|Number|String)\(/u);
+  assert.doesNotMatch(productionStaticTransport,
+    /exact(?:Tag|Number|String|Length|KeyString|Key|Value)\(/u);
   const verificationTransport = renderStaticHermes(layouts, { verification: true });
   assert.match(verificationTransport, /exactTag\(\):number/u);
   assert.match(verificationTransport, /exactNumber\(slot:number\):number/u);
   assert.match(verificationTransport, /exactString\(\):string/u);
+  assert.match(verificationTransport, /exactLength\(\):number/u);
+  assert.match(verificationTransport, /exactKeyString\(slot:number\):string/u);
+  assert.match(verificationTransport, /exactKey\(slot:number\):DehermStaticValue/u);
+  assert.match(verificationTransport, /exactValue\(slot:number\):DehermStaticValue/u);
 });
 
 test("build-only Static exact verification owns executable normal and sanitizer checks", () => {

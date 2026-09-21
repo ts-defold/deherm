@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -22,6 +23,7 @@ const reportPaths = Object.freeze({
   xteaSpan: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
   astcProbe: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
   cstringValue: "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
+  hashState: "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
 });
 const dispatchers = Object.freeze({
   arenaCString: "deherm_dmsdk_arena_cstring_dispatch",
@@ -33,6 +35,7 @@ const dispatchers = Object.freeze({
   xteaSpan: "deherm_dmsdk_xtea_span_dispatch",
   astcProbe: "deherm_dmsdk_astc_probe_dispatch",
   cstringValue: "deherm_dmsdk_cstring_value_dispatch",
+  hashState: "deherm_dmsdk_hash_state_dispatch",
 });
 
 function sha256(value) {
@@ -101,6 +104,8 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
         digestBytes: declaration.digestBytes ?? null,
         resultBits: declaration.resultBits ?? null,
         mode: declaration.mode ?? declaration.recipe?.kind ?? null,
+        operation: declaration.operation ?? null,
+        width: declaration.width ?? null,
       });
     }
   }
@@ -141,6 +146,8 @@ export async function buildDmSdkGeneratedAdapterExact({ root = repositoryRoot, o
           digestBytes: route.digestBytes,
           resultBits: route.resultBits,
           mode: route.mode,
+          operation: route.operation,
+          width: route.width,
           blockers: [],
         },
       },
@@ -193,7 +200,7 @@ export async function run(argv = process.argv.slice(2)) {
     process.stdout.write(`Generated ${result.report.generatedAdapterCount} dmSDK generated-adapter exact vectors from ${result.report.recipeCount} recipes.\n`);
     return result;
   }
-  const temporary = path.join(options.outRoot, `.dmsdk-generated-adapter-exact-${process.pid}`);
+  const temporary = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-generated-adapter-exact-"));
   try {
     const result = await buildDmSdkGeneratedAdapterExact({ outRoot: temporary });
     for (const relative of Object.values(dmSdkGeneratedAdapterCorpusArtifacts)) {

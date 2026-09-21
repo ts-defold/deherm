@@ -1,0 +1,507 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "hash-state-v1",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "packages/bindings/generated/defold-sdk-ir.json",
+    "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "symbols": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+    "policy": "packages/bindings/overrides/dmsdk-hash-state-bindings.json"
+  },
+  "sourceHashes": {
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "symbols": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+    "policy": "a57bd04d8e5cbefaaf354e8fdba7a9a3a43aff35e8636dfbdcd69e6697c864a1"
+  },
+  "policy": {
+    "schemaVersion": 1,
+    "policyVersion": "hash-state-v1",
+    "family": "generation-checked-hash-state",
+    "candidateSelector": {
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "symbolPattern": "^dmHash(?:Init|Clone|UpdateBuffer|Final|Release)(?:32|64)$",
+      "operations": [
+        "Init",
+        "Clone",
+        "UpdateBuffer",
+        "Final",
+        "Release"
+      ],
+      "widths": [
+        32,
+        64
+      ],
+      "expectedCount": 10
+    },
+    "registry": {
+      "capacityPerWidth": 16,
+      "token": "opaque-u64-magic-width-generation-slot",
+      "generationBits": 31,
+      "consumeOperations": [
+        "Final",
+        "Release"
+      ],
+      "reverseHashDefault": false,
+      "threadSafety": "global-allocation-free-spin-lock",
+      "generationExhaustion": "retire-slot"
+    },
+    "symbolEvidence": {
+      "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+      "requiredLinkage": "external",
+      "requiredAvailability": "all-targets-all-variants"
+    }
+  },
+  "coverage": {
+    "discovered": 10,
+    "generated": 10,
+    "registryCapacityPerWidth": 16,
+    "exactFixtureCount": 10
+  },
+  "artifacts": [
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_state.h",
+    "defold/defold_hermes/src/generated_dmsdk_hash_state.cpp",
+    "tests/fixtures/generated_dmsdk_hash_state_exact.cpp"
+  ],
+  "artifactHashes": {
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_state.h": "fa8817bdffc449a3dfc3624c8a6b16006ba09d5c8241a06031ff332af7ea1e10",
+    "defold/defold_hermes/src/generated_dmsdk_hash_state.cpp": "819fd13607ae78ae18092ad024b080139a49a3906a2e8520298df20942efc846",
+    "tests/fixtures/generated_dmsdk_hash_state_exact.cpp": "f471fceab8092aa7037be2578f53298967ff83ca3052c7dfaf796dfacda33170"
+  },
+  "declarations": [
+    {
+      "id": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
+      "symbol": "dmHashClone32",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 214,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState32,in:pointer:record:HashState32,value:scalar:bool)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState32",
+          "direction": "inout",
+          "nativeType": "HashState32 *"
+        },
+        {
+          "position": 1,
+          "name": "source_hash_state",
+          "role": "pointer:record:HashState32",
+          "direction": "in",
+          "nativeType": "const HashState32 *"
+        },
+        {
+          "position": 2,
+          "name": "reverse_hash",
+          "role": "scalar:bool",
+          "direction": "value",
+          "nativeType": "bool"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 0,
+      "operation": "Clone",
+      "width": 32,
+      "disposition": "generated",
+      "wrapper": "dmHashClone32"
+    },
+    {
+      "id": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
+      "symbol": "dmHashClone64",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 256,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState64,in:pointer:record:HashState64,value:scalar:bool)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState64",
+          "direction": "inout",
+          "nativeType": "HashState64 *"
+        },
+        {
+          "position": 1,
+          "name": "source_hash_state",
+          "role": "pointer:record:HashState64",
+          "direction": "in",
+          "nativeType": "const HashState64 *"
+        },
+        {
+          "position": 2,
+          "name": "reverse_hash",
+          "role": "scalar:bool",
+          "direction": "value",
+          "nativeType": "bool"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 1,
+      "operation": "Clone",
+      "width": 64,
+      "disposition": "generated",
+      "wrapper": "dmHashClone64"
+    },
+    {
+      "id": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
+      "symbol": "dmHashFinal32",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 231,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:u32(inout:pointer:record:HashState32)",
+      "result": {
+        "role": "scalar:u32",
+        "direction": "value",
+        "nativeType": "uint32_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState32",
+          "direction": "inout",
+          "nativeType": "HashState32 *"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 2,
+      "operation": "Final",
+      "width": 32,
+      "disposition": "generated",
+      "wrapper": "dmHashFinal32"
+    },
+    {
+      "id": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
+      "symbol": "dmHashFinal64",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 273,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:u64(inout:pointer:record:HashState64)",
+      "result": {
+        "role": "scalar:u64",
+        "direction": "value",
+        "nativeType": "uint64_t"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState64",
+          "direction": "inout",
+          "nativeType": "HashState64 *"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 3,
+      "operation": "Final",
+      "width": 64,
+      "disposition": "generated",
+      "wrapper": "dmHashFinal64"
+    },
+    {
+      "id": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
+      "symbol": "dmHashInit32",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 204,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState32,value:scalar:bool)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState32",
+          "direction": "inout",
+          "nativeType": "HashState32 *"
+        },
+        {
+          "position": 1,
+          "name": "reverse_hash",
+          "role": "scalar:bool",
+          "direction": "value",
+          "nativeType": "bool"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 4,
+      "operation": "Init",
+      "width": 32,
+      "disposition": "generated",
+      "wrapper": "dmHashInit32"
+    },
+    {
+      "id": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
+      "symbol": "dmHashInit64",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 247,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState64,value:scalar:bool)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState64",
+          "direction": "inout",
+          "nativeType": "HashState64 *"
+        },
+        {
+          "position": 1,
+          "name": "reverse_hash",
+          "role": "scalar:bool",
+          "direction": "value",
+          "nativeType": "bool"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 5,
+      "operation": "Init",
+      "width": 64,
+      "disposition": "generated",
+      "wrapper": "dmHashInit64"
+    },
+    {
+      "id": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
+      "symbol": "dmHashRelease32",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 239,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState32)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState32",
+          "direction": "inout",
+          "nativeType": "HashState32 *"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 6,
+      "operation": "Release",
+      "width": 32,
+      "disposition": "generated",
+      "wrapper": "dmHashRelease32"
+    },
+    {
+      "id": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
+      "symbol": "dmHashRelease64",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 281,
+      "primaryFamily": "pointer",
+      "families": [
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState64)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState64",
+          "direction": "inout",
+          "nativeType": "HashState64 *"
+        }
+      ],
+      "tranche": "pointer-lifetime-adapters",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy"
+      ],
+      "denseId": 7,
+      "operation": "Release",
+      "width": 64,
+      "disposition": "generated",
+      "wrapper": "dmHashRelease64"
+    },
+    {
+      "id": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
+      "symbol": "dmHashUpdateBuffer32",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 223,
+      "primaryFamily": "pointer-span",
+      "families": [
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState32,in:opaque-pointer,value:scalar:u32)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState32",
+          "direction": "inout",
+          "nativeType": "HashState32 *"
+        },
+        {
+          "position": 1,
+          "name": "buffer",
+          "role": "opaque-pointer",
+          "direction": "in",
+          "nativeType": "const void *"
+        },
+        {
+          "position": 2,
+          "name": "buffer_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "denseId": 8,
+      "operation": "UpdateBuffer",
+      "width": 32,
+      "disposition": "generated",
+      "wrapper": "dmHashUpdateBuffer32"
+    },
+    {
+      "id": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
+      "symbol": "dmHashUpdateBuffer64",
+      "kind": "function",
+      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+      "line": 265,
+      "primaryFamily": "pointer-span",
+      "families": [
+        "pointer-span",
+        "pointer"
+      ],
+      "shape": "scalar:void(inout:pointer:record:HashState64,in:opaque-pointer,value:scalar:u32)",
+      "result": {
+        "role": "scalar:void",
+        "direction": "value",
+        "nativeType": "void"
+      },
+      "parameters": [
+        {
+          "position": 0,
+          "name": "hash_state",
+          "role": "pointer:record:HashState64",
+          "direction": "inout",
+          "nativeType": "HashState64 *"
+        },
+        {
+          "position": 1,
+          "name": "buffer",
+          "role": "opaque-pointer",
+          "direction": "in",
+          "nativeType": "const void *"
+        },
+        {
+          "position": 2,
+          "name": "buffer_len",
+          "role": "scalar:u32",
+          "direction": "value",
+          "nativeType": "uint32_t"
+        }
+      ],
+      "tranche": "arena-backed-spans",
+      "blockers": [
+        "native-symbol-linkage-unverified",
+        "pointer-bounds-direction-lifetime-policy",
+        "span-element-unit-and-copy-policy"
+      ],
+      "denseId": 9,
+      "operation": "UpdateBuffer",
+      "width": 64,
+      "disposition": "generated",
+      "wrapper": "dmHashUpdateBuffer64"
+    }
+  ]
+}

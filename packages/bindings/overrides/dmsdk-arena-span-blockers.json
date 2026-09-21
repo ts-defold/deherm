@@ -23,6 +23,10 @@
     {
       "path": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
       "policyVersion": "hash-span-v1"
+    },
+    {
+      "path": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
+      "policyVersion": "hash-state-v1"
     }
   ],
   "coveredByPriorWaves": [
@@ -37,18 +41,20 @@
     "dmCrypt::Encrypt",
     "dmCrypt::Decrypt",
     "dmHashBuffer32",
-    "dmHashBuffer64"
+    "dmHashBuffer64",
+    "dmHashUpdateBuffer32",
+    "dmHashUpdateBuffer64"
   ],
   "expectedCoverage": {
     "arenaSpanCensus": 79,
-    "coveredByPriorWaves": 12,
+    "coveredByPriorWaves": 14,
     "generatedCStringArena": 5,
-    "blocked": 62
+    "blocked": 60
   },
   "expectedPartitionSummary": {
     "handle-provenance-or-engine-context": 33,
     "opaque-byte-pointee-unit-or-lifetime": 4,
-    "record-layout-or-borrowed-record-lifetime": 19,
+    "record-layout-or-borrowed-record-lifetime": 17,
     "template-element-layout-or-specialization": 6
   },
   "blockerDefinitions": {

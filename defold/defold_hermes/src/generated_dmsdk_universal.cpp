@@ -657,14 +657,14 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(649), UINT16_C(4), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(650), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(651), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
-  {UINT32_C(652), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(653), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(654), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(655), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(656), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(657), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(658), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(659), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(652), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(653), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(654), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(655), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(656), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(657), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(658), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(659), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(660), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(661), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(662), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
@@ -697,8 +697,8 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(689), UINT16_C(1), UINT8_C(2), UINT8_C(0)},
   {UINT32_C(690), UINT16_C(2), UINT8_C(2), UINT8_C(0)},
   {UINT32_C(691), UINT16_C(1), UINT8_C(2), UINT8_C(0)},
-  {UINT32_C(692), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(693), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(692), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(693), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(694), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(695), UINT16_C(5), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(696), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
@@ -1373,7 +1373,7 @@ void* g_context = nullptr;
 
 extern "C" {
 uint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(1361); }
-const char* deherm_dmsdk_universal_catalog_sha256(void) { return "e022158624fd769c4be6e957e86b8cd91c740626c5da625b738e4089de2cc571"; }
+const char* deherm_dmsdk_universal_catalog_sha256(void) { return "be7d6d8bf8563cd052e57a96346fd025e61f3798ee3189d0a7a0cd731e1016f2"; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {
   return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;

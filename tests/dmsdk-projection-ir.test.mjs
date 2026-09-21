@@ -36,10 +36,10 @@ test("all 1,361 declarations have unique identities, provenance, shapes, and eff
     unprojectedDeclarations: 0,
     silentUnknowns: 0,
     generatedAdapters: 45,
-    policyBlocked: 71,
+    policyBlocked: 69,
     mechanicallyProjected: 1361,
     projectionGaps: 0,
-    loweringPending: 1245,
+    loweringPending: 1247,
   });
   assert.equal(report.rows.length, 1361);
   assert.equal(new Set(report.rows.map(({ id }) => id)).size, 1361);
@@ -172,8 +172,8 @@ test("reconciles generated adapters and policy gates while projecting every pend
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   assert.deepEqual(report.loweringSummary, {
     "generated-adapter": 45,
-    "policy-blocked": 71,
-    "lowering-pending": 1245
+    "policy-blocked": 69,
+    "lowering-pending": 1247
   });
   const hash = report.rows.find(({ symbol }) => symbol === "dmHashBuffer64");
   assert.equal(hash.lowering.state, "generated-adapter");

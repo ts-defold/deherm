@@ -19,6 +19,9 @@ const uint16_t* candidateRouteOffsets() noexcept;
 const uint16_t* shapeArgumentOffsets() noexcept;
 const uint8_t* shapeArgumentCounts() noexcept;
 const Codec* argumentCodecs() noexcept;
+const int32_t* resultDomainValues() noexcept;
+const uint16_t* resultDomainOffsets() noexcept;
+const uint8_t* resultDomainCounts() noexcept;
 const Route* find(uint32_t stableId) noexcept;
 DispatchStatus dispatch(ScriptCallFrame*, char*, size_t, const LuaApi*) noexcept;
 }  // namespace defold_hermes::value_tail

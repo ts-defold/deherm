@@ -49,6 +49,26 @@ Lua stack top and prior Defold script instance are exact before and after.
 The browser test exercises the equivalent stable-ID/tagged memory layout and
 verifies that its stack scratch rewinds after both success and rejection.
 
+## Static Hermes exact-call twin
+
+The Static Hermes transport does not add a scalar-only C ABI. Its generated
+sound-typed caller encodes the 90 scalar routes into the same bounded universal
+frame used by the typed-native bridge, then dispatches their stable IDs through
+the production `ScriptCallFrame` seam. The generator selects those routes by
+`loweringFamily === "scalar"` from the recording IR and emits their exact
+arguments and result predicates alongside the existing 127 Defold-value
+vectors. The native recording provider therefore observes the same stable ID,
+ordered primitive values, arity, and decoded results that a production Static
+unit uses.
+
+The scalar wave's 217-route census had no scalar table-entry, Matrix4, or URL
+scratch requirement; however, it deliberately retained the production frame's
+fail-closed argument bound and reentrant frame-pool behavior. Its normal and
+ASan/UBSan executions prove the bridge contract and memory-safety gate. They do
+not instrument allocation calls or assert Defold implementation semantics for
+context-dependent calls. Warmed allocation evidence comes from the separate
+instrumented scalar runtime benchmark below.
+
 ## Reproduced source claims
 
 - `render.set_viewport` reads four integer stack slots with

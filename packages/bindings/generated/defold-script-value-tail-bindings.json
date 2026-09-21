@@ -14,7 +14,7 @@
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "valueBindingsSha256": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9",
     "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "reviewedPolicySha256": "0df5aec30d6294c8ca2627a3196c12ef27d8aee3d4e211957e2bff5d47da7a37",
+    "reviewedPolicySha256": "46ac7dac60e3a727c599ab003239fd74fd6d50ab8555a8f06e95472699321f22",
     "defoldSources": [
       {
         "path": "upstream/defold/engine/gameobject/src/gameobject/gameobject_script.cpp",
@@ -39,6 +39,10 @@
       {
         "path": "upstream/defold/engine/gui/src/gui_script.cpp",
         "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
+      },
+      {
+        "path": "upstream/defold/engine/liveupdate/src/liveupdate.h",
+        "sha256": "a5bb40dbf0e3972464195e8ac0bb58c035f78e5edf19ad9c634a79dcc2e22c3a"
       },
       {
         "path": "upstream/defold/engine/liveupdate/src/script_liveupdate.cpp",
@@ -664,6 +668,40 @@
         "sourceSignature": "dmLiveUpdate::Result result = dmLiveUpdate::RemoveMountSync(name_hash); lua_pushinteger(L, result)",
         "acceptedLuaType": "integer",
         "domain": "dmLiveUpdate::Result / exported LIVEUPDATE_* constants"
+      },
+      "resultDomain": {
+        "names": [
+          "RESULT_OK",
+          "RESULT_INVALID_HEADER",
+          "RESULT_MEM_ERROR",
+          "RESULT_INVALID_RESOURCE",
+          "RESULT_VERSION_MISMATCH",
+          "RESULT_ENGINE_VERSION_MISMATCH",
+          "RESULT_SIGNATURE_MISMATCH",
+          "RESULT_SCHEME_MISMATCH",
+          "RESULT_BUNDLED_RESOURCE_MISMATCH",
+          "RESULT_FORMAT_ERROR",
+          "RESULT_IO_ERROR",
+          "RESULT_INVAL",
+          "RESULT_NOT_INITIALIZED",
+          "RESULT_UNKNOWN"
+        ],
+        "values": [
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8,
+          -9,
+          -10,
+          -11,
+          -12,
+          -1000
+        ]
       }
     },
     {

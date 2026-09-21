@@ -51,6 +51,8 @@ int main() {
       if (deherm_recording_observed_arity(
               route, DEHERM_RECORDING_TRANSPORT_TYPED_NATIVE) !=
               deherm_static_script_exact_argument_count(vector) ||
+          deherm_recording_observed_context(
+              route, DEHERM_RECORDING_TRANSPORT_TYPED_NATIVE)[0] == '\0' ||
           std::strcmp(deherm_recording_observed_arguments(
                           route, DEHERM_RECORDING_TRANSPORT_TYPED_NATIVE),
                       deherm_static_script_exact_expected_arguments(vector)) != 0 ||
@@ -62,7 +64,7 @@ int main() {
       }
     }
     deherm_recording_uninstall();
-    std::printf("static-script-exact:%u-defold-value-routes:typed-native:ok\n",
+    std::printf("static-script-exact:%u-routes:all-static-emitted:typed-native:ok\n",
                 expected);
     return 0;
   } catch (const std::exception& error) {

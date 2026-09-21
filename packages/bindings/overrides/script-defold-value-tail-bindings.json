@@ -10,6 +10,7 @@
     { "key": "gui", "path": "engine/gui/src/gui_script.cpp", "sha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4" },
     { "key": "hash", "path": "engine/script/src/script_hash.cpp", "sha256": "0d76c65543191cc9866615ba37109e77f430a216c98dedf474d4f546f9f9ed10" },
     { "key": "liveupdate", "path": "engine/liveupdate/src/script_liveupdate.cpp", "sha256": "c22228e16c8e8b9bf987c3a9d85854b3ea8a26e45f2a1d0bd1ec0dd701c97663" },
+    { "key": "liveupdate-result", "path": "engine/liveupdate/src/liveupdate.h", "sha256": "a5bb40dbf0e3972464195e8ac0bb58c035f78e5edf19ad9c634a79dcc2e22c3a" },
     { "key": "physics", "path": "engine/gamesys/src/gamesys/scripts/script_physics.cpp", "sha256": "0f24a85c4c145ee91568a7f960decf7c6f401731fcf9ff8627dfcc62f9c2d379" },
     { "key": "render", "path": "engine/render/src/render/render_script.cpp", "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e" },
     { "key": "resource", "path": "engine/gamesys/src/gamesys/scripts/script_resource.cpp", "sha256": "0f3df733d31e60508ef8dc312e381a7040906767a8caa7cc04c6bee27d7aff7e" },
@@ -85,6 +86,13 @@
         "sourceSignature": "dmLiveUpdate::Result result = dmLiveUpdate::RemoveMountSync(name_hash); lua_pushinteger(L, result)",
         "acceptedLuaType": "integer",
         "domain": "dmLiveUpdate::Result / exported LIVEUPDATE_* constants"
+      },
+      "resultDomain": {
+        "source": "liveupdate-result",
+        "enumName": "Result",
+        "constantPrefix": "RESULT_",
+        "exportSource": "liveupdate",
+        "exportMacro": "SETCONSTANT"
       },
       "expectedRouteCount": 1,
       "sourceRoutes": [

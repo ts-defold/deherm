@@ -1,11 +1,20 @@
 import { createHash } from "node:crypto";
 
-import { shapeCodes } from "./script-recording-engine.mjs";
+import { renderShapeSpec, shapeCodes } from "./script-recording-engine.mjs";
 
 const STATIC_TARGET = "static-hermes";
 const STATIC_LANE = "static-hermes-typed-native";
-const IMPLEMENTED_FAMILY = "defold-value";
+const IMPLEMENTED_FAMILIES = Object.freeze([
+  "defold-value",
+  "scalar",
+  "lua-table",
+  "dynamic-values",
+  "multi-result",
+  "overload-dispatch",
+]);
+const IMPLEMENTED_FAMILY_SET = new Set(IMPLEMENTED_FAMILIES);
 const SUPPORTED_RELEASE_EXPECTATION = "no-retained-result-release";
+const STATIC_TABLE_ENTRY_CAPACITY = 256;
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -26,84 +35,111 @@ function exactUnsigned64(seed) {
   return (BigInt((seed + 0x10000) >>> 0) << 32n) | BigInt(seed >>> 0);
 }
 
-export function canonicalStaticScriptExactValue(recording, shapeIndex, seed) {
+function childSentinel(seed, index) {
+  return ((seed * 17 + index + 1) % 10000) + 1;
+}
+
+export function planStaticScriptExactValue(recording, shapeIndex, seed, ancestors = new Set()) {
   const shape = recording.shapes[shapeIndex];
   assert(shape, `Static Hermes exact vector references missing shape ${shapeIndex}`);
+  assert(!ancestors.has(shapeIndex), `Static Hermes exact shape ${shapeIndex} is cyclic`);
+  const specification = () => renderShapeSpec(
+    recording.shapes, shapeIndex, recording.semanticHandleKindNames, seed);
   switch (shape.code) {
-    case shapeCodes.boolean: return `bool:${seed % 2}`;
-    case shapeCodes.number: return `num:${seed}`;
-    case shapeCodes.string: return `str:d${seed}`;
-    case shapeCodes.hash: return `hash:${exactUnsigned64(seed)}`;
-    case shapeCodes.url:
-      return `url:${Array.from({ length: 4 }, (_, lane) => exactUnsigned64(seed + lane)).join(",")}`;
-    case shapeCodes.vector3: return `dv:v3:${seed},${seed + 1},${seed + 2}`;
-    case shapeCodes.vector4: return `dv:v4:${seed},${seed + 1},${seed + 2},${seed + 3}`;
-    case shapeCodes.quaternion: return `dv:quat:${seed},${seed + 1},${seed + 2},${seed + 3}`;
+    case shapeCodes.undefined: return { kind: "undefined", specification: specification() };
+    case shapeCodes.null: return { kind: "null", specification: specification() };
+    case shapeCodes.boolean: return { kind: "boolean", value: seed % 2 !== 0, specification: specification() };
+    case shapeCodes.number: return { kind: "number", value: seed, specification: specification() };
+    case shapeCodes.string: return { kind: "string", value: `d${seed}`, specification: specification() };
+    case shapeCodes.hash: {
+      const value = exactUnsigned64(seed);
+      return {
+        kind: "hash", low: Number(value & UINT32_MAX), high: Number(value >> 32n), specification: specification()
+      };
+    }
+    case shapeCodes.url: {
+      const lanes = Array.from({ length: 4 }, (_, lane) => exactUnsigned64(seed + lane));
+      return {
+        kind: "url",
+        halves: lanes.flatMap((value) => [Number(value & UINT32_MAX), Number(value >> 32n)]),
+        specification: specification()
+      };
+    }
+    case shapeCodes.vector3:
+      return { kind: "vector3", lanes: [seed, seed + 1, seed + 2], specification: specification() };
+    case shapeCodes.vector4:
+      return { kind: "vector4", lanes: [seed, seed + 1, seed + 2, seed + 3], specification: specification() };
+    case shapeCodes.quaternion:
+      return { kind: "quaternion", lanes: [seed, seed + 1, seed + 2, seed + 3], specification: specification() };
     case shapeCodes.matrix4:
-      return `dv:mat4:${Array.from({ length: 16 }, (_, lane) => seed + lane).join(",")}`;
+      return {
+        kind: "matrix4", lanes: Array.from({ length: 16 }, (_, lane) => seed + lane), specification: specification()
+      };
+    case shapeCodes.sequence: {
+      const nested = new Set(ancestors).add(shapeIndex);
+      return {
+        kind: "sequence",
+        values: shape.children.map((child, index) =>
+          planStaticScriptExactValue(recording, child, childSentinel(seed, index), nested)),
+        specification: specification()
+      };
+    }
+    case shapeCodes.record: {
+      const nested = new Set(ancestors).add(shapeIndex);
+      return {
+        kind: "record",
+        fields: shape.children.map((child, index) => ({
+          key: recording.shapes[child].keyText,
+          value: planStaticScriptExactValue(recording, child, childSentinel(seed, index), nested)
+        })),
+        specification: specification()
+      };
+    }
+    case shapeCodes.map: {
+      assert(shape.children.length === 2,
+        `Static Hermes exact map shape ${shapeIndex} must have one key and one value shape`);
+      const nested = new Set(ancestors).add(shapeIndex);
+      return {
+        kind: "map",
+        key: planStaticScriptExactValue(recording, shape.children[0], childSentinel(seed, 0), nested),
+        value: planStaticScriptExactValue(recording, shape.children[1], childSentinel(seed, 1), nested),
+        specification: specification()
+      };
+    }
     default:
-      throw new Error(`Static Hermes ${IMPLEMENTED_FAMILY} exact vector cannot encode shape code ${shape.code}`);
+      throw new Error(`Static Hermes exact vector cannot plan shape code ${shape.code}`);
   }
 }
 
-export function parseStaticScriptExactValue(recording, shapeIndex, specification) {
-  const shape = recording.shapes[shapeIndex];
-  assert(shape, `Static Hermes exact vector references missing shape ${shapeIndex}`);
-  const numericList = (prefix, count) => {
-    assert(specification.startsWith(prefix),
-      `Static Hermes exact value ${JSON.stringify(specification)} does not match ${prefix}`);
-    const values = specification.slice(prefix.length).split(",").map((value) => Number(value));
-    assert(values.length === count && values.every(Number.isFinite),
-      `Static Hermes exact value ${JSON.stringify(specification)} has an invalid numeric lane list`);
-    return values;
-  };
-  switch (shape.code) {
-    case shapeCodes.boolean:
-      assert(specification === "bool:0" || specification === "bool:1",
-        `Static Hermes boolean exact value is invalid: ${JSON.stringify(specification)}`);
-      return { kind: "boolean", value: specification === "bool:1" };
-    case shapeCodes.number: {
-      assert(specification.startsWith("num:"),
-        `Static Hermes number exact value is invalid: ${JSON.stringify(specification)}`);
-      const value = Number(specification.slice(4));
-      assert(Number.isFinite(value),
-        `Static Hermes number exact value is not finite: ${JSON.stringify(specification)}`);
-      return { kind: "number", value };
-    }
-    case shapeCodes.string:
-      assert(specification.startsWith("str:"),
-        `Static Hermes string exact value is invalid: ${JSON.stringify(specification)}`);
-      return { kind: "string", value: specification.slice(4) };
-    case shapeCodes.hash: {
-      assert(/^hash:[0-9]+$/u.test(specification),
-        `Static Hermes hash exact value is invalid: ${JSON.stringify(specification)}`);
-      const value = BigInt(specification.slice(5));
-      assert(value <= UINT64_MAX,
-        `Static Hermes hash exact value exceeds uint64: ${JSON.stringify(specification)}`);
-      return { kind: "hash", low: Number(value & UINT32_MAX), high: Number(value >> 32n) };
-    }
-    case shapeCodes.url: {
-      assert(specification.startsWith("url:"),
-        `Static Hermes URL exact value is invalid: ${JSON.stringify(specification)}`);
-      const lanes = specification.slice(4).split(",").map((value) => BigInt(value));
-      assert(lanes.length === 4 && lanes.every((value) => value >= 0n && value <= UINT64_MAX),
-        `Static Hermes URL exact value has invalid uint64 lanes: ${JSON.stringify(specification)}`);
-      return {
-        kind: "url",
-        halves: lanes.flatMap((value) => [Number(value & UINT32_MAX), Number(value >> 32n)])
-      };
-    }
-    case shapeCodes.vector3: return { kind: "vector3", lanes: numericList("dv:v3:", 3) };
-    case shapeCodes.vector4: return { kind: "vector4", lanes: numericList("dv:v4:", 4) };
-    case shapeCodes.quaternion: return { kind: "quaternion", lanes: numericList("dv:quat:", 4) };
-    case shapeCodes.matrix4: return { kind: "matrix4", lanes: numericList("dv:mat4:", 16) };
-    default:
-      throw new Error(`Static Hermes ${IMPLEMENTED_FAMILY} exact vector cannot parse shape code ${shape.code}`);
-  }
+export function canonicalStaticScriptExactValue(recording, shapeIndex, seed) {
+  return planStaticScriptExactValue(recording, shapeIndex, seed).specification;
 }
 
 const UINT32_MAX = 0xffffffffn;
-const UINT64_MAX = 0xffffffffffffffffn;
+
+function compareCodePoints(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+function tableEntryCount(plan) {
+  if (plan.kind === "sequence") {
+    return plan.values.length + plan.values.reduce((sum, value) => sum + tableEntryCount(value), 0);
+  }
+  if (plan.kind === "record") {
+    return plan.fields.length + plan.fields.reduce((sum, field) => sum + tableEntryCount(field.value), 0);
+  }
+  if (plan.kind === "map") return 1 + tableEntryCount(plan.key) + tableEntryCount(plan.value);
+  return 0;
+}
+
+function shapeContains(recording, shapeIndex, code, ancestors = new Set()) {
+  if (ancestors.has(shapeIndex)) return false;
+  const shape = recording.shapes[shapeIndex];
+  assert(shape, `Static Hermes exact vector references missing shape ${shapeIndex}`);
+  if (shape.code === code) return true;
+  const nested = new Set(ancestors).add(shapeIndex);
+  return shape.children.some((child) => shapeContains(recording, child, code, nested));
+}
 
 function validateStaticLane(recording, lanes, targetIndex, route) {
   assert(Array.isArray(route.applicability) && targetIndex < route.applicability.length,
@@ -139,6 +175,11 @@ export function auditStaticScriptExactFamilies(recording) {
     "script recording applicability has duplicate lane IDs");
   const emitted = recording.routes.filter((route) =>
     validateStaticLane(recording, lanes, targetIndex, route).status === "exercise");
+  const declaredEmitted = recording.applicabilityCatalog.lanes
+    .filter(({ target, status }) => target === STATIC_TARGET && status === "exercise")
+    .reduce((sum, { routeCount }) => sum + routeCount, 0);
+  assert(emitted.length === declaredEmitted,
+    `Static Hermes emitted route census ${emitted.length} differs from applicability lanes ${declaredEmitted}`);
   const families = new Map();
   for (const route of emitted) {
     const rows = families.get(route.loweringFamily) ?? [];
@@ -149,18 +190,22 @@ export function auditStaticScriptExactFamilies(recording) {
     .map(([family, routes]) => ({
       family,
       emittedRouteCount: routes.length,
-      exactVectorCount: family === IMPLEMENTED_FAMILY ? routes.length : 0,
-      missingVectorCount: family === IMPLEMENTED_FAMILY ? 0 : routes.length,
+      exactVectorCount: IMPLEMENTED_FAMILY_SET.has(family) ? routes.length : 0,
+      missingVectorCount: IMPLEMENTED_FAMILY_SET.has(family) ? 0 : routes.length,
       routeIds: routes.map(({ id }) => id)
     }))
     .sort((left, right) =>
-      right.emittedRouteCount - left.emittedRouteCount || left.family.localeCompare(right.family));
+      right.emittedRouteCount - left.emittedRouteCount || compareCodePoints(left.family, right.family));
 }
 
 export function materializeStaticScriptExactVectors(recording) {
   const families = auditStaticScriptExactFamilies(recording);
+  const unsupportedFamilies = families.filter(({ family }) => !IMPLEMENTED_FAMILY_SET.has(family));
+  assert(unsupportedFamilies.length === 0,
+    `Static Hermes exact verification has no emitter for exercised families: ${unsupportedFamilies
+      .map(({ family, emittedRouteCount }) => `${family}(${emittedRouteCount})`).join(", ")}`);
   const selected = new Set(families
-    .filter(({ family }) => family === IMPLEMENTED_FAMILY)
+    .filter(({ family }) => IMPLEMENTED_FAMILY_SET.has(family))
     .flatMap(({ routeIds }) => routeIds));
   const contracts = new Map(recording.exactVectorCatalog.vectors.map((vector) => [vector.id, vector]));
   const vectors = recording.routes.flatMap((route, routeIndex) => {
@@ -171,32 +216,51 @@ export function materializeStaticScriptExactVectors(recording) {
       `${route.id}: exact argument shape/value arity drifted`);
     assert(route.resultShapes.length === contract.resultValues.length,
       `${route.id}: exact result shape/value arity drifted`);
-    route.argumentShapes.forEach((shape, slot) => {
+    const argumentPlans = route.argumentShapes.map((shape, slot) => {
       const specification = contract.argumentValues[slot];
-      parseStaticScriptExactValue(recording, shape, specification);
-      assert(specification === canonicalStaticScriptExactValue(recording, shape, slot + 1),
+      const plan = planStaticScriptExactValue(recording, shape, slot + 1);
+      assert(specification === plan.specification,
         `${route.id}: exact argument value drifted at slot ${slot}`);
+      return plan;
     });
-    route.resultShapes.forEach((shape, slot) => {
+    const resultPlans = route.resultShapes.map((shape, slot) => {
       const specification = contract.resultValues[slot];
-      parseStaticScriptExactValue(recording, shape, specification);
-      assert(specification === canonicalStaticScriptExactValue(recording, shape, 257 + slot),
+      const plan = planStaticScriptExactValue(recording, shape, 257 + slot);
+      assert(specification === plan.specification,
         `${route.id}: exact result value drifted at slot ${slot}`);
+      return plan;
     });
     assert(contract.bounds && typeof contract.bounds === "object",
       `${route.id}: exact frame bounds are missing`);
-    assert(contract.bounds.argumentCapacity === route.argumentShapes.length,
+    assert(route.arity?.driven === route.argumentShapes.length &&
+      route.argumentShapes.length >= route.arity.minimum &&
+      route.argumentShapes.length <= route.arity.maximum,
+    `${route.id}: exact driven argument arity drifted`);
+    assert(route.results?.driven === route.resultShapes.length &&
+      route.resultShapes.length >= route.results.minimum &&
+      route.resultShapes.length <= route.results.maximum,
+    `${route.id}: exact driven result arity drifted`);
+    assert(contract.bounds.argumentCapacity === route.arity.maximum,
       `${route.id}: exact argument capacity drifted`);
-    assert(contract.bounds.resultCapacity === route.resultShapes.length,
+    assert(contract.bounds.resultCapacity === route.results.maximum,
       `${route.id}: exact result capacity drifted`);
-    assert(contract.bounds.inputEntryCapacity === 0 && contract.bounds.outputEntryCapacity === 0,
-      `${route.id}: ${IMPLEMENTED_FAMILY} exact vector unexpectedly requires table-entry scratch`);
-    const shapes = [...route.argumentShapes, ...route.resultShapes].map((index) => recording.shapes[index]);
+    assert([0, STATIC_TABLE_ENTRY_CAPACITY].includes(contract.bounds.inputEntryCapacity) &&
+      [0, STATIC_TABLE_ENTRY_CAPACITY].includes(contract.bounds.outputEntryCapacity),
+    `${route.id}: exact table-entry capacity drifted`);
+    assert(argumentPlans.reduce((sum, plan) => sum + tableEntryCount(plan), 0) <=
+      contract.bounds.inputEntryCapacity,
+    `${route.id}: exact input table-entry capacity is insufficient`);
+    assert(resultPlans.reduce((sum, plan) => sum + tableEntryCount(plan), 0) <=
+      contract.bounds.outputEntryCapacity,
+    `${route.id}: exact output table-entry capacity is insufficient`);
+    const shapes = [...route.argumentShapes, ...route.resultShapes];
     assert(typeof contract.bounds.matrix4Arena === "boolean" &&
-      (!shapes.some(({ code }) => code === shapeCodes.matrix4) || contract.bounds.matrix4Arena),
+      (!shapes.some((index) => shapeContains(recording, index, shapeCodes.matrix4)) ||
+        contract.bounds.matrix4Arena),
     `${route.id}: exact Matrix4 arena flag drifted`);
     assert(typeof contract.bounds.urlArena === "boolean" &&
-      (!shapes.some(({ code }) => code === shapeCodes.url) || contract.bounds.urlArena),
+      (!shapes.some((index) => shapeContains(recording, index, shapeCodes.url)) ||
+        contract.bounds.urlArena),
     `${route.id}: exact URL arena flag drifted`);
     assert(contract.releaseExpectation === SUPPORTED_RELEASE_EXPECTATION,
       `${route.id}: unsupported Static Hermes release expectation ${contract.releaseExpectation}`);
@@ -213,18 +277,20 @@ export function materializeStaticScriptExactVectors(recording) {
       releaseExpectation: contract.releaseExpectation
     }];
   });
-  const family = families.find(({ family }) => family === IMPLEMENTED_FAMILY);
-  assert(vectors.length === family?.emittedRouteCount,
-    `Static Hermes ${IMPLEMENTED_FAMILY} vector census drifted`);
+  for (const implementedFamily of IMPLEMENTED_FAMILIES) {
+    const family = families.find(({ family: candidate }) => candidate === implementedFamily);
+    assert(family && vectors.filter(({ loweringFamily }) => loweringFamily === implementedFamily).length ===
+      family.emittedRouteCount, `Static Hermes ${implementedFamily} vector census drifted`);
+  }
   const report = {
-    schemaVersion: 1,
+    schemaVersion: 3,
     transport: "static-hermes-typed-native",
-    family: IMPLEMENTED_FAMILY,
+    implementedFamilies: IMPLEMENTED_FAMILIES,
     emittedRouteCount: vectors.length,
     exactVectorCount: vectors.length,
     families,
     vectorSha256: sha256(canonicalJson(vectors)),
-    evidenceBoundary: "The generated sound-typed Static Hermes runner replays only lowering-plan-emitted defold-value routes through the production bounded frame and the generated recording provider. Exact argument and result predicates are derived from the interned contract values; generation fails on applicability, frame-bound, arena-flag, or release-policy drift. It proves exact bridge lookup, ordered values, result decoding, and target applicability; it does not execute Defold implementation semantics or claim negative exhaustion coverage for each route."
+    evidenceBoundary: "The generated sound-typed Static Hermes runner replays every lowering-plan-emitted route through the production bounded frame and the generated recording provider. Exact argument and result predicates are derived from the interned contract values; generation fails on applicability, driven arity, argument/result/table capacity, arena-flag, recursive-shape, or release-policy drift. It proves exact bridge lookup, ordered values, result decoding, and target applicability. It does not execute Defold implementation semantics, prove every dynamic or overload alternative, claim optional-result omission behavior, instrument allocator calls, or claim negative exhaustion coverage for each route; allocation evidence belongs to separate instrumented runtime benchmarks, not ASan/UBSan execution."
   };
   return { report, vectors };
 }

@@ -33,16 +33,22 @@ the family report.
 The callable-route promotion joins those same five recipe identities into the
 generated-adapter call index. The complete dmSDK release partition therefore
 moves from 566 universal-ready, 59 generated-adapter, and 736
-specialization-required recipes to 566, 64, and 731 respectively. Universal
+specialization-required recipes to 566, 64, and 731 respectively. A later
+hash-state registry wave adds ten lifecycle routes, so the current aggregate
+partition is 566 universal-ready, 74 callable generated adapters, and 721
+specialization-required recipes. Universal
 recipe coverage remains 1,361/1,361 with zero silent omissions; the five
 usage-materialized fallback recipes remain present as a fail-safe path.
 
-The complete partition changed from 12 declarations covered by prior waves and
-67 blocked declarations to 12 prior-wave declarations, five generated C-string
-arena declarations, and 62 blocked declarations. The remaining exclusive
-blocker counts are 33 handle/context, 19 record layout or borrowed lifetime,
-six template element/specialization, and four opaque byte-pointee/lifetime.
-Overlap and unaccounted counts are zero.
+The original arena partition changed from 12 declarations covered by prior
+waves and 67 blocked declarations to 12 prior-wave declarations, five generated
+C-string arena declarations, and 62 blocked declarations. The subsequent
+hash-state wave accounts for two more arena-backed declarations. The current
+ledger is therefore 14 prior-wave declarations, five C-string arena adapters,
+and 60 explicitly blocked declarations; its remaining exclusive blocker counts
+are 33 handle/context, 17 record layout or borrowed lifetime, six template
+element/specialization, and four opaque byte-pointee/lifetime. Overlap and
+unaccounted counts are zero.
 
 # ABI and scratch contract
 

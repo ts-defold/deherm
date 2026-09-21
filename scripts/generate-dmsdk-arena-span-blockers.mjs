@@ -54,7 +54,7 @@ function validatePolicy(policy) {
   assert(policy.policyVersion === "arena-span-cstring-v2", "arena-span policyVersion is unsupported");
   assert(/^[0-9a-f]{40}$/.test(policy.defoldRevision), "arena-span policy must pin a Defold revision");
   assert(policy.tranche === "arena-backed-spans", "arena-span policy tranche is unsupported");
-  assert(Array.isArray(policy.priorWaveReports) && policy.priorWaveReports.length === 5, "arena-span policy must name five prior waves");
+  assert(Array.isArray(policy.priorWaveReports) && policy.priorWaveReports.length === 6, "arena-span policy must name six prior waves");
   unique(policy.priorWaveReports, ({ path }) => path, "priorWaveReports");
   unique(policy.coveredByPriorWaves.map((symbol) => ({ symbol })), ({ symbol }) => symbol, "coveredByPriorWaves");
   exactKeys(policy.expectedCoverage, ["arenaSpanCensus", "coveredByPriorWaves", "generatedCStringArena", "blocked"], "expectedCoverage");
@@ -208,6 +208,8 @@ export function generate(inputs) {
   assert(shapes.sourceIr === paths.ir && shapes.sourceHashes?.ir === sha256(inputs.irText), "IR hash does not match ABI-shape census provenance");
   unique(ir.declarations, ({ id }) => id, "dmSDK IR declarations");
   unique(shapes.rows, ({ id }) => id, "dmSDK ABI-shape rows");
+  const census = shapes.rows.filter(({ tranche }) => tranche === policy.tranche).sort((a, b) => compare(a.id, b.id));
+  const censusIds = new Set(census.map(({ id }) => id));
   const priorDeclarations = [];
   const priorWaves = [];
   for (const expected of policy.priorWaveReports) {
@@ -216,8 +218,9 @@ export function generate(inputs) {
     assert(report.policyVersion === expected.policyVersion && report.defoldRevision === ir.defoldRevision, `${expected.path}: prior-wave identity drifted`);
     assert(report.sourceHashes?.ir === sha256(inputs.irText), `${expected.path}: IR provenance drifted`);
     assert(report.sourceHashes?.shapes === sha256(inputs.shapesText), `${expected.path}: ABI-shape provenance drifted`);
-    for (const declaration of report.declarations) priorDeclarations.push({ ...declaration, sourceReport: expected.path });
-    priorWaves.push({ report: expected.path, policyVersion: report.policyVersion, sha256: sha256(text), declarationCount: report.declarations.length });
+    const applicable = report.declarations.filter(({ id }) => censusIds.has(id));
+    for (const declaration of applicable) priorDeclarations.push({ ...declaration, sourceReport: expected.path });
+    priorWaves.push({ report: expected.path, policyVersion: report.policyVersion, sha256: sha256(text), declarationCount: applicable.length });
   }
   const priorIds = unique(priorDeclarations, ({ id }) => id, "combined prior-wave declarations");
   assert(JSON.stringify([...new Set(priorDeclarations.map(({ symbol }) => symbol))].sort(compare)) === JSON.stringify([...policy.coveredByPriorWaves].sort(compare)), "coveredByPriorWaves does not exactly match generated prior-wave symbols");
@@ -226,7 +229,6 @@ export function generate(inputs) {
     const source = inputs.evidenceTexts.get(evidence.path);
     assert(source?.split("\n")[evidence.line - 1] === evidence.text, `${evidence.path}:${evidence.line}: cstring arena source evidence drifted`);
   }
-  const census = shapes.rows.filter(({ tranche }) => tranche === policy.tranche).sort((a, b) => compare(a.id, b.id));
   const available = census.filter(({ id }) => !priorIds.has(id));
   const selected = available.filter((row) => blockerFor(row) === policy.cstringArena.selection.blocker);
   const entries = selected.map((candidate, bindingId) => {

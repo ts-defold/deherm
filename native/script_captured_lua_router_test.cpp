@@ -151,7 +151,11 @@ int MockTail(lua_State* state) {
   switch (route.resultCodec) {
     case tail::Codec::kNone: return 0;
     case tail::Codec::kBoolean: lua_pushboolean(state, 1); return 1;
-    case tail::Codec::kNumber: lua_pushnumber(state, 2.5); return 1;
+    case tail::Codec::kNumber: {
+      const uint8_t count = tail::resultDomainCounts()[route.index];
+      const double value = count ? tail::resultDomainValues()[tail::resultDomainOffsets()[route.index]] : 2.5;
+      lua_pushnumber(state, value); return 1;
+    }
     case tail::Codec::kString: lua_pushliteral(state, "generated-tail"); return 1;
     case tail::Codec::kHash: dmScript::PushHash(state, UINT64_C(0x123456789abcdef0)); return 1;
     case tail::Codec::kVector3: dmScript::PushVector3(state, dmVMath::Vector3(1, 2, 3)); return 1;

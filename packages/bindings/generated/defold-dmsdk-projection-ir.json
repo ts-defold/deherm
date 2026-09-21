@@ -54,7 +54,7 @@
         "astcProbe": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
         "xteaSpan": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
         "hashSpan": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
-        "arenaSpan": "84e3101830f4b069e576d781e0829b7ea9182c6fe5d4a4888ad69b62578b0b22"
+        "arenaSpan": "5d7e4def887574e34fae8e9ed880a90ebf45ba6c05dfca97552b79ae10f3b845"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",
@@ -160,8 +160,8 @@
     "unprojectedDeclarations": 0,
     "silentUnknowns": 0,
     "generatedAdapters": 45,
-    "policyBlocked": 71,
-    "loweringPending": 1245
+    "policyBlocked": 69,
+    "loweringPending": 1247
   },
   "constructorSummary": {
     "callback": 114,
@@ -210,13 +210,13 @@
   },
   "loweringStateSummary": {
     "generated-adapter": 45,
-    "lowering-pending": 1245,
-    "policy-blocked": 71
+    "lowering-pending": 1247,
+    "policy-blocked": 69
   },
   "loweringSummary": {
     "generated-adapter": 45,
-    "lowering-pending": 1245,
-    "policy-blocked": 71
+    "lowering-pending": 1247,
+    "policy-blocked": 69
   },
   "semanticTokenSummary": {
     "call-thread-affinity": 1361,
@@ -105330,19 +105330,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "arenaSpan",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "record-layout-or-borrowed-record-lifetime",
-        "stages": {
-          "generated": "not-applicable",
-          "compiled": "not-claimed",
-          "linked": "not-claimed",
-          "runtime": "not-claimed",
-          "allocation": "not-claimed"
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
@@ -105499,19 +105493,13 @@
         "target-feature-symbol-matrix"
       ],
       "lowering": {
-        "state": "policy-blocked",
-        "family": "arenaSpan",
+        "state": "lowering-pending",
+        "family": null,
         "wrapper": null,
-        "policy": "record-layout-or-borrowed-record-lifetime",
-        "stages": {
-          "generated": "not-applicable",
-          "compiled": "not-claimed",
-          "linked": "not-claimed",
-          "runtime": "not-claimed",
-          "allocation": "not-claimed"
-        }
+        "policy": null,
+        "stages": null
       },
-      "loweringState": "policy-blocked"
+      "loweringState": "lowering-pending"
     },
     {
       "id": "dmsdk:dmHID::AddKeyboardChar@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:733:1629",

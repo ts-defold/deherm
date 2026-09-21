@@ -2096,6 +2096,7 @@ void pushShape(lua_State* state, uint32_t shapeIndex, uint32_t seed) {
   }
 }
 
+bool pushTailDomainResult(lua_State* state,const DehermRecordingRoute& descriptor,uint32_t resultIndex){if(resultIndex!=0)return false;const auto* route=defold_hermes::value_tail::find(descriptor.stableId);if(!route)return false;const uint8_t count=defold_hermes::value_tail::resultDomainCounts()[route->index];if(!count)return false;lua_pushinteger(state,defold_hermes::value_tail::resultDomainValues()[defold_hermes::value_tail::resultDomainOffsets()[route->index]]);return true;}
 int LuaProvider(lua_State* state) {
   const uint32_t route = static_cast<uint32_t>(lua_tointeger(state, lua_upvalueindex(1)));
   const auto& descriptor = kDehermRecordingRoutes[route];
@@ -2110,7 +2111,7 @@ int LuaProvider(lua_State* state) {
     if (actual != expected) { gFailure={route,"argument-value-mismatch",actual+" != "+expected}; return luaL_error(state,"deherm-exact:argument-value-mismatch"); }
   }
   ++gCalls[route];
-  for(uint32_t index=0;index<descriptor.resultCount;++index)pushShape(state,kDehermRecordingShapeRefs[descriptor.resultFirst+index],257u+index);
+  for(uint32_t index=0;index<descriptor.resultCount;++index)if(!pushTailDomainResult(state,descriptor,index))pushShape(state,kDehermRecordingShapeRefs[descriptor.resultFirst+index],257u+index);
   return descriptor.resultCount;
 }
 
@@ -2238,7 +2239,7 @@ int main(){
     const bool ok=api.dispatch(api.context,&frame);
     if(pushed){adapter.popComponentContext();}
     expect(ok,"adapter-dispatch",route,api.lastError(api.context));expect(gFailure.code[0]=='\\0',gFailure.code,route,gFailure.detail.c_str());expect(gCalls[route]==1,"provider-call-count",route,"");expect(lua_gettop(state)==before,"lua-stack-not-restored",route,"");expect(currentInstance(state)==gPreviousInstance,"instance-not-restored",route,"");expect(frame.resultCount==descriptor.resultCount,"result-count-mismatch",route,"");
-    for(uint32_t i=0;i<frame.resultCount;++i){const uint32_t shape=kDehermRecordingShapeRefs[descriptor.resultFirst+i];const std::string actual=scriptSpec(frame.results[i],shape,257+i);const std::string expected=expectedSpec(shape,257+i);expect(actual==expected,"result-value-mismatch",route,(actual+" != "+expected).c_str());}
+    for(uint32_t i=0;i<frame.resultCount;++i){const uint32_t shape=kDehermRecordingShapeRefs[descriptor.resultFirst+i];const auto* tailRoute=defold_hermes::value_tail::find(descriptor.stableId);const bool domainResult=i==0&&tailRoute&&defold_hermes::value_tail::resultDomainCounts()[tailRoute->index];if(domainResult){const double expected=defold_hermes::value_tail::resultDomainValues()[defold_hermes::value_tail::resultDomainOffsets()[tailRoute->index]];expect(frame.results[i].tag==ScriptValueTag::kNumber&&frame.results[i].number==expected,"result-domain-value-mismatch",route,"");continue;}const std::string actual=scriptSpec(frame.results[i],shape,257+i);const std::string expected=expectedSpec(shape,257+i);expect(actual==expected,"result-value-mismatch",route,(actual+" != "+expected).c_str());}
   }
   expect(exercised==DEHERM_RECORDING_LUA_EXACT_COUNT&&skipped==DEHERM_RECORDING_LUA_SKIP_COUNT,"generated-partition-drift",0,"");
   // A fresh adapter must reject a missing exact member and restore the stack.

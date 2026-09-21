@@ -20,19 +20,19 @@ After the 78 existing generated value routes, 26 `defold-value` routes remain.
 from the IR, classifier, and accounting report, then verifies all cross-input
 revisions, hashes, counts, and identities.
 
-- 16 routes have finite reviewed codecs, require a game-object script instance,
-  and are captured-Lua candidates.
-- Four `gui.*` routes are blocked until a `.gui_script` attachment can capture
-  and restore an actual GUI-script instance.
-- Four `render.*` routes are blocked until a `.render_script` attachment can
-  capture and restore an actual render-script instance.
-- `gui.set_texture_data` is blocked on the mixed `string | image.TYPE` codec.
-- `liveupdate.remove_mount` is blocked until the named enum domain is generated
-  and validated; arbitrary numbers are not accepted as an “exact” enum codec.
+- All 26 routes have generated captured-Lua candidates with an explicit
+  game-object, GUI-script, or render-script execution context. The adapter
+  rejects a route before Lua when the selected context does not match.
+- `gui.set_texture_data` preserves the pinned `luaL_checkstring` contract for
+  `image.TYPE`; a numeric fourth argument is rejected before Lua.
+- `liveupdate.remove_mount` derives the exported `LIVEUPDATE_*` names from
+  `SetConstants` and their integer values from the pinned
+  `dmLiveUpdate::Result` enum. The ABI checks domain membership after the exact
+  Lua call, so an arbitrary number cannot cross as an exact named enum.
 
 The generated static tables enforce `uint8_t`/`uint16_t` bounds, use a dense
 candidate index, validate every argument tag, clear failed results, and validate
-the returned tag. The generator derives this tail from the script IR,
+the returned tag plus any named integer domain. The generator derives this tail from the script IR,
 classifier, and already-owned value/URL reports, so it executes before API
 accounting without a dependency cycle.
 

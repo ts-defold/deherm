@@ -5,12 +5,12 @@
   "generator": "sha256:19aff0f104cccfafd3e50ad59170d4bc09ef05d5c534235b528d020db00ad708",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "078841c67ded514e10b2a878e82e3701bfb79e3f4150ae17603399ef5652b61a",
+  "policyRoot": "1ccaaadf4953aabe7222ba3f27d078099ae3a84a6b74254166f276fc2f25bc85",
   "layoutVersion": "v1",
   "counts": {
-    "subtrees": 188,
+    "subtrees": 190,
     "namespaces": 52,
-    "objectBytes": 24250768,
+    "objectBytes": 24264058,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,12 +54,12 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "a0ff2caf38f3073dc2653f540eef256dd7a38c7cf11f3deb391dec215b57b4cb",
-      "bytes": 65357
+      "hash": "b797b91bb8a730bbc981e4db10469a6fcaaa9a5978ea4b72d97b4c1cd70d3c81",
+      "bytes": 66255
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
-      "hash": "1009a5b295b084468a5b61af168f8702126f81c08f5472df199b2c221db655ea",
-      "bytes": 2561302
+      "hash": "b230e8ea2a8dc898d88f5556f8a1ea6a501d5ee26432395d1706a7b42d7fa7a0",
+      "bytes": 2561667
     },
     "@compiler:document:defold-dmsdk-binding-patterns.json": {
       "hash": "44402523e06aa9afd60364c4949c247b1778ababd98dda7dba287a947e564019",
@@ -70,15 +70,15 @@
       "bytes": 80506
     },
     "@compiler:document:defold-dmsdk-universal-bindings.json": {
-      "hash": "08bd265da28c8cecacd3e5faf5ca2c2eaecd86d8703e67d67917c4a94955adae",
-      "bytes": 3255768
+      "hash": "5e902bc3f83d3bcc5a900f002df05e118387b21ec2798b4be47f32206cb84a99",
+      "bytes": 3257247
     },
     "@compiler:document:defold-resource-declaration-schema.json": {
       "hash": "8ad0bfd42a2f54c4ead38ba000df255f530ffa27d0f557bbab1d376fa1286c31",
       "bytes": 13974
     },
     "@compiler:document:defold-script-api-accounting.json": {
-      "hash": "ec81b8470baff65ef0e53bdcc47938cf96664a59ff8ff0c613477457d956d43e",
+      "hash": "2f70ff8d1e6b8731538edad3be19cfaf25920ab39044c8c55097f504afbb6fd6",
       "bytes": 742550
     },
     "@compiler:document:defold-script-api-ir.json": {
@@ -90,7 +90,7 @@
       "bytes": 463509
     },
     "@compiler:document:defold-script-handle-lowering.json": {
-      "hash": "8bc9918af09536eeb42ae693e945ec8002c39e8585a749d234bbc131bfc40dbb",
+      "hash": "01d6bbd1c28edee2401cfa970b629748caddc3432c8f00b5ba5ce8a2111dbcb0",
       "bytes": 780429
     },
     "@compiler:document:defold-script-real-engine-probes.json": {
@@ -102,7 +102,7 @@
       "bytes": 84816
     },
     "@compiler:document:defold-script-route-availability-profiles.json": {
-      "hash": "b71429c455bf8cff41885b163b36b16bbda6c1e7a04d93a8f718c2a3ca1c5581",
+      "hash": "0e2ad6337e1b45a4481f031ad31bc2d4303e7e970b4cf6c9bbc973941deff010",
       "bytes": 1221310
     },
     "@compiler:document:defold-script-scalar-dispatch.json": {
@@ -110,7 +110,7 @@
       "bytes": 50250
     },
     "@compiler:document:defold-script-universal-value-bindings.json": {
-      "hash": "f66c6b9c810da9ea61fab27fdac4723fe1699b5b3c73bd19f6e7d90bded4e29e",
+      "hash": "3271d1567c500a7c391d00e5ff1da4bef1460ce3b6dd54af93ef7900e2d15d3d",
       "bytes": 564468
     },
     "@compiler:document:defold-sdk-ir.json": {
@@ -176,6 +176,10 @@
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h": {
       "hash": "5af720ecd803dadf79b7cf7823ed5fdd47a767eaa97ffc780e42a3c4e65a5316",
       "bytes": 1156
+    },
+    "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_state.h": {
+      "hash": "799237f2b36545783e0784c68b488b6541557b92220b88c3913aeab24cf45978",
+      "bytes": 1944
     },
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h": {
       "hash": "30733db240b628dd6096e30ce899d24af1ba6d410b593f94e40baca0703f08eb",
@@ -278,8 +282,8 @@
       "bytes": 4217
     },
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_script_value_tail_bindings.hpp": {
-      "hash": "88613ca74d67349bc8504336a73b45f62846ffb6018232e623fb474ad2e5ae75",
-      "bytes": 1716
+      "hash": "72c96d93daf22e3e9938b4e92d0be4dca434545ddc0b1b6c2626424a3f7eea5c",
+      "bytes": 1859
     },
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h": {
       "hash": "87ec8637f18f04d2fe1816c598b4989fa0ab0050c936f10072c3f403451599cd",
@@ -302,7 +306,7 @@
       "bytes": 3850
     },
     "@compiler:output:defold/defold_hermes/lib/web/generated_dmsdk_universal.js": {
-      "hash": "d7757bf41fcc54441e857d1b96d22c6ca8dcaecd3136f5d87120654ba0c0920d",
+      "hash": "22bcc2653316e9595ca5474566b91222de37dfdb863f868a6ef24bc646b0a59a",
       "bytes": 423303
     },
     "@compiler:output:defold/defold_hermes/lib/web/generated_modules.js": {
@@ -393,6 +397,10 @@
       "hash": "709ea65894b46e5214d5d27153c3cde3fdad4a942ca472c719dd5aed84339453",
       "bytes": 1709
     },
+    "@compiler:output:defold/defold_hermes/src/generated_dmsdk_hash_state.cpp": {
+      "hash": "f36c4f09457babdd112376709658e7aaffdabd687b47fd06a5fb0e99855fd6f8",
+      "bytes": 7454
+    },
     "@compiler:output:defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp": {
       "hash": "b1440cba28fde480f77d10febaf73439171680af1c657d6ef4bc76a024c61860",
       "bytes": 20022
@@ -438,11 +446,11 @@
       "bytes": 8739
     },
     "@compiler:output:defold/defold_hermes/src/generated_dmsdk_universal.cpp": {
-      "hash": "9dcaed92b6fe4a6b2497b3ea1aeebff39abc0a56a0496309c1a6f5af37b4a40e",
+      "hash": "faf013698e0683ae87047a8787d8d990c1a985158370e98c7ba3332ba4e3091c",
       "bytes": 79821
     },
     "@compiler:output:defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp": {
-      "hash": "ade5a55c934de3facb07b695f45af59f2b80e9d27395f2cf48f8526c8914ddcd",
+      "hash": "dac2e5b411e8599e15e592a5fe0fb7983250aeb5a990a1cf915bce3959b1c20b",
       "bytes": 8769
     },
     "@compiler:output:defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp": {
@@ -510,8 +518,8 @@
       "bytes": 69532
     },
     "@compiler:output:defold/defold_hermes/src/generated_script_value_tail_bindings.cpp": {
-      "hash": "25fc378f4078f77750e28e999282106e72ff27c5b194ac4a02d2a65b512f0520",
-      "bytes": 13229
+      "hash": "6fb5ce40cf131b3f375b6b19e11082537a6ac5998db125d147676141dce170c2",
+      "bytes": 14236
     },
     "@compiler:output:defold/defold_hermes/src/generated_static_hermes_vmath.cpp": {
       "hash": "a1b0fd38a1bc0b149c2f7b48df5dec010448004d6b262f09047173bf60e5c8f9",

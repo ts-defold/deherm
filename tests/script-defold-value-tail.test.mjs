@@ -23,7 +23,7 @@ test("value-tail generator covers the exact remaining Defold-value accounting ta
   assert.match(report.inputEvidence.valueBindingsSha256, /^[0-9a-f]{64}$/);
   assert.match(report.inputEvidence.urlBindingsSha256, /^[0-9a-f]{64}$/);
   assert.equal(report.targetSupport.nativeDynamicHermes, "generated-executable-shared-script-adapter");
-  assert.equal(report.inputEvidence.defoldSources.length, 10);
+  assert.equal(report.inputEvidence.defoldSources.length, 11);
   assert.deepEqual(report.bindings.map(({ stableId }) => stableId), report.bindings.map(({ stableId }) => stableId).toSorted((a, b) => a - b));
   assert.equal(report.bindings.every(({ id, stableId }) => stableId === stableBindingId(id)), true);
   assert.equal(report.bindings.filter(({ disposition }) => disposition === "candidate")
@@ -43,6 +43,13 @@ test("value-tail generator covers the exact remaining Defold-value accounting ta
   assert.equal(namedEnum.family, "liveupdate-result-enum-codec");
   assert.equal(namedEnum.resultCodec, "Number");
   assert.match(namedEnum.codecEvidence.sourceSignature, /lua_pushinteger\(L, result\)/);
+  assert.deepEqual(namedEnum.resultDomain, {
+    names: ["RESULT_OK", "RESULT_INVALID_HEADER", "RESULT_MEM_ERROR", "RESULT_INVALID_RESOURCE",
+      "RESULT_VERSION_MISMATCH", "RESULT_ENGINE_VERSION_MISMATCH", "RESULT_SIGNATURE_MISMATCH",
+      "RESULT_SCHEME_MISMATCH", "RESULT_BUNDLED_RESOURCE_MISMATCH", "RESULT_FORMAT_ERROR",
+      "RESULT_IO_ERROR", "RESULT_INVAL", "RESULT_NOT_INITIALIZED", "RESULT_UNKNOWN"],
+    values: [0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -1000]
+  });
   assert.equal(report.bindings.find(({ id }) => id === "script:hash_to_hex").sourceSymbol, "HashToHex");
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:camera.get_view").callShapes,
     [[], ["Url"], ["Number"], ["Nil"]]);
@@ -60,6 +67,7 @@ test("value-tail candidate dispatch is generated as fail-closed metadata", async
   assert.match(source, /captured Lua backend is unavailable/);
   assert.match(source, /arguments do not match a reviewed exact codec shape/);
   assert.match(source, /Lua result does not match the reviewed codec/);
+  assert.match(source, /kResultDomainValues/);
   assert.doesNotMatch(source, /image-type-union-codec|named-enum-domain-codec/);
   assert.match(source, /candidateIndex >= kCandidateCount/);
   assert.match(source, /candidate shape offsets drifted/);

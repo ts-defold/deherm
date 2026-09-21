@@ -168,6 +168,7 @@ void TestHandles() {
   Expect(pool.resolve(first, &record), "live handle did not resolve");
   Expect(record.state == &fakeState && record.payload == 42, "handle payload is wrong");
   Expect(pool.queueRelease(first), "handle could not be queued");
+  Expect(!pool.queueRelease(first), "duplicate handle release was queued twice");
   Expect(!pool.resolve(first, &record), "queued handle remained publicly resolvable");
   uint32_t released = pool.drain([](const bridge::HandleRecord&) {});
   Expect(released == 1, "deferred release did not drain");

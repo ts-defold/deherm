@@ -26,6 +26,37 @@ dogfoods the result in a playable native/browser War Battles project.
 
 # Ordered work
 
+## Active execution tranche
+
+This is the current implementation queue. It refines the broader ordered work
+below without changing its completion rule.
+
+1. **Static scalar 90.** Emit the typed Static Hermes caller, native dispatch,
+   and exact-call twin for every scalar route. Preserve fail-closed bounds,
+   stack restoration, reentrancy, sanitizers, and zero warmed allocations.
+2. **dmSDK hash-state 10.** Specialize
+   `dmHash{Init,Clone,UpdateBuffer,Final,Release}{32,64}` with a fixed-capacity,
+   generation-tagged native state registry. Reject stale, foreign, exhausted,
+   and double-consumed handles without exposing raw pointers or allocating on
+   the warmed call path.
+3. **Static tail 108.** Close the remaining generated families in this order:
+   Lua-table 70, dynamic-value 14, multi-result 12, and overload-dispatch 12.
+4. **Matrix and ledger reconciliation.** Regenerate the complete 926-route
+   script matrix and 1,361-declaration dmSDK matrix, publish exact evidence per
+   emitted transport, and close or update the owning GitHub issues from that
+   evidence.
+5. **Policy-only clean consumer.** Prove the published package plus policy and
+   project extensions can materialize, compile, link, and smoke the generated
+   surface on supported hosts without a Defold checkout.
+6. **Product continuation.** Resume the installed TUI/HMR/debug lane and
+   native/browser War Battles only after the API and clean-consumer gates are
+   green.
+
+Every route remains public when Defold exposes it. Verification status controls
+the evidence label, never whether the generator ships the route; a missing
+specialization must retain a generated default path and a machine-readable
+limitation rather than silently removing API.
+
 ## External task ledger
 
 GitHub issues are the public execution ledger for this roadmap. Before each

@@ -2,7 +2,7 @@
   "schemaVersion": 2,
   "kind": "deherm.fixture.old-pipeline-sdk",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "treeSha256": "997508163f729372c15df8661bb08259d054dc22d851fbe34925a362a45310eb",
+  "treeSha256": "407f246bc74012bcf82eb9f05dd8345e6402bef00a780bd75e2d1ef74547d539",
   "source": "Frozen SHA-256 golden captured from the checkout-backed generated SDK and canonical lowering plan produced by the source pipeline. It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
   "files": {
     "dmsdk/borrowed-handle.ts": {
@@ -11,7 +11,7 @@
     },
     "dmsdk/browser-arena.ts": {
       "bytes": 5513,
-      "sha256": "a9e890502d8a4f8ad9a34ddcc9b5247e0492e4dcfb367c2bc317b51651ea80bb"
+      "sha256": "79c095743aa2c800a1244d85f09d98cbcecd729c5137f3d1f97f13389368ea04"
     },
     "dmsdk/cstring-value.ts": {
       "bytes": 4753,
@@ -47,7 +47,7 @@
     },
     "dmsdk/universal.ts": {
       "bytes": 148212,
-      "sha256": "233b6db74cfe61099913b8bea33453f7b230352e83eb5771fa2740101ec4dd18"
+      "sha256": "4e59f86ea873139059ee89430dcb534cf11eab5e115207a12eaf39f131073ba8"
     },
     "script/browser-target-support.ts": {
       "bytes": 567,
@@ -120,8 +120,8 @@
   },
   "documents": {
     "defold-binding-lowering-plan.json": {
-      "bytes": 16786618,
-      "sha256": "9bc84924c4246ccb4869a2974a962824fafe52b99878ceecf8cf0aeb5d646315"
+      "bytes": 16788401,
+      "sha256": "46351265597105f46f25ab988c82a1ab26dc0441bc1ca6fdf70eec9e9d222776"
     }
   }
 }

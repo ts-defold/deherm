@@ -9,6 +9,7 @@ const adapterWrapperHeaders = Object.freeze({
   enumValue: "defold_hermes/generated_dmsdk_enum_value.h",
   fixedDigest: "defold_hermes/generated_dmsdk_fixed_digest.h",
   hashSpan: "defold_hermes/generated_dmsdk_hash_span.h",
+  hashState: "defold_hermes/generated_dmsdk_hash_state.h",
   scalar: "defold_hermes/generated_dmsdk_scalar.h",
   xteaSpan: "defold_hermes/generated_dmsdk_xtea_span.h",
 });
@@ -21,6 +22,7 @@ const adapterRuntimeHeaders = Object.freeze({
   enumValue: "defold_hermes/generated_dmsdk_enum_value_runtime.h",
   fixedDigest: "defold_hermes/generated_dmsdk_fixed_digest_runtime.h",
   hashSpan: "defold_hermes/generated_dmsdk_hash_span_runtime.h",
+  hashState: "defold_hermes/generated_dmsdk_hash_state.h",
   scalar: "defold_hermes/generated_dmsdk_scalar_runtime.h",
   xteaSpan: "defold_hermes/generated_dmsdk_xtea_span_runtime.h",
 });
@@ -236,6 +238,8 @@ export function materializeDmSdkGeneratedAdapterUsages(usages, options = {}) {
         digestBytes: verificationAdapter.digestBytes ?? null,
         resultBits: verificationAdapter.resultBits ?? null,
         mode: verificationAdapter.mode ?? null,
+        operation: verificationAdapter.operation ?? null,
+        width: verificationAdapter.width ?? null,
       },
       invocation: recipe.invocation,
       abi: recipe.abi,

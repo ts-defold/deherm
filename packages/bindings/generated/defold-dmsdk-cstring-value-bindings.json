@@ -6,7 +6,7 @@
     "sdkIr": "packages/bindings/generated/defold-sdk-ir.json",
     "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
     "hashes": {
-      "projection": "0b217c772541014c2406aaa84d3bd8a00bd46e71fb6dda56c8acff6b911f8cee",
+      "projection": "bbe895d62582cc9f1955d619b5b879d75be7bf6b572c38d8553300e7edace0c0",
       "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
       "policy": "0eb7a1eb92d08fccc88e9151afa66d7edf75f91fb6d1d033e086a6451be875ca",
       "semanticEvidence": {

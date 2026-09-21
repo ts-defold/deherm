@@ -1,7 +1,7 @@
 ---
 type: Design and Verification Report
 title: dmSDK callable generated-adapter exact-call corpus
-description: Same-recipe C ABI and JSI verification twins for the 64 callable generated-adapter routes, plus the 21-row named-scalar sibling census with 20 linked adapters and one explicit symbol blocker, without changing the 1,361-recipe universal catalog.
+description: Same-recipe C ABI and JSI verification twins for the 74 callable generated-adapter routes, plus the 21-row named-scalar sibling census with 20 linked adapters and one explicit symbol blocker, without changing the 1,361-recipe universal catalog.
 tags: [dmsdk, generated-adapter, named-scalar, exact-call, jsi, c-abi, verification]
 status: active
 generated: { by: codex, at: 2026-09-20T00:00:00-04:00 }
@@ -9,8 +9,8 @@ generated: { by: codex, at: 2026-09-20T00:00:00-04:00 }
 
 # Outcome
 
-The 64 callable `generated-adapter` dmSDK rows now have a deterministic exact
-corpus derived from the same 1,361 production recipes and the nine owning
+The 74 callable `generated-adapter` dmSDK rows now have a deterministic exact
+corpus derived from the same 1,361 production recipes and the ten owning
 family reports. The derivative joins every recipe to its family-local adapter
 ID and production C ABI dispatcher, records ordered native arguments and the
 result ABI, and hashes each vector independently. Before adding exact-only
@@ -20,9 +20,9 @@ report. It does not overwrite, correct, mutate, or reseal the policy-owned
 universal catalog.
 
 The direct-adapter partition is total: 26 scalar, seven enum-value, fourteen C-string/value,
-five arena C-string, four fixed-digest, two hash-span, two base64-span, two XTEA-span, and two ASTC
+five arena C-string, four fixed-digest, two hash-span, ten hash-state, two base64-span, two XTEA-span, and two ASTC
 probe vectors. No recipe is removed: the source catalog remains 1,361 recipes,
-with 64 callable generated adapters, 566 universal-ready rows, and 731 rows
+with 74 callable generated adapters, 566 universal-ready rows, and 721 rows
 that still fail closed pending specialization.
 
 The separate named-scalar family reviews 21 structural candidates and derives
@@ -35,7 +35,7 @@ built-in signed, unsigned, boolean, float, double, and void lanes only when the
 pinned symbol-evidence pass also proves the native symbol is header-only or
 external in every target and build variant. This sibling family deliberately
 leaves all 21 universal recipes on their universal fallback and therefore does
-not alter the 64-row generated-adapter corpus above.
+not alter the 74-row generated-adapter corpus above.
 
 The remaining candidate, `ProfilePropertyAddBool`, exposes a pinned-source
 contradiction: `profile.h` macro-expands its declaration, but neither
@@ -50,8 +50,8 @@ identity in generated source.
 
 # Production boundaries
 
-All 64 vectors bind the production family C ABI dispatcher and its exact
-family-local ID. The generated native executable links all eight production
+All 74 vectors bind the production family C ABI dispatcher and its exact
+family-local ID. The generated native executable links all ten production
 dispatcher implementations to generated recording/fake callees. It invokes
 every dispatcher, compares position-distinct native argument sentinels, checks
 the returned or copied-out result, and also rejects descriptor count, order,
@@ -63,8 +63,8 @@ production host functions and drives every vector into an ABI-compatible
 recording C callee. The verifier uses position-distinct type-valid values,
 compares every decoded raw lane, and checks the returned JSI type and value.
 The staged-private C-string JSI source is deliberately excluded because it is
-not installed or compiled by the production package. The remaining 26
-C-string/span/digest/probe vectors make no production JSI claim.
+not installed or compiled by the production package. The remaining 41
+C-string/span/digest/probe/hash-state vectors make no production JSI claim.
 
 # Fail-closed generation
 
@@ -81,10 +81,10 @@ every consumed family report.
 
 # Evidence
 
-`tests/dmsdk-universal-bindings.test.mjs` verifies the 64-vector census,
+`tests/dmsdk-universal-bindings.test.mjs` verifies the 74-vector census,
 per-family partition, unique vector hashes, all 1,361 source recipes, zero
 silent omissions, byte-identical temporary-root regeneration, linked execution
-of all 64 production C ABI dispatcher routes, and execution of all 33 installed
+of all 74 production C ABI dispatcher routes, and execution of all 33 installed
 JSI vectors through real Hermes and the production host modules.
 
 `tests/dmsdk-named-scalar-bindings.test.mjs` separately regenerates all seven

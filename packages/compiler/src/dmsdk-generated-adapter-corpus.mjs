@@ -15,6 +15,7 @@ const familyDescriptor = Object.freeze({
   enumValue: { count: "deherm_dmsdk_enum_count", descriptors: "deherm_dmsdk_enum_descriptors", id: "id", declaration: "declaration_id" },
   fixedDigest: { count: "deherm_dmsdk_fixed_digest_count", descriptors: "deherm_dmsdk_fixed_digest_descriptors", id: "id", declaration: "declaration_id" },
   hashSpan: { count: "deherm_dmsdk_hash_span_count", descriptors: "deherm_dmsdk_hash_span_descriptors", id: "id", declaration: "declaration_id" },
+  hashState: { count: "deherm_dmsdk_hash_state_count", descriptors: "deherm_dmsdk_hash_state_descriptors", id: "id", declaration: "declaration_id" },
   base64Span: { count: "deherm_dmsdk_base64_span_count", descriptors: "deherm_dmsdk_base64_span_descriptors", id: "id", declaration: "declaration_id" },
   astcProbe: { count: "deherm_dmsdk_astc_probe_count", descriptors: "deherm_dmsdk_astc_probe_descriptors", id: "id", declaration: "declaration_id" },
   cstringValue: { count: "deherm_dmsdk_cstring_value_count", descriptors: "deherm_dmsdk_cstring_value_descriptors", id: null, declaration: "source_id" },
@@ -69,6 +70,7 @@ const familyCode = Object.freeze({
   scalar: 0, enumValue: 1, fixedDigest: 2, hashSpan: 3,
   base64Span: 4, xteaSpan: 5, astcProbe: 6, cstringValue: 7,
   arenaCString: 8,
+  hashState: 9,
 });
 
 function enumValue(parameter, seed) {
@@ -187,6 +189,18 @@ function renderFamilyFake(vector) {
     const value = vector.familyContract.resultBits === 32 ? `UINT32_C(${0x65000000 + id})` : `UINT64_C(${0x6500000000000000 + id})`;
     return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,${out} output){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${7 + id})||input[0]!=UINT8_C(${0x30 + id})||!output)++g_failures[${code}][${id}];*output=${value};return UINT8_C(1);}`;
   }
+  if (vector.family === "hashState") {
+    const operation = vector.familyContract.operation;
+    const width = vector.familyContract.width;
+    const state = `HashState${width}`;
+    const count = `++g_calls[${code}][${id}];`;
+    if (operation === "Init") return `void ${name}(${state}* s,bool reverse){${count}s->m_Hash=reverse?${width}:${width === 32 ? 3 : 6};s->m_Tail=0;s->m_Count=0;s->m_Size=0;s->m_ReverseHashEntryIndex=0;}`;
+    if (operation === "Clone") return `void ${name}(${state}* d,const ${state}* s,bool reverse){${count}d->m_Hash=s->m_Hash+(reverse?${width === 32 ? 7 : 9}:1);d->m_Tail=s->m_Tail;d->m_Count=s->m_Count;d->m_Size=s->m_Size;d->m_ReverseHashEntryIndex=0;}`;
+    if (operation === "UpdateBuffer") return `void ${name}(${state}* s,const void* input,uint32_t length){${count}const auto* bytes=static_cast<const uint8_t*>(input);for(uint32_t i=0;i<length;++i)s->m_Hash+=bytes[i];}`;
+    if (operation === "Final") return `uint${width}_t ${name}(${state}* s){${count}return s->m_Hash;}`;
+    if (operation === "Release") return `void ${name}(${state}*){${count}}`;
+    throw new Error(`${vector.declarationId} has unsupported hash-state operation ${operation}`);
+  }
   if (vector.family === "base64Span") {
     return `extern \"C\" uint8_t ${name}(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t* inout){++g_calls[${code}][${id}];if(!input||length!=UINT32_C(${id === 0 ? 4 : 5})||input[0]!=UINT8_C(${id === 0 ? 81 : 0x41 + id})||!output||!inout||*inout!=UINT32_C(32))++g_failures[${code}][${id}];if(output&&inout){output[0]=UINT8_C(${0x81 + id});output[1]=UINT8_C(${0x91 + id});*inout=UINT32_C(2);}return UINT8_C(1);}`;
   }
@@ -232,6 +246,21 @@ function renderDispatchCheck(vector, failure) {
     const expected = vector.familyContract.resultBits === 32 ? `UINT64_C(${0x65000000 + id})` : `UINT64_C(${0x6500000000000000 + id})`;
     return `{uint8_t input[16]={UINT8_C(${0x30 + id})};uint64_t output=0;if(deherm_dmsdk_hash_span_dispatch(UINT16_C(${id}),input,UINT32_C(${7 + id}),&output)!=DEHERM_DMSDK_HASH_SPAN_OK)return ${failure};${common}if(output!=${expected})return ${failure};}`;
   }
+  if (vector.family === "hashState") {
+    const operation = vector.familyContract.operation;
+    const width = vector.familyContract.width;
+    const initId = width === 32 ? "DEHERM_DMSDK_HASH_STATE_INIT_32" : "DEHERM_DMSDK_HASH_STATE_INIT_64";
+    const finalId = width === 32 ? "DEHERM_DMSDK_HASH_STATE_FINAL_32" : "DEHERM_DMSDK_HASH_STATE_FINAL_64";
+    const releaseId = width === 32 ? "DEHERM_DMSDK_HASH_STATE_RELEASE_32" : "DEHERM_DMSDK_HASH_STATE_RELEASE_64";
+    const bytes = `uint8_t input[4]={1,2,3,4};`;
+    const before = `const uint32_t before=g_calls[${code}][${id}];`;
+    const stateCommon = `if(g_calls[${code}][${id}]!=before+UINT32_C(1)||g_failures[${code}][${id}]!=UINT32_C(0))return ${failure};`;
+    if (operation === "Init") return `{${before}uint64_t state=0,value=0;if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),0,nullptr,0,1,&state)!=DEHERM_DMSDK_HASH_STATE_OK||state==0)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=UINT64_C(${width}))return ${failure};}`;
+    if (operation === "Clone") return `{uint64_t source=0,value=0,result=0;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&source)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),source,nullptr,0,1,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value==0||value==source)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},value,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK||result!=UINT64_C(${width === 32 ? 10 : 15}))return ${failure};if(deherm_dmsdk_hash_state_dispatch(${releaseId},source,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};}`;
+    if (operation === "UpdateBuffer") return `{uint64_t state=0,value=9,result=0;${bytes}if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,input,4,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=0)return ${failure};${stateCommon}if(deherm_dmsdk_hash_state_dispatch(${finalId},state,nullptr,0,0,&result)!=DEHERM_DMSDK_HASH_STATE_OK||result!=UINT64_C(${width === 32 ? 13 : 16}))return ${failure};}`;
+    if (operation === "Final") return `{uint64_t state=0,value=0;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=UINT64_C(${width === 32 ? 3 : 6}))return ${failure};${stateCommon}}`;
+    return `{uint64_t state=0,value=9;if(deherm_dmsdk_hash_state_dispatch(${initId},0,nullptr,0,0,&state)!=DEHERM_DMSDK_HASH_STATE_OK)return ${failure};${before}if(deherm_dmsdk_hash_state_dispatch(UINT16_C(${id}),state,nullptr,0,0,&value)!=DEHERM_DMSDK_HASH_STATE_OK||value!=0)return ${failure};${stateCommon}}`;
+  }
   if (vector.family === "base64Span") {
     const init = id === 0 ? "'Q','Q','=','='" : `${0x41 + id},0x22,0x33,0x44,0x55`;
     return `{uint8_t input[5]={${init}};uint8_t output[32]={};uint32_t written=0;if(deherm_dmsdk_base64_span_dispatch(UINT16_C(${id}),input,UINT32_C(${id === 0 ? 4 : 5}),output,UINT32_C(32),&written)!=DEHERM_DMSDK_BASE64_SPAN_OK)return ${failure};${common}if(written!=UINT32_C(2)||output[0]!=UINT8_C(${0x81 + id})||output[1]!=UINT8_C(${0x91 + id}))return ${failure};}`;
@@ -251,7 +280,7 @@ function renderDispatchCheck(vector, failure) {
 
 function renderVerificationSource(generated) {
   const vectors = generated.verification.vectors;
-  const headers = [...new Set(vectors.flatMap(({ productionHeader, family }) => [productionHeader, `defold_hermes/generated_dmsdk_${({ arenaCString: "arena_cstring", enumValue: "enum_value", fixedDigest: "fixed_digest", hashSpan: "hash_span", base64Span: "base64_span", xteaSpan: "xtea_span", astcProbe: "astc_probe", scalar: "scalar", cstringValue: "cstring_value" })[family]}.h`]))].sort(compareCodeUnits);
+  const headers = [...new Set(vectors.flatMap(({ productionHeader, family }) => [productionHeader, `defold_hermes/generated_dmsdk_${({ arenaCString: "arena_cstring", enumValue: "enum_value", fixedDigest: "fixed_digest", hashSpan: "hash_span", hashState: "hash_state", base64Span: "base64_span", xteaSpan: "xtea_span", astcProbe: "astc_probe", scalar: "scalar", cstringValue: "cstring_value" })[family]}.h`]))].sort(compareCodeUnits);
   const sdkHeaders = ["dmsdk/dlib/buffer.h", "dmsdk/dlib/dstrings.h", "dmsdk/dlib/hash.h", "dmsdk/dlib/socket.h", "dmsdk/dlib/sys.h", "dmsdk/dlib/uri.h", "dmsdk/dlib/utf8.h", "dmsdk/graphics/graphics.h", "dmsdk/resource/resource.h", "dmsdk/resource/resource.hpp"];
   const descriptorChecks = [];
   let failure = 1;
@@ -276,7 +305,7 @@ ${headers.map((header) => `#include <${header}>`).join("\n")}
 ${sdkHeaders.map((header) => `#include <${header}>`).join("\n")}
 #include <stdint.h>
 #include <string.h>
-namespace {uint32_t g_calls[9][32]{};uint32_t g_failures[9][32]{};bool g_arena_uri_failure=false;uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
+namespace {uint32_t g_calls[10][32]{};uint32_t g_failures[10][32]{};bool g_arena_uri_failure=false;uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
 ${fakes}
 struct DehermDmSdkAdapterExactVector{uint32_t recipe_id;uint16_t adapter_id;const char* family;const char* sha256;};
 static const DehermDmSdkAdapterExactVector kVectors[]={

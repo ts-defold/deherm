@@ -32,6 +32,9 @@ constexpr Route kRoutes[] = {
   {24, 24, 0xf6c4cfbau, "script:gui.set_texture_data", "gui", "set_texture_data", "upstream/defold/engine/gui/src/gui_script.cpp", "LuaSetTextureData", Disposition::kCandidate, Codec::kBoolean, Context::kGui, nullptr},
   {25, 25, 0xfc717758u, "script:gui.set_layout", "gui", "set_layout", "upstream/defold/engine/gui/src/gui_script.cpp", "LuaSetLayout", Disposition::kCandidate, Codec::kBoolean, Context::kGui, nullptr},
 };
+constexpr int32_t kResultDomainValues[] = { 0, -1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -1000 };
+constexpr uint16_t kResultDomainOffsets[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 14, 14, 14 };
+constexpr uint8_t kResultDomainCounts[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 0, 0 };
 constexpr uint16_t kCandidateRouteOffsets[] = { 0, 2, 4, 8, 9, 13, 17, 18, 19, 21, 25, 26, 27, 30, 32, 36, 40, 42, 44, 45, 47, 49, 51, 53, 55, 57, 59 };
 constexpr uint16_t kShapeArgumentOffsets[] = { 0, 1, 2, 4, 6, 8, 10, 12, 14, 15, 15, 16, 17, 18, 18, 19, 20, 21, 21, 22, 22, 23, 23, 24, 25, 26, 27, 28, 30, 32, 34, 37, 40, 40, 41, 42, 43, 45, 47, 49, 51, 52, 53, 54, 55, 55, 56, 57, 59, 61, 62, 63, 64, 65, 66, 67, 73, 79, 80, 81 };
 constexpr uint8_t kShapeArgumentCounts[] = { 1, 1, 2, 2, 2, 2, 2, 2, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 0, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 0, 1, 1, 2, 2, 1, 1, 1, 1, 1, 1, 6, 6, 1, 1 };
@@ -61,7 +64,15 @@ bool validShape(const Route& route, const ScriptCallFrame& frame) noexcept {
 }
 bool validResult(const Route& route, const ScriptCallFrame& frame) noexcept {
   if (route.resultCodec == Codec::kNone) return frame.resultCount == 0;
-  return frame.resultCount == 1 && frame.results && matches(route.resultCodec, frame.results[0]);
+  if (frame.resultCount != 1 || !frame.results || !matches(route.resultCodec, frame.results[0])) return false;
+  const uint8_t domainCount = kResultDomainCounts[route.index];
+  if (!domainCount) return true;
+  const double value = frame.results[0].number;
+  const uint16_t domainOffset = kResultDomainOffsets[route.index];
+  for (uint8_t index = 0; index < domainCount; ++index) {
+    if (value == static_cast<double>(kResultDomainValues[domainOffset + index])) return true;
+  }
+  return false;
 }
 }  // namespace
 const Route* routes() noexcept { return kRoutes; }
@@ -69,6 +80,9 @@ const uint16_t* candidateRouteOffsets() noexcept { return kCandidateRouteOffsets
 const uint16_t* shapeArgumentOffsets() noexcept { return kShapeArgumentOffsets; }
 const uint8_t* shapeArgumentCounts() noexcept { return kShapeArgumentCounts; }
 const Codec* argumentCodecs() noexcept { return kArgumentCodecs; }
+const int32_t* resultDomainValues() noexcept { return kResultDomainValues; }
+const uint16_t* resultDomainOffsets() noexcept { return kResultDomainOffsets; }
+const uint8_t* resultDomainCounts() noexcept { return kResultDomainCounts; }
 const Route* find(uint32_t stableId) noexcept { size_t first=0,count=kRouteCount; while(count){const size_t step=count/2,index=first+step;if(kRoutes[index].stableId<stableId){first=index+1;count-=step+1;}else count=step;} return first<kRouteCount&&kRoutes[first].stableId==stableId?&kRoutes[first]:nullptr; }
 DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t capacity, const LuaApi* api) noexcept {
   if (!frame) { fail(error, capacity, "Defold value-tail call frame is null"); return DispatchStatus::kError; }

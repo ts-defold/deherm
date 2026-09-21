@@ -19,7 +19,7 @@ namespace {
 }
 void expect(bool value, const char* message) { if (!value) fail(message); }
 
-struct Backend { uint32_t calls = 0; bool wrongResult = false; };
+struct Backend { uint32_t calls = 0; bool wrongResult = false; bool invalidEnumResult = false; };
 tail::DispatchStatus invoke(void* raw, const tail::Route& route, ScriptCallFrame* frame, char*, size_t) noexcept {
   auto* backend = static_cast<Backend*>(raw);
   ++backend->calls;
@@ -32,7 +32,7 @@ tail::DispatchStatus invoke(void* raw, const tail::Route& route, ScriptCallFrame
   else if (route.resultCodec == tail::Codec::kMatrix4) { frame->results[0].tag = ScriptValueTag::kDefoldValue; frame->results[0].defoldKind = ScriptDefoldValueKind::kMatrix4; }
   else if (route.resultCodec == tail::Codec::kHash) { frame->results[0].tag = ScriptValueTag::kHandle; frame->results[0].handleKind = ScriptHandleKind::kHash; }
   else if (route.resultCodec == tail::Codec::kBoolean) { frame->results[0].tag = ScriptValueTag::kBoolean; }
-  else { frame->results[0].tag = ScriptValueTag::kNumber; }
+  else { frame->results[0].tag = ScriptValueTag::kNumber; frame->results[0].number = backend->invalidEnumResult ? 17.0 : 0.0; }
   return tail::DispatchStatus::kSuccess;
 }
 
@@ -106,5 +106,10 @@ int main() {
     "integer dmLiveUpdate::Result candidate was rejected");
   expect(enumCall.frame.resultCount == 1 && enumCall.results[0].tag == ScriptValueTag::kNumber && backend.calls == 5,
     "liveupdate result did not cross the numeric enum carrier");
+  backend.invalidEnumResult = true;
+  expect(tail::dispatch(&enumCall.frame, enumCall.error.data(), enumCall.error.size(), &api) == tail::DispatchStatus::kError,
+    "out-of-domain liveupdate result crossed the named-enum ABI");
+  expect(enumCall.frame.resultCount == 0 && backend.calls == 6 && std::strstr(enumCall.error.data(), "result does not match"),
+    "out-of-domain liveupdate result did not fail closed after the exact call");
   std::puts("script-value-tail:ok");
 }

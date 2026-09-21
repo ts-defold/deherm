@@ -28,9 +28,9 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
   ));
   assert.deepEqual(report.coverage, {
     arenaSpanCensus: 79,
-    coveredByPriorWaves: 12,
+    coveredByPriorWaves: 14,
     generatedCStringArena: 5,
-    blocked: 62,
+    blocked: 60,
     executableAdaptersEmitted: 5,
     exactCallTwinsEmitted: 5,
     overlap: 0,
@@ -39,19 +39,19 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
   assert.deepEqual(report.partitionSummary, {
     "handle-provenance-or-engine-context": 33,
     "opaque-byte-pointee-unit-or-lifetime": 4,
-    "record-layout-or-borrowed-record-lifetime": 19,
+    "record-layout-or-borrowed-record-lifetime": 17,
     "template-element-layout-or-specialization": 6
   });
   const priorIds = new Set(report.coveredByPriorWaves.map(({ id }) => id));
   const blockedIds = new Set(report.declarations.map(({ id }) => id));
-  assert.equal(priorIds.size, 12);
+  assert.equal(priorIds.size, 14);
   const generatedIds = new Set(report.generatedDeclarations.map(({ id }) => id));
   assert.equal(generatedIds.size, 5);
-  assert.equal(blockedIds.size, 62);
+  assert.equal(blockedIds.size, 60);
   assert.equal([...priorIds].some((id) => blockedIds.has(id)), false);
   assert.equal([...priorIds].some((id) => generatedIds.has(id)), false);
   assert.equal([...generatedIds].some((id) => blockedIds.has(id)), false);
-  assert.equal(Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0), 62);
+  assert.equal(Object.values(report.partitionSummary).reduce((sum, count) => sum + count, 0), 60);
   assert.deepEqual(report.generatedDeclarations.map(({ recipe }) => recipe.kind), [
     "canonical-path", "error-string", "trimmed-string", "uri-encode", "canonical-path"
   ]);

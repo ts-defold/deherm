@@ -13,20 +13,22 @@
       "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
       "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
       "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
-      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json"
+      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
+      "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"
     ]
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
-    "policy": "417173a096bcb9e49b3422e7d431844c1920e193b9770c3388503b7795bde5e0",
+    "policy": "d6865ee151c6b2a57007b7f3e4d9c81607966e4a63aea0f789998a8ffcbd3414",
     "priorWaveReports": {
       "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
       "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
       "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
       "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
-      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051"
+      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
+      "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json": "66325311eeb4c07d867e021b32c00cb2036a84cb4b9725ac3eddcb581e6c93b9"
     },
     "evidence": {
       "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h": "c31d7f9f6408120e88cd0b3257720ed4cb98e6670ce9ebd15d30adbb3a8896fc",
@@ -48,9 +50,9 @@
   },
   "coverage": {
     "arenaSpanCensus": 79,
-    "coveredByPriorWaves": 12,
+    "coveredByPriorWaves": 14,
     "generatedCStringArena": 5,
-    "blocked": 62,
+    "blocked": 60,
     "executableAdaptersEmitted": 5,
     "exactCallTwinsEmitted": 5,
     "overlap": 0,
@@ -85,6 +87,12 @@
       "report": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
       "policyVersion": "hash-span-v1",
       "sha256": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
+      "declarationCount": 2
+    },
+    {
+      "report": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
+      "policyVersion": "hash-state-v1",
+      "sha256": "66325311eeb4c07d867e021b32c00cb2036a84cb4b9725ac3eddcb581e6c93b9",
       "declarationCount": 2
     }
   ],
@@ -140,6 +148,16 @@
       "sourceReport": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json"
     },
     {
+      "id": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
+      "symbol": "dmHashUpdateBuffer32",
+      "sourceReport": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"
+    },
+    {
+      "id": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
+      "symbol": "dmHashUpdateBuffer64",
+      "sourceReport": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"
+    },
+    {
       "id": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
       "symbol": "dmImage::GetAstcBlockSize",
       "sourceReport": "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json"
@@ -153,7 +171,7 @@
   "partitionSummary": {
     "handle-provenance-or-engine-context": 33,
     "opaque-byte-pointee-unit-or-lifetime": 4,
-    "record-layout-or-borrowed-record-lifetime": 19,
+    "record-layout-or-borrowed-record-lifetime": 17,
     "template-element-layout-or-specialization": 6
   },
   "artifactHashes": {
@@ -2706,120 +2724,6 @@
       "disposition": "blocked",
       "blocker": "opaque-byte-pointee-unit-or-lifetime",
       "blockerReason": "The void pointer's pointee unit, mutability, returned lifetime, allocation source, or ownership is not fully represented by the mechanical span shape.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
-      "id": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
-      "symbol": "dmHashUpdateBuffer32",
-      "kind": "function",
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
-      "line": 223,
-      "primaryFamily": "pointer-span",
-      "families": [
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:void(inout:pointer:record:HashState32,in:opaque-pointer,value:scalar:u32)",
-      "result": {
-        "role": "scalar:void",
-        "direction": "value",
-        "nativeType": "void"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "hash_state",
-          "role": "pointer:record:HashState32",
-          "direction": "inout",
-          "nativeType": "HashState32 *"
-        },
-        {
-          "position": 1,
-          "name": "buffer",
-          "role": "opaque-pointer",
-          "direction": "in",
-          "nativeType": "const void *"
-        },
-        {
-          "position": 2,
-          "name": "buffer_len",
-          "role": "scalar:u32",
-          "direction": "value",
-          "nativeType": "uint32_t"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "record-layout-or-borrowed-record-lifetime",
-      "blockerReason": "The ABI crosses a record pointer whose exact layout, nested fields, borrowed lifetime, or engine-context relationship is not yet verified.",
-      "stages": {
-        "generated": "not-applicable",
-        "compiled": "not-claimed",
-        "linked": "not-claimed",
-        "runtime": "not-claimed",
-        "allocation": "not-claimed"
-      }
-    },
-    {
-      "id": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
-      "symbol": "dmHashUpdateBuffer64",
-      "kind": "function",
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
-      "line": 265,
-      "primaryFamily": "pointer-span",
-      "families": [
-        "pointer-span",
-        "pointer"
-      ],
-      "shape": "scalar:void(inout:pointer:record:HashState64,in:opaque-pointer,value:scalar:u32)",
-      "result": {
-        "role": "scalar:void",
-        "direction": "value",
-        "nativeType": "void"
-      },
-      "parameters": [
-        {
-          "position": 0,
-          "name": "hash_state",
-          "role": "pointer:record:HashState64",
-          "direction": "inout",
-          "nativeType": "HashState64 *"
-        },
-        {
-          "position": 1,
-          "name": "buffer",
-          "role": "opaque-pointer",
-          "direction": "in",
-          "nativeType": "const void *"
-        },
-        {
-          "position": 2,
-          "name": "buffer_len",
-          "role": "scalar:u32",
-          "direction": "value",
-          "nativeType": "uint32_t"
-        }
-      ],
-      "tranche": "arena-backed-spans",
-      "blockers": [
-        "native-symbol-linkage-unverified",
-        "pointer-bounds-direction-lifetime-policy",
-        "span-element-unit-and-copy-policy"
-      ],
-      "disposition": "blocked",
-      "blocker": "record-layout-or-borrowed-record-lifetime",
-      "blockerReason": "The ABI crosses a record pointer whose exact layout, nested fields, borrowed lifetime, or engine-context relationship is not yet verified.",
       "stages": {
         "generated": "not-applicable",
         "compiled": "not-claimed",

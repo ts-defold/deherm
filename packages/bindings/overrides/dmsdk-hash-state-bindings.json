@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "hash-state-v1",
+  "family": "generation-checked-hash-state",
+  "candidateSelector": {
+    "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+    "symbolPattern": "^dmHash(?:Init|Clone|UpdateBuffer|Final|Release)(?:32|64)$",
+    "operations": ["Init", "Clone", "UpdateBuffer", "Final", "Release"],
+    "widths": [32, 64],
+    "expectedCount": 10
+  },
+  "registry": {
+    "capacityPerWidth": 16,
+    "token": "opaque-u64-magic-width-generation-slot",
+    "generationBits": 31,
+    "consumeOperations": ["Final", "Release"],
+    "reverseHashDefault": false,
+    "threadSafety": "global-allocation-free-spin-lock",
+    "generationExhaustion": "retire-slot"
+  },
+  "symbolEvidence": {
+    "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+    "requiredLinkage": "external",
+    "requiredAvailability": "all-targets-all-variants"
+  }
+}
