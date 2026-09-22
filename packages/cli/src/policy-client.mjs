@@ -13,6 +13,8 @@ import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
 
 const defaultSiteConfig = new URL("../../bindings/policy-site.json", import.meta.url);
 const DIGEST_PATTERN = /^[0-9a-f]{64}$/u;
+const DEFAULT_FETCH_RETRY_DELAYS_MS = Object.freeze([250, 500, 1_000, 2_000, 4_000, 8_000]);
+const MAX_RETRY_AFTER_MS = 8_000;
 
 export function policyLocatorFromSiteConfig(config) {
   if (config?.schemaVersion !== 1 || typeof config.baseUrl !== "string" ||
@@ -181,10 +183,39 @@ async function atomicReplace(file, bytes) {
   return true;
 }
 
-async function fetchBytes(url, fetchImpl) {
-  const response = await fetchImpl(url);
-  if (!response.ok) throw new Error(`${url}: HTTP ${response.status}`);
-  return Buffer.from(await response.arrayBuffer());
+function retryableHttpStatus(status) {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
+function retryAfterMilliseconds(response) {
+  const value = response.headers?.get?.("retry-after");
+  if (!value) return null;
+  if (/^\d+$/u.test(value)) return Math.min(MAX_RETRY_AFTER_MS, Number(value) * 1_000);
+  const date = Date.parse(value);
+  return Number.isFinite(date) ? Math.min(MAX_RETRY_AFTER_MS, Math.max(0, date - Date.now())) : null;
+}
+
+async function fetchBytes(url, fetchImpl, options = {}) {
+  const delays = options.fetchRetryDelaysMs ?? DEFAULT_FETCH_RETRY_DELAYS_MS;
+  const sleep = options.sleepImpl ?? ((milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)));
+  let lastError = null;
+  for (let attempt = 0; attempt <= delays.length; attempt += 1) {
+    let response;
+    try {
+      response = await fetchImpl(url);
+    } catch (error) {
+      lastError = error;
+      if (attempt === delays.length) throw error;
+      await sleep(delays[attempt]);
+      continue;
+    }
+    if (response.ok) return Buffer.from(await response.arrayBuffer());
+    lastError = new Error(`${url}: HTTP ${response.status}`);
+    if (!retryableHttpStatus(response.status) || attempt === delays.length) throw lastError;
+    await response.body?.cancel?.();
+    await sleep(retryAfterMilliseconds(response) ?? delays[attempt]);
+  }
+  throw lastError;
 }
 
 function parseJson(bytes, label) {
@@ -255,7 +286,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
       throw new Error(`No authenticated cached ${label} for Defold ${revision} at ${file}; DEHERM_OFFLINE=1`);
     }
     const url = `${base}/${relative}`;
-    const bytes = await fetchBytes(url, fetchImpl);
+    const bytes = await fetchBytes(url, fetchImpl, options);
     transfer.transferBytes += bytes.length;
     const value = validate(bytes, relative);
     if (await atomicWrite(file, bytes)) transfer.cacheWrites += 1;
@@ -283,7 +314,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     }
     transfer.cacheMisses += 1;
     const url = `${base}/${relative}`;
-    const bytes = await fetchBytes(url, fetchImpl);
+    const bytes = await fetchBytes(url, fetchImpl, options);
     transfer.transferBytes += bytes.length;
     const value = validate(bytes, relative);
     if (await atomicReplace(file, bytes)) transfer.cacheWrites += 1;

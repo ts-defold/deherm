@@ -167,6 +167,31 @@ test("an absent exact revision is rejected without revision fallback", async () 
   assert.deepEqual(source.requests, [`https://policy.invalid/deherm/v1/index/${absentRevision}.json`]);
 });
 
+test("published policy resolution retries transient Pages propagation failures", async () => {
+  const cacheHome = await mkdtemp(path.join(tmpdir(), "deherm-policy-client-transient-"));
+  const source = fixture();
+  const objectUrl = `https://policy.invalid/deherm/v1/object/${source.documentHash}.json`;
+  const fetchImpl = source.fetchImpl;
+  let transientFailures = 2;
+  const sleeps = [];
+  const resolved = await resolvePublishedPolicy(revision, {
+    ...source,
+    cacheHome,
+    fetchImpl: async (url) => {
+      if (String(url) === objectUrl && transientFailures-- > 0) {
+        source.requests.push(String(url));
+        return new Response("publishing", { status: 503 });
+      }
+      return fetchImpl(url);
+    },
+    fetchRetryDelaysMs: [1, 2],
+    sleepImpl: async (milliseconds) => { sleeps.push(milliseconds); }
+  });
+  assert.equal(resolved.entry.policyRoot, source.policyRoot);
+  assert.deepEqual(sleeps, [1, 2]);
+  assert.equal(source.requests.filter((url) => url === objectUrl).length, 3);
+});
+
 test("published policy resolution rejects an object substituted at its digest path", async () => {
   const cacheHome = await mkdtemp(path.join(tmpdir(), "deherm-policy-client-tamper-"));
   await assert.rejects(

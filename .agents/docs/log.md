@@ -1,5 +1,19 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Policy consumers tolerate bounded publication propagation
+
+The public policy index and its content-addressed objects can become visible at
+slightly different moments while GitHub Pages deploys a new site. A real hosted
+consumer run resolved the new index successfully and then received HTTP 503 for
+one referenced object. The policy client now retries transport failures and
+HTTP 408, 425, 429, and 5xx responses with a bounded exponential schedule of
+250 ms through 8 s. Authoritative 4xx responses such as a missing exact revision
+still fail immediately, and every successful response remains authenticated by
+its content digest before entering the immutable cache. Focused tests prove a
+transient object becomes usable after two 503 responses without weakening the
+existing one-request 404 failure. This is client/network resilience evidence,
+not evidence that the publication host provides atomic multi-object deployment.
+
 ## 2026-09-22 - Project-authored message evidence stays separate from Defold declarations
 
 The generated project resource table now carries an optional versioned
