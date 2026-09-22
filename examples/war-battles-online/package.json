@@ -29,6 +29,7 @@
     "runtime:debug": "node integration/check-debug-runtime.mjs",
     "runtime:debug:browser": "node integration/check-browser-debug-runtime.mjs",
     "runtime:browser": "node integration/check-browser-runtime.mjs",
+    "runtime:browser:playability": "node integration/check-browser-playability.mjs",
     "runtime:browser:record": "node integration/check-browser-runtime.mjs --record-evidence",
     "runtime:browser:check": "node integration/check-browser-runtime.mjs --check-evidence",
     "runtime:packaged:record": "node integration/check-packaged-runtime.mjs --record-evidence",

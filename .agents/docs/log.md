@@ -1797,3 +1797,34 @@ evidence rather than a build rule. Focused language-server tests pass across
 all three scopes, duplicate declarations, aliases, CRLF/UTF-16 positions, and
 exact definition locations. This is deterministic language-service evidence;
 it is not a TypeScript type-checker proof or a live VS Code UI observation.
+
+## 2026-09-22 - War Battles HTML5 is visually and interactively playable
+
+The current War Battles project regenerated through the public CLI, passed its
+four TypeScript context checks and 32-player deterministic simulation suite,
+and bundled for `wasm-web` through pinned Bob plus local Extender. The existing
+browser runtime gate observed the tutorial fire/collision/score sequence,
+camera clamps, eight registered TypeScript components, and offline arena
+engagement. A new companion playability gate sent real Chrome keyboard events:
+`W` interrupted the idle tutorial and engaged the arena in under 100 ms across
+the recorded reruns. The gate
+then dispatched weapon-three and fire events while the live match rendered;
+only the first event has an in-game observation today.
+
+The browser reported a live, non-lost WebGL 2 context using WebGL GLSL ES 3.00
+through ANGLE/SwiftShader. Chrome's canvas-clipped composed frame contained
+4,000/4,000 visible and non-black sampled pixels across more than 60 coarse
+colour buckets; the roughly 65 KB PNG at
+`build/evidence/war-battles-html5.png` was inspected and shows the arena,
+HUD, walls, tank, terrain and projectile. Directly copying the WebGL default
+framebuffer after presentation produced cleared pixels, which is permitted when
+`preserveDrawingBuffer` is false, so the durable gate analyzes the compositor
+screenshot rather than misclassifying that expected buffer lifecycle as a
+black game. This proves the local packaged HTML5 input/render path under
+software WebGL; it does not prove every hardware GPU or browser.
+
+The checked JavaScript bundle-size source census also stopped counting the
+generated `defold_hermes` and optional `defold_hermes_typed_native` installation
+trees. Their target-dependent presence had made the authored-game evidence vary
+with local build state. Bundle artifacts remain measured exactly; only the
+source census boundary was corrected.

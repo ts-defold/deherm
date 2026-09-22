@@ -73,7 +73,18 @@ async function collectFiles(base, directories) {
 
 async function walk(directory, output) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if (entry.isDirectory() && [".deherm", ".internal", "build", "deherm"].includes(entry.name)) continue;
+    // Source evidence must not depend on whether this checkout has staged the
+    // generated runtime extension or an optional typed-native unit. Both trees
+    // are installed build inputs with their own manifests, not War Battles
+    // source, and their contents legitimately vary by selected target.
+    if (entry.isDirectory() && [
+      ".deherm",
+      ".internal",
+      "build",
+      "deherm",
+      "defold_hermes",
+      "defold_hermes_typed_native"
+    ].includes(entry.name)) continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) await walk(path, output);
     else if (entry.isSymbolicLink()) continue;

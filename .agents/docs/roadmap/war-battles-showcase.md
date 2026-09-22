@@ -184,3 +184,10 @@ profiles, plus a long-running 32-bot soak. Record:
 
 The showcase is successful when it demonstrates the SDK under real load and
 the same TypeScript gameplay source works across native and HTML5 targets.
+
+The local HTML5 playability gate builds the current project through pinned Bob
+and Extender, engages the arena through real Chrome keyboard events, queries
+the Defold-owned WebGL context, analyzes Chrome's composed frame for visible
+and diverse pixels, and retains a screenshot for human inspection. That is
+input/render evidence under software WebGL, not hardware-GPU parity or an
+aesthetic regression oracle.
