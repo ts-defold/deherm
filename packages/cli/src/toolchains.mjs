@@ -41,6 +41,30 @@ function targetRecord(lock, requested) {
   return { ...record, requested, extenderTarget };
 }
 
+/**
+ * Resolve Bob's command-line platform and Extender's bundle target from the
+ * authenticated target matrix generated for one project. Defold owns both
+ * spellings; this function deliberately carries no package-level allowlist.
+ */
+export async function resolveDefoldPlatform(projectRoot, requested, options = {}) {
+  if (typeof requested !== "string" || !requested) {
+    throw new TypeError("A Bob or Extender platform is required");
+  }
+  const root = path.resolve(projectRoot);
+  const lock = options.lock ?? await projectLock(root);
+  const target = targetRecord(lock, requested);
+  if (target.kind !== "bundle") throw new Error(`${target.extenderTarget} is retired by this Defold revision`);
+  const pair = lock.toolchain.targetMatrix.platformPairs.find(
+    (entry) => entry.extenderTarget === target.extenderTarget
+  );
+  if (!pair) {
+    throw new Error(
+      `${target.extenderTarget} has no Bob platform declared by ${lock.toolchain.targetMatrix.authority.pairs}`
+    );
+  }
+  return { ...target, bobPlatform: pair.bobPlatform };
+}
+
 function nativeArtifactFamily(lock) {
   const family = lock.artifacts?.artifacts?.["native-artifacts"];
   if (!family || family.indexedBy !== "bundleTarget" ||

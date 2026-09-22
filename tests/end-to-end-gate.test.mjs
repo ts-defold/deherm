@@ -156,6 +156,7 @@ test("Bob consumes the generated project's target artifact instead of rebuilding
   assert.match(wrapper, /check-project-native-artifact\.mjs" "\$project_root" "\$bundle_target"/u);
   assert.match(wrapper, /--platform "\$bob_platform"/u);
   assert.match(wrapper, /resolve-defold-platform\.mjs/u);
+  assert.match(wrapper, /resolve-defold-platform\.mjs" "\$platform_input" "\$project_root"/u);
   assert.doesNotMatch(wrapper, /package:defold/u);
 });
 

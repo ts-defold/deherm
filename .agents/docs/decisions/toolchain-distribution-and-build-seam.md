@@ -337,6 +337,13 @@ Two artifacts cross from déherm into Bob, with different lifecycles:
 2. **The extension** `defold_hermes/`, which Bob uploads to Extender. Per
    release for its fixed parts, **per build for its generated C**.
 
+Bob's command-line platform and Extender's bundle target are also distinct
+Defold-owned identities (`arm64-macos` versus `arm64-osx` is the current visible
+case). The Bob wrapper resolves both from the generated project's authenticated
+`deherm.lock` target matrix. It must not consult a package-version allowlist:
+the selected Defold revision is the authority, including for targets added or
+retired after the npm package was published.
+
 ## The extension's `src/` is not static
 
 For a release build, `shermes -typed -emit-c` produces C for the reachable

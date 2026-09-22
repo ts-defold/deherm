@@ -58,11 +58,6 @@ if [[ "$local_build" == "1" ]] && ! curl --silent --fail --max-time 2 "$build_se
   exit 1
 fi
 
-platform_input="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
-platform_identity="$(node "$repo_root/scripts/resolve-defold-platform.mjs" "$platform_input")"
-IFS=$'\t' read -r bundle_target bob_platform <<< "$platform_identity"
-variant="${DEFOLD_HERMES_VARIANT:-debug}"
-
 # The smoke project under defold/ is the default Bob root. A product example is
 # an ordinary Defold project with the same extension link, so the same wrapper
 # builds it when DEFOLD_HERMES_PROJECT names its directory. The value is a path
@@ -76,6 +71,11 @@ if [[ ! -f "$project_root/game.project" ]]; then
   echo "No game.project under $project_root." >&2
   exit 1
 fi
+
+platform_input="${DEFOLD_HERMES_PLATFORM:-arm64-macos}"
+platform_identity="$(node "$repo_root/scripts/resolve-defold-platform.mjs" "$platform_input" "$project_root")"
+IFS=$'\t' read -r bundle_target bob_platform <<< "$platform_identity"
+variant="${DEFOLD_HERMES_VARIANT:-debug}"
 
 # A `shermes -emit-c` unit is a transport of the Hermes runtime. Bob discovers
 # extensions by walking the project, and an ext.manifest cannot exclude a

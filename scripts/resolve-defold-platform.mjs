@@ -7,6 +7,9 @@
 import { resolveDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 
 const input = process.argv[2];
-if (!input) throw new Error("Usage: resolve-defold-platform.mjs <bob-or-extender-platform>");
-const { extenderTarget, bobPlatform } = await resolveDefoldPlatform(input);
+const projectRoot = process.argv[3];
+if (!input || !projectRoot) {
+  throw new Error("Usage: resolve-defold-platform.mjs <bob-or-extender-platform> <generated-project>");
+}
+const { extenderTarget, bobPlatform } = await resolveDefoldPlatform(projectRoot, input);
 process.stdout.write(`${extenderTarget}\t${bobPlatform}\n`);

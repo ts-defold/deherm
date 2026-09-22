@@ -9,7 +9,12 @@ import test from "node:test";
 import { deriveBundleTargets, derivePlatformPairs } from "../scripts/generate-defold-bundle-targets.mjs";
 import { hostCompilerKey, inspectHostCompilers, hostCompilerReport, requireHostCompilers, requireHostTool } from "../packages/cli/src/host-compilers.mjs";
 import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
-import { assertProjectNativeArtifact, ensureProjectNativeArtifact, nativeArtifactReport } from "../packages/cli/src/toolchains.mjs";
+import {
+  assertProjectNativeArtifact,
+  ensureProjectNativeArtifact,
+  nativeArtifactReport,
+  resolveDefoldPlatform
+} from "../packages/cli/src/toolchains.mjs";
 import { buildArtifactReferences } from "../packages/generator/src/policy/generate-api-policy.mjs";
 import { dehermPluginManifest, transformCompilerIdentity, transformProject } from "../packages/cli/src/transform-compiler.mjs";
 
@@ -56,6 +61,22 @@ test("Bob and Extender platform identities are derived from Defold Platform.java
   assert.deepEqual(generated, await derivePlatformPairs());
   assert.deepEqual(policyToolchain.targetMatrix.platformPairs, generated.platforms);
   assert.ok(policyToolchain.targetMatrix.targets.some(({ target, kind }) => target === "x86-osx" && kind === "retired"));
+});
+
+test("a generated project resolves Bob and Extender identities from its authenticated target matrix", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-platform-resolution."));
+  try {
+    await writeProjectLock(project);
+    const fromBob = await resolveDefoldPlatform(project, "arm64-macos");
+    const fromExtender = await resolveDefoldPlatform(project, "arm64-osx");
+    assert.equal(fromBob.extenderTarget, "arm64-osx");
+    assert.equal(fromBob.bobPlatform, "arm64-macos");
+    assert.equal(fromExtender.extenderTarget, fromBob.extenderTarget);
+    assert.equal(fromExtender.bobPlatform, fromBob.bobPlatform);
+    await assert.rejects(resolveDefoldPlatform(project, "ppc-aix"), /not a Defold bundle target/u);
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
 });
 
 test("a copied browser-host source artifact satisfies the project artifact gate", async () => {
