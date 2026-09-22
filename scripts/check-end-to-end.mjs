@@ -201,9 +201,23 @@ async function node(script, args = [], options = {}) {
 }
 
 const stages = {
-  async policy() {
-    const { stdout } = await node("scripts/check-policy-site-resolution.mjs");
-    return { detail: stdout.trim().split("\n").at(-1) ?? "resolved" };
+  async policy(context) {
+    // Exercise the same published-policy path as an installed npm consumer and
+    // retain its authenticated materialization in the user cache. A repository
+    // checkout is a valid offline API fallback, but deliberately carries no
+    // mutable release mapping; Bob needs the published sibling artifacts
+    // document in deherm.lock to authenticate the target archive it uploads.
+    const { readPolicyLocator, resolvePublishedPolicy } = await import("../packages/cli/src/policy-client.mjs");
+    const resolved = await resolvePublishedPolicy(context.defoldRevision, {
+      index: await readPolicyLocator()
+    });
+    const native = resolved.artifacts?.artifacts?.["native-artifacts"];
+    if (native?.indexedBy !== "bundleTarget" || !native.tag || !native.assets) {
+      throw new Error(`${context.defoldRevision}: published policy carries no usable native-artifacts mapping`);
+    }
+    return {
+      detail: `resolved ${resolved.entry.policyRoot.slice(0, 12)} and materialized ${native.tag} for ${Object.keys(native.assets).length} target(s)`
+    };
   },
 
   async "host-tools"() {

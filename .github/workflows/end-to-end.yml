@@ -221,7 +221,7 @@ jobs:
         run: |
           node scripts/check-end-to-end.mjs \
             --target "${{ matrix.target }}" \
-            --stage target-archives --stage scaffold --stage generate --stage bob
+            --stage policy --stage target-archives --stage scaffold --stage generate --stage bob
 
       - name: Print Extender failure log
         if: failure()

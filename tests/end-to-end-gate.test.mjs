@@ -146,6 +146,8 @@ test("pushes run the available cheap consumer half while artifact-dispatched run
   assert.match(workflow, /group: end-to-end-\$\{\{ github\.ref \}\}-\$\{\{ github\.event_name == 'push' && 'push' \|\| 'full' \}\}/u);
   assert.match(workflow, /extension-headers:[\s\S]*if: github\.event_name != 'push'/u);
   assert.match(workflow, /bob:[\s\S]*if: github\.event_name != 'push'/u);
+  const bob = workflow.slice(workflow.indexOf("  bob:"));
+  assert.match(bob, /--stage policy --stage target-archives --stage scaffold --stage generate --stage bob/u);
   const dispatch = nativeWorkflow.slice(nativeWorkflow.indexOf("Verify every fingerprinted row is published"));
   assert.match(dispatch, /Run full end-to-end after every fingerprinted row is published[\s\S]*gh workflow run end-to-end\.yml/u);
   assert.doesNotMatch(dispatch, /if: needs\.plan\.outputs\.build_any == 'true'/u);
