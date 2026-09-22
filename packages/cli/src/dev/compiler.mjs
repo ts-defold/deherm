@@ -1,6 +1,8 @@
 import { spawnSync } from "node:child_process";
-import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { context } from "esbuild";
 
@@ -11,6 +13,7 @@ import {
   createBundleFingerprintPlaceholder
 } from "../../../compiler/src/bundle-fingerprint.mjs";
 import {
+  emitProjectWithSourceMaps,
   loadDehermPluginConfig,
   transformProject
 } from "../transform-compiler.mjs";
@@ -31,6 +34,49 @@ async function writeAtomically(file, contents) {
 function normalizeResourcePath(value) {
   const resource = value.replaceAll("\\", "/");
   return resource.startsWith("/") ? resource : `/${resource}`;
+}
+
+async function filesBelow(root) {
+  const files = [];
+  const visit = async (directory) => {
+    const entries = await readdir(directory, { withFileTypes: true });
+    await Promise.all(entries.map(async (entry) => {
+      const absolute = path.join(directory, entry.name);
+      if (entry.isDirectory()) await visit(absolute);
+      else if (entry.isFile()) files.push(absolute);
+    }));
+  };
+  await visit(root);
+  return files.sort();
+}
+
+function resolveMapSource(mapFile, sourceMap, source) {
+  if (source.startsWith("file://")) return fileURLToPath(source);
+  return path.resolve(path.dirname(mapFile), sourceMap.sourceRoot ?? "", source);
+}
+
+// esbuild composes an input map only when the transformed module carries one.
+// dehermc writes external .js.map files, while the onLoad plugin presents a
+// virtual module at the original .ts path. Normalize the one-source map to
+// that virtual module and inline it so resolution is relative to the authored
+// file rather than the temporary compiler output directory.
+async function loadMappedJavaScript(outputRoot) {
+  const modules = new Map();
+  for (const mapFile of (await filesBelow(outputRoot)).filter((file) => file.endsWith(".js.map"))) {
+    const sourceMap = JSON.parse(await readFile(mapFile, "utf8"));
+    if (sourceMap.version !== 3 || sourceMap.sources?.length !== 1) {
+      throw new Error(`dehermc emitted unsupported source map ${mapFile}: expected one version-3 source`);
+    }
+    const sourceFile = path.resolve(resolveMapSource(mapFile, sourceMap, sourceMap.sources[0]));
+    sourceMap.sourceRoot = "";
+    sourceMap.sources = [path.basename(sourceFile)];
+    const javaScriptFile = mapFile.slice(0, -4);
+    const javaScript = (await readFile(javaScriptFile, "utf8"))
+      .replace(/\n?\/\/# sourceMappingURL=[^\n]*\s*$/, "");
+    const inlineMap = Buffer.from(JSON.stringify(sourceMap)).toString("base64");
+    modules.set(sourceFile, `${javaScript}\n//# sourceMappingURL=data:application/json;base64,${inlineMap}\n`);
+  }
+  return modules;
 }
 
 // Compile the bundle to Hermes bytecode with the SHIPPED hermesc.
@@ -88,6 +134,9 @@ export async function createIncrementalCompiler(options) {
   if (useTtsc && !tsconfig) {
     throw new Error("The déherm transform compiler requires a generated tsconfig");
   }
+  const transformOutputRoot = useTtsc
+    ? await mkdtemp(path.join(tmpdir(), "deherm-mapped-transform-"))
+    : null;
   let transformedSources = new Map();
   let transformInputFiles = [];
   const transformedSourcePlugin = {
@@ -98,7 +147,7 @@ export async function createIncrementalCompiler(options) {
         if (source === undefined) return null;
         return {
           contents: source,
-          loader: args.path.endsWith("x") ? "tsx" : "ts",
+          loader: "js",
           watchFiles: transformInputFiles
         };
       });
@@ -107,21 +156,27 @@ export async function createIncrementalCompiler(options) {
   const refreshTransforms = async () => {
     if (!useTtsc) return;
     const projectRoot = path.dirname(tsconfig);
+    const config = await loadDehermPluginConfig(tsconfig);
     const envelope = await transformProject({
       tsconfig,
       cwd: projectRoot,
-      config: await loadDehermPluginConfig(tsconfig)
+      config
     });
-    transformedSources = new Map(Object.entries(envelope.typescript ?? {}).map(([file, source]) => [
-      path.resolve(projectRoot, file),
-      source
-    ]));
+    await rm(transformOutputRoot, { recursive: true, force: true });
+    await mkdir(transformOutputRoot, { recursive: true });
+    await emitProjectWithSourceMaps({
+      tsconfig,
+      cwd: projectRoot,
+      config,
+      outDir: transformOutputRoot
+    });
+    transformedSources = await loadMappedJavaScript(transformOutputRoot);
     const observedHostInputs = Object.entries(envelope.hostInputHashes ?? {})
       .filter(([, digest]) => typeof digest === "string")
       .map(([file]) => path.resolve(projectRoot, file));
     const configInputs = (envelope.graph?.configs ?? []).map((file) => path.resolve(projectRoot, file));
     transformInputFiles = [...new Set([
-      ...transformedSources.keys(),
+      ...Object.keys(envelope.typescript ?? {}).map((file) => path.resolve(projectRoot, file)),
       ...observedHostInputs,
       ...configInputs
     ])].sort();
@@ -264,6 +319,9 @@ export async function createIncrementalCompiler(options) {
       await options.afterRebuild?.(build);
       return build;
     },
-    dispose: () => buildContext.dispose()
+    async dispose() {
+      await buildContext.dispose();
+      if (transformOutputRoot) await rm(transformOutputRoot, { recursive: true, force: true });
+    }
   };
 }

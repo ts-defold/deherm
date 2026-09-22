@@ -84,11 +84,13 @@ export async function loadDehermPluginConfig(tsconfig) {
   );
 }
 
-async function invoke(command, { tsconfig, cwd, config, outDir }) {
+async function invoke(command, { tsconfig, cwd, config, outDir, emit = false, tsgoArgs }) {
   const tool = await requireHostTool("dehermc");
   const args = [command, "--tsconfig", tsconfig, "--plugins-json", dehermPluginManifest(config)];
   if (cwd) args.push("--cwd", cwd);
-  if (outDir) args.push("--outdir", outDir);
+  if (outDir) args.push("--outDir", outDir);
+  if (emit) args.push("--emit");
+  if (tsgoArgs) args.push("--tsgo-args", JSON.stringify(tsgoArgs));
   try {
     const { stdout, stderr } = await run(tool.path, args, { maxBuffer: MAX_OUTPUT_BYTES, cwd });
     return { ok: true, status: 0, signal: null, stdout, stderr, tool };
@@ -121,6 +123,37 @@ export async function transformProject(options) {
     throw new Error(`dehermc transform failed (exit ${result.status}):\n${result.stderr || result.stdout}`);
   }
   return JSON.parse(result.stdout);
+}
+
+/**
+ * Emit transformed JavaScript and compiler-authored source maps.
+ *
+ * `transformProject` deliberately returns printer text because its envelope is
+ * also the complete invalidation graph. Printer text has no mapping back to
+ * the authored TypeScript, though, so feeding it straight to a bundler makes
+ * every line after a removed comment or blank line lie. The build command uses
+ * TypeScript-Go's real emitter after the same linked transforms and therefore
+ * preserves the transformed AST's original positions. Dev bundling consumes
+ * these files and lets esbuild compose their maps into the final bundle map.
+ */
+export async function emitProjectWithSourceMaps(options) {
+  if (!options.outDir) {
+    throw new Error("dehermc mapped emit requires an output directory");
+  }
+  const result = await invoke("build", {
+    ...options,
+    emit: true,
+    tsgoArgs: ["--sourceMap", "true", "--inlineSources", "true"]
+  });
+  if (!result.ok) {
+    throw new Error(`dehermc mapped emit failed (exit ${result.status}):\n${result.stderr || result.stdout}`);
+  }
+  return {
+    compiler: result.tool.path,
+    compilerSha256: result.tool.sha256,
+    outDir: path.resolve(options.cwd ?? process.cwd(), options.outDir),
+    diagnostics: `${result.stdout}${result.stderr}`.trimEnd()
+  };
 }
 
 /**

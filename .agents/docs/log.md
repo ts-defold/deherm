@@ -1528,3 +1528,31 @@ the authoritative input the generator already requires.
 * **Integrated runtime and CI closure**: The Static Hermes lifecycle build now uses the direct sound `-typed` frontend; its universal probe chooses a generated frame with the required bounded table/Matrix4/URL capacity. Runtime-smoke TypeScript inherits the root revision-derived SDK aliases. The end-to-end extension-header job installs the pinned pnpm dependency graph before staging Hermes headers. Local `pnpm check` and `pnpm test:static-hermes` pass; the CI workflow changes remain unproven on a fresh hosted runner until the pushed workflow completes.
 * **Bounded OKF metadata retrieval**: Extended the existing disposable SQLite knowledge index with top-level structured frontmatter metadata and a bounded `knowledge:metadata` command. The source Markdown remains authoritative; schema changes rebuild the cache, cells and responses are size-limited, and truncation backs up to a complete UTF-8 code-point boundary before adding its ellipsis. The 15-test graph suite covers metadata, sections, outlines, and read-only SQL with two-, three-, and four-byte text. Nested YAML and full Markdown AST semantics remain intentionally outside this deterministic projection.
 * **External adversarial review closure**: A read-only external review of the complete working-tree wave reported zero P0/P1/P2 findings plus three P3 observations. Independent reproduction accepted two latent hardening points: bounded OKF metadata now rejects truncated-key collisions, and named-scalar generation retains every distinct symbol/structural blocker with symbol availability first. Focused OKF and named-scalar suites pass, and the generator's `--check` confirms the present one-blocker census is byte-identical. The dense-ID observation was evaluated and rejected as a change: these are revision-keyed internal dispatch ordinals regenerated atomically with their consumers, while sparse identity hashes would add hot-path lookup cost without a demonstrated mismatch.
+
+## 2026-09-22 - Authored debugger maps reach the live War Battles engine
+
+The developer compiler previously handed esbuild printer-only transformed
+TypeScript. The transform was correct, but its printer removed comments and
+blank lines without emitting an input source map, so `player.script.ts:173`
+was advertised as generated line 4284 instead of the executable statement at
+4259. Hermes accepted that location and reported a verified breakpoint, but the
+engine could never hit the intended statement. Dev bundling now invokes the
+shipped `dehermc build` emitter with source maps after the same linked ttsc
+transforms, normalizes each one-source map at the original module path, and
+lets esbuild compose it into the bundle map. The real compiler regression maps
+the authored statement to its exact generated JavaScript statement.
+
+A current local-Extender engine then passed the public stdin/stdout DAP proof
+against War Battles: `arena.script.ts:284` was verified, the real Hermes runtime
+emitted `stopped(reason=breakpoint)`, the top `update` frame mapped to the same
+authored line, evaluating `dt` returned a live number, and continue plus
+disconnect completed in two consecutive debugger processes. The first rerun
+exposed that the Node bridge had kept a one-frontend Hermes CDP agent alive
+after WebSocket detach; the second agent accepted breakpoints but never
+interrupted the runtime. Frontend detach now closes the private engine stream,
+which exercises the native resume/reset/reconnect path, and both sessions pass.
+`pnpm --filter @deherm/example-war-battles-online
+runtime:debug` reproduces that observation while a dev session is running.
+This is mapped compiler, native packaged-engine, and DAP runtime evidence. It
+does not establish HTML5 breakpoint parity, editor/LSP integration, or a
+debugger memory-soak claim.

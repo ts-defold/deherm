@@ -70,8 +70,13 @@ below without changing its completion rule.
    now cover authored source-map breakpoints, stack/scopes, variables, watches,
    conditional breakpoints, stepping, exception policy, and HMR breakpoint
    reapplication; native tests prove both Hermes' paused-runtime command path
-   and the background engine transport. Next prove the same breakpoint path in
-   the installed War Battles engine and HTML5, then implement the editor-neutral
+   and the background engine transport. The public DAP process now has a
+   repeatable live War Battles proof: a breakpoint on the permanent arena
+   component stops the real packaged engine at the authored TypeScript line,
+   maps the top frame to that line, evaluates live `dt`, resumes, disconnects,
+   and repeats through a freshly rebuilt inspector session without restarting
+   the engine.
+   Next prove the same breakpoint path in HTML5, then implement the editor-neutral
    language server and thin VS Code client. After that, finish the public
    TypeScript ergonomics and native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
@@ -213,16 +218,19 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
 4. **Completed.** Logs are laptop-scrollable, mouse-selectable, copyable, and
    mirrored to `.deherm/dev/session.log`; full errors remain in the file and
    `q` tears down the engine and quits the session.
-5. **Active.** The incremental compiler already emits source-content maps and
-   passes them to `hermesc -source-map` for debug bytecode. Native Hermes now
+5. **Active.** The incremental compiler emits transformed JavaScript through
+   TypeScript-Go's mapped emitter, composes those authored maps through esbuild,
+   and passes the final map to `hermesc -source-map` for debug bytecode. Native Hermes now
    exposes a standard CLI CDP endpoint and preserves one frontend across HMR.
    Stable session discovery plus standard CPU-profile and streaming heap-snapshot
    capture are implemented. The editor-neutral DAP now provides authored
    breakpoints/source presentation, stack/scopes/variables, watches, stepping,
    exception policy, and HMR reapplication, with pinned-Hermes and background
-   engine-transport proofs. Finish installed native/browser breakpoint smokes
-   and the VS Code extension/LSP with context types and live instance/property
-   telemetry.
+   engine-transport proofs. The installed native War Battles smoke stops at
+   `arena.script.ts`, maps stack state, evaluates `dt`, resumes, and disconnects
+   through two consecutive public stdin/stdout DAP processes. Finish the browser
+   breakpoint smoke and the VS Code extension/LSP with context types and live
+   instance/property telemetry.
 
 ## 5. Finish public API ergonomics and project integration
 

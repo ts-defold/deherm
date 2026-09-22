@@ -74,8 +74,36 @@ test("a frontend command before the engine connects receives a correlated CDP er
   await bridge.close();
 });
 
+test("frontend detach resets the engine transport before a fresh debugger session", async () => {
+  const bridge = await createInspectorBridge();
+  const firstEngine = net.createConnection({ host: "127.0.0.1", port: bridge.enginePort });
+  await event(firstEngine, "connect");
+  const firstFrontend = new WebSocket(bridge.websocketUrl);
+  await event(firstFrontend, "open");
+
+  const firstEngineClosed = event(firstEngine, "close");
+  firstFrontend.close();
+  await firstEngineClosed;
+
+  const secondFrontend = new WebSocket(bridge.websocketUrl);
+  await event(secondFrontend, "open");
+  secondFrontend.send('{"id":2,"method":"Debugger.enable"}');
+  const secondEngine = net.createConnection({ host: "127.0.0.1", port: bridge.enginePort });
+  const command = new Promise((resolve) => {
+    secondEngine.once("data", (data) => resolve(data.toString("utf8")));
+  });
+  await event(secondEngine, "connect");
+  assert.equal(await command, '{"id":2,"method":"Debugger.enable"}\n');
+
+  secondFrontend.close();
+  secondEngine.destroy();
+  await bridge.close();
+});
+
 test("a second frontend is rejected unless replacement is explicit", async () => {
   const bridge = await createInspectorBridge();
+  const firstEngine = net.createConnection({ host: "127.0.0.1", port: bridge.enginePort });
+  await event(firstEngine, "connect");
   const first = new WebSocket(bridge.websocketUrl);
   await event(first, "open");
   const rejected = new WebSocket(bridge.websocketUrl);
@@ -85,11 +113,21 @@ test("a second frontend is rejected unless replacement is explicit", async () =>
   assert.equal(first.readyState, WebSocket.OPEN);
 
   const firstClose = event(first, "close");
+  const firstEngineClose = event(firstEngine, "close");
   const replacement = new WebSocket(`${bridge.websocketUrl}?replace=1`);
   await event(replacement, "open");
   await firstClose;
+  await firstEngineClose;
   assert.equal(replacement.readyState, WebSocket.OPEN);
+  replacement.send('{"id":3,"method":"Runtime.enable"}');
+  const replacementEngine = net.createConnection({ host: "127.0.0.1", port: bridge.enginePort });
+  const replacementCommand = new Promise((resolve) => {
+    replacementEngine.once("data", (data) => resolve(data.toString("utf8")));
+  });
+  await event(replacementEngine, "connect");
+  assert.equal(await replacementCommand, '{"id":3,"method":"Runtime.enable"}\n');
   replacement.close();
+  replacementEngine.destroy();
   await bridge.close();
 });
 

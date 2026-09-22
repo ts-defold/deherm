@@ -496,6 +496,29 @@ already attached. The command is intended for a VS Code debug-adapter client,
 not an interactive terminal—the thin extension/launch configuration remains
 the next editor-integration deliverable.
 
+The dev bundle does not feed printer-only transformed TypeScript into esbuild.
+That text has already lost authored whitespace and comments, so a structurally
+valid map would bind later lines to the wrong instructions. The CLI runs the
+same shipped `dehermc` transforms through TypeScript-Go's mapped JavaScript
+emitter, inlines each compiler map at the original module path, and lets esbuild
+compose the final bundle map before `hermesc` consumes it. The regression suite
+asserts that an authored War Battles statement maps to the exact emitted
+statement, not merely to some valid generated location.
+
+With a War Battles `pnpm dev` session running, the live native proof is:
+
+```sh
+pnpm --filter @deherm/example-war-battles-online runtime:debug
+```
+
+It launches the public stdin/stdout DAP command, installs a breakpoint on the
+permanent arena component, requires a real `stopped` event, checks that the top
+frame maps back to the authored `*.script.ts` line, evaluates the live `dt`
+local, resumes, and disconnects. It then repeats the whole flow in a second
+process, proving that frontend detach resets the private engine transport and
+Hermes CDP agent before reattachment. This is native packaged-engine debugger
+evidence; it is not HTML5 debugger evidence or a VS Code/LSP claim.
+
 The console itself is declarative. `packages/cli/src/dev/tui/` is authored in
 TSX against `@rezi-ui/jsx`; `packages/cli/src/dev/tsx-loader.mjs` registers a
 synchronous esbuild module hook before those views are imported, so no build

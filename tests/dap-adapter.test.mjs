@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import path from "node:path";
 import { PassThrough } from "node:stream";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import test from "node:test";
 
 import { transform } from "esbuild";
 
+import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
 import { createDapAdapter } from "../packages/cli/src/dev/dap-adapter.mjs";
 import { createDapTransport } from "../packages/cli/src/dev/dap-protocol.mjs";
 import { DebugSourceMap } from "../packages/cli/src/dev/debug-source-map.mjs";
@@ -74,6 +75,40 @@ test("debug source maps round-trip authored TypeScript locations and content", a
   assert.equal(original.line, 2);
   assert.match(map.content(fixture.source), /const answer: number = 42/u);
   assert.equal(await map.refresh(), false);
+});
+
+test("real dehermc transforms compose authored locations into the dev bundle", async (t) => {
+  const repositoryRoot = path.resolve(import.meta.dirname, "..");
+  const projectRoot = path.join(repositoryRoot, "examples/war-battles-online/defold");
+  const source = path.join(projectRoot, "main/player.script.ts");
+  const temporary = await mkdtemp(path.join(tmpdir(), "deherm-dap-ttsc-"));
+  const generated = path.join(temporary, "app.js");
+  const compiler = await createIncrementalCompiler({
+    entryPoint: source,
+    outputFile: generated,
+    tsconfig: path.join(projectRoot, "tsconfig.deherm.bundle.json")
+  });
+  t.after(async () => {
+    await compiler.dispose();
+    await rm(temporary, { recursive: true, force: true });
+  });
+  await compiler.rebuild();
+
+  const authoredLines = (await readFile(source, "utf8")).split("\n");
+  const authoredLine = authoredLines.findIndex((line) => line.includes("self.elapsed += dt;")) + 1;
+  assert.ok(authoredLine > 0, "fixture must contain the executable breakpoint statement");
+  const debugMap = new DebugSourceMap(`${generated}.map`);
+  await debugMap.refresh();
+  const mapped = debugMap.generated(source, authoredLine, 4);
+  assert.ok(mapped, "authored statement must have a generated location");
+  const generatedLine = (await readFile(generated, "utf8")).split("\n")[mapped.line - 1];
+  assert.match(generatedLine, /self\.elapsed \+= dt;/u);
+  assert.deepEqual(debugMap.original(mapped.line, mapped.column), {
+    source,
+    line: authoredLine,
+    column: 4,
+    name: null
+  });
 });
 
 test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and reload", async (t) => {

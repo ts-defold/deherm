@@ -26,6 +26,7 @@
     "bundle:size:update": "node headless/measure-bundles.mjs --write",
     "play": "node integration/play-packaged.mjs",
     "runtime:packaged": "node integration/check-packaged-runtime.mjs",
+    "runtime:debug": "node integration/check-debug-runtime.mjs",
     "runtime:browser": "node integration/check-browser-runtime.mjs",
     "runtime:browser:record": "node integration/check-browser-runtime.mjs --record-evidence",
     "runtime:browser:check": "node integration/check-browser-runtime.mjs --check-evidence",

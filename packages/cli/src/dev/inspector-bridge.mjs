@@ -41,6 +41,9 @@ export async function createInspectorBridge(options = {}) {
   const emit = options.emit ?? (() => {});
   let engineSocket;
   let frontendSocket;
+  let resettingEngine = false;
+  let pendingFrontendBytes = 0;
+  let pendingFrontendCommands = [];
   let closing = false;
 
   const log = (message, level = "info") => emit({ type: "log", source: "inspector", level, message });
@@ -48,10 +51,14 @@ export async function createInspectorBridge(options = {}) {
   const engineServer = net.createServer((socket) => {
     if (engineSocket) engineSocket.destroy();
     engineSocket = socket;
+    resettingEngine = false;
     socket.setNoDelay(true);
     socket.setKeepAlive(true);
     let pending = Buffer.alloc(0);
     log("native Hermes inspector connected");
+    for (const command of pendingFrontendCommands) socket.write(command);
+    pendingFrontendCommands = [];
+    pendingFrontendBytes = 0;
     socket.on("data", (chunk) => {
       pending = pending.length ? Buffer.concat([pending, chunk]) : chunk;
       if (pending.length > maximumMessageBytes) {
@@ -127,7 +134,11 @@ export async function createInspectorBridge(options = {}) {
       socket.close(1013, "a debugger frontend is already attached");
       return;
     }
-    if (frontendSocket) frontendSocket.close(1012, "replaced by an explicitly authorized debugger client");
+    if (frontendSocket) {
+      frontendSocket.close(1012, "replaced by an explicitly authorized debugger client");
+      resettingEngine = true;
+      engineSocket?.destroy();
+    }
     frontendSocket = socket;
     log("CDP frontend attached");
     socket.on("message", (data, binary) => {
@@ -137,6 +148,17 @@ export async function createInspectorBridge(options = {}) {
       }
       const message = data.toString("utf8");
       if (!engineSocket || engineSocket.destroyed) {
+        if (resettingEngine) {
+          const framed = `${message}\n`;
+          const bytes = Buffer.byteLength(framed);
+          if (bytes > maximumMessageBytes || pendingFrontendBytes > maximumMessageBytes - bytes) {
+            socket.close(1013, "engine inspector reset queue is full");
+            return;
+          }
+          pendingFrontendCommands.push(framed);
+          pendingFrontendBytes += bytes;
+          return;
+        }
         let id;
         try { id = JSON.parse(message)?.id; } catch {}
         socket.send(JSON.stringify({
@@ -152,7 +174,22 @@ export async function createInspectorBridge(options = {}) {
       engineSocket.write(`${message}\n`);
     });
     socket.on("close", () => {
-      if (frontendSocket === socket) frontendSocket = undefined;
+      if (frontendSocket === socket) {
+        frontendSocket = undefined;
+        pendingFrontendCommands = [];
+        pendingFrontendBytes = 0;
+        // Hermes CDPAgent owns debugger-domain state for one frontend
+        // lifetime. Keeping the engine TCP stream alive after its WebSocket
+        // disappears makes a later frontend look attached and even accept
+        // breakpoints, but the agent no longer interrupts the runtime. Closing
+        // this private transport tells InspectorClient to resume if necessary,
+        // rebuild the agent at the next engine safe point, and reconnect with a
+        // genuinely fresh session.
+        if (engineSocket && !engineSocket.destroyed) {
+          resettingEngine = true;
+          engineSocket.destroy();
+        }
+      }
       if (!closing) log("CDP frontend detached");
     });
     socket.on("error", (error) => {
