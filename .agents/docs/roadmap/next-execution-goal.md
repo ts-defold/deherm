@@ -52,11 +52,13 @@ below without changing its completion rule.
    a concrete `dmMath::Clamp<int32_t>` production wrapper and exact twin without
    a Defold checkout. Remaining policy snapshot/transfer reduction is tracked
    as optimization and does not gate API availability or product work.
-6. **Active — close CI and continue the product.** Keep the Static script exact
-   executable in policy CI, clear the packed-consumer inventory regression,
-   close the exact-call and cross-platform delivery issues on green hosted
-   evidence, then continue the installed TUI/HMR/debug lane, public TypeScript
-   ergonomics, and native/browser War Battles.
+6. **Completed — close CI and cross-platform delivery.** Hosted end-to-end run
+   `35674434017` passed the local and extension-header gates plus all eleven Bob
+   targets across macOS, iOS/simulator, Linux, Windows, Android, and HTML5/Wasm.
+7. **Active — continue the product.** Finish the installed TUI/HMR/debug lane,
+   then public TypeScript ergonomics and native/browser War Battles, using the
+   now-green generated API and cross-platform consumer path rather than
+   reopening the compiler/distribution seam.
 
 Every route remains public when Defold exposes it. Verification status controls
 the evidence label, never whether the generator ships the route; a missing
@@ -175,6 +177,11 @@ Public ledger: [#97 Close cross-platform artifact publication and clean consumer
    usable by npm consumers and contributors.
 5. Evaluate `tmikov/hermes-x`; adopt only after existing Static Hermes, JSI,
    Android, iOS, and packaging gates pass.
+
+Hosted full end-to-end run `35674434017` satisfies this delivery gate: the local
+and extension-header jobs and every one of the eleven Bob target jobs completed
+successfully. Policy/materialization transfer-size work remains a tracked
+optimization and does not reopen this gate.
 
 ## 4. Finish the installed developer experience
 
