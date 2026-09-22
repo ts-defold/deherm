@@ -24,7 +24,7 @@ for (const path of sourceFiles) sourceBytes += (await readFile(path)).byteLength
 
 const report = {
   schemaVersion: 1,
-  observedOn: "2026-09-19",
+  observedOn: "2026-09-22",
   esbuildVersion,
   scope: "JavaScript bundle evidence only; not a Defold package or Hermes bytecode measurement",
   sourceFileCount: sourceFiles.length,

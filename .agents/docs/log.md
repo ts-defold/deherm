@@ -1,5 +1,33 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Project-authored message evidence stays separate from Defold declarations
+
+The generated project resource table now carries an optional versioned
+`projectMessages` projection. A bounded scan of every project TypeScript source,
+including ordinary modules imported by components, records direct
+literal message ids sent through canonical `MsgApi.post` imports and separately
+records `hashLiteral("#name")` constants actually compared with an `onMessage`
+message-id parameter. Each evidence site retains source, line, column, role, and
+constant name where applicable. Dynamic expressions remain silent, and local
+lookalikes outside `@deherm/project` or `@ts-defold/deherm` do not enter the
+projection.
+
+The table's route metadata constrains consumers to `MsgApi.post` parameter 1;
+message ids never enter protobuf-derived resource namespaces and are never a
+closed-world diagnostic set. Focused tests prove sender/receiver separation,
+deterministic output under reversed file order, canonical-package gating,
+dynamic-expression silence, and no resource-name mixing. Adversarial lexical
+fixtures additionally reject expression-bodied arrow parameter shadows,
+destructured shadows, regex contents after `yield`, locally shadowed hash
+constants, and comparisons under nested message-id parameters. The slash
+classifier now distinguishes expression-ending division from expression-starting
+regex contexts and skips an unresolved source rather than guessing. Receiver
+evidence is further limited to the exported object/class component forms the
+component generator recognizes; arbitrary `onMessage` members are ignored. This
+includes `for await` control boundaries, function-hoisted `var` shadows, and
+semicolonless canonical import coverage. This is generation and semantic-index
+evidence only, not runtime message-delivery evidence.
+
 ## 2026-09-22 - Bounded live component state reaches the developer control plane
 
 Native debugger builds and the HTML5 host now project the same versioned live
@@ -1699,3 +1727,19 @@ runtime:debug` reproduces that observation while a dev session is running.
 This is mapped compiler, native packaged-engine, and DAP runtime evidence. It
 does not establish HTML5 breakpoint parity, editor/LSP integration, or a
 debugger memory-soak claim.
+
+## 2026-09-22 - Generated route semantics reach the language server
+
+The language server now joins a literal to the generated SDK route and exact
+argument position before offering project symbols. Attached resources,
+literal-addressed component resources, and component/collection addresses use
+the same generated scope metadata as the checker; dynamic sibling addresses
+widen only to their classified namespaces. Completion, hover, and definition
+share that candidate set. Canonical named, local, and namespace aliases are
+recognized, while an unrelated import that happens to expose a Defold-shaped
+name is rejected. The optional static project-message projection is consumed
+only at its declared `MsgApi.post` argument and remains suggestion/navigation
+evidence rather than a build rule. Focused language-server tests pass across
+all three scopes, duplicate declarations, aliases, CRLF/UTF-16 positions, and
+exact definition locations. This is deterministic language-service evidence;
+it is not a TypeScript type-checker proof or a live VS Code UI observation.

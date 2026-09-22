@@ -40,6 +40,7 @@ export async function loadResourceClassification({
 async function walkProject(projectRoot) {
   const resources = [];
   const componentSources = [];
+  const typeScriptSources = [];
   async function visit(directory) {
     let entries;
     try {
@@ -59,13 +60,18 @@ async function walkProject(projectRoot) {
       const relative = portable(path.relative(projectRoot, absolute));
       if (sourceKinds.some(({ suffix }) => entry.name.endsWith(suffix))) {
         componentSources.push(relative);
+        typeScriptSources.push(relative);
+        continue;
+      }
+      if (/\.(?:[cm]?ts|tsx)$/u.test(entry.name) && !/\.d\.[cm]?ts$/u.test(entry.name)) {
+        typeScriptSources.push(relative);
         continue;
       }
       resources.push({ relative, absolute });
     }
   }
   await visit(path.resolve(projectRoot));
-  return { resources, componentSources };
+  return { resources, componentSources, typeScriptSources };
 }
 
 /**
@@ -78,7 +84,7 @@ async function walkProject(projectRoot) {
 export async function buildProjectResourceSymbols(projectRoot, options = {}) {
   const { schema, classification } = options.pinned ?? await loadResourceClassification();
   const extensions = schemaExtensions(schema);
-  const { resources, componentSources } = await walkProject(projectRoot);
+  const { resources, componentSources, typeScriptSources } = await walkProject(projectRoot);
   const diagnostics = [];
   const parsed = [];
   for (const { relative, absolute } of resources) {
@@ -97,15 +103,15 @@ export async function buildProjectResourceSymbols(projectRoot, options = {}) {
       diagnostics.push({ severity: "warning", path: relative, message: `unparsable resource: ${error.message}` });
     }
   }
-  const componentTexts = new Map();
-  for (const relative of componentSources) {
+  const sourceTexts = new Map();
+  for (const relative of typeScriptSources) {
     try {
-      componentTexts.set(relative, await readFile(path.join(projectRoot, relative), "utf8"));
+      sourceTexts.set(relative, await readFile(path.join(projectRoot, relative), "utf8"));
     } catch (error) {
-      diagnostics.push({ severity: "warning", path: relative, message: `unreadable component source: ${error.message}` });
+      diagnostics.push({ severity: "warning", path: relative, message: `unreadable TypeScript source: ${error.message}` });
     }
   }
-  const table = buildResourceSymbolTable({ schema, classification, resources: parsed, componentSources, componentTexts });
+  const table = buildResourceSymbolTable({ schema, classification, resources: parsed, componentSources, sourceTexts });
   return {
     ...table,
     projectFile: "game.project",

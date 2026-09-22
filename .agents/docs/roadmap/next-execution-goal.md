@@ -88,9 +88,15 @@ below without changing its completion rule.
    bounded CodeLens values beside authored component files. A packaged
    arm64-macOS War Battles engine has now emitted the snapshot through the
    public dev session and the authenticated endpoint joined current schemas
-   with zero omissions. Next record the actual VS Code visual observation and
-   finish the remaining route-specific
-   Defold semantic projections. After that, finish the public
+   with zero omissions. Generated route/argument metadata now also drives
+   scoped completion, hover, and definition for attached resources,
+   addressed-component resources, component addresses, and separately derived
+   project message ids; real War Battles queries prove the joins. Next record
+   the actual VS Code visual observation. Native activation itself is already
+   proven, while cross-realm component state migration remains the distinct
+   measured HMR boundary tracked by
+   [issue #120](https://github.com/ts-defold/deherm/issues/120). After that,
+   finish the public
    TypeScript ergonomics and native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
 

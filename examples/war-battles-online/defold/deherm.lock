@@ -483,12 +483,12 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "abe98f7da6cca6b61ed9023991872903ef725966f91dc46583632ddbf0ac0508",
+          "digest": "bd74090edf47f03a75d254015c972b39fa8f22c2fc665a606e088cfb233ea012",
           "fileCount": 67,
           "files": {
             ".deherm/generated/components/registry.ts": "242e47ddc478fc63b95af757e52f370d4302c83ead219ff0690f298b2c640e79",
             ".deherm/generated/dmsdk-call-symbol-index.json": "5b42fdf93957d7f5448f21e7f3b8cb6e5335dc6431d84136a0dad3d9d91f2b88",
-            ".deherm/generated/resource-symbols.json": "c83eeead47206b85d455f4bd899dd040d1ed4c7224ff0b1df6343668460b02aa",
+            ".deherm/generated/resource-symbols.json": "ec6e4d01e2c5f01ae864534cfe244b399c0b006482c8bcadd1acdf16fad28c39",
             ".deherm/generated/script-route-symbol-index.json": "8e4defeb6df30557f79c3724394e7cea7bbec9d5132854c73d98377ce6553dc8",
             ".deherm/sdk/address.ts": "32420294482945e853794417e35e5614224af893df0338901259e63b62176649",
             ".deherm/sdk/component.ts": "64b6d6b295d2843f5c86147df0a52f68b802c20a6a993ab2b30290d3add0f614",

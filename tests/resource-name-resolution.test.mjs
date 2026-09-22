@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFile, rm } from "node:fs/promises";
+import { readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
 import { buildProjectResourceSymbols, writeProjectResourceSymbols } from "../packages/cli/src/resource-symbols.mjs";
-import { componentStringLiterals } from "../packages/compiler/src/resource-symbol-table.mjs";
+import {
+  buildProjectMessages,
+  componentStringLiterals,
+  projectMessageEvidence
+} from "../packages/compiler/src/resource-symbol-table.mjs";
 import { parameterValueShape } from "../packages/compiler/src/resource-namespace-classification.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -104,6 +108,8 @@ test("the project symbol table records declarations, scopes, and attachments", a
   assert.equal(table.gameObjects["/main/player.go"].components.sprite.resources[".atlas"].path, "/main/units.atlas");
   assert.equal(table.collections["/main/main.collection"].instances.player.prototype, "/main/player.go");
   assert.deepEqual(table.diagnostics, []);
+  assert.deepEqual(table.projectMessages.names.map(({ name }) => name), ["clear_color", "create", "enable"]);
+  assert.ok(!table.projectMessages.names.some(({ name }) => name === "backdrop"));
 });
 
 test("component string literals include the declared id behind an address sigil", () => {
@@ -111,6 +117,228 @@ test("component string literals include the declared id behind an address sigil"
   assert.ok(literals.has("/level#spawner"));
   assert.ok(literals.has("level"));
   assert.ok(literals.has("spawner"));
+});
+
+test("project message evidence separates send literals from receiver contracts", () => {
+  const source = `
+    import { hashLiteral as h, msg as messages } from "@deherm/project";
+    const DAMAGE: DefoldHash = h("#damage");
+    const dynamicMessage = readMessage();
+    export default defineComponent({
+      onMessage(_self: unknown, messageId: DefoldHash): void {
+        if (DAMAGE === messageId) receiveDamage();
+      },
+      update(): void {
+        messages.post("#hud", "damage");
+        messages.post("#hud", dynamicMessage);
+      }
+    });
+  `;
+  assert.deepEqual(projectMessageEvidence(source, "main/player.script.ts"), {
+    sender: [{
+      name: "damage",
+      evidence: { kind: "msg-post-literal", source: "main/player.script.ts", line: 10, column: 31 }
+    }],
+    receiver: [{
+      name: "damage",
+      evidence: {
+        kind: "on-message-hash-comparison",
+        source: "main/player.script.ts",
+        line: 3,
+        column: 34,
+        constant: "DAMAGE"
+      }
+    }],
+    skipped: null
+  });
+});
+
+test("project message projection is deterministic, route-scoped, and ignores unrelated globals", () => {
+  const componentTexts = new Map([
+    ["main/z.script.ts", `
+      import { msg } from "@deherm/project";
+      const unrelatedPattern = /msg.post(".", "not-source-code")/;
+      function localLookalike(msg: { post(receiver: string, message: string): void }): void {
+        msg.post(".", "shadowed-import");
+      }
+      msg.post(".", messageName);
+      msg.post(".", "zeta");
+    `],
+    ["main/a.script.ts", `
+      const msg = { post(_receiver: string, _name: string): void {} };
+      msg.post(".", "not-a-defold-message");
+    `]
+  ]);
+  const first = buildProjectMessages(componentTexts);
+  const second = buildProjectMessages(new Map([...componentTexts].reverse()));
+  assert.deepEqual(first, second);
+  assert.deepEqual(first.routes, {
+    "MsgApi.post": { parameter: 1, role: "message-id", names: "projectMessages.names" }
+  });
+  assert.deepEqual(first.names.map(({ name }) => name), ["zeta"]);
+  assert.deepEqual(first.names[0].senderEvidence.map(({ source }) => source), ["main/z.script.ts"]);
+  assert.deepEqual(first.names[0].receiverEvidence, []);
+});
+
+test("expression-bodied arrow parameters shadow imported message APIs", () => {
+  const result = projectMessageEvidence(`
+    import { msg } from "@deherm/project";
+    const arrow = (msg: LocalMessages): void => msg.post(".", "arrow-shadow");
+  `, "main/arrow.ts");
+  assert.deepEqual(result.sender, []);
+});
+
+test("destructured bindings shadow imported message APIs", () => {
+  const result = projectMessageEvidence(`
+    import { msg } from "@deherm/project";
+    function localLookalike(local: { msg: LocalMessages }): void {
+      const { msg } = local;
+      msg.post(".", "destructured-shadow");
+    }
+  `, "main/destructured.ts");
+  assert.deepEqual(result.sender, []);
+});
+
+test("function-scoped var shadows imported message APIs outside its declaring block", () => {
+  const result = projectMessageEvidence(`
+    import { msg } from "@deherm/project";
+    function localLookalike(enabled: boolean): void {
+      if (enabled) {
+        var msg = localMessages();
+      }
+      msg.post(".", "var-shadow");
+    }
+  `, "main/var-shadow.ts");
+  assert.deepEqual(result.sender, []);
+});
+
+test("regular expressions after yield never become message evidence", () => {
+  const result = projectMessageEvidence(`
+    import { msg } from "@deherm/project";
+    function* regexBody(): Generator<RegExp> {
+      yield /msg.post(".", "regex-after-yield")/;
+    }
+  `, "main/regex.ts");
+  assert.deepEqual(result.sender, []);
+});
+
+test("regular expressions after control conditions and logical operators never become message evidence", () => {
+  const result = projectMessageEvidence(`
+    import { msg } from "@deherm/project";
+    if (enabled) /msg.post(".", "if-regex")/.test(source);
+    const matched = enabled && /msg.post(".", "logical-regex")/.test(source);
+    msg.post(".", "real-send");
+  `, "main/regex-contexts.ts");
+  assert.deepEqual(result.sender.map(({ name }) => name), ["real-send"]);
+  assert.equal(result.skipped, null);
+});
+
+test("regular expressions after for-await control conditions never become message evidence", () => {
+  const result = projectMessageEvidence(`
+    import { msg } from "@deherm/project";
+    async function consume(stream: AsyncIterable<unknown>): Promise<void> {
+      for await (const value of stream) /msg.post(".", "for-await-regex")/.test(String(value));
+    }
+  `, "main/for-await-regex.ts");
+  assert.deepEqual(result.sender, []);
+  assert.equal(result.skipped, null);
+});
+
+test("semicolonless canonical imports still produce message evidence", () => {
+  const result = projectMessageEvidence(`
+    import { msg } from "@deherm/project"
+    msg.post(".", "semicolonless-ready")
+  `, "main/semicolonless.ts");
+  assert.deepEqual(result.sender.map(({ name }) => name), ["semicolonless-ready"]);
+});
+
+test("receiver evidence rejects shadowed hashes and nested message-id parameters", () => {
+  const result = projectMessageEvidence(`
+    import { hashLiteral } from "@deherm/project";
+    const REAL = hashLiteral("#real-message");
+    const SHADOWED = hashLiteral("#shadowed-receiver");
+    export default defineComponent({
+      onMessage(_self: unknown, messageId: DefoldHash): void {
+        if (messageId === REAL) receiveReal();
+        {
+          const SHADOWED = readHash();
+          if (messageId === SHADOWED) receiveShadowed();
+        }
+        const nested = (messageId: DefoldHash) => messageId === SHADOWED;
+      }
+    });
+  `, "main/receiver.script.ts");
+  assert.deepEqual(result.receiver.map(({ name }) => name), ["real-message"]);
+  assert.equal(result.receiver[0].evidence.constant, "REAL");
+});
+
+test("receiver evidence ignores arbitrary objects and classes named onMessage", () => {
+  const result = projectMessageEvidence(`
+    import { defineComponent, hashLiteral } from "@deherm/project";
+    const REAL = hashLiteral("#real-lifecycle");
+    const OBJECT_ONLY = hashLiteral("#object-only");
+    const CLASS_ONLY = hashLiteral("#class-only");
+    const helper = {
+      onMessage(_self: unknown, messageId: DefoldHash): void {
+        if (messageId === OBJECT_ONLY) consumeObject();
+      }
+    };
+    class Helper {
+      onMessage(_self: unknown, messageId: DefoldHash): void {
+        if (messageId === CLASS_ONLY) consumeClass();
+      }
+    }
+    export default defineComponent({
+      onMessage(_self: unknown, messageId: DefoldHash): void {
+        if (messageId === REAL) consumeLifecycle();
+      }
+    });
+  `, "main/lifecycle.script.ts");
+  assert.deepEqual(result.receiver.map(({ name }) => name), ["real-lifecycle"]);
+});
+
+test("receiver evidence recognizes exported component class lifecycles", () => {
+  const result = projectMessageEvidence(`
+    import { component, hashLiteral, ScriptComponent } from "@deherm/project";
+    const READY = hashLiteral("#class-ready");
+    class Player extends ScriptComponent {
+      onMessage(messageId: DefoldHash, _message: unknown, _sender: DefoldUrl): void {
+        if (messageId === READY) consumeReady();
+      }
+    }
+    export default component(Player);
+  `, "main/class-player.script.ts");
+  assert.deepEqual(result.receiver.map(({ name }) => name), ["class-ready"]);
+});
+
+test("the War Battles project supplies canonical sender and receiver message evidence", async () => {
+  const table = await buildProjectResourceSymbols(path.join(root, "examples/war-battles-online/defold"));
+  const messages = new Map(table.projectMessages.names.map((message) => [message.name, message]));
+  assert.deepEqual(messages.get("add_score")?.senderEvidence.map(({ source }) => source), ["main/rocket.script.ts"]);
+  assert.deepEqual(messages.get("add_score")?.receiverEvidence.map(({ source, constant }) => ({ source, constant })), [
+    { source: "main/ui.gui.ts", constant: "ADD_SCORE" }
+  ]);
+  assert.deepEqual(messages.get("player_at")?.receiverEvidence.map(({ source, constant }) => ({ source, constant })), [
+    { source: "main/camera.script.ts", constant: "PLAYER_AT" }
+  ]);
+  assert.equal(table.projectMessages.skippedSources.length, 0);
+});
+
+test("project message evidence includes ordinary imported TypeScript modules", async () => {
+  const helper = path.join(fixture, "main", "message-helper.ts");
+  await writeFile(helper, `
+    import { msg } from "@deherm/project";
+    export function announce(): void { msg.post("#hud", "helper-ready"); }
+  `);
+  try {
+    const table = await buildProjectResourceSymbols(fixture, { pinned: { schema, classification } });
+    const message = table.projectMessages.names.find(({ name }) => name === "helper-ready");
+    assert.equal(message?.senderEvidence[0]?.source, "main/message-helper.ts");
+    assert.equal(table.componentCount, 5);
+    assert.equal(table.components["main/message-helper.ts"], undefined);
+  } finally {
+    await rm(helper, { force: true });
+  }
 });
 
 test("declared names no component source mentions are reported for review", async () => {
@@ -123,7 +351,7 @@ test("declared names no component source mentions are reported for review", asyn
 });
 
 test("the ttsc host resolves literal names and stays silent for dynamic ones", async (t) => {
-  await writeProjectResourceSymbols(fixture, path.join(fixture, ".deherm"));
+  await writeProjectResourceSymbols(fixture, path.join(fixture, ".deherm"), { pinned: { schema, classification } });
   t.after(() => rm(path.join(fixture, ".deherm"), { recursive: true, force: true }));
 
   compileFixture("tsconfig.json");
