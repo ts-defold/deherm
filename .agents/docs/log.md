@@ -1,5 +1,30 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Extension-owned schemas select local and remote C/C++ surfaces
+
+`defold-hermes.bindings.json` is now an executable project-generation input,
+not an inventory-only placeholder. The bounded schema selects canonical
+include-relative entry headers, C or C++ parsing, optional qualified symbols,
+and an optional C prefix. Local extension trees and Bob-resolved dependency
+ZIPs take the same path. Unselected public headers remain usable as transitive
+includes and are reported; missing headers and symbols fail closed as explicit
+blockers.
+
+The Clang projection retains established C stable identities while adding
+qualified C++ free functions to production glue and their generated exact-call
+twins. Methods and templates are cataloged with receiver and specialization
+blockers rather than omitted. Focused generator and project tests compile and
+execute a namespaced C++ free-function bridge, materialize one local C++ schema
+and one dependency-ZIP C schema, prove invalid schemas fail closed, and keep
+38/38 native-extension and CLI tests green. An independent adversarial review
+found three fail-closed gaps; reproduced regressions now exclude implicit
+compiler methods, retain class-template specialization blockers, and prevent a
+C++ free-function prefix from truncating method member names. The same tests
+pin the established C numeric IDs and compile qualified C++ enum transport.
+This is generator/host-compiler
+evidence; it does not claim that a method receiver or template specialization
+has been materialized yet.
+
 ## 2026-09-22 - Development artifact writes no longer rebuild their own engine
 
 The public `deherm dev` session now excludes only its exact tool-owned native

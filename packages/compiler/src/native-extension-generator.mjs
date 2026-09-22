@@ -5,14 +5,42 @@ import path from "node:path";
 
 function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
 function safeName(value, label) { if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(value)) throw new Error(`${label} must be an identifier`); return value; }
-function mainHeaderDeclaration(node, absolute) {
+function typeScriptName(value) { return value.replaceAll("::", "$"); }
+function mainHeaderDeclaration(node, absolute, ancestors = []) {
+  if (node.isImplicit || node.implicit) return false;
   const location = node.loc ?? {};
   if (location.includedFrom) return false;
   if (location.file) return path.resolve(location.file) === absolute;
+  for (const ancestor of [...ancestors].reverse()) {
+    const inherited = ancestor.loc ?? {};
+    if (inherited.includedFrom) return false;
+    if (inherited.file) return path.resolve(inherited.file) === absolute;
+  }
   return Number.isInteger(location.line);
 }
-function walk(node, visit) { visit(node); for (const child of node.inner ?? []) walk(child, visit); }
-function resultSpelling(node) { return node.type.qualType.replace(/\s*\([^()]*\)$/, "").trim(); }
+function walk(node, visit, ancestors = []) {
+  visit(node, ancestors);
+  for (const child of node.inner ?? []) walk(child, visit, [...ancestors, node]);
+}
+function resultSpelling(node) {
+  return node.type.qualType
+    .replace(/\s*\([^()]*\)(?:\s+(?:const|volatile|noexcept))*$/u, "")
+    .trim();
+}
+
+function cppScopePath(ancestors) {
+  return ancestors
+    .filter(({ kind, name }) => (kind === "NamespaceDecl" || kind === "CXXRecordDecl") && name)
+    .map(({ name }) => name);
+}
+
+function qualifiedName(name, ancestors) {
+  return [...cppScopePath(ancestors), name].join("::");
+}
+
+function sourceOffset(node) {
+  return node.range?.begin?.offset ?? node.loc?.offset ?? Number.MAX_SAFE_INTEGER;
+}
 
 const scalar = new Map([
   ["void", ["void", "void"]], ["_Bool", ["bool", "boolean"]], ["bool", ["bool", "boolean"]],
@@ -21,13 +49,25 @@ const scalar = new Map([
   ["float", ["f32", "number"]], ["double", ["f64", "number"]], ["const char *", ["cstring", "string"]], ["char const *", ["cstring", "string"]],
 ]);
 
-function normalizeType(spelling, enums, records) {
+function declaredType(types, name, scope) {
+  if (types.has(name)) return types.get(name);
+  if (name.includes("::")) return null;
+  for (let length = scope.length; length > 0; length -= 1) {
+    const candidate = `${scope.slice(0, length).join("::")}::${name}`;
+    if (types.has(candidate)) return types.get(candidate);
+  }
+  return null;
+}
+
+function normalizeType(spelling, enums, records, scope = []) {
   const text = spelling.replace(/\s+/g, " ").trim();
   if (scalar.has(text)) { const [kind, ts] = scalar.get(text); return { kind, nativeType: text, ts }; }
   const enumName = text.replace(/^enum /, "");
-  if (enums.has(enumName)) return { kind: "enum", name: enumName, nativeType: text, ts: enumName };
+  const enumDeclaration = declaredType(enums, enumName, scope);
+  if (enumDeclaration) { const declared = enumDeclaration.name; return { kind: "enum", name: declared, nativeType: declared.includes("::") ? declared : text, ts: typeScriptName(declared) }; }
   const recordName = text.replace(/^struct /, "");
-  if (records.has(recordName)) return { kind: "record", name: recordName, nativeType: text, ts: recordName };
+  const recordDeclaration = declaredType(records, recordName, scope);
+  if (recordDeclaration) { const declared = recordDeclaration.name; return { kind: "record", name: declared, nativeType: declared.includes("::") ? declared : text, ts: typeScriptName(declared) }; }
   if (/\*$/.test(text)) return { kind: "pointer", nativeType: text, ts: "NativeAddress" };
   return { kind: "unsupported", nativeType: text, ts: "never" };
 }
@@ -52,32 +92,96 @@ function routeIdentity(module, symbol, parameters, result, variadic) {
   };
 }
 
-export function ingestNativeExtensionHeader({ header, moduleName, symbolPrefix = `${moduleName}_`, clang = process.env.CLANG ?? "clang", include = [] }) {
+export function ingestNativeExtensionHeader({
+  header,
+  moduleName,
+  symbolPrefix,
+  language = "c",
+  symbols = null,
+  clang = process.env.CLANG ?? "clang",
+  include = []
+}) {
   const absolute = path.resolve(header), module = safeName(moduleName, "moduleName");
-  if (symbolPrefix !== null && (typeof symbolPrefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(symbolPrefix))) {
+  if (language !== "c" && language !== "c++") throw new Error("language must be c or c++");
+  const effectiveSymbolPrefix = symbolPrefix === undefined ? (language === "c++" ? null : `${moduleName}_`) : symbolPrefix;
+  if (effectiveSymbolPrefix !== null && (typeof effectiveSymbolPrefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(effectiveSymbolPrefix))) {
     throw new Error("symbolPrefix must be null or a C identifier prefix");
   }
-  const ast = JSON.parse(execFileSync(clang, ["-x", "c", "-std=c11", "-Wno-pragma-once-outside-header", ...include.flatMap((entry) => ["-I", path.resolve(entry)]), "-Xclang", "-ast-dump=json", "-fsyntax-only", absolute], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] }));
-  const enums = new Map(), records = new Map(), functions = [];
-  walk(ast, (node) => {
+  if (symbols !== null && (!Array.isArray(symbols) || symbols.some((symbol) => typeof symbol !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$/u.test(symbol)))) {
+    throw new Error("symbols must be null or an array of C/C++ identifiers");
+  }
+  const selectedSymbols = symbols === null ? null : new Set(symbols);
+  if (selectedSymbols && selectedSymbols.size !== symbols.length) throw new Error("symbols must not contain duplicates");
+  const ast = JSON.parse(execFileSync(clang, [
+    "-x", language, language === "c++" ? "-std=c++17" : "-std=c11",
+    "-Wno-pragma-once-outside-header",
+    ...include.flatMap((entry) => ["-I", path.resolve(entry)]),
+    "-Xclang", "-ast-dump=json", "-fsyntax-only", absolute
+  ], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "pipe"] }));
+  const enums = new Map(), records = new Map(), functions = [], methods = [];
+  walk(ast, (node, ancestors) => {
     // Type facts may live in transitive public headers even though only the
     // selected header owns callable surface declarations. Referenced-type
     // filtering below keeps unrelated transitive types out of emitted IR.
-    if (node.kind === "EnumDecl" && node.name) enums.set(node.name, { name: node.name, values: enumValues(node.inner ?? []) });
-    if (node.kind === "RecordDecl" && node.name) records.set(node.name, { name: node.name, fields: (node.inner ?? []).filter((item) => item.kind === "FieldDecl").map((item) => ({ name: item.name, nativeType: item.type.qualType })) });
-    if (node.kind === "FunctionDecl" && node.name && (symbolPrefix === null || node.name.startsWith(symbolPrefix)) && mainHeaderDeclaration(node, absolute)) functions.push(node);
+    if (node.kind === "EnumDecl" && node.name) {
+      const name = language === "c++" ? qualifiedName(node.name, ancestors) : node.name;
+      enums.set(name, { name, values: enumValues(node.inner ?? []) });
+    }
+    if ((node.kind === "RecordDecl" || node.kind === "CXXRecordDecl") && node.name) {
+      const name = language === "c++" ? qualifiedName(node.name, ancestors) : node.name;
+      const record = { name, fields: (node.inner ?? []).filter((item) => item.kind === "FieldDecl").map((item) => ({ name: item.name, nativeType: item.type.qualType })) };
+      if (!records.has(name) || record.fields.length) records.set(name, record);
+    }
+    const template = ancestors.some(({ kind }) => kind === "FunctionTemplateDecl" || kind === "ClassTemplateDecl");
+    if (node.kind === "FunctionDecl" && node.name && mainHeaderDeclaration(node, absolute, ancestors)) {
+      const nativeSymbol = language === "c++" ? qualifiedName(node.name, ancestors) : node.name;
+      if ((effectiveSymbolPrefix === null || node.name.startsWith(effectiveSymbolPrefix)) &&
+          (!selectedSymbols || selectedSymbols.has(nativeSymbol))) {
+        functions.push({ node, nativeSymbol, template, scope: language === "c++" ? cppScopePath(ancestors) : [] });
+      }
+    }
+    if (language === "c++" && node.kind === "CXXMethodDecl" && node.name && mainHeaderDeclaration(node, absolute, ancestors)) {
+      const record = [...ancestors].reverse().find(({ kind, name }) => kind === "CXXRecordDecl" && name);
+      const nativeSymbol = qualifiedName(node.name, ancestors);
+      if (!selectedSymbols || selectedSymbols.has(nativeSymbol)) {
+        methods.push({ node, nativeSymbol, record: record?.name ?? null, template, scope: cppScopePath(ancestors) });
+      }
+    }
   });
-  const candidates = functions.sort((a, b) => a.loc.line - b.loc.line || a.name.localeCompare(b.name)).map((node) => {
-    const parameters = (node.inner ?? []).filter((item) => item.kind === "ParmVarDecl").map((item, position) => ({ position, name: item.name || `arg${position}`, type: normalizeType(item.type.qualType, enums, records) }));
-    const result = normalizeType(resultSpelling(node), enums, records);
+  const callableNodes = [
+    ...functions.map((entry) => ({ ...entry, invocation: "free-function" })),
+    ...methods.map((entry) => ({ ...entry, invocation: "method" }))
+  ];
+  const candidates = callableNodes.sort((a, b) => sourceOffset(a.node) - sourceOffset(b.node) || a.nativeSymbol.localeCompare(b.nativeSymbol)).map(({ node, nativeSymbol, template, invocation, record, scope }) => {
+    const parameters = (node.inner ?? []).filter((item) => item.kind === "ParmVarDecl").map((item, position) => ({ position, name: item.name || `arg${position}`, type: normalizeType(item.type.qualType, enums, records, scope) }));
+    const result = normalizeType(resultSpelling(node), enums, records, scope);
     const variadic = Boolean(node.variadic) || /,?\s*\.\.\.\s*\)/u.test(node.type.qualType);
     const blockers = [
+      ...(invocation === "method" ? [`receiver:requires-handle-policy:${record ?? "unknown"}`] : []),
+      ...(template ? ["template:requires-specialization"] : []),
       ...parameters.filter(({ type }) => !typeSupported(type)).map(({ position, type }) => `parameter-${position}:${type.kind}:${type.nativeType}`),
       ...(!typeSupported(result) ? [`result:${result.kind}:${result.nativeType}`] : []),
       ...(variadic ? ["variadic:requires-typed-nonvariadic-facade"] : []),
     ];
-    const identity = routeIdentity(module, node.name, parameters, result, variadic);
-    return { id: identity.numericId, ...identity, symbol: node.name, memberName: symbolPrefix === null ? node.name : node.name.slice(symbolPrefix.length), line: node.loc.line, variadic, parameters, result, disposition: blockers.length ? "cataloged-needs-layout" : "generated-c-abi", blockers };
+    const identity = routeIdentity(module, nativeSymbol, parameters, result, variadic);
+    return {
+      id: identity.numericId,
+      ...identity,
+      symbol: nativeSymbol,
+      memberName: invocation === "method" || effectiveSymbolPrefix === null
+        ? node.name
+        : node.name.slice(effectiveSymbolPrefix.length),
+      line: node.loc.line ?? 0,
+      language,
+      linkage: language === "c++" && node.mangledName && node.mangledName !== node.name ? "c++" : "extern-c",
+      invocation,
+      ...(record ? { receiverType: record } : {}),
+      variadic,
+      parameters,
+      result,
+      disposition: blockers.length ? "cataloged-needs-layout" : "generated-c-abi",
+      blockers
+    };
   });
   const stableRoutes = new Map();
   for (const route of candidates) {
@@ -92,7 +196,22 @@ export function ingestNativeExtensionHeader({ header, moduleName, symbolPrefix =
   }
   const referencedRecords = new Set(routes.flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)]).filter(({ kind }) => kind === "record").map(({ name }) => name));
   const referencedEnums = new Set(routes.flatMap((route) => [route.result, ...route.parameters.map(({ type }) => type)]).filter(({ kind }) => kind === "enum").map(({ name }) => name));
-  return { schemaVersion: 1, module, symbolPrefix, header: path.basename(absolute), headerSha256: sha256(readFileSync(absolute)), enums: [...enums.values()].filter(({ name }) => referencedEnums.has(name)).sort((a, b) => a.name.localeCompare(b.name)), records: [...records.values()].filter(({ name }) => referencedRecords.has(name)).sort((a, b) => a.name.localeCompare(b.name)), routes };
+  const missingSymbols = selectedSymbols
+    ? [...selectedSymbols].filter((symbol) => !routes.some((route) => route.symbol === symbol)).sort()
+    : [];
+  return {
+    schemaVersion: 1,
+    module,
+    language,
+    symbolPrefix: effectiveSymbolPrefix,
+    ...(symbols === null ? {} : { selectedSymbols: [...selectedSymbols].sort(), missingSymbols }),
+    header: path.basename(absolute),
+    headerSha256: sha256(readFileSync(absolute)),
+    enums: [...new Map([...enums.values()].filter(({ name }) => referencedEnums.has(name)).map((item) => [item.name, item])).values()].sort((a, b) => a.name.localeCompare(b.name)),
+    records: [...new Map([...records.values()].filter(({ name }) => referencedRecords.has(name)).map((item) => [item.name, item])).values()].sort((a, b) => a.name.localeCompare(b.name)),
+    routes,
+    blockers: missingSymbols.map((symbol) => ({ code: "schema-symbol-not-found", symbol }))
+  };
 }
 
 function tag(type) { if (type.kind === "bool") return "DEHERM_DMSDK_UNIVERSAL_BOOL"; if (["f32", "f64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_F64"; if (["i8", "i16", "i32", "i64", "enum"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_I64"; if (["u8", "u16", "u32", "u64"].includes(type.kind)) return "DEHERM_DMSDK_UNIVERSAL_U64"; if (type.kind === "cstring") return "DEHERM_DMSDK_UNIVERSAL_ADDRESS"; return type.kind === "void" ? "DEHERM_DMSDK_UNIVERSAL_VOID" : null; }
@@ -221,8 +340,8 @@ function renderVerificationDriver(ir, routes, exactDispatch) {
 export function renderNativeExtensionBindings(ir, { headerInclude = path.basename(ir.header), namespace = ir.module } = {}) {
   const generatedNamespace = safeName(namespace, "namespace");
   const generated = ir.routes.filter((route) => route.disposition === "generated-c-abi").map((route) => ({ ...route, names: routeNames(generatedNamespace, route) }));
-  const enumLines = ir.enums.flatMap((item) => [`export const ${item.name}={${item.values.map((value) => `${value.name}:${value.value}`).join(",")}} as const;`, `export type ${item.name}=typeof ${item.name}[keyof typeof ${item.name}];`]);
-  const recordLines = ir.records.map((item) => `export interface ${item.name}{${item.fields.map((field) => `readonly ${field.name}:number`).join(";")}}`);
+  const enumLines = ir.enums.flatMap((item) => { const name = typeScriptName(item.name); return [`export const ${name}={${item.values.map((value) => `${value.name}:${value.value}`).join(",")}} as const;`, `export type ${name}=typeof ${name}[keyof typeof ${name}];`]; });
+  const recordLines = ir.records.map((item) => `export interface ${typeScriptName(item.name)}{${item.fields.map((field) => `readonly ${field.name}:number`).join(";")}}`);
   const functions = ir.routes.map((route) => route.disposition === "generated-c-abi" ? `  ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}(${route.parameters.map((parameter) => `${parameter.name}:${parameter.type.ts}`).join(",")}):${route.result.ts};` : `  /** blocked: ${route.blockers.join(", ")} */ readonly ${route.memberName ?? route.symbol.slice(ir.module.length + 1)}:never;`);
   const typescript = `// Generated by @deherm/compiler native-extension-generator. Do not edit.\nexport type NativeAddress=bigint;\n${enumLines.join("\n")}\n${recordLines.join("\n")}\nexport interface ${ir.module[0].toUpperCase()+ir.module.slice(1)}NativeExtension {\n${functions.join("\n")}\n}\n`;
   const preamble = `#include <defold_hermes/generated_dmsdk_universal.h>\n#include <${headerInclude}>\n#include <stdint.h>\n#include <string.h>\n[[maybe_unused]] static int64_t deherm_ext_unpack_i64(uint64_t bits){int64_t value;memcpy(&value,&bits,sizeof(value));return value;}\n[[maybe_unused]] static double deherm_ext_unpack_f64(uint64_t bits){double value;memcpy(&value,&bits,sizeof(value));return value;}\n`;
@@ -257,7 +376,7 @@ export function renderNativeExtensionBindings(ir, { headerInclude = path.basenam
       line: route.line,
       compileTimeResolution: {
         declaredNativeSymbol: route.symbol,
-        callingConvention: "extern-c",
+        callingConvention: route.linkage ?? "extern-c",
         callExpression: `${route.symbol}(${route.parameters.map((_, parameterIndex) => `arg${parameterIndex}`).join(", ")})`,
         returnCppType: route.result.nativeType,
         parameterCppTypes: route.parameters.map(({ type }) => type.nativeType),

@@ -467,6 +467,108 @@ test("project inspection finds local and resolved dependency extensions", async 
   assert.deepEqual(inventory.diagnostics, []);
 });
 
+test("local and dependency binding schemas select C/C++ entry headers through project generation", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-extension-binding-schema-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  await mkdir(path.join(project, "cpp_math", "include"), { recursive: true });
+  await mkdir(path.join(project, ".internal", "lib"), { recursive: true });
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Binding schema\n\n[defold_hermes]\ndefold_sdk = ${bundledDefoldRevision}\n`);
+  await writeFile(path.join(project, "cpp_math", "ext.manifest"), "name: CppMath\n");
+  await writeFile(path.join(project, "cpp_math", "include", "cpp_math.hpp"), `#pragma once
+#include <stdint.h>
+namespace cppmath {
+uint32_t add(uint32_t left, uint32_t right);
+struct Counter { uint32_t step(uint32_t amount) const; };
+}
+`);
+  await writeFile(path.join(project, "cpp_math", "include", "detail.hpp"), "namespace cppmath { uint32_t internal(); }\n");
+  await writeFile(path.join(project, "cpp_math", "defold-hermes.bindings.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    headers: [{
+      path: "cpp_math.hpp",
+      language: "c++",
+      symbols: ["cppmath::Counter::step", "cppmath::add"]
+    }]
+  }, null, 2)}\n`);
+
+  const remoteSchema = `${JSON.stringify({
+    schemaVersion: 1,
+    headers: [{ path: "remote.h", language: "c", symbolPrefix: "remote_", symbols: ["remote_add"] }]
+  }, null, 2)}\n`;
+  await writeFile(path.join(project, ".internal", "lib", "remote.zip"), zipSync({
+    "remote/ext.manifest": strToU8("name: RemoteMath\n"),
+    "remote/include/remote.h": strToU8("#include <stdint.h>\nuint32_t remote_add(uint32_t left, uint32_t right);\n"),
+    "remote/defold-hermes.bindings.json": strToU8(remoteSchema)
+  }));
+
+  const inventory = await inspectDefoldProject({ project });
+  assert.deepEqual(inventory.extensions.map(({ name, kind, bindingStatus }) => ({ name, kind, bindingStatus })), [
+    { name: "CppMath", kind: "local", bindingStatus: "native-schema" },
+    { name: "RemoteMath", kind: "dependency", bindingStatus: "native-schema" }
+  ]);
+  assert.deepEqual(inventory.extensions.map(({ bindingSchema }) => bindingSchema.document), [
+    {
+      schemaVersion: 1,
+      headers: [{
+        path: "cpp_math.hpp",
+        language: "c++",
+        symbolPrefix: null,
+        symbols: ["cppmath::Counter::step", "cppmath::add"]
+      }]
+    },
+    {
+      schemaVersion: 1,
+      headers: [{ path: "remote.h", language: "c", symbolPrefix: "remote_", symbols: ["remote_add"] }]
+    }
+  ]);
+  assert.deepEqual(inventory.diagnostics, []);
+
+  const generated = await writeGeneratedProject(inventory);
+  const index = JSON.parse(await readFile(path.join(generated.root, "generated", "native-extensions", "index.json"), "utf8"));
+  assert.equal(index.headerCount, 2);
+  assert.equal(index.generatedRouteCount, 2);
+  assert.equal(index.blockedRouteCount, 1);
+  assert.equal(index.ignoredHeaderCount, 1);
+  assert.deepEqual(index.ignoredHeaders.map(({ extension, includePath, reason }) => ({ extension, includePath, reason })), [{
+    extension: "CppMath",
+    includePath: "detail.hpp",
+    reason: "not-selected-by-binding-schema"
+  }]);
+  const cpp = index.headers.find(({ extension }) => extension === "CppMath");
+  assert.equal(cpp.language, "c++");
+  assert.equal(cpp.schema, "cpp_math/defold-hermes.bindings.json");
+  assert.deepEqual(cpp.blockers.map(({ code }) => code), ["receiver:requires-handle-policy:Counter"]);
+  const cppRoot = path.join(generated.root, "generated", "native-extensions", ...cpp.output.split("/"));
+  const cppIr = JSON.parse(await readFile(path.join(cppRoot, "extension.ir.json"), "utf8"));
+  assert.deepEqual(cppIr.routes.map(({ symbol, disposition }) => [symbol, disposition]), [
+    ["cppmath::add", "generated-c-abi"],
+    ["cppmath::Counter::step", "cataloged-needs-layout"]
+  ]);
+  assert.match(await readFile(path.join(cppRoot, "cpp_math_glue.cpp"), "utf8"), /cppmath::add/);
+  const remote = index.headers.find(({ extension }) => extension === "RemoteMath");
+  assert.equal(remote.language, "c");
+  const remoteRoot = path.join(generated.root, "generated", "native-extensions", ...remote.output.split("/"));
+  assert.match(await readFile(path.join(remoteRoot, "remote_math_glue.cpp"), "utf8"), /remote_add/);
+});
+
+test("invalid native binding schemas fail closed in project inventory", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-invalid-binding-schema-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  await mkdir(path.join(project, "extension", "include"), { recursive: true });
+  await writeFile(path.join(project, "game.project"), "[project]\ntitle = Invalid schema\n");
+  await writeFile(path.join(project, "extension", "ext.manifest"), "name: Broken\n");
+  await writeFile(path.join(project, "extension", "include", "broken.hpp"), "uint32_t broken();\n");
+  await writeFile(path.join(project, "extension", "defold-hermes.bindings.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    headers: [{ path: "broken.hpp", language: "c++", symbolPrefixes: "broken_" }]
+  })}\n`);
+  const inventory = await inspectDefoldProject({ project });
+  assert.equal(inventory.extensions[0].bindingStatus, "native-schema-required");
+  assert.equal(inventory.extensions[0].bindingSchema.document, null);
+  assert.match(inventory.diagnostics[0].message, /Invalid native binding schema/);
+  assert.match(inventory.diagnostics[0].message, /unknown field\(s\): symbolPrefixes/);
+});
+
 test("dependency header discovery uses exact include segments and rejects unsafe or oversized ZIP entries", async () => {
   const project = await mkdtemp(path.join(tmpdir(), "deherm-extension-zip-guards-"));
   await mkdir(path.join(project, ".internal", "lib"), { recursive: true });

@@ -15,6 +15,7 @@ const projectDiscoveryIgnoredDirectories = new Set([
 ]);
 const textDecoder = new TextDecoder();
 const defaultEngineProfileId = "default-legacy-bullet";
+export const NATIVE_EXTENSION_BINDING_SCHEMA = "defold-hermes.bindings.json";
 export const PUBLIC_EXTENSION_ZIP_LIMITS = Object.freeze({
   archiveBytes: 64 * 1024 * 1024,
   entries: 10_000,
@@ -390,11 +391,86 @@ function isNativeSource(relative) {
   return /(^|\/)(?:src|commonsrc)\/.*\.(?:c|cc|cpp|cxx|m|mm)$/i.test(relative);
 }
 
-function bindingStatus(scriptApis, publicHeaders) {
+function bindingStatus(scriptApis, publicHeaders, bindingSchema) {
+  if (scriptApis.length && publicHeaders.length && bindingSchema?.document) return "script-api+native-schema";
+  if (publicHeaders.length && bindingSchema?.document) return "native-schema";
   if (scriptApis.length && publicHeaders.length) return "script-api+native-schema-required";
   if (scriptApis.length) return "script-api";
   if (publicHeaders.length) return "native-schema-required";
   return "no-public-api-metadata";
+}
+
+export function normalizeNativeExtensionBindingSchema(document) {
+  if (!document || Array.isArray(document) || typeof document !== "object") {
+    throw new Error("the root must be a JSON object");
+  }
+  const unknownRootKeys = Object.keys(document).filter((key) => !["schemaVersion", "headers"].includes(key));
+  if (unknownRootKeys.length) throw new Error(`unknown root field(s): ${unknownRootKeys.sort().join(", ")}`);
+  if (document.schemaVersion !== 1) throw new Error("schemaVersion must be 1");
+  if (!Array.isArray(document.headers) || !document.headers.length) {
+    throw new Error("headers must be a non-empty array");
+  }
+  const seenHeaders = new Set();
+  const headers = document.headers.map((entry, index) => {
+    if (!entry || Array.isArray(entry) || typeof entry !== "object") {
+      throw new Error(`headers[${index}] must be an object`);
+    }
+    const unknownHeaderKeys = Object.keys(entry).filter((key) => !["path", "language", "symbolPrefix", "symbols"].includes(key));
+    if (unknownHeaderKeys.length) throw new Error(`headers[${index}] has unknown field(s): ${unknownHeaderKeys.sort().join(", ")}`);
+    if (typeof entry.path !== "string" || !entry.path) {
+      throw new Error(`headers[${index}].path must be a non-empty include-relative path`);
+    }
+    const header = assertSafeArchiveEntryName(entry.path);
+    if (header !== entry.path || header.includes(":")) {
+      throw new Error(`headers[${index}].path must be a canonical include-relative path`);
+    }
+    if (!/\.(?:h|hh|hpp|hxx)$/iu.test(header)) {
+      throw new Error(`headers[${index}].path must name a C or C++ header`);
+    }
+    if (seenHeaders.has(header)) throw new Error(`duplicate header entry: ${header}`);
+    seenHeaders.add(header);
+    const language = entry.language ?? (/\.(?:hh|hpp|hxx)$/iu.test(header) ? "c++" : "c");
+    if (language !== "c" && language !== "c++") {
+      throw new Error(`headers[${index}].language must be c or c++`);
+    }
+    const symbolPrefix = entry.symbolPrefix === undefined ? null : entry.symbolPrefix;
+    if (symbolPrefix !== null && (typeof symbolPrefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(symbolPrefix))) {
+      throw new Error(`headers[${index}].symbolPrefix must be null or a C identifier prefix`);
+    }
+    const symbols = entry.symbols === undefined ? null : entry.symbols;
+    if (symbols !== null && (!Array.isArray(symbols) || symbols.some((symbol) =>
+      typeof symbol !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*(?:::[A-Za-z_][A-Za-z0-9_]*)*$/u.test(symbol)))) {
+      throw new Error(`headers[${index}].symbols must be an array of C/C++ identifiers`);
+    }
+    if (symbols !== null && new Set(symbols).size !== symbols.length) {
+      throw new Error(`headers[${index}].symbols must not contain duplicates`);
+    }
+    return {
+      path: header,
+      language,
+      symbolPrefix,
+      ...(symbols === null ? {} : { symbols: [...symbols].sort() })
+    };
+  }).sort((left, right) => left.path.localeCompare(right.path));
+  return { schemaVersion: 1, headers };
+}
+
+function parseBindingSchema(bytes, displayPath, diagnostics) {
+  if (bytes.byteLength > PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes) {
+    diagnostics.push({
+      severity: "error",
+      path: displayPath,
+      message: `Native binding schema exceeds ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes} bytes`
+    });
+    return { path: displayPath, sha256: sha256(bytes), document: null };
+  }
+  try {
+    const document = normalizeNativeExtensionBindingSchema(JSON.parse(textDecoder.decode(bytes)));
+    return { path: displayPath, sha256: sha256(bytes), document };
+  } catch (error) {
+    diagnostics.push({ severity: "error", path: displayPath, message: `Invalid native binding schema: ${error.message}` });
+    return { path: displayPath, sha256: sha256(bytes), document: null };
+  }
 }
 
 async function localExtension(projectRoot, manifestPath, diagnostics) {
@@ -433,6 +509,9 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
     bytes: await readFile(file)
   }))));
   const publicIncludeRoots = [...new Set(includeFiles.map((file) => publicIncludeRoot(portable(path.relative(root, file)))))].sort();
+  const schemaPath = path.join(root, NATIVE_EXTENSION_BINDING_SCHEMA);
+  const bindingSchema = await readFile(schemaPath)
+    .then((bytes) => parseBindingSchema(bytes, portable(path.relative(projectRoot, schemaPath)), diagnostics), () => null);
   return {
     kind: "local",
     name: typeof manifest.name === "string" ? manifest.name : path.basename(root),
@@ -445,7 +524,8 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
     publicIncludeTreeSha256,
     publicIncludeRoots,
     sourceFiles,
-    bindingStatus: bindingStatus(scriptApis, publicHeaders)
+    bindingSchema,
+    bindingStatus: bindingStatus(scriptApis, publicHeaders, bindingSchema)
   };
 }
 
@@ -471,6 +551,7 @@ function zipEntries(bytes) {
       }
       listing.push(name);
       const selected = name.endsWith("/ext.manifest") || name === "ext.manifest" || name.endsWith(".script_api") ||
+        path.posix.basename(name) === NATIVE_EXTENSION_BINDING_SCHEMA ||
         isPublicIncludeFile(name) || isNativeSource(name);
       if (!selected) return false;
       if (file.originalSize > PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes) {
@@ -562,6 +643,12 @@ async function dependencyExtensions(projectRoot, diagnostics) {
       const sourceFiles = names
         .filter((name) => withinExtension(name) && isNativeSource(relativeToExtension(name)))
         .map((name) => `${archive}:${name}`);
+      const schemaEntry = root
+        ? `${root}/${NATIVE_EXTENSION_BINDING_SCHEMA}`
+        : NATIVE_EXTENSION_BINDING_SCHEMA;
+      const bindingSchema = entries[schemaEntry]
+        ? parseBindingSchema(entries[schemaEntry], `${archive}:${schemaEntry}`, diagnostics)
+        : null;
       extensions.push({
         kind: "dependency",
         name: typeof manifest.name === "string" ? manifest.name : path.posix.basename(root || archive),
@@ -575,7 +662,8 @@ async function dependencyExtensions(projectRoot, diagnostics) {
         publicIncludeTreeSha256,
         publicIncludeRoots,
         sourceFiles,
-        bindingStatus: bindingStatus(scriptApis, publicHeaders)
+        bindingSchema,
+        bindingStatus: bindingStatus(scriptApis, publicHeaders, bindingSchema)
       });
     }
   }

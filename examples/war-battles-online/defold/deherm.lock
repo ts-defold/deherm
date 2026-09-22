@@ -328,11 +328,11 @@
   "generation": {
     "schemaVersion": 1,
     "projectGeneratorSha256": "9e923c2fd0664f4ec505761bf4776e3fb3130506fd1f6e4a770c942b023e3f7f",
-    "nativeExtensionGeneratorSha256": "41f96c3cf30cde0da23797f573223098d4f7b1c4accdfa354469eff89a786f5c",
+    "nativeExtensionGeneratorSha256": "7c85459ce52d51aaf1e2d184615be90af562b8916699327c9968ae1c214073a1",
     "nativeExtensionClang": {
       "required": false
     },
-    "cacheKey": "223212de6f3dd100745433871b0c780b5a50d565a4b3557a633d940ae431b9fc"
+    "cacheKey": "94cda3a8de7ec5c30695202334047c0fa1c39a0bd38b71aa44cbf2daf52a695a"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -342,8 +342,8 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 8441220,
-      "modifiedMs": 1790066808025
+      "size": 8497051,
+      "modifiedMs": 1790108229495
     },
     "via": "deherm-lock"
   },
@@ -380,7 +380,7 @@
   "generatedOutputs": {
     "output": {
       "script-contexts.json": "de6c9c72202b702272e57a0fffa869c9d63fa491d7db281ac419b2e821f0fc05",
-      "generated/native-extensions/index.json": "a765434a57e13903ee1d47475f7834833a614fde11cea9e5f1a11bdcfcd5a83a",
+      "generated/native-extensions/index.json": "f0fb6a1f5e67b50b005ebbfb91f9b46bed0dd6340a3044b5365dab1f21b0135d",
       "sdk/contexts/shared.ts": "f9fbf6bad84413a3fc4da22499b431e8a1a23e787ef6082e8935a2c3ad651784",
       "sdk/contexts/game-object.ts": "f78f5740bb6eb06bf903f8de41a5ff30206b2b5eeb841c12568aa6ac00cd6ed7",
       "sdk/contexts/gui.ts": "cf03743da2030749d238eefa30eab9cd6819a5cbcc28720cd017e52749b53026",
@@ -402,8 +402,8 @@
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/223212de6f3dd100745433871b0c780b5a50d565a4b3557a633d940ae431b9fc",
-    "treeSha256": "32cdfb63c35722e146b54ba6179ae3b15f0aba0c011e1514580764dccc313132"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/94cda3a8de7ec5c30695202334047c0fa1c39a0bd38b71aa44cbf2daf52a695a",
+    "treeSha256": "a75051f88af4d498fa45ffd2c5d72ae9f5bc7d25eca0489972fa1549f5814197"
   },
   "engineProfiles": {
     "source": "defold-default",

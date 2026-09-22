@@ -88,10 +88,49 @@ for the blocker taxonomy and the pinned ingestion evidence.
 Likewise, finding a C/C++ header does not make it safe to expose through JSI or
 Static Hermes automatically. Public headers enter the Clang ingestion lane, but
 native emission remains blocked until the generated IR has an explicit ABI and
-lifetime policy. The intended extension-owned escape hatch is a versioned
-`defold-hermes.bindings.json` schema that can select header declarations and
-provide those policies. The CLI will merge that schema into the same canonical
-IR used for dmSDK.
+lifetime policy. The extension-owned escape hatch is a versioned
+`defold-hermes.bindings.json` beside `ext.manifest`. It selects include-relative
+entry headers, chooses C or C++ parsing, optionally filters exact qualified
+symbols, and optionally strips one C prefix from public member names:
+
+```json
+{
+  "schemaVersion": 1,
+  "headers": [
+    {
+      "path": "xmath.hpp",
+      "language": "c++",
+      "symbolPrefix": null,
+      "symbols": ["xmath::dot", "xmath::Matrix::invert"]
+    }
+  ]
+}
+```
+
+The same bounded parser reads this file from local extensions and directly from
+Bob-resolved dependency ZIPs. Paths and symbols are canonicalized, duplicates
+and unknown fields are rejected, qualified symbol grammar is validated, the
+schema bytes participate in the project generation key, and
+public headers not selected as entry points remain available as transitive
+includes while being named in the native-generation report as intentionally
+ignored. A requested header or symbol that does not exist becomes a
+machine-readable blocker rather than silently disappearing.
+
+Clang now projects schema-selected scalar, string, and enum C or C++ free
+functions into the same production glue and generated exact-call twin. C++
+methods, templates, records, pointers, and other shapes that still require
+receiver, specialization, layout, bounds, ownership, or lifetime facts remain
+public catalog rows with those explicit blockers. The schema's presentation
+choices do not perturb the established C-route stable-id signature. Later
+policy fields may satisfy those blockers without changing discovery or the
+output ownership contract. Implicit compiler declarations never enter the
+catalog, a method nested in a class template retains its specialization
+blocker, and a configured symbol prefix changes only matching free-function
+member names; it never truncates a method name. Qualified C++ enum and record
+names use `$` between namespace segments in emitted TypeScript while retaining
+their exact qualified spelling in native glue. Unqualified Clang type spellings
+resolve against their enclosing C++ namespace/record scope instead of a global
+short-name alias.
 
 This gives extensions two compatible routes:
 

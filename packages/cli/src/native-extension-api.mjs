@@ -291,6 +291,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
   try {
     await mkdir(keyedRoot, { recursive: true });
     const headers = [];
+    const ignoredHeaders = [];
     const ignoredExtensions = inventory.extensions
       .filter(isDehermInfrastructureExtension)
       .map(({ name, manifestPath, publicHeaders = [] }) => ({
@@ -306,23 +307,101 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
           details.some((detail, index) => detail.path !== [...extension.publicHeaders].sort(compare)[index])) {
         throw new Error(`Public header detail inventory is incomplete for ${extension.manifestPath}`);
       }
-      for (const [headerIndex, detail] of details.entries()) {
+      const schemaHeaders = extension.bindingSchema?.document?.headers ?? null;
+      const schemaByHeader = schemaHeaders
+        ? new Map(schemaHeaders.map((entry) => [entry.path, entry]))
+        : null;
+      const detailsByInclude = new Map(details.map((detail, headerIndex) => {
+        const includePath = publicIncludeSuffix(detail.path);
+        if (!includePath) throw new Error(`Discovered public header has no include-relative path: ${detail.path}`);
+        if (details.some((candidate) => candidate !== detail && publicIncludeSuffix(candidate.path) === includePath)) {
+          throw new Error(`Extension exposes duplicate include-relative header path: ${includePath}`);
+        }
+        return [includePath, { detail, headerIndex }];
+      }));
+      if (schemaByHeader) {
+        for (const schemaHeader of schemaHeaders) {
+          if (detailsByInclude.has(schemaHeader.path)) continue;
+          const blocker = { code: "schema-header-not-found", header: schemaHeader.path };
+          headers.push({
+            extension: extension.name,
+            kind: extension.kind,
+            input: `${extension.bindingSchema.path}#${schemaHeader.path}`,
+            inputSha256: extension.bindingSchema.sha256,
+            module: moduleName(extension.name),
+            language: schemaHeader.language,
+            schema: extension.bindingSchema.path,
+            routeCount: 0,
+            generatedRouteCount: 0,
+            blockedRouteCount: 1,
+            blockers: [blocker]
+          });
+        }
+        for (const [includePath, { detail }] of detailsByInclude) {
+          if (!schemaByHeader.has(includePath)) {
+            ignoredHeaders.push({
+              extension: extension.name,
+              kind: extension.kind,
+              input: detail.path,
+              includePath,
+              reason: "not-selected-by-binding-schema"
+            });
+          }
+        }
+      }
+      const selectedDetails = schemaByHeader
+        ? [...detailsByInclude].filter(([includePath]) => schemaByHeader.has(includePath)).map(([, value]) => value)
+        : details.map((detail, headerIndex) => ({ detail, headerIndex }));
+      for (const { detail, headerIndex } of selectedDetails) {
         const module = moduleName(extension.name);
         const leaf = `${String(extensionIndex).padStart(3, "0")}-${String(headerIndex).padStart(3, "0")}-${fileSlug(path.basename(detail.path))}-${detail.sha256.slice(0, 8)}`;
         const destination = path.join(keyedRoot, leaf);
         let resolved;
         try {
           resolved = await resolvedHeader(inventory, extension, detail);
+          const schemaHeader = schemaByHeader?.get(resolved.headerInclude) ?? null;
           let ir;
           try {
-            ir = ingestNativeExtensionHeader({ header: resolved.header, moduleName: module, symbolPrefix: null, include: resolved.include, clang });
+            ir = ingestNativeExtensionHeader({
+              header: resolved.header,
+              moduleName: module,
+              symbolPrefix: schemaHeader?.symbolPrefix ?? null,
+              language: schemaHeader?.language ?? "c",
+              symbols: schemaHeader?.symbols ?? null,
+              include: resolved.include,
+              clang
+            });
           } catch (error) {
             if (!isExpectedClangParseFailure(error)) throw error;
-            const blocker = { code: "header-parse-failed", message: "Clang rejected this discovered public C header" };
-            const failedIr = { schemaVersion: 1, module, header: path.basename(detail.path), headerSha256: detail.sha256, enums: [], records: [], routes: [], blockers: [blocker] };
+            const languageLabel = (schemaHeader?.language ?? "c") === "c++" ? "C++" : "C";
+            const blocker = { code: "header-parse-failed", message: `Clang rejected this discovered public ${languageLabel} header` };
+            const failedIr = {
+              schemaVersion: 1,
+              module,
+              language: schemaHeader?.language ?? "c",
+              header: path.basename(detail.path),
+              headerSha256: detail.sha256,
+              enums: [],
+              records: [],
+              routes: [],
+              blockers: [blocker]
+            };
             await mkdir(destination, { recursive: true });
             await writeFile(path.join(destination, "extension.ir.json"), `${JSON.stringify(failedIr, null, 2)}\n`);
-            headers.push({ extension: extension.name, kind: extension.kind, input: detail.path, inputSha256: detail.sha256, module, output: path.posix.join(defoldRevision, generationKey, leaf), routeCount: 0, generatedRouteCount: 0, blockedRouteCount: 1, blockers: [blocker] });
+            headers.push({
+              extension: extension.name,
+              kind: extension.kind,
+              input: detail.path,
+              inputSha256: detail.sha256,
+              module,
+              language: failedIr.language,
+              ...(extension.bindingSchema ? { schema: extension.bindingSchema.path } : {}),
+              output: path.posix.join(defoldRevision, generationKey, leaf),
+              routeCount: 0,
+              generatedRouteCount: 0,
+              blockedRouteCount: 1,
+              blockers: [blocker]
+            });
             continue;
           }
           const generatedNamespace = `${module}_${sha256(`${extension.manifestPath}\0${detail.path}\0${detail.sha256}`).slice(0, 8)}`;
@@ -336,19 +415,24 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
             writeFile(path.join(destination, `${module}_glue.verify.driver.cpp`), generated.verificationDriver),
             writeFile(path.join(destination, `${module}_glue.verify.json`), `${JSON.stringify(generated.verification, null, 2)}\n`)
           ]);
-          const blockers = ir.routes.flatMap((route) => route.blockers.map((code) => ({ stableId: route.stableId, code })));
-          if (!ir.routes.length) blockers.push({ code: "no-public-functions" });
+          const blockers = [
+            ...(ir.blockers ?? []),
+            ...ir.routes.flatMap((route) => route.blockers.map((code) => ({ stableId: route.stableId, code })))
+          ];
+          if (!ir.routes.length && !blockers.length) blockers.push({ code: "no-public-functions" });
           headers.push({
             extension: extension.name,
             kind: extension.kind,
             input: detail.path,
             inputSha256: detail.sha256,
             module,
+            language: ir.language ?? "c",
+            ...(extension.bindingSchema ? { schema: extension.bindingSchema.path } : {}),
             generatedNamespace,
             output: path.posix.join(defoldRevision, generationKey, leaf),
             routeCount: ir.routes.length,
             generatedRouteCount: generated.generatedRouteCount,
-            blockedRouteCount: generated.blockedRouteCount || (ir.routes.length ? 0 : 1),
+            blockedRouteCount: generated.blockedRouteCount + (ir.blockers?.length ?? 0) + (!ir.routes.length && !(ir.blockers?.length) ? 1 : 0),
             blockers,
             verificationManifestSha256: generated.verification.manifestSha256
           });
@@ -367,6 +451,8 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
       blockedRouteCount: headers.reduce((sum, item) => sum + item.blockedRouteCount, 0),
       ignoredExtensionCount: ignoredExtensions.length,
       ignoredExtensions,
+      ignoredHeaderCount: ignoredHeaders.length,
+      ignoredHeaders,
       headers
     };
     await writeFile(path.join(keyedRoot, "report.json"), `${JSON.stringify(report, null, 2)}\n`);

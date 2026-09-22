@@ -22,6 +22,13 @@ test("arbitrary extension headers deterministically produce ABI IR, TypeScript, 
   ]);
   assert.equal(first.routes.filter(({ symbol }) => symbol === "sample_label").length, 1, "repeated compatible declarations deduplicate");
   assert.deepEqual(first.routes.find(({ symbol }) => symbol === "sample_variadic").blockers, ["variadic:requires-typed-nonvariadic-facade"]);
+  assert.deepEqual(first.routes.map(({ symbol, numericId }) => [symbol, numericId]), [
+    ["sample_accumulate", 2909348425],
+    ["sample_apply", 2278323060],
+    ["sample_label", 1125900017],
+    ["sample_translate", 4093783932],
+    ["sample_variadic", 2877018145]
+  ], "C route identities remain stable while the C++ catalog evolves");
   assert.equal(new Set(first.routes.map(({ numericId }) => numericId)).size, first.routes.length);
   assert.ok(first.routes.every(({ id, numericId, stableId, signatureSha256 }) =>
     id === numericId && Number.isSafeInteger(numericId) && numericId >= 0 &&
@@ -135,6 +142,102 @@ test("automatic header ingestion keeps exact C names and excludes transitive dec
   assert.match(generated.typescript, /XMathDot\(left:number,right:number\):number/);
   assert.doesNotMatch(generated.typescript, /SharedHelper/);
   assert.match(generated.source, /XMathDot\(/);
+});
+
+test("schema-selected C++ headers emit free functions and catalog methods/templates without changing the C ABI", async (t) => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-native-extension-cxx-"));
+  t.after(() => rm(output, { recursive: true, force: true }));
+  const header = path.join(output, "sample.hpp");
+  await writeFile(header, `#pragma once
+#include <stdint.h>
+namespace sample {
+uint32_t accumulate(uint32_t value, int32_t delta);
+enum Mode : uint32_t { MODE_ADD = 3, MODE_MULTIPLY = 4 };
+uint32_t mode_value(Mode mode);
+struct Counter { uint32_t step(uint32_t amount) const; };
+template <typename T> T identity(T value) { return value; }
+template <typename T> struct Box { T get() const; };
+}
+namespace other { enum Mode : uint32_t { MODE_OTHER = 99 }; }
+`);
+
+  const ir = ingestNativeExtensionHeader({
+    header,
+    moduleName: "sample",
+    language: "c++",
+    symbolPrefix: null,
+    symbols: ["sample::accumulate", "sample::mode_value", "sample::Counter::step", "sample::identity", "sample::Box::get", "sample::missing"]
+  });
+  assert.equal(ir.language, "c++");
+  assert.deepEqual(ir.routes.map(({ symbol, invocation, disposition }) => ({ symbol, invocation, disposition })), [
+    { symbol: "sample::accumulate", invocation: "free-function", disposition: "generated-c-abi" },
+    { symbol: "sample::mode_value", invocation: "free-function", disposition: "generated-c-abi" },
+    { symbol: "sample::Counter::step", invocation: "method", disposition: "cataloged-needs-layout" },
+    { symbol: "sample::identity", invocation: "free-function", disposition: "cataloged-needs-layout" },
+    { symbol: "sample::Box::get", invocation: "method", disposition: "cataloged-needs-layout" }
+  ]);
+  assert.ok(ir.routes.find(({ symbol }) => symbol === "sample::Counter::step").blockers
+    .includes("receiver:requires-handle-policy:Counter"));
+  assert.ok(ir.routes.find(({ symbol }) => symbol === "sample::identity").blockers
+    .includes("template:requires-specialization"));
+  assert.ok(ir.routes.find(({ symbol }) => symbol === "sample::Box::get").blockers
+    .includes("template:requires-specialization"));
+  assert.deepEqual(ir.blockers, [{ code: "schema-symbol-not-found", symbol: "sample::missing" }]);
+  assert.deepEqual(ir.enums.map(({ name }) => name), ["sample::Mode"], "unqualified AST spellings resolve in their declaration scope");
+
+  const generated = renderNativeExtensionBindings(ir);
+  assert.equal(generated.generatedRouteCount, 2);
+  assert.equal(generated.blockedRouteCount, 3);
+  assert.match(generated.typescript, /export const sample\$Mode=/);
+  assert.match(generated.typescript, /mode_value\(mode:sample\$Mode\):number/);
+  assert.equal(generated.verification.vectors[0].compileTimeResolution.callingConvention, "c++");
+  assert.equal(generated.verification.vectors[0].compileTimeResolution.declaredNativeSymbol, "sample::accumulate");
+
+  const glue = path.join(output, "glue.cpp");
+  const implementation = path.join(output, "implementation.cpp");
+  const harness = path.join(output, "harness.cpp");
+  const executable = path.join(output, "test");
+  await writeFile(glue, generated.source);
+  await writeFile(implementation, '#include <sample.hpp>\nuint32_t sample::accumulate(uint32_t value,int32_t delta){return value+delta;}\nuint32_t sample::mode_value(sample::Mode mode){return static_cast<uint32_t>(mode);}\n');
+  const id = ir.routes.find(({ symbol }) => symbol === "sample::accumulate").numericId;
+  await writeFile(harness, `#include <defold_hermes/generated_dmsdk_universal.h>
+#include <stdint.h>
+extern "C" DehermDmSdkUniversalStatus deherm_ext_sample_dispatch(uint32_t,const DehermDmSdkUniversalValue*,uint32_t,DehermDmSdkUniversalValue*);
+int main(){DehermDmSdkUniversalValue a[2]={{7,0,DEHERM_DMSDK_UNIVERSAL_U64,0},{static_cast<uint64_t>(static_cast<int64_t>(-2)),0,DEHERM_DMSDK_UNIVERSAL_I64,0}},r={};return deherm_ext_sample_dispatch(UINT32_C(${id}),a,2,&r)==DEHERM_DMSDK_UNIVERSAL_OK&&r.payload==5?0:1;}
+`);
+  execFileSync(process.env.CXX ?? "clang++", [
+    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+    `-I${path.join(root, "defold/defold_hermes/include")}`, `-I${output}`,
+    glue, implementation, harness, "-o", executable
+  ], { cwd: root, stdio: "pipe" });
+  execFileSync(executable, [], { stdio: "pipe" });
+});
+
+test("C++ ingestion rejects implicit methods and applies symbol prefixes only to free-function member names", async (t) => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-native-extension-cxx-fail-closed-"));
+  t.after(() => rm(output, { recursive: true, force: true }));
+  const header = path.join(output, "prefixed.hpp");
+  await writeFile(header, `#pragma once
+#include <stdint.h>
+namespace api {
+uint32_t de_add(uint32_t left, uint32_t right);
+struct Counter { uint32_t step(uint32_t amount) const; };
+inline void force_implicit_methods() { Counter first{}; Counter second = first; second = first; }
+}
+`);
+
+  const ir = ingestNativeExtensionHeader({
+    header,
+    moduleName: "prefixed",
+    language: "c++",
+    symbolPrefix: "de_"
+  });
+  assert.deepEqual(ir.routes.map(({ symbol, memberName }) => [symbol, memberName]), [
+    ["api::de_add", "add"],
+    ["api::Counter::step", "step"]
+  ]);
+  assert.deepEqual(ir.blockers, []);
+  assert.doesNotMatch(renderNativeExtensionBindings(ir).typescript, /operator=/);
 });
 
 test("CLI exposes header-to-IR generation and reports layout blockers", async () => {
