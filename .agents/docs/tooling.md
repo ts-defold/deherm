@@ -340,6 +340,8 @@ pnpm exec deherm materialize-dmsdk --usage deherm.dmsdk.json --output generated/
 pnpm exec deherm typecheck
 pnpm exec deherm verify-generated
 pnpm exec deherm verify-bundle
+pnpm exec deherm language-server --stdio
+pnpm exec deherm debug
 ```
 
 The npm package contains no platform `.a`/`.lib` archive and no generated
@@ -412,11 +414,14 @@ tsconfig.deherm.render.json   render `*.render.ts`
 tsconfig.deherm.bundle.json   unfiltered runtime SDK used only to compose mixed-context bundles
 tsconfig.deherm.json          solution referencing all four contexts
 tsconfig.json                        created only when the project has none
-.vscode/extensions.json              created only when absent
+.vscode/extensions.json              preserves user entries and adds the ttsc + déherm recommendations
 .vscode/settings.json                created only when absent
+.vscode/launch.json                  created only when absent; attaches through the déherm DAP
 ```
 
-Existing root `tsconfig.json` and VS Code files are never overwritten. Run
+Existing root `tsconfig.json`, VS Code settings, and VS Code launch files are
+never overwritten. The extension recommendation file is merged by adding only
+missing déherm-owned recommendations and preserving every user entry. Run
 `npx deherm typecheck` regardless of an existing root configuration: it invokes
 the generated solution with the package's local TypeScript compiler and checks
 all four source contexts. `gui.*` is absent outside `*.gui.ts`; `render.*` is
@@ -485,6 +490,26 @@ changes restart an engine that the operator launched manually. The watcher
 excludes `.internal`, `.deherm`, build outputs, and generated proxies so editor
 cache churn and self-authored outputs do not form rebuild loops.
 
+`deherm language-server --stdio --project <game.project>` is the installed,
+editor-neutral Defold semantic server. It consumes
+`.deherm/generated/resource-symbols.json` and contributes project resource
+paths, collection/component addresses, declaration hovers, and definitions.
+It reloads that generated index when the watcher reports a change and keeps
+missing or malformed generated state as an actionable request error rather
+than crashing the process. It intentionally does not duplicate normal
+TypeScript diagnostics, completion, TSDoc hover, navigation, or refactors;
+those remain owned by VS Code's TypeScript service.
+
+The thin `editors/vscode` extension is a separate VSIX artifact. It discovers
+each `game.project`, resolves only the workspace-local
+`@ts-defold/deherm/bin/deherm.mjs`, starts one scoped LSP client per project,
+and contributes the `deherm` debug type. It does not embed the compiler or
+runtime; its bundled client is the only executable content in the VSIX. A
+missing local package produces an install instruction rather than silently
+using a global or mismatched compiler. Protocol processes use the Node.js
+22.13+ executable resolved from `PATH`; `deherm.nodePath` is the resource-scoped
+override when the editor's GUI environment does not inherit that path.
+
 While that dev session is running, `deherm debug --project <game.project>`
 starts the editor-neutral Debug Adapter Protocol server on stdin/stdout. It
 reads the private `.deherm/dev/inspector.json` descriptor, authenticates the
@@ -493,8 +518,8 @@ breakpoints, stack frames, scopes, variables, watches, stepping, exception
 policy, and HMR breakpoint reapplication. A native session owns one debugger
 frontend; `--replace-debugger` is an explicit opt-in when another frontend is
 already attached. The command is intended for a VS Code debug-adapter client,
-not an interactive terminal—the thin extension/launch configuration remains
-the next editor-integration deliverable.
+not an interactive terminal; the generated launch configuration and thin
+extension now provide that client.
 
 The dev bundle does not feed printer-only transformed TypeScript into esbuild.
 That text has already lost authored whitespace and comments, so a structurally

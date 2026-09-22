@@ -1,5 +1,52 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Installed Defold semantic LSP and thin VS Code client
+
+The public npm artifact now carries `deherm language-server --stdio`, a bounded
+LSP 3.17 server using the same Content-Length framing primitive as the existing
+DAP. It reads the generated `resource-symbols.json` rather than reparsing Defold
+resources or inventing another project authority. Open TypeScript documents
+receive project resource, collection-instance, and component-address
+completion inside literals, plus generated provenance hover and
+go-to-definition back to the declaring Defold resource. Watched generated
+state reloads without a server restart; missing state returns an actionable
+request error and leaves the server alive. The server does not advertise
+ordinary TypeScript checking, completion, TSDoc, refactors, or navigation, so
+VS Code's built-in TypeScript service retains the ownership recorded by the
+development-loop decision.
+
+`editors/vscode` is now an isolated VSIX workspace rather than part of the npm
+payload. Its thin client discovers every `game.project`, resolves only the
+workspace-local `@ts-defold/deherm` CLI, starts one scoped semantic server per
+project, and launches that same package's existing DAP for the contributed
+`deherm` debug type. Multi-project workspaces fail closed on ambiguous debug
+selection. The generated project setup merges the `ts-defold.deherm` and ttsc
+recommendations without deleting user entries and creates a launch file only
+when none exists.
+
+Focused evidence is protocol and artifact evidence: six LSP protocol tests
+cover completion/hover/definition, watched-index reload, missing-state recovery,
+malformed/non-file inputs, in-flight shutdown, and clean shutdown; 31 CLI tests
+cover context generation plus non-destructive VS Code setup; eight extension
+tests cover POSIX/Windows local-package lookup, nested-project ownership,
+multi-project selection, exact LSP/DAP argv and environment, manifest shape,
+and packaging exclusions. The production extension bundle builds and the VSIX
+packager emits a client-only artifact. This does not yet prove a live VS Code
+Extension Host session, route-specific message/material semantic completion, or
+the live Defold instance/property channel; those remain explicit next gates.
+
+A read-only Fable adversarial review found two material defects before landing:
+string document globs did not attach a nested Defold project, and an in-flight
+semantic response could write after orderly LSP exit. The client now registers
+TypeScript documents broadly but admits completion/hover/definition only to the
+deepest owning `game.project`, with nested ownership covered as a pure test. The
+server makes shutdown idempotent and suppresses late replies, with a controlled
+in-flight-request test. The same hardening pass rejects cross-workspace debug
+fallback, makes malformed generated state actionable, ignores non-file URIs,
+type-checks the extension as part of its test command, and launches protocol
+servers through the package-supported Node.js 22.13+ toolchain rather than the
+editor's older embedded Electron runtime.
+
 ## 2026-09-22 - Browser DAP stops authored War Battles TypeScript
 
 HTML5 now uses the browser's own CDP endpoint through the same public `deherm

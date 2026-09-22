@@ -46,6 +46,18 @@ with a thin VS Code extension acting as their client:
   Defold introspection channel supplies live game-object, component, property,
   and message state that CDP alone cannot know.
 
+The first language-server slice is deliberately additive rather than a second
+TypeScript checker. `deherm language-server --stdio` reads the generated
+project resource-symbol table and contributes Defold resource paths,
+collection/component addresses, declaration provenance, hover text, and
+go-to-definition. It does not advertise ordinary TypeScript diagnostics,
+completion, hover, navigation, or refactors. The VS Code client continues to
+leave those capabilities with VS Code's TypeScript service and starts one
+workspace-local déherm server for each discovered `game.project`. The client
+also launches the existing `deherm debug` DAP from that same local package, so
+language, debugger, generator, and project policy cannot silently come from
+different installed versions.
+
 An optional Defold editor hook passes `editor.engine_sha1`, notifies the CLI,
 and advertises the active game-session endpoint. It does not implement a code
 editor.

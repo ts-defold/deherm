@@ -942,7 +942,11 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.ok(!contextManifest.contexts["game-object"].namespaces.includes("render"));
   assert.match(await readFile(path.join(output.root, "sdk", "contexts", "game-object.ts"), "utf8"), /projectExtensions = \{/);
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "extensions.json"), "utf8")), {
-    recommendations: ["samchon.ttsc"]
+    recommendations: ["samchon.ttsc", "ts-defold.deherm"]
+  });
+  assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "launch.json"), "utf8")), {
+    version: "0.2.0",
+    configurations: [{ type: "deherm", request: "attach", name: "déherm: Attach", project: "${workspaceFolder}" }]
   });
 
   const tsc = path.resolve("node_modules/typescript/bin/tsc");
@@ -1029,6 +1033,27 @@ test("project generation uses an input key and does not rewrite current outputs"
   const changed = await writeGeneratedProject(changedInventory);
   assert.equal(changed.cached, false);
   assert.notEqual(changed.generationKey, first.generationKey);
+});
+
+test("project generation merges editor recommendations and never overwrites an authored launch config", async () => {
+  const project = await fixture();
+  await mkdir(path.join(project, ".vscode"), { recursive: true });
+  await writeFile(path.join(project, ".vscode", "extensions.json"), `${JSON.stringify({
+    recommendations: ["publisher.user-tool"],
+    unwantedRecommendations: ["publisher.unwanted"]
+  }, null, 2)}\n`);
+  const authoredLaunch = { version: "0.2.0", configurations: [{ type: "node", request: "launch", name: "User launch" }] };
+  await writeFile(path.join(project, ".vscode", "launch.json"), `${JSON.stringify(authoredLaunch, null, 2)}\n`);
+
+  const generated = await writeGeneratedProject(await inspectDefoldProject({ project }));
+  assert.equal(generated.created.vscodeExtensions, false);
+  assert.equal(generated.created.vscodeExtensionsUpdated, true);
+  assert.equal(generated.created.vscodeLaunch, false);
+  assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "extensions.json"), "utf8")), {
+    recommendations: ["publisher.user-tool", "samchon.ttsc", "ts-defold.deherm"],
+    unwantedRecommendations: ["publisher.unwanted"]
+  });
+  assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "launch.json"), "utf8")), authoredLaunch);
 });
 
 test("script context projection requires an exact route-id bijection and records unknown tokens as unresolved", async () => {

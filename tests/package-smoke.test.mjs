@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { cp, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -21,6 +21,52 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")}\n${result.stdout}\n${result.stderr}`);
   return result;
+}
+
+async function driveLanguageServer(command, args, options = {}) {
+  const child = spawn(command, args, { ...options, stdio: ["pipe", "pipe", "pipe"] });
+  const closed = new Promise((resolve, reject) => {
+    child.once("error", reject);
+    child.once("close", (code, signal) => resolve({ code, signal }));
+  });
+  let buffer = Buffer.alloc(0);
+  let stderr = "";
+  let nextId = 1;
+  const pending = new Map();
+  child.stderr.setEncoding("utf8");
+  child.stderr.on("data", (chunk) => { stderr += chunk; });
+  child.stdout.on("data", (chunk) => {
+    buffer = buffer.length ? Buffer.concat([buffer, chunk]) : Buffer.from(chunk);
+    while (true) {
+      const delimiter = buffer.indexOf("\r\n\r\n");
+      if (delimiter < 0) return;
+      const length = Number(/content-length:\s*(\d+)/iu.exec(buffer.subarray(0, delimiter).toString("ascii"))?.[1]);
+      if (buffer.length < delimiter + 4 + length) return;
+      const message = JSON.parse(buffer.subarray(delimiter + 4, delimiter + 4 + length).toString("utf8"));
+      buffer = buffer.subarray(delimiter + 4 + length);
+      pending.get(message.id)?.(message);
+      pending.delete(message.id);
+    }
+  });
+  const send = (message) => {
+    const body = Buffer.from(JSON.stringify(message));
+    child.stdin.write(`Content-Length: ${body.length}\r\n\r\n`);
+    child.stdin.write(body);
+  };
+  const request = (method, params) => {
+    const id = nextId++;
+    const response = new Promise((resolve) => pending.set(id, resolve));
+    send({ jsonrpc: "2.0", id, method, params });
+    return response;
+  };
+  const initialized = await request("initialize", { processId: process.pid, rootUri: pathToFileURL(options.cwd).href, capabilities: {} });
+  assert.equal(initialized.result.serverInfo.name, "deherm");
+  assert.equal((await request("shutdown", null)).result, null);
+  send({ jsonrpc: "2.0", method: "exit", params: null });
+  child.stdin.end();
+  const exit = await closed;
+  assert.deepEqual(exit, { code: 0, signal: null }, stderr);
+  assert.equal(stderr, "");
 }
 
 async function assertMaterializedFiles(root, entries, revision) {
@@ -167,6 +213,11 @@ test("command-specific target parsing keeps dev endpoints separate from conforma
     { command: debug.command, inspectorSession: debug.inspectorSession },
     { command: "debug", inspectorSession: ".deherm/dev/custom-inspector.json" }
   );
+  const languageServer = parseArguments(["language-server", "--stdio", "--project", "game"]);
+  assert.deepEqual(
+    { command: languageServer.command, stdio: languageServer.stdio, project: languageServer.project },
+    { command: "language-server", stdio: true, project: "game" }
+  );
   assert.throws(() => parseArguments(["generate", "--check"]), /Unknown option: --check/);
 });
 
@@ -186,6 +237,9 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   assert.equal(packedFiles.has("packages/compiler/src/generated/dmsdk-universal-recipes.mjs"), false,
     "the package must not ship a pinned Defold dmSDK catalog as realization authority");
   for (const relative of [
+    "bin/deherm-language-server.mjs",
+    "packages/cli/src/lsp/server.mjs",
+    "packages/cli/src/lsp/resource-semantics.mjs",
     "packages/compiler/src/dmsdk-universal-jsi-exact-runner.mjs",
     "packages/compiler/src/dmsdk-universal-static-frame.mjs",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
@@ -216,6 +270,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     packedManifest.exports["./compiler/dmsdk-universal-jsi-exact-runner"].import,
     "./packages/compiler/src/dmsdk-universal-jsi-exact-runner.mjs"
   );
+  assert.equal(packedManifest.exports["./language-server"].import, "./packages/cli/src/lsp/server.mjs");
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "binding-identity.mjs"), "utf8");
   await readFile(path.join(packageRoot, "packages", "compiler", "src", "component-proxy-generator.mjs"), "utf8");
   await assert.rejects(
@@ -529,6 +584,10 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   assert.match(await readFile(path.join(project, "game.project"), "utf8"), /title = Packed smoke test/);
   assert.match(await readFile(path.join(project, "src", "main.script.ts"), "utf8"), /defineComponent/);
   assert.equal(await readFile(path.join(project, "input", "game.input_binding"), "utf8"), "");
+  await driveLanguageServer(process.execPath, [
+    path.join(packageRoot, "bin", "deherm-language-server.mjs"),
+    "--project", project
+  ], { cwd: project, env: materializedPolicyEnvironment });
 
   run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),

@@ -79,8 +79,11 @@ below without changing its completion rule.
    The same public DAP path now stops a fresh Defold Wasm game in Chrome at the
    authored `arena.script.ts` line, evaluates live `dt`, resumes, and disconnects;
    browser HMR breakpoint URLs cover both the initial and numbered generations.
-   Next implement the editor-neutral language server and thin VS Code client.
-   After that, finish the public
+   The installed package now exposes an editor-neutral Defold-semantic LSP,
+   and the separate thin VS Code workspace client starts that exact local CLI,
+   contributes resource/address completion, hover and definition, and launches
+   the existing DAP. Next finish the sampled live instance/property channel and
+   the remaining route-specific Defold semantic projections. After that, finish the public
    TypeScript ergonomics and native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
 
@@ -234,8 +237,12 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
    through two consecutive public stdin/stdout DAP processes. A fresh
    `wasm-web` War Battles bundle also passes the browser twin through Chrome's
    own CDP endpoint: authored breakpoint, mapped frame, live evaluation,
-   continue, and detach. Finish the VS Code extension/LSP with context types and live
-   instance/property telemetry.
+   continue, and detach. The first VS Code/LSP slice is implemented and packed:
+   generated Defold symbols drive resource/address completion, hover and
+   definition, while ordinary TypeScript stays with VS Code's built-in service;
+   the thin client resolves only the workspace-local déherm package and launches
+   both LSP and DAP. Finish live instance/property telemetry and the remaining
+   route-specific Defold semantic projections.
 
 ## 5. Finish public API ergonomics and project integration
 

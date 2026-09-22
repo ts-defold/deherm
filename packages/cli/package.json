@@ -12,6 +12,7 @@
     "./dmsdk": "./src/dmsdk.mjs",
     "./generate": "./src/generate.mjs",
     "./project": "./src/project.mjs",
-    "./policy-client": "./src/policy-client.mjs"
+    "./policy-client": "./src/policy-client.mjs",
+    "./language-server": "./src/lsp/server.mjs"
   }
 }

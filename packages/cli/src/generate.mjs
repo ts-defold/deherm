@@ -970,6 +970,32 @@ async function writeIfMissing(file, contents) {
   }
 }
 
+async function mergeVscodeRecommendations(file, recommendations) {
+  let document;
+  let existed = true;
+  try {
+    const source = await readFile(file, "utf8");
+    document = JSON.parse(source);
+    if (!document || typeof document !== "object" || Array.isArray(document)) return { created: false, updated: false };
+  } catch (error) {
+    if (error?.code !== "ENOENT") return { created: false, updated: false };
+    existed = false;
+    document = {};
+  }
+  const existing = Array.isArray(document.recommendations)
+    ? [...document.recommendations]
+    : [];
+  const merged = [...existing];
+  for (const recommendation of recommendations) if (!merged.includes(recommendation)) merged.push(recommendation);
+  if (JSON.stringify(merged) === JSON.stringify(existing) && Array.isArray(document.recommendations)) {
+    return { created: false, updated: false };
+  }
+  document.recommendations = merged;
+  await mkdir(path.dirname(file), { recursive: true });
+  await writeFile(file, `${JSON.stringify(document, null, 2)}\n`);
+  return { created: !existed, updated: existed };
+}
+
 async function migrateLegacyGeneratedTsconfig(file, contents) {
   let source;
   try {
@@ -1695,9 +1721,9 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     path.join(inventory.projectRoot, "tsconfig.json"),
     projectConfigSources["tsconfig.deherm.json"]
   );
-  const createdVscodeExtensions = await writeIfMissing(
+  const vscodeExtensions = await mergeVscodeRecommendations(
     path.join(inventory.projectRoot, ".vscode", "extensions.json"),
-    `${JSON.stringify({ recommendations: ["samchon.ttsc"] }, null, 2)}\n`
+    ["samchon.ttsc", "ts-defold.deherm"]
   );
   const createdVscodeSettings = await writeIfMissing(
     path.join(inventory.projectRoot, ".vscode", "settings.json"),
@@ -1705,6 +1731,18 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       "[typescript][typescriptreact]": {
         "editor.defaultFormatter": "samchon.ttsc"
       }
+    }, null, 2)}\n`
+  );
+  const createdVscodeLaunch = await writeIfMissing(
+    path.join(inventory.projectRoot, ".vscode", "launch.json"),
+    `${JSON.stringify({
+      version: "0.2.0",
+      configurations: [{
+        type: "deherm",
+        request: "attach",
+        name: "déherm: Attach",
+        project: "\${workspaceFolder}"
+      }]
     }, null, 2)}\n`
   );
   return {
@@ -1723,8 +1761,10 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     typecheckProject: path.join(inventory.projectRoot, "tsconfig.deherm.json"),
     created: {
       tsconfig: tsconfigState.created,
-      vscodeExtensions: createdVscodeExtensions,
-      vscodeSettings: createdVscodeSettings
+      vscodeExtensions: vscodeExtensions.created,
+      vscodeExtensionsUpdated: vscodeExtensions.updated,
+      vscodeSettings: createdVscodeSettings,
+      vscodeLaunch: createdVscodeLaunch
     },
     migrated: {
       tsconfig: tsconfigState.migrated

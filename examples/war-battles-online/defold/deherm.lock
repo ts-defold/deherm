@@ -327,12 +327,12 @@
   },
   "generation": {
     "schemaVersion": 1,
-    "projectGeneratorSha256": "620137c5f2692f91170bfc3729eb55be3f2b5039f91d63b028834d9957206f61",
+    "projectGeneratorSha256": "9d7052e4c42abc3ada7b5c3cdc4b3ba573db725f619b6118d8e2caf744439970",
     "nativeExtensionGeneratorSha256": "41f96c3cf30cde0da23797f573223098d4f7b1c4accdfa354469eff89a786f5c",
     "nativeExtensionClang": {
       "required": false
     },
-    "cacheKey": "0cd7337908e626b22862cf49f6079544824c39870e6456b74dcd46938f351d0d"
+    "cacheKey": "5daf57e1c40bf2d9889f83a78b88b3ecda1f3b166770db9e5018439c71cb6ffc"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -342,10 +342,9 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 8433136,
-      "modifiedMs": 1790057910051
-    },
-    "via": "deherm-lock"
+      "size": 8441220,
+      "modifiedMs": 1790066808025
+    }
   },
   "defoldSurface": {
     "layer": "user-cache"
@@ -354,7 +353,7 @@
     "schemaVersion": 1,
     "engineRoot": "87eac0877268f8631749fe9297de5a00bee6426c80c58e776673d5c78532f143",
     "nativeRoot": "0499f56f899a668241f171e213759fcdd4c92a6f6a08c8d50a946672766eb363",
-    "root": "15a6ecaafae8f53e278f033830fe192429648649ac991b865d8204365a73c23e"
+    "root": "e539190e9d6805f428ba8e1ffa771e0ec77bf493ec6660e44e885986370024de"
   },
   "inputs": {
     "valueLayoutsSha256": "53276a2451fc181fb983ee0bf7ad56ab24aab7c6f043e29f28eeda64704ef188",
@@ -380,7 +379,7 @@
   "generatedOutputs": {
     "output": {
       "script-contexts.json": "de6c9c72202b702272e57a0fffa869c9d63fa491d7db281ac419b2e821f0fc05",
-      "generated/native-extensions/index.json": "7faae9e7362615e9c7373941089c305f04ad6d2cff5b09feca4dfb17c616e6fd",
+      "generated/native-extensions/index.json": "8887b5f6393ba53365e2348e7a4617aa892d779c46e7c49568c7cb0de01beca8",
       "sdk/contexts/shared.ts": "f9fbf6bad84413a3fc4da22499b431e8a1a23e787ef6082e8935a2c3ad651784",
       "sdk/contexts/game-object.ts": "f78f5740bb6eb06bf903f8de41a5ff30206b2b5eeb841c12568aa6ac00cd6ed7",
       "sdk/contexts/gui.ts": "cf03743da2030749d238eefa30eab9cd6819a5cbcc28720cd017e52749b53026",
@@ -402,8 +401,8 @@
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/0cd7337908e626b22862cf49f6079544824c39870e6456b74dcd46938f351d0d",
-    "treeSha256": "2a94594d5a0add75a7c156e4e35b32ecd525a6ee462761db056998d149921e99"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/5daf57e1c40bf2d9889f83a78b88b3ecda1f3b166770db9e5018439c71cb6ffc",
+    "treeSha256": "c0f2f98d253c7f3ff83796a1c5287252ef6c4e0610746700d6e18445a5a34352"
   },
   "engineProfiles": {
     "source": "defold-default",

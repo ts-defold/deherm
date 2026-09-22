@@ -32,6 +32,7 @@ Commands:
   verify-bundle     Verify the bundle Bob will archive against the sources it was built from
   dev          Run the compiler/watch console; press p to launch or stop the built game
   debug        Run the editor-neutral Debug Adapter Protocol server on stdin/stdout
+  language-server  Run the editor-neutral Defold semantic LSP server on stdin/stdout
   profile cpu  Capture a standard Hermes .cpuprofile from a running dev session
   profile heap Capture a standard Hermes .heapsnapshot from a running dev session
   bugs         Harvest engine/dev output into the deduplicated runtime bug pool
@@ -72,6 +73,7 @@ Options:
   --inspector-session <path>  Running dev-session descriptor (default: .deherm/dev/inspector.json)
   --duration <ms>    CPU profile duration in milliseconds (default: 10000)
   --replace-debugger Allow debug/profile to replace an attached debugger frontend
+  --stdio            Use stdin/stdout protocol transport (language-server default)
   --transcript <path>   Packaged-run transcript harvested by bugs; may be repeated
   --no-harvest       Print the stored bug pool without reading new output
   --once             Build one development generation and exit
@@ -119,6 +121,7 @@ export function parseArguments(argv) {
     else if (value === "--release") options.release = true;
     else if (value === "--profile") options.profile = true;
     else if (value === "--replace-debugger") options.replaceDebugger = true;
+    else if (value === "--stdio") options.stdio = true;
     else if (value === "--reconcile") options.reconcile = true;
     else if (value === "--shermes") options.shermes = args.shift();
     else if (value === "--force") options.force = true;
@@ -611,6 +614,11 @@ export async function run(argv = process.argv.slice(2)) {
       replaceDebugger: options.replaceDebugger === true
     });
     return 0;
+  }
+  if (options.command === "language-server" || options.command === "lsp") {
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const { runLanguageServer } = await import("./lsp/server.mjs");
+    return await runLanguageServer({ projectRoot });
   }
   if (options.command === "bugs") {
     // The pool reports how déherm itself behaved during real runs. It is a

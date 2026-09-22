@@ -1,0 +1,132 @@
+{
+  "name": "deherm",
+  "displayName": "déherm",
+  "description": "Defold project intelligence and Hermes debugging for TypeScript",
+  "version": "0.0.1",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "publisher": "ts-defold",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ts-defold/deherm.git",
+    "directory": "editors/vscode"
+  },
+  "engines": {
+    "vscode": "^1.96.0"
+  },
+  "categories": [
+    "Debuggers",
+    "Programming Languages"
+  ],
+  "keywords": [
+    "Defold",
+    "Hermes",
+    "TypeScript",
+    "game development"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./dist/extension.cjs",
+  "activationEvents": [
+    "workspaceContains:**/game.project",
+    "onDebug:deherm",
+    "onCommand:deherm.restartLanguageServer"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "deherm.restartLanguageServer",
+        "title": "Restart Language Server",
+        "category": "déherm"
+      }
+    ],
+    "configuration": {
+      "title": "déherm",
+      "properties": {
+        "deherm.cliPath": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Optional path to bin/deherm.mjs. Relative paths resolve from the workspace folder. By default the extension uses the workspace-local @ts-defold/deherm installation."
+        },
+        "deherm.nodePath": {
+          "type": "string",
+          "default": "",
+          "scope": "resource",
+          "description": "Optional Node.js 22.13+ executable. By default the extension resolves node from PATH."
+        }
+      }
+    },
+    "debuggers": [
+      {
+        "type": "deherm",
+        "label": "déherm",
+        "languages": [
+          "typescript",
+          "typescriptreact"
+        ],
+        "configurationAttributes": {
+          "attach": {
+            "required": [
+              "project"
+            ],
+            "properties": {
+              "project": {
+                "type": "string",
+                "description": "Defold project directory or game.project file.",
+                "default": "${workspaceFolder}"
+              },
+              "inspectorSession": {
+                "type": "string",
+                "description": "Optional inspector-session descriptor. Relative paths resolve from the Defold project root."
+              },
+              "replaceDebugger": {
+                "type": "boolean",
+                "description": "Replace an already attached native debugger frontend.",
+                "default": false
+              }
+            }
+          }
+        },
+        "configurationSnippets": [
+          {
+            "label": "déherm: Attach to running game",
+            "description": "Attach to the Hermes or browser inspector published by deherm dev.",
+            "body": {
+              "type": "deherm",
+              "request": "attach",
+              "name": "déherm: Attach to running game",
+              "project": "${workspaceFolder}"
+            }
+          }
+        ],
+        "initialConfigurations": [
+          {
+            "type": "deherm",
+            "request": "attach",
+            "name": "déherm: Attach to running game",
+            "project": "${workspaceFolder}"
+          }
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "check": "tsc --project ./tsconfig.json --noEmit",
+    "test": "pnpm check && node --experimental-strip-types --test ./test/*.test.ts",
+    "package": "pnpm build && vsce package --no-dependencies --out ./dist/deherm.vsix"
+  },
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.0",
+    "@types/vscode": "1.96.0",
+    "@vscode/vsce": "3.2.1",
+    "esbuild": "0.25.10",
+    "typescript": "7.0.2"
+  }
+}
