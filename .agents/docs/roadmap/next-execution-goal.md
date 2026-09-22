@@ -212,8 +212,9 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
 5. **Active.** The incremental compiler already emits source-content maps and
    passes them to `hermesc -source-map` for debug bytecode. Native Hermes now
    exposes a standard CLI CDP endpoint and preserves one frontend across HMR.
-   Finish DAP breakpoint/source presentation, profiler capture, and the VS Code
-   extension/LSP with context types and live instance/property telemetry.
+   Stable session discovery plus standard CPU-profile and streaming heap-snapshot
+   capture are implemented. Finish DAP breakpoint/source presentation and the
+   VS Code extension/LSP with context types and live instance/property telemetry.
 
 ## 5. Finish public API ergonomics and project integration
 

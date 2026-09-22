@@ -10,6 +10,34 @@ const targetCacheReceiptName = ".deherm-target-cache.json";
 const targetInstallReceiptName = ".deherm-artifact.json";
 const targetVariantHeader = "defold_hermes/include/defold_hermes/generated_runtime_variant.h";
 
+async function replaceProjectFile(destination, writeTemporary) {
+  const temporary = `${destination}.deherm-replace-${process.pid}-${randomBytes(5).toString("hex")}`;
+  await mkdir(path.dirname(destination), { recursive: true });
+  try {
+    await writeTemporary(temporary);
+    // Never truncate the destination in place: package-manager/project copies
+    // can be hard-linked or clone-backed. Replacing the directory entry keeps
+    // selecting a debug artifact in one project from mutating the package
+    // template or another project sharing the old inode.
+    // rename replaces the destination entry atomically without touching the
+    // old inode shared by any hard-linked package/project copy.
+    await rename(temporary, destination);
+  } finally {
+    await rm(temporary, { force: true });
+  }
+}
+
+async function replaceProjectCopy(source, destination) {
+  await replaceProjectFile(destination, (temporary) => cp(source, temporary, {
+    errorOnExist: true,
+    force: false
+  }));
+}
+
+async function replaceProjectText(destination, source) {
+  await replaceProjectFile(destination, (temporary) => writeFile(temporary, source, { flag: "wx" }));
+}
+
 function requestedArtifactVariant(options = {}) {
   const variant = options.variant ?? "release";
   if (variant !== "release" && variant !== "debug") {
@@ -247,8 +275,7 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   const installedBytes = {};
   for (const [source, targetMember] of [[selectedMember, canonicalMember], [configMember, configMember]]) {
     const output = targetArtifactPath(root, target.extenderTarget, targetMember);
-    await mkdir(path.dirname(output), { recursive: true });
-    await cp(path.join(destination, source), output);
+    await replaceProjectCopy(path.join(destination, source), output);
     installed.push(output);
     installedBytes[targetMember] = (await stat(output)).size;
   }
@@ -261,10 +288,9 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
     await rm(targetArtifactPath(root, target.extenderTarget, member), { force: true });
   }
   const header = path.join(root, targetVariantHeader);
-  await mkdir(path.dirname(header), { recursive: true });
-  await writeFile(header, renderRuntimeVariantHeader(variant, target.extenderTarget, family.fingerprint));
+  await replaceProjectText(header, renderRuntimeVariantHeader(variant, target.extenderTarget, family.fingerprint));
   installed.push(header);
-  await writeFile(path.join(root, "defold_hermes", "lib", target.extenderTarget, targetInstallReceiptName), `${JSON.stringify({
+  await replaceProjectText(path.join(root, "defold_hermes", "lib", target.extenderTarget, targetInstallReceiptName), `${JSON.stringify({
     schemaVersion: 2,
     kind: "deherm.installed-target-artifact",
     target: target.extenderTarget,

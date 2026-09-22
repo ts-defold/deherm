@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { copyFile, link, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -283,6 +283,10 @@ test("a target release already in the content-addressed cache installs without n
     );
     const variantHeader = path.join(project, "defold_hermes/include/defold_hermes/generated_runtime_variant.h");
     assert.match(await readFile(variantHeader, "utf8"), /DEHERM_HERMES_DEBUGGER 0/u);
+    const protectedLibraryLink = path.join(project, "package-template-libhermes.a");
+    const protectedHeaderLink = path.join(project, "package-template-runtime-variant.h");
+    await link(verified.file, protectedLibraryLink);
+    await link(variantHeader, protectedHeaderLink);
     const debug = await ensureProjectNativeArtifact(project, "arm64-macos", {
       env: { DEHERM_CACHE_HOME: cacheHome },
       offline: true,
@@ -291,6 +295,8 @@ test("a target release already in the content-addressed cache installs without n
     assert.equal(debug.variant, "debug");
     assert.equal(await readFile(verified.file, "utf8"), "fixture:libhermes.debug.a");
     assert.match(await readFile(variantHeader, "utf8"), /DEHERM_HERMES_DEBUGGER 1/u);
+    assert.equal(await readFile(protectedLibraryLink, "utf8"), "fixture:libhermes.a");
+    assert.match(await readFile(protectedHeaderLink, "utf8"), /DEHERM_HERMES_DEBUGGER 0/u);
     await assert.rejects(
       assertProjectNativeArtifact(project, "arm64-macos", { fetch: false, variant: "release" }),
       /missing or does not match its receipt/u

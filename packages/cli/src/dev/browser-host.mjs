@@ -135,6 +135,7 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
   let nextId = 1;
   const pending = new Map();
   const waiters = new Map();
+  const listeners = new Map();
   const transcript = [];
   const failures = [];
   socket.addEventListener("message", ({ data }) => {
@@ -143,6 +144,7 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
       const continuation = pending.get(message.id);
       if (!continuation) return;
       pending.delete(message.id);
+      if (continuation.timer) clearTimeout(continuation.timer);
       if (message.error) continuation.reject(new Error(message.error.message));
       else continuation.resolve(message.result);
       return;
@@ -150,8 +152,12 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
     const queued = waiters.get(message.method);
     if (queued?.length) {
       waiters.delete(message.method);
-      for (const notify of queued) notify(message.params);
+      for (const waiter of queued) {
+        clearTimeout(waiter.timer);
+        waiter.resolve(message.params);
+      }
     }
+    for (const notify of listeners.get(message.method) ?? []) notify(message.params);
     if (message.method === "Runtime.consoleAPICalled") {
       const rendered = message.params.args
         .map((argument) => argument.value ?? argument.description ?? "")
@@ -175,24 +181,63 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
       options.onFailure?.(failure);
     }
   });
-  const send = (method, params = {}) => {
+  const send = (method, params = {}, sendOptions = {}) => {
     const id = nextId++;
-    const result = new Promise((ok, no) => pending.set(id, { resolve: ok, reject: no }));
+    const result = new Promise((ok, no) => {
+      const timer = sendOptions.timeoutMs
+        ? setTimeout(() => {
+            pending.delete(id);
+            no(new Error(`Timed out waiting for CDP response to ${method}`));
+          }, sendOptions.timeoutMs)
+        : undefined;
+      pending.set(id, { resolve: ok, reject: no, timer });
+    });
     socket.send(JSON.stringify({ id, method, params }));
     return result;
   };
   const waitForEvent = (method, timeoutMs = 30_000) => new Promise((ok, no) => {
-    const timer = setTimeout(() => no(new Error(`Timed out waiting for CDP event ${method}`)), timeoutMs);
+    const timer = setTimeout(() => {
+      const queue = waiters.get(method) ?? [];
+      const remaining = queue.filter((waiter) => waiter.timer !== timer);
+      if (remaining.length) waiters.set(method, remaining);
+      else waiters.delete(method);
+      no(new Error(`Timed out waiting for CDP event ${method}`));
+    }, timeoutMs);
     const queue = waiters.get(method) ?? [];
-    queue.push((params) => { clearTimeout(timer); ok(params); });
+    queue.push({ resolve: ok, reject: no, timer });
     waiters.set(method, queue);
   });
+  const onEvent = (method, listener) => {
+    const group = listeners.get(method) ?? new Set();
+    group.add(listener);
+    listeners.set(method, group);
+    return () => {
+      group.delete(listener);
+      if (!group.size) listeners.delete(method);
+    };
+  };
+  const close = () => new Promise((resolve) => {
+    if (socket.readyState === WebSocket.CLOSED) return resolve();
+    socket.addEventListener("close", resolve, { once: true });
+    socket.close(1000, "CDP client closed");
+  });
   socket.addEventListener("close", () => {
-    for (const [, continuation] of pending) continuation.reject(new Error("CDP connection closed"));
+    for (const [, continuation] of pending) {
+      if (continuation.timer) clearTimeout(continuation.timer);
+      continuation.reject(new Error("CDP connection closed"));
+    }
     pending.clear();
+    for (const [method, queued] of waiters) {
+      for (const waiter of queued) {
+        clearTimeout(waiter.timer);
+        waiter.reject(new Error(`CDP connection closed while waiting for ${method}`));
+      }
+    }
+    waiters.clear();
+    listeners.clear();
     options.onClose?.();
   });
-  return { socket, send, waitForEvent, transcript, failures };
+  return { socket, send, waitForEvent, onEvent, transcript, failures, close };
 }
 
 /**

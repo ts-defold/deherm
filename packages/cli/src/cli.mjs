@@ -31,6 +31,8 @@ Commands:
   verify-generated  Verify packaged IR plus generated context/config output sentinels
   verify-bundle     Verify the bundle Bob will archive against the sources it was built from
   dev          Run the compiler/watch console; press p to launch or stop the built game
+  profile cpu  Capture a standard Hermes .cpuprofile from a running dev session
+  profile heap Capture a standard Hermes .heapsnapshot from a running dev session
   bugs         Harvest engine/dev output into the deduplicated runtime bug pool
   conformance generate  Generate exhaustive API compile/runtime fixtures and a disposition plan
   conformance compile   Compile a generated shard and emit per-binding observations
@@ -66,6 +68,9 @@ Options:
   --browser-window   Run that Chrome with a window instead of headless
   --pool <path>      Runtime bug pool JSON (default: <project>/.deherm/dev/bug-pool.json)
   --session-log <path>  Session log harvested by bugs; may be repeated
+  --inspector-session <path>  Running dev-session descriptor (default: .deherm/dev/inspector.json)
+  --duration <ms>    CPU profile duration in milliseconds (default: 10000)
+  --replace-debugger Allow profile capture to replace an attached debugger frontend
   --transcript <path>   Packaged-run transcript harvested by bugs; may be repeated
   --no-harvest       Print the stored bug pool without reading new output
   --once             Build one development generation and exit
@@ -103,6 +108,7 @@ export function parseArguments(argv) {
   const args = [...argv];
   if (args[0] && !args[0].startsWith("-")) options.command = args.shift();
   if (options.command === "conformance" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
+  if (options.command === "profile" && args[0] && !args[0].startsWith("-")) options.action = args.shift();
   if (options.command === "create" && args[0] && !args[0].startsWith("-")) options.directory = args.shift();
   while (args.length) {
     const value = args.shift();
@@ -111,6 +117,7 @@ export function parseArguments(argv) {
     else if (value === "--strict") options.strict = true;
     else if (value === "--release") options.release = true;
     else if (value === "--profile") options.profile = true;
+    else if (value === "--replace-debugger") options.replaceDebugger = true;
     else if (value === "--reconcile") options.reconcile = true;
     else if (value === "--shermes") options.shermes = args.shift();
     else if (value === "--force") options.force = true;
@@ -128,6 +135,8 @@ export function parseArguments(argv) {
     else if (value === "--no-harvest") options.harvest = false;
     else if (value === "--pool") options.pool = args.shift();
     else if (value === "--session-log") options.sessionLogs.push(args.shift());
+    else if (value === "--inspector-session") options.inspectorSession = args.shift();
+    else if (value === "--duration") options.durationMs = Number(args.shift());
     else if (value === "--transcript") options.transcripts.push(args.shift());
     else if (value === "-h" || value === "--help") options.help = true;
     else if (value === "--project") options.project = args.shift();
@@ -166,6 +175,9 @@ export function parseArguments(argv) {
   }
   if (options.servicePort !== undefined && (!Number.isSafeInteger(options.servicePort) || options.servicePort < 1 || options.servicePort > 65_535)) {
     throw new Error("--service-port must be an integer from 1 through 65535");
+  }
+  if (options.durationMs !== undefined && (!Number.isSafeInteger(options.durationMs) || options.durationMs < 1 || options.durationMs > 86_400_000)) {
+    throw new Error("--duration must be an integer from 1 through 86400000 milliseconds");
   }
   return options;
 }
@@ -548,6 +560,11 @@ export async function run(argv = process.argv.slice(2)) {
     }
     options.project = await findProjectRoot(process.cwd(), options.project ?? options.entry);
     if (entryFromInvocation) options.entry = entryFromInvocation;
+    // The runtime extension is package-owned. Install its stable skeleton before
+    // inspection so a clean project never needs a checkout symlink merely to
+    // satisfy the project-readiness gate. The policy surface is overlaid after
+    // generation below.
+    await installNativeExtension(options.project);
     const inventory = await inspectDefoldProject({ project: options.project, requireDehermRuntime: true });
     const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
     if (errors.length) {
@@ -566,6 +583,23 @@ export async function run(argv = process.argv.slice(2)) {
     const snapshot = await runDevSession(options);
     if (options.once && options.json) console.log(JSON.stringify({ schemaVersion: 1, snapshot }, null, 2));
     return snapshot.phase === "failed" ? 1 : 0;
+  }
+  if (options.command === "profile") {
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const { captureCpuProfile, captureHeapSnapshot } = await import("./dev/profiler.mjs");
+    const request = {
+      projectRoot,
+      sessionFile: options.inspectorSession,
+      output: options.output,
+      replaceDebugger: options.replaceDebugger === true
+    };
+    let result;
+    if (options.action === "cpu") result = await captureCpuProfile({ ...request, durationMs: options.durationMs });
+    else if (options.action === "heap") result = await captureHeapSnapshot(request);
+    else throw new Error(`Unknown profile action: ${options.action ?? "<missing>"}; expected cpu or heap`);
+    if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
+    else console.log(`Captured ${result.kind} profile in ${path.relative(process.cwd(), result.output) || path.basename(result.output)}`);
+    return 0;
   }
   if (options.command === "bugs") {
     // The pool reports how déherm itself behaved during real runs. It is a
@@ -673,6 +707,14 @@ export async function run(argv = process.argv.slice(2)) {
       for (const line of formatBuildArtifactReport(result)) console.log(line);
     }
     return result.ok ? 0 : 1;
+  }
+  if (options.command === "generate") {
+    options.project = await findProjectRoot(process.cwd(), options.project, {
+      select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined
+    });
+    // A generated project consumes a managed copy of the package extension;
+    // it must never alias and mutate the package or contributor checkout.
+    await installNativeExtension(options.project);
   }
   const inventory = await inspectDefoldProject({
     project: options.project,

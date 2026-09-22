@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, unlink, writeFile } from "node:fs/promises";
+import { lstat, mkdtemp, mkdir, readFile, readdir, rm, stat, symlink, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -135,6 +135,26 @@ test("managed native extension installation never copies target artifacts from a
     await readFile(path.join(project, "defold_hermes", "lib", "web", "library_defold_hermes.js"), "utf8"),
     "// portable browser source\n"
   );
+});
+
+test("managed native extension installation replaces a package workspace symlink", async (t) => {
+  if (process.platform === "win32") return t.skip("directory symlink creation requires host policy on Windows");
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-managed-extension-link-project-"));
+  const source = await mkdtemp(path.join(tmpdir(), "deherm-managed-extension-link-source-"));
+  t.after(() => Promise.all([
+    rm(project, { recursive: true, force: true }),
+    rm(source, { recursive: true, force: true })
+  ]));
+  await mkdir(path.join(source, "src"));
+  await writeFile(path.join(source, "ext.manifest"), 'name: "defold_hermes"\n');
+  await writeFile(path.join(source, "src", "extension.cpp"), "// package\n");
+  await symlink(source, path.join(project, "defold_hermes"));
+
+  const installed = await installNativeExtension(project, { source });
+  assert.equal(installed.installed, true);
+  assert.equal((await lstat(path.join(project, "defold_hermes"))).isSymbolicLink(), false);
+  await writeFile(path.join(project, "defold_hermes", "src", "extension.cpp"), "// project\n");
+  assert.equal(await readFile(path.join(source, "src", "extension.cpp"), "utf8"), "// package\n");
 });
 
 test("game.project parser preserves indexed dependency keys", () => {
@@ -542,10 +562,9 @@ test("project native generation excludes deherm runtime implementation headers",
   );
 });
 
-test("the real War Battles project excludes only deherm infrastructure extensions", async () => {
+test("the real War Battles project excludes its managed runtime and typed-native infrastructure", async () => {
   const inventory = await inspectDefoldProject({ project: path.resolve("examples/war-battles-online/defold") });
   assert.deepEqual(inventory.extensions.map(({ name }) => name), [
-    "defold_hermes",
     "defold_hermes_typed_native"
   ]);
   let clangInvoked = false;

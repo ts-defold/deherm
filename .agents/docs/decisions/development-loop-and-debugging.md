@@ -118,9 +118,33 @@ browser's existing CDP endpoint with the same authored source paths.
 # Profiling
 
 The development Hermes build enables sampling-profiler support and carries the
-Hermes CDP Profiler and HeapProfiler domains. CLI commands still need to capture
-CPU profiles, allocation tracking, and heap snapshots into standard artifacts
-that VS Code or browser tooling can open.
+Hermes CDP Profiler and HeapProfiler domains. A live development session writes
+an atomic, mode-0600 `.deherm/dev/inspector.json` descriptor containing a random
+session identity and loopback-only discovery URLs. The bridge removes that file
+only when it still owns the recorded identity, so an old session cannot erase a
+replacement session's descriptor. Readers reject non-loopback URLs and require
+discovery to return the exact WebSocket recorded by the descriptor.
+
+`deherm profile cpu --duration <ms>` sends `Profiler.start`/`Profiler.stop` and
+writes the returned standard `.cpuprofile`. `deherm profile heap` streams each
+`HeapProfiler.addHeapSnapshotChunk` directly to a temporary file and atomically
+publishes a `.heapsnapshot`; it does not retain the snapshot in JavaScript
+memory. An already attached debugger is preserved by default. The operator must
+pass `--replace-debugger` explicitly because the native transport currently
+admits one frontend; the bridge enforces that choice again during the WebSocket
+handshake so a discovery/connection race cannot evict the debugger. The
+debugger-enabled checkout build forces Hermes memory
+instrumentation to follow the selected variant even when a CMake cache was
+previously configured for release; otherwise the domain exists but snapshots
+fail at runtime.
+
+Exact Node transport tests prove descriptor ownership, CDP request identity,
+CPU artifact emission, and ordered heap streaming. The native pinned-Hermes test
+separately compiles and executes CPU sampling and a real heap snapshot. A pinned
+local Extender build of War Battles then captured both artifacts through the
+public CLI from its running engine: five CPU nodes with 22 samples and a
+654,011-byte heap graph with 63,924 nodes. That last run is integrated arm64
+macOS evidence; it does not promote unexecuted host/target combinations.
 Release performance measurement uses a separate instrumented profile; the lean
 shipping runtime does not carry the debugger server.
 

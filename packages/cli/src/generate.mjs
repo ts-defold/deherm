@@ -1262,10 +1262,12 @@ export async function installNativeExtension(projectRoot, options = {}) {
   if (path.resolve(source) === path.resolve(destination)) {
     return { root: destination, installed: false, source: "workspace" };
   }
+  let workspaceLink = false;
   try {
     const [resolvedSource, resolvedDestination] = await Promise.all([realpath(source), realpath(destination)]);
     if (resolvedSource === resolvedDestination) {
-      return { root: destination, installed: false, source: "workspace-link" };
+      workspaceLink = (await lstat(destination)).isSymbolicLink();
+      if (!workspaceLink) return { root: destination, installed: false, source: "workspace" };
     }
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
@@ -1273,9 +1275,10 @@ export async function installNativeExtension(projectRoot, options = {}) {
   try {
     const destinationInformation = await lstat(destination);
     if (destinationInformation.isSymbolicLink()) {
-      throw new Error(`Refusing to replace native-extension symlink that does not target this package: ${destination}`);
-    }
-    if (!destinationInformation.isDirectory()) {
+      if (!workspaceLink) {
+        throw new Error(`Refusing to replace native-extension symlink that does not target this package: ${destination}`);
+      }
+    } else if (!destinationInformation.isDirectory()) {
       throw new Error(`Refusing to replace non-directory native extension at ${destination}`);
     }
   } catch (error) {
@@ -1304,15 +1307,17 @@ export async function installNativeExtension(projectRoot, options = {}) {
   };
   const sentinelName = ".deherm-managed.json";
   let current = null;
-  try {
-    current = JSON.parse(await readFile(path.join(destination, sentinelName), "utf8"));
-  } catch (error) {
-    if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
+  if (!workspaceLink) {
     try {
-      await lstat(destination);
-      throw new Error(`Refusing to replace unmanaged native extension at ${destination}`);
-    } catch (destinationError) {
-      if (destinationError?.code !== "ENOENT") throw destinationError;
+      current = JSON.parse(await readFile(path.join(destination, sentinelName), "utf8"));
+    } catch (error) {
+      if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
+      try {
+        await lstat(destination);
+        throw new Error(`Refusing to replace unmanaged native extension at ${destination}`);
+      } catch (destinationError) {
+        if (destinationError?.code !== "ENOENT") throw destinationError;
+      }
     }
   }
   if (options.force !== true && current && JSON.stringify(current) === JSON.stringify(identity)) {
@@ -1343,7 +1348,7 @@ export async function installNativeExtension(projectRoot, options = {}) {
       });
     }
     await writeFile(path.join(stage, sentinelName), `${JSON.stringify(identity, null, 2)}\n`, { flag: "wx" });
-    if (current) {
+    if (current || workspaceLink) {
       await rename(destination, backup);
       movedCurrent = true;
     }

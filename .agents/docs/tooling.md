@@ -70,7 +70,9 @@ to five seconds for an active refresh transaction before reporting contention.
 | Intent | Command | Result |
 | --- | --- | --- |
 | Launch the project/scaffold TUI | `pnpm cli` | Discovers projects; starts dev, doctor, or scaffolding |
-| Run the War Battles edit loop | `pnpm --filter @deherm/example-war-battles-online dev` | Rezi console; press `p` to launch/stop the built engine |
+| Run the War Battles edit loop | `pnpm extender:start`, then `pnpm --filter @deherm/example-war-battles-online dev` | Rezi console using the pinned local Extender; press `p` to launch/stop the built engine |
+| Capture a Hermes CPU profile | `deherm profile cpu --project <path> --duration 10000` | Writes a standard `.cpuprofile` from the running native dev session |
+| Capture a Hermes heap snapshot | `deherm profile heap --project <path>` | Streams a standard `.heapsnapshot` without retaining it in the CLI heap |
 | Validate generated sources, inventories, types, and OKF | `pnpm check` | No native rebuild |
 | Inspect a Defold project | `pnpm cli -- doctor --project <path>` | Finds local and resolved extensions |
 | List extension binding inputs | `pnpm cli -- extensions --project <path>` | Reports script API, headers, and schema gaps |

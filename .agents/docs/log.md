@@ -1,5 +1,45 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Installed profiler capture has native and transport proof
+
+The native development bridge now publishes an atomic private inspector-session
+descriptor rather than asking tools to scrape a TUI log for an ephemeral port.
+The descriptor is loopback-only, identity-owned, and stale-session safe.
+`deherm profile cpu` captures the pinned Hermes CDP `Profiler` result as a
+standard `.cpuprofile`; `deherm profile heap` streams heap-snapshot chunks to a
+temporary file and atomically publishes the result without retaining the heap
+graph in Node memory. Profile capture refuses to evict an attached debugger
+unless the operator explicitly passes `--replace-debugger`.
+
+Focused loopback tests passed the exact CPU request sequence, artifact content,
+ordered heap-chunk stream, private descriptor mode, and replacement-safe cleanup.
+The pinned native Hermes runtime separately compiled and executed `Profiler.start`,
+work under `Runtime.evaluate`, `Profiler.stop`, and a non-empty
+`HeapProfiler.takeHeapSnapshot`. That native test exposed a reused-CMake-cache
+defect: enabling the debugger did not update Hermes' previously cached memory
+instrumentation flag. The checkout build now forces both flags together.
+
+The public CLI then captured a five-node, 22-sample CPU profile and streamed
+seven heap chunks into a valid 654,011-byte, 63,924-node snapshot from running
+War Battles. The game was built through the pinned local Extender; the first
+attempt without an explicit server reproduced the known public-service `r8Cmd`
+schema mismatch, so the repository's private War Battles `dev` script now
+selects its local server explicitly. This integrated evidence covers arm64
+macOS, not every packaged target. The run also materialized the project's
+`generated_runtime_variant.h` inside the checkout template; the policy check
+caught discovery treating that per-project debug/release selector as a
+revision-derived output. Revision-output classification now excludes it and a
+focused test keeps future local dev runs from perturbing published policy roots.
+
+War Battles had also been tracked as a symlink to the contributor checkout's
+native-extension template. Selecting the debugger artifact for that project
+therefore rewrote the checkout's canonical release archive. The CLI now installs
+its managed package extension before the project-readiness inspection, and the
+example consumes an ignored project-owned copy like an external npm consumer.
+Running the public generation command from a project with no extension present
+materialized that copy and the published policy surface; both checkout release
+and debug archives retained their authenticated digests afterward.
+
 ## 2026-09-22 - Native Hermes CDP survives a real War Battles HMR swap
 
 Development artifact installation now keeps both Hermes variants in the

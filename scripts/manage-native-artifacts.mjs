@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-import { createHash } from "node:crypto";
+import { createHash, randomBytes } from "node:crypto";
 import { spawn } from "node:child_process";
-import { cp, mkdir, readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { cp, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { downloadReleaseAssets, extractReleaseArchive } from "../packages/cli/src/release-assets.mjs";
@@ -103,8 +103,18 @@ async function install(downloadRoot) {
 
     const place = async (source, relative) => {
       const destination = path.join(root, relative);
+      const temporary = `${destination}.deherm-replace-${process.pid}-${randomBytes(5).toString("hex")}`;
       await mkdir(path.dirname(destination), { recursive: true });
-      await cp(source, destination);
+      try {
+        await cp(source, temporary, { errorOnExist: true, force: false });
+        // An example/project copy may still share the old inode. Never
+        // truncate it while refreshing the contributor checkout.
+        // Replace the directory entry atomically; never truncate the inode a
+        // project copy may still share with the contributor checkout.
+        await rename(temporary, destination);
+      } finally {
+        await rm(temporary, { force: true });
+      }
       const bytes = await readFile(destination);
       if (bytes.byteLength < 1_000_000) throw new Error(`${relative} is implausibly small (${bytes.byteLength} bytes)`);
       return bytes;

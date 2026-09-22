@@ -3,6 +3,12 @@ import net from "node:net";
 
 import WebSocket, { WebSocketServer } from "ws";
 
+import {
+  createInspectorSession,
+  removeOwnedInspectorSession,
+  writeInspectorSession
+} from "./inspector-session.mjs";
+
 const maximumMessageBytes = 4 * 1024 * 1024;
 
 function listen(server, port = 0) {
@@ -80,6 +86,7 @@ export async function createInspectorBridge(options = {}) {
       title: options.title ?? "déherm / Defold",
       description: "Hermes CDP runtime inside Defold",
       url: "deherm://runtime",
+      attached: frontendSocket?.readyState === WebSocket.OPEN,
       webSocketDebuggerUrl: websocket,
       devtoolsFrontendUrl: `/devtools/inspector.html?ws=127.0.0.1:${devtoolsPort}/devtools/page/deherm`
     };
@@ -114,8 +121,13 @@ export async function createInspectorBridge(options = {}) {
     }
     websocketServer.handleUpgrade(request, socket, head, (client) => websocketServer.emit("connection", client, request));
   });
-  websocketServer.on("connection", (socket) => {
-    if (frontendSocket) frontendSocket.close(1012, "replaced by a newer debugger client");
+  websocketServer.on("connection", (socket, request) => {
+    const replace = new URL(request.url ?? "/", "http://127.0.0.1").searchParams.get("replace") === "1";
+    if (frontendSocket?.readyState === WebSocket.OPEN && !replace) {
+      socket.close(1013, "a debugger frontend is already attached");
+      return;
+    }
+    if (frontendSocket) frontendSocket.close(1012, "replaced by an explicitly authorized debugger client");
     frontendSocket = socket;
     log("CDP frontend attached");
     socket.on("message", (data, binary) => {
@@ -147,10 +159,32 @@ export async function createInspectorBridge(options = {}) {
       if (!closing) log(`CDP frontend error: ${error.message}`, "warn");
     });
   });
-  const devtoolsAddress = await listen(httpServer, options.devtoolsPort ?? 0);
-  devtoolsPort = devtoolsAddress.port;
-  const devtoolsUrl = `http://127.0.0.1:${devtoolsPort}`;
+  let devtoolsUrl;
+  let session;
+  try {
+    const devtoolsAddress = await listen(httpServer, options.devtoolsPort ?? 0);
+    devtoolsPort = devtoolsAddress.port;
+    devtoolsUrl = `http://127.0.0.1:${devtoolsPort}`;
+    session = options.sessionFile
+      ? createInspectorSession({
+          projectRoot: options.projectRoot,
+          enginePort: engineAddress.port,
+          devtoolsPort,
+          devtoolsUrl,
+          websocketUrl: target().webSocketDebuggerUrl
+        })
+      : undefined;
+    if (session) await writeInspectorSession(options.sessionFile, session);
+  } catch (error) {
+    closing = true;
+    engineSocket?.destroy();
+    for (const client of websocketServer.clients) client.terminate();
+    websocketServer.close();
+    await Promise.all([closeServer(engineServer), closeServer(httpServer)]);
+    throw error;
+  }
   log(`CDP discovery ready at ${devtoolsUrl}/json/list`);
+  if (session) log(`inspector session: ${options.sessionFile}`);
 
   const close = async () => {
     if (closing) return;
@@ -160,6 +194,7 @@ export async function createInspectorBridge(options = {}) {
     for (const client of websocketServer.clients) client.terminate();
     websocketServer.close();
     await Promise.all([closeServer(engineServer), closeServer(httpServer)]);
+    if (session) await removeOwnedInspectorSession(options.sessionFile, session.sessionId);
   };
 
   return {
@@ -167,6 +202,8 @@ export async function createInspectorBridge(options = {}) {
     devtoolsPort,
     devtoolsUrl,
     websocketUrl: target().webSocketDebuggerUrl,
+    session,
+    sessionFile: options.sessionFile,
     close
   };
 }

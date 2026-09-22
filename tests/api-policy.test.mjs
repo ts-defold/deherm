@@ -31,7 +31,7 @@ import {
   DMSDK_UNIVERSAL_STATIC_FRAME_SCHEMA
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
-import { REVISION_OUTPUT_ROOTS } from "../packages/compiler/src/revision-output-layout.mjs";
+import { isRevisionOutput, REVISION_OUTPUT_ROOTS } from "../packages/compiler/src/revision-output-layout.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
 import { validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import {
@@ -45,6 +45,15 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const generated = path.join(repositoryRoot, "packages", "bindings", "generated");
 
 const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
+
+test("project-selected runtime variants never leak into revision policy", () => {
+  assert.equal(isRevisionOutput(
+    "defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h"
+  ), false);
+  assert.equal(isRevisionOutput(
+    "defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp"
+  ), true);
+});
 
 test("policy host parity materializes every authoritative generator input", async () => {
   const workflow = await readFile(path.join(repositoryRoot, ".github/workflows/policy.yml"), "utf8");

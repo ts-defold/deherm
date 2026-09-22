@@ -19,6 +19,7 @@ import { createDefoldBuilder } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
 import { createEngineController } from "./engine-process.mjs";
 import { createInspectorBridge } from "./inspector-bridge.mjs";
+import { defaultInspectorSessionFile } from "./inspector-session.mjs";
 import { BROWSER_TARGET_ID, createBrowserTarget } from "./browser-target.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "./model.mjs";
 import { normalizeResourcePaths } from "./protocol.mjs";
@@ -357,7 +358,9 @@ export async function runDevSession(options = {}) {
     ? undefined
     : await (services.createInspectorBridge ?? createInspectorBridge)({
         emit,
-        title: path.basename(projectRoot)
+        title: path.basename(projectRoot),
+        projectRoot,
+        sessionFile: path.resolve(options.inspectorSession ?? defaultInspectorSessionFile(projectRoot))
       });
   // The resource server starts later in this function, so the engine resolves
   // its content root lazily at launch time.

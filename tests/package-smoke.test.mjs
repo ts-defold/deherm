@@ -157,6 +157,11 @@ test("command-specific target parsing keeps dev endpoints separate from conforma
   assert.equal(parseArguments(["materialize-dmsdk", "--check"]).check, true);
   assert.equal(parseArguments(["typecheck", "--release"]).release, true);
   assert.equal(parseArguments(["dev", "--no-bytecode"]).bytecode, false);
+  const profile = parseArguments(["profile", "cpu", "--duration", "250", "--replace-debugger"]);
+  assert.deepEqual(
+    { command: profile.command, action: profile.action, durationMs: profile.durationMs, replaceDebugger: profile.replaceDebugger },
+    { command: "profile", action: "cpu", durationMs: 250, replaceDebugger: true }
+  );
   assert.throws(() => parseArguments(["generate", "--check"]), /Unknown option: --check/);
 });
 

@@ -327,12 +327,12 @@
   },
   "generation": {
     "schemaVersion": 1,
-    "projectGeneratorSha256": "423c01edaab6c6c7259893ecaaebc8a370d20002232544a07c6868c43a85eb28",
+    "projectGeneratorSha256": "53347c9012086f8cd873ab3c209376b8c3de6fb9f024cecea2c07b567274c4f4",
     "nativeExtensionGeneratorSha256": "41f96c3cf30cde0da23797f573223098d4f7b1c4accdfa354469eff89a786f5c",
     "nativeExtensionClang": {
       "required": false
     },
-    "cacheKey": "87743fe6f68565eecd7cd7748c888808905409d7a09dab37882b947fda41f093"
+    "cacheKey": "afbc3a9051fa5d4120c09556f63be738a8dcc3e89ed48b7af3fbe3ce319b1038"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -342,8 +342,8 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 8031146,
-      "modifiedMs": 1790046495274
+      "size": 8433136,
+      "modifiedMs": 1790057910051
     },
     "via": "deherm-lock"
   },
@@ -353,8 +353,8 @@
   "generationMerkle": {
     "schemaVersion": 1,
     "engineRoot": "87eac0877268f8631749fe9297de5a00bee6426c80c58e776673d5c78532f143",
-    "nativeRoot": "bed4702b78202f310f0ffc2b8aa8192c30fd499774726609ed532e3968dec0d0",
-    "root": "1ff0004916bcd34a5104e67bdaab0725a84a87ac44f0a9c202fcb34cfe600bfc"
+    "nativeRoot": "0499f56f899a668241f171e213759fcdd4c92a6f6a08c8d50a946672766eb363",
+    "root": "59a4fd6fc64241b7a80ad1f519ca044cdaf87c7452f75a94fa4b9d10df46372b"
   },
   "inputs": {
     "valueLayoutsSha256": "53276a2451fc181fb983ee0bf7ad56ab24aab7c6f043e29f28eeda64704ef188",
@@ -380,7 +380,7 @@
   "generatedOutputs": {
     "output": {
       "script-contexts.json": "de6c9c72202b702272e57a0fffa869c9d63fa491d7db281ac419b2e821f0fc05",
-      "generated/native-extensions/index.json": "9c3825a4005269b6887fd90a58757b5b75339e4455296dcf5c68c01c0c2ea072",
+      "generated/native-extensions/index.json": "f3f8582bbc8617ef22be376e288e31d01698e447262b0a36d8b6d723c77a7785",
       "sdk/contexts/shared.ts": "f9fbf6bad84413a3fc4da22499b431e8a1a23e787ef6082e8935a2c3ad651784",
       "sdk/contexts/game-object.ts": "f78f5740bb6eb06bf903f8de41a5ff30206b2b5eeb841c12568aa6ac00cd6ed7",
       "sdk/contexts/gui.ts": "cf03743da2030749d238eefa30eab9cd6819a5cbcc28720cd017e52749b53026",
@@ -402,8 +402,8 @@
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/87743fe6f68565eecd7cd7748c888808905409d7a09dab37882b947fda41f093",
-    "treeSha256": "f97a67fd48716568d1e8dee8f5ad89403dcaebf255c9950b4e7f4d26e62e864b"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/afbc3a9051fa5d4120c09556f63be738a8dcc3e89ed48b7af3fbe3ce319b1038",
+    "treeSha256": "13db0e2e37ea9dd6bd0bccc07a99af10d73c9cbe5acf8471b2e5600b43098d4b"
   },
   "engineProfiles": {
     "source": "defold-default",
@@ -465,7 +465,7 @@
           "deherm/app.dehermc": "197aa11071b501b85aaca5b3de51390b739aca0b7fc50f98813d1661de629627"
         },
         "build": {
-          "entryPoint": "main/arena.script.ts",
+          "entryPoint": "main/player.script.ts",
           "preludeEntries": [
             ".deherm/generated/components/registry.ts"
           ],
@@ -483,7 +483,7 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "cc417c1a8dc4957ca557d2040de0e585d265b7bed9f59077da8caf1e7e29de8e",
+          "digest": "abe98f7da6cca6b61ed9023991872903ef725966f91dc46583632ddbf0ac0508",
           "fileCount": 67,
           "files": {
             ".deherm/generated/components/registry.ts": "242e47ddc478fc63b95af757e52f370d4302c83ead219ff0690f298b2c640e79",

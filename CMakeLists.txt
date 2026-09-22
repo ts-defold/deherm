@@ -30,6 +30,11 @@ set(HERMES_ENABLE_TOOLS ON CACHE BOOL "" FORCE)
 set(HERMES_ENABLE_NAPI OFF CACHE BOOL "" FORCE)
 option(DEHERM_HERMES_DEBUGGER "Build the native runtime against Hermes CDP and profiler support" OFF)
 set(HERMES_ENABLE_DEBUGGER ${DEHERM_HERMES_DEBUGGER} CACHE BOOL "" FORCE)
+# Hermes derives this from HERMES_ENABLE_DEBUGGER only when the cache entry is
+# first created. A build directory that was previously configured for release
+# otherwise keeps instrumentation OFF after switching to the debugger variant,
+# making HeapProfiler advertise a domain that cannot take snapshots.
+set(HERMES_MEMORY_INSTRUMENTATION ${DEHERM_HERMES_DEBUGGER} CACHE BOOL "" FORCE)
 set(HERMES_ENABLE_INTL OFF CACHE BOOL "" FORCE)
 set(HERMES_ENABLE_CONTRIB_EXTENSIONS OFF CACHE BOOL "" FORCE)
 set(HERMES_BUILD_SHARED_JSI OFF CACHE BOOL "" FORCE)

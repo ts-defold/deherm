@@ -15,6 +15,10 @@ export const REVISION_OUTPUT_ROOTS = Object.freeze([
 // and constants. They are deliberately not revision-policy facts.
 export const STABLE_GENERATED_OUTPUTS = Object.freeze(new Set([
   "defold/defold_hermes/include/defold_hermes/generated_build_config.h",
+  // Selected per project/build profile by the artifact installer. It is not a
+  // fact derived from a Defold revision and must never enter a published
+  // revision policy merely because a local development run created it.
+  "defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h",
   "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
   "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
