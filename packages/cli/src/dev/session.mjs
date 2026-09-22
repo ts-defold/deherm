@@ -1,5 +1,5 @@
 import { createWriteStream } from "node:fs";
-import { access, mkdir, readdir } from "node:fs/promises";
+import { access, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 
 import {
@@ -52,7 +52,7 @@ function isComponentProxy(file) {
 }
 
 async function resolveEntry(projectRoot, requested) {
-  if (requested) return path.resolve(requested);
+  if (requested) return path.isAbsolute(requested) ? requested : path.resolve(projectRoot, requested);
   const candidates = [
     path.join(projectRoot, "src", "main.ts"),
     path.join(projectRoot, "src", "main.script.ts")
@@ -141,6 +141,42 @@ export function buildRelevantChanges(files) {
   return files.filter((file) => !isDocumentationOnlyChange(file));
 }
 
+async function refreshProjectSymbolIndexes(projectRoot, generatedRoot) {
+  const irRoot = path.join(generatedRoot, "ir");
+  const groups = [
+    {
+      name: "resource",
+      inputs: ["defold-resource-declaration-schema.json", "defold-script-resource-namespaces.json"],
+      output: "resource-symbols.json",
+      write: () => writeProjectResourceSymbols(projectRoot, generatedRoot)
+    },
+    {
+      name: "script-route",
+      inputs: ["script-api.json", "binding-lowering-plan.json"],
+      output: "script-route-symbol-index.json",
+      write: () => writeProjectRouteSymbolIndex(generatedRoot)
+    },
+    {
+      name: "dmsdk-call",
+      inputs: ["dmsdk.json", "dmsdk-universal-bindings.json"],
+      output: "dmsdk-call-symbol-index.json",
+      write: () => writeProjectDmSdkCallSymbolIndex(generatedRoot)
+    }
+  ];
+  const written = [];
+  const unavailable = [];
+  for (const group of groups) {
+    if ((await Promise.all(group.inputs.map((file) => exists(path.join(irRoot, file))))).every(Boolean)) {
+      await group.write();
+      written.push(group.name);
+    } else {
+      await rm(path.join(generatedRoot, "generated", group.output), { force: true });
+      unavailable.push(group.name);
+    }
+  }
+  return { written, unavailable };
+}
+
 function needsDefoldBuild(files) {
   return files.some((file) => isComponentSource(file) || !/\.[cm]?[jt]sx?$/.test(file));
 }
@@ -152,6 +188,7 @@ function needsEngineRestart(files) {
 export async function runDevSession(options = {}) {
   const services = options.services ?? {};
   const projectRoot = path.resolve(options.project ?? process.cwd());
+  const generatedRoot = path.resolve(options.generatedRoot ?? path.join(projectRoot, options.outDir ?? ".deherm"));
   const entryPoint = await resolveEntry(projectRoot, options.entry);
   const outputFile = path.resolve(options.outputFile ?? path.join(projectRoot, ".deherm", "dev", "app.dehermc"));
   const sessionLogFile = path.resolve(options.sessionLog ?? path.join(projectRoot, ".deherm", "dev", "session.log"));
@@ -219,6 +256,7 @@ export async function runDevSession(options = {}) {
   }
   let generatedComponents = false;
   let reportedArtifactRecordingFailure = false;
+  let reportedMissingSymbolIndexes = false;
   const compiler = await (services.createIncrementalCompiler ?? createIncrementalCompiler)({
     entryPoint,
     // The generated registry imports every authored component and installs the
@@ -269,9 +307,16 @@ export async function runDevSession(options = {}) {
     beforeRebuild: options.components === false ? undefined : async (changedSources) => {
       if (generatedComponents && !changedSources.some(isComponentSource)) return;
       await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
-      await writeProjectResourceSymbols(projectRoot, path.join(projectRoot, ".deherm"));
-      await writeProjectRouteSymbolIndex(path.join(projectRoot, ".deherm"));
-      await writeProjectDmSdkCallSymbolIndex(path.join(projectRoot, ".deherm"));
+      const indexes = await refreshProjectSymbolIndexes(projectRoot, generatedRoot);
+      if (indexes.unavailable.length && !reportedMissingSymbolIndexes) {
+        reportedMissingSymbolIndexes = true;
+        emit({
+          type: "log",
+          level: "warn",
+          source: "compiler",
+          message: `some project API IR inputs are absent; ${indexes.unavailable.join(", ")} compile-time indexes are disabled (run 'deherm generate' to enable them)`
+        });
+      }
       generatedComponents = true;
     }
   });
@@ -398,7 +443,9 @@ export async function runDevSession(options = {}) {
     emit({ type: "log", source: "resource-server", message: `serving ${buildRoot} at ${resourceServer.baseUrl}` });
   }
   const watcher = await (services.watchProject ?? watchProject)({
-    root: path.resolve(options.watchRoot ?? projectRoot),
+    root: options.watchRoot
+      ? (path.isAbsolute(options.watchRoot) ? options.watchRoot : path.resolve(projectRoot, options.watchRoot))
+      : projectRoot,
     debounceMs: options.debounceMs,
     ...createDevWatchOptions({ outputFile, sourceMirror, buildMirror }),
     onBatch: (files) => processChanges(files),

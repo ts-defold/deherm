@@ -509,6 +509,7 @@ export async function reconcile(options) {
 export async function assemble(options) {
   const projectRoot = path.resolve(options.project);
   const extensionRoot = path.join(projectRoot, kExtensionName);
+  const hermesInclude = path.resolve(options.hermesInclude ?? path.join(repositoryRoot, "defold/defold_hermes/include"));
 
   // A typed-native unit is a transport of the `hermes` runtime. Deciding this
   // before anything is emitted is what keeps a browser-runtime target from
@@ -593,7 +594,7 @@ export async function assemble(options) {
   const declarations = new Map();
   for (const headerPath of [
     path.join(projectRoot, "defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h"),
-    path.join(options.hermesInclude, "hermes/VM/static_h.h")
+    path.join(hermesInclude, "hermes/VM/static_h.h")
   ]) {
     const header = await readFile(headerPath, "utf8");
     for (const [name, declaration] of parseDeclarations(header, calleeNames)) {
@@ -607,7 +608,7 @@ export async function assemble(options) {
   const assertState = await resolveArchiveAssertState(path.join(projectRoot, kVendoredLibraryRoot));
   const adapted = `${renderRuntimeGuard()}${renderArchiveMatchPrologue(assertState)}${adaptEmittedCToCxx(emittedC, kPreludeHeader)}`;
 
-  const headers = await resolveHermesHeaderClosure(options.hermesInclude, hermesConfigInclude);
+  const headers = await resolveHermesHeaderClosure(hermesInclude, hermesConfigInclude);
 
   await rm(extensionRoot, { recursive: true, force: true });
   await mkdir(path.join(extensionRoot, "src"), { recursive: true });

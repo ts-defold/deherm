@@ -8,8 +8,9 @@ import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, installNativeExtension, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, generatedProjectCacheMatches, installNativeExtension, shouldResolvePublishedPolicy, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
 import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
+import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } from "../packages/cli/src/native-extension-api.mjs";
 import { writeProjectDmSdkCallSymbolIndex, writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../packages/cli/src/resource-symbols.mjs";
 import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import { PUBLIC_EXTENSION_ZIP_LIMITS, discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
@@ -495,6 +496,157 @@ test("project native header generation requires executable Clang and catalogs on
   assert.deepEqual(await readdir(cameraRoot), ["extension.ir.json"]);
 });
 
+test("project native generation excludes deherm runtime implementation headers", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-infrastructure-headers-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  const inventory = {
+    projectRoot: project,
+    extensions: [
+      {
+        name: "defold_hermes",
+        manifestPath: "defold_hermes/ext.manifest",
+        publicHeaders: Array.from({ length: 104 }, (_, index) => `defold_hermes/include/internal-${index}.hpp`)
+      },
+      {
+        name: "defold_hermes_typed_native",
+        manifestPath: "defold_hermes_typed_native/ext.manifest",
+        publicHeaders: ["defold_hermes_typed_native/include/static_h.h"]
+      }
+    ]
+  };
+  let clangInvoked = false;
+  assert.deepEqual(resolveNativeExtensionClang({
+    inventory,
+    execFile() {
+      clangInvoked = true;
+      throw new Error("the infrastructure-only project must not require Clang");
+    }
+  }), { required: false });
+  assert.equal(clangInvoked, false);
+
+  const outputRoot = path.join(project, ".deherm");
+  const generated = await materializeProjectNativeExtensionApis({
+    inventory,
+    outputRoot,
+    defoldRevision: "a".repeat(40),
+    generationKey: "b".repeat(64)
+  });
+  assert.equal(generated.index.headerCount, 0);
+  assert.equal(generated.index.ignoredExtensionCount, 2);
+  assert.deepEqual(
+    generated.index.ignoredExtensions.map(({ name, publicHeaderCount, reason }) => ({ name, publicHeaderCount, reason })),
+    [
+      { name: "defold_hermes", publicHeaderCount: 104, reason: "deherm-runtime-infrastructure" },
+      { name: "defold_hermes_typed_native", publicHeaderCount: 1, reason: "deherm-runtime-infrastructure" }
+    ]
+  );
+});
+
+test("the real War Battles project excludes only deherm infrastructure extensions", async () => {
+  const inventory = await inspectDefoldProject({ project: path.resolve("examples/war-battles-online/defold") });
+  assert.deepEqual(inventory.extensions.map(({ name }) => name), [
+    "defold_hermes",
+    "defold_hermes_typed_native"
+  ]);
+  let clangInvoked = false;
+  assert.deepEqual(resolveNativeExtensionClang({
+    inventory,
+    execFile() {
+      clangInvoked = true;
+      throw new Error("deherm infrastructure must not require project-header parsing");
+    }
+  }), { required: false });
+  assert.equal(clangInvoked, false);
+});
+
+test("generation cache invalidates when published artifact or surface evidence changes", () => {
+  const generationKey = "1".repeat(64);
+  const generationMerkle = {
+    schemaVersion: 1,
+    engineRoot: "2".repeat(64),
+    nativeRoot: "3".repeat(64),
+    root: "4".repeat(64)
+  };
+  const artifacts = {
+    schemaVersion: 1,
+    artifacts: {
+      "native-artifacts": {
+        tag: "libs-current",
+        fingerprint: "5".repeat(64),
+        indexedBy: "bundleTarget"
+      }
+    }
+  };
+  const core = {
+    toolchain: { kind: "deherm.policy.toolchain", pins: { test: "current" } },
+    artifacts,
+    inputs: { scriptIrSha256: "6".repeat(64) },
+    surfaceLayer: "user-cache"
+  };
+  const record = {
+    generation: { cacheKey: generationKey },
+    generationMerkle,
+    toolchain: core.toolchain,
+    artifacts,
+    inputs: core.inputs,
+    defoldSurface: { layer: core.surfaceLayer }
+  };
+  assert.equal(generatedProjectCacheMatches({
+    manifest: structuredClone(record),
+    lock: structuredClone(record),
+    generationKey,
+    generationMerkle,
+    core
+  }), true);
+
+  const staleManifest = structuredClone(record);
+  staleManifest.artifacts = null;
+  assert.equal(generatedProjectCacheMatches({
+    manifest: staleManifest,
+    lock: structuredClone(record),
+    generationKey,
+    generationMerkle,
+    core
+  }), false);
+
+  const staleLock = structuredClone(record);
+  staleLock.defoldSurface.layer = "repository-checkout";
+  assert.equal(generatedProjectCacheMatches({
+    manifest: structuredClone(record),
+    lock: staleLock,
+    generationKey,
+    generationMerkle,
+    core
+  }), false);
+});
+
+test("public generation refreshes mutable artifacts online and reuses authenticated artifacts offline", () => {
+  const surface = { blocker: null, artifacts: { kind: "deherm.policy.artifacts" } };
+  assert.equal(shouldResolvePublishedPolicy(surface, {
+    requirePublishedArtifacts: true,
+    env: {}
+  }), true);
+  assert.equal(shouldResolvePublishedPolicy(surface, {
+    requirePublishedArtifacts: true,
+    env: { DEHERM_OFFLINE: "1" }
+  }), false);
+  assert.equal(shouldResolvePublishedPolicy({ blocker: null, artifacts: null }, {
+    requirePublishedArtifacts: true,
+    env: { DEHERM_OFFLINE: "1" }
+  }), true);
+  assert.equal(shouldResolvePublishedPolicy(surface, { env: {} }), false);
+});
+
+test("custom generated roots still exclude the fixed Static Hermes staging lane", async (t) => {
+  const project = await fixture();
+  t.after(() => rm(project, { recursive: true, force: true }));
+  const inventory = await inspectDefoldProject({ project });
+  await writeGeneratedProject(inventory, "generated-sdk", { force: true });
+  const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
+  assert.ok(bundleConfig.exclude.includes("generated-sdk/static-hermes/**/*.ts"));
+  assert.ok(bundleConfig.exclude.includes(".deherm/build/generated/typed-native/**/*.ts"));
+});
+
 test("project inspection follows symlinked extensions without duplicate traversal", async () => {
   const project = await fixture();
   const external = await mkdtemp(path.join(tmpdir(), "defold-hermes-linked-extension-"));
@@ -732,11 +884,11 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(baseConfig.compilerOptions.plugins[0].enabled, true);
   const guiConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.gui.json"), "utf8"));
   assert.deepEqual(guiConfig.include, ["**/*.ts", ".deherm/**/*.ts"]);
-  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts", ".deherm/static-hermes/**/*.ts"]);
+  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
   assert.deepEqual(guiConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/contexts/gui.ts"]);
   const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
   assert.deepEqual(bundleConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
-  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/static-hermes/**/*.ts"]);
+  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
   const releaseConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.release.json"), "utf8"));
   assert.equal(releaseConfig.compilerOptions.plugins[0].profile, "release");
   assert.equal(releaseConfig.compilerOptions.plugins[0].dmsdkSymbols,
@@ -744,6 +896,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(releaseConfig.compilerOptions.plugins[0].dmsdkUsage,
     "./.deherm/generated/dmsdk-usage.json");
   assert.deepEqual(releaseConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
+  assert.ok(releaseConfig.exclude.includes(".deherm/build/generated/typed-native/**/*.ts"));
   const installedScope = path.join(project, "node_modules", "@ts-defold");
   await mkdir(installedScope, { recursive: true });
   await symlink(path.resolve("."), path.join(installedScope, "deherm"), process.platform === "win32" ? "junction" : "dir");

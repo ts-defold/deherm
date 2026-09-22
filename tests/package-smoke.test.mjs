@@ -237,6 +237,13 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   const entry = shippedIndex.entries[0];
   const store = path.join(repositoryRoot, "packages", "bindings", "generated", "policy", shippedIndex.base.layoutVersion);
   const policy = JSON.parse(await readFile(path.join(store, "policy", `${entry.policyRoot}.json`), "utf8"));
+  const { buildArtifactReferences } = await import("../scripts/generate-api-policy.mjs");
+  const artifacts = {
+    schemaVersion: 1,
+    kind: "deherm.policy.artifacts",
+    defoldRevision: entry.defoldRevision,
+    artifacts: await buildArtifactReferences()
+  };
   const objects = new Map(await Promise.all(Object.entries(policy.subtrees).map(async ([namespace, digest]) => [namespace, {
     digest,
     value: JSON.parse(await readFile(path.join(store, "object", `${digest}.json`), "utf8"))
@@ -246,13 +253,18 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "packages", "compiler", "src", "policy-surface-materializer.mjs"
   )));
   const dehermCacheHome = path.join(root, "deherm-cache");
+  const materializedPolicyEnvironment = {
+    ...process.env,
+    DEHERM_CACHE_HOME: dehermCacheHome,
+    DEHERM_OFFLINE: "1"
+  };
   const packedSurfaceRoot = path.join(dehermCacheHome, "surfaces", entry.defoldRevision);
   const materialized = await materializePolicySurface({
     revision: entry.defoldRevision,
     entry,
     policy,
     objects
-  }, { outputRoot: packedSurfaceRoot });
+  }, { outputRoot: packedSurfaceRoot, artifacts });
   assert.equal(Object.keys(materialized.descriptor.sdk).length, 28);
   await assertMaterializedFiles(
     path.join(packedSurfaceRoot, "sdk", "generated"), materialized.descriptor.sdk, entry.defoldRevision);
@@ -413,7 +425,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "--project", extensionProject,
     "--json",
     "--force"
-  ], { cwd: root, env: { ...process.env, DEHERM_CACHE_HOME: dehermCacheHome } });
+  ], { cwd: root, env: materializedPolicyEnvironment });
   const packedProjectSummary = JSON.parse(packedProjectGeneration.stdout);
   assert.equal(packedProjectSummary.nativeExtensions.generatedRouteCount, 1);
   assert.equal(packedProjectSummary.nativeExtensions.blockedRouteCount, 0);
@@ -436,7 +448,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "--target", "js-web",
     "--shard", "0/32",
     "--json"
-  ], { cwd: root, env: { ...process.env, DEHERM_CACHE_HOME: dehermCacheHome } });
+  ], { cwd: root, env: materializedPolicyEnvironment });
   const conformanceSummary = JSON.parse(conformance.stdout);
   assert.ok(conformanceSummary.selectedCaseCount > 0);
   const conformancePlan = path.join(conformanceRoot, "plan.json");
@@ -448,7 +460,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "--plan", conformancePlan,
     "--output", conformanceObservation,
     "--json"
-  ], { cwd: root, env: { ...process.env, DEHERM_CACHE_HOME: dehermCacheHome } });
+  ], { cwd: root, env: materializedPolicyEnvironment });
   assert.equal(JSON.parse(compiledConformance.stdout).passed, true);
   await readFile(conformanceObservation, "utf8");
 
@@ -489,7 +501,7 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "--name", "Packed smoke test",
     "--defold-sdk", entry.defoldRevision,
     "--json"
-  ], { cwd: root, env: { ...process.env, DEHERM_CACHE_HOME: dehermCacheHome } });
+  ], { cwd: root, env: materializedPolicyEnvironment });
   // Generated projects enable the `@ts-defold/deherm/ttsc` transform, which the
   // TypeScript plugin loader resolves from the project itself. Reproduce the
   // layout a real `npm install` produces so the transform actually loads.
@@ -558,16 +570,30 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   assert.equal(packedReleaseUsage.profile, "release");
   assert.deepEqual(packedReleaseUsage.specializationRequiredSites, []);
 
+  run(process.execPath, [
+    path.join(packageRoot, "bin", "deherm.mjs"),
+    "generate",
+    "--project", project,
+    "--out-dir", "generated-sdk",
+    "--force"
+  ], { cwd: root, env: materializedPolicyEnvironment });
+  await rm(path.join(project, ".deherm", "generated"), { recursive: true, force: true });
+
   const development = run(process.execPath, [
     path.join(packageRoot, "bin", "deherm.mjs"),
     "dev",
-    "--project", project,
+    "--entry", path.relative(root, path.join(project, "src", "main.script.ts")),
+    "--out-dir", "generated-sdk",
     "--once",
     "--headless",
     "--no-bytecode"
-  ], { cwd: project, env: {
-    ...compilerEnvironment
+  ], { cwd: root, env: {
+    ...compilerEnvironment,
+    DEHERM_OFFLINE: "1"
   } });
   assert.match(development.stdout, /\[deherm\] build-succeeded generation=1/);
   await readFile(path.join(project, ".deherm", "dev", "app.dehermc"), "utf8");
+  for (const file of ["resource-symbols.json", "script-route-symbol-index.json", "dmsdk-call-symbol-index.json"]) {
+    await readFile(path.join(project, "generated-sdk", "generated", file), "utf8");
+  }
 });

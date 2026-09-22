@@ -210,6 +210,21 @@ async function layerProvides(candidate, revision) {
         !/^[0-9a-f]{64}$/u.test(descriptor.outputTreeSha256 ?? "")) {
       return { ok: false, missing: [], error: "surface descriptor has no authenticated tree digests" };
     }
+    if (!/^[0-9a-f]{64}$/u.test(descriptor.toolchainSha256 ?? "")) {
+      return { ok: false, missing: [], error: "surface descriptor has no authenticated toolchain digest" };
+    }
+    try {
+      const bytes = await readFile(path.join(candidate.irRoot, surfaceIrFiles.toolchainPath));
+      if (sha256(bytes) !== descriptor.toolchainSha256) {
+        return { ok: false, missing: [], error: "surface toolchain digest mismatch" };
+      }
+      toolchain = JSON.parse(bytes);
+      if (toolchain.kind !== "deherm.policy.toolchain") {
+        return { ok: false, missing: [], error: "surface toolchain object has invalid kind" };
+      }
+    } catch (error) {
+      return { ok: false, missing: [surfaceIrFiles.toolchainPath], error: error.message };
+    }
     if (descriptor.artifactsSha256) {
       try {
         const bytes = await readFile(path.join(candidate.irRoot, "defold-artifacts.json"));

@@ -4,6 +4,7 @@ import { access, cp, lstat, mkdir, readFile, readdir, realpath, rename, rm, writ
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 
 import { API as TypeScriptApi } from "typescript/unstable/sync";
 
@@ -65,6 +66,48 @@ export function createDefoldValueTypeCatalog(layouts) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function assertPublishedNativeArtifacts(artifactPolicy, revision) {
+  const family = artifactPolicy?.artifacts?.["native-artifacts"];
+  if (!family) throw new Error(`Published Defold policy ${revision} has no native-artifacts mapping`);
+  if (family.indexedBy !== "bundleTarget" ||
+      !/^[A-Za-z0-9][A-Za-z0-9._-]*$/u.test(family.tag ?? "") ||
+      !/^[0-9a-f]{64}$/u.test(family.fingerprint ?? "")) {
+    throw new Error(`Published Defold policy ${revision} has an invalid native-artifacts mapping`);
+  }
+  return family;
+}
+
+export function generatedProjectCacheMatches({ manifest, lock, generationKey, generationMerkle, core }) {
+  const expectedMerkle = {
+    schemaVersion: generationMerkle.schemaVersion,
+    engineRoot: generationMerkle.engineRoot,
+    nativeRoot: generationMerkle.nativeRoot,
+    root: generationMerkle.root
+  };
+  return manifest?.generation?.cacheKey === generationKey &&
+    lock?.generation?.cacheKey === generationKey &&
+    isDeepStrictEqual(manifest.generationMerkle, expectedMerkle) &&
+    isDeepStrictEqual(lock.generationMerkle, expectedMerkle) &&
+    isDeepStrictEqual(manifest.toolchain, core.toolchain) &&
+    isDeepStrictEqual(lock.toolchain, core.toolchain) &&
+    isDeepStrictEqual(manifest.artifacts ?? null, core.artifacts ?? null) &&
+    isDeepStrictEqual(lock.artifacts ?? null, core.artifacts ?? null) &&
+    manifest.defoldSurface?.layer === core.surfaceLayer &&
+    lock.defoldSurface?.layer === core.surfaceLayer &&
+    isDeepStrictEqual(manifest.inputs, core.inputs) &&
+    isDeepStrictEqual(lock.inputs, core.inputs);
+}
+
+export function shouldResolvePublishedPolicy(surface, options = {}) {
+  if (surface?.blocker) return true;
+  if (options.requirePublishedArtifacts !== true) return false;
+  const environment = options.env ?? process.env;
+  // The artifact sibling is the deliberately replaceable part of publication:
+  // online commands refresh it, while an explicit offline session reuses only
+  // an already authenticated materialized copy.
+  return environment.DEHERM_OFFLINE !== "1" || !surface.artifacts;
 }
 
 async function directoryDigest(root, options = {}) {
@@ -595,6 +638,14 @@ export function getExtensionValue(moduleName: string, memberName: string): unkno
 }
 
 const ignoredAuthoredGlobs = ["node_modules/**", ".internal/**", "build/**", "dist/**"];
+function generatedCompilerOnlyGlobs(generated) {
+  return [...new Set([
+    `${generated}/static-hermes/**/*.ts`,
+    // Typed-native assembly deliberately stages at this stable project path so
+    // shermes source locations are reproducible, independent of --out-dir.
+    ".deherm/build/generated/typed-native/**/*.ts"
+  ])];
+}
 const authoredContexts = [
   { id: "shared", suffix: null, includes: ["**/*.ts"], excludes: ["**/*.script.ts", "**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
   { id: "game-object", suffix: ".script.ts", includes: ["**/*.ts"], excludes: ["**/*.gui.ts", "**/*.gui_script.ts", "**/*.render.ts", ...ignoredAuthoredGlobs] },
@@ -853,7 +904,7 @@ function contextProjectConfig(outputDirectory, context) {
   const excludes = [
     ...context.excludes,
     `${generated}/generated/components/registry.ts`,
-    `${generated}/static-hermes/**/*.ts`
+    ...generatedCompilerOnlyGlobs(generated)
   ];
   return {
     extends: "./tsconfig.deherm.base.json",
@@ -881,7 +932,7 @@ function bundleProjectConfig(outputDirectory) {
       }
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: [...ignoredAuthoredGlobs, `${generated}/static-hermes/**/*.ts`]
+    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated)]
   };
 }
 
@@ -897,7 +948,7 @@ function releaseProjectConfig(outputDirectory) {
       }
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: [...ignoredAuthoredGlobs, `${generated}/static-hermes/**/*.ts`]
+    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated)]
   };
 }
 
@@ -972,7 +1023,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     env: options.env
   };
   let unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
-  if (unresolved.blocker) {
+  if (shouldResolvePublishedPolicy(unresolved, options)) {
     const { readPolicyLocator, resolvePublishedPolicy } = await import("./policy-client.mjs");
     await resolvePublishedPolicy(requestedRevision, {
       index: await readPolicyLocator(),
@@ -981,6 +1032,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
   }
   const surface = assertResolvedDefoldSurface(unresolved);
+  if (options.requirePublishedArtifacts === true) assertPublishedNativeArtifacts(surface.artifacts, requestedRevision);
   const sdkSourceRoot = surface.sdkRoot;
   const repositorySourceRoot = surface.repositoryRoot;
   const {
@@ -1342,7 +1394,11 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     env: options.env
   });
   const defoldRevision = assertResolvedDefoldRevision(revisionResolution);
-  const core = await coreSdkForRevision(defoldRevision, { projectRoot: inventory.projectRoot, env: options.env });
+  const core = await coreSdkForRevision(defoldRevision, {
+    projectRoot: inventory.projectRoot,
+    env: options.env,
+    requirePublishedArtifacts: options.requirePublishedArtifacts
+  });
   const toolchain = core.toolchain;
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const nativeExtensionClang = resolveNativeExtensionClang({ inventory, clang: options.clang });
@@ -1375,8 +1431,13 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       ]);
       const previousManifest = JSON.parse(manifestSource.toString("utf8"));
       const previousLock = JSON.parse(lockSource.toString("utf8"));
-      if (previousManifest.generation?.cacheKey === generationKey &&
-          previousLock.generation?.cacheKey === generationKey &&
+      if (generatedProjectCacheMatches({
+        manifest: previousManifest,
+        lock: previousLock,
+        generationKey,
+        generationMerkle: merkle,
+        core
+      }) &&
           previousManifest.generatedOutputs?.output?.["generated/native-extensions/index.json"] === sha256(nativeIndexSource)) {
         const nativeIndex = JSON.parse(nativeIndexSource.toString("utf8"));
         if (nativeIndex.keyedOutput !== path.posix.join(core.revision, generationKey)) throw new Error("Cached native-extension index has a stale generation key");

@@ -535,6 +535,20 @@ why it did not answer. It never falls through to a different revision's
 surface, because that is exactly the defect: signatures that compile and are
 wrong.
 
+Descriptor-backed cache layers also authenticate and return their toolchain and
+artifact siblings. The toolchain digest gates the Defold target matrix; the
+artifact digest gates the per-target GitHub release mapping. `deherm create`,
+`deherm generate`, and `deherm dev` require that published artifact mapping.
+Online runs refresh the deliberately replaceable mapping before selecting the
+surface; `DEHERM_OFFLINE=1` reuses an already authenticated materialized copy.
+This keeps repaired/rebuilt release artifacts discoverable without sacrificing
+explicit offline work, and ensures a contributor and an installed npm consumer
+write the same launchable lock. The repository checkout remains sufficient for
+offline generator tests that do not request a buildable target artifact. Reusing a generated project also compares
+the authenticated toolchain and artifact siblings, selected surface layer,
+generation Merkle roots, and input digests; an unchanged project-source key
+cannot preserve a stale or absent release mapping.
+
 Producing the **policy** for a new revision still reads that revision's source
 and reference documentation in the derivation workflow. Producing a local
 **surface from a published policy** does not: `deherm policy` fetches the

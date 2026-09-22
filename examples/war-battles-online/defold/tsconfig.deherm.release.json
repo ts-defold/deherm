@@ -22,8 +22,25 @@
         "apiUsage": "./.deherm/generated/defold-api-usage.json",
         "dmsdkSymbols": "./.deherm/generated/dmsdk-call-symbol-index.json",
         "dmsdkUsage": "./.deherm/generated/dmsdk-usage.json",
-        "profile": "development"
+        "profile": "release"
       }
-    ]
-  }
+    ],
+    "paths": {
+      "@deherm/project": [
+        "./.deherm/sdk/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    ".deherm/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules/**",
+    ".internal/**",
+    "build/**",
+    "dist/**",
+    ".deherm/static-hermes/**/*.ts",
+    ".deherm/build/generated/typed-native/**/*.ts"
+  ]
 }

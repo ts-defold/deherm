@@ -145,7 +145,7 @@ static SHLegacyValue _51_probeSize_4_(SHRuntime *shr);
 static SHLegacyValue _52_DehermStaticMap(SHRuntime *shr);
 static SHLegacyValue _53_encode_12_(SHRuntime *shr);
 static SHLegacyValue _54_probeSize_5_(SHRuntime *shr);
-// build/generated/typed-native/deherm_typed_native.ts:3:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:3:1
 static SHLegacyValue _0_global(SHRuntime *shr) {
   _SH_MODEL();
   struct {
@@ -177,6 +177,7 @@ static SHLegacyValue _0_global(SHRuntime *shr) {
   locals.t9 = _sh_ljs_undefined();
   SHLegacyValue np0 = _sh_ljs_undefined();
   SHLegacyValue np1 = _sh_ljs_undefined();
+  SHLegacyValue np2 = _sh_ljs_undefined();
 
 L0:
   ;
@@ -436,7 +437,7 @@ L0:
   _sh_prstore_object(shr, &locals.t2, 5, &locals.t4);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 41);
   _sh_ljs_put_by_id_strict_rjs(shr, shUnit, &locals.t3, get_symbols(shUnit)[30] /*prototype*/, &locals.t2, get_write_prop_cache(shUnit) + 18);
-  locals.t2 = _sh_new_fastarray_with_proto(shr, &locals.t1, 320);
+  locals.t2 = _sh_new_fastarray_with_proto(shr, &locals.t1, 325);
   np1 = _sh_ljs_double(350770);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(2636616);
@@ -452,6 +453,8 @@ L0:
   np1 = _sh_ljs_double(96184340);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(109392419);
+  _sh_fastarray_push(shr, &np1, &locals.t2);
+  np1 = _sh_ljs_double(143800718);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(161653622);
   _sh_fastarray_push(shr, &np1, &locals.t2);
@@ -699,6 +702,8 @@ L0:
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(1995008024);
   _sh_fastarray_push(shr, &np1, &locals.t2);
+  np1 = _sh_ljs_double(2020799616);
+  _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(2034901354);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(2048321486);
@@ -781,6 +786,8 @@ L0:
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747516596092665856u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
+  np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747517391703900160u}).f64);
+  _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747518574979973120u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747535885040353280u}).f64);
@@ -800,6 +807,8 @@ L0:
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747659078382125056u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747737010949586944u}).f64);
+  _sh_fastarray_push(shr, &np1, &locals.t2);
+  np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747745811297730560u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4747762286431567872u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
@@ -862,6 +871,8 @@ L0:
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4748502672577921024u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4748521954951036928u}).f64);
+  _sh_fastarray_push(shr, &np1, &locals.t2);
+  np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4748534133731360768u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4748543798657679360u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
@@ -1078,10 +1089,10 @@ L0:
   np1 = _sh_ljs_double(((struct HermesValueBase){.raw = 4751256412728852480u}).f64);
   _sh_fastarray_push(shr, &np1, &locals.t2);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t2, 16);
-  np1 = _sh_ljs_double(7);
+  np1 = _sh_ljs_double(32);
   _sh_ljs_store_to_env(shr, locals.t0,np1, 17);
-  np1 = _sh_ljs_double(8);
-  _sh_ljs_store_to_env(shr, locals.t0,np1, 18);
+  np2 = _sh_ljs_double(8);
+  _sh_ljs_store_to_env(shr, locals.t0,np2, 18);
   locals.t3 = _sh_ljs_get_global_object(shr);
   locals.t1 = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[31] /*globalThis*/, get_read_prop_cache(shUnit) + 0);
   locals.t4 = _sh_ljs_get_by_id_rjs_inline(shr,&locals.t1,get_symbols(shUnit)[32] /*Array*/, get_read_prop_cache(shUnit) + 1);
@@ -1104,9 +1115,9 @@ L0:
   locals.t4 = _sh_ljs_call(shr, frame, 1);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t4, 24);
   frame[3] = _sh_ljs_try_get_by_id_rjs(shr,&locals.t3, get_symbols(shUnit)[37] /*BigInt*/, get_read_prop_cache(shUnit) + 10);
-  frame[1] = _sh_ljs_double(32);
   frame[4] = _sh_ljs_undefined();
   frame[2] = _sh_ljs_undefined();
+  frame[1] = _sh_ljs_double(32);
   locals.t3 = _sh_ljs_call(shr, frame, 1);
   _sh_ljs_store_to_env(shr, locals.t0,locals.t3, 25);
   np1 = _sh_ljs_bool(false);
@@ -1219,7 +1230,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:58:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:58:1
 static SHLegacyValue _6___writeUtf8(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -1628,7 +1639,7 @@ L37:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[46] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:60:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:60:1
 static SHLegacyValue _7___decode(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -2163,7 +2174,7 @@ L46:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[52] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:61:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:61:1
 static SHLegacyValue _8_dispatchScriptUniversalValue(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -2368,7 +2379,7 @@ L_catch:
       goto L15;
   }
 }
-// build/generated/typed-native/deherm_typed_native.ts:166:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:167:1
 static SHLegacyValue _9___dehermToStatic(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -3238,7 +3249,7 @@ L75:
   _sh_leave(shr, &locals.head, frame);
   return locals.t0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:280:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:281:1
 static SHLegacyValue _10___dehermFromStatic(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -3728,7 +3739,7 @@ L38:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:362:1
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:363:1
 static SHLegacyValue _11___dehermTypedNativeCall(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4030,7 +4041,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:43:33
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:33
 static SHLegacyValue _13_encode(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4047,7 +4058,7 @@ L0:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[72] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:43:160
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:160
 static SHLegacyValue _14_asString(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4064,7 +4075,7 @@ L0:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[73] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:43:232
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:232
 static SHLegacyValue _15_probeSize(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4081,7 +4092,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:43:266
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:43:266
 static SHLegacyValue _16_probeChecksum(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4115,7 +4126,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:44:63
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:44:63
 static SHLegacyValue _18_encode_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4150,7 +4161,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:45:58
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:45:58
 static SHLegacyValue _20_encode_2_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4168,7 +4179,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:46:81
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:46:81
 static SHLegacyValue _21_DehermStaticBoolean(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4192,7 +4203,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:46:130
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:46:130
 static SHLegacyValue _22_encode_3_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4226,7 +4237,7 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:47:79
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:47:79
 static SHLegacyValue _23_DehermStaticNumber(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4250,7 +4261,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:47:127
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:47:127
 static SHLegacyValue _24_encode_4_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4273,7 +4284,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:48:79
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:79
 static SHLegacyValue _25_DehermStaticString(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4299,7 +4310,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:48:127
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:127
 static SHLegacyValue _26_encode_5_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4334,7 +4345,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:48:247
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:48:247
 static SHLegacyValue _27_asString_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4353,7 +4364,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return locals.t0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:49:172
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:172
 static SHLegacyValue _28_DehermStaticHandle(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4387,7 +4398,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:49:417
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:417
 static SHLegacyValue _29_encode_6_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4418,7 +4429,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:49:606
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:606
 static SHLegacyValue _30_probeChecksum_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4441,7 +4452,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:49:665
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:49:665
 static SHLegacyValue _31_dispose(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4481,7 +4492,7 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:50:120
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:120
 static SHLegacyValue _32_DehermStaticDefoldValue(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4513,7 +4524,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:50:237
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:237
 static SHLegacyValue _33_encode_7_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4544,7 +4555,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:50:390
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:50:390
 static SHLegacyValue _34_probeChecksum_2_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4573,7 +4584,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:51:90
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:90
 static SHLegacyValue _35_DehermStaticMatrix4(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4613,7 +4624,7 @@ L2:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[51] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:51:254
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:254
 static SHLegacyValue _36_encode_8_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4728,7 +4739,7 @@ L2:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[74] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:51:735
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:735
 static SHLegacyValue _37_probeSize_1_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4745,7 +4756,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:51:770
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:51:770
 static SHLegacyValue _38_probeChecksum_3_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4793,7 +4804,7 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:52:214
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:214
 static SHLegacyValue _39_DehermStaticUrl(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4831,7 +4842,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:52:592
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:592
 static SHLegacyValue _40_encode_9_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4880,7 +4891,7 @@ L2:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[75] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:52:915
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:915
 static SHLegacyValue _41_probeSize_2_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4897,7 +4908,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:52:949
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:52:949
 static SHLegacyValue _42_probeChecksum_4_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -4955,7 +4966,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:53:62
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:53:62
 static SHLegacyValue _44_begin(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5054,7 +5065,7 @@ L9:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[78] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:53:460
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:53:460
 static SHLegacyValue _45_end(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5080,7 +5091,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:54:101
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:101
 static SHLegacyValue _46_DehermStaticArray(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5119,7 +5130,7 @@ L2:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:54:170
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:170
 static SHLegacyValue _47_encode_10_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5283,7 +5294,7 @@ L13:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[78] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:54:541
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:54:541
 static SHLegacyValue _48_probeSize_3_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5305,7 +5316,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:55:122
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:122
 static SHLegacyValue _49_DehermStaticRecord(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5362,7 +5373,7 @@ L4:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[49] /*deherm record key/va...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:55:304
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:304
 static SHLegacyValue _50_encode_11_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5540,7 +5551,7 @@ L13:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[78] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:55:683
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:55:683
 static SHLegacyValue _51_probeSize_4_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5562,7 +5573,7 @@ L0:
   _sh_leave(shr, &locals.head, frame);
   return np0;
 }
-// build/generated/typed-native/deherm_typed_native.ts:56:130
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:130
 static SHLegacyValue _52_DehermStaticMap(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5619,7 +5630,7 @@ L4:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[48] /*deherm map key/value...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:56:320
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:320
 static SHLegacyValue _53_encode_12_(SHRuntime *shr) {
   struct {
     SHLocals head;
@@ -5798,7 +5809,7 @@ L13:
   locals.t0 = _sh_ljs_get_string(shr, get_symbols(shUnit)[78] /*deherm Static Hermes...*/);
   _sh_throw(shr, locals.t0);
 }
-// build/generated/typed-native/deherm_typed_native.ts:56:712
+// .deherm/build/generated/typed-native/deherm_typed_native.ts:56:712
 static SHLegacyValue _54_probeSize_5_(SHRuntime *shr) {
   struct {
     SHLocals head;

@@ -18,6 +18,18 @@ import {
 } from "./project.mjs";
 
 const ignoredIncludeDirectories = new Set([".git", ".internal", "build", "node_modules"]);
+// These extensions implement déherm's transport itself. Their include trees are
+// compiler/runtime implementation details, not user extension APIs to project
+// back into TypeScript. Treat the names as reserved: a project cannot provide a
+// second extension with either name without colliding with the runtime anyway.
+const infrastructureExtensionNames = new Set([
+  "defold_hermes",
+  "defold_hermes_typed_native"
+]);
+
+export function isDehermInfrastructureExtension(extension) {
+  return infrastructureExtensionNames.has(extension?.name);
+}
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -49,7 +61,8 @@ function safeArchiveEntry(value) {
 }
 
 export function resolveNativeExtensionClang({ inventory, clang = process.env.CLANG ?? "clang", execFile = execFileSync }) {
-  const required = inventory.extensions.some(({ publicHeaders }) => publicHeaders?.length);
+  const required = inventory.extensions.some((extension) =>
+    !isDehermInfrastructureExtension(extension) && extension.publicHeaders?.length);
   if (!required) return { required: false };
   let version;
   try {
@@ -278,7 +291,16 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
   try {
     await mkdir(keyedRoot, { recursive: true });
     const headers = [];
+    const ignoredExtensions = inventory.extensions
+      .filter(isDehermInfrastructureExtension)
+      .map(({ name, manifestPath, publicHeaders = [] }) => ({
+        name,
+        manifestPath,
+        publicHeaderCount: publicHeaders.length,
+        reason: "deherm-runtime-infrastructure"
+      }));
     for (const [extensionIndex, extension] of inventory.extensions.entries()) {
+      if (isDehermInfrastructureExtension(extension)) continue;
       const details = [...(extension.publicHeaderDetails ?? [])].sort((left, right) => compare(left.path, right.path));
       if (details.length !== (extension.publicHeaders ?? []).length ||
           details.some((detail, index) => detail.path !== [...extension.publicHeaders].sort(compare)[index])) {
@@ -343,6 +365,8 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
       headerCount: headers.length,
       generatedRouteCount: headers.reduce((sum, item) => sum + item.generatedRouteCount, 0),
       blockedRouteCount: headers.reduce((sum, item) => sum + item.blockedRouteCount, 0),
+      ignoredExtensionCount: ignoredExtensions.length,
+      ignoredExtensions,
       headers
     };
     await writeFile(path.join(keyedRoot, "report.json"), `${JSON.stringify(report, null, 2)}\n`);

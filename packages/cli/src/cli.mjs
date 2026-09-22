@@ -194,7 +194,10 @@ async function scaffoldProject(options) {
     defoldRevision: options.defoldSdk
   });
   const inventory = await inspectDefoldProject({ project: scaffold.projectRoot });
-  const generated = await writeGeneratedProject(inventory, options.outDir, { force: true });
+  const generated = await writeGeneratedProject(inventory, options.outDir, {
+    force: true,
+    requirePublishedArtifacts: true
+  });
   const nativeExtension = await installNativeExtension(scaffold.projectRoot, {
     force: true,
     surfaceRepositoryRoot: generated.surfaceRepositoryRoot
@@ -536,12 +539,15 @@ export async function run(argv = process.argv.slice(2)) {
     // Keep doctor/generate/conformance usable without loading the heavier dev
     // compiler and terminal stack. This also keeps `deherm --help` portable.
     const { runDevSession } = await import("./dev/session.mjs");
+    const entryLocatesProject = !options.project && Boolean(options.entry);
+    const entryFromInvocation = entryLocatesProject ? path.resolve(process.cwd(), options.entry) : null;
     if (!options.project && !options.entry) {
       options.project = await findProjectRoot(process.cwd(), undefined, {
         select: !options.json && process.stdin.isTTY && process.stdout.isTTY ? selectProjectFromTerminal : undefined
       });
     }
     options.project = await findProjectRoot(process.cwd(), options.project ?? options.entry);
+    if (entryFromInvocation) options.entry = entryFromInvocation;
     const inventory = await inspectDefoldProject({ project: options.project, requireDehermRuntime: true });
     const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
     if (errors.length) {
@@ -549,8 +555,10 @@ export async function run(argv = process.argv.slice(2)) {
     }
     const generated = await writeGeneratedProject(inventory, options.outDir, {
       defoldSdk: options.defoldSdk,
-      bob: options.bob
+      bob: options.bob,
+      requirePublishedArtifacts: true
     });
+    options.generatedRoot = generated.root;
     await installNativeExtension(inventory.projectRoot, {
       surfaceRepositoryRoot: generated.surfaceRepositoryRoot
     });
@@ -682,7 +690,12 @@ export async function run(argv = process.argv.slice(2)) {
     if (errors.length) {
       throw new Error(`Defold project configuration is not ready for déherm:\n${errors.map(({ path, message }) => `- ${path}: ${message}`).join("\n")}`);
     }
-    const output = await writeGeneratedProject(inventory, options.outDir, { defoldSdk: options.defoldSdk, bob: options.bob, force: options.force });
+    const output = await writeGeneratedProject(inventory, options.outDir, {
+      defoldSdk: options.defoldSdk,
+      bob: options.bob,
+      force: options.force,
+      requirePublishedArtifacts: true
+    });
     const nativeExtension = await installNativeExtension(inventory.projectRoot, {
       force: options.force,
       surfaceRepositoryRoot: output.surfaceRepositoryRoot

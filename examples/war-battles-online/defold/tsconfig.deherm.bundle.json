@@ -16,6 +16,8 @@
     "node_modules/**",
     ".internal/**",
     "build/**",
-    "dist/**"
+    "dist/**",
+    ".deherm/static-hermes/**/*.ts",
+    ".deherm/build/generated/typed-native/**/*.ts"
   ]
 }

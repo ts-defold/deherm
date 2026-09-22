@@ -15,8 +15,8 @@
   },
   "profile": false,
   "laneSources": {
-    "packages/static-hermes/src/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
-    "packages/static-hermes/src/generated/script-typed-native-bridge.ts": "71a5383a4fa616f7014358600d0c546fe2c6cb65038be836ae44cf3b2633cb3b"
+    ".deherm/static-hermes/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
+    ".deherm/static-hermes/generated/script-typed-native-bridge.ts": "a0cf0fa42bc363738602ca9811768ed3bd4f7cd7ac45b4d06c80734f390417ac"
   },
   "vendoredHeaders": {
     "hermes/Support/sh_tryfast_fp_cvt.h": "765d5904d92d2fbfe1c0fbd7a7da1c1e50f3b66a467b21f4721538a444386d15",
@@ -36,9 +36,9 @@
   "compiledWithAssertsOff": true,
   "externCalleeCount": 37,
   "externCallSiteCount": 67,
-  "emittedCSha256": "3ed34496f6af1d0897f9cc5e96e028740ca55bf4099e4e139073d13bc42aa4f2",
-  "emittedCBytes": 250408,
-  "adaptedSourceSha256": "48c9c272a76364452121557d69be845a433501b23253396896922163bf7afa7b",
+  "emittedCSha256": "08bad8650699fd599c0c68ccf9c2f117f4eeb6e28b0f97361ef73857a322c57b",
+  "emittedCBytes": 251371,
+  "adaptedSourceSha256": "4262386166dff931b70983a17816ff88b3a964c7c20244707b7a7935c37601be",
   "evidenceBoundary": {
     "cEmission": "observed",
     "compilation": "requires-extender",

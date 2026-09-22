@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { materializePolicySurface } from "../packages/compiler/src/policy-surface-materializer.mjs";
+import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
 import {
   BINDING_LOWERING_RECIPE_CAPABILITY,
   BINDING_LOWERING_RECIPE_EMITTER,
@@ -39,7 +40,8 @@ async function currentResolvedPolicy() {
 
 test("authenticated policy materializes the complete generated SDK without a Defold tree", async () => {
   const policy = await currentResolvedPolicy();
-  const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
+  const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
+  const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
   assert.equal(first.descriptor.documents.length, 17);
   for (const name of [
@@ -118,6 +120,12 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.equal(toolchain.bob.urlTemplate, "https://d.defold.com/archive/{defoldRevision}/bob/bob.jar");
   assert.match(toolchain.bob.sha256, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.toolchainSha256, /^[0-9a-f]{64}$/u);
+  const resolved = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.equal(resolved.layer, "user-cache");
+  assert.deepEqual(resolved.toolchain, toolchain,
+    "a descriptor-backed cache must return the authenticated target matrix, not only its API files");
   const planBytes = await readFile(path.join(outputRoot, "ir", "defold-binding-lowering-plan.json"));
   const expectedPlan = oldPipelineFixture.documents["defold-binding-lowering-plan.json"];
   assert.equal(planBytes.byteLength, expectedPlan.bytes,
@@ -133,6 +141,16 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.deepEqual(second.written, [], "materialization must be idempotent when policy and compiler are unchanged");
   assert.deepEqual(await readFile(sentinelPath), sentinelBytes,
     "keyed lowering-plan realization must preserve its sentinel bytes");
+
+  const descriptorPath = path.join(outputRoot, "surface.json");
+  const unauthenticatedDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  delete unauthenticatedDescriptor.toolchainSha256;
+  await writeFile(descriptorPath, `${JSON.stringify(unauthenticatedDescriptor, null, 2)}\n`);
+  const refused = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refused.blocker, "a descriptor-backed surface without an authenticated toolchain digest must be refused");
+  assert.match(refused.searched[0].reason, /no authenticated toolchain digest/u);
 });
 
 test("policy materialization fails closed when the dmSDK catalog exceeds the package frame", async () => {
