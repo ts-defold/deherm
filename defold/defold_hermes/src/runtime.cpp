@@ -24,12 +24,17 @@
 #include <atomic>
 #include <array>
 #include <cctype>
+#include <charconv>
+#include <chrono>
+#include <cmath>
+#include <cstring>
 #include <deque>
 #include <exception>
 #include <functional>
 #include <mutex>
 #include <optional>
 #include <stdexcept>
+#include <system_error>
 #include <utility>
 
 #include <hermes/hermes.h>
@@ -38,6 +43,9 @@
 #include <jsi/instrumentation.h>
 
 namespace jsi = facebook::jsi;
+
+extern "C" size_t hermes_numberToString(
+    double value, char* destination, size_t destinationSize);
 
 namespace defold_hermes {
 
@@ -72,6 +80,84 @@ std::unique_ptr<facebook::hermes::HermesRuntime> makeRuntime() {
   return facebook::hermes::makeHermesRuntime(config.build());
 }
 
+#if DEHERM_HERMES_DEBUGGER
+
+constexpr size_t kSnapshotPropertyCapacity = 32;
+constexpr size_t kSnapshotStringByteCapacity = 256;
+constexpr size_t kSnapshotFrameByteCapacity = 512 * 1024;
+// Leave a conservative fixed allowance for the envelope and omission fields.
+// The completed frame is checked again before it is returned.
+constexpr size_t kSnapshotInstancesByteCapacity =
+    kSnapshotFrameByteCapacity - 1024;
+constexpr uint64_t kMaximumSafeJsonInteger = UINT64_C(9007199254740991);
+
+void appendJsonString(std::string& output, const char* bytes, size_t length) {
+  static constexpr char kHex[] = "0123456789abcdef";
+  output.push_back('"');
+  for (size_t index = 0; index < length; ++index) {
+    const unsigned char byte = static_cast<unsigned char>(bytes[index]);
+    switch (byte) {
+      case '"': output.append("\\\""); break;
+      case '\\': output.append("\\\\"); break;
+      case '\b': output.append("\\b"); break;
+      case '\f': output.append("\\f"); break;
+      case '\n': output.append("\\n"); break;
+      case '\r': output.append("\\r"); break;
+      case '\t': output.append("\\t"); break;
+      default:
+        if (byte < 0x20) {
+          output.append("\\u00");
+          output.push_back(kHex[byte >> 4]);
+          output.push_back(kHex[byte & 0xf]);
+        } else {
+          output.push_back(static_cast<char>(byte));
+        }
+    }
+  }
+  output.push_back('"');
+}
+
+void appendJsonString(std::string& output, const std::string& value) {
+  appendJsonString(output, value.data(), value.size());
+}
+
+void appendUnsigned(std::string& output, uint64_t value) {
+  std::array<char, 32> buffer{};
+  const auto result = std::to_chars(buffer.data(), buffer.data() + buffer.size(), value);
+  if (result.ec != std::errc{}) throw std::runtime_error("Snapshot integer encoding failed");
+  output.append(buffer.data(), static_cast<size_t>(result.ptr - buffer.data()));
+}
+
+void appendFiniteNumber(std::string& output, double value) {
+  // Hermes' locale-independent ECMAScript number formatter uses only this
+  // fixed caller-owned buffer. The symbol is part of the already-linked
+  // Hermes support archive and avoids per-lane stream allocation.
+  std::array<char, 32> buffer{};
+  const size_t length = hermes_numberToString(value, buffer.data(), buffer.size());
+  if (length >= buffer.size()) throw std::runtime_error("Snapshot number encoding failed");
+  output.append(buffer.data(), length);
+}
+
+uint32_t saturatedAdd(uint32_t left, uint32_t right) {
+  return UINT32_MAX - left < right ? UINT32_MAX : left + right;
+}
+
+void appendHex64(std::string& output, uint64_t value) {
+  static constexpr char kHex[] = "0123456789abcdef";
+  output.push_back('"');
+  for (int shift = 60; shift >= 0; shift -= 4)
+    output.push_back(kHex[(value >> shift) & 0xf]);
+  output.push_back('"');
+}
+
+void appendUnavailable(std::string& output, const char* reason) {
+  output.append(R"({"kind":"unavailable","reason":)");
+  appendJsonString(output, reason, std::strlen(reason));
+  output.push_back('}');
+}
+
+#endif
+
 }  // namespace
 
 class Runtime::Impl {
@@ -80,6 +166,11 @@ class Runtime::Impl {
       : host_(host), runtime_(makeRuntime()), identity_(acquireRuntimeId()) {
     callbacks_ = std::make_unique<CallbackRegistry>(
         *runtime_, 4096, identity_);
+#if DEHERM_HERMES_DEBUGGER
+    auto object = runtime_->global().getPropertyAsObject(*runtime_, "Object");
+    ownPropertyDescriptor_.emplace(
+        object.getPropertyAsFunction(*runtime_, "getOwnPropertyDescriptor"));
+#endif
     installHost();
   }
 
@@ -224,7 +315,39 @@ class Runtime::Impl {
   void setComponentProperty(ComponentHandle handle, const char* name, const ComponentValue& value) {
     ComponentSlot& slot = resolve(handle);
     if (!name) throw std::invalid_argument("Component property name is null");
-    slot.self->setProperty(*runtime_, name, decodeComponentValue(value));
+    jsi::Value decoded = decodeComponentValue(value);
+#if DEHERM_HERMES_DEBUGGER
+    // Attach projects each declaration once. If a defensive repeated call
+    // reaches an unretained (33rd+) name, do not count the same structural
+    // omission twice and do not retain another unbounded name just to dedupe.
+    jsi::Value previous;
+    const bool previouslyOwn =
+        ownDataProperty(*slot.self, name, &previous) != OwnPropertyResult::kMissing;
+    int retainedIndex = -1;
+    for (uint8_t index = 0; index < slot.propertyCount; ++index) {
+      if (slot.propertyNames[index] == name) {
+        retainedIndex = index;
+        break;
+      }
+    }
+    std::optional<jsi::Object> trustedObject;
+    if (decoded.isObject() && !decoded.asObject(*runtime_).isFunction(*runtime_))
+      trustedObject.emplace(decoded.asObject(*runtime_));
+#endif
+    slot.self->setProperty(*runtime_, name, std::move(decoded));
+#if DEHERM_HERMES_DEBUGGER
+    if (retainedIndex >= 0) {
+      slot.trustedPropertyObjects[retainedIndex] = std::move(trustedObject);
+    } else {
+      if (slot.propertyCount < slot.propertyNames.size()) {
+        const uint8_t index = slot.propertyCount++;
+        slot.propertyNames[index] = name;
+        slot.trustedPropertyObjects[index] = std::move(trustedObject);
+      } else if (!previouslyOwn) {
+        slot.omittedPropertyCount = saturatedAdd(slot.omittedPropertyCount, 1);
+      }
+    }
+#endif
   }
 
   bool dispatchComponent(ComponentHandle handle, const char* lifecycle,
@@ -266,6 +389,14 @@ class Runtime::Impl {
     ComponentSlot& slot = componentSlots_[handle.slot];
     if (!slot.live || slot.generation != handle.generation) return;
     slot.definition.reset(); slot.self.reset(); slot.componentId.clear(); slot.schemaFingerprint.clear(); slot.live = false;
+#if DEHERM_HERMES_DEBUGGER
+    for (uint8_t index = 0; index < slot.propertyCount; ++index)
+      slot.propertyNames[index].clear();
+    for (auto& trusted : slot.trustedPropertyObjects)
+      trusted.reset();
+    slot.propertyCount = 0;
+    slot.omittedPropertyCount = 0;
+#endif
     if (++slot.generation == 0) ++slot.generation;
     --liveComponents_;
   }
@@ -389,6 +520,62 @@ class Runtime::Impl {
 #endif
   }
 
+  std::string sampleComponentSnapshot() {
+#if DEHERM_HERMES_DEBUGGER
+    uint32_t omittedProperties = 0;
+    for (const ComponentSlot& slot : componentSlots_) {
+      if (slot.live)
+        omittedProperties = saturatedAdd(omittedProperties, slot.omittedPropertyCount);
+    }
+
+    std::string instances;
+    instances.reserve(4096);
+    uint32_t omittedInstances = 0;
+    bool firstInstance = true;
+    for (uint32_t slotIndex = 0; slotIndex < componentSlots_.size(); ++slotIndex) {
+      ComponentSlot& slot = componentSlots_[slotIndex];
+      if (!slot.live) continue;
+      const size_t checkpoint = instances.size();
+      if (!firstInstance) instances.push_back(',');
+      appendSnapshotInstance(instances, slotIndex, slot);
+      if (instances.size() > kSnapshotInstancesByteCapacity) {
+        instances.resize(checkpoint);
+        for (uint32_t remaining = slotIndex; remaining < componentSlots_.size(); ++remaining)
+          if (componentSlots_[remaining].live) ++omittedInstances;
+        break;
+      }
+      firstInstance = false;
+    }
+
+    if (++snapshotSequence_ > kMaximumSafeJsonInteger) snapshotSequence_ = 1;
+    const auto sampledAt = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count();
+    const bool complete = omittedInstances == 0 && omittedProperties == 0;
+
+    std::string frame;
+    frame.reserve(instances.size() + 512);
+    frame.append(R"({"channel":"deherm-dev-v1","payload":{"schemaVersion":1,"type":"component-snapshot","runtimeId":)");
+    appendUnsigned(frame, identity_);
+    frame.append(R"(,"sequence":)");
+    appendUnsigned(frame, snapshotSequence_);
+    frame.append(R"(,"sampledAt":)");
+    appendUnsigned(frame, sampledAt < 0 ? 0 : static_cast<uint64_t>(sampledAt));
+    frame.append(R"(,"complete":)");
+    frame.append(complete ? "true" : "false");
+    frame.append(R"(,"omitted":{"instances":)");
+    appendUnsigned(frame, omittedInstances);
+    frame.append(R"(,"properties":)");
+    appendUnsigned(frame, omittedProperties);
+    frame.append(R"(},"instances":[)");
+    frame.append(instances);
+    frame.append("]}}");
+    if (frame.size() > kSnapshotFrameByteCapacity) return {};
+    return frame;
+#else
+    return {};
+#endif
+  }
+
  private:
   struct ComponentSlot {
     std::optional<jsi::Object> definition;
@@ -398,7 +585,229 @@ class Runtime::Impl {
     ComponentContext context = ComponentContext::kGameObject;
     uint32_t generation = 1;
     bool live = false;
+#if DEHERM_HERMES_DEBUGGER
+    std::array<std::string, kSnapshotPropertyCapacity> propertyNames{};
+    std::array<std::optional<jsi::Object>, kSnapshotPropertyCapacity>
+        trustedPropertyObjects{};
+    uint8_t propertyCount = 0;
+    uint32_t omittedPropertyCount = 0;
+#endif
   };
+
+#if DEHERM_HERMES_DEBUGGER
+  enum class OwnPropertyResult : uint8_t { kData, kMissing, kAccessor, kFailed };
+
+  OwnPropertyResult ownDataProperty(
+      const jsi::Object& object, const std::string& name, jsi::Value* output) {
+    try {
+      auto descriptor = ownPropertyDescriptor_->call(
+          *runtime_, object, jsi::String::createFromUtf8(*runtime_, name));
+      if (descriptor.isUndefined()) return OwnPropertyResult::kMissing;
+      if (!descriptor.isObject()) return OwnPropertyResult::kFailed;
+      auto descriptorObject = descriptor.asObject(*runtime_);
+      auto valueDescriptor = ownPropertyDescriptor_->call(
+          *runtime_, descriptorObject,
+          jsi::String::createFromAscii(*runtime_, "value"));
+      if (valueDescriptor.isUndefined()) return OwnPropertyResult::kAccessor;
+      if (!valueDescriptor.isObject()) return OwnPropertyResult::kFailed;
+      *output = descriptorObject.getProperty(*runtime_, "value");
+      return OwnPropertyResult::kData;
+    } catch (...) {
+      return OwnPropertyResult::kFailed;
+    }
+  }
+
+  OwnPropertyResult ownDataProperty(
+      const jsi::Object& object, const char* name, jsi::Value* output) {
+    return ownDataProperty(object, std::string(name), output);
+  }
+
+  bool appendObjectLane(
+      std::string& output, const jsi::Object& object, const char* name,
+      bool comma) {
+    jsi::Value lane;
+    if (ownDataProperty(object, name, &lane) != OwnPropertyResult::kData ||
+        !lane.isBigInt()) return false;
+    auto bigint = lane.getBigInt(*runtime_);
+    if (!bigint.isUint64(*runtime_)) return false;
+    if (comma) output.push_back(',');
+    appendJsonString(output, name, std::strlen(name));
+    output.push_back(':');
+    appendHex64(output, bigint.asUint64(*runtime_));
+    return true;
+  }
+
+  bool appendVectorLanes(
+      std::string& output, const jsi::Object& object, size_t count) {
+    constexpr const char* names[] = {"x", "y", "z", "w"};
+    std::array<double, 4> lanes{};
+    for (size_t index = 0; index < count; ++index) {
+      jsi::Value lane;
+      if (ownDataProperty(object, names[index], &lane) != OwnPropertyResult::kData ||
+          !lane.isNumber() || !std::isfinite(lane.asNumber())) return false;
+      lanes[index] = lane.asNumber();
+    }
+    output.append(R"(,"value":[)");
+    for (size_t index = 0; index < count; ++index) {
+      if (index) output.push_back(',');
+      appendFiniteNumber(output, lanes[index]);
+    }
+    output.push_back(']');
+    return true;
+  }
+
+  void appendSnapshotValue(
+      std::string& output, const jsi::Value& value,
+      std::optional<jsi::Object>& trustedObject) {
+    if (value.isNull()) { output.append(R"({"kind":"nil"})"); return; }
+    if (value.isUndefined()) { appendUnavailable(output, "undefined"); return; }
+    if (value.isBool()) {
+      output.append(R"({"kind":"boolean","value":)");
+      output.append(value.getBool() ? "true}" : "false}");
+      return;
+    }
+    if (value.isNumber()) {
+      if (!std::isfinite(value.asNumber())) {
+        appendUnavailable(output, "non-finite-number");
+        return;
+      }
+      output.append(R"({"kind":"number","value":)");
+      appendFiniteNumber(output, value.asNumber());
+      output.push_back('}');
+      return;
+    }
+    if (value.isString()) {
+      std::string string = value.getString(*runtime_).utf8(*runtime_);
+      if (string.size() > kSnapshotStringByteCapacity) {
+        appendUnavailable(output, "string-too-long");
+        return;
+      }
+      output.append(R"({"kind":"string","value":)");
+      appendJsonString(output, string);
+      output.push_back('}');
+      return;
+    }
+    if (value.isBigInt()) {
+      auto bigint = value.getBigInt(*runtime_);
+      if (!bigint.isUint64(*runtime_)) {
+        appendUnavailable(output, "bigint-out-of-range");
+        return;
+      }
+      output.append(R"({"kind":"hash","value":)");
+      appendHex64(output, bigint.asUint64(*runtime_));
+      output.push_back('}');
+      return;
+    }
+    if (!value.isObject()) {
+      appendUnavailable(output, "unsupported-type");
+      return;
+    }
+
+    auto object = value.asObject(*runtime_);
+    if (object.isFunction(*runtime_)) {
+      appendUnavailable(output, "unsupported-type");
+      return;
+    }
+    // Defold-decoded structured values are retained by identity when the
+    // property crosses the engine boundary. A later authored replacement may
+    // be a Proxy; never reflect on it because getOwnPropertyDescriptor would
+    // execute the Proxy trap on the engine thread.
+    if (!trustedObject ||
+        !jsi::Object::strictEquals(*runtime_, object, *trustedObject)) {
+      trustedObject.reset();
+      appendUnavailable(output, "untrusted-structured-value");
+      return;
+    }
+    jsi::Value marker;
+    if (ownDataProperty(object, "__dehermUrlV1", &marker) == OwnPropertyResult::kData &&
+        marker.isBool() && marker.getBool()) {
+      const size_t checkpoint = output.size();
+      output.append(R"({"kind":"url",)");
+      if (!appendObjectLane(output, object, "socket", false) ||
+          !appendObjectLane(output, object, "reserved", true) ||
+          !appendObjectLane(output, object, "path", true) ||
+          !appendObjectLane(output, object, "fragment", true)) {
+        output.resize(checkpoint);
+        appendUnavailable(output, "invalid-url");
+        return;
+      }
+      output.push_back('}');
+      return;
+    }
+
+    if (ownDataProperty(object, "__dehermValueKind", &marker) == OwnPropertyResult::kData &&
+        marker.isString()) {
+      const std::string kind = marker.getString(*runtime_).utf8(*runtime_);
+      const size_t laneCount = kind == "vector3" ? 3 :
+          (kind == "vector4" || kind == "quaternion" ? 4 : 0);
+      if (laneCount) {
+        const size_t checkpoint = output.size();
+        output.append(R"({"kind":)");
+        appendJsonString(output, kind);
+        if (!appendVectorLanes(output, object, laneCount)) {
+          output.resize(checkpoint);
+          appendUnavailable(output, "invalid-vector");
+          return;
+        }
+        output.push_back('}');
+        return;
+      }
+    }
+    appendUnavailable(output, "unsupported-object");
+  }
+
+  void appendSnapshotInstance(
+      std::string& output, uint32_t slotIndex, ComponentSlot& slot) {
+    output.append(R"({"instanceId":{"slot":)");
+    appendUnsigned(output, slotIndex);
+    output.append(R"(,"generation":)");
+    appendUnsigned(output, slot.generation);
+    output.append(R"(},"componentId":)");
+    appendJsonString(output, slot.componentId);
+    output.append(R"(,"schemaFingerprint":)");
+    appendJsonString(output, slot.schemaFingerprint);
+    output.append(R"(,"contextKind":)");
+    const char* context = slot.context == ComponentContext::kGameObject ? "game-object" :
+        slot.context == ComponentContext::kGuiScene ? "gui-scene" :
+        "render-instance+graphics";
+    appendJsonString(output, context, std::strlen(context));
+    output.append(R"(,"properties":[)");
+    for (uint8_t index = 0; index < slot.propertyCount; ++index) {
+      if (index) output.push_back(',');
+      output.append(R"({"name":)");
+      appendJsonString(output, slot.propertyNames[index]);
+      output.append(R"(,"value":)");
+      jsi::Value property;
+      const OwnPropertyResult result = ownDataProperty(
+          *slot.self, slot.propertyNames[index], &property);
+      if (result == OwnPropertyResult::kData) {
+        const bool retainedObject = property.isObject() &&
+            !property.asObject(*runtime_).isFunction(*runtime_) &&
+            slot.trustedPropertyObjects[index] &&
+            jsi::Object::strictEquals(
+                *runtime_, property.asObject(*runtime_), *slot.trustedPropertyObjects[index]);
+        if (!retainedObject) slot.trustedPropertyObjects[index].reset();
+        try {
+          appendSnapshotValue(output, property, slot.trustedPropertyObjects[index]);
+        } catch (...) {
+          slot.trustedPropertyObjects[index].reset();
+          appendUnavailable(output, "inspection-failed");
+        }
+      } else if (result == OwnPropertyResult::kMissing) {
+        slot.trustedPropertyObjects[index].reset();
+        appendUnavailable(output, "missing-own-property");
+      } else if (result == OwnPropertyResult::kAccessor) {
+        slot.trustedPropertyObjects[index].reset();
+        appendUnavailable(output, "accessor-property");
+      } else {
+        slot.trustedPropertyObjects[index].reset();
+        appendUnavailable(output, "inspection-failed");
+      }
+      output.push_back('}');
+    }
+    output.append("]}");
+  }
+#endif
 
   ComponentSlot& resolve(ComponentHandle handle) {
     if (handle.slot >= componentSlots_.size()) throw std::runtime_error("Component handle is out of range");
@@ -561,6 +970,8 @@ class Runtime::Impl {
   size_t componentSlotCursor_ = 0;
   uint32_t liveComponents_ = 0;
 #if DEHERM_HERMES_DEBUGGER
+  std::optional<jsi::Function> ownPropertyDescriptor_;
+  uint64_t snapshotSequence_ = 0;
   std::unique_ptr<facebook::hermes::cdp::CDPDebugAPI> inspectorDebugApi_;
   std::unique_ptr<facebook::hermes::cdp::CDPAgent> inspectorAgent_;
   Runtime::InspectorMessageCallback inspectorOutbound_;
@@ -624,6 +1035,7 @@ bool Runtime::inspectorCommand(const std::string& command) {
   return impl_->inspectorCommand(command);
 }
 void Runtime::pumpInspector() { impl_->pumpInspector(); }
+std::string Runtime::sampleComponentSnapshot() { return impl_->sampleComponentSnapshot(); }
 Runtime::ComponentHandle Runtime::attachComponent(const char* id, const char* schema, ComponentContext context) { return impl_->attachComponent(id, schema, context); }
 void Runtime::setComponentProperty(ComponentHandle handle, const char* name, const ComponentValue& value) { impl_->setComponentProperty(handle, name, value); }
 bool Runtime::dispatchComponent(ComponentHandle handle, const char* lifecycle, const ComponentArgument* arguments, uint8_t count) { return impl_->dispatchComponent(handle, lifecycle, arguments, count); }

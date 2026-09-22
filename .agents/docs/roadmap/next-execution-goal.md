@@ -82,8 +82,15 @@ below without changing its completion rule.
    The installed package now exposes an editor-neutral Defold-semantic LSP,
    and the separate thin VS Code workspace client starts that exact local CLI,
    contributes resource/address completion, hover and definition, and launches
-   the existing DAP. Next finish the sampled live instance/property channel and
-   the remaining route-specific Defold semantic projections. After that, finish the public
+   the existing DAP. Native and browser runtimes now emit the same bounded live
+   instance/property snapshot; the CLI joins exact schemas, the TUI renders the
+   genuine rows, and the VS Code client polls the authenticated state into
+   bounded CodeLens values beside authored component files. A packaged
+   arm64-macOS War Battles engine has now emitted the snapshot through the
+   public dev session and the authenticated endpoint joined current schemas
+   with zero omissions. Next record the actual VS Code visual observation and
+   finish the remaining route-specific
+   Defold semantic projections. After that, finish the public
    TypeScript ergonomics and native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
 
@@ -241,8 +248,12 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
    generated Defold symbols drive resource/address completion, hover and
    definition, while ordinary TypeScript stays with VS Code's built-in service;
    the thin client resolves only the workspace-local déherm package and launches
-   both LSP and DAP. Finish live instance/property telemetry and the remaining
-   route-specific Defold semantic projections.
+   both LSP and DAP. Native/browser live instance and property telemetry now
+   reaches the TUI and a schema-current CodeLens beside authored component
+   files through the authenticated project state endpoint. A packaged
+   arm64-macOS War Battles engine has emitted that live state through the public
+   dev session; record the actual VS Code visual observation and finish the remaining route-specific
+   Defold semantic projections.
 
 ## 5. Finish public API ergonomics and project integration
 

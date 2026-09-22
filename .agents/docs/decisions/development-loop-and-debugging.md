@@ -149,6 +149,70 @@ TypeScript location. A fresh War Battles `wasm-web` bundle proves the
 public DAP stops Chrome on `arena.script.ts`, maps the top frame, evaluates the
 live `dt`, resumes, and disconnects. The thin VS Code client remains.
 
+# Live instance and property channel
+
+CDP knows JavaScript frames and values, but not which Defold component owns a
+realm object. A private, versioned development channel therefore projects the
+component registry at an engine-owned safe point. Native debugger builds emit
+one newline-delimited envelope whose `channel` is `deherm-dev-v1`; HTML5 exposes
+the same snapshot payload through the page's private development entry point.
+Release native builds compile this sampler out. Immutable marker-bearing HTML5
+templates live in the CLI package, while the checked-in/npm extension files are
+generated release output. Before Bob, the toolchain always materializes the
+exact requested profile into the project extension: debug retains the sampler;
+release removes its state, retained roots, implementation, and public
+development method. A browser dev launch always asks the builder for a fresh
+debug `wasm-web` bundle before it opens or reuses a page, so an older release
+bundle cannot silently disable the channel.
+
+Each snapshot names its runtime and monotonically increasing sequence, then
+lists deterministic `{slot,generation}` component identities, component and
+schema identities, Defold context, and declared property values. The sampler
+retains at most the first 32 distinct declared properties per component slot,
+encodes strings only through 256 UTF-8 bytes, and caps the complete transport
+frame at 512 KiB. A non-fitting component is rolled back as a whole and counted
+under `omitted`; a partial JSON object is never emitted. Values are a closed
+union of nil, boolean, finite number, string, hash, URL, vector3, vector4,
+quaternion, or an explicit unavailable reason.
+
+Inspection captures the pristine `Object.getOwnPropertyDescriptor` before user
+code runs and reads own data descriptors only. It never walks a prototype or
+invokes an accessor. Structured engine values carry an identity retained at the
+engine crossing; an authored replacement fails closed before descriptor lookup,
+and the old identity is released on the first mismatch. The browser encoder
+uses captured intrinsics, null-prototype records, and explicitly defined array
+lanes so hostile prototype setters and replaced reflection methods cannot run as
+a side effect of observation. Native samples at most four times per second and only
+while the private loopback inspector is connected. The existing four-MiB
+transport queue remains the single bounded backpressure authority, and CDP
+messages retain their existing framing and routing.
+
+The CLI consumes the reserved native envelope before CDP forwarding and polls
+browser telemetry plus the snapshot in one single-flight evaluation. Every
+connection gets an epoch; stale sequences, old pages, late exit callbacks,
+stopped engines, and disconnected targets clear rather than preserve plausible
+live values or disturb a replacement page. Generated component
+metadata joins a runtime row only when both component id and schema fingerprint
+match. Mismatches are visibly stale. The TUI shows those genuine rows and keeps
+aggregate telemetry as an explicitly separate fallback.
+
+The existing loopback inspector server also exposes an authenticated,
+`no-store`, ETagged state projection at the descriptor's private `stateUrl`.
+The random bearer token and URL remain in the mode-0600 project descriptor;
+the response contains no credential and grants no cross-origin access. This is
+the editor seam for live values, not a second listener or a public game API.
+Its schema-enriched projection has its own byte budget below the editor's two-MiB
+intake cap, distributes that budget across targets, and omits only complete rows
+with explicit per-target totals. The in-process TUI retains the complete bounded
+runtime snapshot and is not reduced to satisfy the editor transport. The thin
+VS Code client polls it with bearer authentication and ETag
+revalidation, accepts only the owning project's loopback descriptor, and
+renders only server-enriched rows whose schema is current. A bounded top-of-file
+CodeLens shows at most six instances and three properties per instance. Aged,
+disconnected, replaced-session, unknown, and schema-stale rows disappear rather
+than retaining or guessing values; ordinary TypeScript semantics remain with
+VS Code's built-in service.
+
 # Profiling
 
 The development Hermes build enables sampling-profiler support and carries the

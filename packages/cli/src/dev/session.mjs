@@ -194,6 +194,97 @@ function needsEngineRestart(files) {
   return files.some((file) => file === "game.project" || file.startsWith("defold_hermes/") || file.endsWith("/ext.manifest") || file === "ext.manifest");
 }
 
+export function sessionLogEvent(event) {
+  if (event.type !== "component-snapshot") return event;
+  let propertyCount = 0;
+  for (const instance of event.instances ?? []) propertyCount += Array.isArray(instance?.properties) ? instance.properties.length : 0;
+  return {
+    schemaVersion: event.schemaVersion,
+    type: event.type,
+    id: event.id,
+    connectionEpoch: event.connectionEpoch,
+    runtimeId: event.runtimeId,
+    sequence: event.sequence,
+    sampledAt: event.sampledAt,
+    complete: event.complete,
+    omitted: event.omitted ? { ...event.omitted } : undefined,
+    instanceCount: event.instances?.length ?? 0,
+    propertyCount
+  };
+}
+
+export function devStateSnapshot(model) {
+  const snapshot = snapshotDevModel(model);
+  const result = {
+    schemaVersion: 1,
+    kind: "deherm-dev-state",
+    modelVersion: snapshot.version,
+    targets: snapshot.targets.map((target) => ({
+      id: target.id,
+      runtime: target.runtime,
+      status: target.status,
+      connectionEpoch: target.connectionEpoch,
+      telemetry: target.telemetry,
+      instances: [],
+      instanceProjection: {
+        complete: true,
+        totalInstances: target.instances?.length ?? 0,
+        omittedInstances: 0
+      },
+      // `instances` above is the authoritative server-enriched projection.
+      // Keep only snapshot freshness/identity metadata here: returning the raw
+      // instances as well would duplicate up to 512 KiB per target and could
+      // push an otherwise valid native+browser response past the editor's
+      // bounded 2 MiB intake.
+      componentSnapshot: target.componentSnapshot ? {
+        schemaVersion: target.componentSnapshot.schemaVersion,
+        type: target.componentSnapshot.type,
+        runtimeId: target.componentSnapshot.runtimeId,
+        sequence: target.componentSnapshot.sequence,
+        sampledAt: target.componentSnapshot.sampledAt,
+        complete: target.componentSnapshot.complete,
+        omitted: target.componentSnapshot.omitted
+      } : null
+    }))
+  };
+  // The editor intake is deliberately bounded at 2 MiB. Generated source and
+  // proxy paths are server-enriched onto every runtime row and can be much
+  // larger than the producer frame, so divide the available body budget fairly
+  // across targets and omit only whole rows. The TUI still owns the complete
+  // in-process model; this is the separate editor projection.
+  const maximumBytes = 2 * 1024 * 1024;
+  const envelopeReserve = 32 * 1024;
+  const baseBytes = Buffer.byteLength(JSON.stringify(result));
+  const targetBudget = Math.max(0, Math.floor(
+    (maximumBytes - envelopeReserve - baseBytes) / Math.max(1, result.targets.length)));
+  for (let targetIndex = 0; targetIndex < result.targets.length; ++targetIndex) {
+    const sourceInstances = snapshot.targets[targetIndex].instances ?? [];
+    const projected = result.targets[targetIndex];
+    let used = 0;
+    for (const instance of sourceInstances) {
+      const rowBytes = Buffer.byteLength(JSON.stringify(instance)) + (projected.instances.length ? 1 : 0);
+      if (used + rowBytes > targetBudget) {
+        projected.instanceProjection.omittedInstances += 1;
+        continue;
+      }
+      projected.instances.push(instance);
+      used += rowBytes;
+    }
+    projected.instanceProjection.complete = projected.instanceProjection.omittedInstances === 0;
+  }
+  return result;
+}
+
+export async function prepareDebugWebBundle(builder, options = {}) {
+  const webBundle = options.webBundle ? path.resolve(options.webBundle) : undefined;
+  return builder.bundle({
+    platform: "wasm-web",
+    variant: "debug",
+    ...(webBundle ? { bundleOutput: path.dirname(webBundle) } : {}),
+    reason: options.reason ?? "development browser launch"
+  });
+}
+
 export async function runDevSession(options = {}) {
   const services = options.services ?? {};
   const projectRoot = path.resolve(options.project ?? process.cwd());
@@ -246,7 +337,7 @@ export async function runDevSession(options = {}) {
       const timestamp = new Date(event.at ?? Date.now()).toISOString();
       const line = event.type === "log"
         ? `${timestamp} [${String(event.level ?? "info").toUpperCase()}] ${event.source ?? "deherm"} ${event.message}`
-        : `${timestamp} [EVENT] ${event.type} ${JSON.stringify(event)}`;
+        : `${timestamp} [EVENT] ${event.type} ${JSON.stringify(sessionLogEvent(event))}`;
       sessionLog.write(`${line}\n`);
     }
     if (options.json) process.stdout.write(`${JSON.stringify({ schemaVersion: 1, event })}\n`);
@@ -329,6 +420,17 @@ export async function runDevSession(options = {}) {
       const components = await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
       generatedProxyPaths.clear();
       for (const component of components.manifest.components) generatedProxyPaths.add(component.proxy);
+      emit({
+        type: "component-catalog",
+        components: components.manifest.components.map((component) => ({
+          componentId: component.componentId,
+          schemaFingerprint: component.schemaFingerprint,
+          source: component.source,
+          proxy: component.proxy,
+          contextKind: component.contextKind,
+          properties: component.properties.map(({ name, slot, kind }) => ({ name, slot, kind }))
+        }))
+      });
       // Sticky until the watcher batch consumes it. A forced/manual build may
       // join the coordinator loop after this build and must not erase the fact
       // that the component batch changed a Defold resource.
@@ -360,6 +462,8 @@ export async function runDevSession(options = {}) {
         emit,
         title: path.basename(projectRoot),
         projectRoot,
+        targetId: "local-engine",
+        getDevState: () => devStateSnapshot(model),
         sessionFile: path.resolve(options.inspectorSession ?? defaultInspectorSessionFile(projectRoot)),
         bundleUrl: `deherm://${resourcePath}`,
         sourceMapFile: `${outputFile}.map`
@@ -425,6 +529,7 @@ export async function runDevSession(options = {}) {
 
   let builder;
   let builderPromise;
+  let browserBundleReady = false;
   let developmentLoop = Promise.resolve();
   // A rejected promise must not be cached: a transient failure (a busy port, a
   // temporary filesystem error) would otherwise make every later build and
@@ -438,6 +543,12 @@ export async function runDevSession(options = {}) {
     builderPromise = undefined;
     throw error;
   });
+  const ensureDebugBrowserBundle = async (reason) => {
+    if (browserBundleReady) return;
+    const activeBuilder = await ensureBuilder();
+    await prepareDebugWebBundle(activeBuilder, { webBundle: options.webBundle, reason });
+    browserBundleReady = true;
+  };
   const enqueue = (operation) => {
     const current = developmentLoop.then(operation);
     developmentLoop = current.catch(() => {});
@@ -517,7 +628,8 @@ export async function runDevSession(options = {}) {
   // browser edit loop, and it waits for the first bundle so the page is pushed
   // a generation that exists.
   const webStartup = options.web
-    ? startup.then(() => browser.launch())
+    ? startup.then(() => ensureDebugBrowserBundle("initial development browser launch"))
+      .then(() => browser.launch())
       .then((started) => started && browser.activate(model.lastSuccessfulGeneration || undefined))
       .catch((error) => emit({
         type: "log",
@@ -581,15 +693,11 @@ export async function runDevSession(options = {}) {
             // command produces one. It is a slow operation - a bundle resolves
             // native extensions through an Extender - so it is announced.
             const launchBrowser = async () => {
-              try {
-                return await browser.launch();
-              } catch (error) {
-                if (!/No packaged HTML5 bundle found/.test(error?.message ?? "")) throw error;
-                emit({ type: "log", source: "browser", message: "no HTML5 bundle yet; bundling for wasm-web (this resolves native extensions and takes a while)" });
-                const activeBuilder = await ensureBuilder();
-                await activeBuilder.bundle({ platform: "wasm-web", reason: "manual web launch" });
-                return await browser.launch();
+              if (!browserBundleReady) {
+                emit({ type: "log", source: "browser", message: "preparing a debug wasm-web bundle (this resolves native extensions and takes a while)" });
+                await ensureDebugBrowserBundle("manual development browser launch");
               }
+              return await browser.launch();
             };
             const action = browser.running()
               ? browser.stop()

@@ -197,6 +197,12 @@ export function browserTelemetryEvent(id, reported) {
   };
 }
 
+export function browserComponentSnapshotEvent(id, connectionEpoch, reported) {
+  if (!reported || reported.schemaVersion !== 1 || reported.type !== "component-snapshot" ||
+      !Array.isArray(reported.instances)) return undefined;
+  return { ...reported, id, connectionEpoch };
+}
+
 /**
  * A browser target with the same controller surface as the native engine
  * controller - `launch`, `stop`, `toggle`, `running` - plus `activate`, which
@@ -210,9 +216,11 @@ export function createBrowserTarget(options) {
   const openPage = options.openBundlePage ?? openBundlePage;
   let page;
   let telemetryTimer;
+  let telemetryPoll;
   let starting;
   let stopping;
   let pushed = 0;
+  let connectionEpoch = 0;
 
   const log = (message, level = "info") => emit({ type: "log", source: "browser", level, message });
 
@@ -237,20 +245,43 @@ export function createBrowserTarget(options) {
   };
 
   const pollTelemetry = async () => {
-    if (!page) return;
+    if (telemetryPoll) return telemetryPoll;
+    const polledPage = page;
+    const polledEpoch = connectionEpoch;
+    if (!polledPage) return;
+    telemetryPoll = (async () => {
+      try {
+        const result = await polledPage.client.send("Runtime.evaluate", {
+          expression: `(() => {
+            const dev = globalThis.__defoldHermesDevV1;
+            return dev ? {
+              telemetry: dev.telemetry(),
+              componentSnapshot: typeof dev.componentSnapshot === "function" ? dev.componentSnapshot() : null
+            } : null;
+          })()`,
+          returnByValue: true
+        });
+        // A CDP response from a page that closed while evaluation was pending
+        // must never be relabelled as the replacement page's connection epoch.
+        if (page !== polledPage || connectionEpoch !== polledEpoch) return;
+        const reported = result.result?.value;
+        const telemetry = browserTelemetryEvent(id, reported?.telemetry);
+        if (telemetry) emit(telemetry);
+        const snapshot = browserComponentSnapshotEvent(id, polledEpoch, reported?.componentSnapshot);
+        if (snapshot) emit(snapshot);
+      } catch {
+        // A page that is navigating or closing simply reports nothing this tick.
+      }
+    })();
     try {
-      const result = await page.client.send("Runtime.evaluate", {
-        expression: "globalThis.__defoldHermesDevV1 ? globalThis.__defoldHermesDevV1.telemetry() : null",
-        returnByValue: true
-      });
-      const event = browserTelemetryEvent(id, result.result?.value);
-      if (event) emit(event);
-    } catch {
-      // A page that is navigating or closing simply reports nothing this tick.
+      return await telemetryPoll;
+    } finally {
+      telemetryPoll = undefined;
     }
   };
 
   const launch = async () => {
+    if (stopping) await stopping.catch(() => {});
     if (page || starting) return false;
     starting = (async () => {
       const bundle = await resolveWebBundle({
@@ -260,7 +291,9 @@ export function createBrowserTarget(options) {
       });
       log(`serving ${path.relative(projectRoot, bundle.directory) || bundle.directory}`);
       let openedExited = false;
-      const opened = await openPage({
+      let opened;
+      let openedEpoch;
+      opened = await openPage({
         bundleDirectory: bundle.directory,
         index: bundle.index,
         chromeBinary: options.chromeBinary ?? defaultChromeBinary,
@@ -273,16 +306,15 @@ export function createBrowserTarget(options) {
         },
         onBrowserExit: () => {
           openedExited = true;
-          if (!page) return;
-          const exited = page;
+          if (!opened || page !== opened) return;
           page = undefined;
           clearInterval(telemetryTimer);
           telemetryTimer = undefined;
-          if (exited.inspectorSession) {
-            void removeOwnedInspectorSession(options.sessionFile, exited.inspectorSession.sessionId)
+          if (opened.inspectorSession) {
+            void removeOwnedInspectorSession(options.sessionFile, opened.inspectorSession.sessionId)
               .catch(() => {});
           }
-          emit({ type: "target-disconnected", id });
+          emit({ type: "target-disconnected", id, connectionEpoch: openedEpoch });
           emit({ type: "log", source: "browser", message: "browser exited" });
         }
       });
@@ -310,8 +342,9 @@ export function createBrowserTarget(options) {
       }
       opened.inspectorSession = inspectorSession;
       page = opened;
+      openedEpoch = ++connectionEpoch;
       emit({ type: "target-configured", id, name: `chrome:${opened.server.port}`, url: opened.pageUrl, runtime: "browser" });
-      emit({ type: "target-connected", id, name: `chrome:${opened.server.port}`, url: opened.pageUrl });
+      emit({ type: "target-connected", id, name: `chrome:${opened.server.port}`, url: opened.pageUrl, connectionEpoch: openedEpoch });
       publishCapabilities();
       log(`page ${opened.pageUrl} (CDP 127.0.0.1:${opened.debuggingPort}, profile ${opened.profile})`);
       if (inspectorSession) log(`browser inspector session: ${options.sessionFile}`);
@@ -327,6 +360,7 @@ export function createBrowserTarget(options) {
     const open = page;
     if (!open) return false;
     if (stopping) return stopping;
+    const stoppedEpoch = connectionEpoch;
     page = undefined;
     clearInterval(telemetryTimer);
     telemetryTimer = undefined;
@@ -334,7 +368,7 @@ export function createBrowserTarget(options) {
       if (open.inspectorSession) {
         await removeOwnedInspectorSession(options.sessionFile, open.inspectorSession.sessionId);
       }
-      emit({ type: "target-disconnected", id });
+      emit({ type: "target-disconnected", id, connectionEpoch: stoppedEpoch });
       log("browser target stopped; server, profile and browser released");
       return true;
     }).finally(() => { stopping = undefined; });

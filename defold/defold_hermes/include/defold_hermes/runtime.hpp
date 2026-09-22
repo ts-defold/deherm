@@ -128,6 +128,13 @@ class Runtime {
   bool inspectorCommand(const std::string& command);
   /** Run queued debugger work at an engine-owned JavaScript safe point. */
   void pumpInspector();
+  /**
+   * Project the live component slots into one bounded private-development
+   * transport frame. This must only be called at an engine-owned JavaScript
+   * safe point. Targets without the debugger runtime fail closed with an empty
+   * string.
+   */
+  std::string sampleComponentSnapshot();
 
  private:
   class Impl;

@@ -9,6 +9,18 @@ const packageRoot = path.resolve(import.meta.dirname, "../../..");
 const targetCacheReceiptName = ".deherm-target-cache.json";
 const targetInstallReceiptName = ".deherm-artifact.json";
 const targetVariantHeader = "defold_hermes/include/defold_hermes/generated_runtime_variant.h";
+const webRuntimeVariantFiles = [
+  {
+    source: "packages/cli/templates/web-runtime/component_bridge.js",
+    destination: "defold_hermes/lib/web/component_bridge.js"
+  },
+  {
+    source: "packages/cli/templates/web-runtime/library_defold_hermes.js",
+    destination: "defold_hermes/lib/web/library_defold_hermes.js"
+  }
+];
+const webDebugBegin = "/* DEHERM_DEBUG_SNAPSHOT_BEGIN */";
+const webDebugEnd = "/* DEHERM_DEBUG_SNAPSHOT_END */";
 
 async function replaceProjectFile(destination, writeTemporary) {
   const temporary = `${destination}.deherm-replace-${process.pid}-${randomBytes(5).toString("hex")}`;
@@ -140,6 +152,43 @@ function renderRuntimeVariantHeader(variant, target, fingerprint) {
     `#define DEHERM_HERMES_DEBUGGER ${variant === "debug" ? 1 : 0}\n`;
 }
 
+export function renderWebRuntimeVariant(source, variant) {
+  if (variant !== "debug" && variant !== "release") throw new Error(`Unknown web runtime variant ${JSON.stringify(variant)}`);
+  const starts = source.split(webDebugBegin).length - 1;
+  const ends = source.split(webDebugEnd).length - 1;
+  if (starts === 0 || starts !== ends) throw new Error("Web runtime snapshot variant markers are missing or unbalanced");
+  const rendered = variant === "debug"
+    ? source
+      .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\t ]*\r?\n/gmu, "")
+      .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/[\t ]*\r?\n/gmu, "")
+    : source.replace(/\s*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\s\S]*?\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/\s*/gu, "\n");
+  if (rendered.includes(webDebugBegin) || rendered.includes(webDebugEnd)) {
+    throw new Error("Web runtime snapshot variant markers survived rendering");
+  }
+  return rendered;
+}
+
+async function webRuntimeVariantSources(variant) {
+  return Object.fromEntries(await Promise.all(webRuntimeVariantFiles.map(async ({ source, destination }) => [
+    destination,
+    renderWebRuntimeVariant(await readFile(path.join(packageRoot, source), "utf8"), variant)
+  ])));
+}
+
+async function installProjectWebRuntimeVariant(root, variant) {
+  const sources = await webRuntimeVariantSources(variant);
+  const installed = [];
+  for (const [relative, source] of Object.entries(sources)) {
+    const destination = path.join(root, relative);
+    const current = await readFile(destination, "utf8").catch(() => null);
+    if (current !== source) {
+      await replaceProjectText(destination, source);
+      installed.push(destination);
+    }
+  }
+  return installed;
+}
+
 function targetLibraryPath(projectRoot, target, member) {
   return path.join(path.resolve(projectRoot), "defold_hermes", "lib", target, member);
 }
@@ -200,7 +249,12 @@ export async function ensureProjectNativeArtifact(projectRoot, defoldPlatform, o
   const lock = options.lock ?? await projectLock(root);
   const target = targetRecord(lock, defoldPlatform);
   if (target.kind !== "bundle") throw new Error(`${target.extenderTarget} is retired by this Defold revision`);
-  if (target.group === "web") return assertProjectNativeArtifact(root, defoldPlatform, { lock, fetch: false });
+  if (target.group === "web") {
+    const variant = requestedArtifactVariant(options);
+    const installed = await installProjectWebRuntimeVariant(root, variant);
+    const verified = await assertProjectNativeArtifact(root, defoldPlatform, { lock, fetch: false, variant });
+    return { ...verified, installed, reused: installed.length === 0 };
+  }
 
   const family = nativeArtifactFamily(lock);
   const variant = requestedArtifactVariant(options);
@@ -316,16 +370,23 @@ export async function assertProjectNativeArtifact(projectRoot, defoldPlatform, o
   const lock = options.lock ?? await projectLock(root);
   const target = targetRecord(lock, defoldPlatform);
   if (target.group === "web") {
-    const file = path.join(root, "defold_hermes", "lib", "web", "library_defold_hermes.js");
-    let actual;
-    try {
-      actual = await readFile(file);
-    } catch {
-      throw new Error(`The installed déherm extension is missing ${path.relative(root, file)}`);
+    const variant = requestedArtifactVariant(options);
+    const expected = await webRuntimeVariantSources(variant);
+    const files = [];
+    for (const [relative, source] of Object.entries(expected)) {
+      const file = path.join(root, relative);
+      const actual = await readFile(file, "utf8").catch(() => null);
+      if (actual === null) throw new Error(`The installed déherm extension is missing ${path.relative(root, file)}`);
+      if (actual !== source) throw new Error(`The installed ${target.extenderTarget} ${variant} browser source checksum mismatch`);
+      files.push(file);
     }
-    const expected = await readFile(path.join(packageRoot, "defold", "defold_hermes", "lib", "web", "library_defold_hermes.js"));
-    if (!actual.equals(expected)) throw new Error(`The installed ${target.extenderTarget} browser source checksum mismatch`);
-    return { target: target.extenderTarget, file, source: "package-browser-adapter" };
+    return {
+      target: target.extenderTarget,
+      variant,
+      file: files.at(-1),
+      files,
+      source: "package-browser-adapter"
+    };
   }
   const family = nativeArtifactFamily(lock);
   const variant = requestedArtifactVariant(options);

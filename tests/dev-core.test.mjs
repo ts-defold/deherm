@@ -229,6 +229,142 @@ test("dev model rejects stale generations and bounds noisy data", () => {
   assert.equal(snapshot.targets[0].appliedGeneration, 1);
 });
 
+test("component snapshots reject stale sequences, replace runtimes atomically, and deep-copy values", () => {
+  const model = createDevModel();
+  const first = {
+    schemaVersion: 1,
+    type: "component-snapshot",
+    id: "local-engine",
+    connectionEpoch: 1,
+    runtimeId: 10,
+    sequence: 2,
+    sampledAt: 1,
+    complete: true,
+    omitted: { instances: 0, properties: 0 },
+    instances: [{
+      instanceId: { slot: 1, generation: 1 },
+      componentId: "player",
+      schemaFingerprint: "one",
+      contextKind: "script",
+      properties: [{ name: "health", value: { current: 100 } }]
+    }]
+  };
+  assert.equal(applyDevEvent(model, first), true);
+  first.instances[0].properties[0].value.current = -1;
+  assert.equal(model.targets.get("local-engine").instances[0].properties[0].value.current, 100);
+
+  assert.equal(applyDevEvent(model, { ...first, sequence: 1, instances: [] }), false);
+  assert.equal(model.targets.get("local-engine").instances.length, 1);
+  assert.equal(applyDevEvent(model, {
+    ...first,
+    runtimeId: 11,
+    sequence: 0,
+    instances: [{ componentId: "replacement", properties: [] }]
+  }), true);
+  assert.deepEqual(model.targets.get("local-engine").instances, [{
+    componentId: "replacement",
+    properties: [],
+    schemaStatus: "unknown-component"
+  }]);
+
+  const snapshot = snapshotDevModel(model);
+  snapshot.targets[0].instances[0].componentId = "mutated";
+  snapshot.targets[0].componentSnapshot.instances[0].componentId = "also-mutated";
+  assert.equal(model.targets.get("local-engine").instances[0].componentId, "replacement");
+  assert.equal(model.targets.get("local-engine").componentSnapshot.instances[0].componentId, "replacement");
+
+  for (const instances of [[null], [{ componentId: "broken" }], [{
+    componentId: "broken",
+    properties: [null]
+  }]]) {
+    assert.equal(applyDevEvent(model, { ...first, runtimeId: 12, sequence: 1, instances }), false,
+      "malformed nested rows must fail closed before enrichment");
+  }
+  assert.equal(model.targets.get("local-engine").componentSnapshot.instances[0].componentId, "replacement");
+});
+
+test("component catalog joins live instances only on an exact schema fingerprint", () => {
+  const model = createDevModel();
+  applyDevEvent(model, {
+    type: "component-catalog",
+    components: [{
+      componentId: "player",
+      schemaFingerprint: "schema-one",
+      source: "main/player.script.ts",
+      proxy: "main/player.script",
+      contextKind: "game-object",
+      properties: [{ name: "health", slot: 0, kind: "number" }]
+    }]
+  });
+  applyDevEvent(model, {
+    schemaVersion: 1,
+    type: "component-snapshot",
+    id: "local-engine",
+    connectionEpoch: 1,
+    runtimeId: 1,
+    sequence: 1,
+    complete: true,
+    instances: [{
+      componentId: "player",
+      schemaFingerprint: "schema-one",
+      properties: [{ name: "health", value: { kind: "number", value: 100 } }]
+    }]
+  });
+  const current = model.targets.get("local-engine").instances[0];
+  assert.equal(current.source, "main/player.script.ts");
+  assert.equal(current.schemaStatus, "current");
+  assert.equal(current.properties[0].declaredKind, "number");
+
+  applyDevEvent(model, {
+    type: "component-catalog",
+    components: [{
+      componentId: "player",
+      schemaFingerprint: "schema-two",
+      source: "main/player.script.ts",
+      properties: []
+    }]
+  });
+  const stale = model.targets.get("local-engine").instances[0];
+  assert.equal(stale.schemaStatus, "stale");
+  assert.equal(stale.expectedSchemaFingerprint, "schema-two");
+  assert.equal(snapshotDevModel(model).componentCatalog, undefined);
+});
+
+test("component instances clear on epoch changes, target disconnect, and engine stop", () => {
+  const model = createDevModel();
+  const componentSnapshot = (connectionEpoch, sequence = 1) => ({
+    schemaVersion: 1,
+    type: "component-snapshot",
+    id: "local-engine",
+    connectionEpoch,
+    runtimeId: 1,
+    sequence,
+    complete: true,
+    instances: [{ componentId: "player", properties: [] }]
+  });
+  applyDevEvent(model, componentSnapshot(1));
+  assert.equal(applyDevEvent(model, { type: "component-snapshot-connected", id: "local-engine", connectionEpoch: 2 }), true);
+  assert.equal(model.targets.get("local-engine").instances, undefined);
+  assert.equal(applyDevEvent(model, componentSnapshot(1, 2)), false, "an older connection cannot repopulate state");
+  applyDevEvent(model, componentSnapshot(2));
+  applyDevEvent(model, { type: "target-disconnected", id: "local-engine" });
+  assert.equal(model.targets.get("local-engine").componentSnapshot, undefined);
+  assert.equal(applyDevEvent(model, componentSnapshot(2, 2)), false, "a disconnected epoch cannot repopulate state");
+  applyDevEvent(model, { type: "component-snapshot-connected", id: "local-engine", connectionEpoch: 3 });
+  applyDevEvent(model, componentSnapshot(3));
+  assert.equal(applyDevEvent(model, {
+    type: "target-disconnected", id: "local-engine", connectionEpoch: 2
+  }), false, "an older target exit cannot clear a replacement connection");
+  assert.equal(model.targets.get("local-engine").instances.length, 1);
+  assert.equal(applyDevEvent(model, {
+    type: "target-disconnected", id: "local-engine", connectionEpoch: 3
+  }), true);
+  applyDevEvent(model, { type: "component-snapshot-connected", id: "local-engine", connectionEpoch: 4 });
+  applyDevEvent(model, componentSnapshot(4));
+  applyDevEvent(model, { type: "engine-stopped", code: 0 });
+  assert.equal(model.targets.get("local-engine").instances, undefined);
+});
+
 test("runtime fingerprint acknowledgement is the activation authority", () => {
   const fingerprint = "ab".repeat(32);
   const nextFingerprint = "cd".repeat(32);

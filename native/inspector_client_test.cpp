@@ -59,6 +59,11 @@ int main() {
 
   pushCommand(R"({"id":1,"method":"Runtime.enable"})");
   pumpUntil(client, R"("id":1)");
+  pumpUntil(client, R"("channel":"deherm-dev-v1","payload":{"schemaVersion":1,"type":"component-snapshot")");
+  if (!waitForOutput(R"("runtimeId":1)") ||
+      !waitForOutput(R"("complete":true,"omitted":{"instances":0,"properties":0},"instances":[])") ) {
+    fail("bounded component snapshot did not cross the private transport");
+  }
   pushCommand(R"({"id":2,"method":"Debugger.enable"})");
   pumpUntil(client, R"("id":2)");
 
@@ -85,6 +90,7 @@ int main() {
   }
 
   client.close();
+  std::puts("inspector-client-test:deherm-dev-v1-and-cdp-coexist:ok");
   std::puts("inspector-client-test:background-transport-breakpoint-resume:ok");
   return 0;
 }

@@ -1,5 +1,54 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Bounded live component state reaches the developer control plane
+
+Native debugger builds and the HTML5 host now project the same versioned live
+component snapshot: runtime/sequence identity, deterministic slot/generation
+handles, component/schema/context identity, and a closed value union for the
+first 32 declared properties. Both implementations inspect only own data
+descriptors through pristine intrinsics, bound strings to 256 UTF-8 bytes, and
+roll back whole instances at a 512 KiB frame boundary. Native sampling occurs
+at the engine safe point no more than four times per second while the private
+inspector is connected; release builds return no frame. Browser HMR preserves
+live attachment identity and navigation/detach clears it.
+
+The marker-bearing browser sources now live only as immutable CLI templates;
+the checked-in and packed extension files are generated release variants. Bob's
+artifact selector materializes the exact requested debug or release variant,
+and a browser development launch always builds a fresh debug `wasm-web` bundle
+before opening the page. Repeated debug/release transitions in the repository's
+own Defold project leave those templates byte-identical.
+
+The existing inspector bridge consumes the reserved native envelope before CDP
+forwarding and polls browser telemetry and component state in one evaluation.
+Connection epochs plus runtime/sequence ordering reject stale snapshots. The
+dev model joins a row to generated TypeScript source only on an exact component
+id and schema fingerprint, clears rows on disconnect/engine stop, redacts values
+from normal session logs, and exposes the full state only through an
+authenticated, no-CORS, ETagged loopback endpoint. The TUI Instances view now
+renders those genuine rows and leaves aggregate counters as a separate waiting
+fallback.
+
+Adversarial review additionally found and closed late old-page exit callbacks,
+overlapping browser polls, structured roots surviving scalar/deleted/accessor
+replacement, mutable-global `BigInt` dependence, and same-tree template
+mutation. Evidence is the 18-test browser bridge suite; focused CLI model, lifecycle,
+loopback transport, endpoint, and TUI tests; release and ASan/UBSan native
+inspector binaries; and the release component-runtime executable. Those prove
+schema, own-data safety, lifecycle invalidation, bounds, CDP coexistence, and
+compile-out behavior in their respective harnesses. Fourteen thin-extension
+tests plus its TypeScript build prove descriptor validation, authenticated
+ETag polling, exact source/schema filtering, stale clearing, bounded value
+rendering, and that the VSIX remains a client. A fresh local-Extender build then
+launched the packaged arm64-macOS War Battles engine through the public
+`deherm dev` path. The authenticated state endpoint observed runtime id 1 at
+sequence 176 with zero omitted instances/properties and exact current-schema
+joins for arena, camera, UI, player, tank, pickup, and rocket attachments,
+including genuine slot/generation identities and declared-property counts.
+That is packaged-engine-to-control-plane evidence. The CodeLens behavior is
+covered by its client tests, but this wave did not record the values visibly
+rendered inside an actual VS Code window.
+
 ## 2026-09-22 - Installed Defold semantic LSP and thin VS Code client
 
 The public npm artifact now carries `deherm language-server --stdio`, a bounded

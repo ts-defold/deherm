@@ -589,8 +589,60 @@ over OSC 52 (so copy works across SSH) with a local `pbcopy`/`clip`/`wl-copy`/
 `xclip` fallback; `/` filters the log stream and accepts a paste. Dragging in
 the log viewport selects text: the log console keeps tailing and wheel handling,
 and an active selection swaps in a virtual list whose rows carry the highlight.
-The Instances view renders an explicit "requires runtime instance channel" empty
-state because `DEHERM_EVENT telemetry` reports counts, never identities.
+The Instances view consumes the private `deherm-dev-v1` component snapshot.
+For each connected native or browser target it shows the runtime-local
+`slot:generation` identity, the generated TypeScript source when the component
+id and schema fingerprint match, a visible stale/unknown schema state, and the
+bounded own-data property projection. Before a genuine snapshot arrives it
+shows an explicit waiting state and keeps the older aggregate component/root/
+Lua-handle counters separate; it never fabricates per-instance rows from those
+counts.
+
+Native debugger builds sample at most every 250 ms while the loopback inspector
+is connected. Release builds expose no sampler. Browser snapshots use the same
+schema through `globalThis.__defoldHermesDevV1.componentSnapshot()` in debug
+artifacts. The CLI package owns immutable marker-bearing web templates; the
+checked-in/npm extension is generated release output, and `deherm` materializes
+the exact requested debug or release variant into the project before Bob reads
+it. Browser dev always requests a fresh debug `wasm-web` bundle before first
+launch, even when a previous bundle exists. Both paths
+retain at most 32 declared properties per component, bound strings to 256 UTF-8
+bytes, omit only whole instances when the 512 KiB frame limit is reached, and
+inspect own data descriptors without invoking getters or walking prototypes.
+Structured values are observed only while their engine-crossing identity is
+unchanged. Replacing or deleting one with a scalar, function, accessor, or
+different object releases its trusted root. Browser output construction uses
+captured intrinsics, literal bigint bounds, and own data properties so Proxy
+traps, poisoned reflection, replaced `BigInt`, and prototype setters cannot be
+triggered by passive telemetry.
+
+The private `.deherm/dev/inspector.json` descriptor also carries `stateUrl` and
+`authToken`. An editor may poll that loopback URL with `Authorization: Bearer
+<authToken>` and `If-None-Match`; the response is `no-store`, has no CORS
+permission, and projects all current native/browser targets without returning
+the credential. The response budgets complete schema-enriched instance rows
+fairly across targets below the editor's two-MiB intake ceiling and reports exact
+omission totals; the TUI's in-process model is not truncated by this editor-only
+projection. Normal session logs record only snapshot counts and sequence;
+full property values appear only in the explicit JSON event stream and the
+authenticated state response.
+
+The VS Code client polls that state once per second with ETag revalidation, a
+one-second timeout, redirects disabled, and a two-MiB response cap. It places a
+restrained CodeLens at the top of an owning `.script.ts`, `.gui.ts`, or
+`.render.ts` file: at most six exact-schema instances and three bounded values
+per instance. Source ownership is accepted only from the server-enriched
+`target.instances` projection. Raw runtime rows are never joined locally, and
+disconnected, replaced-session, failed, or older-than-five-second state clears
+instead of presenting stale values.
+
+A fresh local-Extender arm64-macOS War Battles build exercised this path through
+the installed-style public dev command. Its packaged Defold engine connected as
+the native Hermes target, emitted monotonically advancing snapshots, and the
+authenticated endpoint joined current schemas for arena, camera, UI, player,
+tank, pickup, and rocket instances with zero omissions. This records the live
+engine-to-control-plane seam; the final VS Code acceptance still requires a
+visual editor observation rather than inferring UI rendering from client tests.
 
 `deherm dev` also classifies every line it emits and accumulates defects into
 `<project>/.deherm/dev/bug-pool.json`, deduplicated by a normalized signature so

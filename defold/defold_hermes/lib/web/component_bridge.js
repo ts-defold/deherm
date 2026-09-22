@@ -24,15 +24,22 @@ var LibraryDefoldHermesComponents = {
     slots: null,
     cursor: 0,
     live: 0,
-
-    activate: function() {
+activate: function() {
       this.slots = new Array(this.capacity);
       for (var index = 0; index < this.capacity; ++index) {
-        this.slots[index] = {live: false, generation: 1, definition: null, self: null, componentId: '', schema: ''};
+        this.slots[index] = {
+          live: false,
+          generation: 1,
+          definition: null,
+          self: null,
+          componentId: '',
+          schema: '',
+          contextKind: '',
+};
       }
       this.cursor = 0;
       this.live = 0;
-      this.revision = (this.revision + 1) >>> 0 || 1;
+this.revision = (this.revision + 1) >>> 0 || 1;
       return this.revision;
     },
 
@@ -40,7 +47,7 @@ var LibraryDefoldHermesComponents = {
       this.slots = null;
       this.cursor = 0;
       this.live = 0;
-      this.revision = 0;
+this.revision = 0;
     },
 
     registry: function() {
@@ -82,17 +89,18 @@ var LibraryDefoldHermesComponents = {
       slot.self = {};
       slot.componentId = componentId;
       slot.schema = schemaFingerprint;
-      slot.live = true;
+      slot.contextKind = contextKind;
+slot.live = true;
       this.cursor = (slotIndex + 1) % this.capacity;
       ++this.live;
       return {slot: slotIndex, generation: slot.generation};
     },
 
     setProperty: function(slot, generation, name, value) {
-      this.resolve(slot, generation).self[name] = value;
-    },
-
-    dispatch: function(slot, generation, lifecycle, args) {
+      var entry = this.resolve(slot, generation);
+entry.self[name] = value;
+},
+dispatch: function(slot, generation, lifecycle, args) {
       var entry = this.resolve(slot, generation);
       var hook = entry.definition[lifecycle];
       if (hook === undefined || hook === null) return false;
@@ -154,7 +162,8 @@ var LibraryDefoldHermesComponents = {
       entry.self = null;
       entry.componentId = '';
       entry.schema = '';
-      entry.generation = (entry.generation + 1) >>> 0 || 1;
+      entry.contextKind = '';
+entry.generation = (entry.generation + 1) >>> 0 || 1;
       if (this.live) --this.live;
     },
 

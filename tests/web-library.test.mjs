@@ -3,6 +3,8 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 import vm from "node:vm";
 
+import { renderWebRuntimeVariant } from "../packages/cli/src/toolchains.mjs";
+
 const extensionBootstrapSource = await readFile(
   new URL("../defold/defold_hermes/lib/web/library_defold_hermes.js", import.meta.url),
   "utf8"
@@ -15,14 +17,14 @@ test("browser bootstrap installs the generated universal script provider", () =>
 });
 
 async function loadLibrary(options = {}) {
-  const source = await readFile(
-    new URL("../defold/defold_hermes/lib/web/library_defold_hermes.js", import.meta.url),
+  const source = renderWebRuntimeVariant(await readFile(
+    new URL("../packages/cli/templates/web-runtime/library_defold_hermes.js", import.meta.url),
     "utf8"
-  );
-  const componentSource = await readFile(
-    new URL("../defold/defold_hermes/lib/web/component_bridge.js", import.meta.url),
+  ), "debug");
+  const componentSource = renderWebRuntimeVariant(await readFile(
+    new URL("../packages/cli/templates/web-runtime/component_bridge.js", import.meta.url),
     "utf8"
-  );
+  ), "debug");
   const logs = [];
   const record = (level) => (...parts) => logs.push({ level, text: parts.join(" ") });
   const context = vm.createContext({
@@ -450,6 +452,7 @@ test("browser activation rebinds live component attachments under their existing
   const components = context.DEFOLD_HERMES_COMPONENTS;
   const handle = components.attach("player", "schema-1", "game-object");
   components.setProperty(handle.slot, handle.generation, "speed", 4);
+  const before = context.__defoldHermesDevV1.componentSnapshot();
 
   const result = context.DEFOLD_HERMES_BRIDGE.activate(bundle({ fingerprint: fingerprintB, components: registry }));
 
@@ -458,6 +461,10 @@ test("browser activation rebinds live component attachments under their existing
   const entry = components.resolve(handle.slot, handle.generation);
   assert.equal(entry.self.speed, 4, "the attachment's self table survives the swap");
   assert.equal(entry.self.reloaded, 1, "the new definition's onReload runs once");
+  const after = context.__defoldHermesDevV1.componentSnapshot();
+  assert.deepEqual(after.instances[0].instanceId, before.instances[0].instanceId);
+  assert.equal(after.instances[0].properties[0].value.value, 4);
+  assert.ok(after.sequence > before.sequence);
 });
 
 test("a component schema change is refused rather than rebound", async () => {
@@ -500,10 +507,251 @@ test("browser telemetry reports measured counters and names every gap", async ()
   }
 });
 
-test("the development entry point is installed by load and removed by reset", async () => {
-  const { context } = await loadedBridge({ bundleSource: bundle({ fingerprint: fingerprintA }) });
+test("browser component snapshots encode only bounded declared own data properties", async () => {
+  const registry = `{
+    "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
+  }`;
+  const { context } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+  });
+  const components = context.DEFOLD_HERMES_COMPONENTS;
+  const handle = components.attach("player", "schema-1", "game-object");
+  const values = [
+    ["nil", null],
+    ["enabled", true],
+    ["speed", 12.5],
+    ["label", "é".repeat(128)],
+    ["surrogate", "\ud800"],
+    ["hash", 0x1234n],
+    ["url", {
+      __dehermUrlV1: true,
+      socket: 1n,
+      reserved: 2n,
+      path: 3n,
+      fragment: 0xffffffffffffffffn
+    }],
+    ["position", { __dehermValueKind: "vector3", x: 1, y: 2, z: 3 }],
+    ["velocity", { __dehermValueKind: "vector3", x: 4, y: 5, z: 6 }],
+    ["tint", { __dehermValueKind: "vector4", x: 1, y: 2, z: 3, w: 4 }],
+    ["rotation", { __dehermValueKind: "quaternion", x: 0, y: 0, z: 0.5, w: 1 }],
+    ["long", "é".repeat(129)],
+    ["infinite", Infinity],
+    ["unsupported", { arbitrary: true }],
+    ["undefinedValue", undefined],
+    ["invalidHash", -1n],
+    ["invalidUrl", { __dehermUrlV1: true, socket: 1n }],
+    ["invalidVector", { __dehermValueKind: "vector3", x: 1, y: Infinity, z: 3 }],
+    ["functionValue", () => {}]
+  ];
+  for (const [name, value] of values) {
+    components.setProperty(handle.slot, handle.generation, name, value);
+  }
+  let getterReads = 0;
+  components.setProperty(handle.slot, handle.generation, "accessor", 1);
+  const self = components.resolve(handle.slot, handle.generation).self;
+  Object.defineProperty(self, "accessor", { get() { getterReads += 1; return 9; } });
+  components.setProperty(handle.slot, handle.generation, "missing", 1);
+  delete self.missing;
+  Object.setPrototypeOf(self, { missing: 99 });
+  let proxyDescriptorReads = 0;
+  self.position = new Proxy(self.position, {
+    getOwnPropertyDescriptor(target, name) {
+      proxyDescriptorReads += 1;
+      return Reflect.getOwnPropertyDescriptor(target, name);
+    }
+  });
+
+  // The sampler captured the intrinsic before application code could replace
+  // it. If it reached this poisoned method, the snapshot would throw.
+  vm.runInContext(`
+    globalThis.__snapshotPrototypeRuns = 0;
+    Object.getOwnPropertyDescriptor = function() { throw new Error('poisoned'); };
+    Object.defineProperty(Object.prototype, 'socket', {
+      configurable: true,
+      get() { globalThis.__snapshotPrototypeRuns += 1; return 'poisoned'; },
+      set() { globalThis.__snapshotPrototypeRuns += 1; }
+    });
+    Object.defineProperty(Array.prototype, '0', {
+      configurable: true,
+      set() { globalThis.__snapshotPrototypeRuns += 1; }
+    });
+    Function.prototype.call = function() {
+      globalThis.__snapshotPrototypeRuns += 1;
+      throw new Error('poisoned Function.prototype.call');
+    };
+    globalThis.__snapshotBigIntRuns = 0;
+    globalThis.BigInt = function() {
+      globalThis.__snapshotBigIntRuns += 1;
+      throw new Error('poisoned BigInt');
+    };
+  `, context);
+  const snapshot = context.__defoldHermesDevV1.componentSnapshot();
+
+  assert.equal(snapshot.schemaVersion, 1);
+  assert.equal(snapshot.type, "component-snapshot");
+  assert.equal(snapshot.runtimeId, 1);
+  assert.equal(snapshot.sequence, 1);
+  assert.equal(typeof snapshot.sampledAt, "number");
+  assert.equal(snapshot.complete, true, "unavailable values are not structural omissions");
+  assert.deepEqual(JSON.parse(JSON.stringify(snapshot.omitted)), { instances: 0, properties: 0 });
+  assert.equal(snapshot.instances.length, 1);
+  const instance = snapshot.instances[0];
+  assert.deepEqual(instance.instanceId, handle);
+  assert.equal(instance.componentId, "player");
+  assert.equal(instance.schemaFingerprint, "schema-1");
+  assert.equal(instance.contextKind, "game-object");
+  assert.equal(
+    components.snapshotInstanceByteLength(instance),
+    new TextEncoder().encode(JSON.stringify(instance)).length,
+    "manual instance accounting must exactly match serialized UTF-8 bytes"
+  );
+  const properties = Object.fromEntries(instance.properties.map(({ name, value }) => [name, value]));
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.nil)), { kind: "nil" });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.enabled)), { kind: "boolean", value: true });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.speed)), { kind: "number", value: 12.5 });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.label)), { kind: "string", value: "é".repeat(128) });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.surrogate)), { kind: "string", value: "�" });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.hash)), { kind: "hash", value: "0000000000001234" });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.url)), {
+    kind: "url",
+    socket: "0000000000000001",
+    reserved: "0000000000000002",
+    path: "0000000000000003",
+    fragment: "ffffffffffffffff"
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.position)), {
+    kind: "unavailable",
+    reason: "untrusted-structured-value"
+  });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.velocity)), { kind: "vector3", value: [4, 5, 6] });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.tint)), { kind: "vector4", value: [1, 2, 3, 4] });
+  assert.deepEqual(JSON.parse(JSON.stringify(properties.rotation)), { kind: "quaternion", value: [0, 0, 0.5, 1] });
+  const unavailableReasons = {
+    long: "string-too-long",
+    infinite: "non-finite-number",
+    unsupported: "unsupported-object",
+    undefinedValue: "undefined",
+    invalidHash: "bigint-out-of-range",
+    invalidUrl: "invalid-url",
+    invalidVector: "invalid-vector",
+    functionValue: "unsupported-type",
+    accessor: "accessor-property",
+    missing: "missing-own-property"
+  };
+  for (const name of Object.keys(unavailableReasons)) {
+    assert.equal(properties[name].kind, "unavailable", `${name} must fail closed`);
+    assert.equal(properties[name].reason, unavailableReasons[name]);
+  }
+  assert.equal(getterReads, 0, "sampling must not invoke accessors");
+  assert.equal(proxyDescriptorReads, 0, "sampling must reject replacement Proxies before reflection");
+  assert.equal(context.__snapshotPrototypeRuns, 0,
+    "snapshot construction must not invoke authored Object, Array, or Function prototype hooks");
+  assert.equal(context.__snapshotBigIntRuns, 0,
+    "snapshot encoding must use captured bigint bounds rather than the authored global BigInt");
+
+  const entry = components.resolve(handle.slot, handle.generation);
+  const rootsToRelease = ["velocity", "tint", "rotation"];
+  entry.self.velocity.retainedGraph = { payload: new Array(64).fill("retained") };
+  entry.self.tint.retainedGraph = { payload: new Array(64).fill("retained") };
+  entry.self.rotation.retainedGraph = { payload: new Array(64).fill("retained") };
+  entry.self.velocity = 7;
+  delete entry.self.tint;
+  Object.defineProperty(entry.self, "rotation", { configurable: true, get() { getterReads += 1; return null; } });
+  context.__defoldHermesDevV1.componentSnapshot();
+  for (const name of rootsToRelease) {
+    const index = entry.declaredProperties.indexOf(name);
+    assert.equal(entry.trustedPropertyObjects[index], null,
+      `${name} must release its trusted structured root when authored state stops referencing it`);
+  }
+  assert.equal(getterReads, 0, "root release must not invoke a replacement accessor");
+});
+
+test("browser component snapshots retain at most 32 declarations and clear them on detach", async () => {
+  const registry = `{
+    "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
+  }`;
+  const { context } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+  });
+  const components = context.DEFOLD_HERMES_COMPONENTS;
+  components.capacity = 1;
+  const first = components.attach("player", "schema-1", "game-object");
+  for (let index = 0; index < 33; ++index) {
+    components.setProperty(first.slot, first.generation, `property${index}`, index);
+  }
+  components.setProperty(first.slot, first.generation, "property32", 3200);
+  const bounded = context.__defoldHermesDevV1.componentSnapshot();
+  assert.equal(bounded.instances[0].properties.length, 32);
+  assert.deepEqual(JSON.parse(JSON.stringify(bounded.omitted)), { instances: 0, properties: 1 });
+  assert.equal(bounded.complete, false);
+
+  components.detach(first.slot, first.generation);
+  const empty = context.__defoldHermesDevV1.componentSnapshot();
+  assert.equal(empty.instances.length, 0);
+  assert.deepEqual(JSON.parse(JSON.stringify(empty.omitted)), { instances: 0, properties: 0 });
+  const second = components.attach("player", "schema-1", "game-object");
+  components.setProperty(second.slot, second.generation, "fresh", 7);
+  const reused = context.__defoldHermesDevV1.componentSnapshot();
+  assert.equal(reused.instances[0].instanceId.slot, first.slot);
+  assert.notEqual(reused.instances[0].instanceId.generation, first.generation);
+  assert.deepEqual([...reused.instances[0].properties].map(({ name }) => name), ["fresh"]);
+});
+
+test("browser component snapshot frames omit whole instances at 512 KiB", async () => {
+  const registry = `{
+    "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
+  }`;
+  const { context } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+  });
+  const components = context.DEFOLD_HERMES_COMPONENTS;
+  for (let index = 0; index < components.capacity; ++index) {
+    const handle = components.attach("player", "schema-1", "game-object");
+    for (let property = 0; property < 4; ++property) {
+      components.setProperty(handle.slot, handle.generation, `label${property}`, "é".repeat(128));
+    }
+  }
+  vm.runInContext(`
+    globalThis.__snapshotToJSONReads = 0;
+    Object.defineProperty(Object.prototype, "toJSON", { configurable: true, get() {
+      globalThis.__snapshotToJSONReads += 1;
+      return function() { return {}; };
+    }});
+  `, context);
+  const snapshot = context.__defoldHermesDevV1.componentSnapshot();
+  assert.equal(context.__snapshotToJSONReads, 0, "snapshot sizing must not consult application prototypes");
+  vm.runInContext("delete Object.prototype.toJSON", context);
+  const bytes = new TextEncoder().encode(JSON.stringify(snapshot)).length;
+  assert.ok(bytes <= 512 * 1024, `snapshot frame used ${bytes} bytes`);
+  assert.ok(snapshot.omitted.instances > 0);
+  assert.equal(snapshot.complete, false);
+  assert.equal(snapshot.instances.length + snapshot.omitted.instances, components.capacity);
+  for (let index = 0; index < snapshot.instances.length; ++index) {
+    assert.equal(snapshot.instances[index].instanceId.slot, index, "instances stay in deterministic slot order");
+    assert.equal(snapshot.instances[index].properties.length, 4, "an included instance is never partial");
+  }
+});
+
+test("navigation reset removes the development entry point and clears component snapshots", async () => {
+  const registry = `{
+    "player": { schemaFingerprint: "schema-1", contextKind: "game-object", definition: {} }
+  }`;
+  const { context } = await loadedBridge({
+    bundleSource: bundle({ fingerprint: fingerprintA, components: registry })
+  });
   assert.equal(typeof context.__defoldHermesDevV1.activate, "function");
   assert.equal(typeof context.__defoldHermesDevV1.telemetry, "function");
+  assert.equal(typeof context.__defoldHermesDevV1.componentSnapshot, "function");
+  const handle = context.DEFOLD_HERMES_COMPONENTS.attach("player", "schema-1", "game-object");
+  context.DEFOLD_HERMES_COMPONENTS.setProperty(handle.slot, handle.generation, "health", 10);
+  assert.equal(context.__defoldHermesDevV1.componentSnapshot().instances.length, 1);
   context.DEFOLD_HERMES_BRIDGE.finalize();
   assert.equal(context.__defoldHermesDevV1, undefined);
+  assert.equal(context.DEFOLD_HERMES_COMPONENTS.slots, null);
+
+  context.DEFOLD_HERMES_BRIDGE.load(0, 0);
+  const navigated = context.__defoldHermesDevV1.componentSnapshot();
+  assert.equal(navigated.runtimeId, 2);
+  assert.equal(navigated.sequence, 1);
+  assert.equal(navigated.instances.length, 0);
 });

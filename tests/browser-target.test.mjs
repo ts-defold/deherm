@@ -15,6 +15,7 @@ import test from "node:test";
 
 import {
   browserCapabilityGaps,
+  browserComponentSnapshotEvent,
   browserTelemetryEvent,
   createBrowserTarget,
   resolveWebBundle
@@ -186,6 +187,231 @@ test("browser telemetry reports what the page measured and names what it could n
   assert.deepEqual(event.capabilities.map(({ name }) => name).sort(),
     ["arenaHighWaterBytes", "hermesHeapBytes", "luaHandles"]);
   for (const capability of event.capabilities) assert.equal(capability.available, false);
+});
+
+test("browser component snapshots receive the target connection epoch without mutation", () => {
+  const reported = {
+    schemaVersion: 1,
+    type: "component-snapshot",
+    runtimeId: 12,
+    sequence: 8,
+    sampledAt: 42,
+    complete: true,
+    omitted: { instances: 0, properties: 0 },
+    instances: [{ properties: [{ name: "health", value: 90 }] }]
+  };
+  assert.deepEqual(browserComponentSnapshotEvent("browser-host", 3, reported), {
+    ...reported,
+    id: "browser-host",
+    connectionEpoch: 3
+  });
+  assert.equal(reported.id, undefined);
+  assert.equal(reported.connectionEpoch, undefined);
+});
+
+test("browser polling obtains telemetry and component state in one CDP tick", async () => {
+  const { root, bundle } = await bundleProject();
+  const events = [];
+  const expressions = [];
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile: path.join(root, ".deherm", "dev", "app.dehermc"),
+    telemetryIntervalMs: 20,
+    emit: (event) => events.push(event),
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: {
+        async send(_method, parameters) {
+          expressions.push(parameters.expression);
+          return { result: { value: {
+            telemetry: { generation: 1, componentRevision: 7, frames: 2, available: {} },
+            componentSnapshot: {
+              schemaVersion: 1,
+              type: "component-snapshot",
+              runtimeId: 7,
+              sequence: 1,
+              complete: true,
+              omitted: { instances: 0, properties: 0 },
+              instances: []
+            }
+          } } };
+        }
+      },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => {}
+    })
+  });
+  try {
+    await target.launch();
+    const deadline = Date.now() + 1_000;
+    while (!events.some(({ type }) => type === "component-snapshot") && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
+    assert.ok(events.some(({ type }) => type === "telemetry"));
+    assert.ok(events.some(({ type, connectionEpoch }) => type === "component-snapshot" && connectionEpoch === 1));
+    assert.equal(expressions.length, 1);
+    assert.match(expressions[0], /telemetry\(\)/u);
+    assert.match(expressions[0], /componentSnapshot\(\)/u);
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("a deferred poll from a closed page cannot populate its replacement epoch", async () => {
+  const { root, bundle } = await bundleProject();
+  const events = [];
+  let pageNumber = 0;
+  let releaseOldPoll;
+  let oldPollStarted;
+  const oldPoll = new Promise((resolve) => { releaseOldPoll = resolve; });
+  const started = new Promise((resolve) => { oldPollStarted = resolve; });
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile: path.join(root, ".deherm", "dev", "app.dehermc"),
+    telemetryIntervalMs: 5,
+    emit: (event) => events.push(event),
+    openBundlePage: async () => {
+      const current = ++pageNumber;
+      return {
+        server: { port: 9443 + current },
+        client: {
+          send: async () => {
+            if (current === 1) {
+              oldPollStarted();
+              return oldPoll;
+            }
+            return { result: { value: null } };
+          }
+        },
+        target: { webSocketDebuggerUrl: `ws://127.0.0.1:9333/devtools/page/browser-${current}` },
+        debuggingPort: 9332 + current,
+        pageUrl: `http://127.0.0.1:${9443 + current}/index.html`,
+        profile: path.join(root, `profile-${current}`),
+        close: async () => {}
+      };
+    }
+  });
+  try {
+    await target.launch();
+    await started;
+    await target.stop();
+    await target.launch();
+    releaseOldPoll({ result: { value: {
+      telemetry: { generation: 1, componentRevision: 1, frames: 1, available: {} },
+      componentSnapshot: {
+        schemaVersion: 1,
+        type: "component-snapshot",
+        runtimeId: 99,
+        sequence: 1,
+        instances: []
+      }
+    } } });
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    assert.equal(events.some(({ type, runtimeId }) => type === "component-snapshot" && runtimeId === 99), false,
+      "page A telemetry must not be relabelled with page B's epoch");
+    assert.ok(events.some(({ type, connectionEpoch }) => type === "target-connected" && connectionEpoch === 2));
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("a late exit callback from a replaced page cannot stop its successor", async () => {
+  const { root, bundle } = await bundleProject();
+  const events = [];
+  const exitCallbacks = [];
+  let pageNumber = 0;
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile: path.join(root, ".deherm", "dev", "app.dehermc"),
+    telemetryIntervalMs: 60_000,
+    emit: (event) => events.push(event),
+    openBundlePage: async (options) => {
+      const current = ++pageNumber;
+      exitCallbacks.push(options.onBrowserExit);
+      return {
+        server: { port: 9443 + current },
+        client: { send: async () => ({ result: { value: null } }) },
+        target: { webSocketDebuggerUrl: `ws://127.0.0.1:9333/devtools/page/browser-${current}` },
+        debuggingPort: 9332 + current,
+        pageUrl: `http://127.0.0.1:${9443 + current}/index.html`,
+        profile: path.join(root, `profile-${current}`),
+        close: async () => {}
+      };
+    }
+  });
+  try {
+    await target.launch();
+    await target.stop();
+    await target.launch();
+    exitCallbacks[0]();
+    assert.equal(target.running(), true);
+    assert.equal(target.pageUrl(), "http://127.0.0.1:9445/index.html");
+    assert.equal(events.some(({ type, connectionEpoch }) =>
+      type === "target-disconnected" && connectionEpoch === 2), false);
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("browser telemetry polling is single-flight within one connection epoch", async () => {
+  const { root, bundle } = await bundleProject();
+  let calls = 0;
+  let active = 0;
+  let maximumActive = 0;
+  let releaseFirst;
+  let firstStarted;
+  const first = new Promise((resolve) => { releaseFirst = resolve; });
+  const started = new Promise((resolve) => { firstStarted = resolve; });
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile: path.join(root, ".deherm", "dev", "app.dehermc"),
+    telemetryIntervalMs: 5,
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: {
+        async send() {
+          calls += 1;
+          active += 1;
+          maximumActive = Math.max(maximumActive, active);
+          if (calls === 1) {
+            firstStarted();
+            await first;
+          }
+          active -= 1;
+          return { result: { value: null } };
+        }
+      },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => {}
+    })
+  });
+  try {
+    await target.launch();
+    await started;
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.equal(calls, 1, "interval ticks must not overlap an in-flight CDP evaluation");
+    releaseFirst();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    assert.ok(calls > 1);
+    assert.equal(maximumActive, 1);
+  } finally {
+    releaseFirst();
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
 });
 
 test("a counter the page could not measure is absent from the values, not zero", () => {

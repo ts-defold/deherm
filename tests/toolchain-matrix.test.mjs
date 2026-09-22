@@ -5,8 +5,10 @@ import { copyFile, link, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import vm from "node:vm";
 
 import { deriveBundleTargets, derivePlatformPairs } from "../scripts/generate-defold-bundle-targets.mjs";
+import { main as selectProjectNativeArtifact } from "../scripts/check-project-native-artifact.mjs";
 import { hostCompilerKey, inspectHostCompilers, hostCompilerReport, requireHostCompilers, requireHostTool } from "../packages/cli/src/host-compilers.mjs";
 import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
 import {
@@ -79,19 +81,97 @@ test("a generated project resolves Bob and Extender identities from its authenti
   }
 });
 
-test("a copied browser-host source artifact satisfies the project artifact gate", async () => {
+test("browser-host sources select debug telemetry and compile it out of release", async () => {
   const project = await mkdtemp(path.join(tmpdir(), "deherm-web-artifact."));
   try {
     await writeProjectLock(project);
-    const relative = "defold_hermes/lib/web/library_defold_hermes.js";
-    await mkdir(path.join(project, path.dirname(relative)), { recursive: true });
-    await copyFile(path.join(repositoryRoot, "defold", relative), path.join(project, relative));
-    const result = await assertProjectNativeArtifact(project, "wasm-web");
-    assert.equal(path.relative(project, result.file), relative);
-    await writeFile(path.join(project, relative), "tampered");
-    await assert.rejects(assertProjectNativeArtifact(project, "wasm-web"), /source checksum mismatch/);
+    const relatives = [
+      "defold_hermes/lib/web/component_bridge.js",
+      "defold_hermes/lib/web/library_defold_hermes.js"
+    ];
+    for (const relative of relatives) {
+      await mkdir(path.join(project, path.dirname(relative)), { recursive: true });
+      await copyFile(path.join(repositoryRoot, "defold", relative), path.join(project, relative));
+    }
+
+    const debug = await ensureProjectNativeArtifact(project, "wasm-web", { variant: "debug" });
+    assert.equal(debug.variant, "debug");
+    const debugLibrary = await readFile(path.join(project, relatives[1]), "utf8");
+    const debugComponents = await readFile(path.join(project, relatives[0]), "utf8");
+    assert.match(debugLibrary, /componentSnapshot/u);
+    assert.match(debugComponents, /untrusted-structured-value/u);
+
+    const release = await ensureProjectNativeArtifact(project, "wasm-web", { variant: "release" });
+    assert.equal(release.variant, "release");
+    const releaseLibrary = await readFile(path.join(project, relatives[1]), "utf8");
+    const releaseComponents = await readFile(path.join(project, relatives[0]), "utf8");
+    assert.doesNotThrow(() => new vm.Script(releaseLibrary));
+    assert.doesNotThrow(() => new vm.Script(releaseComponents));
+    assert.doesNotMatch(releaseLibrary, /componentSnapshot/u);
+    assert.doesNotMatch(releaseComponents, /snapshotSequence|trustedPropertyObjects|untrusted-structured-value/u);
+    assert.doesNotMatch(releaseLibrary + releaseComponents, /DEHERM_DEBUG_SNAPSHOT/u);
+    await assertProjectNativeArtifact(project, "wasm-web", { variant: "release" });
+
+    await writeFile(path.join(project, relatives[1]), "tampered");
+    await assert.rejects(
+      assertProjectNativeArtifact(project, "wasm-web", { variant: "release" }),
+      /release browser source checksum mismatch/);
   } finally {
     await rm(project, { recursive: true, force: true });
+  }
+});
+
+test("the Bob artifact selector materializes the requested web variant in a fresh project", async () => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-web-selector."));
+  try {
+    await writeProjectLock(project);
+    await selectProjectNativeArtifact([project, "wasm-web", "release"]);
+    assert.doesNotMatch(
+      await readFile(path.join(project, "defold_hermes", "lib", "web", "library_defold_hermes.js"), "utf8"),
+      /componentSnapshot/u
+    );
+    await selectProjectNativeArtifact([project, "wasm-web", "debug"]);
+    assert.match(
+      await readFile(path.join(project, "defold_hermes", "lib", "web", "library_defold_hermes.js"), "utf8"),
+      /componentSnapshot/u
+    );
+  } finally {
+    await rm(project, { recursive: true, force: true });
+  }
+});
+
+test("the repository Defold project switches web variants without consuming immutable templates", async () => {
+  const project = path.join(repositoryRoot, "defold");
+  const lock = JSON.parse(await readFile(
+    path.join(repositoryRoot, "examples", "war-battles-online", "defold", "deherm.lock"),
+    "utf8"
+  ));
+  const templates = [
+    "component_bridge.js",
+    "library_defold_hermes.js"
+  ];
+  const before = await Promise.all(templates.map((name) => readFile(
+    path.join(repositoryRoot, "packages", "cli", "templates", "web-runtime", name),
+    "utf8"
+  )));
+  try {
+    await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "debug" });
+    for (const name of templates) {
+      assert.match(
+        await readFile(path.join(project, "defold_hermes", "lib", "web", name), "utf8"),
+        /componentSnapshot/u
+      );
+    }
+    await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "release" });
+    await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "debug" });
+    await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "release" });
+    const after = await Promise.all(templates.map((name) => readFile(
+      path.join(repositoryRoot, "packages", "cli", "templates", "web-runtime", name),
+      "utf8"
+    )));
+    assert.deepEqual(after, before);
+  } finally {
+    await ensureProjectNativeArtifact(project, "wasm-web", { lock, variant: "release" });
   }
 });
 

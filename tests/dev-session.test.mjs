@@ -4,7 +4,147 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { runDevSession } from "../packages/cli/src/dev/session.mjs";
+import {
+  devStateSnapshot,
+  prepareDebugWebBundle,
+  runDevSession,
+  sessionLogEvent
+} from "../packages/cli/src/dev/session.mjs";
+import { applyDevEvent, createDevModel } from "../packages/cli/src/dev/model.mjs";
+
+test("normal session logs summarize component snapshots without property values", () => {
+  const event = {
+    schemaVersion: 1,
+    type: "component-snapshot",
+    id: "local-engine",
+    connectionEpoch: 2,
+    runtimeId: 9,
+    sequence: 5,
+    complete: false,
+    omitted: { instances: 1, properties: 2 },
+    instances: [{ properties: [{ name: "secret", value: "do-not-persist" }] }]
+  };
+  assert.deepEqual(sessionLogEvent(event), {
+    schemaVersion: 1,
+    type: "component-snapshot",
+    id: "local-engine",
+    connectionEpoch: 2,
+    runtimeId: 9,
+    sequence: 5,
+    sampledAt: undefined,
+    complete: false,
+    omitted: { instances: 1, properties: 2 },
+    instanceCount: 1,
+    propertyCount: 1
+  });
+  assert.equal(JSON.stringify(sessionLogEvent(event)).includes("do-not-persist"), false);
+});
+
+test("authenticated dev state projects every target without credentials", () => {
+  const model = createDevModel();
+  applyDevEvent(model, { type: "target-configured", id: "local-engine", runtime: "hermes" });
+  applyDevEvent(model, { type: "target-configured", id: "browser-host", runtime: "browser" });
+  applyDevEvent(model, {
+    type: "component-catalog",
+    components: [{
+      componentId: "player",
+      schemaFingerprint: "schema-v1",
+      source: "main/player.script.ts",
+      proxy: "main/player.script",
+      properties: [{ name: "health", kind: "number" }]
+    }]
+  });
+  applyDevEvent(model, {
+    schemaVersion: 1,
+    type: "component-snapshot",
+    id: "browser-host",
+    connectionEpoch: 1,
+    runtimeId: 2,
+    sequence: 1,
+    complete: true,
+    instances: [{
+      instanceId: { slot: 3, generation: 2 },
+      componentId: "player",
+      schemaFingerprint: "schema-v1",
+      contextKind: "game-object",
+      properties: [{ name: "health", value: { kind: "number", value: 100 } }]
+    }]
+  });
+  const state = devStateSnapshot(model);
+  assert.deepEqual(state.targets.map(({ id }) => id), ["local-engine", "browser-host"]);
+  assert.equal(state.targets[0].componentSnapshot, null);
+  assert.equal(state.targets[1].componentSnapshot.runtimeId, 2);
+  assert.equal("instances" in state.targets[1].componentSnapshot, false,
+    "the authenticated projection must not duplicate the bounded raw runtime rows");
+  assert.equal(state.targets[1].instances[0].source, "main/player.script.ts");
+  assert.equal(state.targets[1].instances[0].schemaStatus, "current");
+  assert.equal(state.targets[1].instances[0].properties[0].declaredKind, "number");
+  assert.equal("authToken" in state, false);
+});
+
+test("authenticated dev state fairly bounds schema-enriched rows below the editor intake", () => {
+  const model = createDevModel();
+  const source = `${"deep/".repeat(600)}player.script.ts`;
+  applyDevEvent(model, {
+    type: "component-catalog",
+    components: [{
+      componentId: "player",
+      schemaFingerprint: "schema-v1",
+      source,
+      proxy: `${source.slice(0, -3)}script`,
+      properties: []
+    }]
+  });
+  for (const [id, runtimeId] of [["local-engine", 1], ["browser-host", 2]]) {
+    applyDevEvent(model, { type: "target-configured", id, runtime: id === "local-engine" ? "hermes" : "browser" });
+    applyDevEvent(model, {
+      schemaVersion: 1,
+      type: "component-snapshot",
+      id,
+      connectionEpoch: 1,
+      runtimeId,
+      sequence: 1,
+      sampledAt: 1,
+      complete: true,
+      omitted: { instances: 0, properties: 0 },
+      instances: Array.from({ length: 1_024 }, (_, slot) => ({
+        instanceId: { slot, generation: 1 },
+        componentId: "player",
+        schemaFingerprint: "schema-v1",
+        contextKind: "game-object",
+        properties: []
+      }))
+    });
+  }
+  const state = devStateSnapshot(model);
+  assert.ok(Buffer.byteLength(JSON.stringify(state)) < 2 * 1024 * 1024);
+  for (const target of state.targets) {
+    assert.ok(target.instances.length > 0, "each live target receives a fair projection share");
+    assert.ok(target.instanceProjection.omittedInstances > 0);
+    assert.equal(target.instanceProjection.totalInstances, 1_024);
+    assert.equal(target.instanceProjection.complete, false);
+    assert.equal(target.instances.every((instance) => instance.source === source), true,
+      "only complete server-enriched rows are projected");
+  }
+});
+
+test("development browser launch always requests a fresh debug wasm-web bundle", async () => {
+  const calls = [];
+  const webBundle = path.join(tmpdir(), "custom-web-output", "War Battles");
+  const result = await prepareDebugWebBundle({
+    async bundle(options) {
+      calls.push(options);
+      return { bundleOutput: options.bundleOutput, platform: options.platform };
+    }
+  }, { webBundle, reason: "test browser launch" });
+  assert.deepEqual(calls, [{
+    platform: "wasm-web",
+    variant: "debug",
+    bundleOutput: path.dirname(webBundle),
+    reason: "test browser launch"
+  }]);
+  assert.equal(result.platform, "wasm-web");
+});
 
 test("one-shot dev session compiles a typed resource generation without claiming activation", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-dev-session-"));

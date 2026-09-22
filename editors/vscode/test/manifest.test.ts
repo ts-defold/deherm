@@ -11,6 +11,8 @@ test("VS Code manifest is a thin workspace extension with an attach configuratio
   assert.equal(manifest.publisher, "ts-defold");
   assert.equal(manifest.main, "./dist/extension.cjs");
   assert.deepEqual(manifest.extensionKind, ["workspace"]);
+  assert.equal(manifest.capabilities.untrustedWorkspaces.supported, false,
+    "the workspace extension executes the project-local CLI and must stay disabled until trust is granted");
   assert.ok(manifest.activationEvents.includes("workspaceContains:**/game.project"));
   assert.ok(manifest.activationEvents.includes("onDebug:deherm"));
   const debuggerContribution = manifest.contributes.debuggers.find(({ type }: { type: string }) => type === "deherm");

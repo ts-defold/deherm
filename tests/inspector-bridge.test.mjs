@@ -60,6 +60,44 @@ test("native NDJSON is projected as a standard CDP discovery and WebSocket endpo
   await bridge.close();
 });
 
+test("reserved native component snapshots update dev state and never reach CDP", async () => {
+  const events = [];
+  const bridge = await createInspectorBridge({ emit: (value) => events.push(value) });
+  const engine = net.createConnection({ host: "127.0.0.1", port: bridge.enginePort });
+  await event(engine, "connect");
+  const frontend = new WebSocket(bridge.websocketUrl);
+  await event(frontend, "open");
+  const payload = {
+    schemaVersion: 1,
+    type: "component-snapshot",
+    runtimeId: 7,
+    sequence: 3,
+    sampledAt: 100,
+    complete: true,
+    omitted: { instances: 0, properties: 0 },
+    instances: [{
+      instanceId: { slot: 2, generation: 4 },
+      componentId: "player",
+      schemaFingerprint: "abc",
+      contextKind: "script",
+      properties: [{ name: "health", value: 100 }]
+    }]
+  };
+  const response = new Promise((resolve) => frontend.once("message", (data) => resolve(data.toString("utf8"))));
+  engine.write(`${JSON.stringify({ channel: "deherm-dev-v1", payload })}\n`);
+  engine.write('{"id":9,"result":{}}\n');
+  assert.equal(await response, '{"id":9,"result":{}}');
+  assert.deepEqual(events.find(({ type }) => type === "component-snapshot"), {
+    ...payload,
+    id: "local-engine",
+    connectionEpoch: 1
+  });
+
+  frontend.close();
+  engine.destroy();
+  await bridge.close();
+});
+
 test("a frontend command before the engine connects receives a correlated CDP error", async () => {
   const bridge = await createInspectorBridge();
   const frontend = new WebSocket(bridge.websocketUrl);
@@ -138,6 +176,8 @@ test("bridge publishes a private session descriptor and stale owners cannot remo
   const first = await createInspectorBridge({ projectRoot: root, sessionFile });
   const firstSession = await readInspectorSession(sessionFile);
   assert.equal(firstSession.websocketUrl, first.websocketUrl);
+  assert.equal(firstSession.stateUrl, `${first.devtoolsUrl}/deherm/dev/v1/snapshot`);
+  assert.match(firstSession.authToken, /^[A-Za-z0-9_-]{43,}$/u);
   if (process.platform !== "win32") assert.equal((await stat(sessionFile)).mode & 0o777, 0o600);
 
   const second = await createInspectorBridge({ projectRoot: root, sessionFile });
@@ -147,6 +187,55 @@ test("bridge publishes a private session descriptor and stale owners cannot remo
   assert.equal((await readInspectorSession(sessionFile)).sessionId, secondSession.sessionId);
   await second.close();
   await assert.rejects(() => readFile(sessionFile), { code: "ENOENT" });
+});
+
+test("dev state endpoint requires its descriptor token and supports ETag revalidation", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-inspector-state-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const sessionFile = path.join(root, "inspector.json");
+  const state = {
+    schemaVersion: 1,
+    kind: "deherm-dev-state",
+    modelVersion: 4,
+    targetId: "local-engine",
+    telemetry: { componentInstances: 1 },
+    componentSnapshot: { schemaVersion: 1, type: "component-snapshot", instances: [] }
+  };
+  const bridge = await createInspectorBridge({
+    projectRoot: root,
+    sessionFile,
+    getDevState: () => state
+  });
+  const session = await readInspectorSession(sessionFile);
+  try {
+    const unauthorized = await fetch(session.stateUrl);
+    assert.equal(unauthorized.status, 401);
+    assert.equal(unauthorized.headers.get("access-control-allow-origin"), null);
+    assert.equal(unauthorized.headers.get("cache-control"), "no-store");
+
+    const authorized = await fetch(session.stateUrl, {
+      headers: { authorization: `Bearer ${session.authToken}` }
+    });
+    assert.equal(authorized.status, 200);
+    assert.equal(authorized.headers.get("cache-control"), "no-store");
+    assert.equal(authorized.headers.get("access-control-allow-origin"), null);
+    const etag = authorized.headers.get("etag");
+    assert.ok(etag);
+    const body = await authorized.json();
+    assert.deepEqual(body, state);
+    assert.equal(JSON.stringify(body).includes(session.authToken), false);
+
+    const unchanged = await fetch(session.stateUrl, {
+      headers: {
+        authorization: `Bearer ${session.authToken}`,
+        "if-none-match": etag
+      }
+    });
+    assert.equal(unchanged.status, 304);
+    assert.equal(unchanged.headers.get("cache-control"), "no-store");
+  } finally {
+    await bridge.close();
+  }
 });
 
 test("owned-session cleanup preserves a different or malformed descriptor", async (t) => {

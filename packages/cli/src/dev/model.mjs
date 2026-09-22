@@ -8,6 +8,51 @@ function changed(model) {
   return true;
 }
 
+function deepCopy(value) {
+  return value === undefined ? undefined : structuredClone(value);
+}
+
+function clearComponentSnapshot(item) {
+  item.instances = undefined;
+  item.componentSnapshot = undefined;
+  item.instanceRuntimeId = undefined;
+  item.instanceSequence = undefined;
+}
+
+function validComponentInstances(instances) {
+  return Array.isArray(instances) && instances.every((instance) =>
+    instance !== null && typeof instance === "object" && !Array.isArray(instance) &&
+    typeof instance.componentId === "string" && Array.isArray(instance.properties) &&
+    instance.properties.every((property) =>
+      property !== null && typeof property === "object" && !Array.isArray(property)));
+}
+
+function enrichInstances(model, instances) {
+  return deepCopy(instances).map((instance) => {
+    const declared = model.componentCatalog.get(instance.componentId);
+    if (!declared) return { ...instance, schemaStatus: "unknown-component" };
+    if (declared.schemaFingerprint !== instance.schemaFingerprint) {
+      return {
+        ...instance,
+        source: declared.source,
+        schemaStatus: "stale",
+        expectedSchemaFingerprint: declared.schemaFingerprint
+      };
+    }
+    const properties = new Map((declared.properties ?? []).map((property) => [property.name, property]));
+    return {
+      ...instance,
+      source: declared.source,
+      proxy: declared.proxy,
+      schemaStatus: "current",
+      properties: instance.properties.map((property) => ({
+        ...property,
+        declaredKind: properties.get(property.name)?.kind
+      }))
+    };
+  });
+}
+
 export function createDevModel(options = {}) {
   return {
     phase: "idle",
@@ -17,6 +62,7 @@ export function createDevModel(options = {}) {
     lastBuildMetrics: undefined,
     lastSuccessfulGeneration: 0,
     targets: new Map(),
+    componentCatalog: new Map(),
     logs: [],
     nextLogSequence: 1,
     history: [],
@@ -91,6 +137,12 @@ export function applyDevEvent(model, event) {
     }
     case "target-connected": {
       const item = target(model, event.id);
+      if (event.connectionEpoch !== undefined &&
+          (item.connectionEpoch === undefined || event.connectionEpoch > item.connectionEpoch)) {
+        clearComponentSnapshot(item);
+        item.connectionEpoch = event.connectionEpoch;
+        item.disconnectedConnectionEpoch = undefined;
+      }
       Object.assign(item, { status: "connected", url: event.url, name: event.name, connectedAt: at });
       return changed(model);
     }
@@ -114,7 +166,62 @@ export function applyDevEvent(model, event) {
       return changed(model);
     }
     case "target-disconnected": {
-      Object.assign(target(model, event.id), { status: "disconnected", disconnectedAt: at });
+      const item = target(model, event.id);
+      if (event.connectionEpoch !== undefined && item.connectionEpoch !== undefined &&
+          event.connectionEpoch !== item.connectionEpoch) return false;
+      clearComponentSnapshot(item);
+      item.disconnectedConnectionEpoch = event.connectionEpoch ?? item.connectionEpoch;
+      Object.assign(item, { status: "disconnected", disconnectedAt: at });
+      return changed(model);
+    }
+    case "component-catalog": {
+      if (!Array.isArray(event.components)) return false;
+      const catalog = new Map();
+      for (const component of event.components) {
+        if (!component || typeof component.componentId !== "string" ||
+            typeof component.schemaFingerprint !== "string" || typeof component.source !== "string") continue;
+        catalog.set(component.componentId, deepCopy(component));
+      }
+      model.componentCatalog = catalog;
+      for (const item of model.targets.values()) {
+        if (item.componentSnapshot) item.instances = enrichInstances(model, item.componentSnapshot.instances);
+      }
+      return changed(model);
+    }
+    case "component-snapshot-connected": {
+      if (!Number.isSafeInteger(event.connectionEpoch) || event.connectionEpoch < 1) return false;
+      const item = target(model, event.id);
+      if (item.connectionEpoch !== undefined && event.connectionEpoch <= item.connectionEpoch) return false;
+      clearComponentSnapshot(item);
+      item.connectionEpoch = event.connectionEpoch;
+      item.disconnectedConnectionEpoch = undefined;
+      return changed(model);
+    }
+    case "component-snapshot-disconnected": {
+      const item = target(model, event.id);
+      if (event.connectionEpoch !== undefined && item.connectionEpoch !== event.connectionEpoch) return false;
+      clearComponentSnapshot(item);
+      item.disconnectedConnectionEpoch = event.connectionEpoch ?? item.connectionEpoch;
+      return changed(model);
+    }
+    case "component-snapshot": {
+      if (event.schemaVersion !== 1 || !validComponentInstances(event.instances) ||
+          !Number.isSafeInteger(event.connectionEpoch) || event.connectionEpoch < 1 ||
+          !Number.isSafeInteger(event.runtimeId) || event.runtimeId < 0 ||
+          !Number.isSafeInteger(event.sequence) || event.sequence < 0) return false;
+      const item = target(model, event.id);
+      if (item.connectionEpoch !== undefined && event.connectionEpoch < item.connectionEpoch) return false;
+      if (item.disconnectedConnectionEpoch !== undefined && event.connectionEpoch <= item.disconnectedConnectionEpoch) return false;
+      const current = item.componentSnapshot;
+      if (current && event.connectionEpoch === current.connectionEpoch &&
+          event.runtimeId === current.runtimeId && event.sequence <= current.sequence) return false;
+      if (item.connectionEpoch !== event.connectionEpoch) clearComponentSnapshot(item);
+      const componentSnapshot = deepCopy(event);
+      item.connectionEpoch = event.connectionEpoch;
+      item.instanceRuntimeId = event.runtimeId;
+      item.instanceSequence = event.sequence;
+      item.componentSnapshot = componentSnapshot;
+      item.instances = enrichInstances(model, componentSnapshot.instances);
       return changed(model);
     }
     case "reload-started": {
@@ -271,6 +378,10 @@ export function applyDevEvent(model, event) {
     }
     case "engine-stopped": {
       model.engine = { status: "stopped", code: event.code, signal: event.signal, stoppedAt: at };
+      for (const item of model.targets.values()) {
+        clearComponentSnapshot(item);
+        item.disconnectedConnectionEpoch = item.connectionEpoch;
+      }
       boundedPush(model.logs, {
         sequence: model.nextLogSequence++, at, level: "info", source: "engine",
         message: `stopped${event.signal ? ` by ${event.signal}` : ` with code ${event.code ?? "unknown"}`}`
@@ -279,6 +390,10 @@ export function applyDevEvent(model, event) {
     }
     case "engine-failed": {
       model.engine = { status: "failed", diagnostic: event.diagnostic, stoppedAt: at };
+      for (const item of model.targets.values()) {
+        clearComponentSnapshot(item);
+        item.disconnectedConnectionEpoch = item.connectionEpoch;
+      }
       boundedPush(model.logs, {
         sequence: model.nextLogSequence++, at, level: "error", source: "engine", message: String(event.diagnostic)
       }, model.logCapacity);
@@ -306,6 +421,7 @@ export function applyDevEvent(model, event) {
 export function snapshotDevModel(model) {
   return {
     ...model,
+    componentCatalog: undefined,
     engine: { ...model.engine },
     reachability: model.reachability ? { ...model.reachability } : undefined,
     defoldBuild: { ...model.defoldBuild, resources: model.defoldBuild.resources ? [...model.defoldBuild.resources] : undefined },
@@ -317,6 +433,8 @@ export function snapshotDevModel(model) {
     targets: [...model.targets.values()].map((value) => ({
       ...value,
       telemetry: { ...value.telemetry },
+      instances: deepCopy(value.instances),
+      componentSnapshot: deepCopy(value.componentSnapshot),
       capabilities: value.capabilities ? value.capabilities.map((capability) => ({ ...capability })) : undefined
     })),
     logs: model.logs.map((value) => ({ ...value })),

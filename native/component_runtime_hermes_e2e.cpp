@@ -158,6 +158,8 @@ int main(int argc, char** argv) {
 
   TestHost host;
   defold_hermes::Runtime runtime(host);
+  if (!runtime.inspectorAvailable() && !runtime.sampleComponentSnapshot().empty())
+    Fail("non-debug runtime exposed private component telemetry");
   gRuntime = &runtime;
   runtime.load(componentSource, "deherm://compiler-generated-components.js");
   runtime.init();

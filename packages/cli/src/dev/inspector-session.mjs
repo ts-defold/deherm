@@ -72,6 +72,18 @@ export function validateInspectorSession(value) {
   if (Number(devtools.port) !== value.devtoolsPort || Number(websocket.port) !== value.devtoolsPort) {
     throw new Error("Inspector session URL ports do not match devtoolsPort");
   }
+  if ((value.authToken === undefined) !== (value.stateUrl === undefined)) {
+    throw new Error("Inspector session authToken and stateUrl must be declared together");
+  }
+  if (value.authToken !== undefined) {
+    if (typeof value.authToken !== "string" || !/^[A-Za-z0-9_-]{43,}$/u.test(value.authToken)) {
+      throw new Error("Inspector session authToken is invalid");
+    }
+    const state = assertLoopbackUrl(value.stateUrl, "stateUrl", ["http:"]);
+    if (Number(state.port) !== value.devtoolsPort || state.pathname !== "/deherm/dev/v1/snapshot" || state.search || state.hash) {
+      throw new Error("Inspector session stateUrl does not match the authenticated dev state endpoint");
+    }
+  }
   if (typeof value.createdAt !== "string" || Number.isNaN(Date.parse(value.createdAt))) {
     throw new Error("Inspector session createdAt is invalid");
   }
@@ -104,6 +116,7 @@ export function createInspectorSession(values) {
     devtoolsPort: values.devtoolsPort,
     devtoolsUrl: values.devtoolsUrl,
     websocketUrl: values.websocketUrl,
+    ...(values.authToken === undefined ? {} : { authToken: values.authToken, stateUrl: values.stateUrl }),
     ...(values.bundleUrl === undefined ? {} : { bundleUrl: values.bundleUrl }),
     ...(values.sourceMapFile === undefined ? {} : { sourceMapFile: path.resolve(values.sourceMapFile) })
   });

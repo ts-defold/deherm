@@ -28,6 +28,11 @@
   "extensionKind": [
     "workspace"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false
+    }
+  },
   "main": "./dist/extension.cjs",
   "activationEvents": [
     "workspaceContains:**/game.project",

@@ -493,16 +493,64 @@ export function GenerationsView({ snapshot, focusedScope, ui, actions, height })
   );
 }
 
-/**
- * Instances deliberately ships an empty state instead of inferred rows.
- *
- * The engine emits `DEHERM_EVENT telemetry` once a second carrying counts only
- * (component_instances, callback_roots, lua_handles). Nothing in that record
- * identifies an individual instance, so a per-instance table here could only be
- * fabricated. Listing identities needs a runtime instance channel, and that
- * protocol change is owned outside this console.
- */
+function terminalValue(value, maximum = 96) {
+  const singleLine = String(value).replace(/[\u0000-\u001f\u007f-\u009f]/gu, "�");
+  return singleLine.length > maximum ? `${singleLine.slice(0, maximum - 1)}…` : singleLine;
+}
+
+function liveValue(value) {
+  let rendered;
+  if (!value || value.kind === "unavailable") rendered = value?.reason ? `!${value.reason}` : "unavailable";
+  else if (value.kind === "nil") rendered = "nil";
+  else if (value.kind === "string") rendered = JSON.stringify(value.value);
+  else if (value.kind === "hash") rendered = `#${value.value}`;
+  else if (value.kind === "url") rendered = `url(${value.socket}:${value.reserved}:${value.path}:${value.fragment})`;
+  else if (Array.isArray(value.value)) rendered = `[${value.value.join(", ")}]`;
+  else rendered = String(value.value);
+  return terminalValue(rendered);
+}
+
+export function instanceRows(snapshot) {
+  return (snapshot.targets ?? []).flatMap((target) => (target.instances ?? []).map((instance) => ({
+    key: `${target.id}:${target.connectionEpoch ?? 0}:${instance.instanceId?.slot ?? 0}:${instance.instanceId?.generation ?? 0}`,
+    target: terminalValue(target.id, 64),
+    identity: terminalValue(`${instance.instanceId?.slot ?? "?"}:${instance.instanceId?.generation ?? "?"}`, 32),
+    component: terminalValue(instance.source ?? instance.componentId, 192),
+    schema: terminalValue(instance.schemaStatus ?? "unjoined", 48),
+    properties: terminalValue((instance.properties ?? []).map(({ name, value }) =>
+      `${terminalValue(name, 48)}=${liveValue(value)}`).join("  ") || "—", 4096)
+  })));
+}
+
 export function InstancesView({ snapshot, focusedScope, height }) {
+  const rows = instanceRows(snapshot);
+  if (rows.length > 0) {
+    return (
+      <FocusPanel scope="instances" focusedScope={focusedScope} height={height}>
+        <Column gap={0} px={1} width="full" height="full" overflow="hidden">
+          <Pane height={Math.max(1, (height ?? 12) - 4)}>
+          <Table
+            id={PANEL_IDS.instances}
+            accessibleLabel="Live component instances"
+            columns={[
+              { key: "target", header: "target", width: 14 },
+              { key: "identity", header: "slot:gen", width: 10 },
+              { key: "component", header: "component", width: 28 },
+              { key: "schema", header: "schema", width: 10 },
+              { key: "properties", header: "live properties", flex: 1, minWidth: 18 }
+            ]}
+            data={rows}
+            getRowKey={(row) => row.key}
+            border="none"
+          />
+          </Pane>
+          <Text style={{ fg: dim }} textOverflow="ellipsis">
+            sampled own data properties · slot:generation identities are runtime-local
+          </Text>
+        </Column>
+      </FocusPanel>
+    );
+  }
   const telemetry = snapshot.targets?.[0]?.telemetry ?? {};
   const counts = [
     { label: "component instances", value: telemetry.componentInstances },
@@ -512,14 +560,11 @@ export function InstancesView({ snapshot, focusedScope, height }) {
   return (
     <FocusPanel scope="instances" focusedScope={focusedScope} height={height}>
       <Column gap={0} px={1} width="full" height="full" overflow="hidden">
-        <Text style={{ fg: prism[2], bold: true }} textOverflow="ellipsis">requires runtime instance channel</Text>
+        <Text style={{ fg: prism[2], bold: true }} textOverflow="ellipsis">waiting for a component snapshot</Text>
         <Text style={{ fg: dim }} textOverflow="ellipsis">
-          The engine reports telemetry once per second as counts, never identities.
+          Launch a debug-enabled native or browser target to stream bounded live values.
         </Text>
-        <Text style={{ fg: dim }} textOverflow="ellipsis">
-          Per-instance rows need a runtime instance channel; that protocol change is owned outside this console.
-        </Text>
-        <Divider label="counts reported today" />
+        <Divider label="aggregate telemetry" />
         {counts.map((entry) => (
           <Row key={entry.label} justify="between" width="full">
             <Text style={{ fg: basaltRamp[4] }} textOverflow="ellipsis">{entry.label}</Text>

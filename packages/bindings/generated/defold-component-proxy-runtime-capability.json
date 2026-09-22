@@ -97,11 +97,11 @@
     },
     "runtimeHeader": {
       "path": "defold/defold_hermes/include/defold_hermes/runtime.hpp",
-      "sha256": "2c57f28a05d8b05331efb7638dfa848768410fe4d6e0e341cb68ce3976289928"
+      "sha256": "bb1f9b4c50665d270225b2349fc763d812db78ab77ab216a609b027308215d4c"
     },
     "runtimeSource": {
       "path": "defold/defold_hermes/src/runtime.cpp",
-      "sha256": "1704eb29500cd52dc5204f12b0e29f4287d91efaeff797f8cf176a912ebf362f"
+      "sha256": "b07158bb1368b84f4a4793df6a5e9dbcd1e6df907f33b9dc197e354c7f1620a6"
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
@@ -121,7 +121,7 @@
     },
     "browserProvider": {
       "path": "defold/defold_hermes/lib/web/component_bridge.js",
-      "sha256": "0ab58d09139f0cfd5ea7851541b52c63c4140bea6dc39cf96580cfd3ddb92962"
+      "sha256": "197838e54998e9b5276841b0e021cea333a4019e3b2d1ac15cbbdd04dfc71a56"
     },
     "adapterSource": {
       "path": "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",
@@ -137,7 +137,7 @@
     },
     "dynamicHermesHarness": {
       "path": "native/component_runtime_hermes_e2e.cpp",
-      "sha256": "bd2e7900cd6c20d694f06d0a24654fefa998965c0b09287b52126a17919a1da8"
+      "sha256": "6f08c82f8d84f88e9576bca15bc09e5b2f39a56dcb2f0dd302b0bbcf643c3133"
     }
   }
 }

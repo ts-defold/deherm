@@ -3,15 +3,20 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { assertProjectNativeArtifact } from "../packages/cli/src/toolchains.mjs";
+import {
+  assertProjectNativeArtifact,
+  ensureProjectNativeArtifact
+} from "../packages/cli/src/toolchains.mjs";
 
 export async function main(argv = process.argv.slice(2)) {
-  const [project, target, ...extra] = argv;
-  if (!project || !target || extra.length) {
-    throw new Error("Usage: check-project-native-artifact.mjs <project> <Defold bundle target>");
+  const [project, target, variant, ...extra] = argv;
+  if (!project || !target || !["debug", "release"].includes(variant) || extra.length) {
+    throw new Error("Usage: check-project-native-artifact.mjs <project> <Defold bundle target> <debug|release>");
   }
-  const verified = await assertProjectNativeArtifact(path.resolve(project), target);
-  console.log(`verified ${verified.target} ${path.relative(path.resolve(project), verified.file)} ${verified.sha256}`);
+  const root = path.resolve(project);
+  await ensureProjectNativeArtifact(root, target, { variant });
+  const verified = await assertProjectNativeArtifact(root, target, { variant });
+  console.log(`verified ${verified.target} ${variant} ${path.relative(root, verified.file)}`);
   return verified;
 }
 

@@ -138,7 +138,11 @@ var LibraryDefoldHermes = {
           runtime: 'browser',
           activate: function(candidate) { return DEFOLD_HERMES_BRIDGE.activate(candidate); },
           telemetry: function() { return DEFOLD_HERMES_BRIDGE.telemetry(); }
-};
+          /* DEHERM_DEBUG_SNAPSHOT_BEGIN */
+          ,
+          componentSnapshot: function() { return DEFOLD_HERMES_BRIDGE.componentSnapshot(); }
+          /* DEHERM_DEBUG_SNAPSHOT_END */
+        };
       } catch (error) {
         DEFOLD_HERMES_BRIDGE.reset();
         throw error;
@@ -290,7 +294,14 @@ var LibraryDefoldHermes = {
         }
       };
     },
-fingerprint: function(buffer, capacity) {
+
+    /* DEHERM_DEBUG_SNAPSHOT_BEGIN */
+    componentSnapshot: function() {
+      return DEFOLD_HERMES_COMPONENTS.componentSnapshot(DEFOLD_HERMES_WEB_CALLBACKS.runtime);
+    },
+    /* DEHERM_DEBUG_SNAPSHOT_END */
+
+    fingerprint: function(buffer, capacity) {
       var value = globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__;
       if (typeof value !== 'string' || value.length !== 64 || !/^[0-9a-f]{64}$/.test(value)) return 0;
       if (!capacity) return 0;

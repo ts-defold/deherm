@@ -17,6 +17,13 @@ import {
   selectDehermProject,
   type DehermProject
 } from "./core.js";
+import {
+  liveValueLenses,
+  liveValuesPollIntervalMs,
+  pollInspectorState,
+  readInspectorStateDescriptor,
+  type DevState
+} from "./live-values.js";
 
 const ignoredProjectDirectories = "**/{.git,.deherm,.internal,node_modules,build,dist}/**";
 
@@ -204,22 +211,151 @@ class DehermDebugAdapterFactory implements vscode.DebugAdapterDescriptorFactory 
   }
 }
 
+interface ProjectLiveState {
+  state?: DevState;
+  etag?: string;
+  sessionId?: string;
+  failure?: string;
+}
+
+class DehermLiveValues implements vscode.CodeLensProvider, vscode.Disposable {
+  private readonly changed = new vscode.EventEmitter<void>();
+  private readonly states = new Map<string, ProjectLiveState>();
+  private readonly timers = new Map<string, NodeJS.Timeout>();
+  private readonly polling = new Set<string>();
+  private revision = 0;
+
+  readonly onDidChangeCodeLenses = this.changed.event;
+
+  constructor(
+    private readonly output: vscode.OutputChannel,
+    private readonly projects: ProjectRegistry
+  ) {}
+
+  provideCodeLenses(document: vscode.TextDocument): vscode.CodeLens[] {
+    const project = owningDehermProject(this.projects.all(), document.uri.fsPath);
+    if (!project) return [];
+    const state = this.states.get(project.projectRoot)?.state;
+    return liveValueLenses({
+      state,
+      projectRoot: project.projectRoot,
+      documentPath: document.uri.fsPath
+    }).map(({ title }) => new vscode.CodeLens(
+      new vscode.Range(0, 0, 0, 0),
+      { title, command: "deherm.liveValues.noop" }
+    ));
+  }
+
+  private clear(projectRoot: string, failure?: string): void {
+    const previous = this.states.get(projectRoot);
+    if (failure && previous?.failure !== failure) {
+      this.output.appendLine(`Live component values unavailable for ${projectRoot}: ${failure}`);
+    }
+    this.states.set(projectRoot, { failure });
+    if (previous?.state || previous?.etag || previous?.sessionId) this.changed.fire();
+  }
+
+  private async poll(project: DehermProject, revision: number): Promise<void> {
+    if (revision !== this.revision || this.polling.has(project.projectRoot)) return;
+    this.polling.add(project.projectRoot);
+    try {
+      const descriptor = await readInspectorStateDescriptor(project.projectRoot);
+      if (revision !== this.revision) return;
+      if (!descriptor) {
+        this.clear(project.projectRoot);
+        return;
+      }
+      const previous = this.states.get(project.projectRoot);
+      const sameSession = previous?.sessionId === descriptor.sessionId;
+      if (previous?.sessionId && !sameSession) {
+        this.states.set(project.projectRoot, { sessionId: descriptor.sessionId });
+        this.changed.fire();
+      }
+      const result = await pollInspectorState({
+        descriptor,
+        etag: sameSession ? previous?.etag : undefined,
+        signal: AbortSignal.timeout(Math.min(2_000, liveValuesPollIntervalMs))
+      });
+      if (revision !== this.revision) return;
+      if (result.kind === "updated") {
+        this.states.set(project.projectRoot, {
+          state: result.state,
+          etag: result.etag,
+          sessionId: descriptor.sessionId
+        });
+      } else if (sameSession) {
+        this.states.set(project.projectRoot, {
+          state: previous?.state,
+          etag: result.etag,
+          sessionId: descriptor.sessionId
+        });
+      } else {
+        this.states.set(project.projectRoot, { sessionId: descriptor.sessionId, etag: result.etag });
+      }
+      // Fire on 304 too: a snapshot ages out even when its ETag stays fixed.
+      this.changed.fire();
+    } catch (error) {
+      if (revision === this.revision) this.clear(
+        project.projectRoot,
+        error instanceof Error ? error.message : String(error)
+      );
+    } finally {
+      this.polling.delete(project.projectRoot);
+    }
+  }
+
+  async startAll(): Promise<void> {
+    const revision = ++this.revision;
+    for (const timer of this.timers.values()) clearInterval(timer);
+    this.timers.clear();
+    this.states.clear();
+    this.changed.fire();
+    const projects = await this.projects.refresh();
+    if (revision !== this.revision) return;
+    for (const project of projects) {
+      void this.poll(project, revision);
+      const timer = setInterval(() => { void this.poll(project, revision); }, liveValuesPollIntervalMs);
+      timer.unref?.();
+      this.timers.set(project.projectRoot, timer);
+    }
+  }
+
+  dispose(): void {
+    this.revision += 1;
+    for (const timer of this.timers.values()) clearInterval(timer);
+    this.timers.clear();
+    this.states.clear();
+    this.changed.dispose();
+  }
+}
+
 let activeClients: DehermClients | undefined;
+let activeLiveValues: DehermLiveValues | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
   const output = vscode.window.createOutputChannel("déherm");
   const projects = new ProjectRegistry();
   activeClients = new DehermClients(output, projects);
+  activeLiveValues = new DehermLiveValues(output, projects);
   context.subscriptions.push(
     output,
+    activeLiveValues,
+    vscode.languages.registerCodeLensProvider([
+      { scheme: "file", language: "typescript", pattern: "**/*.script.ts" },
+      { scheme: "file", language: "typescript", pattern: "**/*.gui.ts" },
+      { scheme: "file", language: "typescript", pattern: "**/*.render.ts" }
+    ], activeLiveValues),
+    vscode.commands.registerCommand("deherm.liveValues.noop", () => {}),
     vscode.debug.registerDebugConfigurationProvider("deherm", new DehermDebugConfigurationProvider()),
     vscode.debug.registerDebugAdapterDescriptorFactory("deherm", new DehermDebugAdapterFactory(projects)),
     vscode.commands.registerCommand("deherm.restartLanguageServer", async () => {
       await activeClients?.startAll(true);
+      await activeLiveValues?.startAll();
       if (!activeClients?.hasFailures()) void vscode.window.showInformationMessage("déherm language server restarted");
     }),
     vscode.workspace.onDidChangeWorkspaceFolders(() => {
       void activeClients?.startAll();
+      void activeLiveValues?.startAll();
     }),
     vscode.workspace.onDidChangeConfiguration((event) => {
       if (event.affectsConfiguration("deherm.cliPath") || event.affectsConfiguration("deherm.nodePath")) {
@@ -228,9 +364,12 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     })
   );
   await activeClients.startAll();
+  await activeLiveValues.startAll();
 }
 
 export async function deactivate(): Promise<void> {
   await activeClients?.stopAll();
+  activeLiveValues?.dispose();
   activeClients = undefined;
+  activeLiveValues = undefined;
 }

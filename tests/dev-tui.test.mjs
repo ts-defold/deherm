@@ -293,6 +293,7 @@ const { copyToClipboard, osc52Sequence } = await import("../packages/cli/src/dev
 const { lineSelectionRange, logLines, pointToCaret, selectAllRange, selectedLogText } =
   await import("../packages/cli/src/dev/tui/logViewport.mjs");
 const { closeTopOverlay, createUiState, openOverlay, topOverlay } = await import("../packages/cli/src/dev/tui/state.mjs");
+const { instanceRows } = await import("../packages/cli/src/dev/tui/views.tsx");
 const { devKeymapEntries, footerText, helpBindings, paletteItems } = await import("../packages/cli/src/dev/tui.mjs");
 
 function renderConsole(viewport, uiState, snapshotValue = snapshot()) {
@@ -478,11 +479,76 @@ test("the generations view is a build timeline with its activation outcome", () 
   assert.match(text, /12 \(-1\.0 KiB\)/);
 });
 
-test("the instances view states its missing channel rather than inventing identities", () => {
+test("the instances view waits for genuine runtime snapshots rather than inventing identities", () => {
   const text = renderConsole({ cols: 150, rows: 48 }, createUiState({ view: "instances" })).toText();
-  assert.match(text, /requires runtime instance channel/);
-  assert.match(text, /counts, never identities/);
+  assert.match(text, /waiting for a component snapshot/);
+  assert.match(text, /debug-enabled native or browser target/);
   assert.match(text, /component instances\s+1/);
+});
+
+test("the instances view projects exact runtime identity, schema state, and bounded values", () => {
+  const live = snapshot({
+    targets: [{
+      id: "local-engine",
+      connectionEpoch: 2,
+      instances: [{
+        instanceId: { slot: 4, generation: 3 },
+        componentId: "player",
+        source: "main/player.script.ts",
+        schemaStatus: "current",
+        properties: [
+          { name: "health", value: { kind: "number", value: 100 } },
+          { name: "target", value: { kind: "hash", value: "0000000000000001" } },
+          { name: "position", value: { kind: "vector3", value: [1, 2, 3] } },
+          { name: "unsafe", value: { kind: "string", value: "line\n\u001b[2J" } },
+          { name: "address", value: {
+            kind: "url",
+            socket: "0000000000000001",
+            reserved: "0000000000000002",
+            path: "0000000000000003",
+            fragment: "0000000000000004"
+          } }
+        ]
+      }]
+    }]
+  });
+  assert.deepEqual(instanceRows(live), [{
+    key: "local-engine:2:4:3",
+    target: "local-engine",
+    identity: "4:3",
+    component: "main/player.script.ts",
+    schema: "current",
+    properties: "health=100  target=#0000000000000001  position=[1, 2, 3]  " +
+      "unsafe=\"line\\n\\u001b[2J\"  " +
+      "address=url(0000000000000001:0000000000000002:0000000000000003:0000000000000004)"
+  }]);
+
+  const text = renderConsole({ cols: 150, rows: 48 }, createUiState({ view: "instances" }), live).toText();
+  assert.match(text, /main\/player\.script\.ts/);
+  assert.match(text, /4:3/);
+  assert.match(text, /current/);
+  assert.match(text, /health=100/);
+  assert.match(text, /slot:generation identities are runtime-local/);
+
+  const hostile = snapshot({
+    targets: [{
+      id: "browser\u001b]52;c;dGFpbnRlZA==\u0007",
+      connectionEpoch: 1,
+      instances: [{
+        instanceId: { slot: 1, generation: 1 },
+        componentId: "fallback\u001b[2J",
+        source: "main/hostile\u001b[2J.script.ts",
+        schemaStatus: "current\u0007",
+        properties: [{ name: "label\u001b]0;x\u0007", value: { kind: "string", value: "safe" } }]
+      }]
+    }]
+  });
+  const [hostileRow] = instanceRows(hostile);
+  for (const field of [hostileRow.target, hostileRow.component, hostileRow.schema,
+    hostileRow.properties]) {
+    assert.doesNotMatch(field, /[\u0000-\u001f\u007f-\u009f]/u,
+      "live instance rows must not pass terminal control bytes through");
+  }
 });
 
 test("only the focused panel wears the focus ring", () => {

@@ -63,7 +63,14 @@ class InspectorClient {
       inspectorOpen_ = false;
     }
     attachInspectorLocked();
-    if (runtime_ && inspectorOpen_) runtime_->pumpInspector();
+    if (runtime_ && inspectorOpen_) {
+      runtime_->pumpInspector();
+      const auto now = std::chrono::steady_clock::now();
+      if (connected_.load(std::memory_order_acquire) && now >= nextSnapshot_) {
+        enqueue(runtime_->sampleComponentSnapshot());
+        nextSnapshot_ = now + kSnapshotInterval;
+      }
+    }
   }
 
   void close() {
@@ -89,6 +96,23 @@ class InspectorClient {
   static constexpr uint32_t kMaximumCommandsPerPump = 256;
   static constexpr auto kConnectedPollDelay = std::chrono::milliseconds(2);
   static constexpr auto kReconnectDelay = std::chrono::milliseconds(250);
+  // Four samples per second keeps the development-only projection live while
+  // bounding worst-case 512 KiB serialization to 2 MiB/s per attached target.
+  static constexpr auto kSnapshotInterval = std::chrono::milliseconds(250);
+
+  void enqueue(std::string message) {
+    if (message.empty()) return;
+    std::lock_guard<std::mutex> lock(outputMutex_);
+    const size_t framedSize = message.size() + 1;
+    if (framedSize > kMaximumBufferedBytes ||
+        outputBytes_ > kMaximumBufferedBytes - framedSize) {
+      overflowed_ = true;
+      return;
+    }
+    message.push_back('\n');
+    outputBytes_ += framedSize;
+    output_.push_back({std::move(message), 0});
+  }
 
   bool connect() {
     dmSocket::Socket candidate = dmSocket::INVALID_SOCKET_HANDLE;
@@ -115,15 +139,9 @@ class InspectorClient {
   void attachInspectorLocked() {
     if (!runtime_ || inspectorOpen_ || !port_) return;
     inspectorOpen_ = runtime_->openInspector([this](const std::string& message) {
-      std::lock_guard<std::mutex> lock(outputMutex_);
-      const size_t framedSize = message.size() + 1;
-      if (framedSize > kMaximumBufferedBytes || outputBytes_ > kMaximumBufferedBytes - framedSize) {
-        overflowed_ = true;
-        return;
-      }
-      output_.push_back({message + '\n', 0});
-      outputBytes_ += framedSize;
+      enqueue(message);
     });
+    nextSnapshot_ = std::chrono::steady_clock::time_point::min();
   }
 
   void receiveCommands() {
@@ -259,6 +277,7 @@ class InspectorClient {
   std::deque<OutboundFrame> output_;
   size_t outputBytes_ = 0;
   bool overflowed_ = false;
+  std::chrono::steady_clock::time_point nextSnapshot_{};
 };
 
 }  // namespace defold_hermes

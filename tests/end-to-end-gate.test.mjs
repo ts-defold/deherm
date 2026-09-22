@@ -155,7 +155,7 @@ test("pushes run the available cheap consumer half while artifact-dispatched run
 
 test("Bob consumes the generated project's target artifact instead of rebuilding a host-native package", async () => {
   const wrapper = await readFile(new URL("../scripts/bob.sh", import.meta.url), "utf8");
-  assert.match(wrapper, /check-project-native-artifact\.mjs" "\$project_root" "\$bundle_target"/u);
+  assert.match(wrapper, /check-project-native-artifact\.mjs" "\$project_root" "\$bundle_target" "\$variant"/u);
   assert.match(wrapper, /--platform "\$bob_platform"/u);
   assert.match(wrapper, /resolve-defold-platform\.mjs/u);
   assert.match(wrapper, /resolve-defold-platform\.mjs" "\$platform_input" "\$project_root"/u);
