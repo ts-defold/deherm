@@ -13,6 +13,11 @@ unless the operator explicitly passes `--replace-debugger`.
 
 Focused loopback tests passed the exact CPU request sequence, artifact content,
 ordered heap-chunk stream, private descriptor mode, and replacement-safe cleanup.
+Review of the cleanup algorithm found that its original read-then-remove sequence
+still had a time-of-check/time-of-use window. Cleanup now renames the descriptor
+to a unique claim before validation and restores a mismatched or malformed claim
+only when no newer canonical descriptor exists; the focused suite preserves both
+replacement and malformed evidence and passes 11/11.
 The pinned native Hermes runtime separately compiled and executed `Profiler.start`,
 work under `Runtime.evaluate`, `Profiler.stop`, and a non-empty
 `HeapProfiler.takeHeapSnapshot`. That native test exposed a reused-CMake-cache

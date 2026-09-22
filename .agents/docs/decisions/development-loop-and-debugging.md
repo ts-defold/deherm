@@ -121,8 +121,10 @@ The development Hermes build enables sampling-profiler support and carries the
 Hermes CDP Profiler and HeapProfiler domains. A live development session writes
 an atomic, mode-0600 `.deherm/dev/inspector.json` descriptor containing a random
 session identity and loopback-only discovery URLs. The bridge removes that file
-only when it still owns the recorded identity, so an old session cannot erase a
-replacement session's descriptor. Readers reject non-loopback URLs and require
+only when it still owns the recorded identity. Cleanup first atomically claims
+the directory entry and restores a mismatched descriptor with create-if-absent
+semantics; a replacement published before or during cleanup therefore wins and
+an old session cannot erase it. Readers reject non-loopback URLs and require
 discovery to return the exact WebSocket recorded by the descriptor.
 
 `deherm profile cpu --duration <ms>` sends `Profiler.start`/`Profiler.stop` and

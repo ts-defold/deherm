@@ -1,14 +1,19 @@
 import assert from "node:assert/strict";
 import net from "node:net";
 import path from "node:path";
-import { mkdir, mkdtemp, readFile, rm, stat } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import test from "node:test";
 
 import WebSocket from "ws";
 
 import { createInspectorBridge } from "../packages/cli/src/dev/inspector-bridge.mjs";
-import { createInspectorSession, readInspectorSession } from "../packages/cli/src/dev/inspector-session.mjs";
+import {
+  createInspectorSession,
+  readInspectorSession,
+  removeOwnedInspectorSession,
+  writeInspectorSession
+} from "../packages/cli/src/dev/inspector-session.mjs";
 
 function event(target, name) {
   return new Promise((resolve, reject) => {
@@ -104,6 +109,30 @@ test("bridge publishes a private session descriptor and stale owners cannot remo
   assert.equal((await readInspectorSession(sessionFile)).sessionId, secondSession.sessionId);
   await second.close();
   await assert.rejects(() => readFile(sessionFile), { code: "ENOENT" });
+});
+
+test("owned-session cleanup preserves a different or malformed descriptor", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-inspector-owner-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const sessionFile = path.join(root, "inspector.json");
+  const replacement = createInspectorSession({
+    projectRoot: root,
+    enginePort: 9000,
+    devtoolsPort: 9001,
+    devtoolsUrl: "http://127.0.0.1:9001",
+    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm"
+  });
+  await writeInspectorSession(sessionFile, replacement);
+  assert.equal(await removeOwnedInspectorSession(sessionFile, "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), false);
+  assert.equal((await readInspectorSession(sessionFile)).sessionId, replacement.sessionId);
+
+  const malformed = "{ definitely-not-json }\n";
+  await writeFile(sessionFile, malformed, { mode: 0o600 });
+  await assert.rejects(
+    () => removeOwnedInspectorSession(sessionFile, replacement.sessionId),
+    /Could not read inspector session/
+  );
+  assert.equal(await readFile(sessionFile, "utf8"), malformed);
 });
 
 test("session descriptors reject non-loopback debugger endpoints", () => {

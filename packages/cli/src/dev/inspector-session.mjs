@@ -1,6 +1,6 @@
 import path from "node:path";
 import { randomUUID } from "node:crypto";
-import { chmod, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { chmod, link, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 
 export const inspectorSessionSchemaVersion = 1;
 
@@ -100,14 +100,50 @@ export async function readInspectorSession(file) {
 
 export async function removeOwnedInspectorSession(file, sessionId) {
   const source = path.resolve(file);
-  let current;
+  const claimed = `${source}.${process.pid}.${randomUUID()}.remove`;
   try {
-    current = await readInspectorSession(source);
+    // Claim the directory entry before inspecting it. A read-then-unlink
+    // sequence has a TOCTOU window where a replacement session can publish
+    // after the read and then be removed by the stale owner. Renaming first
+    // means a concurrently published replacement always receives a fresh
+    // directory entry that this cleanup never touches.
+    await rename(source, claimed);
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith("No live inspector session")) return false;
+    if (error?.code === "ENOENT") return false;
     throw error;
   }
-  if (current.sessionId !== sessionId) return false;
-  await rm(source, { force: true });
-  return true;
+  let discardClaim = false;
+  const restoreClaim = async () => {
+    try {
+      await link(claimed, source);
+    } catch (error) {
+      if (error?.code !== "EEXIST") throw error;
+    }
+    discardClaim = true;
+  };
+  try {
+    let current;
+    try {
+      current = await readInspectorSession(claimed);
+    } catch (error) {
+      // Malformed state is evidence worth preserving. Restore it before
+      // surfacing the validation error rather than turning cleanup into data
+      // loss.
+      await restoreClaim();
+      throw error;
+    }
+    if (current.sessionId === sessionId) {
+      discardClaim = true;
+      return true;
+    }
+
+    // We claimed somebody else's descriptor. Restore it only if no newer
+    // writer has already populated the canonical path. A hard link provides
+    // an atomic create-if-absent operation on the same project filesystem;
+    // EEXIST means the newer descriptor wins.
+    await restoreClaim();
+    return false;
+  } finally {
+    if (discardClaim) await rm(claimed, { force: true });
+  }
 }
