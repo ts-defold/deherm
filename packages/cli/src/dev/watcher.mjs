@@ -8,9 +8,10 @@ const defaultIgnored = new Set([".deherm", ".git", ".internal", "build", "dist",
 // path. Watching the scratch name schedules work against a file that no longer
 // exists by the time the build runs, so a rebuild fails for a reason the author
 // never caused. Covers `<name>.tmp`, `<name>.tmp-<pid>[-<digest>]`,
-// `<name>.tmp.<pid>.<digest>`, `<name>.deherm-tmp-<pid>[-<sequence>]`, and the
-// usual editor scratch and backup names.
-const temporaryArtifact = /(?:\.(?:deherm-)?tmp(?:[-.](?:\d+|[0-9a-f]{6,}))*|\.sw[a-p]|~|\.orig|\.rej|\.bak)$/i;
+// `<name>.tmp.<pid>.<digest>`, `<name>.deherm-tmp-<pid>[-<sequence>]`,
+// `<name>.deherm-replace-<pid>-<digest>`, and the usual editor scratch and
+// backup names.
+const temporaryArtifact = /(?:\.(?:deherm-)?tmp(?:[-.](?:\d+|[0-9a-f]{6,}))*|\.deherm-replace-\d+-[0-9a-f]{6,}|\.sw[a-p]|~|\.orig|\.rej|\.bak)$/i;
 const editorScratch = /^(?:\.#|#|\.~lock\.)/;
 
 export function isTemporaryArtifact(relative) {

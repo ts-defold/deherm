@@ -114,14 +114,30 @@ async function entryTsconfig(projectRoot, entryPoint) {
   return await exists(conventional) ? conventional : undefined;
 }
 
-export function createDevWatchOptions({ outputFile, sourceMirror, buildMirror, lockFile, generatedRoot, generatedProxyPaths = new Set() }) {
+export function createDevWatchOptions({
+  projectRoot,
+  outputFile,
+  sourceMirror,
+  buildMirror,
+  lockFile,
+  generatedRoot,
+  generatedProxyPaths = new Set()
+}) {
+  const toolchainOutputs = projectRoot ? [
+    path.join(projectRoot, ".defignore"),
+    path.join(projectRoot, "defold_hermes", "include", "libhermesvm-config.h"),
+    path.join(projectRoot, "defold_hermes", "include", "defold_hermes", "generated_runtime_variant.h"),
+    path.join(projectRoot, "defold_hermes", "lib")
+  ] : [];
   return {
     ignoredPaths: [outputFile, sourceMirror, buildMirror].flatMap((file) => [
       file,
       `${file}.map`,
       `${file}.hbc`,
       `${file}.hbc.map`
-    ]).concat(lockFile ? [lockFile] : []).concat(generatedRoot ? [generatedRoot] : []),
+    ]).concat(lockFile ? [lockFile] : [])
+      .concat(generatedRoot ? [generatedRoot] : [])
+      .concat(toolchainOutputs),
     // The watcher already drops every atomic-write scratch name, including
     // `.deherm-tmp-*`; this only hides the proxies the session itself writes.
     shouldIgnore: (_file, relative) => generatedProxyPaths.has(relative)
@@ -607,6 +623,7 @@ export async function runDevSession(options = {}) {
       : projectRoot,
     debounceMs: options.debounceMs,
     ...createDevWatchOptions({
+      projectRoot,
       outputFile,
       sourceMirror,
       buildMirror,

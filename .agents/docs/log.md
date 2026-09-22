@@ -1,5 +1,25 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Development artifact writes no longer rebuild their own engine
+
+The public `deherm dev` session now excludes only its exact tool-owned native
+artifact outputs from the project watcher: the installed Hermes archive and
+receipt directory, `libhermesvm-config.h`, the generated runtime-variant
+selector, and `.defignore`. Atomic replacement scratch files are also rejected
+before batching. Authored extension sources and headers beneath
+`defold_hermes/src` and `defold_hermes/include/defold_hermes` remain visible to
+the watcher.
+
+A fresh War Battles session against the pinned local Extender completed one
+ttsc/bundle generation, one Bob engine build, one engine launch, one exact
+fingerprint activation, and one native Hermes inspector connection. Ten seconds
+of subsequent telemetry produced no second build. The authenticated live-state
+endpoint remained available with current-schema rows for 37 instances; the
+arena row exposed `players=8`, `botSkill=2`, and `mapSeed=0`. Focused watcher and
+dev-loop tests pass 19/19. This is real packaged native runtime and watcher
+evidence; macOS remained locked, so the same values have not yet been visually
+recorded inside the VS Code CodeLens.
+
 ## 2026-09-22 - Fresh War Battles HTML5 proves WebGL rendering and keyboard input
 
 The current War Battles project now builds as a fresh `wasm-web` bundle through

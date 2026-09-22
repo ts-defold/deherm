@@ -99,6 +99,16 @@ The first transport uses Defold's resource-reload callback for the generated JS
 resource. A local WebSocket transport follows for remote devices and reloads
 that should not require an editor resource build.
 
+The development watcher treats files written by its own compiler, proxy,
+toolchain-artifact, and runtime-variant stages as outputs rather than new source
+events. The native artifact boundary is deliberately exact: the installed
+archive/receipt tree, `libhermesvm-config.h`, and the generated runtime selector
+are ignored, while authored extension C/C++ sources and headers remain watched.
+Atomic replacement scratch names are ignored independently so a rename-based
+writer cannot schedule a build against a temporary path that has already
+disappeared. A clean launch must therefore converge after one initial build;
+any later build requires an authored or external project input.
+
 # Debugger transport
 
 The pinned Hermes source contains `CDPDebugAPI`, `CDPAgent`, Debugger, Runtime,

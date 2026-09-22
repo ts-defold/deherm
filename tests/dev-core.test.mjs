@@ -151,6 +151,7 @@ test("watcher suppresses declared generated outputs without hiding source edits"
   assert.equal(filterPath(path.join(root, "generated", "proxy.script")), undefined);
   assert.equal(filterPath(path.join(root, "generated", "proxy.script", "nested")), undefined);
   assert.equal(filterPath(path.join(root, "ignored.deherm-self")), undefined);
+  assert.equal(filterPath(path.join(root, "artifact.a.deherm-replace-1234-abcdef0123")), undefined);
   assert.equal(filterPath(path.join(root, ".deherm", "dev", "app.js")), undefined);
   assert.equal(filterPath(path.join(root, ".internal", "cache", "digest")), undefined);
   assert.equal(filterPath(path.join(root, "player.script.ts")), "player.script.ts");
@@ -165,7 +166,7 @@ test("session watcher suppresses generated outputs without hiding authored Lua",
   const generatedRoot = path.join(root, "generated-sdk");
   const generatedProxyPaths = new Set(["scripts/player.script", "gui/hud.gui_script"]);
   const filterPath = createWatchPathFilter(root, createDevWatchOptions({
-    outputFile, sourceMirror, buildMirror, lockFile, generatedRoot, generatedProxyPaths
+    projectRoot: root, outputFile, sourceMirror, buildMirror, lockFile, generatedRoot, generatedProxyPaths
   }));
   for (const artifact of [outputFile, sourceMirror, buildMirror]) {
     assert.equal(filterPath(artifact), undefined);
@@ -175,6 +176,13 @@ test("session watcher suppresses generated outputs without hiding authored Lua",
   }
   assert.equal(filterPath(lockFile), undefined);
   assert.equal(filterPath(path.join(generatedRoot, "generated", "resource-symbols.json")), undefined);
+  assert.equal(filterPath(path.join(root, ".defignore")), undefined);
+  assert.equal(filterPath(path.join(root, "defold_hermes", "include", "libhermesvm-config.h")), undefined);
+  assert.equal(filterPath(path.join(root, "defold_hermes", "include", "defold_hermes", "generated_runtime_variant.h")), undefined);
+  assert.equal(filterPath(path.join(root, "defold_hermes", "lib", "arm64-osx", ".deherm-artifact.json")), undefined);
+  assert.equal(filterPath(path.join(root, "defold_hermes", "lib", "arm64-osx", "libhermes.a")), undefined);
+  assert.equal(filterPath(path.join(root, "defold_hermes", "include", "defold_hermes", "script_adapter.hpp")), "defold_hermes/include/defold_hermes/script_adapter.hpp");
+  assert.equal(filterPath(path.join(root, "defold_hermes", "src", "extension.cpp")), "defold_hermes/src/extension.cpp");
   assert.equal(filterPath(path.join(root, "scripts", "player.script")), undefined);
   assert.equal(filterPath(path.join(root, "gui", "hud.gui_script")), undefined);
   assert.equal(filterPath(path.join(root, "scripts", "authored.script")), "scripts/authored.script");
