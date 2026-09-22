@@ -28,17 +28,35 @@ var LibraryDefoldHermesComponents = {
     snapshotSequence: 0,
     snapshotByteCapacity: 512 * 1024,
     snapshotStringByteCapacity: 256,
-    reflectApply: Reflect.apply,
-    objectCreate: Object.create,
-    getOwnPropertyDescriptor: Object.getOwnPropertyDescriptor,
-    defineProperty: Object.defineProperty,
-    numberIsFinite: Number.isFinite,
-    numberToString: Number.prototype.toString,
-    bigintToString: BigInt.prototype.toString,
-    bigintZero: 0n,
-    bigintMaximum: 0xffffffffffffffffn,
-    stringCharCodeAt: String.prototype.charCodeAt,
-    sampleUnixMilliseconds: Date.now,
+    // Emscripten 4.0.x serializes this library object at link time. Native
+    // functions and BigInt values cannot live in that object yet, so capture
+    // the browser intrinsics once when the runtime activates instead.
+    reflectApply: null,
+    objectCreate: null,
+    getOwnPropertyDescriptor: null,
+    defineProperty: null,
+    numberIsFinite: null,
+    numberToString: null,
+    bigintToString: null,
+    bigintZero: null,
+    bigintMaximum: null,
+    stringCharCodeAt: null,
+    sampleUnixMilliseconds: null,
+
+    initializeDebug: function() {
+      if (this.reflectApply !== null) return;
+      this.reflectApply = Reflect.apply;
+      this.objectCreate = Object.create;
+      this.getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
+      this.defineProperty = Object.defineProperty;
+      this.numberIsFinite = Number.isFinite;
+      this.numberToString = Number.prototype.toString;
+      this.bigintToString = BigInt.prototype.toString;
+      this.bigintZero = BigInt(0);
+      this.bigintMaximum = BigInt('0xffffffffffffffff');
+      this.stringCharCodeAt = String.prototype.charCodeAt;
+      this.sampleUnixMilliseconds = Date.now;
+    },
 
     appendArray: function(array, value) {
       this.defineProperty(array, array.length, {

@@ -80,6 +80,13 @@ Emscripten library to install the generated modules and application lifecycle.
 Extender discovers `.js` files under `lib/wasm-web` and the shared `lib/web`
 directory automatically and passes them to Emscripten as `--js-library` inputs.
 
+Emscripten library objects must contain link-time-serializable values. Debug
+inspection therefore declares null slots for browser native functions and
+`BigInt` bounds, then captures the pristine intrinsics at runtime immediately
+before application evaluation. This both satisfies Emscripten's serializer and
+prevents application code from substituting the inspection primitives. The
+release runtime generator removes the debug capture and snapshot machinery.
+
 The browser bootstrap now installs `DEFOLD_HERMES_SCRIPT_UNIVERSAL`, not the
 legacy six-argument scalar provider. That generated provider projects the same
 bounded recursive value graph used by native code directly into Wasm memory,

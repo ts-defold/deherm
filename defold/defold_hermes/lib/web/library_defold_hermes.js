@@ -138,7 +138,7 @@ var LibraryDefoldHermes = {
           runtime: 'browser',
           activate: function(candidate) { return DEFOLD_HERMES_BRIDGE.activate(candidate); },
           telemetry: function() { return DEFOLD_HERMES_BRIDGE.telemetry(); }
-};
+        };
       } catch (error) {
         DEFOLD_HERMES_BRIDGE.reset();
         throw error;
@@ -290,7 +290,9 @@ var LibraryDefoldHermes = {
         }
       };
     },
-fingerprint: function(buffer, capacity) {
+
+
+    fingerprint: function(buffer, capacity) {
       var value = globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__;
       if (typeof value !== 'string' || value.length !== 64 || !/^[0-9a-f]{64}$/.test(value)) return 0;
       if (!capacity) return 0;

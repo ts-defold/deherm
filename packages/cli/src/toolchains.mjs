@@ -161,7 +161,10 @@ export function renderWebRuntimeVariant(source, variant) {
     ? source
       .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\t ]*\r?\n/gmu, "")
       .replace(/^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/[\t ]*\r?\n/gmu, "")
-    : source.replace(/\s*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\s\S]*?\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/\s*/gu, "\n");
+    : source.replace(
+      /^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_BEGIN \*\/[\t ]*\r?\n[\s\S]*?^[\t ]*\/\* DEHERM_DEBUG_SNAPSHOT_END \*\/[\t ]*\r?\n/gmu,
+      ""
+    );
   if (rendered.includes(webDebugBegin) || rendered.includes(webDebugEnd)) {
     throw new Error("Web runtime snapshot variant markers survived rendering");
   }

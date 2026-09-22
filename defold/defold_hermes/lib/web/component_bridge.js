@@ -24,7 +24,8 @@ var LibraryDefoldHermesComponents = {
     slots: null,
     cursor: 0,
     live: 0,
-activate: function() {
+
+    activate: function() {
       this.slots = new Array(this.capacity);
       for (var index = 0; index < this.capacity; ++index) {
         this.slots[index] = {
@@ -35,11 +36,11 @@ activate: function() {
           componentId: '',
           schema: '',
           contextKind: '',
-};
+        };
       }
       this.cursor = 0;
       this.live = 0;
-this.revision = (this.revision + 1) >>> 0 || 1;
+      this.revision = (this.revision + 1) >>> 0 || 1;
       return this.revision;
     },
 
@@ -47,7 +48,7 @@ this.revision = (this.revision + 1) >>> 0 || 1;
       this.slots = null;
       this.cursor = 0;
       this.live = 0;
-this.revision = 0;
+      this.revision = 0;
     },
 
     registry: function() {
@@ -90,7 +91,7 @@ this.revision = 0;
       slot.componentId = componentId;
       slot.schema = schemaFingerprint;
       slot.contextKind = contextKind;
-slot.live = true;
+      slot.live = true;
       this.cursor = (slotIndex + 1) % this.capacity;
       ++this.live;
       return {slot: slotIndex, generation: slot.generation};
@@ -98,9 +99,11 @@ slot.live = true;
 
     setProperty: function(slot, generation, name, value) {
       var entry = this.resolve(slot, generation);
-entry.self[name] = value;
-},
-dispatch: function(slot, generation, lifecycle, args) {
+      entry.self[name] = value;
+    },
+
+
+    dispatch: function(slot, generation, lifecycle, args) {
       var entry = this.resolve(slot, generation);
       var hook = entry.definition[lifecycle];
       if (hook === undefined || hook === null) return false;
@@ -163,7 +166,7 @@ dispatch: function(slot, generation, lifecycle, args) {
       entry.componentId = '';
       entry.schema = '';
       entry.contextKind = '';
-entry.generation = (entry.generation + 1) >>> 0 || 1;
+      entry.generation = (entry.generation + 1) >>> 0 || 1;
       if (this.live) --this.live;
     },
 

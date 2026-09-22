@@ -633,6 +633,54 @@ of page errors. It also does not promote Static Hermes, the production external
 bundle loader, input handling from a real device, audio, or whole-API browser
 conformance.
 
+## Fresh WebGL and keyboard observation on 2026-09-22
+
+A fresh `wasm-web` debug bundle was built from the current War Battles tree
+through `scripts/bob-local.sh bundle` and the pinned local Extender. The first
+link exposed a real Emscripten 4.0.6 incompatibility: the debug component bridge
+stored browser native functions and `BigInt` values directly in an Emscripten
+library object, whose linker serializer cannot encode `BigInt`. The source
+template now keeps serialization-safe null slots and captures the pristine
+browser intrinsics at runtime immediately before evaluating application code.
+The release-variant generator continues to strip this debug inspection path.
+
+The rebuilt bundle completed at fingerprint
+`2f8c022bee455ca3794ffa3e3f0a632f136c6a1b58484e029d0d1981096badb9`.
+The packaged runtime gate then observed Defold 1.14.0, the
+`default-legacy-bullet` profile with 315 generated Lua symbols, bundle
+generation 1, all tutorial/gameplay markers, and the eight-player offline arena
+without a page failure. The gate now treats the generated-symbol count as a
+positive runtime measurement rather than a pinned API identity, and it clears
+its transcript before asking Chrome to reload so a late
+`executionContextsCleared` event cannot erase startup evidence from the new
+document.
+
+A separate Chrome DevTools Protocol observation exercised the rendered game,
+not only its log. Chrome ran the bundle with WebGL enabled through ANGLE and
+SwiftShader and reported WebGL 2.0 / OpenGL ES 3.0, GLSL ES 3.00, a 756 by 425
+canvas, depth and stencil buffers, and a live context. A screenshot before
+input was 58,751 bytes with SHA-256
+`411129321c3168e23f55ac09870c75f0e9a240998add849cafbfbe834813e9e0`;
+after a real CDP `D` key-down/key-up sequence it was 82,690 bytes with SHA-256
+`3c48f346a5e2c0f2bb92c90768da0e95579235fbf2061b5ff7c9c90782935a26`.
+The framebuffer changed, the game emitted
+`war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline`,
+and the camera target moved right from approximately -39.8 to -22.0. The two
+temporary screenshots were inspected locally: the first shows the tutorial
+tank, textured grass, score, controls and wall edge; the second shows the full
+arena with tanks, pickups, walls, HUD and frag list. They are observations, not
+repository fixtures.
+
+The debug control plane simultaneously reported generation 1, component
+revision 1, 49 live component instances within the fixed 1,024-slot capacity,
+and a complete component snapshot with no omitted instances. Hermes heap data
+was correctly unavailable because the browser-host target uses the browser's
+JavaScript engine rather than embedding Hermes. This evidence proves the fresh
+HTML5 artifact starts, renders through WebGL 2, accepts keyboard input, changes
+game state and exposes live telemetry on this local software-rendered Chrome
+configuration. It does not measure hardware-GPU performance, audio,
+internet-hosted multiplayer, native Hermes execution, leaks or sanitizers.
+
 # Open evidence gaps
 
 The next promotion gate should rebuild this proof from a clean checkout in

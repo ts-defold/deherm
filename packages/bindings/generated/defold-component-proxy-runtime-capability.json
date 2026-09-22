@@ -121,7 +121,7 @@
     },
     "browserProvider": {
       "path": "defold/defold_hermes/lib/web/component_bridge.js",
-      "sha256": "197838e54998e9b5276841b0e021cea333a4019e3b2d1ac15cbbdd04dfc71a56"
+      "sha256": "87ea9fe1c2b73df9b79ab8420ca0e455b32f2ccc5633738ea82abe7a729f52a2"
     },
     "adapterSource": {
       "path": "defold/defold_hermes/src/script_scalar_lua_adapter.cpp",

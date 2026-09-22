@@ -10,6 +10,26 @@ const extensionBootstrapSource = await readFile(
   "utf8"
 );
 
+test("release web runtime stripping preserves the surrounding source layout", () => {
+  const source = [
+    "var value = {",
+    "  live: true,",
+    "  /* DEHERM_DEBUG_SNAPSHOT_BEGIN */",
+    "  debug: 1,",
+    "  /* DEHERM_DEBUG_SNAPSHOT_END */",
+    "  next: true",
+    "};",
+    ""
+  ].join("\n");
+  assert.equal(renderWebRuntimeVariant(source, "release"), [
+    "var value = {",
+    "  live: true,",
+    "  next: true",
+    "};",
+    ""
+  ].join("\n"));
+});
+
 test("browser bootstrap installs the generated universal script provider", () => {
   assert.match(extensionBootstrapSource, /'\$DEFOLD_HERMES_SCRIPT_UNIVERSAL'/);
   assert.match(extensionBootstrapSource, /__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_UNIVERSAL\.install\(\)/);

@@ -46,8 +46,14 @@ const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
 // tutorial's own behaviour.
 export const REQUIRED_ENGINE_MARKERS = Object.freeze([
   "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
-  "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
   "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'"
+]);
+
+// The generated Lua symbol count grows as the mirrored Defold surface grows;
+// it is runtime evidence, not a fixed identity. Assert the exact profile and a
+// positive measured count without pinning this game gate to yesterday's API.
+export const REQUIRED_ENGINE_MARKER_PATTERNS = Object.freeze([
+  /^INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from [1-9][0-9]* generated Lua symbols$/u
 ]);
 
 export const REQUIRED_GAME_MARKERS = Object.freeze([
@@ -104,6 +110,11 @@ function missing(transcript) {
   for (const marker of [...REQUIRED_ENGINE_MARKERS, ...REQUIRED_GAME_MARKERS]) {
     if (!transcript.some((line) => line === marker)) absent.push({ kind: "exact", marker });
   }
+  for (const pattern of REQUIRED_ENGINE_MARKER_PATTERNS) {
+    if (!transcript.some((line) => pattern.test(line))) {
+      absent.push({ kind: "pattern", marker: pattern.source });
+    }
+  }
   for (const prefix of REQUIRED_GAME_MARKER_PREFIXES) {
     if (!transcript.some((line) => line.startsWith(prefix))) absent.push({ kind: "prefix", marker: prefix });
   }
@@ -136,19 +147,25 @@ async function run() {
   const { client, pageUrl, profile } = page;
 
   try {
+    // Clear before requesting the reload. Chrome can deliver
+    // executionContextsCleared after the new page has already logged its
+    // startup; clearing after that event discarded the very run being tested.
+    client.transcript.length = 0;
+    client.failures.length = 0;
     const cleared = client.waitForEvent("Runtime.executionContextsCleared");
     const loaded = client.waitForEvent("Page.loadEventFired");
     await client.send("Page.reload", { ignoreCache: true });
     await cleared;
-    // Discard inspector events replayed from the pre-reload document so the
-    // transcript belongs to exactly one page load.
-    client.transcript.length = 0;
-    client.failures.length = 0;
     await loaded;
 
     const timeoutMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_BROWSER_TIMEOUT_MS ?? "45000", 10);
-    await waitFor(async () => missing(client.transcript).length === 0,
-      { timeoutMs, intervalMs: 250, what: `the required marker set (absent: ${JSON.stringify(missing(client.transcript))})` });
+    try {
+      await waitFor(async () => missing(client.transcript).length === 0,
+        { timeoutMs, intervalMs: 250, what: `the required marker set (absent: ${JSON.stringify(missing(client.transcript))})` });
+    } catch (error) {
+      const tail = client.transcript.slice(-40);
+      throw new Error(`${error.message}\nTranscript tail: ${JSON.stringify(tail)}\nPage failures: ${JSON.stringify(client.failures)}`);
+    }
 
     const state = await client.send("Runtime.evaluate", {
       expression: `({
@@ -186,6 +203,7 @@ async function run() {
       bundleSha256: createHash("sha256").update(bundleBytes).digest("hex"),
       state: observed,
       requiredEngineMarkers: [...REQUIRED_ENGINE_MARKERS],
+      requiredEngineMarkerPatterns: REQUIRED_ENGINE_MARKER_PATTERNS.map((pattern) => pattern.source),
       requiredGameMarkers: [...REQUIRED_GAME_MARKERS],
       observedGameMarkers: client.transcript.filter((line) => line.startsWith("war-battles:") && !line.startsWith("war-battles:camera:")),
       cameraSampleCount: cameraSamples.length,

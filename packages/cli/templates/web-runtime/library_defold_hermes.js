@@ -117,6 +117,12 @@ var LibraryDefoldHermes = {
       };
       globalThis.__defoldModulesV1 = DEFOLD_HERMES_GENERATED_MODULES.install();
       globalThis.__defoldScriptBridgeV1 = DEFOLD_HERMES_SCRIPT_UNIVERSAL.install();
+      /* DEHERM_DEBUG_SNAPSHOT_BEGIN */
+      // Capture inspection intrinsics before evaluating application code. The
+      // values cannot live in the Emscripten library object at link time, but
+      // user code must not get a chance to replace them first.
+      DEFOLD_HERMES_COMPONENTS.initializeDebug();
+      /* DEHERM_DEBUG_SNAPSHOT_END */
 
       try {
         (0, eval)(source + '\n//# sourceURL=defold-hermes://app.js');

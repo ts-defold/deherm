@@ -1,5 +1,25 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Fresh War Battles HTML5 proves WebGL rendering and keyboard input
+
+The current War Battles project now builds as a fresh `wasm-web` bundle through
+the pinned local Extender. Emscripten 4.0.6 initially rejected a debug library
+object containing native functions and `BigInt` values; the generated web
+runtime now keeps link-time-safe null slots and captures those pristine browser
+intrinsics immediately before application evaluation. Focused web-runtime
+generation and bridge tests pass, and release generation strips the debug path.
+
+The rebuilt artifact has fingerprint
+`2f8c022bee455ca3794ffa3e3f0a632f136c6a1b58484e029d0d1981096badb9`.
+Its browser gate observed Defold 1.14.0, 315 generated Lua symbols, all required
+tutorial markers and the eight-player arena with no page failure. A separate
+CDP observation reported a live WebGL 2 / GLSL ES 3.00 SwiftShader context and
+49 live component instances; real `D` key input changed both the framebuffer
+and camera position. Locally inspected before/after screenshots show the
+tutorial scene and then the populated arena. This is exact local software-WebGL
+and input evidence, not hardware-GPU performance, audio, multiplayer, native
+Hermes, leak or sanitizer evidence.
+
 ## 2026-09-22 - Policy consumers tolerate bounded publication propagation
 
 The public policy index and its content-addressed objects can become visible at
