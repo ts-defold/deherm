@@ -76,8 +76,11 @@ below without changing its completion rule.
    maps the top frame to that line, evaluates live `dt`, resumes, disconnects,
    and repeats through a freshly rebuilt inspector session without restarting
    the engine.
-   Next prove the same breakpoint path in HTML5, then implement the editor-neutral
-   language server and thin VS Code client. After that, finish the public
+   The same public DAP path now stops a fresh Defold Wasm game in Chrome at the
+   authored `arena.script.ts` line, evaluates live `dt`, resumes, and disconnects;
+   browser HMR breakpoint URLs cover both the initial and numbered generations.
+   Next implement the editor-neutral language server and thin VS Code client.
+   After that, finish the public
    TypeScript ergonomics and native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
 
@@ -228,8 +231,10 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
    exception policy, and HMR reapplication, with pinned-Hermes and background
    engine-transport proofs. The installed native War Battles smoke stops at
    `arena.script.ts`, maps stack state, evaluates `dt`, resumes, and disconnects
-   through two consecutive public stdin/stdout DAP processes. Finish the browser
-   breakpoint smoke and the VS Code extension/LSP with context types and live
+   through two consecutive public stdin/stdout DAP processes. A fresh
+   `wasm-web` War Battles bundle also passes the browser twin through Chrome's
+   own CDP endpoint: authored breakpoint, mapped frame, live evaluation,
+   continue, and detach. Finish the VS Code extension/LSP with context types and live
    instance/property telemetry.
 
 ## 5. Finish public API ergonomics and project integration

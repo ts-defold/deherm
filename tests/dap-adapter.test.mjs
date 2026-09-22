@@ -219,3 +219,117 @@ test("DAP adapter maps breakpoints, stack, scopes, variables, evaluate, and relo
   assert.equal((await adapter.handle(request(8, "disconnect"))).success, true);
   assert.equal(calls.at(-1).method, "Debugger.resume", "disconnect resumes a paused game before detaching");
 });
+
+test("browser DAP breakpoints cover the initial bundle and numbered HMR generations", async (t) => {
+  const fixture = await sourceMapFixture(t);
+  const generated = new DebugSourceMap(fixture.map);
+  await generated.refresh();
+  const location = generated.generated(fixture.source, 2, 2);
+  const calls = [];
+  const listeners = new Map();
+  let breakpointSequence = 0;
+  let currentBrowserScript = "browser-initial";
+  const client = {
+    onEvent(name, listener) { listeners.set(name, listener); return () => listeners.delete(name); },
+    async send(method, params) {
+      calls.push({ method, params });
+      if (method === "Debugger.enable") {
+        listeners.get("Debugger.scriptParsed")({
+          scriptId: "browser-initial",
+          url: "defold-hermes://app.js"
+        });
+        return {};
+      }
+      if (method === "Debugger.setBreakpointByUrl") return {
+        breakpointId: `browser-${breakpointSequence += 1}`,
+        locations: [
+          { scriptId: "browser-initial", lineNumber: params.lineNumber, columnNumber: params.columnNumber },
+          ...(currentBrowserScript === "browser-initial" ? [] : [
+            { scriptId: currentBrowserScript, lineNumber: params.lineNumber, columnNumber: params.columnNumber }
+          ])
+        ]
+      };
+      return {};
+    },
+    async close() {}
+  };
+  const session = {
+    runtime: "browser",
+    projectRoot: fixture.root,
+    bundleUrl: "defold-hermes://app.js",
+    sourceMapFile: fixture.map,
+    websocketUrl: "ws://127.0.0.1:9222/devtools/page/browser"
+  };
+  const events = [];
+  const adapter = await createDapAdapter({
+    projectRoot: fixture.root,
+    emit: (event) => events.push(event),
+    discoverInspectorTarget: async () => ({ session, target: { webSocketDebuggerUrl: session.websocketUrl } }),
+    connectCdp: async (url) => {
+      assert.equal(url, session.websocketUrl, "browser CDP URLs do not receive the native replacement query");
+      return client;
+    }
+  });
+  assert.equal((await adapter.handle(request(40, "attach"))).success, true);
+  const set = await adapter.handle(request(41, "setBreakpoints", {
+    source: { path: fixture.source },
+    breakpoints: [{ line: 2, column: 3 }]
+  }));
+  assert.equal(set.body.breakpoints[0].verified, true);
+  const command = calls.find(({ method }) => method === "Debugger.setBreakpointByUrl");
+  assert.equal(command.params.url, undefined);
+  assert.equal(command.params.urlRegex, "^defold-hermes://app(?:\\.\\d+)?\\.js$");
+  assert.equal(command.params.lineNumber, location.line - 1);
+  assert.equal(set.body.breakpoints[0].source.path, fixture.source);
+
+  currentBrowserScript = "hmr-2";
+  listeners.get("Debugger.scriptParsed")({ scriptId: "hmr-2", url: "defold-hermes://app.2.js" });
+  for (let index = 0; index < 20 && breakpointSequence < 2; index += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  assert.equal(breakpointSequence, 2, "a numbered browser HMR source reapplies the authored breakpoint");
+  listeners.get("Debugger.scriptParsed")({ scriptId: "other", url: "https://example.test/app.js" });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(breakpointSequence, 2, "unrelated page scripts do not reapply game breakpoints");
+
+  const replaced = await adapter.handle(request(42, "setBreakpoints", {
+    source: { path: fixture.source },
+    breakpoints: [{ line: 2, column: 3 }]
+  }));
+  assert.equal(replaced.body.breakpoints[0].source.path, fixture.source,
+    "the newest HMR script wins even when Chrome returns an older location first");
+
+  listeners.get("Debugger.paused")({
+    reason: "breakpoint",
+    callFrames: [{
+      callFrameId: "old-frame",
+      functionName: "oldCallback",
+      location: { scriptId: "browser-initial", lineNumber: location.line - 1, columnNumber: location.column },
+      scopeChain: []
+    }]
+  });
+  for (let index = 0; index < 20 && !events.some(({ event }) => event === "stopped"); index += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  const oldStack = await adapter.handle(request(43, "stackTrace", { threadId: 1 }));
+  assert.equal(oldStack.body.stackFrames[0].source.path, "defold-hermes://app.js",
+    "an old live closure is not mapped through the newest generation's source map");
+
+  listeners.get("Debugger.paused")({
+    reason: "exception",
+    callFrames: [{
+      callFrameId: "foreign-frame",
+      functionName: "loader",
+      location: { scriptId: "other", lineNumber: location.line - 1, columnNumber: location.column },
+      scopeChain: []
+    }]
+  });
+  for (let index = 0; index < 20 && events.filter(({ event }) => event === "stopped").length < 2; index += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  const foreignStack = await adapter.handle(request(44, "stackTrace", { threadId: 1 }));
+  assert.equal(foreignStack.body.stackFrames[0].source.path, "https://example.test/app.js",
+    "a page script is never projected through the game bundle's TypeScript map");
+  assert.ok(events.some(({ event }) => event === "stopped"));
+  await adapter.close();
+});

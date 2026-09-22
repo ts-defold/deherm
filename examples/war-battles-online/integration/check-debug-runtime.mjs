@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const exampleRoot = path.resolve(import.meta.dirname, "..");
 const repositoryRoot = path.resolve(exampleRoot, "../..");
@@ -16,12 +17,13 @@ const authoredLine = (await readFile(source, "utf8"))
   .findIndex((line) => line.includes(marker)) + 1;
 assert.ok(authoredLine > 0, `Missing debugger proof marker: ${marker}`);
 
-async function runSession(sessionIndex) {
+export async function runDebugSession(sessionIndex, options = {}) {
 const child = spawn(process.execPath, [
   path.join(repositoryRoot, "bin/deherm.mjs"),
   "debug",
   "--project",
-  projectRoot
+  projectRoot,
+  ...(options.inspectorSession ? ["--inspector-session", options.inspectorSession] : [])
 ], {
   cwd: repositoryRoot,
   stdio: ["pipe", "pipe", "pipe"]
@@ -157,14 +159,20 @@ try {
 }
 }
 
-const sessions = [];
-for (let index = 1; index <= 2; index += 1) {
-  if (index > 1) await new Promise((resolve) => setTimeout(resolve, 300));
-  sessions.push(await runSession(index));
+export async function runNativeDebugProof() {
+  const sessions = [];
+  for (let index = 1; index <= 2; index += 1) {
+    if (index > 1) await new Promise((resolve) => setTimeout(resolve, 300));
+    sessions.push(await runDebugSession(index));
+  }
+  return {
+    schemaVersion: 1,
+    project: projectRoot,
+    runtime: "hermes",
+    reconnect: true,
+    sessions
+  };
 }
-console.log(JSON.stringify({
-  schemaVersion: 1,
-  project: projectRoot,
-  reconnect: true,
-  sessions
-}, null, 2));
+
+const invoked = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (invoked) console.log(JSON.stringify(await runNativeDebugProof(), null, 2));

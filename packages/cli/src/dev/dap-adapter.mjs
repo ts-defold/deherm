@@ -22,6 +22,24 @@ function scopeHint(type) {
   return "registers";
 }
 
+const browserBundleUrlRegex = "^defold-hermes://app(?:\\.\\d+)?\\.js$";
+
+function breakpointUrl(session) {
+  return session?.runtime === "browser"
+    ? { urlRegex: browserBundleUrlRegex }
+    : { url: session.bundleUrl };
+}
+
+function isBundleScript(session, url) {
+  if (session?.runtime === "browser") return new RegExp(browserBundleUrlRegex, "u").test(url);
+  return url === session?.bundleUrl;
+}
+
+function browserBundleGeneration(url) {
+  const match = /^defold-hermes:\/\/app(?:\.(\d+))?\.js$/u.exec(url ?? "");
+  return match ? Number.parseInt(match[1] ?? "0", 10) : -1;
+}
+
 export async function createDapAdapter(options = {}) {
   const projectRoot = path.resolve(options.projectRoot ?? process.cwd());
   const sessionFile = path.resolve(options.sessionFile ?? defaultInspectorSessionFile(projectRoot));
@@ -43,6 +61,7 @@ export async function createDapAdapter(options = {}) {
   const breakpointSources = new Map();
   const cdpBreakpoints = new Map();
   const scripts = new Map();
+  let newestBundleScriptId;
 
   const message = (value) => emit({ seq: sequence += 1, ...value });
   const event = (name, body = {}) => message({ type: "event", event: name, body });
@@ -74,18 +93,38 @@ export async function createDapAdapter(options = {}) {
     }
   };
   const dapSource = (file) => file ? { name: path.basename(file), path: file } : undefined;
+  const rawScriptSource = (source) => {
+    if (source?.url?.startsWith("file:")) return dapSource(fileURLToPath(source.url));
+    if (source?.url) return { name: source.url.split("/").at(-1) || source.url, path: source.url };
+    return undefined;
+  };
+  const sourceUsesCurrentMap = (source) => {
+    if (session?.runtime !== "browser") return true;
+    return source?.scriptId === newestBundleScriptId && isBundleScript(session, source.url);
+  };
   const mapGeneratedLocation = (source, lineNumber, columnNumber = 0) => {
-    const original = sourceMap?.trace ? sourceMap.original(lineNumber + 1, columnNumber) : null;
+    const original = sourceMap?.trace && sourceUsesCurrentMap(source)
+      ? sourceMap.original(lineNumber + 1, columnNumber)
+      : null;
     if (original) return {
       source: dapSource(original.source),
       line: original.line,
       column: original.column + 1
     };
     return {
-      source: source?.url?.startsWith("file:") ? dapSource(fileURLToPath(source.url)) : undefined,
+      source: rawScriptSource(source),
       line: lineNumber + 1,
       column: columnNumber + 1
     };
+  };
+  const preferredBreakpointLocation = (locations = []) => {
+    if (session?.runtime !== "browser") return locations[0];
+    const current = locations.find(({ scriptId }) => scriptId === newestBundleScriptId);
+    if (current) return current;
+    return locations
+      .filter(({ scriptId }) => isBundleScript(session, scripts.get(scriptId)?.url))
+      .sort((left, right) => browserBundleGeneration(scripts.get(right.scriptId)?.url)
+        - browserBundleGeneration(scripts.get(left.scriptId)?.url))[0];
   };
   const referenceFor = (object) => {
     if (!object?.objectId) return 0;
@@ -128,14 +167,15 @@ export async function createDapAdapter(options = {}) {
       const answer = await client.send("Debugger.setBreakpointByUrl", {
         lineNumber: generated.line - 1,
         columnNumber: generated.column,
-        url: session.bundleUrl,
+        ...breakpointUrl(session),
         ...(spec.condition ? { condition: spec.condition } : {})
       }, { timeoutMs: 10_000 });
       record.cdpIds.push(answer.breakpointId);
       cdpBreakpoints.set(answer.breakpointId, { record, spec });
-      const actual = answer.locations?.[0];
+      const actual = preferredBreakpointLocation(answer.locations);
+      const actualSource = actual ? scripts.get(actual.scriptId) : undefined;
       const mapped = actual
-        ? mapGeneratedLocation(undefined, actual.lineNumber, actual.columnNumber)
+        ? mapGeneratedLocation(actualSource, actual.lineNumber, actual.columnNumber)
         : { source: dapSource(record.source), line: spec.line, column: spec.column ?? 1 };
       results.push({
         id: spec.id,
@@ -183,6 +223,8 @@ export async function createDapAdapter(options = {}) {
       client = undefined;
       clearPause();
     }
+    scripts.clear();
+    newestBundleScriptId = undefined;
     const discovered = await discover({
       projectRoot,
       sessionFile: args.inspectorSession ? path.resolve(projectRoot, args.inspectorSession) : sessionFile,
@@ -191,11 +233,20 @@ export async function createDapAdapter(options = {}) {
     session = discovered.session;
     await refreshMap();
     const websocket = new URL(discovered.target.webSocketDebuggerUrl);
-    if (args.replaceDebugger === true || options.replaceDebugger === true) websocket.searchParams.set("replace", "1");
+    if (session.runtime !== "browser" &&
+        (args.replaceDebugger === true || options.replaceDebugger === true)) {
+      websocket.searchParams.set("replace", "1");
+    }
     client = await connect(websocket.href, { retain: false });
     client.onEvent("Debugger.scriptParsed", (params) => {
       scripts.set(params.scriptId, params);
-      if (params.url === session.bundleUrl && breakpointSources.size) {
+      if (isBundleScript(session, params.url)) {
+        const previous = newestBundleScriptId ? scripts.get(newestBundleScriptId) : undefined;
+        if (!previous || browserBundleGeneration(params.url) >= browserBundleGeneration(previous.url)) {
+          newestBundleScriptId = params.scriptId;
+        }
+      }
+      if (isBundleScript(session, params.url) && breakpointSources.size) {
         void reapplyBreakpoints().catch((error) => event("output", {
           category: "stderr",
           output: `déherm could not reapply breakpoints after reload: ${error.message}\n`
@@ -205,7 +256,9 @@ export async function createDapAdapter(options = {}) {
     client.onEvent("Debugger.breakpointResolved", ({ breakpointId, location }) => {
       const owner = cdpBreakpoints.get(breakpointId);
       if (!owner) return;
-      const mapped = mapGeneratedLocation(undefined, location.lineNumber, location.columnNumber);
+      const source = scripts.get(location.scriptId);
+      if (session?.runtime === "browser" && !sourceUsesCurrentMap(source)) return;
+      const mapped = mapGeneratedLocation(source, location.lineNumber, location.columnNumber);
       event("breakpoint", {
         reason: "changed",
         breakpoint: { id: owner.spec.id, verified: true, ...mapped }

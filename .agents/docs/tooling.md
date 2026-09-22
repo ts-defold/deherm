@@ -517,7 +517,30 @@ frame maps back to the authored `*.script.ts` line, evaluates the live `dt`
 local, resumes, and disconnects. It then repeats the whole flow in a second
 process, proving that frontend detach resets the private engine transport and
 Hermes CDP agent before reattachment. This is native packaged-engine debugger
-evidence; it is not HTML5 debugger evidence or a VS Code/LSP claim.
+evidence; it is not a VS Code/LSP claim.
+
+The browser twin uses the same authored map and public DAP command against the
+CDP endpoint already owned by the packaged HTML5 target:
+
+```sh
+pnpm --filter @deherm/example-war-battles-online runtime:debug:browser
+```
+
+For a manual client, select the browser session explicitly:
+
+```sh
+deherm debug --project <project> \
+  --inspector-session .deherm/dev/browser-inspector.json
+```
+
+The gate requires a packaged `wasm-web` bundle, waits for the Defold browser
+host, activates the current development bundle, then verifies an authored
+`arena.script.ts` breakpoint, mapped stack frame, live `dt` evaluation,
+continue, and detach. Browser inspector discovery authenticates Chrome's exact
+dynamic target WebSocket. Breakpoints use the stable
+`defold-hermes://app(?:.<generation>).js` URL family, so they are reapplied to
+numbered HMR generations. This is real Chrome/Defold Wasm/DAP evidence; it does
+not claim VS Code UI or language-server behavior.
 
 The console itself is declarative. `packages/cli/src/dev/tui/` is authored in
 TSX against `@rezi-ui/jsx`; `packages/cli/src/dev/tsx-loader.mjs` registers a

@@ -1,5 +1,52 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Browser DAP stops authored War Battles TypeScript
+
+HTML5 now uses the browser's own CDP endpoint through the same public `deherm
+debug` DAP command and composed authored source map as native Hermes. The
+browser target publishes a project-owned inspector descriptor containing the
+exact Chrome target WebSocket; Chrome target ids are dynamic, so discovery
+authenticates that URL rather than assuming the native `deherm` id. Browser
+breakpoints bind the `defold-hermes://app(?:.<generation>).js` URL family and
+are reapplied when HMR parses a numbered generation. The browser descriptor is
+removed only by the target session that created it.
+
+The first real run found two preconditions rather than being promoted from unit
+tests: the disposable `wasm-web` bundle had to be rebuilt through the pinned
+local Extender, and strict-mode `var` did not publish the compiler fingerprint
+out of the browser host's indirect `eval`. The compiler-owned banner now writes
+the fingerprint through `globalThis`; a VM regression proves the exact strict
+indirect-eval semantics while native bundle inspection remains unchanged.
+
+A fresh Defold 1.14.0 War Battles Wasm bundle then loaded in headless Chrome,
+accepted development fingerprint
+`c0e306477ae2056fa9a61e76a805b4edc77d1055c6129b844c2e72cf855451db`,
+rebound four live components, and passed the public DAP proof:
+`arena.script.ts:284` verified and stopped, the top `update` frame mapped back
+to that authored location, `dt` evaluated to a live number, and continue plus
+disconnect completed. This is compiler, real Chrome, packaged Defold Wasm, HMR,
+and DAP evidence. It is not a VS Code UI/LSP or visual-gameplay claim.
+
+The requested external adversarial review returned CLEAR with no P0/P1. Its
+one P2 was mechanically valid: Chrome can retain old-generation closures and
+unrelated page scripts, but the adapter projected every generated location
+through the newest game map. The adapter now tracks the newest matching bundle
+script, chooses that script when Chrome returns several breakpoint locations,
+and leaves old/foreign frames at their raw URLs. Three lifecycle hardening
+points were also accepted: descriptor validation is inside page cleanup,
+launch refuses a page that exits while its descriptor is being published, and
+the live proof fails immediately on a real bundle rejection. Focused tests
+cover old-generation and foreign frames plus both launch cleanup paths. The
+review claim that the browser descriptor was unreachable was rejected: the
+public `--inspector-session` option already selects it; the missing piece was
+the explicit manual command in tooling documentation.
+
+The shared `globalThis` fingerprint banner was then re-proven in native Hermes,
+not inferred from Chrome: the current War Battles engine acknowledged the new
+bundle, and two consecutive public DAP sessions again stopped at
+`arena.script.ts:284`, evaluated live `dt`, resumed, and disconnected without
+restarting the engine.
+
 ## 2026-09-22 - Authored TypeScript DAP reaches a resumable paused Hermes runtime
 
 `deherm debug` now speaks bounded standard DAP over stdin/stdout and attaches to

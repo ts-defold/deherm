@@ -8,6 +8,10 @@ export function defaultInspectorSessionFile(projectRoot) {
   return path.join(path.resolve(projectRoot), ".deherm", "dev", "inspector.json");
 }
 
+export function defaultBrowserInspectorSessionFile(projectRoot) {
+  return path.join(path.resolve(projectRoot), ".deherm", "dev", "browser-inspector.json");
+}
+
 function assertLoopbackUrl(value, field, protocols) {
   let parsed;
   try {
@@ -49,8 +53,16 @@ export function validateInspectorSession(value) {
   if (typeof value.projectRoot !== "string" || !path.isAbsolute(value.projectRoot)) {
     throw new Error("Inspector session projectRoot must be absolute");
   }
-  if (!Number.isSafeInteger(value.enginePort) || value.enginePort < 1 || value.enginePort > 65_535) {
-    throw new Error("Inspector session enginePort is invalid");
+  const runtime = value.runtime ?? "hermes";
+  if (runtime !== "hermes" && runtime !== "browser") {
+    throw new Error("Inspector session runtime must be hermes or browser");
+  }
+  if (runtime === "hermes" &&
+      (!Number.isSafeInteger(value.enginePort) || value.enginePort < 1 || value.enginePort > 65_535)) {
+    throw new Error("Hermes inspector session enginePort is invalid");
+  }
+  if (runtime === "browser" && value.enginePort !== undefined) {
+    throw new Error("Browser inspector session must not declare enginePort");
   }
   if (!Number.isSafeInteger(value.devtoolsPort) || value.devtoolsPort < 1 || value.devtoolsPort > 65_535) {
     throw new Error("Inspector session devtoolsPort is invalid");
@@ -70,7 +82,10 @@ export function validateInspectorSession(value) {
     } catch {
       throw new Error("Inspector session bundleUrl is not a valid URL");
     }
-    if (bundle.protocol !== "deherm:") throw new Error("Inspector session bundleUrl must use deherm:");
+    const expectedProtocol = runtime === "browser" ? "defold-hermes:" : "deherm:";
+    if (bundle.protocol !== expectedProtocol) {
+      throw new Error(`Inspector session bundleUrl must use ${expectedProtocol}`);
+    }
   }
   if (value.sourceMapFile !== undefined) assertProjectFile(value.sourceMapFile, value.projectRoot, "sourceMapFile");
   return value;
@@ -84,7 +99,8 @@ export function createInspectorSession(values) {
     pid: values.pid ?? process.pid,
     projectRoot: path.resolve(values.projectRoot),
     createdAt: values.createdAt ?? new Date().toISOString(),
-    enginePort: values.enginePort,
+    runtime: values.runtime ?? "hermes",
+    ...(values.enginePort === undefined ? {} : { enginePort: values.enginePort }),
     devtoolsPort: values.devtoolsPort,
     devtoolsUrl: values.devtoolsUrl,
     websocketUrl: values.websocketUrl,
@@ -107,12 +123,14 @@ export async function discoverInspectorTarget(options) {
   }
   if (!response.ok) throw new Error(`Inspector discovery failed with HTTP ${response.status}`);
   const targets = await response.json();
-  const target = Array.isArray(targets) ? targets.find((candidate) => candidate?.id === "deherm") : undefined;
+  const target = Array.isArray(targets)
+    ? targets.find((candidate) => candidate?.webSocketDebuggerUrl === session.websocketUrl)
+    : undefined;
   if (!target?.webSocketDebuggerUrl) throw new Error("Inspector discovery did not return the déherm runtime target");
   if (target.webSocketDebuggerUrl !== session.websocketUrl) {
     throw new Error("Inspector discovery URL does not match the authenticated session descriptor");
   }
-  if (target.attached && options.replaceDebugger !== true) {
+  if (session.runtime !== "browser" && target.attached && options.replaceDebugger !== true) {
     throw new Error("A debugger frontend is already attached; detach it or explicitly replace it");
   }
   return { session, target };

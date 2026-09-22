@@ -27,6 +27,11 @@ import path from "node:path";
 
 import { defaultChromeBinary, openBundlePage } from "./browser-host.mjs";
 import { parseEngineControlEvent } from "./engine-process.mjs";
+import {
+  createInspectorSession,
+  removeOwnedInspectorSession,
+  writeInspectorSession
+} from "./inspector-session.mjs";
 
 export const BROWSER_TARGET_ID = "browser-host";
 
@@ -202,6 +207,7 @@ export function createBrowserTarget(options) {
   const emit = options.emit ?? (() => {});
   const id = options.targetId ?? BROWSER_TARGET_ID;
   const projectRoot = path.resolve(options.projectRoot);
+  const openPage = options.openBundlePage ?? openBundlePage;
   let page;
   let telemetryTimer;
   let starting;
@@ -253,7 +259,8 @@ export function createBrowserTarget(options) {
         bundleDirectory: options.bundleDirectory
       });
       log(`serving ${path.relative(projectRoot, bundle.directory) || bundle.directory}`);
-      const opened = await openBundlePage({
+      let openedExited = false;
+      const opened = await openPage({
         bundleDirectory: bundle.directory,
         index: bundle.index,
         chromeBinary: options.chromeBinary ?? defaultChromeBinary,
@@ -265,19 +272,49 @@ export function createBrowserTarget(options) {
           emit({ type: "log", source: "browser", level: "error", message: `${failure.kind}: ${failure.detail}` });
         },
         onBrowserExit: () => {
+          openedExited = true;
           if (!page) return;
+          const exited = page;
           page = undefined;
           clearInterval(telemetryTimer);
           telemetryTimer = undefined;
+          if (exited.inspectorSession) {
+            void removeOwnedInspectorSession(options.sessionFile, exited.inspectorSession.sessionId)
+              .catch(() => {});
+          }
           emit({ type: "target-disconnected", id });
           emit({ type: "log", source: "browser", message: "browser exited" });
         }
       });
+      let inspectorSession;
+      try {
+        inspectorSession = options.sessionFile
+          ? createInspectorSession({
+              runtime: "browser",
+              projectRoot,
+              devtoolsPort: opened.debuggingPort,
+              devtoolsUrl: `http://127.0.0.1:${opened.debuggingPort}`,
+              websocketUrl: opened.target.webSocketDebuggerUrl,
+              bundleUrl: "defold-hermes://app.js",
+              sourceMapFile: options.sourceMapFile
+            })
+          : undefined;
+        if (inspectorSession) await writeInspectorSession(options.sessionFile, inspectorSession);
+        if (openedExited) throw new Error("browser exited while publishing its inspector session");
+      } catch (error) {
+        await opened.close().catch(() => {});
+        if (inspectorSession) {
+          await removeOwnedInspectorSession(options.sessionFile, inspectorSession.sessionId).catch(() => {});
+        }
+        throw error;
+      }
+      opened.inspectorSession = inspectorSession;
       page = opened;
       emit({ type: "target-configured", id, name: `chrome:${opened.server.port}`, url: opened.pageUrl, runtime: "browser" });
       emit({ type: "target-connected", id, name: `chrome:${opened.server.port}`, url: opened.pageUrl });
       publishCapabilities();
       log(`page ${opened.pageUrl} (CDP 127.0.0.1:${opened.debuggingPort}, profile ${opened.profile})`);
+      if (inspectorSession) log(`browser inspector session: ${options.sessionFile}`);
       telemetryTimer = setInterval(() => { void pollTelemetry(); }, options.telemetryIntervalMs ?? 1_000);
       telemetryTimer.unref?.();
       return true;
@@ -293,7 +330,10 @@ export function createBrowserTarget(options) {
     page = undefined;
     clearInterval(telemetryTimer);
     telemetryTimer = undefined;
-    stopping = open.close().then(() => {
+    stopping = open.close().then(async () => {
+      if (open.inspectorSession) {
+        await removeOwnedInspectorSession(options.sessionFile, open.inspectorSession.sessionId);
+      }
       emit({ type: "target-disconnected", id });
       log("browser target stopped; server, profile and browser released");
       return true;

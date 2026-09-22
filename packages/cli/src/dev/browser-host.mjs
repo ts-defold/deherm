@@ -320,7 +320,7 @@ export async function openBundlePage(options) {
     await client.send("Page.enable");
     await client.send("Runtime.enable");
     await client.send("Log.enable");
-    return { server, browser, client, debuggingPort, pageUrl: server.pageUrl, profile: browser.profile, close };
+    return { server, browser, client, target, debuggingPort, pageUrl: server.pageUrl, profile: browser.profile, close };
   } catch (error) {
     await close();
     if (browser?.profile && options.keepProfile === true) {

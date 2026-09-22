@@ -19,7 +19,7 @@ import { createDefoldBuilder } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
 import { createEngineController } from "./engine-process.mjs";
 import { createInspectorBridge } from "./inspector-bridge.mjs";
-import { defaultInspectorSessionFile } from "./inspector-session.mjs";
+import { defaultBrowserInspectorSessionFile, defaultInspectorSessionFile } from "./inspector-session.mjs";
 import { BROWSER_TARGET_ID, createBrowserTarget } from "./browser-target.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "./model.mjs";
 import { normalizeResourcePaths } from "./protocol.mjs";
@@ -385,6 +385,8 @@ export async function runDevSession(options = {}) {
     emit,
     targetId: BROWSER_TARGET_ID,
     bundleFile: outputFile,
+    sourceMapFile: `${outputFile}.map`,
+    sessionFile: path.resolve(options.browserInspectorSession ?? defaultBrowserInspectorSessionFile(projectRoot)),
     bundleDirectory: options.webBundle,
     chromeBinary: options.chrome,
     headless: options.browserHeadless,

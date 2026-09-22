@@ -40,10 +40,18 @@ export function createBundleFingerprintPlaceholder() {
  */
 export const BUNDLE_STRICT_DIRECTIVE = '"use strict";';
 
-/** The banner that publishes the placeholder into the evaluated bundle scope. */
+/**
+ * The banner that publishes the placeholder on the runtime global.
+ *
+ * `var` at script level happens to create a global property in Hermes and in a
+ * browser script tag, but it does not escape a strict indirect `eval`. Browser
+ * HMR deliberately evaluates candidates that way, so the transport contract
+ * must name the shared global explicitly rather than depend on declaration
+ * environment semantics.
+ */
 export function bundleFingerprintBanner(placeholder) {
   assertFingerprintShape(placeholder, "placeholder");
-  return `${BUNDLE_STRICT_DIRECTIVE}\nvar ${BUNDLE_FINGERPRINT_GLOBAL} = "${placeholder}";`;
+  return `${BUNDLE_STRICT_DIRECTIVE}\nglobalThis.${BUNDLE_FINGERPRINT_GLOBAL} = "${placeholder}";`;
 }
 
 function assertFingerprintShape(value, description) {

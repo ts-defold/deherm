@@ -3,6 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { createContext, runInContext } from "node:vm";
 
 import {
   applyBundleFingerprint,
@@ -78,6 +79,18 @@ test("a bundle's published fingerprint is recoverable from the bundle itself", (
   assert.notEqual(edited.computed, fingerprint);
   assert.equal(edited.consistent, false);
   assert.equal(inspectBundleFingerprint("var x = 1;").reason, "no-fingerprint");
+});
+
+test("a strict bundle publishes its fingerprint through browser-style indirect eval", () => {
+  const placeholder = createBundleFingerprintPlaceholder();
+  const { fingerprint, source } = applyBundleFingerprint(
+    `${bundleFingerprintBanner(placeholder)}\nglobalThis.loaded = true;\n`,
+    placeholder
+  );
+  const context = createContext({ candidate: source });
+  runInContext("(0, eval)(candidate)", context);
+  assert.equal(context.__DEFOLD_HERMES_BUILD_FINGERPRINT__, fingerprint);
+  assert.equal(context.loaded, true);
 });
 
 test("the source binding covers build settings as well as file contents", () => {

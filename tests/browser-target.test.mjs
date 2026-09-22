@@ -8,7 +8,7 @@
 // the browser cannot measure is named rather than filled in.
 
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -16,9 +16,11 @@ import test from "node:test";
 import {
   browserCapabilityGaps,
   browserTelemetryEvent,
+  createBrowserTarget,
   resolveWebBundle
 } from "../packages/cli/src/dev/browser-target.mjs";
 import { startBundleServer } from "../packages/cli/src/dev/browser-host.mjs";
+import { readInspectorSession } from "../packages/cli/src/dev/inspector-session.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "../packages/cli/src/dev/model.mjs";
 
 async function bundleProject() {
@@ -46,6 +48,107 @@ test("a missing bundle is an actionable message, never a guess", async () => {
     await assert.rejects(() => resolveWebBundle({ projectRoot: root, cwd: root }),
       /No packaged HTML5 bundle found .* wasm-web/s);
   } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("the browser target publishes and owns a browser debugger session", async () => {
+  const { root, bundle } = await bundleProject();
+  const sessionFile = path.join(root, ".deherm", "dev", "browser-inspector.json");
+  const sourceMapFile = path.join(root, ".deherm", "dev", "app.dehermc.map");
+  const websocketUrl = "ws://127.0.0.1:9333/devtools/page/browser-fixture";
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile: path.join(root, ".deherm", "dev", "app.dehermc"),
+    sourceMapFile,
+    sessionFile,
+    telemetryIntervalMs: 60_000,
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: { send: async () => ({ result: { value: null } }) },
+      target: { webSocketDebuggerUrl: websocketUrl },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => {}
+    })
+  });
+  try {
+    assert.equal(await target.launch(), true);
+    const session = await readInspectorSession(sessionFile);
+    assert.equal(session.runtime, "browser");
+    assert.equal(session.enginePort, undefined);
+    assert.equal(session.websocketUrl, websocketUrl);
+    assert.equal(session.bundleUrl, "defold-hermes://app.js");
+    assert.equal(session.sourceMapFile, sourceMapFile);
+    assert.equal(await target.stop(), true);
+    await assert.rejects(() => readFile(sessionFile), { code: "ENOENT" });
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("browser launch releases the page when inspector-session validation fails", async () => {
+  const { root, bundle } = await bundleProject();
+  let closes = 0;
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile: path.join(root, ".deherm", "dev", "app.dehermc"),
+    sourceMapFile: path.join(root, "..", "outside.map"),
+    sessionFile: path.join(root, ".deherm", "dev", "browser-inspector.json"),
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: { send: async () => ({ result: { value: null } }) },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => { closes += 1; }
+    })
+  });
+  try {
+    await assert.rejects(() => target.launch(), /sourceMapFile must be inside projectRoot/u);
+    assert.equal(closes, 1);
+    assert.equal(target.running(), false);
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("browser launch does not publish a session for a page that exited while opening", async () => {
+  const { root, bundle } = await bundleProject();
+  const sessionFile = path.join(root, ".deherm", "dev", "browser-inspector.json");
+  let closes = 0;
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile: path.join(root, ".deherm", "dev", "app.dehermc"),
+    sourceMapFile: path.join(root, ".deherm", "dev", "app.dehermc.map"),
+    sessionFile,
+    openBundlePage: async (options) => {
+      options.onBrowserExit();
+      return {
+        server: { port: 9444 },
+        client: { send: async () => ({ result: { value: null } }) },
+        target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+        debuggingPort: 9333,
+        pageUrl: "http://127.0.0.1:9444/index.html",
+        profile: path.join(root, "profile"),
+        close: async () => { closes += 1; }
+      };
+    }
+  });
+  try {
+    await assert.rejects(() => target.launch(), /browser exited while publishing/u);
+    assert.equal(closes, 1);
+    assert.equal(target.running(), false);
+    await assert.rejects(() => readFile(sessionFile), { code: "ENOENT" });
+  } finally {
+    await target.stop();
     await rm(root, { recursive: true, force: true });
   }
 });

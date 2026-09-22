@@ -127,7 +127,15 @@ content, carries conditional breakpoints and exception policy, and reapplies
 breakpoints whenever HMR reports the stable bundle URL as a newly parsed
 script. Detaching while paused resumes before releasing the one native frontend.
 HTML5 uses the browser's existing CDP endpoint with the same authored source
-paths; equivalent browser-breakpoint proof and the thin VS Code client remain.
+paths. The project-owned browser inspector descriptor records Chrome's exact
+dynamic target WebSocket, while the DAP binds breakpoints by the
+`defold-hermes://app(?:.<generation>).js` URL family so HMR generations inherit
+the authored breakpoints. Only the newest matching script is projected through
+the current source map; live closures from an older generation and unrelated
+page scripts retain their raw URLs rather than acquiring a plausible but wrong
+TypeScript location. A fresh War Battles `wasm-web` bundle proves the
+public DAP stops Chrome on `arena.script.ts`, maps the top frame, evaluates the
+live `dt`, resumes, and disconnects. The thin VS Code client remains.
 
 # Profiling
 
