@@ -95,7 +95,7 @@ function run(command, args, options) {
 
 const ignoredOutputNames = new Set(["_BobBuildState_", "digest_cache", "game.arcd", "game.arci", "game.dmanifest", "game.graph.json"]);
 
-async function compiledResources(outputRoot) {
+export async function snapshotCompiledResources(outputRoot, prior = new Map()) {
   const resources = new Map();
   async function visit(directory) {
     let entries = await readdir(directory, { withFileTypes: true });
@@ -104,8 +104,17 @@ async function compiledResources(outputRoot) {
       const absolute = path.join(directory, entry.name);
       if (entry.isDirectory()) await visit(absolute);
       else if (entry.isFile() && !ignoredOutputNames.has(entry.name) && entry.name.endsWith("c")) {
-        const information = await stat(absolute);
-        resources.set(path.relative(outputRoot, absolute).split(path.sep).join("/"), `${information.size}:${information.mtimeMs}`);
+        const information = await stat(absolute, { bigint: true });
+        const relative = path.relative(outputRoot, absolute).split(path.sep).join("/");
+        // Nanosecond modification + metadata times make a same-size rewrite a
+        // digest candidate even when a tool restores mtime. The digest remains
+        // the authority; this identity only avoids rereading untouched output.
+        const statIdentity = `${information.size}:${information.mtimeNs}:${information.ctimeNs}`;
+        const previous = prior.get(relative);
+        const digest = previous?.statIdentity === statIdentity
+          ? previous.digest
+          : sha256(await readFile(absolute));
+        resources.set(relative, { statIdentity, digest });
       }
     }
   }
@@ -113,9 +122,9 @@ async function compiledResources(outputRoot) {
   return resources;
 }
 
-function changedResources(before, after) {
+export function changedCompiledResources(before, after) {
   const changed = [];
-  for (const [relative, identity] of after) if (before.get(relative) !== identity) changed.push(`/${relative}`);
+  for (const [relative, identity] of after) if (before.get(relative)?.digest !== identity.digest) changed.push(`/${relative}`);
   return changed.sort();
 }
 
@@ -180,7 +189,7 @@ export async function createDefoldBuilder(options) {
   await assertProjectNativeArtifact(projectRoot, platform);
   const outputRoot = path.resolve(options.outputRoot ?? path.join(projectRoot, "build", "default"));
   const buildServer = options.buildServer ?? process.env.DEHERM_BUILD_SERVER ?? process.env.DEFOLD_HERMES_BUILD_SERVER;
-  let previous = await compiledResources(outputRoot);
+  let previous = await snapshotCompiledResources(outputRoot);
   let loop = Promise.resolve();
 
   const build = (reason = "change") => {
@@ -209,8 +218,8 @@ export async function createDefoldBuilder(options) {
         await run(java, args, { ...options, cwd: projectRoot, emit, source: "bob" });
         const engine = path.join(projectRoot, "build", ...engineRelativePath(platform));
         if (process.platform !== "win32" && await exists(engine)) await chmod(engine, 0o755);
-        previous = await compiledResources(outputRoot);
-        const resources = changedResources(before, previous);
+        previous = await snapshotCompiledResources(outputRoot, previous);
+        const resources = changedCompiledResources(before, previous);
         emit({ type: "defold-build-succeeded", reason, resources });
         return { resources, outputRoot, platform };
       } catch (error) {

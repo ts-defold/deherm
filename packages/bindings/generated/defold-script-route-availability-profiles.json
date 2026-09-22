@@ -6,7 +6,7 @@
     "policy": "packages/bindings/overrides/script-route-availability-profiles.json",
     "policySha256": "2aa62ed6214d4d2fccc986f6a659e597475187c9f9dfc71e3ab252641601d5d7",
     "borrowedClassification": "packages/bindings/generated/defold-script-borrowed-handle-classification.json",
-    "borrowedClassificationSha256": "7bb95aa15c4ec66eeaf946a89ef2eac8ba90605bc78bbadfd9a4b9535e34de91",
+    "borrowedClassificationSha256": "b5503f3b23853225354481bd7b694023f67814a22555ab8e037cf27242ecfbbd",
     "scriptIr": "packages/bindings/generated/defold-script-api-ir.json",
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "sourceHashes": {

@@ -78,7 +78,7 @@ test("installed package drives the bounded incremental dev loop", async () => {
   assert.equal(result.builds.length, 3);
   assert.equal(result.builds[0], "initial dev startup");
   assert.ok(result.builds.slice(1).every((reason) => /^changed [12] file\(s\)$/.test(reason)));
-  assert.deepEqual(result.bundleGenerations, [1, 2, 3, 4]);
+  assert.deepEqual(result.bundleGenerations, [1, 2, 3, 4, 5]);
   assert.notEqual(result.bundleFingerprints[0], result.bundleFingerprints[1]);
   assert.ok(result.lifecycle > 0);
   // `p` relaunches an already-ready build instead of rerunning Bob, so the only
@@ -93,6 +93,7 @@ test("installed package drives the bounded incremental dev loop", async () => {
     ["/deherm/app.dehermc"],
     ["/deherm/app.dehermc"],
     [compiledNames[0]],
+    ["/deherm/app.dehermc"],
     ["/deherm/app.dehermc"],
     [compiledNames[1]]
   ]);

@@ -541,8 +541,10 @@ confirmation and name the exact target.
    transport, line/JSON output, Bob change classification, and TUI controller
    intents are implemented. A process test runs these paths from an extracted
    npm artifact: one plain TypeScript edit produces one bundle reload without
-   Bob; asset and component edits each produce a bundle reload, Bob build, and
-   compiled-resource reload; `.internal/cache` produces no work; and
+   Bob; a component implementation-only edit likewise produces one bundle
+   reload without changing its generated Defold proxy; an asset edit and a
+   component schema/lifecycle edit each add a Bob build and compiled-resource
+   reload; `.internal/cache` produces no work; and
    `--no-launch` suppresses startup while the `p` intent still launches. The
    process fixture substitutes bounded Bob/engine adapters, so it proves the
    installed controller and compiler flow, not packaged-engine activation.
@@ -554,6 +556,17 @@ confirmation and name the exact target.
    that exact runtime acknowledgement; it displays runtime id, Defold resource
    generation, and the fingerprint prefix. Rejected candidates report a
    separate structured event and cannot acknowledge a newer pending build.
+   Generated bundle, source-map, bytecode, lock, and proxy writes are excluded
+   from watcher feedback. Bob change detection reuses stat identities but hashes
+   touched compiled resources before signaling them, so a rewritten identical
+   `game.projectc` or shader is not sent to an engine that never loaded it. The
+   already-activated `.dehermc` is also removed from the later Bob resource
+   batch, preventing a second activation of one compiler generation. The
+   companion `.hbc` is a compiler artifact, not an engine-loaded resource, and
+   is filtered from the same batch without claiming runtime activation. That
+   filtering is conditional on a `reload-signalled` acknowledgement for the
+   current native-engine compiler generation; after a failed post, Bob retains
+   the bundle resource as the retry path.
 3. **Runtime transaction:** add candidate runtime slots, state capture/restore,
    schema validation, atomic commit, rollback, old-generation callback rejection,
    root drain, and bounded arenas.
@@ -638,8 +651,22 @@ browser activation transaction, state capture/restore, broader component state
 migration, protobuf telemetry stream, rollback of native side effects performed
 before a candidate init failure, and long-run memory/leak limits remain
 unproven. Native local activation now has a structured, fingerprint-bound log
-acknowledgement, but the packaged War Battles reload must still be rerun against
-the rebuilt extension before that product path is claimed.
+acknowledgement. A packaged War Battles run against Defold `7f0f554` observed
+runtime profile `default-legacy-bullet` from 315 registered symbols, an initial
+activation, two implementation-only `arena.script.ts` edits, exactly one build,
+one reload signal, and one matching runtime activation for each edit, continuous
+heap/component/Lua-registry telemetry, and no runtime error. The exact
+fingerprints were `5de1ceb3...` -> `6334816a...` -> `5de1ceb3...`.
+
+That run also made the remaining state boundary visible rather than closing it:
+the native candidate transaction constructs a fresh Hermes component `self` and
+runs `init` when a live Lua proxy first dispatches into the new runtime. War
+Battles therefore restarted its match and spawned another presentation set;
+observed component counts rose from 51 to 95 to 127. This is not claimed as a
+leak-free/state-preserving HMR result. Explicit component capture/restore or a
+bounded teardown/migration contract is still required before that claim;
+[issue #120](https://github.com/ts-defold/deherm/issues/120) tracks that exact
+measured boundary and soak gate.
 The Rezi console exists and has deterministic renderer fixtures, but still
 needs PTY/performance/platform evidence. Its focus, layer, pointer, selection,
 and keymap behavior is covered by deterministic renderer and lifecycle tests

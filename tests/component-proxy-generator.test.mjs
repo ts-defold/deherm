@@ -353,6 +353,26 @@ test("check mode is a strict freshness gate and normal generation repairs marked
   assert.doesNotMatch(await readFile(proxy, "utf8"), /-- stale/);
 });
 
+test("component body edits update provenance without invalidating the Defold proxy", async () => {
+  const projectRoot = await temporaryProject();
+  const source = await componentSource(projectRoot, "player.script.ts", minimalComponent());
+  const first = await generateComponentProxies({ projectRoot });
+  assert.ok(first.defoldResourceStale.some((file) => file.endsWith("player.script")));
+  const proxy = path.join(projectRoot, "player.script");
+  const originalProxy = await readFile(proxy, "utf8");
+
+  await writeFile(source, minimalComponent("property.number(1)", "const implementationOnly = 2; void implementationOnly;"), "utf8");
+  const implementationEdit = await generateComponentProxies({ projectRoot });
+  assert.deepEqual(implementationEdit.defoldResourceStale, []);
+  assert.ok(implementationEdit.stale.some((file) => file.endsWith("manifest.json")));
+  assert.equal(await readFile(proxy, "utf8"), originalProxy);
+
+  await writeFile(source, minimalComponent("property.number(2)"), "utf8");
+  const schemaEdit = await generateComponentProxies({ projectRoot });
+  assert.deepEqual(schemaEdit.defoldResourceStale, [proxy]);
+  assert.notEqual(await readFile(proxy, "utf8"), originalProxy);
+});
+
 test("full-inventory reconciliation reports and removes only owned orphan proxies", async () => {
   const projectRoot = await temporaryProject();
   const source = await componentSource(projectRoot, "retired.script.ts", minimalComponent());

@@ -126,6 +126,11 @@ prepare() {
 
 start() {
   prepare
+  # The standalone service redirects stdout/stderr before it starts Java, but
+  # a clean Extender checkout has no app/logs directory. Create the service's
+  # own runtime directory here so the first local build behaves like every
+  # subsequent one instead of failing before Extender can bind its port.
+  mkdir -p "$app_dir/logs"
   ENV_PROFILE=deherm-macos JAVA_HOME="$java_home" "$service_script" start standalone-dev
   for _ in {1..30}; do
     if curl --silent --fail --max-time 1 http://localhost:9010/actuator/health >/dev/null; then

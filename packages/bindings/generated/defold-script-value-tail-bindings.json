@@ -12,7 +12,7 @@
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
-    "valueBindingsSha256": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9",
+    "valueBindingsSha256": "969027da2d8c8db9e963538978a9a0ce05239eef6beb8f4f3c7d9e1ebbda6a95",
     "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
     "reviewedPolicySha256": "46ac7dac60e3a727c599ab003239fd74fd6d50ab8555a8f06e95472699321f22",
     "defoldSources": [

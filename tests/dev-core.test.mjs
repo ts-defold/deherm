@@ -12,9 +12,14 @@ import { applyDevEvent, createDevModel, snapshotDevModel } from "../packages/cli
 import { encodeResourceReload, encodeResourceReloadBatches, normalizeResourcePaths, postResourceReload } from "../packages/cli/src/dev/protocol.mjs";
 import { startResourceServer } from "../packages/cli/src/dev/resource-server.mjs";
 import { createWatchPathFilter } from "../packages/cli/src/dev/watcher.mjs";
-import { createDevWatchOptions } from "../packages/cli/src/dev/session.mjs";
+import { createDevWatchOptions, resourcesForBobReload } from "../packages/cli/src/dev/session.mjs";
 import { createEngineController, parseEngineControlEvent, resolveBuiltEngine } from "../packages/cli/src/dev/engine-process.mjs";
-import { ensureBob, extractBobFailureDiagnostics } from "../packages/cli/src/dev/defold-builder.mjs";
+import {
+  changedCompiledResources,
+  ensureBob,
+  extractBobFailureDiagnostics,
+  snapshotCompiledResources
+} from "../packages/cli/src/dev/defold-builder.mjs";
 import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 
 function decodeVarint(bytes, offset) {
@@ -151,20 +156,56 @@ test("watcher suppresses declared generated outputs without hiding source edits"
   assert.equal(filterPath(path.join(root, "player.script.ts")), "player.script.ts");
 });
 
-test("session watcher suppresses bundle maps and both generated proxy kinds", async () => {
+test("session watcher suppresses generated outputs without hiding authored Lua", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-session-watcher-"));
   const outputFile = path.join(root, ".deherm", "dev", "app.dehermc");
   const sourceMirror = path.join(root, "deherm", "app.dehermc");
   const buildMirror = path.join(root, "build", "default", "deherm", "app.dehermc");
-  const filterPath = createWatchPathFilter(root, createDevWatchOptions({ outputFile, sourceMirror, buildMirror }));
+  const lockFile = path.join(root, "deherm.lock");
+  const generatedRoot = path.join(root, "generated-sdk");
+  const generatedProxyPaths = new Set(["scripts/player.script", "gui/hud.gui_script"]);
+  const filterPath = createWatchPathFilter(root, createDevWatchOptions({
+    outputFile, sourceMirror, buildMirror, lockFile, generatedRoot, generatedProxyPaths
+  }));
   for (const artifact of [outputFile, sourceMirror, buildMirror]) {
     assert.equal(filterPath(artifact), undefined);
     assert.equal(filterPath(`${artifact}.map`), undefined);
+    assert.equal(filterPath(`${artifact}.hbc`), undefined);
+    assert.equal(filterPath(`${artifact}.hbc.map`), undefined);
   }
+  assert.equal(filterPath(lockFile), undefined);
+  assert.equal(filterPath(path.join(generatedRoot, "generated", "resource-symbols.json")), undefined);
   assert.equal(filterPath(path.join(root, "scripts", "player.script")), undefined);
   assert.equal(filterPath(path.join(root, "gui", "hud.gui_script")), undefined);
+  assert.equal(filterPath(path.join(root, "scripts", "authored.script")), "scripts/authored.script");
+  assert.equal(filterPath(path.join(root, "gui", "authored.gui_script")), "gui/authored.gui_script");
   assert.equal(filterPath(path.join(root, "scripts", "player.script.ts")), "scripts/player.script.ts");
   assert.equal(filterPath(path.join(root, "gui", "hud.gui_script.ts")), "gui/hud.gui_script.ts");
+});
+
+test("Bob resource snapshots content-check same-size writes even when mtime is restored", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-bob-resources-"));
+  const resource = path.join(root, "main", "player.scriptc");
+  await mkdir(path.dirname(resource), { recursive: true });
+  await writeFile(resource, "first-v1");
+  const originalStat = await stat(resource);
+  const first = await snapshotCompiledResources(root);
+
+  await writeFile(resource, "other-v2");
+  await utimes(resource, originalStat.atime, originalStat.mtime);
+  const changed = await snapshotCompiledResources(root, first);
+  assert.deepEqual(changedCompiledResources(first, changed), ["/main/player.scriptc"]);
+
+  await writeFile(resource, "other-v2");
+  await utimes(resource, originalStat.atime, originalStat.mtime);
+  const rewrittenSame = await snapshotCompiledResources(root, changed);
+  assert.deepEqual(changedCompiledResources(changed, rewrittenSame), []);
+});
+
+test("Bob only omits compiler resources after the engine accepted that generation", () => {
+  const resources = ["/deherm/app.dehermc", "/deherm/app.dehermc.hbc", "/main/player.scriptc"];
+  assert.deepEqual(resourcesForBobReload(resources, ["/deherm/app.dehermc"], true), ["/main/player.scriptc"]);
+  assert.deepEqual(resourcesForBobReload(resources, ["/deherm/app.dehermc"], false), resources);
 });
 
 test("dev model rejects stale generations and bounds noisy data", () => {

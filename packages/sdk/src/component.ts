@@ -1,8 +1,14 @@
 import type { DefoldHash, DefoldUrl } from "./address";
-import type { Quaternion, Vector3, Vector4 } from "./generated/script/types";
 
 export type { DefoldHash, DefoldUrl } from "./address";
-export type { Quaternion, Vector3, Vector4 } from "./generated/script/types";
+
+// Component authoring is part of the revision-neutral npm package, while the
+// full branded SDK is materialized from the selected Defold policy. Keep the
+// editor-property shapes structural here so this subpath is independently
+// usable before that revision-specific surface exists.
+export type ComponentVector3 = Readonly<{ x: number; y: number; z: number }>;
+export type ComponentVector4 = Readonly<{ x: number; y: number; z: number; w: number }>;
+export type ComponentQuaternion = Readonly<{ x: number; y: number; z: number; w: number }>;
 
 export interface PropertyDescriptor<Value, Kind extends string> {
   readonly __value?: Value;
@@ -106,13 +112,13 @@ export const property = Object.freeze({
   url(): PropertyDescriptor<DefoldUrl, "url"> {
     return descriptor();
   },
-  vector3(_x: number, _y: number, _z: number): PropertyDescriptor<Vector3, "vector3"> {
+  vector3(_x: number, _y: number, _z: number): PropertyDescriptor<ComponentVector3, "vector3"> {
     return descriptor();
   },
-  vector4(_x: number, _y: number, _z: number, _w: number): PropertyDescriptor<Vector4, "vector4"> {
+  vector4(_x: number, _y: number, _z: number, _w: number): PropertyDescriptor<ComponentVector4, "vector4"> {
     return descriptor();
   },
-  quaternion(_x: number, _y: number, _z: number, _w: number): PropertyDescriptor<Quaternion, "quaternion"> {
+  quaternion(_x: number, _y: number, _z: number, _w: number): PropertyDescriptor<ComponentQuaternion, "quaternion"> {
     return descriptor();
   },
   atlas(_path?: string): PropertyDescriptor<DefoldResource<"atlas">, "atlas"> {

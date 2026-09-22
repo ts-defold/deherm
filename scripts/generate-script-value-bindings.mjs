@@ -111,6 +111,19 @@ function deriveCallShapes(fn, codecOverrides = new Map()) {
   return [...unique.values()];
 }
 
+function factoryImplementedCallShapes(callShapes) {
+  if (callShapes.length === 0 || callShapes.some((shape) => shape.length < 1 || shape.length > 5)) {
+    throw new Error("script:factory.create must retain its pinned one-to-five argument contract");
+  }
+  if (callShapes.some((shape) => shape[0] === "Nil")) {
+    throw new Error("script:factory.create never accepts nil for its factory address");
+  }
+  const expanded = callShapes.flatMap((shape) => cartesian(shape.map((codec, index) =>
+    index === 0 ? [codec] : [codec, "Nil"])))
+  const unique = new Map(expanded.map((shape) => [JSON.stringify(shape), shape]));
+  return [...unique.values()];
+}
+
 function luaRegistration(source, member) {
   const literal = source.match(new RegExp(`\\{\\s*"${member}"\\s*,\\s*([A-Za-z_][A-Za-z0-9_]*)\\s*\\}`));
   if (literal) return { symbol: literal[1], anchor: literal[0] };
@@ -530,7 +543,12 @@ function reviewedStructuredLuaTemplate(parameters, callShapes, resultCodec) {
   return {
     validate(binding) {
       exactOperationParameters(binding, [parameters]);
-      if (callShapes) expectOperationContract(binding, callShapes, resultCodec);
+      if (callShapes) {
+        const expectedCallShapes = typeof callShapes === "function"
+          ? callShapes(binding.callShapes)
+          : callShapes;
+        expectOperationContract(binding, expectedCallShapes, resultCodec);
+      }
       else {
         if (binding.resultCodec !== resultCodec ||
             binding.implementedCallShapes.length === 0 ||
@@ -1032,7 +1050,7 @@ ${delegation}
     scaleDefault: "sender-world-scale", propertyKeyReality: "string-only",
     resultPolicy: "hash-or-undefined", reentrant: true,
     allocationPolicy: "engine-property-spawn-resource-may-allocate"
-  }, [["String"], ["String", "Vector3", "Nil", "Table"]], "Hash")],
+  }, factoryImplementedCallShapes, "Hash")],
   ["game-object-delete", reviewedStructuredLuaTemplate({
     backend: "captured-lua", context: "active-go", async: true, rejectBone: true,
     singleMissing: "error", listMissing: "warn-continue", explicitNil: "error",
@@ -1216,7 +1234,9 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
         `${entry.id}: reviewed call shapes differ from pinned IR: ${JSON.stringify(derived)}`);
       return [];
     }
-    const implementedCallShapes = entry.implementedCallShapes ?? entry.callShapes;
+    const implementedCallShapes = entry.operation.template === "factory-spawn"
+      ? factoryImplementedCallShapes(entry.callShapes)
+      : entry.implementedCallShapes ?? entry.callShapes;
     if (implementedCallShapes.some((shape) => shape.some((codec) => !CODECS.has(codec))) ||
         implementedCallShapes.some((shape) =>
           !derived.some((candidate) => equal(candidate, shape)) && !isIrCompatibleShape(fn, shape))) {
@@ -1400,7 +1420,18 @@ bool writeMatrix4(ScriptCallFrame* frame, const dmVMath::Matrix4& value, char* e
 DispatchStatus complete(bool ok) noexcept { return ok ? DispatchStatus::kSuccess : DispatchStatus::kError; }`)
     .replace(
       "DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity) noexcept {",
-      "DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity, const StructuredLuaApi* structuredLua) noexcept {");
+      "DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity, const StructuredLuaApi* structuredLua) noexcept {")
+    .replace(
+      `if (!validateShape(binding, *frame)) { fail(error, errorCapacity, "Defold value arguments do not match a generated call shape"); return DispatchStatus::kError; }`,
+      `if (!validateShape(binding, *frame)) {
+    if (error && errorCapacity) std::snprintf(
+        error,
+        errorCapacity,
+        "Defold value arguments do not match a generated call shape (stable_id=0x%08x, arguments=%u)",
+        frame->stableId,
+        static_cast<unsigned>(frame->argumentCount));
+    return DispatchStatus::kError;
+  }`);
   const sourceWithContext = sourceWithStructuredLua.replace(
     "#include <defold_hermes/generated_script_value_bindings.hpp>\n",
     "#include <defold_hermes/generated_script_value_bindings.hpp>\n#include <defold_hermes/active_game_object_context.hpp>\n#include <defold_hermes/script_matrix4_arena.hpp>\n#ifndef DLIB_LOG_DOMAIN\n#define DLIB_LOG_DOMAIN \"DEFOLD_HERMES\"\n#endif\n#include <dmsdk/dlib/log.h>\n");

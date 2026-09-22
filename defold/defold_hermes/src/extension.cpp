@@ -549,7 +549,36 @@ bool EnsureScriptBridgeReady(lua_State* state) {
       state, &detection, detectionError, sizeof(detectionError));
   if (status != defold_hermes::script_handle_lowering::RuntimeProfileDetectionStatus::kMatched ||
       !detection.profile) {
-    dmLogError("Unable to detect exact Defold runtime profile: %s", detectionError);
+    dmLogError(
+        "Unable to detect exact Defold runtime profile: %s (observed=%u matching_mask=0x%02x)",
+        detectionError,
+        static_cast<unsigned>(detection.observedPresent),
+        static_cast<unsigned>(detection.matchingProfileMask));
+    const auto* profiles = defold_hermes::script_handle_lowering::runtimeProfiles();
+    for (uint8_t index = 0;
+         index < defold_hermes::script_handle_lowering::kRuntimeProfileCount;
+         ++index) {
+      dmLogError(
+          "Runtime profile candidate '%s': %u generated-symbol mismatch(es)",
+          profiles[index].id,
+          static_cast<unsigned>(detection.mismatches[index]));
+      for (uint8_t sample = 0;
+           sample < detection.mismatches[index] &&
+           sample < defold_hermes::script_handle_lowering::kRuntimeProfileMismatchSampleCapacity;
+           ++sample) {
+        const uint32_t stableId = detection.mismatchStableIds[index][sample];
+        const auto* route = defold_hermes::script_handle_lowering::find(stableId);
+        dmLogError(
+            "Runtime profile candidate '%s' mismatch route=%s stable_id=0x%08x observed=%s expected=%s",
+            profiles[index].id,
+            route ? route->canonicalId : "<unknown>",
+            stableId,
+            detection.mismatchObserved[index][sample] ? "present" : "absent",
+            route && (route->registrationProfileMask & profiles[index].mask) != 0
+                ? "present"
+                : "absent");
+      }
+    }
     gScriptBridgeState = ScriptBridgeState::kUninitialized;
     return false;
   }

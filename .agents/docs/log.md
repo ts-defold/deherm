@@ -1,5 +1,60 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Installed HMR review closure is fail-closed and packable
+
+The post-wave adversarial review found no P0/P1 issue. Two P2 observations had
+already been closed before the report arrived: component-schema change state is
+sticky until its watcher batch consumes it, and Bob's compiled-resource digest
+cache has a direct same-size/replaced-content test. The remaining profile
+observation was valid: generated detection now reports more than one exact Lua
+registration match as ambiguous, and generation rejects profiles with identical
+registration vectors so a future Defold feature combination cannot silently
+select the first runtime mask. All six current profiles remain distinct.
+
+The packed `@ts-defold/deherm/component` subpath is now compiled by the npm smoke
+without importing the deliberately absent revision-specific SDK tree. Stable
+component property shapes use distinct `ComponentVector3`, `ComponentVector4`,
+and `ComponentQuaternion` names; the policy-materialized SDK remains authority
+for branded Defold values. The same smoke caught and closed a package-emitter
+parity gap for the newly generated registration masks. Custom generated roots
+are excluded from watch input, while only manifest-owned Lua proxies are ignored,
+so hand-authored `.script` and `.gui_script` resources still schedule Bob. The
+focused materializer, installed dev-loop, watcher, generator, type, and packed
+consumer tests pass. The `.hbc` file remains a compiler artifact; only the
+`.dehermc` resource is claimed as activated by the native extension.
+
+## 2026-09-21 - Real War Battles HMR is single-shot and its state boundary is measured
+
+The installed `deherm dev` path now distinguishes a TypeScript component body
+edit from a Defold resource-schema edit. Generated Lua proxies contain only
+Defold-relevant schema/lifecycle/property state; full source provenance remains
+in the generated component manifest. The generator reports changed Defold
+resources separately, so body-only `*.script.ts`/`*.gui.ts` edits compile and
+activate one bundle without Bob while schema changes retain the slower Bob path.
+Watcher exclusions now cover bytecode and `deherm.lock`, touched Bob outputs are
+content-compared before reload, and the bundle plus compiler-only HBC artifact
+are not posted again from Bob. The installed-package process fixture
+proves body vs schema classification and suppression of duplicate bundle/HBC
+resources. The root package again exports `@ts-defold/deherm/component`, and the
+War Battles workspace `pnpm dev` command resolves its entry/watch roots from the
+declared Defold project instead of duplicating `defold/defold`.
+
+A real local-Extender build and Defold `7f0f554` run loaded runtime profile
+`default-legacy-bullet` from 315 generated Lua symbols, activated fingerprint
+`5de1ceb3...`, auto-engaged eight players, and emitted live Hermes heap,
+component, Lua-handle, and arena telemetry. Editing `SPARK_TICKS` and restoring
+it produced only generations 2 and 3: each had one compiler build, one reload
+signal, and one exact fingerprint-bound activation (`6334816a...`, then
+`5de1ceb3...`) with no Bob build and no runtime error. This is real installed
+compiler/native-engine HMR evidence, not an editor, remote-device, or HTML5
+claim. It is also not state-preservation or leak certification: fresh Hermes
+component state reran game initialization after each runtime swap, and observed
+component counts rose 51 -> 95 -> 127 as War Battles spawned another arena
+presentation. [Issue #120](https://github.com/ts-defold/deherm/issues/120)
+tracks the required state migration, generation-owned teardown, and reload soak;
+that measured boundary remains explicit work rather than being promoted to a
+green memory claim.
+
 ## 2026-09-21 - Packed policy consumer executes a usage-specialized dmSDK twin
 
 The packed npm smoke now resolves the external content-addressed policy,

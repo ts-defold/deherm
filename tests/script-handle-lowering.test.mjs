@@ -130,19 +130,34 @@ test("derives exact fail-closed runtime profile masks and handshakes", () => {
     assert.equal(profile.defoldRevision, generated.defoldRevision);
     assert.equal(profile.schema, "deherm.script-route-capabilities/v1");
     assert.match(profile.adapterSurfaceSha256, /^[0-9a-f]{64}$/);
+    assert.match(profile.registrationSurfaceSha256, /^[0-9a-f]{64}$/);
     assert.equal(generated.routes.filter((route) =>
       route.generation.router === "emitted" && (route.profiles.runtimeMask & profile.mask) !== 0).length,
     profile.adapterExecutableRouteCount);
   }
   assert.equal(new Set(generated.runtimeProfiles.map(({ adapterSurfaceSha256 }) => adapterSurfaceSha256)).size, 6);
+  assert.equal(new Set(generated.runtimeProfiles.map(({ registrationSurfaceSha256 }) => registrationSurfaceSha256)).size, 6);
   const executableSymbols = generated.routes
     .filter(({ generation }) => generation.router === "emitted")
     .map(({ modulePath, member }) => `${modulePath.join(".")}.${member}`);
   assert.equal(new Set(executableSymbols).size, executableSymbols.length);
   for (const route of generated.routes) {
+    const expectedRegistrationMask = generated.runtimeProfiles.reduce((mask, profile) =>
+      mask | (route.profiles.registration.includes(profile.id) ? profile.mask : 0), 0);
     const expectedMask = generated.runtimeProfiles.reduce((mask, profile) =>
       mask | (route.profiles.runtime.includes(profile.id) ? profile.mask : 0), 0);
+    assert.equal(route.profiles.registrationMask, expectedRegistrationMask);
     assert.equal(route.profiles.runtimeMask, expectedMask);
+  }
+  for (const id of ["script:b2d.get_world", "script:b2d.body.get_world"]) {
+    const route = generated.routes.find((candidate) => candidate.id === id);
+    const profile = generated.runtimeProfiles.find((candidate) => candidate.id === "default-legacy-bullet");
+    assert.ok(route, `${id} route is generated`);
+    assert.ok(profile, "default-legacy-bullet profile is generated");
+    assert.notEqual(route.profiles.registrationMask & profile.mask, 0,
+      `${id} is present in the source registration surface`);
+    assert.equal(route.profiles.runtimeMask & profile.mask, 0,
+      `${id} remains unavailable to the adapter because its lightuserdata world handle is not capturable`);
   }
 });
 

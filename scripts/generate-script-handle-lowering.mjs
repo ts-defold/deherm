@@ -320,6 +320,7 @@ struct Route {
   const char* lifetimeToken;
   const char* availabilityToken;
   bool runtimeAvailable;
+  uint8_t registrationProfileMask;
   uint8_t runtimeProfileMask;
   bool nativeAdapterHarness;
   Disposition nativeDynamicHermes;
@@ -354,12 +355,16 @@ struct RuntimeProfileHandshake {
   const char* catalogSha256;
 };
 
+inline constexpr uint8_t kRuntimeProfileMismatchSampleCapacity = 4;
+
 struct RuntimeProfileDetection {
   RuntimeProfileDetectionStatus status;
   const RuntimeProfile* profile;
   uint16_t observedPresent;
   uint8_t matchingProfileMask;
   uint16_t mismatches[${report.runtimeProfiles.length}];
+  uint32_t mismatchStableIds[${report.runtimeProfiles.length}][kRuntimeProfileMismatchSampleCapacity];
+  uint8_t mismatchObserved[${report.runtimeProfiles.length}][kRuntimeProfileMismatchSampleCapacity];
 };
 
 inline constexpr uint16_t kHandleKindCount = ${report.handleKindCount};
@@ -496,7 +501,7 @@ function renderSource(report) {
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
   const results = report.resultCodecs.map((codec) =>
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
-  const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
+  const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.registrationMask}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
   const runtimeProfiles = report.runtimeProfiles.map((profile) =>
     `  {${profile.index}, ${profile.mask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`).join("\n");
   const stableOrder = [...report.routes].sort((left, right) => left.stableId - right.stableId).map(({ index }) => index);
@@ -618,8 +623,14 @@ int protectedDetectRuntimeProfile(lua_State* state) {
     const bool present = rawFunctionPresent(state, route);
     if (present) ++output.observedPresent;
     for (uint8_t profileIndex = 0; profileIndex < kRuntimeProfileCount; ++profileIndex) {
-      const bool expected = (route.runtimeProfileMask & kRuntimeProfiles[profileIndex].mask) != 0;
-      if (present != expected) ++output.mismatches[profileIndex];
+      const bool expected = (route.registrationProfileMask & kRuntimeProfiles[profileIndex].mask) != 0;
+      if (present != expected) {
+        const uint16_t mismatchIndex = output.mismatches[profileIndex]++;
+        if (mismatchIndex < kRuntimeProfileMismatchSampleCapacity) {
+          output.mismatchStableIds[profileIndex][mismatchIndex] = route.stableId;
+          output.mismatchObserved[profileIndex][mismatchIndex] = present ? 1u : 0u;
+        }
+      }
     }
   }
   uint8_t matches = 0;
@@ -630,9 +641,12 @@ int protectedDetectRuntimeProfile(lua_State* state) {
     if (!match) match = &kRuntimeProfiles[index];
     ++matches;
   }
-  if (matches >= 1) {
+  if (matches == 1) {
     output.profile = match;
     output.status = RuntimeProfileDetectionStatus::kMatched;
+  } else if (matches > 1) {
+    output.profile = nullptr;
+    output.status = RuntimeProfileDetectionStatus::kAmbiguous;
   } else {
     output.status = RuntimeProfileDetectionStatus::kNoMatch;
   }
@@ -1191,22 +1205,27 @@ export function generateScriptHandleLowering(textInputs) {
     };
     const harnessDisposition = nativeAdapterHarnessDisposition(row, policy);
     const blocked = harnessDisposition !== "router-candidate";
-    let runtimeProfileIds = [...(row.availability.runtimeProfiles ??
+    const registrationProfileIds = [...(row.availability.runtimeProfiles ??
       (row.availability.runtimeAvailable !== false && row.availability.token === "core"
         ? runtimeProfiles.map(({ id }) => id)
         : []))].sort();
+    let registrationMask = 0;
+    for (const profileId of registrationProfileIds) {
+      const profile = runtimeProfileById.get(profileId);
+      if (!profile) throw new Error(`${row.id} references unknown runtime profile ${profileId}`);
+      if (row.availability.token !== "core" && !availableRouteIdsByProfile.get(profileId)?.has(row.id)) {
+        throw new Error(`${row.id} runtime profile ${profileId} disagrees with the source-derived route set`);
+      }
+      registrationMask |= profile.mask;
+    }
     const semanticKinds = [...new Set([...discoveredInputKinds, ...discoveredReturnKinds])];
-    runtimeProfileIds = runtimeProfileIds.filter((profileId) => {
+    const runtimeProfileIds = registrationProfileIds.filter((profileId) => {
       const profile = runtimeProfileById.get(profileId);
       return semanticKinds.every((kind) => (kindById[kind].capturableProfileMask & profile.mask) !== 0);
     });
     let runtimeMask = 0;
     for (const profileId of runtimeProfileIds) {
       const profile = runtimeProfileById.get(profileId);
-      if (!profile) throw new Error(`${row.id} references unknown runtime profile ${profileId}`);
-      if (row.availability.token !== "core" && !availableRouteIdsByProfile.get(profileId)?.has(row.id)) {
-        throw new Error(`${row.id} runtime profile ${profileId} disagrees with the source-derived route set`);
-      }
       runtimeMask |= profile.mask;
     }
     for (const profile of runtimeProfiles) {
@@ -1250,6 +1269,8 @@ export function generateScriptHandleLowering(textInputs) {
         documentedFeatures: row.availability.documentedFeatures ?? row.availability.allOf ?? [],
         runtimeFeatures: row.availability.runtimeFeatures ?? row.availability.allOf ?? [],
         documented: row.availability.documentedProfiles ?? [],
+        registration: registrationProfileIds,
+        registrationMask,
         runtime: runtimeProfileIds,
         runtimeAvailable: row.availability.runtimeAvailable !== false,
         runtimeMask
@@ -1300,6 +1321,21 @@ export function generateScriptHandleLowering(textInputs) {
       .map((route) => (route.profiles.runtimeMask & profile.mask) !== 0 ? "1" : "0")
       .join("");
     profile.adapterSurfaceSha256 = sha256(surface);
+    const registrationSurface = routes
+      .filter((route) => route.generation.router === "emitted")
+      .map((route) => (route.profiles.registrationMask & profile.mask) !== 0 ? "1" : "0")
+      .join("");
+    profile.registrationSurfaceSha256 = sha256(registrationSurface);
+  }
+  const registrationSurfaceOwners = new Map();
+  for (const profile of runtimeProfiles) {
+    const owner = registrationSurfaceOwners.get(profile.registrationSurfaceSha256);
+    if (owner) {
+      throw new Error(
+        `runtime profiles ${owner} and ${profile.id} have indistinguishable Lua registration surfaces`
+      );
+    }
+    registrationSurfaceOwners.set(profile.registrationSurfaceSha256, profile.id);
   }
   const runtimeProfileEquivalence = assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds);
   const executableSymbols = routes

@@ -93,7 +93,11 @@ const services = {
         emit({ type: "defold-build-started", reason });
         builds.push(reason);
         const resources = reason.startsWith("changed ")
-          ? [`/compiled/change-${builds.length}.resourcec`]
+          ? [
+              "/deherm/app.dehermc",
+              "/deherm/app.dehermc.hbc",
+              `/compiled/change-${builds.length}.resourcec`
+            ]
           : [];
         emit({ type: "defold-build-succeeded", reason, resources });
         return { resources, outputRoot: path.join(project, "build", "default"), platform: "test" };
@@ -155,6 +159,22 @@ const services = {
     await writeFile(path.join(project, "main", "tiles.atlas"), 'images { image: "/main/tile-2.png" }\n');
     await waitFor("asset Bob build", () => builds.length === assetBuildStart + 1);
     await waitFor("asset compiled-resource reload", () => reloadBatches.length >= assetReloadStart + 2);
+
+    const componentBodyBuildStart = builds.length;
+    const componentBodyReloadStart = reloadBatches.length;
+    const componentBodyGenerationStart = events.filter((event) => event.type === "build-succeeded").length;
+    await writeFile(path.join(project, "main", "battle.gui.ts"), [
+      "function defineComponent(definition) { return definition; }",
+      "export default defineComponent({ update(_dt) { const implementationOnly = 2; void implementationOnly; } });",
+      ""
+    ].join("\n"));
+    await waitFor(
+        "component body bundle reload",
+        () => events.filter((event) => event.type === "build-succeeded").length === componentBodyGenerationStart + 1);
+    if (builds.length !== componentBodyBuildStart) throw new Error("component body edit invoked Bob");
+    if (reloadBatches.length !== componentBodyReloadStart + 1) {
+      throw new Error(`component body edit emitted ${reloadBatches.length - componentBodyReloadStart} reload requests`);
+    }
 
     const componentBuildStart = builds.length;
     const componentReloadStart = reloadBatches.length;

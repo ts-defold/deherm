@@ -17,7 +17,7 @@ test("Defold value and handle bindings are deterministic structured descriptors"
   const report = JSON.parse(await readFile(new URL(
     "packages/bindings/generated/defold-script-value-bindings.json", root), "utf8"));
   assert.equal(report.bindingCount, 78);
-  assert.equal(report.callShapeCount, 121);
+  assert.equal(report.callShapeCount, 236);
   const familyBindings = report.bindings.filter(({ generatedFamily }) => generatedFamily === "gui-node-setters");
   assert.equal(familyBindings.length, 39);
   const vmathFamily = report.bindings.filter(({ generatedFamily }) => generatedFamily === "vmath-fixed-pod");
@@ -79,6 +79,13 @@ test("Defold value and handle bindings are deterministic structured descriptors"
     [["Node"], ["Node", "Node"], ["Node", "Node", "Boolean"]]);
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:gui.set_material").implementedCallShapes,
     [["Node", "String"], ["Node", "Hash"]]);
+  const factory = report.bindings.find(({ id }) => id === "script:factory.create");
+  assert.ok(factory.implementedCallShapes.some((shape) =>
+    JSON.stringify(shape) === JSON.stringify(["String", "Vector3"])));
+  assert.ok(factory.implementedCallShapes.some((shape) =>
+    JSON.stringify(shape) === JSON.stringify(["String", "Vector3", "Nil", "Table"])));
+  assert.ok(factory.implementedCallShapes.some((shape) =>
+    JSON.stringify(shape) === JSON.stringify(["Hash", "Nil", "Nil", "Nil", "Vector3"])));
   assert.equal(familyBindings.every(({ operation }) => operation.template === "gui-node-setter"), true);
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:vmath.euler_to_quat").implementedCallShapes,
     [["Vector3"], ["Number", "Number", "Number"]]);

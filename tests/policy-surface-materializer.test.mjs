@@ -93,7 +93,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_791_828, snapshots: 105_573 },
+  assert.deepEqual(bytesByMode, { rendered: 3_830_751, snapshots: 105_573 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const expectedOutputs = await discoverCompilerSurfaceOutputs();
@@ -110,7 +110,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), sha256(expected), `${relative} drifted from the source pipeline`);
     outputBytesByMode[first.descriptor.outputs[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(outputBytesByMode, { rendered: 5_372, snapshots: 1_663_947 },
+  assert.deepEqual(outputBytesByMode, { rendered: 5_372, snapshots: 1_675_950 },
     "package-emitter versus revision-output snapshot debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));

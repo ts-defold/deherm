@@ -30,9 +30,9 @@
     },
     "hashes": {
       "policy": "68239dfe605ef568c51fd53898744eeadefb6a525fc9a366968f46e806d40546",
-      "projection": "b965bc3188517b47e09916ea8fe7b495ea02f819a494ff3912188d91bd67ffb8",
-      "classification": "7bb95aa15c4ec66eeaf946a89ef2eac8ba90605bc78bbadfd9a4b9535e34de91",
-      "availability": "3a6bcb21b47125b86aee923773ed6a0c1ac70da65644b18ca2dcc9e41b9e2718"
+      "projection": "d7dad8f8254ec9f7c003a4d00a830dada6838cfb6f83e831aed95c6139f66618",
+      "classification": "b5503f3b23853225354481bd7b694023f67814a22555ab8e037cf27242ecfbbd",
+      "availability": "518e380326f65465f3696928299f97e9257c4cab2cce11853e0908c81b43e74a"
     },
     "availabilityCatalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"
   },
@@ -4456,6 +4456,7 @@
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 201,
       "adapterSurfaceSha256": "2d680275e47133ba3e466c31256f6d0ab6b4215aa36ecc3c2cbf3c5e1cc547d6",
+      "registrationSurfaceSha256": "2d680275e47133ba3e466c31256f6d0ab6b4215aa36ecc3c2cbf3c5e1cc547d6",
       "equivalentProfileIds": [
         "bullet-only"
       ],
@@ -4474,6 +4475,7 @@
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 313,
       "adapterSurfaceSha256": "b5a8441fcd1a85e3159703ca27b7b350288fae4466c50da4de7ead5d4197801b",
+      "registrationSurfaceSha256": "9125888ff0a962a44217f643949c04f931e35283907fab0bc22818bef358476d",
       "equivalentProfileIds": [
         "default-legacy-bullet"
       ],
@@ -4492,6 +4494,7 @@
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 182,
       "adapterSurfaceSha256": "1456b1ca8f58728f63c3ec1f23adf9e50d0a8161da131ce9afe8a4892acfb6f1",
+      "registrationSurfaceSha256": "a795bded4638f24bae751fe7c7479812f8b88b4d9f7d295b6d13b46a60397bf4",
       "equivalentProfileIds": [
         "legacy-no-bullet"
       ],
@@ -4510,6 +4513,7 @@
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 70,
       "adapterSurfaceSha256": "157c3993b26f7df2700baf327754ee0ad85b5025a4aad32500836cc5228963eb",
+      "registrationSurfaceSha256": "157c3993b26f7df2700baf327754ee0ad85b5025a4aad32500836cc5228963eb",
       "equivalentProfileIds": [
         "no-physics"
       ],
@@ -4528,6 +4532,7 @@
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 380,
       "adapterSurfaceSha256": "e5c62b968dd4ce1b04c0666f0107b13ceab513832c7fb21874e3c70dd0bdd57f",
+      "registrationSurfaceSha256": "e5c62b968dd4ce1b04c0666f0107b13ceab513832c7fb21874e3c70dd0bdd57f",
       "equivalentProfileIds": [
         "v3-bullet"
       ],
@@ -4546,6 +4551,7 @@
       "catalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b",
       "adapterExecutableRouteCount": 249,
       "adapterSurfaceSha256": "2750367813e3322e9b0f91e79a38655ea443b539911dff0ac82d241bfbd364dc",
+      "registrationSurfaceSha256": "2750367813e3322e9b0f91e79a38655ea443b539911dff0ac82d241bfbd364dc",
       "equivalentProfileIds": [
         "v3-no-bullet"
       ],
@@ -4609,6 +4615,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -4695,6 +4708,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -4781,6 +4801,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -4867,6 +4894,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -4949,6 +4983,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -5033,6 +5072,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -5115,6 +5161,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -5195,6 +5246,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -5275,6 +5331,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -5355,6 +5416,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -5435,6 +5501,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -5515,6 +5586,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -5599,6 +5675,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -5685,6 +5768,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -5771,6 +5861,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -5857,6 +5954,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -5943,6 +6047,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6029,6 +6140,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6115,6 +6233,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6201,6 +6326,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6287,6 +6419,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6373,6 +6512,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6459,6 +6605,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6541,6 +6694,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -6625,6 +6783,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6711,6 +6876,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6797,6 +6969,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -6879,6 +7058,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -6961,6 +7145,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -7045,6 +7234,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -7127,6 +7323,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -7207,6 +7408,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -7291,6 +7497,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -7371,6 +7584,8 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [],
+        "registrationMask": 0,
         "runtime": [],
         "runtimeAvailable": false,
         "runtimeMask": 0
@@ -7454,6 +7669,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -7538,6 +7760,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -7620,6 +7849,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -7704,6 +7938,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -7790,6 +8031,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -7876,6 +8124,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -7962,6 +8217,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8048,6 +8310,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8134,6 +8403,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8220,6 +8496,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8302,6 +8585,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -8382,6 +8670,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -8466,6 +8759,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8552,6 +8852,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8638,6 +8945,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8724,6 +9038,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8810,6 +9131,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8896,6 +9224,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -8982,6 +9317,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -9068,6 +9410,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -9154,6 +9503,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -9240,6 +9596,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -9322,6 +9685,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -9402,6 +9770,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -9486,6 +9859,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -9568,6 +9948,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -9652,6 +10037,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -9738,6 +10130,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -9818,6 +10217,8 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [],
+        "registrationMask": 0,
         "runtime": [],
         "runtimeAvailable": false,
         "runtimeMask": 0
@@ -9895,6 +10296,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -9977,6 +10383,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10057,6 +10468,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10137,6 +10553,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10217,6 +10638,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10297,6 +10723,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10379,6 +10810,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10459,6 +10895,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10539,6 +10980,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10619,6 +11065,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10699,6 +11150,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -10779,6 +11235,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -10859,6 +11320,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -10939,6 +11405,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11019,6 +11490,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11099,6 +11575,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11179,6 +11660,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11259,6 +11745,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11339,6 +11830,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11419,6 +11915,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11499,6 +12000,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11579,6 +12085,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -11662,6 +12173,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -11747,6 +12265,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -11831,6 +12356,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -11917,6 +12449,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -12003,6 +12542,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -12085,6 +12631,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -12169,6 +12720,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -12255,6 +12813,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -12337,6 +12902,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -12417,6 +12987,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -12497,6 +13072,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -12583,6 +13163,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -12671,6 +13258,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -12757,6 +13351,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -12839,6 +13440,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -12919,6 +13525,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -13003,6 +13614,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -13089,6 +13707,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -13171,6 +13796,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -13251,6 +13881,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -13335,6 +13970,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -13419,6 +14061,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -13501,6 +14148,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -13585,6 +14237,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -13671,6 +14330,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -13757,6 +14423,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -13843,6 +14516,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -13925,6 +14605,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -14005,6 +14690,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -14085,6 +14775,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -14165,6 +14860,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -14245,6 +14945,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -14325,6 +15030,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -14409,6 +15119,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -14495,6 +15212,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -14577,6 +15301,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -14661,6 +15390,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -14747,6 +15483,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -14833,6 +15576,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -14919,6 +15669,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15005,6 +15762,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15091,6 +15855,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15173,6 +15944,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -15257,6 +16033,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15343,6 +16126,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15425,6 +16215,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -15509,6 +16304,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15595,6 +16397,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15677,6 +16486,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -15761,6 +16575,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15847,6 +16668,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -15931,6 +16759,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16011,6 +16844,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -16095,6 +16933,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -16181,6 +17026,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -16263,6 +17115,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16343,6 +17200,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16423,6 +17285,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16503,6 +17370,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16583,6 +17455,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16663,6 +17540,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16743,6 +17625,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -16827,6 +17714,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -16913,6 +17807,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -16999,6 +17900,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -17085,6 +17993,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -17167,6 +18082,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -17251,6 +18171,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -17333,6 +18260,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -17413,6 +18345,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -17493,6 +18430,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -17577,6 +18519,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -17663,6 +18612,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -17749,6 +18705,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -17835,6 +18798,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -17921,6 +18891,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -18003,6 +18980,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18087,6 +19069,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -18173,6 +19162,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -18255,6 +19251,11 @@
           "default-legacy-bullet",
           "legacy-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet"
+        ],
+        "registrationMask": 6,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet"
@@ -18335,6 +19336,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18419,6 +19425,13 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 54,
         "runtime": [
           "default-legacy-bullet",
           "legacy-no-bullet",
@@ -18501,6 +19514,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18581,6 +19599,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18661,6 +19684,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18741,6 +19769,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18821,6 +19854,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18901,6 +19939,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -18981,6 +20024,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19061,6 +20109,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19141,6 +20194,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19221,6 +20279,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19303,6 +20366,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19383,6 +20451,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19463,6 +20536,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19543,6 +20621,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19623,6 +20706,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19705,6 +20793,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19785,6 +20878,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19865,6 +20963,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -19945,6 +21048,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20025,6 +21133,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20105,6 +21218,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20185,6 +21303,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20265,6 +21388,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20345,6 +21473,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20425,6 +21558,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20505,6 +21643,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20585,6 +21728,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20665,6 +21813,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20745,6 +21898,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20825,6 +21983,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20905,6 +22068,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -20985,6 +22153,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21065,6 +22238,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21145,6 +22323,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21225,6 +22408,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21305,6 +22493,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21385,6 +22578,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21465,6 +22663,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21545,6 +22748,11 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 48,
         "runtime": [
           "v3-bullet",
           "v3-no-bullet"
@@ -21628,6 +22836,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -21715,6 +22932,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -21802,6 +23028,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -21891,6 +23126,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -21976,6 +23220,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22058,6 +23308,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22140,6 +23396,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22222,6 +23484,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22304,6 +23572,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22386,6 +23660,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22468,6 +23748,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22550,6 +23836,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22632,6 +23924,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22714,6 +24012,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22796,6 +24100,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22878,6 +24188,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -22960,6 +24276,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23042,6 +24364,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23124,6 +24452,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23208,6 +24542,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23290,6 +24630,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23372,6 +24718,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23454,6 +24806,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23536,6 +24894,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23618,6 +24982,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23700,6 +25070,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23782,6 +25158,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23864,6 +25246,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -23946,6 +25334,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24028,6 +25422,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24110,6 +25510,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24192,6 +25598,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24274,6 +25686,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24356,6 +25774,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24438,6 +25862,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24520,6 +25950,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24602,6 +26038,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24684,6 +26126,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24766,6 +26214,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24848,6 +26302,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -24930,6 +26390,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25012,6 +26478,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25094,6 +26566,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25176,6 +26654,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25258,6 +26742,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25340,6 +26830,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25422,6 +26918,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25504,6 +27006,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25588,6 +27096,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25672,6 +27186,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25754,6 +27274,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25836,6 +27362,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -25918,6 +27450,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26000,6 +27538,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26082,6 +27626,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26164,6 +27714,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26246,6 +27802,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26330,6 +27892,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26412,6 +27980,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26494,6 +28068,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26576,6 +28156,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26658,6 +28244,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26740,6 +28332,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26822,6 +28420,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26904,6 +28508,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -26986,6 +28596,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27068,6 +28684,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27150,6 +28772,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27232,6 +28860,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27314,6 +28948,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27396,6 +29036,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27478,6 +29124,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27560,6 +29212,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27642,6 +29300,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27724,6 +29388,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27806,6 +29476,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27888,6 +29564,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -27970,6 +29652,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28052,6 +29740,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28134,6 +29828,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28215,6 +29915,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28296,6 +30002,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28377,6 +30089,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28459,6 +30177,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28541,6 +30265,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28623,6 +30353,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28705,6 +30441,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28787,6 +30529,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28869,6 +30617,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -28951,6 +30705,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29033,6 +30793,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29115,6 +30881,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29197,6 +30969,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29279,6 +31057,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29361,6 +31145,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29443,6 +31233,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29525,6 +31321,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29607,6 +31409,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29689,6 +31497,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29771,6 +31585,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29853,6 +31673,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -29935,6 +31761,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30017,6 +31849,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30099,6 +31937,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30181,6 +32025,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30263,6 +32113,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30345,6 +32201,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30427,6 +32289,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30509,6 +32377,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30591,6 +32465,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30673,6 +32553,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30757,6 +32643,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30839,6 +32731,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -30921,6 +32819,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31003,6 +32907,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31085,6 +32995,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31167,6 +33083,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31249,6 +33171,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31331,6 +33259,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31413,6 +33347,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31495,6 +33435,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31577,6 +33523,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31659,6 +33611,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31741,6 +33699,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31823,6 +33787,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31905,6 +33875,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -31989,6 +33965,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32071,6 +34053,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32153,6 +34141,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32235,6 +34229,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32317,6 +34317,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32399,6 +34405,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32481,6 +34493,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32563,6 +34581,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32645,6 +34669,12 @@
           "default-legacy-bullet",
           "v3-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "v3-bullet"
+        ],
+        "registrationMask": 19,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32722,6 +34752,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32802,6 +34841,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32884,6 +34932,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -32964,6 +35021,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33044,6 +35110,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33124,6 +35199,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33204,6 +35288,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33284,6 +35377,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33364,6 +35466,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33444,6 +35555,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33524,6 +35644,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33604,6 +35733,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33684,6 +35822,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33764,6 +35911,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33844,6 +36000,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -33924,6 +36089,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34004,6 +36178,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34084,6 +36267,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34164,6 +36356,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34244,6 +36445,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34324,6 +36534,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34404,6 +36623,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34484,6 +36712,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34564,6 +36801,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34644,6 +36890,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34724,6 +36979,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34804,6 +37068,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34886,6 +37159,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -34966,6 +37248,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35046,6 +37337,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35126,6 +37426,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35206,6 +37515,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35286,6 +37604,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35366,6 +37693,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35446,6 +37782,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35526,6 +37871,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35606,6 +37960,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35686,6 +38049,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35766,6 +38138,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35846,6 +38227,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -35926,6 +38316,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36006,6 +38405,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36086,6 +38494,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36166,6 +38583,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36246,6 +38672,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36326,6 +38761,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36406,6 +38850,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36486,6 +38939,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36566,6 +39028,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36646,6 +39117,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36726,6 +39206,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36806,6 +39295,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36886,6 +39384,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -36966,6 +39473,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37046,6 +39562,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37126,6 +39651,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37206,6 +39740,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37286,6 +39829,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37366,6 +39918,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37446,6 +40007,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37526,6 +40096,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37606,6 +40185,15 @@
           "defold-core"
         ],
         "documented": [],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37693,6 +40281,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37780,6 +40377,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37867,6 +40473,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37954,6 +40569,15 @@
           "v3-bullet",
           "v3-no-bullet"
         ],
+        "registration": [
+          "bullet-only",
+          "default-legacy-bullet",
+          "legacy-no-bullet",
+          "no-physics",
+          "v3-bullet",
+          "v3-no-bullet"
+        ],
+        "registrationMask": 63,
         "runtime": [
           "bullet-only",
           "default-legacy-bullet",
@@ -37997,7 +40621,7 @@
     "profileSymbolUnavailable": 2
   },
   "generated": {
-    "report": "{\"routeCount\":407,\"hash\":\"0db8047d411bad6540b64037a202f3c8517ea785d55399933db79d512a302041\"}",
+    "report": "{\"routeCount\":407,\"hash\":\"a73d97bce8688c8ef8b30e65a4ecf4cdd2c60a1c8b22ef663707ce1f7217d0b3\"}",
     "artifacts": [
       "packages/bindings/generated/defold-script-handle-lowering.json",
       "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",

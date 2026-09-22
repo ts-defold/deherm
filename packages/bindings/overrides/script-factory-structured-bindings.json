@@ -25,7 +25,6 @@
         }
       },
       "callShapes": [["String"], ["Hash"], ["Url"], ["String", "Vector3"], ["Hash", "Vector3"], ["Url", "Vector3"], ["String", "Vector3", "Quaternion"], ["Hash", "Vector3", "Quaternion"], ["Url", "Vector3", "Quaternion"], ["String", "Vector3", "Quaternion", "Table"], ["Hash", "Vector3", "Quaternion", "Table"], ["Url", "Vector3", "Quaternion", "Table"], ["String", "Vector3", "Quaternion", "Table", "Number"], ["String", "Vector3", "Quaternion", "Table", "Vector3"], ["Hash", "Vector3", "Quaternion", "Table", "Number"], ["Hash", "Vector3", "Quaternion", "Table", "Vector3"], ["Url", "Vector3", "Quaternion", "Table", "Number"], ["Url", "Vector3", "Quaternion", "Table", "Vector3"]],
-      "implementedCallShapes": [["String"], ["String", "Vector3", "Nil", "Table"]],
       "resultCodec": "Hash"
     }
   ]

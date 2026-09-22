@@ -76,6 +76,7 @@ struct Route {
   const char* lifetimeToken;
   const char* availabilityToken;
   bool runtimeAvailable;
+  uint8_t registrationProfileMask;
   uint8_t runtimeProfileMask;
   bool nativeAdapterHarness;
   Disposition nativeDynamicHermes;
@@ -110,12 +111,16 @@ struct RuntimeProfileHandshake {
   const char* catalogSha256;
 };
 
+inline constexpr uint8_t kRuntimeProfileMismatchSampleCapacity = 4;
+
 struct RuntimeProfileDetection {
   RuntimeProfileDetectionStatus status;
   const RuntimeProfile* profile;
   uint16_t observedPresent;
   uint8_t matchingProfileMask;
   uint16_t mismatches[6];
+  uint32_t mismatchStableIds[6][kRuntimeProfileMismatchSampleCapacity];
+  uint8_t mismatchObserved[6][kRuntimeProfileMismatchSampleCapacity];
 };
 
 inline constexpr uint16_t kHandleKindCount = 15;

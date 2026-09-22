@@ -26,7 +26,7 @@ function handleRouteForEmission(route) {
     lifetime: select(route.lifetime, ["projectionToken", "loweringToken"]),
     profiles: select(route.profiles, [
       "token", "catalogSha256", "documentedFeatures", "runtimeFeatures", "documented",
-      "runtime", "runtimeAvailable", "runtimeMask"
+      "registration", "registrationMask", "runtime", "runtimeAvailable", "runtimeMask"
     ]),
     targets: select(route.targets, ["nativeDynamicHermes", "nativeStaticHermes", "html5BrowserHost"])
   };

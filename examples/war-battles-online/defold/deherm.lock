@@ -332,7 +332,7 @@
     "nativeExtensionClang": {
       "required": false
     },
-    "cacheKey": "93251db634cdcbc369a9797edf66bc7c0e7a70c1a7dc90f500967987da3f46b3"
+    "cacheKey": "c0353be8629c9953eeb62b614c286a417b89ae2da535c5e252151da4a5487724"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -342,10 +342,9 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 7770610,
-      "modifiedMs": 1789784960357
-    },
-    "via": "deherm-lock"
+      "size": 8030180,
+      "modifiedMs": 1790046193970
+    }
   },
   "defoldSurface": {
     "layer": "user-cache"
@@ -353,8 +352,8 @@
   "generationMerkle": {
     "schemaVersion": 1,
     "engineRoot": "67b970953636c9977f4b9503ed1eaebe5c82c48817476c8ba40a132999d3e0b4",
-    "nativeRoot": "c84f183ea89273103a34e334759c0449a5f7c795266f3f924ca97a3cec54665b",
-    "root": "abf83ad2c398281965de082faf44892f1dc7577b210ee2cc78177fb40d7dcb54"
+    "nativeRoot": "bc516eee5ba762b2b48755966cbbbb8ba423476e6e63a1e4cb2e3290ca027d4f",
+    "root": "0817330e289213345655bc46d5e02f72a34f33ef871c6adc8cfcd4e68f6a04a3"
   },
   "inputs": {
     "valueLayoutsSha256": "53276a2451fc181fb983ee0bf7ad56ab24aab7c6f043e29f28eeda64704ef188",
@@ -380,7 +379,7 @@
   "generatedOutputs": {
     "output": {
       "script-contexts.json": "15fa9ee8cf6f4e647a5e31e11d64d0818d17cdcc094def8e080ef7bdafed4d2d",
-      "generated/native-extensions/index.json": "15c4d964fe7df84916de4d2217b6113cf3a31d2e238354be6fb14fbe76a95896",
+      "generated/native-extensions/index.json": "33d8979f559487cff3eec936214bf95e21f1f98ac3726e43850c876dcc1e45c1",
       "sdk/contexts/shared.ts": "f9fbf6bad84413a3fc4da22499b431e8a1a23e787ef6082e8935a2c3ad651784",
       "sdk/contexts/game-object.ts": "f78f5740bb6eb06bf903f8de41a5ff30206b2b5eeb841c12568aa6ac00cd6ed7",
       "sdk/contexts/gui.ts": "cf03743da2030749d238eefa30eab9cd6819a5cbcc28720cd017e52749b53026",
@@ -402,8 +401,8 @@
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/93251db634cdcbc369a9797edf66bc7c0e7a70c1a7dc90f500967987da3f46b3",
-    "treeSha256": "696b4607aee9aee510ccd064f3b2e622541d02a6a512fa56535285b75e5e8783"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/c0353be8629c9953eeb62b614c286a417b89ae2da535c5e252151da4a5487724",
+    "treeSha256": "8af5a75555d95d908a8f6984205d1c0fab4957a0cbb1447d8cf9a1a519689d6f"
   },
   "engineProfiles": {
     "source": "defold-default",
@@ -460,12 +459,12 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "c9111e2f3e63877f8e5c22134ca647eaab11c29eff61193c5b28e0d0962746b2",
+        "fingerprint": "5de1ceb35e2c5253cfa120b7f1f28f926ebbcc3eb7a32a1a01b2c41a5e8b91f2",
         "outputs": {
-          "deherm/app.dehermc": "197aa11071b501b85aaca5b3de51390b739aca0b7fc50f98813d1661de629627"
+          "deherm/app.dehermc": "bd31a1ab8700a62cba92c6808b04e7f18002778d725915a8a044408e84718215"
         },
         "build": {
-          "entryPoint": "main/arena.script.ts",
+          "entryPoint": "main/player.script.ts",
           "preludeEntries": [
             ".deherm/generated/components/registry.ts"
           ],
@@ -483,7 +482,7 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "d0e2693b439b89415d917f4aa4f7fccaabe2c213a6094bf58310499a698ceb5d",
+          "digest": "4b163b33040501084215195d16255755591c964728ab0d1923785f04a8d453ff",
           "fileCount": 67,
           "files": {
             ".deherm/generated/components/registry.ts": "242e47ddc478fc63b95af757e52f370d4302c83ead219ff0690f298b2c640e79",

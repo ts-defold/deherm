@@ -12,20 +12,20 @@
     "conformance": "not-claimed"
   },
   "inputHashes": {
-    "scriptProjection": "b965bc3188517b47e09916ea8fe7b495ea02f819a494ff3912188d91bd67ffb8",
+    "scriptProjection": "d7dad8f8254ec9f7c003a4d00a830dada6838cfb6f83e831aed95c6139f66618",
     "scriptScalarDispatch": "ec01d55f6d135721399bb37c65e89aa5b388c9f9c4a0401b387c4818f73c267b",
-    "scriptValueBindings": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9",
+    "scriptValueBindings": "969027da2d8c8db9e963538978a9a0ce05239eef6beb8f4f3c7d9e1ebbda6a95",
     "scriptFixedTuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "scriptDynamicValues": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
-    "scriptValueTail": "a0d1050d94aa39221d00984ab6415488a8f90b4e452f140feb0c707a5d05f446",
-    "scriptOverloadDispatch": "010e8b3200e8aa55895bbf8e84a72a6a7a9e43c4c6f4a3033cd3f6c46ff3627a",
-    "scriptTableRecords": "bc84e9552249849feb140821df8a4d5db5fd30b9cb831eb23c589646d61913c2",
+    "scriptValueTail": "ae7374fcde25ccbf0cc6358a8b726064176a1c09276b294b66da7daacbb28f93",
+    "scriptOverloadDispatch": "973475e6b77b9829e84c58cc783b76f43ba57eadc9feeee61fdd02de04c49b5d",
+    "scriptTableRecords": "f37ac26cca577e303542db8db7b93370f878141229e6b91e294643688d626f01",
     "scriptCallbackLifecycle": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "scriptCopiedValueBlockers": "c5491ba3db7dd572a84d845a476494c367394ed9a5208df8664e099641985a3c",
-    "scriptOpaqueRecordBlockers": "be93695386765a5f3b28998fabd3fe0093c292be5e22f8e169e77f240a04cf70",
+    "scriptCopiedValueBlockers": "2b0a13beeab9ca3fe16f36284653d9c30ca89976747d85088942134ef0cdee6b",
+    "scriptOpaqueRecordBlockers": "6aa4025bbb01f7e38ac8479ab824b0d9df00d9e6879df1511e879109c3f8b5fe",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "a535242bbdcb958dad8bb6b6bfc7cefbec67df127ceb724f2fe69f482e49fcc2",
-    "scriptUniversalValue": "cfb94336b7ecdfb67a9a36a4d806ebe5cab63301fb9ca19111a5d7983d9bebcb",
+    "scriptHandleLowering": "053ac683f096c02afd44260eef8bdf61f8acae1f7d7b010099f58a65b9e73a45",
+    "scriptUniversalValue": "7d40f0df6eab7c6dfe951a669db19f59f1fccf29070d1efa82c6da8296986626",
     "defoldValueLayouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
     "dmsdkProjection": "bbe895d62582cc9f1955d619b5b879d75be7bf6b572c38d8553300e7edace0c0",
     "dmsdkUniversal": "c2dd03c45f16898831792fec17459d0358d52fcbd394de0b2c65790cf3087aaa",
@@ -48,20 +48,20 @@
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
   "inputCanonicalHashes": {
-    "scriptProjection": "570b15ff65f1c5da41ec91ad6a4477cf8a13de34e890684321a032aad8452f69",
+    "scriptProjection": "5bce9f6cb4605c5e85b11c457fea0766f32b9e617d73b176ec39e26ce25bb73a",
     "scriptScalarDispatch": "0c2ec5b561bfb41c071ca9f00cd999310eb1b48f4f444714fea5ed888c6b8859",
-    "scriptValueBindings": "8b6102c70db2b5a1dfb6a65511a96eb928ea36cad8fcba12fdf47fdd2cfe8efe",
+    "scriptValueBindings": "cc6ad9be3df225b40bde918a478058e8374b51cd0b64fd3b3d2cb8d76241e31a",
     "scriptFixedTuples": "985cc2541d2fd278c59bfc0f0aa5f0083b5a94073ff3a7b6f83cd315ecdf9628",
     "scriptDynamicValues": "b987ff960b43ae0fc45d3a6d7002e2b54eca98fc26c35a421d8e7fcc74416326",
-    "scriptValueTail": "117cdb2e78f8b3e9cd1fa8e826afd7f0af4a2748bf2eb7c8614493e0943db193",
-    "scriptOverloadDispatch": "68f9f75029e58402fd9d2bd1b4b11e292195f959eb80b69d7a2a10ea2e03c090",
-    "scriptTableRecords": "3c27456427ae5d6c3543258995f51fb8d8e0edd7d867cb6a9a27b2f55a55f66f",
+    "scriptValueTail": "da733ff897861aae495d43839db38cd369538404a20c54ea7adbe33825095686",
+    "scriptOverloadDispatch": "d7003d9dfbc7e789471a6d776a77b5abfab55461632e01dfd1f19744e977e967",
+    "scriptTableRecords": "529d411a361ee9844325e6ee791ae5837d6e1e91969c5a006a23fc88ac787bd0",
     "scriptCallbackLifecycle": "ae1ea85b129434f31fd28655f78177ead8eab7d8d2e4ea39d19fc8f915b9c1df",
-    "scriptCopiedValueBlockers": "b4168f43aa0837419177705da43c8dd0772b0c1fb89139b87739519d310706fe",
-    "scriptOpaqueRecordBlockers": "6065d88913d8e67211202d8da16bb0c0b8dab737044754bf2a513bbcf2a793c0",
+    "scriptCopiedValueBlockers": "076fcf026bf058e6c94982d7ef15668e6d8bfacbdd242cdb6e817009539f3ed7",
+    "scriptOpaqueRecordBlockers": "5d17d390ec92c51fa0a6d825e56807cf8578dae0d7ecfa62fab270fe5db65f55",
     "scriptUrlAddress": "0c30abae7994fb4f4ba13e53958732c2f5ec4814e3669afeabe379d6180f258f",
-    "scriptHandleLowering": "6813cb984ac56efe2620387cfbc5977cf4d5931e4b607a076fa179bc85ddd78b",
-    "scriptUniversalValue": "51fe383e039515d8170a8b3f229ed82ef8bdbf3e193d8d7e61ad124bf4044935",
+    "scriptHandleLowering": "81f48628d7fb4ac45ea5238c4f3e295bea7e4d489133569f3ea2c6129453b80e",
+    "scriptUniversalValue": "2ec68878503921dfdc0e51f1c372d7f3721c291a99b8d383773b5f8934fe9a43",
     "defoldValueLayouts": "e7dfbb78eec1c3fbd432080161989576915d554668f0d8b009fe420167325d29",
     "dmsdkProjection": "368d19f9b9c1fe6cda37a3189ae6de92744c72d100bf5c036f230cb08db001e3",
     "dmsdkUniversal": "42d2536fd5bf3fc9240fa3d0ef9d1cd357f03b2c2bac055939ac38398792cff6",
@@ -226923,6 +226923,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -227037,6 +227044,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -227153,6 +227167,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -227269,6 +227290,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -227381,6 +227409,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -227495,6 +227528,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -227793,6 +227833,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -227901,6 +227946,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -228009,6 +228059,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -228116,6 +228171,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -228224,6 +228284,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -228332,6 +228397,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -228444,6 +228514,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -228558,6 +228635,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -228672,6 +228756,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -228872,6 +228963,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -228988,6 +229086,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -229102,6 +229207,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -229258,6 +229370,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -229372,6 +229491,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -229488,6 +229614,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -229604,6 +229737,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -229720,6 +229860,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -229832,6 +229979,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -229946,6 +230098,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -230062,6 +230221,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -230178,6 +230344,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -230330,6 +230503,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -230439,6 +230617,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -230551,6 +230734,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -230663,6 +230853,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -230814,6 +231009,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -230968,6 +231168,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -231076,6 +231283,8 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [],
+              "registrationMask": 0,
               "runtime": [],
               "runtimeAvailable": false,
               "runtimeMask": 0
@@ -231187,6 +231396,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -231298,6 +231514,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -231410,6 +231633,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -231524,6 +231752,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -231640,6 +231875,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -231756,6 +231998,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -231870,6 +232119,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -231984,6 +232240,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -232098,6 +232361,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -232212,6 +232482,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -232322,6 +232599,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -232430,6 +232712,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -232542,6 +232829,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -232655,6 +232949,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -232769,6 +233070,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -232883,6 +233191,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -232997,6 +233312,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -233111,6 +233433,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -233225,6 +233554,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -233339,6 +233675,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -233453,6 +233796,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -233567,6 +233917,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -233721,6 +234078,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -233829,6 +234191,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -233941,6 +234308,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -234051,6 +234425,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -234166,6 +234545,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -234283,6 +234669,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -234391,6 +234784,8 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [],
+              "registrationMask": 0,
               "runtime": [],
               "runtimeAvailable": false,
               "runtimeMask": 0
@@ -234498,6 +234893,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -234605,6 +235005,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -234713,6 +235118,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -234863,6 +235273,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -234971,6 +235386,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -235079,6 +235499,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -235230,6 +235655,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -235337,6 +235767,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -235445,6 +235880,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -235553,6 +235993,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -235661,6 +236106,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -235812,6 +236262,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -235963,6 +236418,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236071,6 +236531,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236222,6 +236687,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236331,6 +236801,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236439,6 +236914,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236547,6 +237027,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236698,6 +237183,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236806,6 +237296,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -236914,6 +237409,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -237065,6 +237565,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -237180,6 +237685,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -237353,6 +237865,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -237969,6 +238488,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -238082,6 +238608,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -238196,6 +238729,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -238306,6 +238846,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -238418,6 +238963,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -238534,6 +239086,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -238646,6 +239205,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -238754,6 +239318,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -238862,6 +239431,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -238974,6 +239548,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -239087,6 +239668,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -239200,6 +239788,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -239310,6 +239905,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -239418,6 +240018,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -239530,6 +240135,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -239644,6 +240256,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -239754,6 +240373,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -239864,6 +240488,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -239978,6 +240607,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -240088,6 +240724,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -240195,6 +240836,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -240306,6 +240952,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -240420,6 +241073,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -240534,6 +241194,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -240648,6 +241315,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -240758,6 +241432,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -240866,6 +241545,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -240974,6 +241658,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -241082,6 +241771,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -241190,6 +241884,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -241298,6 +241997,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -241412,6 +242116,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -241528,6 +242239,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -241640,6 +242358,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -241754,6 +242477,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -241868,6 +242598,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -241982,6 +242719,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -242096,6 +242840,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -242210,6 +242961,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -242324,6 +243082,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -242434,6 +243199,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -242607,6 +243377,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -242782,6 +243559,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -242894,6 +243678,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -243131,6 +243920,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -243245,6 +244041,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -243355,6 +244158,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -243467,6 +244275,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -243581,6 +244396,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -243691,6 +244513,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -243798,6 +244625,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -243910,6 +244742,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -244024,6 +244863,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -244134,6 +244980,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -244242,6 +245093,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -244350,6 +245206,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -244458,6 +245319,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -244566,6 +245432,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -244674,6 +245545,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -244782,6 +245658,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -244894,6 +245775,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -245008,6 +245896,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -245122,6 +246017,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -245236,6 +246138,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -245346,6 +246255,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -245458,6 +246372,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -245568,6 +246489,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -245676,6 +246602,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -245784,6 +246715,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -245898,6 +246834,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -246012,6 +246955,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -246126,6 +247076,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -246240,6 +247197,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -246354,6 +247318,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -246464,6 +247435,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -246576,6 +247552,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -246690,6 +247673,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -246802,6 +247792,11 @@
                 "default-legacy-bullet",
                 "legacy-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet"
+              ],
+              "registrationMask": 6,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet"
@@ -246910,6 +247905,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247022,6 +248022,13 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 54,
               "runtime": [
                 "default-legacy-bullet",
                 "legacy-no-bullet",
@@ -247132,6 +248139,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247240,6 +248252,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247347,6 +248364,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247455,6 +248477,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247563,6 +248590,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247671,6 +248703,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247779,6 +248816,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247887,6 +248929,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -247995,6 +249042,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -248103,6 +249155,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -248211,6 +249268,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -248318,6 +249380,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -248428,6 +249495,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -248621,6 +249693,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -248729,6 +249806,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -248922,6 +250004,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -249029,6 +250116,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -249184,6 +250276,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -249622,6 +250719,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -249730,6 +250832,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -249838,6 +250945,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -249946,6 +251058,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250096,6 +251213,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250246,6 +251368,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250356,6 +251483,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250464,6 +251596,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250614,6 +251751,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250722,6 +251864,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250830,6 +251977,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -250938,6 +252090,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251046,6 +252203,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251154,6 +252316,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251388,6 +252555,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251495,6 +252667,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251603,6 +252780,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251713,6 +252895,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251821,6 +253008,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -251929,6 +253121,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -252037,6 +253234,11 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 48,
               "runtime": [
                 "v3-bullet",
                 "v3-no-bullet"
@@ -252818,6 +254020,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -252936,6 +254147,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253103,6 +254323,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253271,6 +254500,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253437,6 +254675,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253547,6 +254791,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253657,6 +254907,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253767,6 +255023,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253877,6 +255139,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -253987,6 +255255,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254097,6 +255371,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254207,6 +255487,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254317,6 +255603,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254427,6 +255719,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254537,6 +255835,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254647,6 +255951,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254757,6 +256067,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254869,6 +256185,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -254979,6 +256301,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255091,6 +256419,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255201,6 +256535,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255414,6 +256754,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255524,6 +256870,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255634,6 +256986,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255744,6 +257102,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255854,6 +257218,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -255964,6 +257334,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256074,6 +257450,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256184,6 +257566,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256294,6 +257682,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256404,6 +257798,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256514,6 +257914,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256624,6 +258030,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256734,6 +258146,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256844,6 +258262,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -256954,6 +258378,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -257064,6 +258494,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -257174,6 +258610,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -257284,6 +258726,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -257396,6 +258844,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -257506,6 +258960,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -257618,6 +259078,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -258072,6 +259538,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -258181,6 +259653,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -258291,6 +259769,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -258401,6 +259885,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -258511,6 +260001,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -258682,6 +260178,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -258970,6 +260472,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -259079,6 +260587,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -259189,6 +260703,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -259479,6 +260999,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -259939,6 +261465,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260049,6 +261581,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260159,6 +261697,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260269,6 +261813,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260379,6 +261929,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260489,6 +262045,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260598,6 +262160,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260708,6 +262276,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260818,6 +262392,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -260928,6 +262508,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261038,6 +262624,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261148,6 +262740,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261259,6 +262857,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261369,6 +262973,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261480,6 +263090,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261594,6 +263210,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261707,6 +263329,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261820,6 +263448,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -261932,6 +263566,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262043,6 +263683,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262153,6 +263799,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262263,6 +263915,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262373,6 +264031,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262485,6 +264149,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262595,6 +264265,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262705,6 +264381,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262815,6 +264497,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -262926,6 +264614,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263036,6 +264730,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263152,6 +264852,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263321,6 +265027,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263431,6 +265143,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263543,6 +265261,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263655,6 +265379,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263767,6 +265497,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263879,6 +265615,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -263991,6 +265733,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264103,6 +265851,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264215,6 +265969,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264327,6 +266087,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264478,6 +266244,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264588,6 +266360,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264700,6 +266478,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264810,6 +266594,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -264922,6 +266712,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265092,6 +266888,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265202,6 +267004,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265314,6 +267122,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265424,6 +267238,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265534,6 +267354,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265646,6 +267472,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265756,6 +267588,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265868,6 +267706,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -265980,6 +267824,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266092,6 +267942,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266204,6 +268060,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266314,6 +268176,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266426,6 +268294,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266538,6 +268412,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266650,6 +268530,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266759,6 +268645,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266869,6 +268761,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -266979,6 +268877,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267089,6 +268993,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267201,6 +269111,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267313,6 +269229,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267423,6 +269345,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267533,6 +269461,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267645,6 +269579,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267755,6 +269695,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267867,6 +269813,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -267979,6 +269931,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -268089,6 +270047,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -268202,6 +270166,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -268312,6 +270282,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -268421,6 +270397,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -268634,6 +270616,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -268744,6 +270732,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -268854,6 +270848,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -269417,6 +271417,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -269570,6 +271576,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -269682,6 +271694,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -269927,6 +271945,12 @@
                 "default-legacy-bullet",
                 "v3-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "v3-bullet"
+              ],
+              "registrationMask": 19,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -275091,6 +277115,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -275205,6 +277238,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -275315,6 +277357,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -275470,6 +277521,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -275690,6 +277750,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -275801,6 +277870,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -275912,6 +277990,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276023,6 +278110,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276134,6 +278230,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276245,6 +278350,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276356,6 +278470,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276467,6 +278590,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276578,6 +278710,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276689,6 +278830,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276800,6 +278950,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -276911,6 +279070,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -277022,6 +279190,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -277249,6 +279426,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -277360,6 +279546,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -277471,6 +279666,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -277582,6 +279786,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -277693,6 +279906,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -277954,6 +280176,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278065,6 +280296,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278176,6 +280416,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278357,6 +280606,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278468,6 +280726,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278579,6 +280846,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278690,6 +280966,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278801,6 +281086,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -278912,6 +281206,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279023,6 +281326,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279134,6 +281446,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279245,6 +281566,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279356,6 +281686,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279467,6 +281806,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279578,6 +281926,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279689,6 +282046,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279800,6 +282166,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -279911,6 +282286,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -280022,6 +282406,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -280133,6 +282526,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -280351,6 +282753,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -280516,6 +282927,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -280627,6 +283047,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -280790,6 +283219,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -280901,6 +283339,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -281012,6 +283459,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -281123,6 +283579,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -281236,6 +283701,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -281351,6 +283825,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -281464,6 +283947,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -281641,6 +284133,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -281937,6 +284438,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -282099,6 +284609,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -289684,6 +292203,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -289794,6 +292322,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -290010,6 +292547,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -290370,6 +292916,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -290538,6 +293093,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -290652,6 +293216,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -291749,6 +294322,15 @@
                 "defold-core"
               ],
               "documented": [],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -292439,6 +295021,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -292700,6 +295291,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -292880,6 +295480,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -295792,6 +298401,15 @@
                 "v3-bullet",
                 "v3-no-bullet"
               ],
+              "registration": [
+                "bullet-only",
+                "default-legacy-bullet",
+                "legacy-no-bullet",
+                "no-physics",
+                "v3-bullet",
+                "v3-no-bullet"
+              ],
+              "registrationMask": 63,
               "runtime": [
                 "bullet-only",
                 "default-legacy-bullet",
@@ -492257,5 +494875,5 @@
       }
     }
   ],
-  "planSha256": "7bb2d1b2b3f85f44dbaffeab9e25c77122b59de82f75c18cf99c46195ddad076"
+  "planSha256": "30b831f33605aa78bc3618961d7169255e528f2c654b4d0c3b89c26850d61257"
 }

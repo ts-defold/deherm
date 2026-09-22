@@ -474,7 +474,6 @@ function renderLua(component) {
   const lines = [
     GENERATED_MARKER,
     `-- source: ${component.source}`,
-    `-- source-sha256: ${component.sourceSha256}`,
     `-- schema-sha256: ${component.schemaFingerprint}`,
     `-- component-id: ${component.componentId}`,
     `-- proxy-kind: ${component.proxyKind}`,
@@ -902,16 +901,19 @@ export async function generateComponentProxies({ projectRoot, sourceFiles, outpu
   }
 
   const stale = [];
+  const defoldResourceStale = [];
   const writes = [];
   for (const output of generated.outputs) {
     const existing = await readExisting(output.path);
     if (existing !== output.content) stale.push(output.path);
+    if (existing !== output.content && output.generatedLua) defoldResourceStale.push(output.path);
     if (existing !== undefined && existing !== output.content && output.generatedLua) {
       assertProxyOwnership(output.path, existing, output.owner, "overwrite");
     }
     if (existing !== output.content) writes.push(output);
   }
   stale.push(...orphans);
+  defoldResourceStale.push(...orphans);
   if (check && stale.length) {
     throw new Error(`component proxy outputs are missing or stale:\n${stale.map((file) => `- ${file}`).join("\n")}`);
   }
@@ -919,7 +921,7 @@ export async function generateComponentProxies({ projectRoot, sourceFiles, outpu
     await stageWrites(writes);
     await Promise.all(orphans.map((file) => rm(file)));
   }
-  return { ...generated, stale };
+  return { ...generated, stale, defoldResourceStale };
 }
 
 export { componentProxyConstants };

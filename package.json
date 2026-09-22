@@ -18,6 +18,11 @@
       "import": "./packages/sdk/src/package.ts",
       "default": "./packages/sdk/src/package.ts"
     },
+    "./component": {
+      "types": "./packages/sdk/src/component.ts",
+      "import": "./packages/sdk/src/component.ts",
+      "default": "./packages/sdk/src/component.ts"
+    },
     "./compiler/dmsdk-universal-materializer": {
       "import": "./packages/compiler/src/dmsdk-universal-materializer.mjs",
       "default": "./packages/compiler/src/dmsdk-universal-materializer.mjs"

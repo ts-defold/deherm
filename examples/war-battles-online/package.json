@@ -33,7 +33,7 @@
     "runtime:packaged:check": "node integration/check-packaged-runtime.mjs --check-evidence",
     "runtime:typed-native": "node integration/check-typed-native-transport.mjs",
     "runtime:projections": "node integration/check-projection-evidence.mjs",
-    "dev": "deherm dev --project defold --entry defold/main/player.script.ts --watch defold"
+    "dev": "deherm dev --project defold --entry main/player.script.ts --watch ."
   },
   "dependencies": {
     "@ts-defold/deherm": "workspace:*"

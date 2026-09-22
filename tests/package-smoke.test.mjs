@@ -481,7 +481,10 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   }, null, 2)}\n`);
   await writeFile(path.join(consumer, "package-api.ts"), [
     'import { hashLiteral, type DefoldHash } from "@ts-defold/deherm";',
+    'import { defineComponent, property, type ComponentVector3 } from "@ts-defold/deherm/component";',
     'const id: DefoldHash = hashLiteral("#packed-component");',
+    'const direction: ComponentVector3 = { x: 1, y: 0, z: 0 };',
+    'defineComponent({ properties: { direction: property.vector3(direction.x, direction.y, direction.z) } });',
     'void id;',
     ""
   ].join("\n"));

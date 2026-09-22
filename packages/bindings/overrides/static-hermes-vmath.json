@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "descriptorSha256": "e4de3e5eb0b1d1196f07d70cbbef4784e59b6bd8dfd3924aaad0bebf65974bb9",
+  "descriptorSha256": "969027da2d8c8db9e963538978a9a0ce05239eef6beb8f4f3c7d9e1ebbda6a95",
   "selector": {
     "idPrefix": "script:vmath.",
     "resultCodec": "Number",

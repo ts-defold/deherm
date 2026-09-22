@@ -104,7 +104,7 @@ enum class BindingId : uint32_t {
   VmathMatrix4Frustum = 0xfd08fe38u
 };
 inline constexpr size_t kBindingCount = 78;
-inline constexpr size_t kCallShapeCount = 121;
+inline constexpr size_t kCallShapeCount = 236;
 inline constexpr size_t kStructuredLuaOperationCount = 47;
 DispatchStatus dispatch(ScriptCallFrame* frame, char* error, size_t errorCapacity, const StructuredLuaApi* structuredLua = nullptr) noexcept;
 

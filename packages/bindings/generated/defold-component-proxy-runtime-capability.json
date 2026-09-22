@@ -89,7 +89,7 @@
   "provenance": {
     "proxyGenerator": {
       "path": "packages/compiler/src/component-proxy-generator.mjs",
-      "sha256": "e0d2c4d55ecefdccef5bd9f93ee6c572b9d838a5fbbc988290e85b59d5aeca14"
+      "sha256": "f1a25714aef9c7999661f26107371ada2950d13c8eca484f96ed42feba239c7f"
     },
     "componentBundler": {
       "path": "scripts/build-component-registry.mjs",
@@ -105,7 +105,7 @@
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
-      "sha256": "bfe017f0f7610c87ee541346add7152f5db583c870e19fe3a8481a6a4f7520cf"
+      "sha256": "2e50325d6f8b51a9c67afa33af89cec4dec68b25d8ba9f5c533d021aaa3fd095"
     },
     "luaProvider": {
       "path": "defold/defold_hermes/include/defold_hermes/component_proxy_lua_gate.hpp",
@@ -129,7 +129,7 @@
     },
     "componentSdk": {
       "path": "packages/sdk/src/component.ts",
-      "sha256": "18e333f993c3de6ff36033e17d8b82eecc3ffc7825d137d43d0fd2e25a323929"
+      "sha256": "64b6d6b295d2843f5c86147df0a52f68b802c20a6a993ab2b30290d3add0f614"
     },
     "nativeLuaHarness": {
       "path": "tests/native/component_proxy_lua_gate/component_proxy_lua_gate_test.cpp",

@@ -34,7 +34,6 @@ async function exists(file) {
 }
 
 const componentSourceSuffixes = componentProxyConstants.sourceKinds.map(({ suffix }) => suffix);
-const componentProxySuffixes = componentSourceSuffixes.map((suffix) => suffix.slice(0, -3));
 const ignoredEntryDirectories = new Set([
   ".deherm",
   ".git",
@@ -45,10 +44,6 @@ const ignoredEntryDirectories = new Set([
 
 function isComponentSource(file) {
   return componentSourceSuffixes.some((suffix) => file.endsWith(suffix));
-}
-
-function isComponentProxy(file) {
-  return componentProxySuffixes.some((suffix) => file.endsWith(suffix));
 }
 
 async function resolveEntry(projectRoot, requested) {
@@ -117,12 +112,17 @@ async function entryTsconfig(projectRoot, entryPoint) {
   return await exists(conventional) ? conventional : undefined;
 }
 
-export function createDevWatchOptions({ outputFile, sourceMirror, buildMirror }) {
+export function createDevWatchOptions({ outputFile, sourceMirror, buildMirror, lockFile, generatedRoot, generatedProxyPaths = new Set() }) {
   return {
-    ignoredPaths: [outputFile, sourceMirror, buildMirror].flatMap((file) => [file, `${file}.map`]),
+    ignoredPaths: [outputFile, sourceMirror, buildMirror].flatMap((file) => [
+      file,
+      `${file}.map`,
+      `${file}.hbc`,
+      `${file}.hbc.map`
+    ]).concat(lockFile ? [lockFile] : []).concat(generatedRoot ? [generatedRoot] : []),
     // The watcher already drops every atomic-write scratch name, including
     // `.deherm-tmp-*`; this only hides the proxies the session itself writes.
-    shouldIgnore: (_file, relative) => isComponentProxy(relative)
+    shouldIgnore: (_file, relative) => generatedProxyPaths.has(relative)
   };
 }
 
@@ -177,8 +177,15 @@ async function refreshProjectSymbolIndexes(projectRoot, generatedRoot) {
   return { written, unavailable };
 }
 
-function needsDefoldBuild(files) {
-  return files.some((file) => isComponentSource(file) || !/\.[cm]?[jt]sx?$/.test(file));
+function needsDefoldBuild(files, componentProxyChanged = false) {
+  return files.some((file) => !/\.[cm]?[jt]sx?$/.test(file)) ||
+    (componentProxyChanged && files.some(isComponentSource));
+}
+
+export function resourcesForBobReload(resources, compilerResources, compilerReloadSignalled) {
+  if (!compilerReloadSignalled) return [...resources];
+  const compilerArtifacts = new Set(compilerResources.flatMap((resource) => [resource, `${resource}.hbc`]));
+  return resources.filter((resource) => !compilerArtifacts.has(resource));
 }
 
 function needsEngineRestart(files) {
@@ -221,7 +228,16 @@ export async function runDevSession(options = {}) {
   });
   const model = createDevModel({ bugPoolFile: bugPool?.file });
   const lineOutput = options.headless || (!options.json && (!process.stdin.isTTY || !process.stdout.isTTY));
+  let compilerGeneration = 0;
+  let compilerReloadSignalled = false;
   const emit = (event) => {
+    if (event.type === "build-succeeded") {
+      compilerGeneration = event.generation;
+      compilerReloadSignalled = false;
+    } else if (event.type === "reload-signalled" &&
+        event.id === "local-engine" && event.generation === compilerGeneration) {
+      compilerReloadSignalled = true;
+    }
     applyDevEvent(model, event);
     bugPool?.record(event);
     if (!sessionLogFailed && !sessionLog.destroyed) {
@@ -255,6 +271,8 @@ export async function runDevSession(options = {}) {
     });
   }
   let generatedComponents = false;
+  const generatedProxyPaths = new Set();
+  let componentProxyChanged = false;
   let reportedArtifactRecordingFailure = false;
   let reportedMissingSymbolIndexes = false;
   const compiler = await (services.createIncrementalCompiler ?? createIncrementalCompiler)({
@@ -306,7 +324,13 @@ export async function runDevSession(options = {}) {
     },
     beforeRebuild: options.components === false ? undefined : async (changedSources) => {
       if (generatedComponents && !changedSources.some(isComponentSource)) return;
-      await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
+      const components = await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
+      generatedProxyPaths.clear();
+      for (const component of components.manifest.components) generatedProxyPaths.add(component.proxy);
+      // Sticky until the watcher batch consumes it. A forced/manual build may
+      // join the coordinator loop after this build and must not erase the fact
+      // that the component batch changed a Defold resource.
+      componentProxyChanged ||= components.defoldResourceStale.length > 0;
       const indexes = await refreshProjectSymbolIndexes(projectRoot, generatedRoot);
       if (indexes.unavailable.length && !reportedMissingSymbolIndexes) {
         reportedMissingSymbolIndexes = true;
@@ -364,6 +388,9 @@ export async function runDevSession(options = {}) {
     }));
   });
   await coordinator.requestBuild([path.relative(projectRoot, entryPoint).split(path.sep).join("/") || path.basename(entryPoint)]);
+  // Startup generation is followed by the explicit initial Bob build below;
+  // only watcher-driven component changes participate in the incremental gate.
+  componentProxyChanged = false;
 
   if (options.once) {
     await coordinator.close();
@@ -420,7 +447,9 @@ export async function runDevSession(options = {}) {
     const files = buildRelevantChanges(batch);
     if (!files.length) return;
     await coordinator.requestBuild(files);
-    if (!needsDefoldBuild(files)) return;
+    const requiresDefoldBuild = needsDefoldBuild(files, componentProxyChanged);
+    componentProxyChanged = false;
+    if (!requiresDefoldBuild) return;
     const activeBuilder = await ensureBuilder();
     const result = await activeBuilder.build(`changed ${files.length} file(s)`);
     if (needsEngineRestart(files)) {
@@ -428,7 +457,8 @@ export async function runDevSession(options = {}) {
       if (wasRunning) await engine.stop();
       if (wasRunning || options.autoLaunch !== false) await engine.launch();
     } else if (engine.running() && result.resources.length) {
-      await coordinator.reloadResources(result.resources);
+      const resources = resourcesForBobReload(result.resources, [resourcePath], compilerReloadSignalled);
+      if (resources.length) await coordinator.reloadResources(resources);
     }
   });
 
@@ -447,7 +477,14 @@ export async function runDevSession(options = {}) {
       ? (path.isAbsolute(options.watchRoot) ? options.watchRoot : path.resolve(projectRoot, options.watchRoot))
       : projectRoot,
     debounceMs: options.debounceMs,
-    ...createDevWatchOptions({ outputFile, sourceMirror, buildMirror }),
+    ...createDevWatchOptions({
+      outputFile,
+      sourceMirror,
+      buildMirror,
+      lockFile: path.join(projectRoot, "deherm.lock"),
+      generatedRoot,
+      generatedProxyPaths
+    }),
     onBatch: (files) => processChanges(files),
     onError: (error) => emit({ type: "log", level: "error", source: "watcher", message: error.message })
   });
