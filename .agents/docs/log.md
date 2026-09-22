@@ -1,5 +1,19 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Installed developer-loop boundary corrected
+
+The roadmap now records the already-shipped boundary explicitly: packed-package
+project discovery/scaffolding, incremental watch/build/launch, native and HTML5
+fingerprint-acknowledged HMR, live telemetry, keyboard/mouse log navigation,
+OSC52/local clipboard copy, `.deherm/dev/session.log`, and `q` teardown are
+complete. The incremental compiler also already writes source-content maps and
+passes them into debug Hermes bytecode compilation. The remaining developer-
+experience work begins at native Hermes CDP/DAP and profiler transport, the
+editor-neutral language server, and its VS Code client. This correction is a
+documentation boundary based on existing code and tests; it is not new runtime
+evidence and does not reopen the completed policy/materializer or HMR
+implementation seams.
+
 ## 2026-09-22 - Installed HMR review closure is fail-closed and packable
 
 The post-wave adversarial review found no P0/P1 issue. Two P2 observations had

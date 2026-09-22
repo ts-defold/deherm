@@ -55,10 +55,19 @@ below without changing its completion rule.
 6. **Completed — close CI and cross-platform delivery.** Hosted end-to-end run
    `35674434017` passed the local and extension-header gates plus all eleven Bob
    targets across macOS, iOS/simulator, Linux, Windows, Android, and HTML5/Wasm.
-7. **Active — continue the product.** Finish the installed TUI/HMR/debug lane,
-   then public TypeScript ergonomics and native/browser War Battles, using the
-   now-green generated API and cross-platform consumer path rather than
-   reopening the compiler/distribution seam.
+7. **Completed — installed TUI, watch, launch, HMR, logs, and telemetry.** The
+   packed npm consumer enters the declarative TUI, discovers or scaffolds a
+   project, watches and incrementally builds, launches native and HTML5
+   targets, acknowledges exact bundle fingerprints, reports live telemetry,
+   writes `.deherm/dev/session.log`, supports keyboard/mouse log navigation and
+   clipboard copy, and tears down the engine when `q` quits the session. Real
+   War Battles runtime evidence includes two activated HMR generations.
+8. **Active — finish Hermes developer inspection.** The incremental compiler
+   already emits source-content maps and feeds them into debug Hermes bytecode;
+   implement the native Hermes CDP/DAP and profiler transport, the
+   editor-neutral language server, and the thin VS Code client. Then finish the
+   public TypeScript ergonomics and native/browser War Battles. Do not reopen the
+   compiler/distribution or core TUI/HMR seams without a concrete regression.
 
 Every route remains public when Defold exposes it. Verification status controls
 the evidence label, never whether the generator ships the route; a missing
@@ -187,16 +196,20 @@ optimization and does not reopen this gate.
 
 Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and profiling](https://github.com/ts-defold/deherm/issues/96).
 
-1. Make `npx deherm` enter the TUI, discover `game.project`, or offer a scaffold
-   when absent, entirely from the published npm package.
-2. Default dev mode watches, incrementally compiles, builds when necessary,
-   launches, hot-reloads, and relaunches without needless rebuilds.
-3. Verify runtime HMR by exact bundle fingerprint and display live engine,
-   Hermes, callback, component, Lua, and arena telemetry.
-4. Make logs laptop-scrollable/copyable and mirrored to a plain file; surface
-   full errors; make `q` teardown and quit.
-5. Finish source maps, Hermes debugging/profiling, and the VS Code extension/LSP
-   with context types and live instance/property telemetry.
+1. **Completed.** `npx deherm` enters the TUI, discovers `game.project`, or
+   offers a scaffold when absent, entirely from the packed npm package.
+2. **Completed.** Default dev mode watches, incrementally compiles, builds when
+   necessary, launches, hot-reloads, and relaunches without needless rebuilds.
+3. **Completed.** Runtime HMR is acknowledged by exact bundle fingerprint and
+   the TUI displays live engine, Hermes, callback, component, Lua, and arena
+   telemetry with explicit unavailable reasons rather than invented values.
+4. **Completed.** Logs are laptop-scrollable, mouse-selectable, copyable, and
+   mirrored to `.deherm/dev/session.log`; full errors remain in the file and
+   `q` tears down the engine and quits the session.
+5. **Active.** The incremental compiler already emits source-content maps and
+   passes them to `hermesc -source-map` for debug bytecode. Finish native Hermes
+   CDP debugging and profiling, and the VS Code extension/LSP with context types
+   and live instance/property telemetry.
 
 ## 5. Finish public API ergonomics and project integration
 
