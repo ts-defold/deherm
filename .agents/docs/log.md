@@ -1,5 +1,28 @@
 # Defold Hermes knowledge log
 
+## 2026-09-21 - Packed policy consumer executes a usage-specialized dmSDK twin
+
+The packed npm smoke now resolves the external content-addressed policy,
+materializes `dmMath::Clamp<int32_t>` from concrete usage facts, and compiles,
+links, and executes both the production C-ABI wrapper and its generated exact
+call twin. A minimal independent SDK header models the header seam supplied by
+the Defold build host; this proves package/policy realization and the generated
+bridge contract, not Defold implementation semantics. The same smoke verifies
+every materialized SDK and revision-output file against its revision-abstracted
+policy digest instead of pinning a brittle output count.
+
+The current output inventory is 118 files: 12 package-rendered outputs and 106
+authenticated compatibility sources. The two new dmHash state files plus prior
+inventory growth made the old 116-file and 1,654,731-byte snapshot assertions
+stale. Exact path equality with `discoverCompilerSurfaceOutputs()` remains the
+authority; the compatibility-source debt is now 1,663,947 bytes.
+
+The exact-call acceptance audit also found that policy CI executed the bounded
+Static dmSDK unit but omitted the already-green 325-route Static script unit.
+The policy graph now builds and runs both targets. Hosted green evidence remains
+required before closing the exact-call ledger issue; the local script executable
+reports `325-routes:all-static-emitted:typed-native:ok`.
+
 ## 2026-09-21 - Named-enum tail result validation
 
 `liveupdate.remove_mount` now derives its accepted numeric result domain from

@@ -115,6 +115,7 @@ test("policy host parity materializes every authoritative generator input", asyn
     "the JSI exact-call gate must run after the packaged Hermes archive is installed"
   );
   assert.match(engine, /defold-hermes-static-dmsdk-exact-test/u);
+  assert.match(engine, /defold-hermes-static-script-exact-test/u);
   assert.match(engine, /bash scripts\/bootstrap-emsdk\.sh/u);
   assert.match(engine, /pnpm test:dmsdk-browser-exact-call/u);
   assert.match(engine, /pnpm test:script-browser-exact-call/u);

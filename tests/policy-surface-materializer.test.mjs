@@ -50,7 +50,6 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.ok(first.descriptor.documents.includes(name), `materialized conformance input is missing ${name}`);
   }
   assert.equal(Object.keys(first.descriptor.sdk).length, 28);
-  assert.equal(Object.keys(first.descriptor.outputs).length, 116);
 
   const compiler = policy.objects.get("@compiler");
   assert.ok(policy.policy.realizer.requiredCapabilities.includes(BINDING_LOWERING_RECIPE_CAPABILITY),
@@ -109,7 +108,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), sha256(expected), `${relative} drifted from the source pipeline`);
     outputBytesByMode[first.descriptor.outputs[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(outputBytesByMode, { rendered: 5_372, snapshots: 1_654_731 },
+  assert.deepEqual(outputBytesByMode, { rendered: 5_372, snapshots: 1_663_947 },
     "package-emitter versus revision-output snapshot debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));

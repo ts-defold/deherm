@@ -102,10 +102,10 @@ receive revision modules through their generated `@deherm/project` surface.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now a **64,441-byte manifest**, not a
+The authenticated `@compiler` subtree is now a **66,255-byte manifest**, not a
 21 MB container. It references 16 independently content-addressed semantic
-documents, a 28-entry SDK manifest, and a 114-entry revision-output manifest.
-Of those outputs, 12 are package-rendered and 102 remain compatibility sources.
+documents, a 28-entry SDK manifest, and a 118-entry revision-output manifest.
+Of those outputs, 12 are package-rendered and 106 remain compatibility sources.
 This keeps each object shareable and makes the remaining migration
 debt enumerable; it does not pretend the referenced bytes have disappeared.
 The current complete object store is 32,019,304 bytes until the lowering-plan,
@@ -115,7 +115,7 @@ support-source, and revision-output emitters replace those objects.
 realization contract. It restores the selected revision, resolves and validates
 the manifest's authenticated references, regenerates sixteen script and
 dmSDK TypeScript files from semantic documents or compact manifest facts,
-verifies their policy SHA-256 values, writes 12 SDK support files and 102
+verifies their policy SHA-256 values, writes 12 SDK support files and 106
 revision outputs from explicitly labelled authenticated compatibility sources,
 renders 12 revision outputs from package machinery, and records a revision-keyed
 `surface.json` descriptor. The repository generator owns extraction and policy
@@ -181,7 +181,7 @@ The 12 remaining SDK snapshots are revision fact projections:
 entries are zero-input stable templates (JSI declarations, three Static Hermes
 dispatch shims, and named-scalar empty-wave support); the universal dmSDK JSI
 header is the twelfth and consumes only the authenticated catalog recipe count.
-Every other one of the 114 outputs remains explicitly classified as a
+Every other one of the 118 outputs remains explicitly classified as a
 revision-source snapshot until its semantic input projection is extracted; the
 materializer does not infer stability from coincidentally unchanged bytes.
 

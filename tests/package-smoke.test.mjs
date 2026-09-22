@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cp, mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -20,6 +21,20 @@ function run(command, args, options = {}) {
   });
   assert.equal(result.status, 0, `${command} ${args.join(" ")}\n${result.stdout}\n${result.stderr}`);
   return result;
+}
+
+async function assertMaterializedFiles(root, entries, revision) {
+  assert.ok(Object.keys(entries).length > 0, `${root} manifest is empty`);
+  for (const [relative, record] of Object.entries(entries)) {
+    assert.match(record.sha256, /^[0-9a-f]{64}$/u, `${relative} has no authenticated digest`);
+    const bytes = await readFile(path.join(root, relative));
+    const canonical = bytes.toString("utf8").split(revision).join("${DEFOLD_REVISION}");
+    assert.equal(
+      createHash("sha256").update(canonical).digest("hex"),
+      record.sha256,
+      `${relative} does not match its materialized manifest`,
+    );
+  }
 }
 
 export async function prepareCurrentHostDehermc(root, dehermCacheHome, options = {}) {
@@ -239,7 +254,10 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     objects
   }, { outputRoot: packedSurfaceRoot });
   assert.equal(Object.keys(materialized.descriptor.sdk).length, 28);
-  assert.equal(Object.keys(materialized.descriptor.outputs).length, 114);
+  await assertMaterializedFiles(
+    path.join(packedSurfaceRoot, "sdk", "generated"), materialized.descriptor.sdk, entry.defoldRevision);
+  await assertMaterializedFiles(
+    path.join(packedSurfaceRoot, "repository"), materialized.descriptor.outputs, entry.defoldRevision);
   await readFile(path.join(packedSurfaceRoot, "sdk", "generated", "script", "types.ts"), "utf8");
   await readFile(path.join(
     packedSurfaceRoot,
@@ -254,24 +272,29 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     staticFrame.assertDmSdkUniversalStaticFrameCapacity(packedCatalogDocument),
     packedCatalogDocument.abi.maxArguments
   );
-  const packedRecipe = packedCatalogDocument.recipes.find(({ symbol, declarationKind, abi }) =>
-    symbol === "dmEndian::ToNetwork" && declarationKind === "function" &&
-    abi.parameters[0]?.nativeType === "uint32_t");
+  const packedRecipe = packedCatalogDocument.recipes.find(({ symbol, declarationKind }) =>
+    symbol === "dmMath::Clamp" && declarationKind === "function-template");
   assert.ok(packedRecipe);
   const packedUsage = path.join(root, "packed-dmsdk-usage.json");
   const packedProvider = path.join(root, "packed-dmsdk-provider.cpp");
+  const signed32 = (name, position) => ({
+    name,
+    position,
+    nativeType: "int32_t",
+    direction: "value",
+    shape: { kind: "scalar", name: "i32" },
+    requirements: [],
+  });
   await writeFile(packedUsage, `${JSON.stringify({
     schemaVersion: 1,
     catalogSha256: packedCatalogDocument.sourceHashes.catalog,
     usages: [{
       declarationId: packedRecipe.declarationId,
-      wrapper: "packed_to_network",
-      acknowledgements: {
-        generatedAdapterBypass: {
-          reason: "packed npm smoke",
-          evidence: "the installed CLI emits and checks the exact-call twin"
-        }
-      }
+      wrapper: "packed_clamp_i32",
+      templateArguments: ["int32_t"],
+      parameters: [signed32("value", 0), signed32("minimum", 1), signed32("maximum", 2)],
+      resultCppType: "int32_t",
+      resultShape: { kind: "scalar", name: "i32" },
     }]
   }, null, 2)}\n`);
   const packedMaterialization = run(process.execPath, [
@@ -286,7 +309,12 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
   await readFile(packedProvider, "utf8");
   await readFile(`${packedProvider}.json`, "utf8");
   await readFile(packedProvider.replace(/\.cpp$/, ".verify.cpp"), "utf8");
-  await readFile(packedProvider.replace(/\.cpp$/, ".verify.json"), "utf8");
+  const packedVerificationReport = JSON.parse(await readFile(
+    packedProvider.replace(/\.cpp$/, ".verify.json"), "utf8"));
+  assert.equal(
+    packedVerificationReport.vectors[0].invocation.kind,
+    "function-template-specialization",
+  );
   const packedJsiVerification = await readFile(
     packedProvider.replace(/\.cpp$/, ".verify.jsi.cpp"),
     "utf8"
@@ -307,6 +335,53 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "--output", packedProvider,
     "--check"
   ], { cwd: root });
+
+  // A customer's local tree does not contain Defold itself: the build host
+  // supplies the selected SDK headers. Model that seam with the smallest
+  // independent SDK header needed by this concrete specialization, then
+  // compile and run both outputs emitted by the packed compiler. The exact
+  // twin checks the selected call expression and ordered ABI values; the
+  // production wrapper is also executed through its public C ABI.
+  const sdkInclude = path.join(root, "build-host-sdk");
+  await mkdir(path.join(sdkInclude, "dmsdk", "dlib"), { recursive: true });
+  await writeFile(path.join(sdkInclude, "dmsdk", "dlib", "math.h"), [
+    "#pragma once",
+    "namespace dmMath {",
+    "template <typename T> inline T Clamp(T value, T minimum, T maximum) {",
+    "  return value < minimum ? minimum : (value > maximum ? maximum : value);",
+    "}",
+    "}",
+    "",
+  ].join("\n"));
+  const packedHarness = path.join(root, "packed-dmsdk-harness.cpp");
+  await writeFile(packedHarness, [
+    "#include <defold_hermes/generated_dmsdk_universal.h>",
+    '#include "packed-dmsdk-provider.verify.cpp"',
+    'extern "C" DehermDmSdkUniversalStatus packed_clamp_i32(const DehermDmSdkUniversalValue*, uint32_t, DehermDmSdkUniversalValue*);',
+    "int main() {",
+    "  DehermDmSdkUniversalValue arguments[3] = {",
+    "    {static_cast<uint64_t>(static_cast<int64_t>(-17)), 0, DEHERM_DMSDK_UNIVERSAL_I64, 0},",
+    "    {static_cast<uint64_t>(static_cast<int64_t>(-10)), 0, DEHERM_DMSDK_UNIVERSAL_I64, 0},",
+    "    {static_cast<uint64_t>(static_cast<int64_t>(10)), 0, DEHERM_DMSDK_UNIVERSAL_I64, 0},",
+    "  };",
+    "  DehermDmSdkUniversalValue result = {};",
+    "  if (packed_clamp_i32(arguments, 3, &result) != DEHERM_DMSDK_UNIVERSAL_OK) return 1;",
+    "  if (result.tag != DEHERM_DMSDK_UNIVERSAL_I64 || static_cast<int64_t>(result.payload) != -10) return 2;",
+    "  return deherm_dmsdk_generated_provider_install_run_exact_verification();",
+    "}",
+    "",
+  ].join("\n"));
+  const packedExecutable = path.join(root, process.platform === "win32" ? "packed-dmsdk.exe" : "packed-dmsdk");
+  run(process.env.CXX || "c++", [
+    "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+    `-I${path.join(packedSurfaceRoot, "repository", "defold", "defold_hermes", "include")}`,
+    `-I${sdkInclude}`,
+    path.join(packedSurfaceRoot, "repository", "defold", "defold_hermes", "src", "generated_dmsdk_universal.cpp"),
+    packedProvider,
+    packedHarness,
+    "-o", packedExecutable,
+  ], { cwd: root });
+  run(packedExecutable, [], { cwd: root });
 
   const help = run(process.execPath, [path.join(packageRoot, "bin", "deherm.mjs"), "--help"]);
   assert.match(help.stdout, /deherm <command>/);

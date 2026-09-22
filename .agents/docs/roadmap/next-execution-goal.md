@@ -31,26 +31,32 @@ dogfoods the result in a playable native/browser War Battles project.
 This is the current implementation queue. It refines the broader ordered work
 below without changing its completion rule.
 
-1. **Static scalar 90.** Emit the typed Static Hermes caller, native dispatch,
-   and exact-call twin for every scalar route. Preserve fail-closed bounds,
-   stack restoration, reentrancy, sanitizers, and zero warmed allocations.
-2. **dmSDK hash-state 10.** Specialize
-   `dmHash{Init,Clone,UpdateBuffer,Final,Release}{32,64}` with a fixed-capacity,
-   generation-tagged native state registry. Reject stale, foreign, exhausted,
-   and double-consumed handles without exposing raw pointers or allocating on
-   the warmed call path.
-3. **Static tail 108.** Close the remaining generated families in this order:
-   Lua-table 70, dynamic-value 14, multi-result 12, and overload-dispatch 12.
-4. **Matrix and ledger reconciliation.** Regenerate the complete 926-route
-   script matrix and 1,361-declaration dmSDK matrix, publish exact evidence per
-   emitted transport, and close or update the owning GitHub issues from that
-   evidence.
-5. **Policy-only clean consumer.** Prove the published package plus policy and
-   project extensions can materialize, compile, link, and smoke the generated
-   surface on supported hosts without a Defold checkout.
-6. **Product continuation.** Resume the installed TUI/HMR/debug lane and
-   native/browser War Battles only after the API and clean-consumer gates are
-   green.
+1. **Completed — Static script exact calls.** The sound-typed executable runs
+   all 325 Static universal routes; the three timer routes make the applicable
+   target total 328/328. The policy graph must continue to build and execute
+   this target rather than relying only on local evidence.
+2. **Completed — dmSDK hash-state 10.** All
+   `dmHash{Init,Clone,UpdateBuffer,Final,Release}{32,64}` routes use the bounded,
+   generation-tagged state registry and pass native exact, sanitizer, stale,
+   foreign, exhausted, double-consumed, and warmed-allocation gates.
+3. **Completed — Static tail 108.** Lua-table 70, dynamic-value 14,
+   multi-result 12, and overload-dispatch 12 all use the existing bounded
+   Static frame and generated exact vectors.
+4. **Completed — matrix reconciliation.** The 926-route script partition is
+   total and the emitted-target matrix is 2,158/2,158. The 1,361-declaration
+   dmSDK catalog has zero omissions; every emitted concrete route carries its
+   generated exact twin. The 721 specialization-required rows are abstract
+   recipes awaiting call-site facts, not missing emitted calls.
+5. **Completed — policy-only clean consumer.** A packed npm package plus an
+   external content-addressed policy materializes, compiles, links, and executes
+   a concrete `dmMath::Clamp<int32_t>` production wrapper and exact twin without
+   a Defold checkout. Remaining policy snapshot/transfer reduction is tracked
+   as optimization and does not gate API availability or product work.
+6. **Active — close CI and continue the product.** Keep the Static script exact
+   executable in policy CI, clear the packed-consumer inventory regression,
+   close the exact-call and cross-platform delivery issues on green hosted
+   evidence, then continue the installed TUI/HMR/debug lane, public TypeScript
+   ergonomics, and native/browser War Battles.
 
 Every route remains public when Defold exposes it. Verification status controls
 the evidence label, never whether the generator ships the route; a missing
