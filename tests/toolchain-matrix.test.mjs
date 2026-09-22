@@ -274,8 +274,36 @@ test("a target release already in the content-addressed cache installs without n
       offline: true
     });
     assert.equal(installed.target, "arm64-osx");
+    assert.equal(installed.variant, "release");
     const verified = await assertProjectNativeArtifact(project, "arm64-macos", { fetch: false });
     assert.match(await readFile(verified.file, "utf8"), /^fixture:/u);
+    await assert.rejects(
+      readFile(path.join(project, "defold_hermes/lib/arm64-osx/libhermes.debug.a"), "utf8"),
+      { code: "ENOENT" }
+    );
+    const variantHeader = path.join(project, "defold_hermes/include/defold_hermes/generated_runtime_variant.h");
+    assert.match(await readFile(variantHeader, "utf8"), /DEHERM_HERMES_DEBUGGER 0/u);
+    const debug = await ensureProjectNativeArtifact(project, "arm64-macos", {
+      env: { DEHERM_CACHE_HOME: cacheHome },
+      offline: true,
+      variant: "debug"
+    });
+    assert.equal(debug.variant, "debug");
+    assert.equal(await readFile(verified.file, "utf8"), "fixture:libhermes.debug.a");
+    assert.match(await readFile(variantHeader, "utf8"), /DEHERM_HERMES_DEBUGGER 1/u);
+    await assert.rejects(
+      assertProjectNativeArtifact(project, "arm64-macos", { fetch: false, variant: "release" }),
+      /missing or does not match its receipt/u
+    );
+    assert.equal(
+      (await assertProjectNativeArtifact(project, "arm64-macos", { fetch: false, variant: "debug" })).variant,
+      "debug"
+    );
+    await ensureProjectNativeArtifact(project, "arm64-macos", {
+      env: { DEHERM_CACHE_HOME: cacheHome },
+      offline: true,
+      variant: "release"
+    });
     const installedConfig = path.join(project, "defold_hermes/include/libhermesvm-config.h");
     assert.equal(await readFile(installedConfig, "utf8"), "fixture:libhermesvm-config.h");
     await writeFile(installedConfig, "wrong target config");
@@ -288,6 +316,9 @@ test("a target release already in the content-addressed cache installs without n
       offline: true
     });
     await writeFile(path.join(cached, family.contents["arm64-osx"][0]), "corrupt cache");
+    // A valid project install does not need to re-read the cache. Invalidate
+    // the install too so this assertion exercises the reinstall boundary.
+    await writeFile(verified.file, "corrupt installed artifact");
     await assert.rejects(
       ensureProjectNativeArtifact(project, "arm64-macos", {
         env: { DEHERM_CACHE_HOME: cacheHome },
@@ -295,7 +326,6 @@ test("a target release already in the content-addressed cache installs without n
       }),
       /no valid cache receipt/u
     );
-    await writeFile(verified.file, "corrupt");
     await assert.rejects(
       assertProjectNativeArtifact(project, "arm64-macos", { fetch: false }),
       /missing or does not match its receipt: defold_hermes\/lib\/arm64-osx\/libhermes\.a/u

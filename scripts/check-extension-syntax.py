@@ -32,8 +32,11 @@ def include_roots() -> list[Path]:
     return sorted(roots)
 
 
-def compile_source(source: Path, platform: str) -> None:
+def compile_source(source: Path, platform: str, extra_flags: list[str] | None = None) -> None:
     platform_flags = ["-fno-exceptions", "-fno-rtti"] if platform == "HTML5" else ["-fexceptions"]
+    runtime_variant = [] if platform == "HTML5" else ["-DDEHERM_HERMES_DEBUGGER=0"]
+    if extra_flags and any(flag.startswith("-DDEHERM_HERMES_DEBUGGER=") for flag in extra_flags):
+        runtime_variant = []
     command = [
         "clang++",
         "-std=c++17",
@@ -43,6 +46,8 @@ def compile_source(source: Path, platform: str) -> None:
         *platform_flags,
         "-DLUA_API=",
         f"-DDM_PLATFORM_{platform}=1",
+        *runtime_variant,
+        *(extra_flags or []),
         *(f"-I{path}" for path in include_roots()),
         str(source),
     ]
@@ -87,9 +92,17 @@ def main() -> None:
     ]
     for source in native:
         compile_source(source, "OSX")
+    # The package skeleton selects release Hermes. Compile the extension once
+    # more with the install-time debug selection so its loopback CDP client is
+    # not left outside the native syntax gate.
+    compile_source(
+        EXTENSION / "src" / "extension.cpp",
+        "OSX",
+        ["-DDEHERM_HERMES_DEBUGGER=1"],
+    )
     for source in common:
         compile_source(source, "HTML5")
-    print(f"Extension syntax check passed ({len(native)} native, {len(common)} HTML5 translation units)")
+    print(f"Extension syntax check passed ({len(native)} native + debug inspector, {len(common)} HTML5 translation units)")
 
 
 if __name__ == "__main__":

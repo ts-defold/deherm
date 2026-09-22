@@ -39,6 +39,8 @@ export const stableGeneratedExceptions = Object.freeze({
 
 const forbiddenRules = Object.freeze([
   ["target-native-config", (file) => file === "defold/defold_hermes/include/libhermesvm-config.h"],
+  ["target-native-install-receipt", (file) =>
+    file.startsWith("defold/defold_hermes/lib/") && file.endsWith("/.deherm-artifact.json")],
   ["bundled-policy", (file) =>
     file === "packages/bindings/generated/defold-policy-index.json" ||
     file.startsWith("packages/bindings/generated/policy/")],

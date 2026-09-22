@@ -97,15 +97,15 @@
     },
     "runtimeHeader": {
       "path": "defold/defold_hermes/include/defold_hermes/runtime.hpp",
-      "sha256": "28a258f5b4b0a1bd0828f99e4572529c180a7b0f7b80bc3fdf914fa64991baf2"
+      "sha256": "86b49019720bca5fe1b7e722b3915f30faef5284443e20644e4bdee819d9bf5b"
     },
     "runtimeSource": {
       "path": "defold/defold_hermes/src/runtime.cpp",
-      "sha256": "e9da8da3a693235242064bebaaaee115110c3d6e11290ebf53c8958a2e28f44d"
+      "sha256": "65bd274e6e7a681dd49b20b4b5ae2225b8586d9078817a2dc754631095a0bbd4"
     },
     "extensionSource": {
       "path": "defold/defold_hermes/src/extension.cpp",
-      "sha256": "2e50325d6f8b51a9c67afa33af89cec4dec68b25d8ba9f5c533d021aaa3fd095"
+      "sha256": "931bfc3080718be4a94ccaf9f7fe6f8858e9074129d9e5c899fda94f7326a34f"
     },
     "luaProvider": {
       "path": "defold/defold_hermes/include/defold_hermes/component_proxy_lua_gate.hpp",

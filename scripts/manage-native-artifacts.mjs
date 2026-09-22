@@ -149,6 +149,14 @@ async function record(target) {
   artifact.status = "vendored";
   artifact.sha256 = digest(bytes);
   artifact.bytes = bytes.byteLength;
+  if (artifact.debugLibrary) {
+    const debugBytes = await readFile(path.join(root, artifact.debugLibrary));
+    if (debugBytes.byteLength < 1_000_000) {
+      throw new Error(`${target} debugger artifact is implausibly small (${debugBytes.byteLength} bytes)`);
+    }
+    artifact.debugSha256 = digest(debugBytes);
+    artifact.debugBytes = debugBytes.byteLength;
+  }
   await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
   return artifact.sha256;
 }

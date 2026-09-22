@@ -33,6 +33,7 @@
 
 #if !defined(DM_PLATFORM_HTML5)
 #include <defold_hermes/component_hermes_backend.hpp>
+#include <defold_hermes/inspector_client.hpp>
 #include <defold_hermes/runtime.hpp>
 #endif
 
@@ -244,6 +245,7 @@ class DefoldHost final : public defold_hermes::Host {
 
 DefoldHost gHost;
 std::unique_ptr<defold_hermes::Runtime> gRuntime;
+defold_hermes::InspectorClient gInspector;
 
 #endif
 
@@ -338,6 +340,8 @@ bool ActivateBundle(bool initial) {
         initial ? "true" : "false");
   }
 #else
+  defold_hermes::Runtime* previousRuntime = gRuntime.get();
+  bool inspectorMovedToCandidate = false;
   std::unique_ptr<defold_hermes::Runtime> candidate;
   bool candidateRejected = false;
   std::string candidateDiagnostic;
@@ -346,6 +350,10 @@ bool ActivateBundle(bool initial) {
   try {
     candidate = std::make_unique<defold_hermes::Runtime>(gHost);
     candidateRuntimeId = candidate->identity();
+    // Attach before evaluating the new generation so CDP observes its scripts
+    // and can bind source-map breakpoints during initial load and HMR alike.
+    gInspector.bindRuntime(candidate.get());
+    inspectorMovedToCandidate = true;
     // Mixing seam. Any AOT unit a build materialised is evaluated into this
     // runtime first, so the bytecode bundle loaded immediately below shares one
     // Hermes runtime with `shermes`-compiled native code. A unit that installs
@@ -384,6 +392,7 @@ bool ActivateBundle(bool initial) {
     candidateDiagnostic = error.what();
   }
   if (candidateRejected) {
+    if (inspectorMovedToCandidate) gInspector.bindRuntime(previousRuntime);
     candidate.reset();
     gRejectedBundleGeneration = bundle.generation;
     if (!initial && gRuntime && gApplicationInitialized) {
@@ -765,6 +774,17 @@ dmExtension::Result InitializeExtension(dmExtension::Params* params) {
 
   gResourceFactory = params->m_ResourceFactory;
   gBundlePath = appPath;
+#if !defined(DM_PLATFORM_HTML5)
+  const int32_t inspectorPort = dmConfigFile::GetInt(
+      params->m_ConfigFile, "defold_hermes.inspector_port", 0);
+  if (inspectorPort > 0 && inspectorPort <= 65535) {
+    gInspector.start(static_cast<uint16_t>(inspectorPort));
+    gInspector.pump();
+    dmLogInfo("DEHERM_EVENT inspector-configured port=%d", inspectorPort);
+  } else if (inspectorPort != 0) {
+    dmLogError("Ignoring invalid defold_hermes.inspector_port=%d", inspectorPort);
+  }
+#endif
 
   gLuaBridge = std::make_unique<defold_hermes::lua_bridge::LuaBridge>(64 * 1024, 4096);
   const defold_hermes::lua_bridge::RegistryApi registryApi = {
@@ -1013,8 +1033,12 @@ dmExtension::Result UpdateExtension(dmExtension::Params*) {
         gApplicationInitialized ? "true" : "false");
     gLoggedFirstExtensionUpdate = true;
   }
+#if !defined(DM_PLATFORM_HTML5)
+  gInspector.pump();
+#endif
   if (gBundleResource) ActivateBundle(false);
 #if !defined(DM_PLATFORM_HTML5)
+  gInspector.pump();
   EmitTelemetry();
 #endif
 #if DEHERM_PROFILE_ENABLED
@@ -1068,6 +1092,7 @@ dmExtension::Result FinalizeExtension(dmExtension::Params*) {
   if (gLuaBridge) gLuaBridge->shutdown();
   gLuaBridge.reset();
 #if !defined(DM_PLATFORM_HTML5)
+  gInspector.close();
   gRuntime.reset();
 #endif
   if (gResourceFactory && gBundleResource) {

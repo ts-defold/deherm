@@ -58,11 +58,17 @@ with the unreferenced `zip.c.o` removed so Extender's force-load does not hit
 duplicate symbols, built with `libtool -D` so it is byte-reproducible. It is
 published per Defold bundle target and never ships in the npm package. On first
 use the portable CLI downloads only the selected target archive into the
-platform-native per-user cache, verifies the cached row, and copies its declared
-members under the generated project's `defold_hermes/lib/<target>/` immediately
-before Bob uploads the extension to Extender. Repository-local libraries are
-build outputs, not generator inputs, and the managed extension copier excludes
-them even when the CLI is dogfooded from a source checkout.
+platform-native per-user cache and verifies every declared member. The cache
+retains both release and debugger libraries, but the project installer copies
+exactly one selected variant under the canonical release-library name plus the
+matching `libhermesvm-config.h` immediately before Bob uploads the extension to
+Extender. It also writes a generated variant header and a digest-bound install
+receipt. Extender recursively discovers static archives, so copying both
+variants into the project would leave link selection to archive order; the
+installer deletes any sibling variant left by an older install. Repository-
+local libraries and the variant header are build outputs, not generator inputs,
+and the managed extension copier excludes them even when the CLI is dogfooded
+from a source checkout.
 
 The same archive rule is enforced per object format. POSIX recipes use `ar -d`;
 native MSVC uses `lib.exe /REMOVE`; Defold's Linux-hosted Windows Extender image
@@ -99,6 +105,16 @@ executable bit, which GitHub does not store, and encodes structure in a name the
 download side then has to parse back out. `pull` extracts with `tar -xzf`, which
 is present on macOS, on Linux, and on Windows 10 1803 and later as bsdtar, so
 the URL-only vendoring path still needs no second CLI and no npm dependency.
+
+Normal `deherm dev` installs the debugger variant; release assembly installs the
+release variant. The project receipt records the selected member, the canonical
+installed name, and each installed digest and byte length, so switching modes is
+deterministic. Repeated development builds use the authenticated receipt, target
+fingerprint, selector, and exact sizes as the keyed/idempotent sentinel; they do
+not re-copy or re-hash a ten-megabyte archive. The explicit verification path
+still hashes the bytes. The npm extension template is variant-neutral: checkout
+builds select with the CMake option, while an installed Defold project receives
+its generated selector from the artifact installer.
 
 ## What a fingerprint may hash, and what it may not
 

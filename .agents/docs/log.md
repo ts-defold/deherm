@@ -1,5 +1,38 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Native Hermes CDP survives a real War Battles HMR swap
+
+Development artifact installation now keeps both Hermes variants in the
+content-addressed user cache but places exactly one selected archive under the
+project's canonical library name. The install receipt binds the selected and
+canonical members, target fingerprint, config header, installed digests, and
+exact byte lengths. Repeated builds use that keyed size sentinel without
+re-hashing the archive; explicit verification still hashes bytes. The release
+template remains variant-neutral. This closes the concrete Extender
+regression where recursively discovering both archives made link selection
+order-dependent.
+
+The debugger Hermes runtime owns `CDPDebugAPI` and `CDPAgent`, queues callbacks
+from arbitrary Hermes threads, and pumps them at engine JavaScript safe points.
+The extension carries a bounded loopback NDJSON client; the Node development
+control plane projects it as standard `/json/list`, `/json/version`, and
+`/devtools/page/deherm` WebSocket endpoints. Candidate HMR runtimes bind before
+evaluation and rejected candidates restore the prior binding.
+
+Evidence is separated by stage. `pnpm test:runtime-inspector` compiled and ran
+the debugger-enabled runtime, accepted `Runtime.enable`, evaluated `6*7` as 42,
+rejected a second session, and failed closed after detach. The focused Node
+bridge test passed exact command/response forwarding. A pinned local Extender
+then built and launched War Battles with the debugger archive; the engine
+reported inspector connection and live telemetry, and a standard WebSocket CDP
+client evaluated the active bundle fingerprint. After a watched TypeScript edit
+activated the next runtime generation, the same WebSocket evaluated the new
+runtime successfully; restoring the file activated the following generation.
+The release runtime also built with no undefined CDP symbols. This proves native
+CDP transport, evaluation, telemetry coexistence, and HMR rebinding on arm64
+macOS. It does not yet prove authored-TypeScript breakpoints, DAP behavior,
+profile export, VS Code UI, HTML5 breakpoint parity, or other native targets.
+
 ## 2026-09-22 - Installed developer-loop boundary corrected
 
 The roadmap now records the already-shipped boundary explicitly: packed-package

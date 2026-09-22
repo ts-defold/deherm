@@ -11,6 +11,38 @@ const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url))
 const hermesRoot = path.join(repositoryRoot, "upstream", "hermes");
 const extensionInclude = path.join(repositoryRoot, "defold", "defold_hermes", "include");
 
+async function resolvePublicHeaderClosure(seeds) {
+  const roots = [
+    path.join(hermesRoot, "API"),
+    path.join(hermesRoot, "public"),
+    path.join(hermesRoot, "include")
+  ];
+  const pending = [...seeds];
+  const resolved = new Map();
+  while (pending.length) {
+    const relative = pending.pop();
+    if (resolved.has(relative)) continue;
+    let source;
+    for (const root of roots) {
+      try {
+        source = await readFile(path.join(root, relative), "utf8");
+        break;
+      } catch (error) {
+        if (error?.code !== "ENOENT") throw error;
+      }
+    }
+    if (source === undefined) {
+      throw new Error(`Hermes debugger public-header closure is missing ${relative}`);
+    }
+    resolved.set(relative, source);
+    for (const match of source.matchAll(/^\s*#\s*include\s*["<]([^">]+)[">]/gm)) {
+      const target = match[1];
+      if (target.startsWith("hermes/") && !resolved.has(target)) pending.push(target);
+    }
+  }
+  return resolved;
+}
+
 const lock = await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8");
 const expectedRevision = /^HERMES_REV=(.+)$/m.exec(lock)?.[1];
 if (!expectedRevision) throw new Error("upstream.lock does not declare HERMES_REV");
@@ -67,6 +99,21 @@ const staticHeaders = await resolveHermesHeaderClosure(
   { omitTargetConfig: true }
 );
 for (const [relative, { source }] of staticHeaders) {
+  const destination = path.join(extensionInclude, relative);
+  await mkdir(path.dirname(destination), { recursive: true });
+  await writeFile(destination, source);
+}
+
+// The debug runtime is built from the same release asset as the release VM,
+// but its extension translation unit additionally includes the public CDP
+// agent/API. Walk those entry headers rather than maintaining a hand-written
+// dependency list, so a pinned Hermes revision that changes the public closure
+// either stages the new header or fails before packaging.
+const debuggerHeaders = await resolvePublicHeaderClosure([
+  "hermes/cdp/CDPAgent.h",
+  "hermes/cdp/CDPDebugAPI.h"
+]);
+for (const [relative, source] of debuggerHeaders) {
   const destination = path.join(extensionInclude, relative);
   await mkdir(path.dirname(destination), { recursive: true });
   await writeFile(destination, source);

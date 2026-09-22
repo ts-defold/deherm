@@ -79,6 +79,9 @@ async function createPollingWatcher(options) {
 const services = {
   onEvent(event) { events.push(event); },
   watchProject: createPollingWatcher,
+  async createInspectorBridge() {
+    return { enginePort: 39229, async close() {} };
+  },
   createCoordinator({ compiler, targets, emit }) {
     return new HotReloadCoordinator({
       compiler,

@@ -309,11 +309,14 @@ test("built engine resolution and controller keep engine output inside model eve
 
   const events = [];
   let child;
+  let spawnedArguments;
   const controller = createEngineController({
     projectRoot: root,
+    inspectorPort: 39229,
     emit: (event) => events.push(event),
     resolveEngine: async () => resolved,
-    spawn() {
+    spawn(_executable, arguments_) {
+      spawnedArguments = arguments_;
       child = new EventEmitter();
       child.pid = 42;
       child.stdout = new PassThrough();
@@ -327,6 +330,7 @@ test("built engine resolution and controller keep engine output inside model eve
     }
   });
   assert.equal(await controller.launch(), true);
+  assert.deepEqual(spawnedArguments, ["--config=defold_hermes.inspector_port=39229"]);
   await new Promise((resolve) => setImmediate(resolve));
   child.stdout.write("engine online\n");
   child.stdout.write(`INFO:DEFOLD_HERMES: DEHERM_EVENT bundle-activated fingerprint=${"ef".repeat(32)} resource_generation=2 runtime_id=4 initial=true\n`);

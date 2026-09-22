@@ -79,6 +79,7 @@
     "defold/defold_hermes/",
     "!defold/defold_hermes/lib/**/*.a",
     "!defold/defold_hermes/lib/**/*.lib",
+    "!defold/defold_hermes/lib/**/.deherm-artifact.json",
     "!defold/defold_hermes/include/libhermesvm-config.h",
     "!defold/defold_hermes/include/defold_hermes/generated*",
     "defold/defold_hermes/include/defold_hermes/generated_build_config.h",
@@ -349,11 +350,12 @@
     "test:native-defold:hot-reload": "node --test tests/native-hot-reload-fixture.test.mjs && node scripts/check-native-defold-hot-reload.mjs",
     "test:extension-retention": "node --test tests/dmsdk-scalar-extension-retention.test.mjs",
     "test:cli": "node --test tests/cli.test.mjs tests/scaffold.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs tests/toolchain-matrix.test.mjs tests/host-compiler-artifact-verification.test.mjs tests/artifact-fingerprints.test.mjs tests/artifact-archives.test.mjs tests/native-artifact-build-plan.test.mjs tests/android-runtime-config.test.mjs",
-    "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs tests/browser-target.test.mjs tests/typed-native-target.test.mjs tests/hash-literal.test.mjs tests/installed-dev-loop.test.mjs tests/runtime-bug-pool.test.mjs",
+    "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs tests/browser-target.test.mjs tests/inspector-bridge.test.mjs tests/typed-native-target.test.mjs tests/hash-literal.test.mjs tests/installed-dev-loop.test.mjs tests/runtime-bug-pool.test.mjs",
     "test:canonical-family-emission": "node --test tests/canonical-family-emission.test.mjs",
     "test:reachability": "node --test tests/release-reachability.test.mjs",
     "test:usage": "pnpm build:release-plan && node --test tests/usage.test.mjs tests/release-build.test.mjs tests/canonical-family-emission.test.mjs tests/release-reachability.test.mjs",
     "test:native": "pnpm build && node --test tests/native.test.mjs",
+    "test:runtime-inspector": "cmake -S . -B build/native-debugger -G Ninja -DCMAKE_BUILD_TYPE=Release -DDEHERM_HERMES_DEBUGGER=ON -DDEHERM_CANONICAL_RELEASE_DIR= && cmake --build build/native-debugger --target defold-hermes-runtime-inspector-test --parallel && build/native-debugger/defold-hermes-runtime-inspector-test",
     "bench:transports": "pnpm configure:native && cmake --build build/native --target defold-hermes-transport-profile-benchmark --parallel && build/native/defold-hermes-transport-profile-benchmark",
     "bench:transports:profiled": "cmake -S . -B build/profile -G Ninja -DCMAKE_BUILD_TYPE=Release -DDEHERM_CANONICAL_RELEASE_DIR= -DDEHERM_PROFILE=ON && cmake --build build/profile --target defold-hermes-transport-profile-benchmark --parallel && build/profile/defold-hermes-transport-profile-benchmark",
     "test:profile-compile-out": "node --test tests/profile-compile-out.test.mjs",
@@ -388,6 +390,7 @@
     "fflate": "0.8.3",
     "ttsc": "0.30.4",
     "typescript": "7.0.2",
+    "ws": "8.18.3",
     "yaml": "2.8.3"
   }
 }

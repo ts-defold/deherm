@@ -4,7 +4,7 @@ import { constants } from "node:fs";
 import { access, chmod, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import { assertProjectNativeArtifact, hostDefoldPlatform } from "../toolchains.mjs";
+import { ensureProjectNativeArtifact, hostDefoldPlatform } from "../toolchains.mjs";
 import { reconcileTypedNativeUpload } from "../typed-native.mjs";
 
 async function exists(file, mode) {
@@ -186,7 +186,11 @@ export async function createDefoldBuilder(options) {
   const bob = await ensureBob(projectRoot, lock, { ...options, emit });
   const java = await resolveJava(options);
   const platform = options.platform ?? hostDefoldPlatform();
-  await assertProjectNativeArtifact(projectRoot, platform);
+  // Dev engines must link the debugger-enabled Hermes compilation. The
+  // artifact cache contains both variants, while project installation exposes
+  // exactly one under the canonical libhermes name so Extender cannot choose
+  // by archive ordering.
+  await ensureProjectNativeArtifact(projectRoot, platform, { variant: "debug" });
   const outputRoot = path.resolve(options.outputRoot ?? path.join(projectRoot, "build", "default"));
   const buildServer = options.buildServer ?? process.env.DEHERM_BUILD_SERVER ?? process.env.DEFOLD_HERMES_BUILD_SERVER;
   let previous = await snapshotCompiledResources(outputRoot);
@@ -195,6 +199,7 @@ export async function createDefoldBuilder(options) {
   const build = (reason = "change") => {
     const operation = loop.then(async () => {
       emit({ type: "defold-build-started", reason });
+      await ensureProjectNativeArtifact(projectRoot, platform, { variant: "debug" });
       // Bob walks the project for extensions and an ext.manifest cannot exclude
       // a platform, so the upload set is decided here: a typed-native unit is a
       // Hermes-runtime transport and must not travel to a browser-runtime
@@ -248,11 +253,13 @@ export async function createDefoldBuilder(options) {
    */
   const bundle = (options_ = {}) => {
     const bundlePlatform = options_.platform ?? "wasm-web";
+    const variant = options_.variant ?? "debug";
     const bundleOutput = path.resolve(options_.bundleOutput
       ?? path.join(projectRoot, "build", "bundle"));
     const reason = options_.reason ?? `bundle ${bundlePlatform}`;
     const operation = loop.then(async () => {
       emit({ type: "defold-build-started", reason });
+      await ensureProjectNativeArtifact(projectRoot, bundlePlatform, { variant });
       // Same reconciliation as `build`, for the bundle's platform: a
       // typed-native unit is a Hermes-runtime transport and must not travel to
       // a browser-runtime target.
@@ -264,7 +271,7 @@ export async function createDefoldBuilder(options) {
         "--bundle-output", bundleOutput,
         "--platform", bundlePlatform,
         "--architectures", bundlePlatform,
-        "--variant", options_.variant ?? "debug",
+        "--variant", variant,
         "--archive",
         "--verbose"
       ];

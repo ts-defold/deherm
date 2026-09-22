@@ -99,6 +99,7 @@ test("the public package ships directory boundaries instead of enumerated genera
     "defold/defold_hermes/",
     "!defold/defold_hermes/lib/**/*.a",
     "!defold/defold_hermes/lib/**/*.lib",
+    "!defold/defold_hermes/lib/**/.deherm-artifact.json",
     "!defold/defold_hermes/include/libhermesvm-config.h",
     "!defold/defold_hermes/include/defold_hermes/generated*",
     "defold/defold_hermes/include/defold_hermes/generated_build_config.h",

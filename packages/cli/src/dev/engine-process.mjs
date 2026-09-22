@@ -125,6 +125,9 @@ export function createEngineController(options) {
       ? options.resourceUri()
       : options.resourceUri;
     const launchArguments = resourceUri ? [`--config=resource.uri=${resourceUri}`] : [];
+    if (options.inspectorPort) {
+      launchArguments.push(`--config=defold_hermes.inspector_port=${options.inspectorPort}`);
+    }
     const next = spawn(resolved.executable, launchArguments, {
       cwd: resolved.runtimeRoot,
       env: { ...process.env, ...(options.env ?? {}) },

@@ -18,6 +18,7 @@ import { createIncrementalCompiler } from "./compiler.mjs";
 import { createDefoldBuilder } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
 import { createEngineController } from "./engine-process.mjs";
+import { createInspectorBridge } from "./inspector-bridge.mjs";
 import { BROWSER_TARGET_ID, createBrowserTarget } from "./browser-target.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "./model.mjs";
 import { normalizeResourcePaths } from "./protocol.mjs";
@@ -349,6 +350,15 @@ export async function runDevSession(options = {}) {
     : new HotReloadCoordinator({ compiler, targets, emit });
   const servicePort = options.servicePort ?? 8001;
   const localTargetUrl = `http://127.0.0.1:${servicePort}`;
+  // `--once` never launches an engine and must not bind background ports. A
+  // normal dev session owns both sides of the local inspector bridge before
+  // spawning Defold, so the engine's synchronous loopback connect is bounded.
+  const inspectorBridge = options.once
+    ? undefined
+    : await (services.createInspectorBridge ?? createInspectorBridge)({
+        emit,
+        title: path.basename(projectRoot)
+      });
   // The resource server starts later in this function, so the engine resolves
   // its content root lazily at launch time.
   let resourceServer;
@@ -357,6 +367,7 @@ export async function runDevSession(options = {}) {
     emit,
     targetId: "local-engine",
     resourceUri: () => resourceServer?.baseUrl,
+    inspectorPort: inspectorBridge?.enginePort,
     env: { DM_SERVICE_PORT: String(servicePort) }
   });
   // The HTML5 target of the same session. It is a peer of the native engine,
@@ -515,6 +526,7 @@ export async function runDevSession(options = {}) {
     await developmentLoop;
     await browser.stop();
     await engine.stop();
+    await inspectorBridge?.close();
     await coordinator.close();
     await builder?.close();
     await resourceServer?.close();

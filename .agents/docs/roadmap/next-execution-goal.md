@@ -62,12 +62,15 @@ below without changing its completion rule.
    writes `.deherm/dev/session.log`, supports keyboard/mouse log navigation and
    clipboard copy, and tears down the engine when `q` quits the session. Real
    War Battles runtime evidence includes two activated HMR generations.
-8. **Active — finish Hermes developer inspection.** The incremental compiler
-   already emits source-content maps and feeds them into debug Hermes bytecode;
-   implement the native Hermes CDP/DAP and profiler transport, the
-   editor-neutral language server, and the thin VS Code client. Then finish the
-   public TypeScript ergonomics and native/browser War Battles. Do not reopen the
-   compiler/distribution or core TUI/HMR seams without a concrete regression.
+8. **Active — finish Hermes developer inspection.** The native Hermes CDP core,
+   bounded engine transport, standard CLI discovery/WebSocket bridge, and HMR
+   runtime rebinding are implemented and proven in real War Battles. The
+   incremental compiler already emits source-content maps and feeds them into
+   debug Hermes bytecode. Next implement DAP/source-map breakpoint UX, profiler
+   artifact capture, the editor-neutral language server, and the thin VS Code
+   client. Then finish the public TypeScript ergonomics and native/browser War
+   Battles. Do not reopen the compiler/distribution or core TUI/HMR seams
+   without a concrete regression.
 
 Every route remains public when Defold exposes it. Verification status controls
 the evidence label, never whether the generator ships the route; a missing
@@ -207,9 +210,10 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
    mirrored to `.deherm/dev/session.log`; full errors remain in the file and
    `q` tears down the engine and quits the session.
 5. **Active.** The incremental compiler already emits source-content maps and
-   passes them to `hermesc -source-map` for debug bytecode. Finish native Hermes
-   CDP debugging and profiling, and the VS Code extension/LSP with context types
-   and live instance/property telemetry.
+   passes them to `hermesc -source-map` for debug bytecode. Native Hermes now
+   exposes a standard CLI CDP endpoint and preserves one frontend across HMR.
+   Finish DAP breakpoint/source presentation, profiler capture, and the VS Code
+   extension/LSP with context types and live instance/property telemetry.
 
 ## 5. Finish public API ergonomics and project integration
 

@@ -28,12 +28,21 @@ set(HERMES_ENABLE_TEST_SUITE OFF CACHE BOOL "" FORCE)
 # the final consumer is only the runtime library.
 set(HERMES_ENABLE_TOOLS ON CACHE BOOL "" FORCE)
 set(HERMES_ENABLE_NAPI OFF CACHE BOOL "" FORCE)
-set(HERMES_ENABLE_DEBUGGER OFF CACHE BOOL "" FORCE)
+option(DEHERM_HERMES_DEBUGGER "Build the native runtime against Hermes CDP and profiler support" OFF)
+set(HERMES_ENABLE_DEBUGGER ${DEHERM_HERMES_DEBUGGER} CACHE BOOL "" FORCE)
 set(HERMES_ENABLE_INTL OFF CACHE BOOL "" FORCE)
 set(HERMES_ENABLE_CONTRIB_EXTENSIONS OFF CACHE BOOL "" FORCE)
 set(HERMES_BUILD_SHARED_JSI OFF CACHE BOOL "" FORCE)
 
 add_subdirectory(upstream/hermes hermes EXCLUDE_FROM_ALL)
+
+# Checkout builds select the variant explicitly. Installed Defold projects do
+# not run CMake; their artifact installer writes generated_runtime_variant.h.
+if(DEHERM_HERMES_DEBUGGER)
+  add_compile_definitions(DEHERM_HERMES_DEBUGGER=1)
+else()
+  add_compile_definitions(DEHERM_HERMES_DEBUGGER=0)
+endif()
 
 option(DEHERM_SANITIZE "Instrument deherm host tests with ASan and UBSan" OFF)
 if(DEHERM_SANITIZE)
@@ -807,6 +816,16 @@ target_compile_features(defold-hermes-component-runtime-e2e PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-component-runtime-e2e PRIVATE
   defold-hermes-component-runtime
 )
+
+if(DEHERM_HERMES_DEBUGGER)
+  add_executable(defold-hermes-runtime-inspector-test
+    native/runtime_inspector_test.cpp
+  )
+  target_compile_features(defold-hermes-runtime-inspector-test PRIVATE cxx_std_17)
+  target_link_libraries(defold-hermes-runtime-inspector-test PRIVATE
+    defold-hermes-runtime
+  )
+endif()
 
 # ---------------------------------------------------------------------------
 # Headless in-process Defold conformance driver.

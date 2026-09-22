@@ -5,11 +5,29 @@
 
 #if !defined(DM_PLATFORM_HTML5)
 
+#if !defined(DEHERM_HERMES_DEBUGGER) && __has_include(<defold_hermes/generated_runtime_variant.h>)
+#include <defold_hermes/generated_runtime_variant.h>
+#endif
+#ifndef DEHERM_HERMES_DEBUGGER
+#define DEHERM_HERMES_DEBUGGER 0
+#endif
+
+#if DEHERM_HERMES_DEBUGGER
+#ifndef HERMES_ENABLE_DEBUGGER
+#define HERMES_ENABLE_DEBUGGER 1
+#endif
+#include <hermes/cdp/CDPAgent.h>
+#include <hermes/cdp/CDPDebugAPI.h>
+#endif
+
 #include <memory>
 #include <atomic>
 #include <array>
 #include <cctype>
+#include <deque>
 #include <exception>
+#include <functional>
+#include <mutex>
 #include <optional>
 #include <stdexcept>
 #include <utility>
@@ -37,7 +55,8 @@ std::string asString(jsi::Runtime& runtime, const jsi::Value& value) {
   return value.toString(runtime).utf8(runtime);
 }
 
-std::unique_ptr<jsi::Runtime> makeRuntime() {
+std::unique_ptr<facebook::hermes::HermesRuntime> makeRuntime() {
+  ::hermes::vm::RuntimeConfig::Builder config;
 #if defined(DM_PLATFORM_ANDROID)
   // Hermes' Android default wraps its finalizer worker in fbjni::ThreadScope.
   // React Native initializes fbjni from JNI_OnLoad; Defold owns the process
@@ -45,13 +64,12 @@ std::unique_ptr<jsi::Runtime> makeRuntime() {
   // platform default while preserving Hermes' own serial finalizer worker.
   // It must be ThreadRunner{}: passing bare {} means std::nullopt and selects
   // the crashing JNI default again.
-  return facebook::hermes::makeHermesRuntime(
-      ::hermes::vm::RuntimeConfig::Builder()
-          .withFinalizerThreadRunner(::hermes::vm::ThreadRunner{})
-          .build());
-#else
-  return facebook::hermes::makeHermesRuntime();
+  config.withFinalizerThreadRunner(::hermes::vm::ThreadRunner{});
 #endif
+#if DEHERM_HERMES_DEBUGGER
+  config.withEnableSampleProfiling(true);
+#endif
+  return facebook::hermes::makeHermesRuntime(config.build());
 }
 
 }  // namespace
@@ -66,6 +84,9 @@ class Runtime::Impl {
   }
 
   ~Impl() {
+#if DEHERM_HERMES_DEBUGGER
+    closeInspector();
+#endif
     // Lua closures can retain ScriptCallback descriptors beyond application
     // finalization. Clear their JSI functions while runtime_ is unquestionably
     // alive; a later Lua __gc may then release an inert native root safely.
@@ -282,6 +303,86 @@ class Runtime::Impl {
     return result;
   }
 
+  bool inspectorAvailable() const noexcept {
+#if DEHERM_HERMES_DEBUGGER
+    return true;
+#else
+    return false;
+#endif
+  }
+
+  bool openInspector(Runtime::InspectorMessageCallback outbound) {
+#if DEHERM_HERMES_DEBUGGER
+    if (!outbound || inspectorAgent_) return false;
+    inspectorOutbound_ = std::move(outbound);
+    inspectorDebugApi_ = facebook::hermes::cdp::CDPDebugAPI::create(*runtime_);
+    inspectorAgent_ = facebook::hermes::cdp::CDPAgent::create(
+        static_cast<int32_t>(identity_),
+        *inspectorDebugApi_,
+        [this](facebook::hermes::debugger::RuntimeTask task) {
+          std::lock_guard<std::mutex> lock(inspectorMutex_);
+          inspectorTasks_.push_back(std::move(task));
+        },
+        [this](const std::string& message) {
+          // Hermes may produce protocol messages from an arbitrary thread.
+          // Never invoke extension/UI code there: queue the bytes and deliver
+          // them from the same engine-owned safe point as runtime tasks.
+          std::lock_guard<std::mutex> lock(inspectorMutex_);
+          inspectorMessages_.push_back(message);
+        });
+    pumpInspector();
+    return true;
+#else
+    (void)outbound;
+    return false;
+#endif
+  }
+
+  void closeInspector() {
+#if DEHERM_HERMES_DEBUGGER
+    inspectorAgent_.reset();
+    // CDPAgent destruction schedules its domain cleanup through the same task
+    // queue. Drain it while both CDPDebugAPI and HermesRuntime are alive.
+    pumpInspector();
+    inspectorDebugApi_.reset();
+    inspectorOutbound_ = {};
+#endif
+  }
+
+  bool inspectorCommand(const std::string& command) {
+#if DEHERM_HERMES_DEBUGGER
+    if (!inspectorAgent_) return false;
+    inspectorAgent_->handleCommand(command);
+    return true;
+#else
+    (void)command;
+    return false;
+#endif
+  }
+
+  void pumpInspector() {
+#if DEHERM_HERMES_DEBUGGER
+    for (;;) {
+      facebook::hermes::debugger::RuntimeTask task;
+      std::string message;
+      {
+        std::lock_guard<std::mutex> lock(inspectorMutex_);
+        if (!inspectorTasks_.empty()) {
+          task = std::move(inspectorTasks_.front());
+          inspectorTasks_.pop_front();
+        } else if (!inspectorMessages_.empty()) {
+          message = std::move(inspectorMessages_.front());
+          inspectorMessages_.pop_front();
+        } else {
+          break;
+        }
+      }
+      if (task) task(*runtime_);
+      else if (inspectorOutbound_) inspectorOutbound_(message);
+    }
+#endif
+  }
+
  private:
   struct ComponentSlot {
     std::optional<jsi::Object> definition;
@@ -440,7 +541,7 @@ class Runtime::Impl {
   }
 
   Host& host_;
-  std::unique_ptr<jsi::Runtime> runtime_;
+  std::unique_ptr<facebook::hermes::HermesRuntime> runtime_;
   uint32_t identity_ = 0;
   std::unique_ptr<CallbackRegistry> callbacks_;
   std::shared_ptr<ScriptJsiBridgeLifetime> scriptBridgeLifetime_;
@@ -453,6 +554,14 @@ class Runtime::Impl {
   std::array<ComponentSlot, kComponentSlotCapacity> componentSlots_{};
   size_t componentSlotCursor_ = 0;
   uint32_t liveComponents_ = 0;
+#if DEHERM_HERMES_DEBUGGER
+  std::unique_ptr<facebook::hermes::cdp::CDPDebugAPI> inspectorDebugApi_;
+  std::unique_ptr<facebook::hermes::cdp::CDPAgent> inspectorAgent_;
+  Runtime::InspectorMessageCallback inspectorOutbound_;
+  std::mutex inspectorMutex_;
+  std::deque<facebook::hermes::debugger::RuntimeTask> inspectorTasks_;
+  std::deque<std::string> inspectorMessages_;
+#endif
 
  public:
   bool invokeCallback(lua_bridge::Handle callback, uint32_t timer, double elapsed) {
@@ -468,23 +577,29 @@ class Runtime::Impl {
 Runtime::Runtime(Host& host) : impl_(std::make_unique<Impl>(host)) {}
 Runtime::~Runtime() = default;
 void Runtime::load(const std::string& source, const std::string& sourceUrl) {
+  impl_->pumpInspector();
   impl_->load(source, sourceUrl);
+  impl_->pumpInspector();
 }
 void Runtime::evaluateStaticUnits(
     const StaticUnitCreator* unitCreators,
     size_t unitCount) {
+  impl_->pumpInspector();
   impl_->evaluateStaticUnits(unitCreators, unitCount);
+  impl_->pumpInspector();
 }
 void Runtime::loadStatic(
     const StaticUnitCreator* unitCreators,
     size_t unitCount,
     const std::string& sourceUrl) {
+  impl_->pumpInspector();
   impl_->loadStatic(unitCreators, unitCount, sourceUrl);
+  impl_->pumpInspector();
 }
-void Runtime::init() { impl_->init(); }
-void Runtime::update(double dt) { impl_->update(dt); }
-void Runtime::onMessage(const std::string& message) { impl_->onMessage(message); }
-void Runtime::finalize() { impl_->finalize(); }
+void Runtime::init() { impl_->pumpInspector(); impl_->init(); impl_->pumpInspector(); }
+void Runtime::update(double dt) { impl_->pumpInspector(); impl_->update(dt); impl_->pumpInspector(); }
+void Runtime::onMessage(const std::string& message) { impl_->pumpInspector(); impl_->onMessage(message); impl_->pumpInspector(); }
+void Runtime::finalize() { impl_->pumpInspector(); impl_->finalize(); impl_->pumpInspector(); }
 bool Runtime::invokeCallback(lua_bridge::Handle callback, uint32_t timer, double elapsed) {
   return impl_->invokeCallback(callback, timer, elapsed);
 }
@@ -495,6 +610,15 @@ const char* Runtime::callbackError() const { return impl_->callbackError(); }
 uint32_t Runtime::liveCallbacks() const { return impl_->liveCallbacks(); }
 std::string Runtime::bundleFingerprint() const { return impl_->bundleFingerprint(); }
 Runtime::Telemetry Runtime::telemetry() const { return impl_->telemetry(); }
+bool Runtime::inspectorAvailable() const noexcept { return impl_->inspectorAvailable(); }
+bool Runtime::openInspector(InspectorMessageCallback outbound) {
+  return impl_->openInspector(std::move(outbound));
+}
+void Runtime::closeInspector() { impl_->closeInspector(); }
+bool Runtime::inspectorCommand(const std::string& command) {
+  return impl_->inspectorCommand(command);
+}
+void Runtime::pumpInspector() { impl_->pumpInspector(); }
 Runtime::ComponentHandle Runtime::attachComponent(const char* id, const char* schema, ComponentContext context) { return impl_->attachComponent(id, schema, context); }
 void Runtime::setComponentProperty(ComponentHandle handle, const char* name, const ComponentValue& value) { impl_->setComponentProperty(handle, name, value); }
 bool Runtime::dispatchComponent(ComponentHandle handle, const char* lifecycle, const ComponentArgument* arguments, uint8_t count) { return impl_->dispatchComponent(handle, lifecycle, arguments, count); }

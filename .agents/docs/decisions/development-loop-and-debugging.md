@@ -90,21 +90,37 @@ that should not require an editor resource build.
 # Debugger transport
 
 The pinned Hermes source contains `CDPDebugAPI`, `CDPAgent`, Debugger, Runtime,
-Profiler, and HeapProfiler domains. Development builds will embed those APIs
-and expose a loopback WebSocket/CDP discovery endpoint. The CLI supplies the
-transport and a VS Code launch configuration; the engine thread pumps debugger
-work at defined safe points.
+Profiler, and HeapProfiler domains. Development builds now embed `CDPDebugAPI`
+and `CDPAgent`. The extension connects through a bounded, loopback-only,
+newline-delimited JSON transport to the CLI; the CLI owns HTTP discovery and a
+standard `/devtools/page/deherm` WebSocket endpoint. This keeps HTTP/WebSocket
+parsing off the game frame while remaining directly consumable by Chrome and
+VS Code CDP clients. The engine accepts one debugger frontend and pumps Hermes
+debugger work only at extension-owned JavaScript safe points.
+
+The target archive cache retains both release and debugger Hermes builds, but a
+project exposes exactly one under the canonical archive name. `deherm dev`
+selects the debugger build and writes the compile-time selector; release builds
+compile the transport out and link no CDP symbols. Hermes can call its debugger
+callbacks from arbitrary threads, so runtime tasks and outbound messages are
+queued under a mutex and delivered at the engine safe point. The transport caps
+each direction at four MiB and disconnects rather than accumulating unbounded
+backpressure.
 
 Source URLs remain stable across rebuilds, and ttsc plus the bundler preserve a
-composed source map back to authored `.ts`. Breakpoints are reapplied after a
-runtime-generation swap. HTML5 uses the browser's existing CDP endpoint with
-the same authored source paths.
+composed source map back to authored `.ts`. A candidate HMR runtime attaches to
+the same engine transport before bundle evaluation; a rejected candidate
+rebinds the prior runtime, while an accepted candidate keeps the frontend
+WebSocket open across the swap. The remaining DAP work owns breakpoint
+reapplication and authored-TypeScript source presentation. HTML5 uses the
+browser's existing CDP endpoint with the same authored source paths.
 
 # Profiling
 
-The development Hermes build enables sampling-profiler and heap-snapshot
-support. CLI commands capture CDP CPU profiles, allocation tracking, and heap
-snapshots into standard artifacts that VS Code or browser tooling can open.
+The development Hermes build enables sampling-profiler support and carries the
+Hermes CDP Profiler and HeapProfiler domains. CLI commands still need to capture
+CPU profiles, allocation tracking, and heap snapshots into standard artifacts
+that VS Code or browser tooling can open.
 Release performance measurement uses a separate instrumented profile; the lean
 shipping runtime does not carry the debugger server.
 

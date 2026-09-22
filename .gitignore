@@ -5,6 +5,7 @@ defold/deherm/
 defold/defold_hermes/include/hermes/
 defold/defold_hermes/include/jsi/
 defold/defold_hermes/include/libhermesvm-config.h
+defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h
 defold/defold_hermes/lib/arm64-osx/
 defold/defold_hermes/lib/x86_64-osx/
 defold/defold_hermes/lib/x86_64-linux/

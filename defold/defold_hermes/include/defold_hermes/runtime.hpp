@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <cstddef>
+#include <functional>
 #include <string>
 
 #include <defold_hermes/lua_bridge_core.hpp>
@@ -24,6 +25,7 @@ class Host {
 
 class Runtime {
  public:
+  using InspectorMessageCallback = std::function<void(const std::string&)>;
   struct Telemetry {
     uint64_t heapAllocatedBytes = 0;
     uint64_t heapSizeBytes = 0;
@@ -113,6 +115,17 @@ class Runtime {
   std::string bundleFingerprint() const;
   /** Low-rate instrumentation snapshot; callers must keep it off hot paths. */
   Telemetry telemetry() const;
+  /** Whether this target linked the debugger-enabled Hermes archive. */
+  bool inspectorAvailable() const noexcept;
+  /**
+   * Attach one CDP client. Commands and outbound messages use raw CDP JSON;
+   * the transport remains outside the runtime and may be replaced by the CLI.
+   */
+  bool openInspector(InspectorMessageCallback outbound);
+  void closeInspector();
+  bool inspectorCommand(const std::string& command);
+  /** Run queued debugger work at an engine-owned JavaScript safe point. */
+  void pumpInspector();
 
  private:
   class Impl;

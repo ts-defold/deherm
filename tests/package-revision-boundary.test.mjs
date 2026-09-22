@@ -30,6 +30,7 @@ test("package revision boundary groups every fixed-revision output family", () =
     { path: "packages/compiler/src/generated/dmsdk-universal-recipes.mjs" },
     { path: "packages/toolchains/defold-bundle-targets.json" },
     { path: "defold/defold_hermes/include/libhermesvm-config.h" },
+    { path: "defold/defold_hermes/lib/arm64-osx/.deherm-artifact.json" },
     { path: "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp" },
     { path: "defold/defold_hermes/src/generated_script_handle_lowering.cpp" },
     { path: "defold/defold_hermes/lib/web/generated_script_universal_value.js" }
@@ -48,11 +49,12 @@ test("package revision boundary groups every fixed-revision output family", () =
     "revision-compiler-catalog": 1,
     "revision-toolchain-surface": 1,
     "target-native-config": 1,
+    "target-native-install-receipt": 1,
     "revision-native-header-output": 1,
     "revision-native-source-output": 1,
     "revision-web-output": 1
   });
-  assert.equal(report.summary.forbiddenFileCount, 15);
+  assert.equal(report.summary.forbiddenFileCount, 16);
 });
 
 test("generated-looking exceptions are exact and carry package-side provenance", () => {
