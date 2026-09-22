@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, open, rename, rm, writeFile } from "node:fs/promises";
 
 import { connectCdp } from "./browser-host.mjs";
-import { defaultInspectorSessionFile, readInspectorSession } from "./inspector-session.mjs";
+import { defaultInspectorSessionFile, discoverInspectorTarget } from "./inspector-session.mjs";
 
 function timestampName() {
   return new Date().toISOString().replace(/[:.]/gu, "-");
@@ -27,30 +27,6 @@ async function atomicJson(file, value) {
   return destination;
 }
 
-async function discoverTarget(sessionFile, projectRoot, replaceDebugger) {
-  const session = await readInspectorSession(sessionFile);
-  if (path.resolve(session.projectRoot) !== path.resolve(projectRoot)) {
-    throw new Error(`Inspector session belongs to a different project: ${session.projectRoot}`);
-  }
-  let response;
-  try {
-    response = await fetch(`${session.devtoolsUrl}/json/list`, { signal: AbortSignal.timeout(5_000) });
-  } catch (error) {
-    throw new Error(`Inspector session ${session.sessionId} is not reachable: ${error instanceof Error ? error.message : String(error)}`);
-  }
-  if (!response.ok) throw new Error(`Inspector discovery failed with HTTP ${response.status}`);
-  const targets = await response.json();
-  const target = Array.isArray(targets) ? targets.find((candidate) => candidate?.id === "deherm") : undefined;
-  if (!target?.webSocketDebuggerUrl) throw new Error("Inspector discovery did not return the déherm runtime target");
-  if (target.webSocketDebuggerUrl !== session.websocketUrl) {
-    throw new Error("Inspector discovery URL does not match the authenticated session descriptor");
-  }
-  if (target.attached && !replaceDebugger) {
-    throw new Error("A debugger frontend is already attached; detach it or pass --replace-debugger to capture a profile");
-  }
-  return { session, target };
-}
-
 export async function captureCpuProfile(options = {}) {
   const projectRoot = path.resolve(options.projectRoot ?? process.cwd());
   const sessionFile = path.resolve(options.sessionFile ?? defaultInspectorSessionFile(projectRoot));
@@ -58,7 +34,11 @@ export async function captureCpuProfile(options = {}) {
   if (!Number.isSafeInteger(durationMs) || durationMs < 1 || durationMs > 86_400_000) {
     throw new Error("CPU profile duration must be an integer from 1 through 86400000 milliseconds");
   }
-  const { session, target } = await discoverTarget(sessionFile, projectRoot, options.replaceDebugger === true);
+  const { session, target } = await discoverInspectorTarget({
+    sessionFile,
+    projectRoot,
+    replaceDebugger: options.replaceDebugger === true
+  });
   const websocketUrl = new URL(target.webSocketDebuggerUrl);
   if (options.replaceDebugger === true) websocketUrl.searchParams.set("replace", "1");
   const client = await connectCdp(websocketUrl.href, { retain: false });
@@ -86,7 +66,11 @@ export async function captureCpuProfile(options = {}) {
 export async function captureHeapSnapshot(options = {}) {
   const projectRoot = path.resolve(options.projectRoot ?? process.cwd());
   const sessionFile = path.resolve(options.sessionFile ?? defaultInspectorSessionFile(projectRoot));
-  const { session, target } = await discoverTarget(sessionFile, projectRoot, options.replaceDebugger === true);
+  const { session, target } = await discoverInspectorTarget({
+    sessionFile,
+    projectRoot,
+    replaceDebugger: options.replaceDebugger === true
+  });
   const destination = path.resolve(options.output ?? defaultOutput(projectRoot, "heap"));
   const temporary = `${destination}.${process.pid}.${randomUUID()}.tmp`;
   const websocketUrl = new URL(target.webSocketDebuggerUrl);

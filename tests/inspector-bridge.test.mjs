@@ -153,6 +153,28 @@ test("session descriptors reject non-loopback debugger endpoints", () => {
   }), /valid sessionId/);
 });
 
+test("session descriptors carry only project-owned source maps and deherm bundle URLs", () => {
+  const projectRoot = path.resolve("fixture-project");
+  const valid = createInspectorSession({
+    projectRoot,
+    enginePort: 9000,
+    devtoolsPort: 9001,
+    devtoolsUrl: "http://127.0.0.1:9001",
+    websocketUrl: "ws://127.0.0.1:9001/devtools/page/deherm",
+    bundleUrl: "deherm:///deherm/app.dehermc",
+    sourceMapFile: path.join(projectRoot, ".deherm", "dev", "app.dehermc.map")
+  });
+  assert.equal(valid.bundleUrl, "deherm:///deherm/app.dehermc");
+  assert.throws(() => createInspectorSession({
+    ...valid,
+    sourceMapFile: path.resolve(projectRoot, "..", "outside.map")
+  }), /must be inside projectRoot/);
+  assert.throws(() => createInspectorSession({
+    ...valid,
+    bundleUrl: "https://example.com/app.js"
+  }), /must use deherm:/);
+});
+
 test("a failed session publication releases both reserved bridge ports", async (t) => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-inspector-startup-"));
   t.after(() => rm(root, { recursive: true, force: true }));

@@ -1,5 +1,46 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Authored TypeScript DAP reaches a resumable paused Hermes runtime
+
+`deherm debug` now speaks bounded standard DAP over stdin/stdout and attaches to
+the private installed dev-session descriptor. The adapter maps authored `.ts`
+breakpoints and stack locations through the composed source map, presents
+scopes, variables, watches and source content, carries conditional breakpoints
+and exception policy, removes replaced CDP breakpoints, reapplies them after an
+HMR `Debugger.scriptParsed`, and resumes a paused target before detach. The
+source-map cache uses nanosecond mtime plus size, so a same-size incremental
+rewrite does not depend on millisecond timestamp resolution.
+
+The first native breakpoint proof found a real transport deadlock rather than
+being promoted as a pass: Hermes paused inside `Runtime::init`, but both the
+`Debugger.paused` notification and incoming `Debugger.resume` were waiting for
+the extension's next frame pump. Pinned Hermes' `RuntimeTaskRunner` already
+solves the runtime-access half by racing the integrator queue against an async
+debugger interrupt. The runtime now delivers outbound protocol bytes to a
+thread-safe callback immediately, while the production `InspectorClient` owns
+a bounded background socket loop for command receive and message send; only
+idle-runtime tasks remain on the engine safe-point pump. Disconnect requests a
+best-effort resume and rebuilds the inspector agent at the next safe point.
+
+Evidence is separated by layer. `tests/dap-adapter.test.mjs` proves framing,
+authored source-map projection, exact CDP command selection, breakpoint
+replacement/reapplication, stack/scopes/variables/evaluate, and paused detach
+against a recording CDP client. `defold-hermes-runtime-inspector-test` compiles
+and executes a real pinned-Hermes authored-bundle breakpoint, receives the
+paused event, resumes through a command issued from another thread, then proves
+evaluation, CPU profiling, heap streaming and close. The separate
+`defold-hermes-inspector-client-test` drives the production threaded transport
+through deterministic in-memory `dmSocket` functions and proves paused and
+resume cross it while the engine thread is blocked. Extension syntax passes 61
+native/debug-inspector and 58 HTML5 translation units. Both native debugger
+tests also pass strict ASan+UBSan. That combined build initially exposed a
+libc++ template-coalescing collision because Hermes and `InspectorClient` both
+instantiated `std::deque<std::string>` with container annotations; transport
+frames now have a distinct `OutboundFrame` type and own their partial-send
+offset, so no sanitizer suppression is needed. This is not yet evidence
+for an installed Defold breakpoint, `update`/native-callback breakpoints, HTML5
+breakpoint parity, VS Code UI, or non-macOS runtime execution.
+
 ## 2026-09-22 - Installed profiler capture has native and transport proof
 
 The native development bridge now publishes an atomic private inspector-session

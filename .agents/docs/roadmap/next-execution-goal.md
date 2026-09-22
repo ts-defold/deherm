@@ -66,11 +66,15 @@ below without changing its completion rule.
    bounded engine transport, standard CLI discovery/WebSocket bridge, and HMR
    runtime rebinding are implemented and proven in real War Battles. The
    incremental compiler already emits source-content maps and feeds them into
-   debug Hermes bytecode. Next implement DAP/source-map breakpoint UX, profiler
-   artifact capture, the editor-neutral language server, and the thin VS Code
-   client. Then finish the public TypeScript ergonomics and native/browser War
-   Battles. Do not reopen the compiler/distribution or core TUI/HMR seams
-   without a concrete regression.
+   debug Hermes bytecode. Installed CPU/heap capture and an editor-neutral DAP
+   now cover authored source-map breakpoints, stack/scopes, variables, watches,
+   conditional breakpoints, stepping, exception policy, and HMR breakpoint
+   reapplication; native tests prove both Hermes' paused-runtime command path
+   and the background engine transport. Next prove the same breakpoint path in
+   the installed War Battles engine and HTML5, then implement the editor-neutral
+   language server and thin VS Code client. After that, finish the public
+   TypeScript ergonomics and native/browser War Battles. Do not reopen the
+   compiler/distribution or core TUI/HMR seams without a concrete regression.
 
 Every route remains public when Defold exposes it. Verification status controls
 the evidence label, never whether the generator ships the route; a missing
@@ -213,8 +217,12 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
    passes them to `hermesc -source-map` for debug bytecode. Native Hermes now
    exposes a standard CLI CDP endpoint and preserves one frontend across HMR.
    Stable session discovery plus standard CPU-profile and streaming heap-snapshot
-   capture are implemented. Finish DAP breakpoint/source presentation and the
-   VS Code extension/LSP with context types and live instance/property telemetry.
+   capture are implemented. The editor-neutral DAP now provides authored
+   breakpoints/source presentation, stack/scopes/variables, watches, stepping,
+   exception policy, and HMR reapplication, with pinned-Hermes and background
+   engine-transport proofs. Finish installed native/browser breakpoint smokes
+   and the VS Code extension/LSP with context types and live instance/property
+   telemetry.
 
 ## 5. Finish public API ergonomics and project integration
 

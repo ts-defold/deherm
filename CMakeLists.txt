@@ -830,6 +830,15 @@ if(DEHERM_HERMES_DEBUGGER)
   target_link_libraries(defold-hermes-runtime-inspector-test PRIVATE
     defold-hermes-runtime
   )
+
+  add_executable(defold-hermes-inspector-client-test
+    native/inspector_client_test.cpp
+    native/inspector_socket_test_support.cpp
+  )
+  target_compile_features(defold-hermes-inspector-client-test PRIVATE cxx_std_17)
+  target_link_libraries(defold-hermes-inspector-client-test PRIVATE
+    defold-hermes-runtime
+  )
 endif()
 
 # ---------------------------------------------------------------------------

@@ -120,6 +120,8 @@ class Runtime {
   /**
    * Attach one CDP client. Commands and outbound messages use raw CDP JSON;
    * the transport remains outside the runtime and may be replaced by the CLI.
+   * Hermes may invoke the outbound callback from any thread, including while
+   * JavaScript is paused, so the callback must be thread-safe and nonblocking.
    */
   bool openInspector(InspectorMessageCallback outbound);
   void closeInspector();

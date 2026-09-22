@@ -357,6 +357,8 @@ jobs:
             --parallel
           build/native/defold-hermes-static-script-exact-test
           build/native/defold-hermes-static-dmsdk-exact-test
+      - name: Compile and run Hermes debugger breakpoint transport
+        run: pnpm test:runtime-inspector
       - id: emsdk
         run: |
           sed -n 's/^EMSDK_VERSION=/version=/p' upstream.lock >> "$GITHUB_OUTPUT"

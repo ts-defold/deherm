@@ -171,7 +171,9 @@ export async function createInspectorBridge(options = {}) {
           enginePort: engineAddress.port,
           devtoolsPort,
           devtoolsUrl,
-          websocketUrl: target().webSocketDebuggerUrl
+          websocketUrl: target().webSocketDebuggerUrl,
+          bundleUrl: options.bundleUrl,
+          sourceMapFile: options.sourceMapFile
         })
       : undefined;
     if (session) await writeInspectorSession(options.sessionFile, session);

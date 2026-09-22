@@ -314,7 +314,10 @@ class Runtime::Impl {
   bool openInspector(Runtime::InspectorMessageCallback outbound) {
 #if DEHERM_HERMES_DEBUGGER
     if (!outbound || inspectorAgent_) return false;
-    inspectorOutbound_ = std::move(outbound);
+    {
+      std::lock_guard<std::mutex> lock(inspectorMutex_);
+      inspectorOutbound_ = std::move(outbound);
+    }
     inspectorDebugApi_ = facebook::hermes::cdp::CDPDebugAPI::create(*runtime_);
     inspectorAgent_ = facebook::hermes::cdp::CDPAgent::create(
         static_cast<int32_t>(identity_),
@@ -324,11 +327,16 @@ class Runtime::Impl {
           inspectorTasks_.push_back(std::move(task));
         },
         [this](const std::string& message) {
-          // Hermes may produce protocol messages from an arbitrary thread.
-          // Never invoke extension/UI code there: queue the bytes and deliver
-          // them from the same engine-owned safe point as runtime tasks.
-          std::lock_guard<std::mutex> lock(inspectorMutex_);
-          inspectorMessages_.push_back(message);
+          // Paused JavaScript cannot return to the engine safe point. Deliver
+          // protocol bytes on the producing thread so the transport can see a
+          // paused event and send resume/step. The callback contract is
+          // therefore thread-safe; runtime tasks remain engine-owned below.
+          Runtime::InspectorMessageCallback outbound;
+          {
+            std::lock_guard<std::mutex> lock(inspectorMutex_);
+            outbound = inspectorOutbound_;
+          }
+          if (outbound) outbound(message);
         });
     pumpInspector();
     return true;
@@ -345,7 +353,10 @@ class Runtime::Impl {
     // queue. Drain it while both CDPDebugAPI and HermesRuntime are alive.
     pumpInspector();
     inspectorDebugApi_.reset();
-    inspectorOutbound_ = {};
+    {
+      std::lock_guard<std::mutex> lock(inspectorMutex_);
+      inspectorOutbound_ = {};
+    }
 #endif
   }
 
@@ -364,21 +375,16 @@ class Runtime::Impl {
 #if DEHERM_HERMES_DEBUGGER
     for (;;) {
       facebook::hermes::debugger::RuntimeTask task;
-      std::string message;
       {
         std::lock_guard<std::mutex> lock(inspectorMutex_);
         if (!inspectorTasks_.empty()) {
           task = std::move(inspectorTasks_.front());
           inspectorTasks_.pop_front();
-        } else if (!inspectorMessages_.empty()) {
-          message = std::move(inspectorMessages_.front());
-          inspectorMessages_.pop_front();
         } else {
           break;
         }
       }
-      if (task) task(*runtime_);
-      else if (inspectorOutbound_) inspectorOutbound_(message);
+      task(*runtime_);
     }
 #endif
   }
@@ -560,7 +566,6 @@ class Runtime::Impl {
   Runtime::InspectorMessageCallback inspectorOutbound_;
   std::mutex inspectorMutex_;
   std::deque<facebook::hermes::debugger::RuntimeTask> inspectorTasks_;
-  std::deque<std::string> inspectorMessages_;
 #endif
 
  public:

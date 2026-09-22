@@ -95,25 +95,39 @@ and `CDPAgent`. The extension connects through a bounded, loopback-only,
 newline-delimited JSON transport to the CLI; the CLI owns HTTP discovery and a
 standard `/devtools/page/deherm` WebSocket endpoint. This keeps HTTP/WebSocket
 parsing off the game frame while remaining directly consumable by Chrome and
-VS Code CDP clients. The engine accepts one debugger frontend and pumps Hermes
-debugger work only at extension-owned JavaScript safe points.
+VS Code CDP clients. The engine accepts one debugger frontend. Its bounded
+loopback reader runs on a transport thread, because a breakpoint blocks the
+engine thread and resume/step must still arrive. `CDPAgent` accepts commands
+from arbitrary threads; pinned Hermes' `RuntimeTaskRunner` races an integrator
+queue against an async debugger interrupt and executes each command exactly
+once with exclusive runtime access. Work that requires an idle runtime remains
+on the extension-owned safe-point pump.
 
 The target archive cache retains both release and debugger Hermes builds, but a
 project exposes exactly one under the canonical archive name. `deherm dev`
 selects the debugger build and writes the compile-time selector; release builds
 compile the transport out and link no CDP symbols. Hermes can call its debugger
-callbacks from arbitrary threads, so runtime tasks and outbound messages are
-queued under a mutex and delivered at the engine safe point. The transport caps
-each direction at four MiB and disconnects rather than accumulating unbounded
-backpressure.
+callbacks from arbitrary threads, so outbound protocol bytes enter a bounded,
+mutex-protected transport queue immediately; deferring a `Debugger.paused`
+notification to the engine safe point would deadlock the session. Runtime tasks
+remain separately queued for the engine safe point when the async debugger did
+not already claim them. The transport caps each direction at four MiB and
+disconnects rather than accumulating unbounded backpressure. Disconnect sends
+a best-effort resume before the engine safe point rebuilds the inspector agent,
+so losing the frontend does not intentionally strand a paused game.
 
 Source URLs remain stable across rebuilds, and ttsc plus the bundler preserve a
 composed source map back to authored `.ts`. A candidate HMR runtime attaches to
 the same engine transport before bundle evaluation; a rejected candidate
 rebinds the prior runtime, while an accepted candidate keeps the frontend
-WebSocket open across the swap. The remaining DAP work owns breakpoint
-reapplication and authored-TypeScript source presentation. HTML5 uses the
-browser's existing CDP endpoint with the same authored source paths.
+WebSocket open across the swap. `deherm debug` is the editor-neutral DAP over
+stdin/stdout. It maps authored `.ts` breakpoints and stack frames through the
+live composed source map, exposes scopes, variables, watches and source
+content, carries conditional breakpoints and exception policy, and reapplies
+breakpoints whenever HMR reports the stable bundle URL as a newly parsed
+script. Detaching while paused resumes before releasing the one native frontend.
+HTML5 uses the browser's existing CDP endpoint with the same authored source
+paths; equivalent browser-breakpoint proof and the thin VS Code client remain.
 
 # Profiling
 
@@ -142,7 +156,10 @@ fail at runtime.
 
 Exact Node transport tests prove descriptor ownership, CDP request identity,
 CPU artifact emission, and ordered heap streaming. The native pinned-Hermes test
-separately compiles and executes CPU sampling and a real heap snapshot. A pinned
+separately compiles and executes an authored-bundle breakpoint/resume transaction,
+CPU sampling, and a real heap snapshot. A second native test drives the production
+background `InspectorClient` framing while the engine thread is paused and proves
+the paused event and resume command cross that transport. A pinned
 local Extender build of War Battles then captured both artifacts through the
 public CLI from its running engine: five CPU nodes with 22 samples and a
 654,011-byte heap graph with 63,924 nodes. That last run is integrated arm64

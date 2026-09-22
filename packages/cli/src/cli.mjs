@@ -31,6 +31,7 @@ Commands:
   verify-generated  Verify packaged IR plus generated context/config output sentinels
   verify-bundle     Verify the bundle Bob will archive against the sources it was built from
   dev          Run the compiler/watch console; press p to launch or stop the built game
+  debug        Run the editor-neutral Debug Adapter Protocol server on stdin/stdout
   profile cpu  Capture a standard Hermes .cpuprofile from a running dev session
   profile heap Capture a standard Hermes .heapsnapshot from a running dev session
   bugs         Harvest engine/dev output into the deduplicated runtime bug pool
@@ -70,7 +71,7 @@ Options:
   --session-log <path>  Session log harvested by bugs; may be repeated
   --inspector-session <path>  Running dev-session descriptor (default: .deherm/dev/inspector.json)
   --duration <ms>    CPU profile duration in milliseconds (default: 10000)
-  --replace-debugger Allow profile capture to replace an attached debugger frontend
+  --replace-debugger Allow debug/profile to replace an attached debugger frontend
   --transcript <path>   Packaged-run transcript harvested by bugs; may be repeated
   --no-harvest       Print the stored bug pool without reading new output
   --once             Build one development generation and exit
@@ -599,6 +600,16 @@ export async function run(argv = process.argv.slice(2)) {
     else throw new Error(`Unknown profile action: ${options.action ?? "<missing>"}; expected cpu or heap`);
     if (options.json) console.log(JSON.stringify({ schemaVersion: 1, ...result }, null, 2));
     else console.log(`Captured ${result.kind} profile in ${path.relative(process.cwd(), result.output) || path.basename(result.output)}`);
+    return 0;
+  }
+  if (options.command === "debug") {
+    const projectRoot = await findProjectRoot(process.cwd(), options.project);
+    const { runDapSession } = await import("./dev/dap-adapter.mjs");
+    await runDapSession({
+      projectRoot,
+      sessionFile: options.inspectorSession,
+      replaceDebugger: options.replaceDebugger === true
+    });
     return 0;
   }
   if (options.command === "bugs") {

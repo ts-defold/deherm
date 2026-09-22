@@ -24,6 +24,17 @@ function assertLoopbackUrl(value, field, protocols) {
   return parsed;
 }
 
+function assertProjectFile(value, projectRoot, field) {
+  if (typeof value !== "string" || !path.isAbsolute(value)) {
+    throw new Error(`Inspector session ${field} must be an absolute path`);
+  }
+  const relative = path.relative(path.resolve(projectRoot), path.resolve(value));
+  if (!relative || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error(`Inspector session ${field} must be inside projectRoot`);
+  }
+  return path.resolve(value);
+}
+
 export function validateInspectorSession(value) {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     throw new Error("Inspector session must be a JSON object");
@@ -52,6 +63,16 @@ export function validateInspectorSession(value) {
   if (typeof value.createdAt !== "string" || Number.isNaN(Date.parse(value.createdAt))) {
     throw new Error("Inspector session createdAt is invalid");
   }
+  if (value.bundleUrl !== undefined) {
+    let bundle;
+    try {
+      bundle = new URL(value.bundleUrl);
+    } catch {
+      throw new Error("Inspector session bundleUrl is not a valid URL");
+    }
+    if (bundle.protocol !== "deherm:") throw new Error("Inspector session bundleUrl must use deherm:");
+  }
+  if (value.sourceMapFile !== undefined) assertProjectFile(value.sourceMapFile, value.projectRoot, "sourceMapFile");
   return value;
 }
 
@@ -66,8 +87,35 @@ export function createInspectorSession(values) {
     enginePort: values.enginePort,
     devtoolsPort: values.devtoolsPort,
     devtoolsUrl: values.devtoolsUrl,
-    websocketUrl: values.websocketUrl
+    websocketUrl: values.websocketUrl,
+    ...(values.bundleUrl === undefined ? {} : { bundleUrl: values.bundleUrl }),
+    ...(values.sourceMapFile === undefined ? {} : { sourceMapFile: path.resolve(values.sourceMapFile) })
   });
+}
+
+export async function discoverInspectorTarget(options) {
+  const projectRoot = path.resolve(options.projectRoot);
+  const session = await readInspectorSession(options.sessionFile);
+  if (path.resolve(session.projectRoot) !== projectRoot) {
+    throw new Error(`Inspector session belongs to a different project: ${session.projectRoot}`);
+  }
+  let response;
+  try {
+    response = await fetch(`${session.devtoolsUrl}/json/list`, { signal: AbortSignal.timeout(5_000) });
+  } catch (error) {
+    throw new Error(`Inspector session ${session.sessionId} is not reachable: ${error instanceof Error ? error.message : String(error)}`);
+  }
+  if (!response.ok) throw new Error(`Inspector discovery failed with HTTP ${response.status}`);
+  const targets = await response.json();
+  const target = Array.isArray(targets) ? targets.find((candidate) => candidate?.id === "deherm") : undefined;
+  if (!target?.webSocketDebuggerUrl) throw new Error("Inspector discovery did not return the déherm runtime target");
+  if (target.webSocketDebuggerUrl !== session.websocketUrl) {
+    throw new Error("Inspector discovery URL does not match the authenticated session descriptor");
+  }
+  if (target.attached && options.replaceDebugger !== true) {
+    throw new Error("A debugger frontend is already attached; detach it or explicitly replace it");
+  }
+  return { session, target };
 }
 
 export async function writeInspectorSession(file, value) {

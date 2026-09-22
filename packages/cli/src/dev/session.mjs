@@ -360,7 +360,9 @@ export async function runDevSession(options = {}) {
         emit,
         title: path.basename(projectRoot),
         projectRoot,
-        sessionFile: path.resolve(options.inspectorSession ?? defaultInspectorSessionFile(projectRoot))
+        sessionFile: path.resolve(options.inspectorSession ?? defaultInspectorSessionFile(projectRoot)),
+        bundleUrl: `deherm://${resourcePath}`,
+        sourceMapFile: `${outputFile}.map`
       });
   // The resource server starts later in this function, so the engine resolves
   // its content root lazily at launch time.

@@ -485,6 +485,17 @@ changes restart an engine that the operator launched manually. The watcher
 excludes `.internal`, `.deherm`, build outputs, and generated proxies so editor
 cache churn and self-authored outputs do not form rebuild loops.
 
+While that dev session is running, `deherm debug --project <game.project>`
+starts the editor-neutral Debug Adapter Protocol server on stdin/stdout. It
+reads the private `.deherm/dev/inspector.json` descriptor, authenticates the
+exact loopback CDP target, and projects authored `.ts` source maps onto Hermes
+breakpoints, stack frames, scopes, variables, watches, stepping, exception
+policy, and HMR breakpoint reapplication. A native session owns one debugger
+frontend; `--replace-debugger` is an explicit opt-in when another frontend is
+already attached. The command is intended for a VS Code debug-adapter client,
+not an interactive terminal—the thin extension/launch configuration remains
+the next editor-integration deliverable.
+
 The console itself is declarative. `packages/cli/src/dev/tui/` is authored in
 TSX against `@rezi-ui/jsx`; `packages/cli/src/dev/tsx-loader.mjs` registers a
 synchronous esbuild module hook before those views are imported, so no build

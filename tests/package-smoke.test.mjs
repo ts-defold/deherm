@@ -162,6 +162,11 @@ test("command-specific target parsing keeps dev endpoints separate from conforma
     { command: profile.command, action: profile.action, durationMs: profile.durationMs, replaceDebugger: profile.replaceDebugger },
     { command: "profile", action: "cpu", durationMs: 250, replaceDebugger: true }
   );
+  const debug = parseArguments(["debug", "--inspector-session", ".deherm/dev/custom-inspector.json"]);
+  assert.deepEqual(
+    { command: debug.command, inspectorSession: debug.inspectorSession },
+    { command: "debug", inspectorSession: ".deherm/dev/custom-inspector.json" }
+  );
   assert.throws(() => parseArguments(["generate", "--check"]), /Unknown option: --check/);
 });
 
