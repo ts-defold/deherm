@@ -501,8 +501,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 16,
-      "bytes": 255353,
-      "sha256": "89cc92296270bbf6bff575e66769c5d61e3d8d9bc55bb310ab8e71ee56ef10e9"
+      "bytes": 255463,
+      "sha256": "ed678238362d6112404ad971a445c3960b84951a6a6e55df0ba97136e9e701ae"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
@@ -525,14 +525,14 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 4097,
-      "sha256": "be068f587b08f7f589983d08205db35347a091ebeebcb3645f3781215583a016"
+      "bytes": 4843,
+      "sha256": "7e5f24f1585424f825bd35c1810ba6e412094b1524bd5c62de9de72755973ae7"
     },
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 43106,
-      "sha256": "2aae366b9d68a40b84b79852a390a7826d872812e6ab713798a2513cede954a0"
+      "bytes": 43268,
+      "sha256": "213a2cdebfd350b1dd0a4284aabb6b3fa1fb56d3ad755c1c4403e84d132696c8"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -541,5 +541,5 @@
       "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
     }
   ],
-  "sourceKey": "1116919c5008c6d5529bb877ad4fd2cc665916253db35b7b1347967ff5984696"
+  "sourceKey": "5b40b14205a868236adef2ff2dd8ccd8406c721655505e469690026801903eb0"
 }

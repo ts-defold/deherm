@@ -1,0 +1,23 @@
+services:
+  war-battles:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    environment:
+      WAR_BATTLES_HOSTNAME: 0.0.0.0
+      WAR_BATTLES_PORT: 4433
+      WAR_BATTLES_HEALTH_PORT: 8080
+      WAR_BATTLES_ROSTER: ${WAR_BATTLES_ROSTER:-8}
+      WAR_BATTLES_BOT_SKILL: ${WAR_BATTLES_BOT_SKILL:-2}
+    ports:
+      # WebTransport is HTTP/3 over QUIC: publish UDP, not only TCP.
+      - "${WAR_BATTLES_QUIC_PORT:-4433}:4433/udp"
+      # Readiness is intentionally plain HTTP and should stay local/private.
+      - "127.0.0.1:${WAR_BATTLES_HEALTH_PORT:-8080}:8080/tcp"
+    volumes:
+      # A stable named volume keeps the pinned certificate across restarts.
+      - war-battles-local-cert:/srv/war-battles-online/server/certs
+    restart: unless-stopped
+
+volumes:
+  war-battles-local-cert:

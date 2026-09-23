@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "kind": "war-battles.performance-operability",
+  "config": {
+    "players": 32,
+    "ticks": 600,
+    "warmupTicks": 60,
+    "tickRate": 60,
+    "seed": 1364152403,
+    "matchId": 1346720326,
+    "mapSeed": 195939070,
+    "snapshotIntervalTicks": 3
+  },
+  "timings": {
+    "unit": "deterministic-work-units",
+    "wallClockObserved": false,
+    "simulation": {
+      "samples": 540,
+      "p50": 812,
+      "p95": 907,
+      "p99": 947,
+      "maximum": 1081
+    },
+    "frame": {
+      "samples": 540,
+      "p50": 852,
+      "p95": 5321,
+      "p99": 6005,
+      "maximum": 6705
+    },
+    "evidenceBoundary": "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings."
+  },
+  "snapshotBandwidth": {
+    "intervalTicks": 3,
+    "frames": 200,
+    "keyframes": 1,
+    "deltas": 199,
+    "totalBytes": 440267,
+    "bytesPerSimulatedSecond": 44026.7,
+    "frameBytes": {
+      "samples": 200,
+      "p50": 2067,
+      "p95": 2600,
+      "p99": 3097,
+      "maximum": 17768
+    },
+    "keyframeBytes": 17768,
+    "fixedFrameCapacity": 17768
+  },
+  "reconciliation": {
+    "samples": 200,
+    "errorUnit": "sum of absolute fixed-point position units across all players before authoritative restore",
+    "error": {
+      "samples": 200,
+      "p50": 0,
+      "p95": 28,
+      "p99": 42,
+      "maximum": 43
+    },
+    "maximumError": 43,
+    "correctedSnapshots": 18,
+    "postRestoreError": 0
+  },
+  "fixedPools": {
+    "players": {
+      "capacity": 32,
+      "highWater": 32,
+      "failures": 0
+    },
+    "projectiles": {
+      "capacity": 512,
+      "highWater": 27,
+      "failures": 0
+    },
+    "pickups": {
+      "capacity": 32,
+      "highWater": 32,
+      "failures": 0
+    },
+    "presentationEvents": {
+      "capacity": 256,
+      "highWater": 30,
+      "failures": 0,
+      "droppedByOverflow": 0,
+      "overflowPolicy": "drop-oldest"
+    },
+    "snapshotFrame": {
+      "capacity": 17768,
+      "highWater": 17768,
+      "failures": 0
+    },
+    "arena": {
+      "observable": false,
+      "failures": null,
+      "reason": "This pure TypeScript harness enters no native/VM arena."
+    }
+  },
+  "allocationShape": {
+    "evidence": "unmeasured",
+    "vmAllocationsMeasured": false,
+    "warmupTicks": 60,
+    "simulationHotPath": {
+      "sourceInspectionImplemented": false,
+      "explicitHeapAllocationsPerTick": null,
+      "dynamicContainerGrowthPerTick": null,
+      "limit": "unmeasured until a transitive AST/source-shape checker covers BattleWorld.step and its callees"
+    },
+    "snapshotBoundary": {
+      "callerOwnedBuffers": 4,
+      "transientDataViewsPerSnapshot": 2,
+      "limit": "fixed snapshot buffers; DataView construction is observable source shape, not a VM allocation count"
+    },
+    "excluded": [
+      "Hermes/JS VM allocations",
+      "Defold engine allocations",
+      "native heap allocations",
+      "browser transport queues"
+    ]
+  },
+  "owner": "examples/war-battles-online/integration/check-performance.mjs",
+  "generator": "examples/war-battles-online/integration/check-performance.mjs",
+  "sourceInputs": [
+    {
+      "path": "examples/war-battles-online/core",
+      "kind": "tree",
+      "fileCount": 16,
+      "bytes": 255463,
+      "sha256": "ed678238362d6112404ad971a445c3960b84951a6a6e55df0ba97136e9e701ae"
+    },
+    {
+      "path": "examples/war-battles-online/integration/performance-harness.ts",
+      "kind": "file",
+      "bytes": 12041,
+      "sha256": "1b07d24d46999b8661658ceea42eab1b1c7ce2181f5c665309f6f63c76909916"
+    },
+    {
+      "path": "examples/war-battles-online/integration/performance-evidence.mjs",
+      "kind": "file",
+      "bytes": 5150,
+      "sha256": "8298f2a71fdf70a7ff160d70561a7f85274cfe478aa2ac27e638ccc5419d0dd2"
+    },
+    {
+      "path": "examples/war-battles-online/integration/check-performance.mjs",
+      "kind": "file",
+      "bytes": 1993,
+      "sha256": "1fe014e30297651854f0f4f12a9740b73689ca57758c8bb942482f1d857cd8d2"
+    }
+  ],
+  "sourceKey": "9e45b7869f5a0771554687ccd95b1045bb8dbec11deaed5db45ae1150e039371",
+  "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
+}

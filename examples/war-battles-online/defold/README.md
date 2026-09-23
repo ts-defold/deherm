@@ -213,7 +213,15 @@ it on a tick count. Visible projectiles are capped at 64.
 ```ini
 [war_battles]
 server = https://localhost:4433/war-battles
+server_certificate_sha256 = <64 hex characters for a local self-signed certificate>
 ```
+
+Production certificates use the browser trust store and do not need the hash.
+For a no-rebuild development session, the browser host may install an explicit
+`globalThis.__warBattlesConfigV1` object with `server` and
+`serverCertificateSha256` before the engine starts. The packaged online gate
+uses that seam; game code exposes its current fixed-shape counters as
+`globalThis.__warBattlesTelemetryV1` and mutates the same object in place.
 
 WebTransport exists only on the browser host — a native Defold engine has no
 WebTransport client extension yet — so on native the arena logs

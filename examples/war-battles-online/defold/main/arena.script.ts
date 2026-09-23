@@ -37,6 +37,30 @@ declare const __defoldHostV1: {
   log(level: "info", message: string): void;
 };
 
+interface WarBattlesRuntimeConfig {
+  /** Browser-only development override; game.project remains authoritative. */
+  server?: string;
+  /** Hex SHA-256 for a short-lived self-signed WebTransport certificate. */
+  serverCertificateSha256?: string;
+}
+
+interface WarBattlesRuntimeTelemetry {
+  mode: "offline" | "online";
+  state: string;
+  playerId: number;
+  rosterSize: number;
+  snapshotsApplied: number;
+  inputsSent: number;
+  inputsDropped: number;
+  lastServerTick: number;
+  localTick: number;
+}
+
+interface WarBattlesBrowserGlobals {
+  __warBattlesConfigV1?: WarBattlesRuntimeConfig;
+  __warBattlesTelemetryV1?: WarBattlesRuntimeTelemetry;
+}
+
 /**
  * The arena director.
  *
@@ -112,6 +136,36 @@ interface ArenaSelf {
   impact: CameraImpactMessage;
   online: boolean;
   sfxMask: number;
+  /** Mutated in place so live observability adds no per-frame object churn. */
+  telemetry: WarBattlesRuntimeTelemetry;
+}
+
+function browserGlobals(): WarBattlesBrowserGlobals {
+  return globalThis as unknown as WarBattlesBrowserGlobals;
+}
+
+function certificateHash(value: string): ArrayBuffer | undefined {
+  const normalized = value.split(":").join("").trim();
+  if (!/^[0-9a-fA-F]{64}$/u.test(normalized)) return undefined;
+  const bytes = new Uint8Array(32);
+  for (let index = 0; index < bytes.length; index += 1) {
+    bytes[index] = Number.parseInt(normalized.slice(index * 2, index * 2 + 2), 16);
+  }
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+}
+
+function updateTelemetry(self: ArenaSelf): void {
+  const client = self.match.client;
+  const telemetry = self.telemetry;
+  telemetry.mode = self.match.mode;
+  telemetry.state = client?.state ?? (self.engaged ? "offline-running" : "offline-ready");
+  telemetry.playerId = client?.playerId ?? 1;
+  telemetry.rosterSize = client?.rosterSize ?? self.players;
+  telemetry.snapshotsApplied = client?.stats.snapshotsApplied ?? 0;
+  telemetry.inputsSent = client?.stats.inputsSent ?? 0;
+  telemetry.inputsDropped = client?.stats.inputsDropped ?? 0;
+  telemetry.lastServerTick = client?.stats.lastServerTick ?? 0;
+  telemetry.localTick = client?.world?.tick ?? self.match.world?.tick ?? 0;
 }
 
 function logHmrState(self: ArenaSelf, edit: string): void {
@@ -346,7 +400,17 @@ function restart(self: ArenaSelf): void {
  * boundary described in the example README, not an accident.
  */
 function connectOnline(self: ArenaSelf): boolean {
-  const url = sys.getConfigString("war_battles.server", "") ?? "";
+  const runtimeConfig = browserGlobals().__warBattlesConfigV1;
+  if (runtimeConfig?.server !== undefined && typeof runtimeConfig.server !== "string") {
+    __defoldHostV1.log("info", "war-battles:arena-online-fallback:config-server:invalid");
+    return false;
+  }
+  if (runtimeConfig?.serverCertificateSha256 !== undefined
+    && typeof runtimeConfig.serverCertificateSha256 !== "string") {
+    __defoldHostV1.log("info", "war-battles:arena-online-fallback:config-certificate-sha256:invalid");
+    return false;
+  }
+  const url = runtimeConfig?.server ?? sys.getConfigString("war_battles.server", "") ?? "";
   if (url === "") return false;
   const constructor = (globalThis as { WebTransport?: unknown }).WebTransport;
   if (constructor === undefined) {
@@ -378,7 +442,18 @@ function connectOnline(self: ArenaSelf): boolean {
     },
   });
   self.match.client = client;
-  void BrowserWebTransportClient.connect(url, client).then(
+  const configuredHash = runtimeConfig?.serverCertificateSha256
+    ?? sys.getConfigString("war_battles.server_certificate_sha256", "")
+    ?? "";
+  const hash = configuredHash === "" ? undefined : certificateHash(configuredHash);
+  if (configuredHash !== "" && hash === undefined) {
+    fallback("certificate-sha256:invalid");
+    return false;
+  }
+  const options = hash === undefined
+    ? undefined
+    : { serverCertificateHashes: [{ algorithm: "sha-256", value: hash }] };
+  void BrowserWebTransportClient.connect(url, client, undefined, options).then(
     (transport) => client.attach(transport),
     (error: unknown) => {
       __defoldHostV1.log("info", `war-battles:net-error:${String(error)}`);
@@ -409,6 +484,18 @@ export default defineComponent({
     self.effectTicks = [];
     self.impact = { x: 0, y: 0, strength: 0 };
     self.sfxMask = 0;
+    self.telemetry = {
+      mode: "offline",
+      state: "initializing",
+      playerId: 0,
+      rosterSize: 0,
+      snapshotsApplied: 0,
+      inputsSent: 0,
+      inputsDropped: 0,
+      lastServerTick: 0,
+      localTick: 0,
+    };
+    browserGlobals().__warBattlesTelemetryV1 = self.telemetry;
     const players = Math.max(2, Math.min(32, Math.trunc(self.players)));
     self.players = players;
     self.match = startArena({
@@ -417,6 +504,7 @@ export default defineComponent({
       mapSeed: self.mapSeed > 0 ? Math.trunc(self.mapSeed) : 0,
     });
     self.online = connectOnline(self);
+    updateTelemetry(self);
     __defoldHostV1.log("info", `war-battles:arena-init:players=${players}:online=${self.online ? 1 : 0}`);
     logHmrState(self, "initial");
   },
@@ -436,13 +524,18 @@ export default defineComponent({
     self.elapsed += dt;
     if (!self.engaged) {
       if (self.autoEngageSeconds > 0 && self.elapsed >= self.autoEngageSeconds) engage(self);
+      updateTelemetry(self);
       return;
     }
-    if (self.match.advance(dt) === 0 && self.match.world === undefined) return;
+    if (self.match.advance(dt) === 0 && self.match.world === undefined) {
+      updateTelemetry(self);
+      return;
+    }
     syncProjectiles(self);
     syncPickups(self);
     drainEvents(self);
     ageEffects(self);
+    updateTelemetry(self);
   },
 
   final(self: ArenaSelf): void {
@@ -450,6 +543,7 @@ export default defineComponent({
     self.effectIds.length = 0;
     self.effectTicks.length = 0;
     self.match.client?.close(1000, "scene teardown");
+    browserGlobals().__warBattlesTelemetryV1 = undefined;
     __defoldHostV1.log("info", "war-battles:arena-final");
   },
 });

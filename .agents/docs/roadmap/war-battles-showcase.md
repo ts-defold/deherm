@@ -370,6 +370,57 @@ updated 200-frame trace measures 1,869–3,201-byte normal deltas (p50 2,438).
 This tranche does not claim persistent destructible spaces, final
 accessibility, or a VM allocation benchmark.
 
+## Bounded performance and operability evidence tranche
+
+`integration/check-performance.mjs` owns a deterministic 32-slot, 600-tick
+fixture over the real `BattleWorld` and snapshot codec. It records p50/p95/p99
+simulation and frame operation-cost percentiles after a 60-tick warm-up, plus
+keyframe/delta counts, total and per-simulated-second snapshot bytes, and
+reconciliation drift immediately before authoritative restore. The current
+record contains 540 measured ticks, 200 snapshot frames (one 17,768-byte
+keyframe followed by 199 deltas), 440,267 total snapshot bytes, and a maximum
+42 fixed-point-unit pre-restore error; post-restore error is zero.
+
+The same run reports observable high-water/failure counters for all 32 player
+slots, 512 projectile slots, 32 pickups, the 256-entry presentation-event ring,
+and the fixed snapshot frame buffer. It explicitly marks the native/VM arena as
+unobservable. Allocation evidence is not yet measured: the record explicitly
+leaves both VM allocation counts and transitive source-shape inspection unset.
+The snapshot boundary records its four caller-owned buffers and two `DataView`
+constructions per snapshot, but that is structure rather than a heap-allocation
+measurement. No Hermes/VM, Defold, native-heap, browser-queue, or wall-clock
+allocation/timing claim is made. The evidence inventory and digest bind the
+record to the canonical core and harness sources, and the focused test rejects
+stale records.
+
+## Self-hosted and packaged-browser multiplayer tranche
+
+The authoritative `server/deno-main.ts` now has a separate HTTP liveness and
+readiness plane, is packaged as a pinned Deno Docker service with an explicitly
+published QUIC/UDP port, and retains its short-lived local certificate across
+container restarts. `integration/check-local-multiplayer.mjs` proves two real
+Chrome WebTransport sessions receive distinct authoritative player slots in the
+same match, apply snapshots, and send input datagrams. The Docker image itself
+builds and reports healthy on the local Colima backend. Its external Chrome gate
+correctly failed there because Colima's default macOS user-mode network did not
+forward the published QUIC/UDP path; containerized UDP ingress therefore remains
+environment-dependent evidence and must not be inferred from `/readyz`.
+
+`integration/check-packaged-online.mjs` closes a different boundary: the actual
+Bob-produced Defold/Wasm game runs in Chrome, the generated browser host loads
+the deherm bundle, `arena.script.ts` connects through the production
+`BrowserWebTransportClient`, and its fixed-shape live telemetry reports online
+state plus received snapshots and sent inputs. A development-only browser
+configuration object supplies the loopback URL and certificate hash before
+engine startup, while `game.project` remains the production configuration
+authority. On 2026-09-23 the reviewed local gate observed player 1 apply four
+snapshots, send twelve inputs, and reach authoritative server tick 243.
+
+This tranche does not claim native Defold networking, WAN deployment,
+authenticated admission/resume tokens, process-restart persistence, network
+fallback, or dedicated-server failover. Those are product frontiers, not API or
+generator blockers.
+
 # Verification
 
 The release gate is one reproducible command that builds and exercises all

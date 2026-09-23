@@ -1453,6 +1453,28 @@ test("a session may only move its own tank and the match refuses a ninth human",
   assert.deepEqual(errors, []);
 });
 
+test("the server rejects input datagrams with trailing bytes", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = join(server, "exact-input", errors);
+  await settle();
+  server.step();
+  await settle();
+
+  const oversized = new Uint8Array(INPUT_PACKET_BYTES + 1);
+  writeInputPacket(oversized, 0, {
+    ...command(client.playerId, server.world.tick + 2, { moveX: 1 }),
+    matchId: server.world.matchId,
+  });
+  const rejectedBefore = server.stats.inputsRejected;
+  client.session.onDatagram(oversized);
+  assert.equal(server.stats.inputsRejected, rejectedBefore + 1);
+  assert.equal(client.session.closed, false, "one malformed datagram must not close the unreliable session");
+  assert.equal(errors.length, 1);
+  assert.match(String(errors[0]), /trailing bytes/);
+  server.close();
+});
+
 test("a control message buys an upgrade through the reliable lane", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 4, onError: (error) => errors.push(error) });

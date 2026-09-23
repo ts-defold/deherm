@@ -578,7 +578,11 @@ export class ServerSession implements TransportReceiver {
 
   private handleInput(payload: Uint8Array): void {
     if (!this.ready) return;
-    if (payload.byteLength < INPUT_PACKET_BYTES) throw new Error("input packet is truncated");
+    if (payload.byteLength !== INPUT_PACKET_BYTES) {
+      throw new Error(payload.byteLength < INPUT_PACKET_BYTES
+        ? "input packet is truncated"
+        : "input packet has trailing bytes");
+    }
     if (this.inputBudget <= 0) {
       // A client flooding the input lane is throttled, not disconnected: the
       // honest cause is a burst after a stall.

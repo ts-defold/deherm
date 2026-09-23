@@ -36,6 +36,10 @@ import type { ServerSession } from "../core/match-server.ts";
 declare const Deno: {
   readTextFile(path: string): Promise<string>;
   args: string[];
+  serve(
+    options: { hostname: string; port: number },
+    handler: (request: Request) => Response,
+  ): { shutdown(): Promise<void> };
   exit(code?: number): never;
   addSignalListener(signal: string, handler: () => void): void;
 };
@@ -43,6 +47,7 @@ declare const Deno: {
 interface Options extends MatchServerOptions {
   hostname: string;
   port: number;
+  healthPort: number;
   certPath: string;
   keyPath: string;
 }
@@ -51,6 +56,7 @@ function parseArguments(argv: readonly string[]): Options {
   const options: Options = {
     hostname: "0.0.0.0",
     port: 4433,
+    healthPort: 8080,
     certPath: "server/certs/localhost.crt",
     keyPath: "server/certs/localhost.key",
     rosterSize: 8,
@@ -63,6 +69,7 @@ function parseArguments(argv: readonly string[]): Options {
     const value = argv[index + 1];
     if (argument === "--hostname") { options.hostname = required(value, argument); index += 1; }
     else if (argument === "--port") { options.port = integer(value, argument); index += 1; }
+    else if (argument === "--health-port") { options.healthPort = integer(value, argument); index += 1; }
     else if (argument === "--cert") { options.certPath = required(value, argument); index += 1; }
     else if (argument === "--key") { options.keyPath = required(value, argument); index += 1; }
     else if (argument === "--roster") { (options as { rosterSize: number }).rosterSize = integer(value, argument); index += 1; }
@@ -120,6 +127,7 @@ export async function main(argv: readonly string[]): Promise<void> {
   });
 
   const pending = new Map<TransportReceiver, ServerSession>();
+  let ready = true;
   const listener = DenoWebTransportServer.start({
     hostname: options.hostname,
     port: options.port,
@@ -148,7 +156,38 @@ export async function main(argv: readonly string[]): Promise<void> {
     onError: (error: unknown) => console.error("war-battles-server:transport-error:", error),
   });
 
+  // Keep readiness on a plain loopback-friendly HTTP control port. It is
+  // deliberately separate from the HTTP/3/WebTransport endpoint: a Docker
+  // healthcheck can verify the process without pretending that TCP is the
+  // gameplay transport. The response includes MatchServer.stats so an
+  // integration gate can observe authoritative admissions and input handling.
+  void listener.completed.then(() => {
+    if (!ready) return;
+    ready = false;
+    console.error("war-battles-server:listener-stopped-unexpectedly");
+  });
+  const healthServer = Deno.serve({ hostname: options.hostname, port: options.healthPort }, (request: Request): Response => {
+    const path = new URL(request.url).pathname;
+    if (path !== "/healthz" && path !== "/readyz" && path !== "/health") {
+      return new Response("not found\n", { status: 404 });
+    }
+    const payload = {
+      ok: path === "/healthz" || ready,
+      ready,
+      transport: "webtransport-h3",
+      endpoint: `https://${options.hostname}:${options.port}`,
+      certificateSha256: digest,
+      rosterSize: options.rosterSize,
+      stats: server.stats,
+    };
+    return new Response(JSON.stringify(payload) + "\n", {
+      status: payload.ok ? 200 : 503,
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+    });
+  });
+
   console.log(`war-battles-server:listening:https://${options.hostname}:${options.port}`);
+  console.log(`war-battles-server:health:http://${options.hostname}:${options.healthPort}`);
   console.log(`war-battles-server:certificate-sha256:${digest}`);
   console.log(`war-battles-server:roster:${options.rosterSize}:bots:${options.botSkill}`);
 
@@ -172,9 +211,11 @@ export async function main(argv: readonly string[]): Promise<void> {
   }, TICK_MILLISECONDS);
 
   const stop = (): void => {
+    ready = false;
     clearInterval(timer);
     server.close(1_001, "server shutting down");
     listener.close();
+    void healthServer.shutdown().catch((error: unknown) => console.error("war-battles-server:health-shutdown-error:", error));
     console.log("war-battles-server:stopped");
     Deno.exit(0);
   };

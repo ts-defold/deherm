@@ -1,0 +1,11 @@
+node_modules
+defold
+defold_hermes_typed_native
+evidence
+test
+tools
+headless
+integration
+README.md
+package.json
+tsconfig.json

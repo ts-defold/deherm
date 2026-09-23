@@ -30,7 +30,7 @@ of which this example performs.
 
 ```sh
 deno run --unstable-net --allow-net --allow-read \
-  server/deno-main.ts --port 4433 --roster 8 --bot-skill 2
+  server/deno-main.ts --port 4433 --health-port 8080 --roster 8 --bot-skill 2
 ```
 
 or, from this package, `pnpm serve`.
@@ -38,6 +38,7 @@ or, from this package, `pnpm serve`.
 | Flag | Meaning |
 | --- | --- |
 | `--hostname`, `--port` | QUIC bind address; default `0.0.0.0:4433` |
+| `--health-port` | Plain HTTP liveness/readiness port; default `8080` |
 | `--cert`, `--key` | PEM paths; default `server/certs/localhost.{crt,key}` |
 | `--roster` | Total tanks, humans plus bots. Default 8, maximum 32 |
 | `--bot-skill` | 0 recruit, 1 regular, 2 veteran, 3 nightmare |
@@ -46,6 +47,11 @@ or, from this package, `pnpm serve`.
 
 It prints its listening address, the certificate digest and the roster, then one
 line per session join and leave.
+
+`GET /healthz` is a liveness check and `GET /readyz` is a readiness check. Both
+return JSON with the certificate digest and a snapshot of authoritative server
+stats; `/readyz` returns HTTP 503 during shutdown. Keep this control port
+private — gameplay remains HTTP/3/WebTransport over UDP.
 
 ## 3. Point the game at it
 
@@ -78,6 +84,22 @@ profiles. Each gets its own `WebTransport` session, its own slot and its own
 resume token; the remaining six tanks stay bots. There is no matchmaking, so
 both simply connect to the same URL. To watch the join and the handover, tail
 the server: it prints `session-joined:<name>:slot=<n>` and the bot count drops.
+
+The repeatable synthetic-browser acceptance for this same production adapter is
+`pnpm runtime:multiplayer`. It opens two independent Chrome pages, verifies
+distinct player ids and one shared match id, applies authoritative snapshots,
+sends input datagrams, and confirms `MatchServer.stats.humans >= 2`. It proves
+the browser transport and server orchestration; it does not claim packaged
+Defold-engine execution. A Docker deployment can be checked with
+`pnpm runtime:multiplayer -- --external --quic-port 4433 --health-port 8080`.
+
+`pnpm runtime:browser:online` is the stronger packaged-game boundary. It starts
+the same Deno server, loads the Bob-produced Defold/Wasm bundle in Chrome,
+injects only the development server/certificate configuration before engine
+startup, and waits for the real `arena.script.ts` component to report an online
+welcome, authoritative snapshots, and sent input datagrams. It does not replace
+the two-client gate: together they prove packaged-engine integration and real
+multi-session admission, respectively.
 
 **Native Defold is offline only.** A native engine has no WebTransport client
 extension; `arena.script.ts` detects the missing `WebTransport` global, logs
