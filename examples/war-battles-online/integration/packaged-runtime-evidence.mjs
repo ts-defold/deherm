@@ -67,6 +67,31 @@ export function observedRequiredMarkers(transcript, requiredMarkers = REQUIRED_M
   });
 }
 
+/**
+ * Reconstruct the required marker list from checked evidence without turning
+ * its one measured field into a pinned constant. Every static marker must
+ * remain byte-identical and in the canonical order; only the final positive
+ * runtime-profile symbol count is admitted as observed data.
+ */
+export function checkedRequiredMarkers(recorded, requiredMarkers = REQUIRED_MARKERS) {
+  if (!Array.isArray(recorded) || recorded.length !== requiredMarkers.length) {
+    throw new Error("Recorded runtime markers do not match the required marker count");
+  }
+  const expected = requiredMarkers.map((marker, index) => {
+    if (marker !== RUNTIME_PROFILE_MARKER_PREFIX) return marker;
+    const candidate = recorded[index];
+    if (typeof candidate !== "string" || !candidate.startsWith(marker) ||
+        !/^[1-9][0-9]* generated Lua symbols$/u.test(candidate.slice(marker.length))) {
+      throw new Error("Recorded runtime profile marker must carry a positive generated Lua symbol count");
+    }
+    return candidate;
+  });
+  if (JSON.stringify(recorded) !== JSON.stringify(expected)) {
+    throw new Error("Recorded runtime markers differ from the required marker set");
+  }
+  return expected;
+}
+
 async function waitForExitAfterSignal(child, method, graceMs) {
   if (child.exitCode !== null || child.signalCode !== null) {
     return { method, exitCode: child.exitCode, signal: child.signalCode };

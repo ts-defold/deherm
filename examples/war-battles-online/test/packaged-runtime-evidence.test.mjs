@@ -5,6 +5,7 @@ import { test } from "node:test";
 import {
   buildEvidenceDocument,
   canonicalizeRuntimeTranscript,
+  checkedRequiredMarkers,
   firstRejectedDiagnostic,
   observedRequiredMarkers,
   REQUIRED_MARKERS,
@@ -105,6 +106,16 @@ test("runtime profile evidence keeps the final positive symbol count without pin
     observedRequiredMarkers(`${RUNTIME_PROFILE_MARKER_PREFIX}0 generated Lua symbols`, [RUNTIME_PROFILE_MARKER_PREFIX])[0],
     null,
   );
+  const recorded = [...REQUIRED_MARKERS];
+  recorded[recorded.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] += "315 generated Lua symbols";
+  assert.deepEqual(checkedRequiredMarkers(recorded), recorded);
+  const zero = [...recorded];
+  zero[REQUIRED_MARKERS.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] = `${RUNTIME_PROFILE_MARKER_PREFIX}0 generated Lua symbols`;
+  assert.throws(() => checkedRequiredMarkers(zero), /positive generated Lua symbol count/);
+  assert.throws(() => checkedRequiredMarkers(recorded.slice(1)), /required marker count/);
+  const altered = [...recorded];
+  altered[0] = "INFO:ENGINE: not Defold";
+  assert.throws(() => checkedRequiredMarkers(altered), /differ from the required marker set/);
 });
 
 test("packaged runtime gate fails closed on known diagnostics", async () => {

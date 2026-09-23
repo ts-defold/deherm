@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 
 import {
   buildEvidenceDocument,
+  checkedRequiredMarkers,
   digestEvidenceInputs,
   REQUIRED_MARKERS,
   runPackagedRuntimeEvidence,
@@ -52,6 +53,7 @@ const sourceInputs = [
   await sha256Tree(repositoryRoot, "defold/defold_hermes"),
   await sha256Tree(repositoryRoot, "examples/war-battles-online/defold", {
     exclude: (path) => path === "build" || path.startsWith("build/") ||
+      path === ".defignore" ||
       path.endsWith(".md") || path === ".vscode" || path.startsWith(".vscode/") ||
       path === "defold_hermes" || path.startsWith("defold_hermes/") ||
       path === ".internal" || path.startsWith(".internal/") ||
@@ -79,7 +81,7 @@ if (arguments_.has("--check-evidence")) {
   const expected = buildEvidenceDocument({
     artifacts,
     sourceInputs,
-    markers: REQUIRED_MARKERS,
+    markers: checkedRequiredMarkers(checked.observation?.requiredMarkers),
     shutdownMarkers: checked.observation?.shutdownMarkers,
     settleMs: checked.observation?.settleMs,
     termination: checked.observation?.termination,
