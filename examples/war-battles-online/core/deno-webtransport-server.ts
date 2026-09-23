@@ -211,7 +211,11 @@ export class DenoWebTransportServer {
       this.trace(options, { phase: "quic-accepted", connectionId });
       session = await runtime.upgradeWebTransport(connection);
       this.trace(options, { phase: "webtransport-upgraded", connectionId, url: session.url });
-      await session.ready;
+      // This connection is already over capacity. Closing must not depend on a
+      // readiness promise that the peer can leave pending forever. Observe a
+      // later rejection so it cannot become unhandled, but release this task
+      // and the upgraded session immediately.
+      void session.ready.catch((error: unknown) => options.onError(error));
       closeSession(4_001, "server session limit reached");
     } catch (error: unknown) {
       closeSession(4_006, "session readiness failed");

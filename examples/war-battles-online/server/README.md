@@ -114,7 +114,7 @@ whose kind fixes the lane it is allowed on:
 | Kind | Lane | Direction | Bytes |
 | --- | --- | --- | --- |
 | `hello` | session | client → server | 40 |
-| `welcome` | session | server → client | 36 |
+| `welcome` | session | server → client | 37 |
 | `reject` | session | server → client | ≤ 102 |
 | `ping` / `pong` | session | both | 12 |
 | `control` | control | client → server | 8 |
@@ -123,6 +123,9 @@ whose kind fixes the lane it is allowed on:
 `PROTOCOL_VERSION` moved to 2. The input packet is still exactly 32 bytes:
 version 1 reserved byte 15 and wrote zero there, and that byte is now the weapon
 request, so every other field kept its offset.
+
+The 37-byte welcome ends with one `snapshotIntervalTicks` cadence byte. Readers
+still accept the legacy 36-byte form and use the default three-tick cadence.
 
 The resume token is a **placeholder**: a keyed hash of the match, the slot and a
 process-lifetime salt, with no signature. It exists so the reconnect path has a

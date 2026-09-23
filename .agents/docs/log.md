@@ -2255,7 +2255,7 @@ backpressure retains only the newest pending snapshot. Focused adapter tests
 prove the single-stream property; the real loopback gate deliberately does not
 promote that unit observation into a runtime stream-open count. The
 mechanically source-bound recorded run joined slot 1 in a 32-player roster,
-applied three authoritative snapshots, sent fourteen input datagrams, and observed
+applied three authoritative snapshots, sent nine input datagrams, and observed
 the authoritative MatchServer accept at least three of them. This is genuine
 loopback HTTP/3/WebTransport protocol evidence; it is not WAN/ingress, native
 Defold, adverse-network, 32-human-load, persistent-stream runtime, or allocation
@@ -2284,8 +2284,20 @@ terminal close. A capacity-rejected Deno connection also retains the upgraded
 session long enough to close it when `session.ready` rejects. Repeated-stream,
 peer-reset, datagram teardown, and rejected-readiness tests cover these paths.
 The source-bound loopback evidence was then regenerated on this exact tree and
-observed three snapshots, fourteen client inputs, and at least three inputs
+observed three snapshots, nine client inputs, and at least three inputs
 accepted by the authoritative match.
+
+The release review then reproduced two final bounded-resource gaps. A blocked
+persistent writer could accumulate one `writer.ready` waiter per arriving
+snapshot because the microtask guard did not cover the active async pump; one
+active-pump flag now keeps that at exactly one while the latest snapshot is
+coalesced. Capacity-rejected Deno sessions also awaited readiness before close,
+so a peer could retain one task and upgraded session indefinitely; the server
+now closes immediately after upgrade and merely observes a later readiness
+rejection. Deterministic regressions exercise a 100-snapshot blocked-writer
+flood and a readiness promise that never settles. The protocol table was also
+corrected to the current 37-byte welcome and documents its trailing cadence
+byte.
 
 The same integration wave rebuilt and re-observed the packaged arm64-macOS and
 HTML5/Wasm games. Native Defold loaded the current Dynamic Hermes bundle, ran

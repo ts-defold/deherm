@@ -910,13 +910,13 @@ test("Deno WebTransport readiness failure closes and releases the pending receiv
   matchServer.close();
 });
 
-test("Deno WebTransport rejects a max-session connection whose readiness fails", async () => {
+test("Deno WebTransport rejects a max-session connection without awaiting readiness", async () => {
   const errors = [];
   let closeCount = 0;
   let closeOptions;
   const failedSession = {
     url: "https://war.invalid/at-capacity",
-    ready: Promise.reject(new Error("capacity handshake rejected")),
+    ready: new Promise(() => {}),
     closed: Promise.resolve({}),
     close(options) {
       closeCount += 1;
@@ -953,8 +953,8 @@ test("Deno WebTransport rejects a max-session connection whose readiness fails",
   await server.completed;
   await settle();
   assert.equal(closeCount, 1, "a rejected max-session handshake must close exactly once");
-  assert.deepEqual(closeOptions, { closeCode: 4_006, reason: "session readiness failed" });
-  assert.equal(errors.length, 1);
+  assert.deepEqual(closeOptions, { closeCode: 4_001, reason: "server session limit reached" });
+  assert.equal(errors.length, 0);
   server.close();
 });
 
@@ -1372,9 +1372,16 @@ test("server snapshots coalesce to one bounded pending frame under stream backpr
   assert.equal(await transport.sendReliable(3, Uint8Array.of(2)), "backpressured");
   assert.equal(session.outgoingStreams.length, 1);
   assert.deepEqual(session.outgoingStreams[0], []);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(session.readyWaiters, 1, "one active pump owns the blocked writer.ready wait");
+  for (let value = 3; value <= 100; value += 1) {
+    assert.equal(await transport.sendReliable(3, Uint8Array.of(value)), "backpressured");
+  }
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(session.readyWaiters, 1, "snapshot flood does not retain additional writer.ready waiters");
   session.releaseCapacity();
   await new Promise((resolve) => setImmediate(resolve));
-  assert.deepEqual([...session.outgoingStreams[0][0]], [3, 1, 0, 0, 0, 2], "only the latest snapshot is retained");
+  assert.deepEqual([...session.outgoingStreams[0][0]], [3, 1, 0, 0, 0, 100], "only the latest snapshot is retained");
   session.releaseCapacity();
   assert.equal(await transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(4)), "sent");
   assert.deepEqual([...session.outgoingStreams[0][1]], [TRANSPORT_CHANNEL_CONTROL, 1, 0, 0, 0, 4]);

@@ -460,9 +460,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "2f5471750d0e09db248111715828be2519e0a1089b64c469e9861bd34db58bf5",
+        "fingerprint": "c5b9d794bd4b7cd2dfaea739a74722d0e00b3acbf1c882e12bb2627fda460cc6",
         "outputs": {
-          "deherm/app.dehermc": "aeb2003e480f425557cc39c8be6a61a005e00eb3400da1721f46570f6cd8ccaa"
+          "deherm/app.dehermc": "653524a91165dcd2f0d3cee3d254508613d9ff17a8ad1498693ace6eaccd7511"
         },
         "build": {
           "entryPoint": "main/arena.script.ts",
@@ -483,7 +483,7 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "7a406a281a5cb2eb66b16ded6912e0300f5c8b1672a011b68f79bc06a8930228",
+          "digest": "17a4d5c70f88702191d6b3855e7b0a756d17e5c5c7ec21ff4d19a23878279885",
           "fileCount": 68,
           "files": {
             ".deherm/generated/components/registry.ts": "442a3864f95018529f415bf4c125a33c4450308ac6b2797be8ad86f1f95b77e9",
@@ -539,7 +539,7 @@
             "src/capability-snapshot.ts": "1cc3bcb6342ff5dbbe53769645d426bb24e0f99eec5067a3995762e091625bf7",
             "src/generated-war-battles/arena.ts": "de4e50ba1a518e18e3bbc0eaec74807af77b59aaac69a0b6abc611b0cd6b9813",
             "src/generated-war-battles/bots.ts": "48ab38f42117527a33a3f8edc1bf032fcb5d2d2b0d5c378729d919a222e3582e",
-            "src/generated-war-battles/browser-webtransport.ts": "71866720c2049d8846da95c3cce3106ec826cda722fcf89b9f2675ae9dba9404",
+            "src/generated-war-battles/browser-webtransport.ts": "da48e41682d5fe39a25f867615b6da47b35f36a0461ead33c2fd2b72f76376ee",
             "src/generated-war-battles/client.ts": "8c47787f2b74e2c148925795565fc655b61bcc7b2bcd46fa00f6ebd345f4ec61",
             "src/generated-war-battles/constants.ts": "b401e6b1b8122dd30d6403c57aa7aace94779857dcbe263e71b339defd415b60",
             "src/generated-war-battles/content.ts": "b80a9516bfd89c233fa1abed06ab7e2aaaad9b181fc21a8ef961ce808d283ce7",

@@ -80,6 +80,7 @@ export class BrowserWebTransportClient implements GameTransport {
   private pendingServerReliableBytes = 0;
   private pendingServerSnapshot?: Uint8Array;
   private snapshotFlushScheduled = false;
+  private snapshotFlushActive = false;
   private datagramWriterClosed = false;
   private sessionCloseRequested = false;
   private closed = false;
@@ -511,13 +512,19 @@ export class BrowserWebTransportClient implements GameTransport {
   private scheduleSnapshotFlush(): void {
     if (
       this.snapshotFlushScheduled ||
+      this.snapshotFlushActive ||
       (this.pendingServerSnapshot === undefined && this.pendingServerReliable.length === 0) ||
       this.closed
     ) return;
     this.snapshotFlushScheduled = true;
     queueMicrotask(() => {
       this.snapshotFlushScheduled = false;
-      void this.flushPendingSnapshot();
+      if (this.snapshotFlushActive || this.closed) return;
+      this.snapshotFlushActive = true;
+      void this.flushPendingSnapshot().finally(() => {
+        this.snapshotFlushActive = false;
+        this.scheduleSnapshotFlush();
+      });
     });
   }
 
