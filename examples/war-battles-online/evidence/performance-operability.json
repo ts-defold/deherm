@@ -142,10 +142,10 @@
     {
       "path": "examples/war-battles-online/integration/check-performance.mjs",
       "kind": "file",
-      "bytes": 1993,
-      "sha256": "1fe014e30297651854f0f4f12a9740b73689ca57758c8bb942482f1d857cd8d2"
+      "bytes": 1992,
+      "sha256": "92f86947de4f74a83c439c9246940f382609f64101d7152361661501169b475a"
     }
   ],
-  "sourceKey": "9e45b7869f5a0771554687ccd95b1045bb8dbec11deaed5db45ae1150e039371",
+  "sourceKey": "75a1c222bd9b90dfc22febfa04c6d616b632feb0400ee3553f24cf53ddedf1d2",
   "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
 }
