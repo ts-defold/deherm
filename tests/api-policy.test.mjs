@@ -47,6 +47,7 @@ const node24ArtifactActions = {
   upload: "actions/upload-artifact@v6",
   download: "actions/download-artifact@v7"
 };
+const node24CacheAction = "actions/cache@v5";
 
 const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
 
@@ -153,6 +154,20 @@ test("all workflow artifact actions use their Node 24-compatible official majors
   assert.ok(downloadRefs.length > 0, "workflows must retain artifact downloads");
   assert.ok(uploadRefs.every((ref) => ref === node24ArtifactActions.upload), `unexpected upload refs: ${uploadRefs.join(", ")}`);
   assert.ok(downloadRefs.every((ref) => ref === node24ArtifactActions.download), `unexpected download refs: ${downloadRefs.join(", ")}`);
+});
+
+test("all workflow cache actions use the official Node 24-compatible major", async () => {
+  const workflows = await Promise.all([
+    "commit-provenance.yml",
+    "end-to-end.yml",
+    "native-artifacts.yml",
+    "policy.yml"
+  ].map(async (name) => [name, await readFile(path.join(repositoryRoot, ".github/workflows", name), "utf8")]));
+  const allWorkflowText = workflows.map(([, text]) => text).join("\n");
+  const cacheRefs = [...allWorkflowText.matchAll(/actions\/cache@v\d+/gu)].map(([ref]) => ref);
+
+  assert.ok(cacheRefs.length > 0, "workflows must retain cache actions");
+  assert.ok(cacheRefs.every((ref) => ref === node24CacheAction), `unexpected cache refs: ${cacheRefs.join(", ")}`);
 });
 
 test("published immutable policy objects retry transient transport failures only", async () => {

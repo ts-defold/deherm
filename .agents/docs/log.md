@@ -1,5 +1,15 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Workflow cache transport moved to the Node 24 runtime
+
+Every committed workflow cache step now uses the official `actions/cache@v5`
+major. The action's pinned metadata declares `using: node24`; its cache keys,
+paths, restore keys, post-save behavior, and runner semantics are unchanged.
+The Node 24 action requires GitHub Actions Runner `2.327.1` or newer. The
+repository uses managed `ubuntu-24.04`, `macos-15`, and Windows hosted runners,
+so no self-hosted runner migration is required. The workflow regression test
+enumerates every committed cache reference and rejects a mixed or older major.
+
 ## 2026-09-23 - Published policy object reads tolerate transient host failures
 
 Hosted policy run `35889801941` published and resolved its manifest, then the

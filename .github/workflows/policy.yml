@@ -103,7 +103,7 @@ jobs:
 
       - id: sysroot
         run: sed -n 's/^DMSDK_PARSE_SYSROOT_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: upstream/dmsdk-parse-sysroot
           key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
@@ -249,13 +249,13 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: sysroot
         run: sed -n 's/^DMSDK_PARSE_SYSROOT_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: upstream/dmsdk-parse-sysroot
           key: dmsdk-parse-sysroot-${{ steps.sysroot.outputs.digest }}
       - id: defold-sdk
         run: sed -n 's/^DEFOLD_SDK_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: upstream/defoldsdk.zip
           key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
@@ -298,7 +298,7 @@ jobs:
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - id: defold-sdk
         run: sed -n 's/^DEFOLD_SDK_SHA256=/digest=/p' upstream.lock >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: upstream/defoldsdk.zip
           key: defold-sdk-${{ steps.defold-sdk.outputs.digest }}
@@ -365,7 +365,7 @@ jobs:
         run: |
           sed -n 's/^EMSDK_VERSION=/version=/p' upstream.lock >> "$GITHUB_OUTPUT"
           sed -n 's/^EMSDK_REV=/revision=/p' upstream.lock >> "$GITHUB_OUTPUT"
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: |
             upstream/extender/platformsdk/emsdk-${{ steps.emsdk.outputs.version }}
