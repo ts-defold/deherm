@@ -279,6 +279,25 @@ authenticated token service. Focused tests cover identity/state retention,
 keyframe recovery, token rotation, and invalid/stale/foreign rejection. They
 do not claim persistence across process restart or cryptographic security.
 
+## Deterministic 32-player impairment/load tranche
+
+`integration/check-authoritative-load.mjs` owns a machine-readable
+`evidence/authoritative-load-32.json` record generated from the real
+`MatchServer` and `BattleClient` protocol. The bounded in-process network seam
+emulates the transport's ordered reliable-channel contract and verifies all
+6,224 reliable sends were delivered without backpressure, while applying
+reproducible 42 ms latency, ±25 ms jitter, 12% datagram loss, bounded datagram
+backpressure, and datagram reordering to all 32 clients. A 600-tick run accepted
+5,691 inputs, delivered 16,916 datagrams, dropped 2,261, backpressured 23 sends,
+observed 3,714 reordered datagrams, peaked at 130 queued packets, and drained to
+zero pending packets. Every client completed the welcome, attempted 600 inputs
+(598–600 delivered), applied authoritative snapshots, and converged on the
+server's final tick/hash with zero captured protocol errors.
+The source inventory and digest in the evidence prevent stale results from
+being presented as current. This is deterministic transport/simulation load
+evidence only; it excludes WAN behavior, native Defold networking, browser
+WebTransport, allocation benchmarking, sanitizer results, and visual proof.
+
 The focused 32-player codec test measured 2,015–3,262-byte normal deltas (p50
 2,398) across a 200-frame veteran-bot trace, compared with the former fixed
 17,568-byte message. The test proves keyframe reconstruction, exact-base

@@ -3,8 +3,8 @@
   "observedOn": "2026-09-22",
   "esbuildVersion": "0.25.10",
   "scope": "JavaScript bundle evidence only; not a Defold package or Hermes bytecode measurement",
-  "sourceFileCount": 503,
-  "sourceBytes": 1978477,
+  "sourceFileCount": 506,
+  "sourceBytes": 2001173,
   "artifacts": {
     "headlessNodeBundle": {
       "bytes": 49656,

@@ -36,9 +36,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 8,
-  "lastServerTick": 84,
-  "lastLocalTick": 87,
+  "observedInputsSent": 9,
+  "lastServerTick": 87,
+  "lastLocalTick": 90,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -94,8 +94,8 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 3502,
-      "sha256": "a8ba1b080009f09491c07c1041da32c198a56be66624d0fa2604f909151591b6"
+      "bytes": 3890,
+      "sha256": "0676b4179932f5209eb539ec1283064a4cac7438957c985d3f48e593e0dbd3bc"
     },
     {
       "path": "examples/war-battles-online/server/deno-main.ts",
@@ -122,6 +122,6 @@
       "sha256": "8f85b23cb316de63981656a5c1f35fd55c09088ca1bc9138fda27f9ff237a9ba"
     }
   ],
-  "sourceKey": "406d27049862dd83086e570d72f19acdd6ef4d9e37ceecd8ec958cda586fe9c0",
+  "sourceKey": "c797b4ddc1d9853fe1dc36620a0533d98ec371a843119bf022afd7952517c3e9",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence."
 }

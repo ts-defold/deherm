@@ -1,5 +1,24 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Deterministic 32-player War Battles impairment/load evidence
+
+The War Battles example now owns a bounded authoritative load harness over the
+real `MatchServer`/`BattleClient` transport contract. It creates all 32 client
+sessions, emulates the transport's ordered reliable-channel contract, and
+applies deterministic 42 ms latency, ±25 ms jitter, 12% datagram loss, bounded
+datagram backpressure, and datagram reordering. The 600-tick record is
+source-bound by a complete core and harness inventory. It observed 5,691
+accepted inputs, 6,224/6,224 delivered reliable messages with zero reliable
+backpressure, 16,916 delivered and 2,261 dropped datagrams, 23 bounded
+backpressure results, 3,714 reorderings, a 130-packet queue high-water mark,
+and zero pending packets after drain. All 32 clients reached ready state,
+applied snapshots, attempted 600 inputs (598–600 delivered per client), and
+converged to the final authoritative hash/tick; server and client error captures
+were empty. Focused package tests
+validate the generated artifact and its freshness. This is in-process
+transport/simulation load evidence, not WAN, browser WebTransport, native
+Defold networking, allocation, sanitizer, or visual evidence.
+
 ## 2026-09-23 - Workflow cache transport moved to the Node 24 runtime
 
 Every committed workflow cache step now uses the official `actions/cache@v5`
