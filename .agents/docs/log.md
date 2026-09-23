@@ -1903,3 +1903,28 @@ runtime IR, SDK recipe, Defold revision, subtree object, or realizer capability
 changed. `pnpm check:api-policy` and the repository-wide generated-state check
 are the authority for this repair; it is policy-store consistency evidence, not
 new engine-runtime evidence.
+
+## 2026-09-22 - Public TypeScript ergonomics and extension ingestion close
+
+The roadmap's public TypeScript acceptance matrix is complete. Contextual
+`DefoldHash` string literals lower through the actual TypeScript transform while
+dynamic strings retain runtime hashing. The public SDK exports `defold` while
+the raw `builtins` route identity remains internal ABI data. Object/factory and
+class authoring both lower through the same generated component proxy contract
+for `.script.ts`, `.gui.ts`, and `.render.ts`; generated editor properties and
+context-specific tsconfigs fail closed on illegal context imports.
+
+Project discovery feeds local extensions, resolved dependency ZIPs, and
+symlinked extensions into the same inventory. Their `.script_api` declarations
+produce deterministic TypeScript and runtime IR, while schema-selected C and
+C++ headers produce ABI IR, glue, blockers, and exact-call verification twins.
+The packed npm consumer also generated a previously unseen extension header
+without a source checkout. Source-derived TSDoc and deprecation augmentation is
+carried by policy and reconstructed by the installed compiler.
+
+Focused ergonomics/component/extension verification passed 65 tests; the wider
+CLI/package/toolchain matrix passed 102 tests; and `pnpm check` passed after the
+policy identity repair. These are generation, type-check, compile/link fixture,
+and package-boundary results. They do not replace the separate real-engine
+evidence already recorded for core routes, nor the still-pending literal VS Code
+visual observation while the desktop is locked.

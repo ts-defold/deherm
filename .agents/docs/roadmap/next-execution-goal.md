@@ -91,13 +91,17 @@ below without changing its completion rule.
    with zero omissions. Generated route/argument metadata now also drives
    scoped completion, hover, and definition for attached resources,
    addressed-component resources, component addresses, and separately derived
-   project message ids; real War Battles queries prove the joins. Next record
-   the actual VS Code visual observation. Native activation itself is already
+   project message ids; real War Battles queries prove the joins. Public
+   TypeScript ergonomics and extension ingestion are now complete: contextual
+   hash literals, the `defold` namespace, function/class component adapters,
+   context-specific projects, generated properties and documentation, and
+   local/dependency `.script_api` plus C/C++ schemas all pass their common
+   generation and test-twin gates. Next record the actual VS Code visual
+   observation. Native activation itself is already
    proven, while cross-realm component state migration remains the distinct
    measured HMR boundary tracked by
    [issue #120](https://github.com/ts-defold/deherm/issues/120). After that,
-   finish the public
-   TypeScript ergonomics and native/browser War Battles. Do not reopen the
+   continue native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
 
 Every route remains public when Defold exposes it. Verification status controls
@@ -264,6 +268,11 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
 ## 5. Finish public API ergonomics and project integration
 
 Public ledger: [#100 Finish idiomatic TypeScript API ergonomics and extension ingestion](https://github.com/ts-defold/deherm/issues/100).
+
+Status: completed on 2026-09-22. The contextual-hash transform, public-root
+projection, component authoring/proxy generator, context projects,
+source-derived documentation, and local/dependency extension ingestion are all
+mechanically covered through the public package paths described below.
 
 1. Preserve contextual `DefoldHash` literals; runtime-hash only dynamic data.
 2. Finish the public `defold` namespace migration and remove leaked `builtins`
