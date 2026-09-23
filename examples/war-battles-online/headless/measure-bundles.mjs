@@ -84,6 +84,7 @@ async function walk(directory, output) {
     if (entry.isDirectory() && [
       ".deherm",
       ".internal",
+      ".vscode",
       "build",
       "deherm",
       "defold_hermes",

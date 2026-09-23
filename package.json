@@ -52,6 +52,10 @@
       "import": "./packages/cli/src/dev/bug-pool.mjs",
       "default": "./packages/cli/src/dev/bug-pool.mjs"
     },
+    "./dev/typed-native": {
+      "import": "./packages/cli/src/typed-native.mjs",
+      "default": "./packages/cli/src/typed-native.mjs"
+    },
     "./language-server": {
       "import": "./packages/cli/src/lsp/server.mjs",
       "default": "./packages/cli/src/lsp/server.mjs"

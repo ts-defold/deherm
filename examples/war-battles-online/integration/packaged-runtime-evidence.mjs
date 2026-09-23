@@ -7,12 +7,14 @@ import { join, relative, resolve } from "node:path";
 // development loop, this packaged harness, and the runtime bug-pool harvester
 // all classify engine output the same way.
 import { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic } from "@ts-defold/deherm/dev/runtime-diagnostics";
+import { TYPED_NATIVE_IGNORE_ENTRY } from "@ts-defold/deherm/dev/typed-native";
 
 import { DYNAMIC_SERVICE_PORT_ENV, requestGracefulShutdown } from "./graceful-shutdown.mjs";
 import { projectionEnvelope } from "./projections.mjs";
 
 /** The projection this harness observes. */
 export const PROJECTION_ID = "native-arm64-macos";
+export const DEFAULT_SETTLE_MS = 1_500;
 
 export { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic };
 
@@ -90,6 +92,20 @@ export function checkedRequiredMarkers(recorded, requiredMarkers = REQUIRED_MARK
     throw new Error("Recorded runtime markers differ from the required marker set");
   }
   return expected;
+}
+
+export function checkedShutdownMarkers(recorded, requiredMarkers = REQUIRED_SHUTDOWN_MARKERS) {
+  if (JSON.stringify(recorded) !== JSON.stringify(requiredMarkers)) {
+    throw new Error("Recorded shutdown markers differ from the required component-teardown marker set");
+  }
+  return [...requiredMarkers];
+}
+
+export function checkedSettleMs(recorded, requiredSettleMs = DEFAULT_SETTLE_MS) {
+  if (recorded !== requiredSettleMs) {
+    throw new Error(`Recorded runtime settle window must be ${requiredSettleMs}ms`);
+  }
+  return requiredSettleMs;
 }
 
 async function waitForExitAfterSignal(child, method, graceMs) {
@@ -286,6 +302,39 @@ export async function sha256Artifact(repositoryRoot, path) {
     path: relative(repositoryRoot, absolute).replaceAll("\\", "/"),
     bytes: metadata.size,
     sha256: createHash("sha256").update(contents).digest("hex"),
+  };
+}
+
+/**
+ * Canonicalise `.defignore` for runtime source evidence without hiding rules
+ * authored by the game. The web/native target reconciler exclusively owns one
+ * exact trimmed line; adding or removing that line must not invalidate native
+ * evidence. Every other line remains an input because it can change what Bob
+ * uploads and therefore what the observed engine actually executes.
+ *
+ * Reconciliation rewrites line endings and trailing blank lines, so those are
+ * normalised here as syntax rather than treated as semantic project changes.
+ */
+export function normalizedDefignoreText(text = "", managedEntry = TYPED_NATIVE_IGNORE_ENTRY) {
+  const lines = text.replaceAll("\r\n", "\n").replaceAll("\r", "\n").split("\n")
+    .filter((line) => line.trim() !== managedEntry);
+  while (lines.length > 0 && lines.at(-1) === "") lines.pop();
+  return lines.length === 0 ? "" : `${lines.join("\n")}\n`;
+}
+
+export async function sha256DefignoreEvidence(repositoryRoot, path) {
+  const absolute = resolve(repositoryRoot, path);
+  let text = "";
+  try {
+    text = await readFile(absolute, "utf8");
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  const normalized = normalizedDefignoreText(text);
+  return {
+    path: `${relative(repositoryRoot, absolute).replaceAll("\\", "/")}#authored-rules`,
+    bytes: Buffer.byteLength(normalized),
+    sha256: createHash("sha256").update(normalized).digest("hex"),
   };
 }
 

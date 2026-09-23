@@ -5,9 +5,13 @@ import { test } from "node:test";
 import {
   buildEvidenceDocument,
   canonicalizeRuntimeTranscript,
+  checkedSettleMs,
+  checkedShutdownMarkers,
   checkedRequiredMarkers,
+  DEFAULT_SETTLE_MS,
   firstRejectedDiagnostic,
   observedRequiredMarkers,
+  normalizedDefignoreText,
   REQUIRED_MARKERS,
   REQUIRED_SHUTDOWN_MARKERS,
   RUNTIME_PROFILE_MARKER_PREFIX,
@@ -116,6 +120,36 @@ test("runtime profile evidence keeps the final positive symbol count without pin
   const altered = [...recorded];
   altered[0] = "INFO:ENGINE: not Defold";
   assert.throws(() => checkedRequiredMarkers(altered), /differ from the required marker set/);
+});
+
+test("checked evidence pins component teardown and the canonical settle window", () => {
+  assert.deepEqual(checkedShutdownMarkers(REQUIRED_SHUTDOWN_MARKERS), [...REQUIRED_SHUTDOWN_MARKERS]);
+  assert.throws(
+    () => checkedShutdownMarkers([REQUIRED_MARKERS[0]]),
+    /required component-teardown marker set/,
+  );
+  assert.throws(() => checkedShutdownMarkers([]), /required component-teardown marker set/);
+  assert.equal(checkedSettleMs(DEFAULT_SETTLE_MS), DEFAULT_SETTLE_MS);
+  assert.throws(() => checkedSettleMs(0), /must be 1500ms/);
+  assert.throws(() => checkedSettleMs(undefined), /must be 1500ms/);
+});
+
+test("runtime source evidence removes only the target-managed defignore rule", () => {
+  assert.equal(normalizedDefignoreText(), "");
+  assert.equal(normalizedDefignoreText("/defold_hermes_typed_native\n"), "");
+  assert.equal(normalizedDefignoreText("  /defold_hermes_typed_native  \r\n"), "");
+  assert.equal(
+    normalizedDefignoreText("/reference\r\n/defold_hermes_typed_native\r\n/notes\r\n"),
+    "/reference\n/notes\n",
+  );
+  assert.equal(
+    normalizedDefignoreText("/defold_hermes_typed_native\n/defold_hermes_typed_native\n/reference\n\n"),
+    "/reference\n",
+  );
+  assert.equal(
+    normalizedDefignoreText("/defold_hermes_typed-native\n"),
+    "/defold_hermes_typed-native\n",
+  );
 });
 
 test("packaged runtime gate fails closed on known diagnostics", async () => {

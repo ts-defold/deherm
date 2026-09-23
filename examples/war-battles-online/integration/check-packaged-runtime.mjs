@@ -6,11 +6,15 @@ import { fileURLToPath } from "node:url";
 
 import {
   buildEvidenceDocument,
+  checkedSettleMs,
+  checkedShutdownMarkers,
   checkedRequiredMarkers,
+  DEFAULT_SETTLE_MS,
   digestEvidenceInputs,
   REQUIRED_MARKERS,
   runPackagedRuntimeEvidence,
   sha256Artifact,
+  sha256DefignoreEvidence,
   sha256Tree,
   transcriptEvidence,
 } from "./packaged-runtime-evidence.mjs";
@@ -61,6 +65,7 @@ const sourceInputs = [
       path === "deherm" || path.startsWith("deherm/") ||
       path === "deherm.lock",
   }),
+  await sha256DefignoreEvidence(repositoryRoot, "examples/war-battles-online/defold/.defignore"),
   ...await Promise.all(sourceFilePaths.map((path) => sha256Artifact(repositoryRoot, path))),
 ];
 
@@ -82,8 +87,8 @@ if (arguments_.has("--check-evidence")) {
     artifacts,
     sourceInputs,
     markers: checkedRequiredMarkers(checked.observation?.requiredMarkers),
-    shutdownMarkers: checked.observation?.shutdownMarkers,
-    settleMs: checked.observation?.settleMs,
+    shutdownMarkers: checkedShutdownMarkers(checked.observation?.shutdownMarkers),
+    settleMs: checkedSettleMs(checked.observation?.settleMs),
     termination: checked.observation?.termination,
     transcript: checked.observation?.transcript,
   });
@@ -95,7 +100,7 @@ if (arguments_.has("--check-evidence")) {
 }
 
 const timeoutMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_TIMEOUT_MS ?? "30000", 10);
-const settleMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_SETTLE_MS ?? "1500", 10);
+const settleMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_SETTLE_MS ?? String(DEFAULT_SETTLE_MS), 10);
 // Every packaged run is also an observation of how this software behaved. The
 // transcript feeds the shared runtime bug pool so defects accumulate across
 // runs; the pool is behavioural evidence only and never a conformance claim.
