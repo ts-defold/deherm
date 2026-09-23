@@ -761,6 +761,13 @@ function componentAtAddress(table, relativeDocument, addressValue) {
   return table.gameObjects?.[instance?.prototype]?.components?.[match[2]] ?? null;
 }
 
+function boundResourcePaths(component, extension) {
+  const binding = component?.resources?.[extension];
+  if (!binding) return [];
+  const paths = Array.isArray(binding.paths) ? binding.paths : [binding.path];
+  return [...new Set(paths.filter((value) => typeof value === "string" && value.startsWith("/")))];
+}
+
 function resourceSymbolsForContext(table, projectRoot, relativeDocument, context) {
   const parameter = context.parameter;
   const namespaces = parameter.namespaces ?? [];
@@ -782,8 +789,7 @@ function resourceSymbolsForContext(table, projectRoot, relativeDocument, context
     const resources = new Set();
     for (const namespace of namespaces) {
       const extension = table.namespaceKinds?.[namespace]?.extension;
-      const resource = extension ? component.resources?.[extension]?.path : null;
-      if (resource) resources.add(resource);
+      for (const resource of extension ? boundResourcePaths(component, extension) : []) resources.add(resource);
     }
     return resources.size ? declarationSymbols(table, projectRoot, namespaces, resources) : [];
   }

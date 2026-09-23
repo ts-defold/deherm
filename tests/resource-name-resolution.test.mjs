@@ -7,7 +7,9 @@ import test from "node:test";
 import { buildProjectResourceSymbols, writeProjectResourceSymbols } from "../packages/cli/src/resource-symbols.mjs";
 import {
   buildProjectMessages,
+  buildResourceSymbolTable,
   componentStringLiterals,
+  readResource,
   projectMessageEvidence
 } from "../packages/compiler/src/resource-symbol-table.mjs";
 import { parameterValueShape } from "../packages/compiler/src/resource-namespace-classification.mjs";
@@ -110,6 +112,31 @@ test("the project symbol table records declarations, scopes, and attachments", a
   assert.deepEqual(table.diagnostics, []);
   assert.deepEqual(table.projectMessages.names.map(({ name }) => name), ["clear_color", "create", "enable"]);
   assert.ok(!table.projectMessages.names.some(({ name }) => name === "backdrop"));
+});
+
+test("component bindings retain every same-extension resource for route projections", () => {
+  const source = {
+    "/main/player.go": 'components { id: "sprite" component: "/main/player.model" }',
+    "/main/player.model": [
+      'materials { name: "body" material: "/main/body.material" }',
+      'materials { name: "turret" material: "/main/turret.material" }'
+    ].join("\n"),
+    "/main/body.material": 'vertex_constants { name: "body_tint" }',
+    "/main/turret.material": 'vertex_constants { name: "turret_tint" }'
+  };
+  const resources = Object.entries(source).map(([resourcePath, text]) =>
+    readResource({ path: resourcePath.slice(1), source: text, schema }));
+  const table = buildResourceSymbolTable({
+    schema,
+    classification: { routes: [], runtimeExtensibleNamespaces: [] },
+    resources,
+    componentSources: ["main/player.script.ts"]
+  });
+  assert.deepEqual(table.gameObjects["/main/player.go"].components.sprite.resources[".material"], {
+    path: "/main/body.material",
+    line: 1,
+    paths: ["/main/body.material", "/main/turret.material"]
+  });
 });
 
 test("component string literals include the declared id behind an address sigil", () => {

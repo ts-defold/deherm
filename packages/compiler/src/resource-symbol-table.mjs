@@ -120,8 +120,21 @@ function boundResources(schema, componentMessage, resourcesByPath) {
   const record = (value, line) => {
     if (typeof value !== "string" || !value.startsWith("/")) return;
     const extension = schemaExtension(schema, value);
-    if (!extension || bound[extension]) return;
-    bound[extension] = { path: value, line };
+    if (!extension) return;
+    const existing = bound[extension];
+    if (!existing) {
+      bound[extension] = { path: value, line };
+      return;
+    }
+    // A model, particle effect, or other component may bind several resources
+    // of the same extension. Keep the historical singleton shape for the
+    // common case, but retain a deterministic path list when the engine can
+    // address more than one resource through the same component. Route-aware
+    // editor projections (for example material constants) must not silently
+    // narrow to whichever resource happened to be visited first.
+    const paths = existing.paths ?? [existing.path];
+    if (!paths.includes(value)) paths.push(value);
+    if (paths.length > 1) existing.paths = paths;
   };
   const data = componentMessage.find((field) => field.name === "data" && field.kind === "string");
   if (data) {

@@ -29,6 +29,7 @@ function symbols(extra = {}) {
       "collection:instance": { kind: "instance", extension: ".collection" },
       "go:component": { kind: "component", extension: ".go" },
       "gui:node": { kind: "node", extension: ".gui" },
+      "material:constant": { kind: "constant", extension: ".material" },
       "render:material": { kind: "material", extension: ".render" }
     },
     declarations: {
@@ -284,6 +285,59 @@ test("route metadata scopes completion, hover, and definition to the exact Defol
   const unrelatedCompletion = await index.complete(guiUri, unrelatedImport, { line: 1, character: 13 });
   assert.ok(unrelatedCompletion.some(({ label }) => label === "idle"));
   assert.ok(unrelatedCompletion.some(({ label }) => label === "#sprite"));
+});
+
+test("addressed material routes project every bound same-extension resource", async () => {
+  const root = await fixture();
+  const table = symbols({
+    declarations: {
+      "/main/body.material": {
+        "material:constant": [{ name: "body_tint", line: 4, field: "vertex_constants" }]
+      },
+      "/main/turret.material": {
+        "material:constant": [{ name: "turret_tint", line: 7, field: "fragment_constants" }]
+      }
+    },
+    gameObjects: {
+      "/main/player.go": {
+        components: {
+          sprite: {
+            line: 2,
+            type: "sprite",
+            component: null,
+            resources: {
+              ".material": {
+                path: "/main/body.material",
+                line: 3,
+                paths: ["/main/body.material", "/main/turret.material"]
+              }
+            }
+          }
+        }
+      }
+    },
+    routes: {
+      "SpriteApi.resetConstant": {
+        0: { parameter: "url", jsParameter: "url", namespaces: ["go:component", "collection:instance"], scope: "component-address" },
+        1: { parameter: "constant", jsParameter: "constant", namespaces: ["material:constant"], scope: "addressed-component-resource", addressParameter: 0 }
+      }
+    }
+  });
+  await writeFile(path.join(root, ".deherm", "generated", "resource-symbols.json"), `${JSON.stringify(table)}\n`);
+  const index = createResourceSemanticIndex(root);
+  const uri = pathToFileURL(path.join(root, "main", "player.script.ts")).href;
+  const text = 'sprite.resetConstant("#sprite", "turret_");';
+  const position = { line: 0, character: text.indexOf("turret_") + 3 };
+  const completion = await index.complete(uri, text, position);
+  assert.deepEqual(completion.map(({ label }) => label), ["turret_tint"]);
+
+  const fullText = 'sprite.resetConstant("#sprite", "body_tint");';
+  const fullPosition = { line: 0, character: fullText.indexOf("body_tint") + 3 };
+  const hover = await index.hover(uri, fullText, fullPosition);
+  assert.match(hover.contents.value, /body\.material/u);
+  const definition = await index.definition(uri, fullText, fullPosition);
+  assert.equal(definition[0].uri, pathToFileURL(path.join(root, "main", "body.material")).href);
+  assert.equal(definition[0].range.start.line, 3);
 });
 
 test("route matching respects lexical bindings, direct arguments, regular expressions, and approved literal wrappers", async () => {

@@ -118,6 +118,15 @@ Receiver contracts are considered only in the lifecycle owned by the exported
 `defineComponent({...})` object or exported `component(ClassName)` class;
 arbitrary objects and classes with an `onMessage` member remain invisible.
 
+Component resource bindings retain every distinct path for an extension when a
+single Defold component reaches more than one resource of that kind. The
+historical `{ path, line }` shape remains for singleton bindings; multi-resource
+bindings add an ordered `paths` array. The language server uses that array for
+addressed resource routes such as `sprite.reset_constant` and
+`model.reset_constant`, so material constants are offered from every material
+the addressed component can reach rather than from the first path encountered
+by the protobuf walk.
+
 # Scoping rules that hold
 
 * `gui.getNode` resolves against the specific `.gui` scene whose `script` field
@@ -193,7 +202,7 @@ must never reject a build or produce an unknown-message diagnostic.
 | --- | --- | --- |
 | Declaration schema | `scripts/generate-defold-resource-schema.mjs --check` over the pinned Defold checkout | 18 resource kinds, 30 namespaces, 0 blockers, deterministic |
 | Parameter classification | `scripts/generate-script-resource-namespace-classification.mjs --check` over the pinned API IR | 24 namespaced names, 92 addresses, 139 explicitly unresolved |
-| Project symbol table | `tests/fixtures/resource-names` built through `buildProjectResourceSymbols` | Declarations with source lines, game-object bindings, collection instances, and all five component attachments |
+| Project symbol table | `tests/fixtures/resource-names` built through `buildProjectResourceSymbols` plus the multi-material unit fixture | Declarations with source lines, game-object bindings, collection instances, all five component attachments, and deterministic same-extension resource lists |
 | Project message evidence | Focused scanner and project-table tests | Deterministic sender/receiver separation, canonical-package import gating, exact authored locations, lexical-shadow and regex rejection, no mixing with resource declarations, and dynamic-expression silence |
 | Language service route join | `tests/language-server.test.mjs` over generated-table-shaped fixtures | Exact call/argument filtering across all three scopes, namespace-only dynamic fallback, project-message opt-in, CRLF/UTF-16 safety, and completion/hover/definition parity |
 | Actual ttsc host | Pinned `ttsc` compiles the fixture projects through the package plugin descriptor | A GUI node/layer/font/layout typo, a sprite animation typo, a `#component` typo, and a `/instance` typo each produce a diagnostic naming the namespace, the declaring resource, and the candidates |
@@ -210,6 +219,9 @@ must never reject a build or produce an unknown-message diagnostic.
 * `model.play_anim` classifies against the animation namespaces, which is wrong
   for a model's animation set; it stays silent because a model component binds no
   atlas or tilesource, but the classification is imprecise rather than correct.
+* A route that cannot identify a single addressed component or bound resource
+  remains silent; retaining several same-extension bindings widens only to the
+  declarations from those bound paths, not to every project resource.
 * The two generators are deterministic and self-verifying through `--check`, but
   they are not yet registered in the script clean-room regeneration graph, which
   would need the pinned `.proto` and builder sources added to its evidence set.
