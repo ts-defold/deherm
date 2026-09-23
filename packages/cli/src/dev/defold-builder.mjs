@@ -4,6 +4,7 @@ import { constants } from "node:fs";
 import { access, chmod, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
+import { defoldSurfaceCacheHome } from "../defold-surface.mjs";
 import { ensureProjectNativeArtifact, hostDefoldPlatform } from "../toolchains.mjs";
 import { reconcileTypedNativeUpload } from "../typed-native.mjs";
 
@@ -18,6 +19,30 @@ async function exists(file, mode) {
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+/**
+ * Mutable packaged builds cannot live below the Defold project root. Bob
+ * rejects its reserved `build` directory, and any other in-project directory
+ * can be rediscovered as project input on the next bundle. Keep one stable,
+ * project-keyed output root in the same platform-native cache used by the rest
+ * of the installed toolchain instead.
+ */
+export function defaultDefoldBundleOutput(projectRoot, options = {}) {
+  const resolvedProject = path.resolve(projectRoot);
+  const projectKey = sha256(Buffer.from(resolvedProject)).slice(0, 24);
+  const cacheHome = defoldSurfaceCacheHome(
+    options.env ?? process.env,
+    options.hostPlatform ?? process.platform,
+    options.userHome
+  );
+  return path.join(cacheHome, "dev-bundles", projectKey);
+}
+
+/** Keep another platform's compiled resources away from the live native tree. */
+export function defaultDefoldBundleBuildOutput(projectRoot, bundlePlatform = "wasm-web") {
+  if (!/^[a-z0-9_-]+$/iu.test(bundlePlatform)) throw new Error(`Invalid Defold bundle platform: ${bundlePlatform}`);
+  return path.join(path.resolve(projectRoot), "build", `deherm-${bundlePlatform}`);
 }
 
 export async function ensureBob(projectRoot, lock, options = {}) {
@@ -148,8 +173,12 @@ export function extractBobFailureDiagnostics(text, limit = 12) {
   return diagnostics;
 }
 
-async function emitBobFailureDiagnostics(projectRoot, platform, emit) {
-  const logFile = path.join(projectRoot, "build", platform, "log.txt");
+export function bobFailureLogFile(outputRoot) {
+  return path.join(path.resolve(outputRoot), "log.txt");
+}
+
+async function emitBobFailureDiagnostics(projectRoot, outputRoot, emit) {
+  const logFile = bobFailureLogFile(outputRoot);
   let text;
   try {
     text = await readFile(logFile, "utf8");
@@ -228,7 +257,7 @@ export async function createDefoldBuilder(options) {
         emit({ type: "defold-build-succeeded", reason, resources });
         return { resources, outputRoot, platform };
       } catch (error) {
-        const logFile = await emitBobFailureDiagnostics(projectRoot, platform, emit);
+        const logFile = await emitBobFailureDiagnostics(projectRoot, outputRoot, emit);
         const detail = error instanceof Error ? error.message : String(error);
         const diagnostic = logFile
           ? `${detail}; see ${path.relative(projectRoot, logFile).split(path.sep).join("/")}`
@@ -255,7 +284,9 @@ export async function createDefoldBuilder(options) {
     const bundlePlatform = options_.platform ?? "wasm-web";
     const variant = options_.variant ?? "debug";
     const bundleOutput = path.resolve(options_.bundleOutput
-      ?? path.join(projectRoot, "build", "bundle"));
+      ?? defaultDefoldBundleOutput(projectRoot, { env: options.env }));
+    const bundleBuildOutput = path.resolve(options_.buildOutput
+      ?? defaultDefoldBundleBuildOutput(projectRoot, bundlePlatform));
     const reason = options_.reason ?? `bundle ${bundlePlatform}`;
     const operation = loop.then(async () => {
       emit({ type: "defold-build-started", reason });
@@ -268,6 +299,7 @@ export async function createDefoldBuilder(options) {
       const args = [
         "-jar", bob,
         "--root", projectRoot,
+        "--output", path.relative(projectRoot, bundleBuildOutput),
         "--bundle-output", bundleOutput,
         "--platform", bundlePlatform,
         "--architectures", bundlePlatform,
@@ -280,9 +312,9 @@ export async function createDefoldBuilder(options) {
       try {
         await run(java, args, { ...options, cwd: projectRoot, emit, source: "bob" });
         emit({ type: "defold-build-succeeded", reason, resources: [] });
-        return { bundleOutput, platform: bundlePlatform };
+        return { bundleOutput, buildOutput: bundleBuildOutput, platform: bundlePlatform };
       } catch (error) {
-        await emitBobFailureDiagnostics(projectRoot, bundlePlatform, emit);
+        await emitBobFailureDiagnostics(projectRoot, bundleBuildOutput, emit);
         emit({ type: "defold-build-failed", reason, diagnostic: error instanceof Error ? error.message : String(error) });
         throw error;
       }

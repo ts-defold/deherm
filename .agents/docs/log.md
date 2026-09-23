@@ -1,5 +1,56 @@
 # Defold Hermes knowledge log
 
+## 2026-09-22 - Installed web launch uses the native user cache
+
+A real `deherm dev --web` War Battles session reproduced an installed-path
+failure after the native engine and live component channel had already started:
+Bob rejected `<project>/build/bundle` because `build` is reserved by Defold.
+The CLI now derives a deterministic 24-hex project key from the absolute
+project root, writes mutable HTML5 bundles under the platform-native déherm
+cache, and supplies that exact root to browser discovery. Explicit bundle paths
+remain authoritative and name the packaged directory containing `index.html`;
+only the internal default-cache path enables nested discovery before Bob creates
+its titled child, so an explicit path cannot silently select stale content.
+The wasm-web compilation also has its own
+`build/deherm-wasm-web` intermediate tree instead of sharing the live native
+`build/default` resources; the reproduced shared-tree run caused the native
+engine to reject a browser shader while Bob was bundling. Bob failure extraction
+now reads `log.txt` from that same actual `--output` tree. The first browser
+activation is also readiness-gated: the reproduced post-build run connected
+Chrome before Defold had installed `__defoldHermesDevV1`, rejected generation
+one, and later initialized normally. Activation now polls that exact host and
+callable `activate` member with a bounded timeout before reading and pushing the
+bundle.
+
+Focused dev-session and browser-target tests pass 29/29, including separate
+project keys, outside-project placement, direct explicit and nested cached discovery,
+explicit nested-child rejection, the loopback bundle-server boundary, delayed host
+readiness, target replacement, paired activation failure, and a missing-host
+fail-closed timeout. A fresh post-fix session through the pinned local Extender
+then built the native and wasm-web targets in their separate intermediate
+trees, kept the native Hermes engine alive, connected headless Chrome, waited
+for the page host, and received the generation-one browser activation
+acknowledgement. The authenticated editor endpoint simultaneously reported 43
+native and 127 browser instances, all schema-current; both arena rows carried
+`players=8`, `botSkill=2`, `mapSeed=0`, and `autoEngageSeconds=0`. Two VS Code
+Extension Host processes held authenticated loopback connections to that
+endpoint. This is packaged native/browser runtime plus editor-transport
+evidence; the locked macOS display still prevents the distinct visual CodeLens
+observation.
+
+The final post-review acceptance rebuilt that cache-backed bundle through the
+local Extender, started the native Hermes engine and browser peer together, and
+observed the browser generation-one `reload-started`, page-side activation, and
+`reload-signalled` sequence while telemetry and component snapshots continued.
+The independent Chrome playability gate then delivered real W, weapon-select,
+fire, and restart input through Defold: arena engagement arrived in 265 ms,
+round two started, and both fire and round sound markers appeared. The live
+756x425 canvas reported WebGL 2 / GLSL ES 3.00 through ANGLE SwiftShader with an
+unlost context; its composed screenshot had 4,000/4,000 visible pixels, 4,000
+bright pixels, and 78 coarse colour buckets. This is real packaged browser
+rendering and input evidence, distinct from the compiler and generated-state
+gates.
+
 ## 2026-09-22 - Extension-owned schemas select local and remote C/C++ surfaces
 
 `defold-hermes.bindings.json` is now an executable project-generation input,

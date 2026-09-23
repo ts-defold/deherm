@@ -43,6 +43,80 @@ test("the newest packaged bundle under the project is the one served", async () 
   }
 });
 
+test("the configured cache root resolves Bob's nested titled directory", async () => {
+  const { root, bundle } = await bundleProject();
+  try {
+    const explicitRoot = path.join(root, "build", "bundle");
+    const resolved = await resolveWebBundle({
+      projectRoot: path.join(root, "unrelated-project"),
+      bundleDirectory: explicitRoot,
+      allowNestedBundleDirectory: true
+    });
+    assert.equal(resolved.directory, bundle);
+    assert.equal(resolved.index, "index.html");
+    assert.equal(resolved.source, "cache-root");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("an explicit bundle directory cannot guess a nested child", async () => {
+  const { root } = await bundleProject();
+  try {
+    await assert.rejects(() => resolveWebBundle({
+      projectRoot: root,
+      bundleDirectory: path.join(root, "build", "bundle")
+    }), /No index\.html in HTML5 bundle directory/u);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("browser activation rejects a target replacement after host readiness", async () => {
+  const { root, bundle } = await bundleProject();
+  const bundleFile = path.join(root, ".deherm", "dev", "app.dehermc");
+  await mkdir(path.dirname(bundleFile), { recursive: true });
+  await writeFile(bundleFile, "globalThis.__dehermTestBundle = true;");
+  let target;
+  let activationCalls = 0;
+  const targetOptions = {
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile,
+    telemetryIntervalMs: 60_000,
+    hostPollIntervalMs: 1,
+    hostTimeoutMs: 1_000,
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: {
+        async send(_method, request) {
+          if (request.expression.startsWith("Boolean(")) {
+            await target.stop();
+            return { result: { value: true } };
+          }
+          activationCalls += 1;
+          return { result: { value: { status: "activated" } } };
+        }
+      },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => {}
+    })
+  };
+  target = createBrowserTarget(targetOptions);
+  try {
+    await target.launch();
+    await assert.rejects(() => target.activate(8), /browser target changed before bundle activation/u);
+    assert.equal(activationCalls, 0);
+    assert.equal(target.pushCount(), 0);
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("a missing bundle is an actionable message, never a guess", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-browser-empty."));
   try {
@@ -148,6 +222,124 @@ test("browser launch does not publish a session for a page that exited while ope
     assert.equal(closes, 1);
     assert.equal(target.running(), false);
     await assert.rejects(() => readFile(sessionFile), { code: "ENOENT" });
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("first browser activation waits for Defold to install its host", async () => {
+  const { root, bundle } = await bundleProject();
+  const bundleFile = path.join(root, ".deherm", "dev", "app.dehermc");
+  await mkdir(path.dirname(bundleFile), { recursive: true });
+  await writeFile(bundleFile, "globalThis.__dehermTestBundle = true;");
+  const events = [];
+  let readinessCalls = 0;
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile,
+    telemetryIntervalMs: 60_000,
+    hostPollIntervalMs: 1,
+    hostTimeoutMs: 1_000,
+    emit: (event) => events.push(event),
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: {
+        async send(_method, request) {
+          if (request.expression.startsWith("Boolean(")) {
+            readinessCalls += 1;
+            return { result: { value: readinessCalls >= 3 } };
+          }
+          return { result: { value: { status: "activated" } } };
+        }
+      },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => {}
+    })
+  });
+  try {
+    await target.launch();
+    assert.deepEqual(await target.activate(7), { status: "activated" });
+    assert.equal(readinessCalls, 3);
+    assert.equal(target.pushCount(), 1);
+    assert.ok(events.some(({ type, generation }) => type === "reload-started" && generation === 7));
+    assert.ok(events.some(({ type, generation }) => type === "reload-signalled" && generation === 7));
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("browser activation fails closed when the Defold host never appears", async () => {
+  const { root, bundle } = await bundleProject();
+  const bundleFile = path.join(root, ".deherm", "dev", "app.dehermc");
+  await mkdir(path.dirname(bundleFile), { recursive: true });
+  await writeFile(bundleFile, "globalThis.__dehermTestBundle = true;");
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile,
+    telemetryIntervalMs: 60_000,
+    hostPollIntervalMs: 1,
+    hostTimeoutMs: 10,
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: { send: async () => ({ result: { value: false } }) },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => {}
+    })
+  });
+  try {
+    await target.launch();
+    await assert.rejects(() => target.activate(1), /Timed out waiting for the Defold browser host/u);
+    assert.equal(target.pushCount(), 0);
+  } finally {
+    await target.stop();
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("a failed activation closes the reload event pair", async () => {
+  const { root, bundle } = await bundleProject();
+  const bundleFile = path.join(root, ".deherm", "dev", "app.dehermc");
+  await mkdir(path.dirname(bundleFile), { recursive: true });
+  await writeFile(bundleFile, "globalThis.__dehermTestBundle = true;");
+  const events = [];
+  const target = createBrowserTarget({
+    projectRoot: root,
+    bundleDirectory: bundle,
+    bundleFile,
+    telemetryIntervalMs: 60_000,
+    emit: (event) => events.push(event),
+    openBundlePage: async () => ({
+      server: { port: 9444 },
+      client: {
+        async send(_method, request) {
+          if (request.expression.startsWith("Boolean(")) return { result: { value: true } };
+          throw new Error("CDP page closed");
+        }
+      },
+      target: { webSocketDebuggerUrl: "ws://127.0.0.1:9333/devtools/page/browser-fixture" },
+      debuggingPort: 9333,
+      pageUrl: "http://127.0.0.1:9444/index.html",
+      profile: path.join(root, "profile"),
+      close: async () => {}
+    })
+  });
+  try {
+    await target.launch();
+    await assert.rejects(() => target.activate(9), /CDP page closed/u);
+    assert.ok(events.some(({ type, generation }) => type === "reload-started" && generation === 9));
+    assert.ok(events.some(({ type, generation, diagnostic }) =>
+      type === "reload-failed" && generation === 9 && diagnostic === "CDP page closed"));
+    assert.equal(target.pushCount(), 0);
   } finally {
     await target.stop();
     await rm(root, { recursive: true, force: true });

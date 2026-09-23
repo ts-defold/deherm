@@ -62,6 +62,26 @@ An optional Defold editor hook passes `editor.engine_sha1`, notifies the CLI,
 and advertises the active game-session endpoint. It does not implement a code
 editor.
 
+Development HTML5 bundles are mutable tool output, not Defold project input.
+The CLI writes Bob's `--bundle-output` to a project-keyed directory below the
+platform-native déherm user cache and gives that same output root to the browser
+target. Bob therefore never receives the reserved `<project>/build` directory,
+successive bundles cannot be rediscovered as project resources, sibling
+projects do not overwrite one another, and the installed CLI can reuse the
+latest bundle without repository-specific paths. An explicit `--web-bundle`
+continues to win and names the packaged directory containing `index.html`.
+Only the internal default-cache path enables Bob-parent discovery so an
+explicit path cannot guess or serve a stale nested child. The cache path can
+remain stable while Bob creates its titled child.
+Bob's intermediate wasm-web resources use a separate
+`<project>/build/deherm-wasm-web` tree, never the native development engine's
+`<project>/build/default` tree; starting both targets cannot rewrite shaders or
+archives while the native engine is reading them, and failure diagnostics read
+the `log.txt` from that exact `--output` tree. After Chrome connects, the
+first bundle activation waits on a bounded CDP readiness predicate for the
+Defold page host; a missing host times out explicitly instead of consuming and
+rejecting the first generation during page bootstrap.
+
 # Reload transaction
 
 TypeScript-only edits do not rebuild Hermes or the custom engine:

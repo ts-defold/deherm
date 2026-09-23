@@ -460,9 +460,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "cc048e6691d9d087cf034e694fb470ca9bbfde1a90cd9ede6a0c8d3297a0f67e",
+        "fingerprint": "be4d20399b4388c064bbd5acbb7d223058d5b826b6945cbc8c0f32f551e6f6bc",
         "outputs": {
-          "deherm/app.dehermc": "6f024d0f88621cc6217c97f67ceffafadfa41c9d9c077690469eaee4f55264e6"
+          "deherm/app.dehermc": "fc1d5f8092224f6beb40504f5908d404029222b390abc92003ae279b02fe9193"
         },
         "build": {
           "entryPoint": "main/player.script.ts",

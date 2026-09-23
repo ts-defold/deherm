@@ -15,7 +15,7 @@ import {
 import { readReleaseReachability } from "./release-reachability.mjs";
 import { createBugPoolRecorder, defaultBugPoolFile } from "./bug-pool.mjs";
 import { createIncrementalCompiler } from "./compiler.mjs";
-import { createDefoldBuilder } from "./defold-builder.mjs";
+import { createDefoldBuilder, defaultDefoldBundleOutput } from "./defold-builder.mjs";
 import { HotReloadCoordinator } from "./coordinator.mjs";
 import { createEngineController } from "./engine-process.mjs";
 import { createInspectorBridge } from "./inspector-bridge.mjs";
@@ -469,6 +469,9 @@ export async function runDevSession(options = {}) {
     : new HotReloadCoordinator({ compiler, targets, emit });
   const servicePort = options.servicePort ?? 8001;
   const localTargetUrl = `http://127.0.0.1:${servicePort}`;
+  const browserBundleRoot = options.webBundle
+    ? path.resolve(options.webBundle)
+    : defaultDefoldBundleOutput(projectRoot, { env: options.env });
   // `--once` never launches an engine and must not bind background ports. A
   // normal dev session owns both sides of the local inspector bridge before
   // spawning Defold, so the engine's synchronous loopback connect is bounded.
@@ -507,7 +510,8 @@ export async function runDevSession(options = {}) {
     bundleFile: outputFile,
     sourceMapFile: `${outputFile}.map`,
     sessionFile: path.resolve(options.browserInspectorSession ?? defaultBrowserInspectorSessionFile(projectRoot)),
-    bundleDirectory: options.webBundle,
+    bundleDirectory: browserBundleRoot,
+    allowNestedBundleDirectory: !options.webBundle,
     chromeBinary: options.chrome,
     headless: options.browserHeadless,
     telemetryIntervalMs: options.telemetryIntervalMs

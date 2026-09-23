@@ -25,7 +25,7 @@ import { existsSync } from "node:fs";
 import { readFile, readdir, stat } from "node:fs/promises";
 import path from "node:path";
 
-import { defaultChromeBinary, openBundlePage } from "./browser-host.mjs";
+import { defaultChromeBinary, openBundlePage, waitFor } from "./browser-host.mjs";
 import { parseEngineControlEvent } from "./engine-process.mjs";
 import {
   createInspectorSession,
@@ -133,8 +133,16 @@ export async function resolveWebBundle(options) {
   const index = options.index ?? "index.html";
   if (options.bundleDirectory) {
     const directory = path.resolve(options.bundleDirectory);
-    await stat(path.join(directory, index));
-    return { directory, index, source: "explicit" };
+    const direct = await stat(path.join(directory, index)).then(
+      (entry) => entry.isFile(),
+      () => false
+    );
+    if (direct) return { directory, index, source: "explicit" };
+    if (options.allowNestedBundleDirectory) {
+      const nested = await newestBundleDirectory(directory, index);
+      if (nested) return { directory: nested.directory, index, source: "cache-root" };
+    }
+    throw new Error(`No ${index} in HTML5 bundle directory: ${directory}`);
   }
   // Three conventions, newest first. The repository root matters because a
   // Defold project inside a monorepo - examples/<name>/defold here - gets its
@@ -287,7 +295,8 @@ export function createBrowserTarget(options) {
       const bundle = await resolveWebBundle({
         projectRoot,
         cwd: options.cwd,
-        bundleDirectory: options.bundleDirectory
+        bundleDirectory: options.bundleDirectory,
+        allowNestedBundleDirectory: options.allowNestedBundleDirectory
       });
       log(`serving ${path.relative(projectRoot, bundle.directory) || bundle.directory}`);
       let openedExited = false;
@@ -383,15 +392,54 @@ export function createBrowserTarget(options) {
    */
   const activate = async (generation) => {
     if (!page) return { status: "skipped", reason: "no browser target is running" };
-    const source = await readFile(options.bundleFile, "utf8");
-    if (generation !== undefined) emit({ type: "reload-started", id, generation });
-    const result = await page.client.send("Runtime.evaluate", {
-      expression: `globalThis.__defoldHermesDevV1
-        ? globalThis.__defoldHermesDevV1.activate(${JSON.stringify(source)})
-        : { status: "rejected", diagnostic: "browser host is not loaded" }`,
-      returnByValue: true,
-      awaitPromise: false
+    const activePage = page;
+    const activeEpoch = connectionEpoch;
+    await waitFor(async () => {
+      if (page !== activePage || connectionEpoch !== activeEpoch) {
+        const error = new Error("browser target changed while waiting for its Defold host");
+        error.fatal = true;
+        throw error;
+      }
+      const readiness = await activePage.client.send("Runtime.evaluate", {
+        expression: "Boolean(globalThis.__defoldHermesDevV1 && typeof globalThis.__defoldHermesDevV1.activate === 'function')",
+        returnByValue: true
+      });
+      return readiness.result?.value === true;
+    }, {
+      timeoutMs: options.hostTimeoutMs ?? 30_000,
+      intervalMs: options.hostPollIntervalMs ?? 50,
+      what: "the Defold browser host"
     });
+    if (page !== activePage || connectionEpoch !== activeEpoch) {
+      const error = new Error("browser target changed before bundle activation");
+      error.fatal = true;
+      throw error;
+    }
+    const source = await readFile(options.bundleFile, "utf8");
+    if (page !== activePage || connectionEpoch !== activeEpoch) {
+      const error = new Error("browser target changed while reading the bundle for activation");
+      error.fatal = true;
+      throw error;
+    }
+    if (generation !== undefined) emit({ type: "reload-started", id, generation });
+    let result;
+    try {
+      result = await activePage.client.send("Runtime.evaluate", {
+        expression: `globalThis.__defoldHermesDevV1
+          ? globalThis.__defoldHermesDevV1.activate(${JSON.stringify(source)})
+          : { status: "rejected", diagnostic: "browser host is not loaded" }`,
+        returnByValue: true,
+        awaitPromise: false
+      });
+    } catch (error) {
+      if (generation !== undefined) emit({
+        type: "reload-failed",
+        id,
+        generation,
+        diagnostic: error instanceof Error ? error.message : String(error)
+      });
+      throw error;
+    }
     const value = result.result?.value ?? { status: "rejected", diagnostic: "page returned nothing" };
     ++pushed;
     if (generation !== undefined) {

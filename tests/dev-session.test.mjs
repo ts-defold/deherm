@@ -10,6 +10,11 @@ import {
   runDevSession,
   sessionLogEvent
 } from "../packages/cli/src/dev/session.mjs";
+import {
+  bobFailureLogFile,
+  defaultDefoldBundleBuildOutput,
+  defaultDefoldBundleOutput
+} from "../packages/cli/src/dev/defold-builder.mjs";
 import { applyDevEvent, createDevModel } from "../packages/cli/src/dev/model.mjs";
 
 test("normal session logs summarize component snapshots without property values", () => {
@@ -144,6 +149,35 @@ test("development browser launch always requests a fresh debug wasm-web bundle",
     reason: "test browser launch"
   }]);
   assert.equal(result.platform, "wasm-web");
+});
+
+test("default development bundles use a project-keyed native cache outside Defold", () => {
+  const project = path.resolve("/workspace/game");
+  const output = defaultDefoldBundleOutput(project, {
+    env: { XDG_CACHE_HOME: "/cache" },
+    hostPlatform: "linux",
+    userHome: "/home/player"
+  });
+  assert.match(output, /^\/cache\/deherm\/dev-bundles\/[a-f0-9]{24}$/u);
+  assert.equal(path.relative(project, output).startsWith(".."), true);
+  assert.equal(defaultDefoldBundleOutput(project, {
+    env: { XDG_CACHE_HOME: "/cache" },
+    hostPlatform: "linux",
+    userHome: "/home/player"
+  }), output, "the same project reuses its cached bundle root");
+  assert.notEqual(defaultDefoldBundleOutput("/workspace/other", {
+    env: { XDG_CACHE_HOME: "/cache" },
+    hostPlatform: "linux",
+    userHome: "/home/player"
+  }), output, "sibling projects do not overwrite one another");
+
+  const browserBuild = defaultDefoldBundleBuildOutput(project, "wasm-web");
+  assert.equal(browserBuild, path.join(project, "build", "deherm-wasm-web"));
+  assert.equal(bobFailureLogFile(browserBuild), path.join(browserBuild, "log.txt"),
+    "bundle diagnostics follow Bob's actual --output tree");
+  assert.notEqual(browserBuild, path.join(project, "build", "default"),
+    "browser compilation never mutates the live native resource tree");
+  assert.throws(() => defaultDefoldBundleBuildOutput(project, "../../outside"), /Invalid Defold bundle platform/u);
 });
 
 test("one-shot dev session compiles a typed resource generation without claiming activation", async () => {
