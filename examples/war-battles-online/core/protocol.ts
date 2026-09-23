@@ -2,15 +2,15 @@ import { INPUT_BUTTON_MASK, MAX_PLAYERS, SNAPSHOT_BYTES, TICK_RATE } from "./con
 import { WEAPON_COUNT } from "./content.ts";
 
 /**
- * Version 4 adds authoritative chassis state to the compact snapshot framing and
- * reliable control lane.
- * session/control envelope below. Version 2 added the weapon-request byte to
+ * Version 5 adds authoritative weapon-branch state to the compact snapshot and
+ * reliable control lane. Version 4 added authoritative chassis state. Version
+ * 2 added the weapon-request byte to
  * the tick input packet; the packet is still exactly 32 bytes because version 1
  * left byte 15 reserved and zero. The snapshot wire change is intentionally a
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 4;
+export const PROTOCOL_VERSION = 5;
 export const INPUT_PACKET_BYTES = 32;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
@@ -168,6 +168,10 @@ export const CONTROL_BUY_UPGRADE = 1;
 export const CONTROL_SET_WEAPON = 2;
 export const CONTROL_SUICIDE = 3;
 export const CONTROL_SET_CHASSIS = 4;
+/** Selects/purchases one of the two branches for the argument's weapon. */
+export const CONTROL_SET_WEAPON_UPGRADE = 5;
+/** Alias emphasizing that the first selection may spend credits. */
+export const CONTROL_BUY_WEAPON_UPGRADE = CONTROL_SET_WEAPON_UPGRADE;
 
 export const REJECT_VERSION = 1;
 export const REJECT_FULL = 2;

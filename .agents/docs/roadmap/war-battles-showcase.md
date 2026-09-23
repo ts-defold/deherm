@@ -346,6 +346,30 @@ rejection, snapshot rollback/resume, fail-closed control input, and existing
 not claim the complete Stage-3 weapon families, destructible spaces, or final
 renderer/accessibility work listed above.
 
+## Bounded Stage-3 branching weapon tranche
+
+The second Stage-3 vertical slice keeps the six existing weapons and adds two
+data-driven branches to each (blast/piercer, overclock/stabilizer,
+phase/capacitor, slug/fan, napalm/siege, and chain/shard). Each branch is a
+fixed wire id with stat deltas applied to the base weapon at fire time; no new
+bridge or protocol shape is required. A per-player 12-bit unlock mask and
+packed six-weapon branch selection are authoritative fixed-capacity state.
+The first selection spends credits once, while selecting an already-unlocked
+branch is free. The selected branch is captured on each projectile so a later
+selection cannot rewrite in-flight shots.
+
+The reliable control lane carries branch selection, and the expanded versioned
+snapshot preserves unlocks, selections, and projectile branch identity through
+prediction rollback, delta recovery, and reconnect. Bots choose branches from
+the same authoritative world path using a stable tick/slot hash. Defold exposes
+branch one/two as Q/E and keeps the active branch in the compact HUD status.
+Focused tests cover data rows, meaningful fire-time effects, one-time purchase,
+free reselection, invalid IDs, reliable control, and snapshot restoration. The
+raw world image is now 17,752 bytes and the keyframe is 17,768 bytes; the
+updated 200-frame trace measures 1,869–3,201-byte normal deltas (p50 2,438).
+This tranche does not claim persistent destructible spaces, final
+accessibility, or a VM allocation benchmark.
+
 # Verification
 
 The release gate is one reproducible command that builds and exercises all

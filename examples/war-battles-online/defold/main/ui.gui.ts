@@ -5,6 +5,8 @@ import {
   MAX_PLAYERS,
   createPlayerView,
   chassisById,
+  weaponUpgradeById,
+  weaponUpgradeId,
   weaponById,
   createBattleEvent,
   type BattleEvent,
@@ -77,12 +79,14 @@ function statusLine(self: UiSelf): string {
   const weapon = weaponById(self.view.weaponId);
   const chassis = chassisById(self.view.chassisId);
   const ammo = weapon.maximumAmmo === 0 ? "INF" : `${self.view.ammo}`;
+  const branch = (self.view.weaponUpgradeSelections >>> ((weapon.id - 1) * 2)) & 3;
+  const upgradeId = weaponUpgradeId(weapon.id, branch);
+  const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
+  const upgradeLabel = upgrade === undefined ? "BASE" : upgrade.name.toUpperCase();
   const overdrive = self.view.overdriveTicks > 0 ? "  OVERDRIVE" : "";
-  return `${chassis.name.toUpperCase()} [${chassis.role.toUpperCase()}]  HP ${bar(self.view.health, chassis.maxHealth)} ${self.view.health}` +
-    `   AR ${self.view.armor}` +
-    `   ${weapon.name.toUpperCase()} ${ammo}` +
-    `   BOOST ${bar(self.view.boostTicks, 90)}${overdrive}` +
-    `   ROUND ${match?.mode === "offline" ? match.battle.round : 1}`;
+  return `${chassis.name.toUpperCase()} ${chassis.role.toUpperCase()}  HP ${self.view.health}/${chassis.maxHealth}` +
+    ` AR ${self.view.armor}  ${weapon.name.toUpperCase()}/${upgradeLabel} ${ammo}` +
+    `  CR ${self.view.credits} B${self.view.boostTicks} R${match?.mode === "offline" ? match.battle.round : 1}${overdrive}`;
 }
 
 function leaderboard(self: UiSelf): string {
@@ -207,7 +211,7 @@ export default defineComponent({
     if (match === undefined || !match.engaged) return;
     if (!self.engaged) {
       self.engaged = true;
-      gui.setText(self.hint, "ARROWS/WASD DRIVE   SPACE FIRE   SHIFT BOOST   1-6 WEAPON   7-0 CHASSIS   R RESTART");
+      gui.setText(self.hint, "ARROWS/WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 WEAPON  7-0 CHASSIS  Q/E BRANCH  R RESTART");
     }
     gui.setText(self.status, statusLine(self));
     drainPresentation(self, match);

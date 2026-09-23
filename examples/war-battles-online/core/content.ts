@@ -12,6 +12,20 @@ export const WEAPON_SCATTER = 4;
 export const WEAPON_MORTAR = 5;
 export const WEAPON_RICOCHET = 6;
 export const WEAPON_COUNT = 6;
+export const WEAPON_UPGRADE_BRANCHES = 2;
+export const WEAPON_UPGRADE_COUNT = WEAPON_COUNT * WEAPON_UPGRADE_BRANCHES;
+export const WEAPON_UPGRADE_CANNON_BLAST = 1;
+export const WEAPON_UPGRADE_CANNON_PIERCER = 2;
+export const WEAPON_UPGRADE_AUTOCANNON_OVERCLOCK = 3;
+export const WEAPON_UPGRADE_AUTOCANNON_STABILIZER = 4;
+export const WEAPON_UPGRADE_RAILGUN_PHASE = 5;
+export const WEAPON_UPGRADE_RAILGUN_CAPACITOR = 6;
+export const WEAPON_UPGRADE_SCATTER_SLUG = 7;
+export const WEAPON_UPGRADE_SCATTER_FAN = 8;
+export const WEAPON_UPGRADE_MORTAR_NAPALM = 9;
+export const WEAPON_UPGRADE_MORTAR_SIEGE = 10;
+export const WEAPON_UPGRADE_RICOCHET_CHAIN = 11;
+export const WEAPON_UPGRADE_RICOCHET_SHARD = 12;
 /** The weapon a tank always has, with unlimited ammunition. */
 export const SPAWN_WEAPON = WEAPON_CANNON;
 
@@ -79,6 +93,27 @@ export interface WeaponDefinition {
   readonly maximumAmmo: number;
   /** How eagerly a bot prefers this weapon when choosing what to carry. */
   readonly botPreference: number;
+}
+
+export interface WeaponUpgradeDefinition {
+  readonly id: number;
+  readonly weaponId: number;
+  /** Branch number within the weapon, one or two. */
+  readonly branch: number;
+  readonly name: string;
+  readonly cost: number;
+  readonly damageDelta: number;
+  readonly projectileSpeedDelta: number;
+  readonly cooldownDelta: number;
+  readonly lifetimeDelta: number;
+  readonly projectileRadiusDelta: number;
+  readonly pelletsDelta: number;
+  readonly spreadDelta: number;
+  readonly bouncesDelta: number;
+  readonly splashRadiusDelta: number;
+  readonly splashDamageDelta: number;
+  readonly pierceDelta: number;
+  readonly recoilDelta: number;
 }
 
 export interface PickupDefinition {
@@ -278,6 +313,30 @@ export const UPGRADES: readonly (UpgradeDefinition | undefined)[] = Object.freez
   Object.freeze({ id: UPGRADE_ARMOR, name: "armor", maximumLevel: 3, baseCost: 125, costPerLevel: 100 }),
 ]);
 
+const weaponUpgrade = (definition: WeaponUpgradeDefinition): WeaponUpgradeDefinition => Object.freeze(definition);
+
+/**
+ * Two permanent, independently purchasable branches for every weapon. The
+ * rows only contain stat deltas; simulation code applies the selected row to
+ * the base weapon, so adding content never adds another protocol or bridge
+ * route. IDs are dense and stable on the wire: `(weapon - 1) * 2 + branch`.
+ */
+export const WEAPON_UPGRADES: readonly (WeaponUpgradeDefinition | undefined)[] = Object.freeze([
+  undefined,
+  weaponUpgrade({ id: 1, weaponId: WEAPON_CANNON, branch: 1, name: "blast", cost: 125, damageDelta: -4, projectileSpeedDelta: 0, cooldownDelta: 6, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: 0, bouncesDelta: 0, splashRadiusDelta: 32 * 16, splashDamageDelta: 20, pierceDelta: 0, recoilDelta: 0 }),
+  weaponUpgrade({ id: 2, weaponId: WEAPON_CANNON, branch: 2, name: "piercer", cost: 125, damageDelta: 10, projectileSpeedDelta: 80, cooldownDelta: 8, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: 0, bouncesDelta: 0, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 1, recoilDelta: 150 }),
+  weaponUpgrade({ id: 3, weaponId: WEAPON_AUTOCANNON, branch: 1, name: "overclock", cost: 150, damageDelta: -1, projectileSpeedDelta: 0, cooldownDelta: -2, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: 2, bouncesDelta: 0, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 0, recoilDelta: 0 }),
+  weaponUpgrade({ id: 4, weaponId: WEAPON_AUTOCANNON, branch: 2, name: "stabilizer", cost: 150, damageDelta: 3, projectileSpeedDelta: 0, cooldownDelta: 2, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: -7, bouncesDelta: 0, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 0, recoilDelta: -30 }),
+  weaponUpgrade({ id: 5, weaponId: WEAPON_RAILGUN, branch: 1, name: "phase", cost: 200, damageDelta: -8, projectileSpeedDelta: 96, cooldownDelta: 0, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: 0, bouncesDelta: 0, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 1, recoilDelta: 0 }),
+  weaponUpgrade({ id: 6, weaponId: WEAPON_RAILGUN, branch: 2, name: "capacitor", cost: 200, damageDelta: 24, projectileSpeedDelta: 0, cooldownDelta: 18, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: 0, bouncesDelta: 0, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 0, recoilDelta: 250 }),
+  weaponUpgrade({ id: 7, weaponId: WEAPON_SCATTER, branch: 1, name: "slug", cost: 175, damageDelta: 36, projectileSpeedDelta: 88, cooldownDelta: 12, lifetimeDelta: 18, projectileRadiusDelta: 0, pelletsDelta: -6, spreadDelta: -42, bouncesDelta: 0, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 1, recoilDelta: 400 }),
+  weaponUpgrade({ id: 8, weaponId: WEAPON_SCATTER, branch: 2, name: "fan", cost: 175, damageDelta: -2, projectileSpeedDelta: -16, cooldownDelta: 8, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 3, spreadDelta: 12, bouncesDelta: 0, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 0, recoilDelta: 250 }),
+  weaponUpgrade({ id: 9, weaponId: WEAPON_MORTAR, branch: 1, name: "napalm", cost: 225, damageDelta: -8, projectileSpeedDelta: -16, cooldownDelta: 8, lifetimeDelta: 24, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: 0, bouncesDelta: 0, splashRadiusDelta: 24 * 16, splashDamageDelta: 10, pierceDelta: 0, recoilDelta: 0 }),
+  weaponUpgrade({ id: 10, weaponId: WEAPON_MORTAR, branch: 2, name: "siege", cost: 225, damageDelta: 32, projectileSpeedDelta: 32, cooldownDelta: 16, lifetimeDelta: 0, projectileRadiusDelta: 2 * 16, pelletsDelta: 0, spreadDelta: 0, bouncesDelta: 0, splashRadiusDelta: -8 * 16, splashDamageDelta: -4, pierceDelta: 0, recoilDelta: 300 }),
+  weaponUpgrade({ id: 11, weaponId: WEAPON_RICOCHET, branch: 1, name: "chain", cost: 160, damageDelta: -3, projectileSpeedDelta: 0, cooldownDelta: 2, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 0, spreadDelta: 0, bouncesDelta: 2, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 0, recoilDelta: 0 }),
+  weaponUpgrade({ id: 12, weaponId: WEAPON_RICOCHET, branch: 2, name: "shard", cost: 160, damageDelta: -7, projectileSpeedDelta: -16, cooldownDelta: 6, lifetimeDelta: 0, projectileRadiusDelta: 0, pelletsDelta: 2, spreadDelta: 8, bouncesDelta: -2, splashRadiusDelta: 0, splashDamageDelta: 0, pierceDelta: 0, recoilDelta: 0 }),
+]);
+
 export function weaponById(id: number): WeaponDefinition {
   const definition = WEAPONS[id];
   if (definition === undefined) throw new RangeError(`unknown weapon id ${id}`);
@@ -313,6 +372,21 @@ export function upgradeById(id: number): UpgradeDefinition {
 
 export function upgradeCost(upgrade: UpgradeDefinition, currentLevel: number): number {
   return upgrade.baseCost + upgrade.costPerLevel * currentLevel;
+}
+
+export function weaponUpgradeById(id: number): WeaponUpgradeDefinition {
+  const definition = WEAPON_UPGRADES[id];
+  if (definition === undefined) throw new RangeError(`unknown weapon upgrade id ${id}`);
+  return definition;
+}
+
+export function isWeaponUpgradeId(id: number): boolean {
+  return Number.isInteger(id) && id >= 1 && id <= WEAPON_UPGRADE_COUNT;
+}
+
+export function weaponUpgradeId(weaponId: number, branch: number): number {
+  if (!isWeaponId(weaponId) || branch < 1 || branch > WEAPON_UPGRADE_BRANCHES) return 0;
+  return (weaponId - 1) * WEAPON_UPGRADE_BRANCHES + branch;
 }
 
 /** True when the weapon id exists and is carryable. */

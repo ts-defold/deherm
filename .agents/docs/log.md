@@ -2493,3 +2493,35 @@ The 200-frame deterministic snapshot trace now measures 1,918–3,160-byte
 normal deltas with a 2,433-byte median and ten 17,640-byte recovery keyframes.
 These are local deterministic/runtime observations; they do not claim WAN
 latency, production ingress, or a human visual-quality judgment.
+
+## 2026-09-23 - War Battles branching weapon tranche
+
+The second Stage-3 vertical slice adds two data-driven branches to each of the
+six existing weapons. Branch rows contain fixed stat deltas, and the core
+captures the selected branch on each projectile so in-flight shots remain
+authoritative after a later selection. Each player has a fixed 12-bit unlock
+mask plus six packed two-bit selections. The first branch purchase charges its
+cost once; selecting any already-unlocked branch is free.
+
+Branch selection uses a reliable control action, survives the versioned world
+snapshot through rollback/delta/reconnect, and is mirrored into Defold through
+the canonical sync step. Bots choose branches through the same world method
+using a stable tick/slot hash. Defold exposes branch one/two as Q/E and shows
+the active branch in the compact HUD status. Invalid branch ids fail closed.
+Adversarial review found that the incompatible snapshot growth had not bumped
+the outer protocol and that bot fire decisions still used base weapon range,
+splash and bounce values. Protocol v5 now rejects v4 handshakes and frames
+before either peer can interpret the wrong layout; bots derive those tactical
+values from the same selected branch rows captured by fired projectiles. A
+negative close-range test proves Cannon Blast's larger self-damage radius
+suppresses fire where the base cannon may fire. Focused core coverage is 59/59.
+The raw snapshot is now 17,752 bytes and the
+keyframe 17,768 bytes; the deterministic 200-frame trace measures normal
+deltas 1,869–3,201 bytes with a 2,438-byte median. This remains in-process
+protocol/simulation evidence, not a VM allocation benchmark. The final sources
+also passed the owner-run 32-player load and soak records, real Chrome-to-Deno
+QUIC/WebTransport loopback, packaged arm64 Defold launch and graceful exit, and
+Bob wasm-web plus Chrome/WebGL2 runtime/playability gates. The browser gate
+observed the tutorial-to-arena marker chain, restart and sound markers and a
+fully composited frame; it is automated browser evidence rather than a human
+visual-quality judgment or WAN test.

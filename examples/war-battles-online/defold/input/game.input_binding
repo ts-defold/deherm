@@ -83,6 +83,14 @@ key_trigger {
   action: "chassis4"
 }
 key_trigger {
+  input: KEY_Q
+  action: "upgrade1"
+}
+key_trigger {
+  input: KEY_E
+  action: "upgrade2"
+}
+key_trigger {
   input: KEY_R
   action: "restart"
 }

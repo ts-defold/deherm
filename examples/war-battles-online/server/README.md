@@ -118,16 +118,17 @@ whose kind fixes the lane it is allowed on:
 | `reject` | session | server → client | ≤ 102 |
 | `ping` / `pong` | session | both | 12 |
 | `control` | control | client → server | 8 |
-| `snapshot` | snapshot | server → client | 17,640 keyframe; compact delta after join |
+| `snapshot` | snapshot | server → client | 17,768 keyframe; compact delta after join |
 
-`PROTOCOL_VERSION` is 4: the snapshot now carries the authoritative chassis id
-and unlock mask, and the reliable control lane carries chassis selection. The
+`PROTOCOL_VERSION` is 5: the snapshot now carries the authoritative chassis and
+weapon-branch state, and the reliable control lane carries chassis and branch
+selection. The
 input packet is still exactly 32 bytes:
 version 1 reserved byte 15 and wrote zero there, and that byte is now the weapon
 request, so every other field kept its offset.
 
 Snapshot frames have a 16-byte envelope/codec header. A keyframe carries the
-17,624-byte raw world image. Established sessions receive sorted,
+17,752-byte raw world image. Established sessions receive sorted,
 non-overlapping changed-byte runs against their own fixed-capacity baseline;
 the server emits a keyframe at least every 20 snapshots, and a backpressured
 or replaced latest-only frame forces the next one. The client rejects a delta

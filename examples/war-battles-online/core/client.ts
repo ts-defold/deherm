@@ -20,12 +20,13 @@ import {
   SNAPSHOT_BYTES,
   TICK_MILLISECONDS,
 } from "./constants.ts";
-import { isWeaponId } from "./content.ts";
+import { isWeaponId, isWeaponUpgradeId } from "./content.ts";
 import { clamp, createDirection, normalizeInto, type Direction } from "./fixed.ts";
 import { assistedAim, type PlayControls } from "./playable.ts";
 import {
   CONTROL_BYTES,
   CONTROL_SET_CHASSIS,
+  CONTROL_SET_WEAPON_UPGRADE,
   HELLO_BYTES,
   INPUT_PACKET_BYTES,
   MESSAGE_PONG,
@@ -296,6 +297,12 @@ export class BattleClient implements TransportReceiver {
   /** Purchases/switches the local player's chassis on the reliable control lane. */
   sendChassis(chassisId: number): void {
     this.sendControl(CONTROL_SET_CHASSIS, chassisId);
+  }
+
+  /** Purchases/selects a weapon branch on the reliable control lane. */
+  sendWeaponUpgrade(upgradeId: number): void {
+    if (!isWeaponUpgradeId(upgradeId)) return;
+    this.sendControl(CONTROL_SET_WEAPON_UPGRADE, upgradeId);
   }
 
   ping(clientTime: number): void {

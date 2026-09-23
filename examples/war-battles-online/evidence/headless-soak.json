@@ -13,10 +13,10 @@
   "seed": 12648430,
   "matchId": 77,
   "mapSeed": 12648430,
-  "stateHash": 2563301512,
-  "replayBodyHash": 1058935495,
+  "stateHash": 2340706098,
+  "replayBodyHash": 154245043,
   "alivePlayers": 32,
-  "totalKills": 28,
+  "totalKills": 14,
   "rollbackCount": 1,
   "rollbackMatchesUninterrupted": true,
   "sourceInputs": [
@@ -24,8 +24,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 16,
-      "bytes": 241303,
-      "sha256": "a5520a0a48cfd442b6b422600fe5ecea3a15c3a3acf89e8337d308df4f2d24f5"
+      "bytes": 255353,
+      "sha256": "89cc92296270bbf6bff575e66769c5d61e3d8d9bc55bb310ab8e71ee56ef10e9"
     },
     {
       "path": "examples/war-battles-online/headless/fixture.ts",
@@ -76,6 +76,6 @@
       "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
     }
   ],
-  "sourceKey": "522b718ba86edf211e702b34d492caa3eaa2132e2c226d49d9d7f1b25d124f1f",
+  "sourceKey": "6e7f19b4659c4b9c081091d24faab4560eb84700be53282dd9fb3d5570c02cf9",
   "evidenceBoundary": "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence."
 }

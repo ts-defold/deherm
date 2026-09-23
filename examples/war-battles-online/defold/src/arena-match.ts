@@ -19,6 +19,7 @@ import {
   UNITS_PER_PIXEL,
   WORLD_PIXEL_ORIGIN_X,
   WORLD_PIXEL_ORIGIN_Y,
+  weaponUpgradeId,
   type PlayerTransform,
   type PlayControls,
 } from "./generated-war-battles/index";
@@ -106,6 +107,24 @@ export class ArenaMatch {
       return true;
     }
     return this.battle.selectChassis(chassisId);
+  }
+
+  /** Reliable online control or deterministic offline branch purchase/select. */
+  selectWeaponUpgrade(upgradeId: number): boolean {
+    if (this.mode === "online") {
+      this.client?.sendWeaponUpgrade(upgradeId);
+      return true;
+    }
+    return this.battle.selectWeaponUpgrade(upgradeId);
+  }
+
+  selectCurrentWeaponBranch(branch: number): boolean {
+    const world = this.world;
+    const slot = this.localSlot;
+    if (world === undefined || slot < 0) return false;
+    const weaponId = world.playerWeapon[slot]!;
+    const upgradeId = weaponUpgradeId(weaponId, branch);
+    return upgradeId !== 0 && this.selectWeaponUpgrade(upgradeId);
   }
 
   /** Starts a fresh offline round. The authoritative server owns online restarts. */

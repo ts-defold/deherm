@@ -110,7 +110,7 @@ the player an inset copy of that rectangle and the camera the rectangle itself.
 The arena is **point-symmetric and not destructible**. Symmetric because neither
 half of a deathmatch may be the bad half. Not destructible because the grid is
 derived from a four-byte `mapSeed` rather than stored: a joining client rebuilds
-it exactly, and the authoritative snapshot stays a fixed 17,624 bytes with no
+it exactly, and the authoritative snapshot stays a fixed 17,752 bytes with no
 terrain delta codec. Breakable cover would put 10,800 mutable cells on the wire
 or force an encoder this slice does not have — and Quake's arenas are not
 destructible either; cover you learned stays where you learned it.

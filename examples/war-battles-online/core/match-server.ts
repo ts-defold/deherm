@@ -20,6 +20,7 @@ import {
   CONTROL_BUY_UPGRADE,
   CONTROL_SET_WEAPON,
   CONTROL_SET_CHASSIS,
+  CONTROL_SET_WEAPON_UPGRADE,
   INPUT_PACKET_BYTES,
   CONTROL_SUICIDE,
   MESSAGE_CONTROL,
@@ -52,7 +53,7 @@ import {
   writeSnapshotDelta,
   writeSnapshotKeyframe,
 } from "./snapshot.ts";
-import { isWeaponId } from "./content.ts";
+import { isWeaponId, isWeaponUpgradeId } from "./content.ts";
 import { BotController } from "./bots.ts";
 import { BattleWorld } from "./world.ts";
 import {
@@ -568,6 +569,8 @@ export class ServerSession implements TransportReceiver {
       if (isWeaponId(this.control.argument)) this.server.world.playerWeaponRequest[this.slot] = this.control.argument;
     } else if (this.control.action === CONTROL_SET_CHASSIS) {
       this.server.world.selectChassis(playerId, this.control.argument);
+    } else if (this.control.action === CONTROL_SET_WEAPON_UPGRADE) {
+      if (isWeaponUpgradeId(this.control.argument)) this.server.world.applyWeaponUpgrade(playerId, this.control.argument);
     } else if (this.control.action === CONTROL_SUICIDE) {
       this.server.world.playerHealth[this.slot] = 0;
     }

@@ -9,7 +9,7 @@ import {
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
 } from "./constants";
-import { CHASSIS_COUNT, CHASSIS_UNLOCK_MASK, WEAPON_COUNT, chassisUnlockBit } from "./content";
+import { CHASSIS_COUNT, CHASSIS_UNLOCK_MASK, WEAPON_COUNT, WEAPON_UPGRADE_COUNT, chassisUnlockBit, weaponUpgradeById } from "./content";
 import {
   ENVELOPE_MAGIC,
   MESSAGE_SNAPSHOT,
@@ -22,7 +22,7 @@ import {
 import type { BattleWorld } from "./world";
 
 const SNAPSHOT_MAGIC = 0x57425331;
-const SNAPSHOT_VERSION = 3;
+const SNAPSHOT_VERSION = 4;
 
 export interface SnapshotFrameScratch {
   readonly baseline: Uint8Array;
@@ -258,8 +258,10 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
     view.setUint8(cursor + 75, world.playerBoostTicks[slot]!);
     view.setUint8(cursor + 76, world.playerChassis[slot]!);
     view.setUint8(cursor + 77, world.playerChassisUnlocks[slot]!);
+    view.setUint16(cursor + 78, world.playerWeaponUpgradeUnlocks[slot]!, true);
+    view.setUint16(cursor + 80, world.playerWeaponUpgradeSelections[slot]!, true);
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
-      view.setUint16(cursor + 78 + weapon * 2, world.playerAmmo[slot * WEAPON_COUNT + weapon]!, true);
+      view.setUint16(cursor + 82 + weapon * 2, world.playerAmmo[slot * WEAPON_COUNT + weapon]!, true);
     }
     cursor += PLAYER_SNAPSHOT_BYTES;
   }
@@ -279,7 +281,7 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
     view.setUint16(cursor + 22, world.projectileSpeed[slot]!, true);
     view.setUint16(cursor + 24, world.projectileRadius[slot]!, true);
     view.setUint8(cursor + 26, world.projectilePierce[slot]!);
-    view.setUint8(cursor + 27, 0);
+    view.setUint8(cursor + 27, world.projectileUpgrade[slot]!);
     cursor += PROJECTILE_SNAPSHOT_BYTES;
   }
 
@@ -348,15 +350,28 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     world.playerBoostTicks[slot] = view.getUint8(cursor + 75);
     const chassis = view.getUint8(cursor + 76);
     const chassisUnlocks = view.getUint8(cursor + 77);
+    const weaponUpgradeUnlocks = view.getUint16(cursor + 78, true);
+    const weaponUpgradeSelections = view.getUint16(cursor + 80, true);
     if (world.playerActive[slot] !== 0 && (chassis < 1 || chassis > CHASSIS_COUNT)) throw new Error("snapshot chassis id is invalid");
     if ((chassisUnlocks & ~CHASSIS_UNLOCK_MASK) !== 0) throw new Error("snapshot chassis unlock mask is invalid");
     if (world.playerActive[slot] !== 0 && (chassisUnlocks & chassisUnlockBit(chassis)) === 0) {
       throw new Error("snapshot active chassis is not unlocked");
     }
+    if ((weaponUpgradeUnlocks & ~((1 << WEAPON_UPGRADE_COUNT) - 1)) !== 0) throw new Error("snapshot weapon upgrade mask is invalid");
+    for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
+      const branch = (weaponUpgradeSelections >>> (weapon * 2)) & 3;
+      if (branch > 2) throw new Error("snapshot weapon upgrade selection is invalid");
+      if (branch !== 0) {
+        const upgradeId = weapon * 2 + branch;
+        if ((weaponUpgradeUnlocks & (1 << (upgradeId - 1))) === 0) throw new Error("snapshot selected weapon upgrade is locked");
+      }
+    }
     world.playerChassis[slot] = chassis;
     world.playerChassisUnlocks[slot] = chassisUnlocks;
+    world.playerWeaponUpgradeUnlocks[slot] = weaponUpgradeUnlocks;
+    world.playerWeaponUpgradeSelections[slot] = weaponUpgradeSelections;
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
-      world.playerAmmo[slot * WEAPON_COUNT + weapon] = view.getUint16(cursor + 78 + weapon * 2, true);
+      world.playerAmmo[slot * WEAPON_COUNT + weapon] = view.getUint16(cursor + 82 + weapon * 2, true);
     }
     cursor += PLAYER_SNAPSHOT_BYTES;
   }
@@ -376,6 +391,12 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     world.projectileSpeed[slot] = view.getUint16(cursor + 22, true);
     world.projectileRadius[slot] = view.getUint16(cursor + 24, true);
     world.projectilePierce[slot] = view.getUint8(cursor + 26);
+    const projectileUpgrade = view.getUint8(cursor + 27);
+    if (projectileUpgrade > WEAPON_UPGRADE_COUNT) throw new Error("snapshot projectile upgrade is invalid");
+    if (projectileUpgrade !== 0 && weaponUpgradeById(projectileUpgrade).weaponId !== world.projectileWeapon[slot]) {
+      throw new Error("snapshot projectile upgrade weapon mismatch");
+    }
+    world.projectileUpgrade[slot] = projectileUpgrade;
     cursor += PROJECTILE_SNAPSHOT_BYTES;
   }
 

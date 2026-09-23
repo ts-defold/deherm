@@ -21,6 +21,7 @@ import {
   UPGRADE_ARMOR,
   UPGRADE_DAMAGE,
   UPGRADE_MOBILITY,
+  isWeaponUpgradeId,
   isWeaponId,
   weaponById,
 } from "./content.ts";
@@ -154,6 +155,11 @@ export class PlayableBattle {
 
   selectChassis(chassisId: number): boolean {
     return this.world.selectChassis(LOCAL_PLAYER_ID, chassisId);
+  }
+
+  selectWeaponUpgrade(upgradeId: number): boolean {
+    if (!isWeaponUpgradeId(upgradeId)) return false;
+    return this.world.applyWeaponUpgrade(LOCAL_PLAYER_ID, upgradeId);
   }
 
   /** Highest frag count in the match. */

@@ -133,9 +133,9 @@ export const DIRECTION_DIAGONAL = 181;
 
 // --- wire sizes -------------------------------------------------------------
 
-// Two additive bytes carry the authoritative chassis id and a reserved slot;
-// ammo remains aligned and the snapshot stays a fixed-capacity record.
-export const PLAYER_SNAPSHOT_BYTES = 90;
+// Four additive bytes carry a per-player weapon-upgrade unlock mask and packed
+// branch selections; the record remains fixed-capacity and ammo stays aligned.
+export const PLAYER_SNAPSHOT_BYTES = 94;
 export const PROJECTILE_SNAPSHOT_BYTES = 28;
 export const PICKUP_SNAPSHOT_BYTES = 12;
 export const SNAPSHOT_HEADER_BYTES = 24;

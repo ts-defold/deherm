@@ -33,6 +33,8 @@ import {
   WEAPON_COUNT,
   pickupByKind,
   weaponById,
+  weaponUpgradeById,
+  weaponUpgradeId,
 } from "./content";
 import { clamp, length, mixSigned, normalizeInto, createDirection, type Direction } from "./fixed";
 import type { InputCommand } from "./protocol";
@@ -147,11 +149,20 @@ export class BotController {
     let canFire = false;
     if (enemy >= 0 && world.playerActive[enemy] !== 0 && world.playerHealth[enemy]! > 0) {
       const weapon = weaponById(world.playerWeapon[slot]!);
+      const branch = world.weaponUpgradeSelected(slot + 1, weapon.id);
+      const selectedUpgradeId = weaponUpgradeId(weapon.id, branch);
+      const upgrade = selectedUpgradeId !== 0 && world.weaponUpgradeUnlocked(slot + 1, selectedUpgradeId)
+        ? weaponUpgradeById(selectedUpgradeId)
+        : undefined;
+      const projectileSpeed = Math.max(1, weapon.projectileSpeed + (upgrade?.projectileSpeedDelta ?? 0));
+      const lifetimeTicks = Math.max(1, weapon.lifetimeTicks + (upgrade?.lifetimeDelta ?? 0));
+      const splashRadius = Math.max(0, weapon.splashRadius + (upgrade?.splashRadiusDelta ?? 0));
+      const bounces = Math.max(0, weapon.bounces + (upgrade?.bouncesDelta ?? 0));
       const rawX = world.playerX[enemy]! - selfX;
       const rawY = world.playerY[enemy]! - selfY;
       const distance = length(rawX, rawY);
       // Lead by the flight time, scaled by how good this bot is supposed to be.
-      const flightTicks = weapon.projectileSpeed > 0 ? Math.trunc(distance / weapon.projectileSpeed) : 0;
+      const flightTicks = Math.trunc(distance / projectileSpeed);
       const leadScale = Math.trunc((flightTicks * skill.leadAccuracy) / 100);
       const leadX = rawX + Math.trunc((world.playerVelocityX[enemy]! * leadScale) / VELOCITY_SCALE);
       const leadY = rawY + Math.trunc((world.playerVelocityY[enemy]! * leadScale) / VELOCITY_SCALE);
@@ -170,13 +181,13 @@ export class BotController {
         aimX = this.aim.x;
         aimY = this.aim.y;
       }
-      const inRange = distance < weapon.projectileSpeed * weapon.lifetimeTicks;
+      const inRange = distance < projectileSpeed * lifetimeTicks;
       const alignment = Math.trunc(
         (world.playerTurretX[slot]! * aimX + world.playerTurretY[slot]! * aimY) / DIRECTION_SCALE);
-      const sighted = weapon.bounces > 0 || world.map.lineOfSight(selfX, selfY, world.playerX[enemy]!, world.playerY[enemy]!);
+      const sighted = bounces > 0 || world.map.lineOfSight(selfX, selfY, world.playerX[enemy]!, world.playerY[enemy]!);
       // A mortar fired into a wall two metres away kills its owner, so splash
       // weapons hold fire at point-blank range.
-      const tooClose = weapon.splashRadius > 0 && distance < weapon.splashRadius;
+      const tooClose = splashRadius > 0 && distance < splashRadius;
       canFire = inRange && sighted && !tooClose && alignment >= skill.fireCone;
     }
     command.aimX = quantize(aimX);
@@ -219,6 +230,15 @@ export class BotController {
     const nextChassis = (world.playerChassis[slot]! % CHASSIS_COUNT) + 1;
     if (world.playerCredits[slot]! >= chassisById(nextChassis).unlockCost && (hash(tick, slot * 17 + 9) & 0xff) < 4) {
       world.selectChassis(slot + 1, nextChassis);
+    }
+    // Branch purchases and free respecs use the same authoritative path as a
+    // human. The branch choice is a stable hash of tick/slot, so prediction and
+    // server-side bots make identical decisions without per-tick allocations.
+    const weaponId = world.playerWeapon[slot]!;
+    const branch = ((hash(tick, slot * 29 + 7) >>> 3) & 1) + 1;
+    const weaponUpgrade = weaponUpgradeById(weaponUpgradeId(weaponId, branch));
+    if (world.playerCredits[slot]! >= weaponUpgrade.cost || world.weaponUpgradeUnlocked(slot + 1, weaponUpgrade.id)) {
+      world.applyWeaponUpgrade(slot + 1, weaponUpgrade.id);
     }
     const enemy = nearestEnemy(world, slot);
     this.goalTarget[slot] = enemy;

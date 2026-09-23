@@ -15,6 +15,7 @@ import {
   CELL_FLOOR,
   CONTROL_BUY_UPGRADE,
   CONTROL_SET_CHASSIS,
+  CONTROL_SET_WEAPON_UPGRADE,
   EVENT_KILL,
   EVENT_PICKUP_TAKEN,
   HELLO_BYTES,
@@ -40,8 +41,11 @@ import {
   TRANSPORT_CHANNEL_SESSION,
   TRANSPORT_CHANNEL_SNAPSHOT,
   UPGRADE_DAMAGE,
+  WEAPON_UPGRADE_CANNON_BLAST,
+  WEAPON_UPGRADE_CANNON_PIERCER,
   WELCOME_BYTES,
   WEAPON_AUTOCANNON,
+  WEAPON_CANNON,
   WEAPON_MORTAR,
   WEAPON_RICOCHET,
   WEAPON_SCATTER,
@@ -139,6 +143,8 @@ test("session messages round-trip and reject a foreign kind", () => {
   assert.equal(observedWelcome.serverTick, 4_321);
   assert.equal(observedWelcome.snapshotIntervalTicks, 6);
   assert.throws(() => readHello(welcome, observedHello), /not kind/);
+  hello[2] -= 1;
+  assert.throws(() => readHello(hello, observedHello), /version mismatch/);
 });
 
 test("32-player snapshot deltas are compact and keyframes recover the baseline", () => {
@@ -170,9 +176,9 @@ test("32-player snapshot deltas are compact and keyframes recover the baseline",
     baselineTick: -1,
   };
   writeSnapshotKeyframe(frame, 0, first);
-  const legacyV2Frame = frame.slice();
-  legacyV2Frame[2] = 2;
-  assert.throws(() => readSnapshotFrame(legacyV2Frame, scratch), /envelope mismatch/);
+  const previousProtocolFrame = frame.slice();
+  previousProtocolFrame[2] = 4;
+  assert.throws(() => readSnapshotFrame(previousProtocolFrame, scratch), /envelope mismatch/);
   const reservedByteFrame = frame.slice();
   reservedByteFrame[9] = 1;
   assert.throws(() => readSnapshotFrame(reservedByteFrame, scratch), /reserved byte/);
@@ -234,12 +240,12 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   }
   lengths.sort((left, right) => left - right);
   assert.equal(lengths.length, 200);
-  assert.equal(lengths[0], 1_918);
+  assert.equal(lengths[0], 1_869);
   assert.equal(lengths.at(-1), SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_433);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_438);
   assert.equal(lengths.filter((length) => length === SNAPSHOT_MESSAGE_BYTES).length, 10);
   const normal = lengths.filter((length) => length !== SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(normal.at(-1), 3_160);
+  assert.equal(normal.at(-1), 3_201);
 });
 
 test("a replaced in-flight snapshot forces a recovery keyframe", async () => {
@@ -726,6 +732,73 @@ test("chassis weapon masks and handling affect authoritative simulation", () => 
   bulwark.step();
   assert.notEqual(scout.playerWeapon[0], WEAPON_MORTAR, "a weapon outside the chassis mask is rejected");
   assert.ok(Math.abs(scout.playerVelocityX[0]) > Math.abs(bulwark.playerVelocityX[0]), "the scout accelerates faster under identical input");
+});
+
+test("weapon branches are data-driven, purchased once, selected for free, and survive rollback", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1);
+  world.grantCredits(1, 500);
+  assert.equal(world.applyWeaponUpgrade(1, WEAPON_UPGRADE_CANNON_BLAST), true);
+  assert.equal(world.playerCredits[0], 375);
+  assert.equal(world.weaponUpgradeSelected(1, WEAPON_CANNON), 1);
+  assert.equal(world.applyWeaponUpgrade(1, WEAPON_UPGRADE_CANNON_BLAST), true);
+  assert.equal(world.playerCredits[0], 375, "reselecting a purchased branch is free");
+  assert.equal(world.applyWeaponUpgrade(1, WEAPON_UPGRADE_CANNON_PIERCER), true);
+  assert.equal(world.playerCredits[0], 250);
+  assert.equal(world.weaponUpgradeSelected(1, WEAPON_CANNON), 2);
+  const snapshot = new Uint8Array(SNAPSHOT_BYTES);
+  world.writeSnapshot(snapshot);
+  world.applyWeaponUpgrade(1, WEAPON_UPGRADE_CANNON_BLAST);
+  world.restoreSnapshot(snapshot);
+  assert.equal(world.weaponUpgradeSelected(1, WEAPON_CANNON), 2);
+  assert.equal(world.weaponUpgradeUnlocked(1, WEAPON_UPGRADE_CANNON_BLAST), true);
+  world.submitInput(command(1, world.tick + 1, { buttons: INPUT_BUTTON_FIRE, aimX: 127, aimY: 0 }));
+  world.step();
+  const projectile = world.projectileActive.findIndex((active) => active !== 0);
+  assert.ok(projectile >= 0);
+  assert.equal(world.projectileUpgrade[projectile], WEAPON_UPGRADE_CANNON_PIERCER);
+  assert.ok(world.projectileDamage[projectile] > 30, "piercer branch changes the fired damage");
+  assert.equal(world.weaponUpgradeUnlocked(1, 255), false);
+  assert.equal(world.applyWeaponUpgrade(1, 255), false);
+});
+
+test("bots use selected branch splash safety instead of base weapon tactics", () => {
+  const stageAtCloseRange = (blast) => {
+    const world = new BattleWorld(77);
+    world.addPlayer(1, 1);
+    world.addPlayer(2, 2);
+    world.setBotSkill(1, 3);
+    let found = false;
+    for (let cellY = 1; cellY < MAP_HEIGHT - 1 && !found; cellY += 1) {
+      for (let cellX = 1; cellX < MAP_WIDTH - 2; cellX += 1) {
+        if (world.map.solidAt(cellX, cellY) || world.map.solidAt(cellX + 1, cellY)) continue;
+        const x = cellX * 256 + 128;
+        const y = cellY * 256 + 128;
+        world.playerX[0] = x;
+        world.playerY[0] = y;
+        world.playerX[1] = x + 256;
+        world.playerY[1] = y;
+        found = true;
+        break;
+      }
+    }
+    assert.equal(found, true);
+    world.playerTurretX[0] = 256;
+    world.playerTurretY[0] = 0;
+    if (blast) {
+      world.grantCredits(1, 125);
+      assert.equal(world.applyWeaponUpgrade(1, WEAPON_UPGRADE_CANNON_BLAST), true);
+    }
+    const bots = new BotController();
+    bots.goalTarget[0] = 1;
+    bots.decideAt[0] = 0x7fff_ffff;
+    const staged = createInputCommand(77, 1);
+    bots.stage(world, staged, 1, 1);
+    return staged.buttons;
+  };
+
+  assert.notEqual(stageAtCloseRange(false) & INPUT_BUTTON_FIRE, 0, "base cannon may fire at one-cell range");
+  assert.equal(stageAtCloseRange(true) & INPUT_BUTTON_FIRE, 0, "blast branch respects its larger self-damage radius");
 });
 
 // --- bots -------------------------------------------------------------------
@@ -1387,7 +1460,7 @@ test("a control message buys an upgrade through the reliable lane", async () => 
   await settle();
   server.step();
   await settle();
-  server.world.grantCredits(client.playerId, 500);
+  server.world.grantCredits(client.playerId, 600);
   const before = server.world.playerDamageLevel[client.playerId - 1];
   client.sendControl(CONTROL_BUY_UPGRADE, UPGRADE_DAMAGE);
   await settle();
@@ -1397,6 +1470,9 @@ test("a control message buys an upgrade through the reliable lane", async () => 
   await settle();
   assert.equal(server.world.playerChassis[client.playerId - 1], CHASSIS_BULWARK);
   assert.ok(server.world.playerCredits[client.playerId - 1] < chassisCredits);
+  client.sendControl(CONTROL_SET_WEAPON_UPGRADE, WEAPON_UPGRADE_CANNON_BLAST);
+  await settle();
+  assert.equal(server.world.weaponUpgradeSelected(client.playerId, WEAPON_CANNON), 1);
   assert.deepEqual(errors, []);
   server.close();
 });

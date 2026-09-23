@@ -34,6 +34,8 @@ const CHASSIS_1 = hashLiteral("#chassis1");
 const CHASSIS_2 = hashLiteral("#chassis2");
 const CHASSIS_3 = hashLiteral("#chassis3");
 const CHASSIS_4 = hashLiteral("#chassis4");
+const UPGRADE_1 = hashLiteral("#upgrade1");
+const UPGRADE_2 = hashLiteral("#upgrade2");
 const RESTART = hashLiteral("#restart");
 
 /**
@@ -290,6 +292,11 @@ export default defineComponent({
     const chassis = actionId === CHASSIS_1 ? 1 : actionId === CHASSIS_2 ? 2 : actionId === CHASSIS_3 ? 3 : actionId === CHASSIS_4 ? 4 : 0;
     if (chassis !== 0) {
       if (action.pressed) arenaMatch()?.selectChassis(chassis);
+      engage(self);
+      return true;
+    }
+    if (actionId === UPGRADE_1 || actionId === UPGRADE_2) {
+      if (action.pressed) arenaMatch()?.selectCurrentWeaponBranch(actionId === UPGRADE_1 ? 1 : 2);
       engage(self);
       return true;
     }

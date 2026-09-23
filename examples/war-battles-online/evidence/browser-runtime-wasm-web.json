@@ -27,8 +27,8 @@
     ]
   },
   "platform": "wasm-web",
-  "bundleFingerprint": "a0d41e4e5986bc1114576c2e2f2d6500ff9b7e2ffb01f9dba7619c176821b749",
-  "bundleSha256": "d8bafa57f214b3596e708f0417d2178810f263760c0c76f0a8691c3bb033aaaf",
+  "bundleFingerprint": "245537836ef5ec51de90a19014e39c59d5857a8678a79e93cac6dab1831435b2",
+  "bundleSha256": "d72615701235e5bd33d41b75a169dda5a1e5ed29de90c254a60dfa7adca7b730",
   "state": {
     "documentReady": "complete",
     "engineStarted": true,
@@ -42,7 +42,7 @@
       "ExampleMath",
       "Timer"
     ],
-    "bundleFingerprint": "a0d41e4e5986bc1114576c2e2f2d6500ff9b7e2ffb01f9dba7619c176821b749",
+    "bundleFingerprint": "245537836ef5ec51de90a19014e39c59d5857a8678a79e93cac6dab1831435b2",
     "canvas": {
       "width": 756,
       "height": 425

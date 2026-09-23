@@ -45,9 +45,12 @@ import {
   UPGRADE_MOBILITY,
   WEAPON_COUNT,
   isWeaponId,
+  isWeaponUpgradeId,
   pickupByKind,
   upgradeById,
   upgradeCost,
+  weaponUpgradeById,
+  weaponUpgradeId,
   weaponById,
 } from "./content.ts";
 import {
@@ -98,6 +101,8 @@ export interface PlayerView {
   botSkill: number;
   chassisId: number;
   chassisUnlocks: number;
+  weaponUpgradeUnlocks: number;
+  weaponUpgradeSelections: number;
 }
 
 export interface ProjectileView {
@@ -155,6 +160,10 @@ export class BattleWorld {
   readonly playerWeapon = new Uint8Array(MAX_PLAYERS);
   readonly playerChassis = new Uint8Array(MAX_PLAYERS);
   readonly playerChassisUnlocks = new Uint8Array(MAX_PLAYERS);
+  /** Twelve one-time branch unlocks, two per weapon. */
+  readonly playerWeaponUpgradeUnlocks = new Uint16Array(MAX_PLAYERS);
+  /** Six two-bit branch selections packed into one u16 per player. */
+  readonly playerWeaponUpgradeSelections = new Uint16Array(MAX_PLAYERS);
   readonly playerDamageLevel = new Uint8Array(MAX_PLAYERS);
   readonly playerMobilityLevel = new Uint8Array(MAX_PLAYERS);
   readonly playerArmorLevel = new Uint8Array(MAX_PLAYERS);
@@ -205,6 +214,8 @@ export class BattleWorld {
   readonly projectileRadius = new Uint16Array(MAX_PROJECTILES);
   readonly projectileBounces = new Uint8Array(MAX_PROJECTILES);
   readonly projectilePierce = new Uint8Array(MAX_PROJECTILES);
+  /** Selected upgrade is captured at fire time, preserving projectile behaviour across respec. */
+  readonly projectileUpgrade = new Uint8Array(MAX_PROJECTILES);
 
   readonly pickupKind = new Uint8Array(MAX_PICKUPS);
   readonly pickupActive = new Uint8Array(MAX_PICKUPS);
@@ -264,6 +275,8 @@ export class BattleWorld {
     const chassisId = defaultChassisForSlot(slot);
     this.playerChassis[slot] = chassisId;
     this.playerChassisUnlocks[slot] = chassisUnlockBit(1) | chassisUnlockBit(chassisId);
+    this.playerWeaponUpgradeUnlocks[slot] = 0;
+    this.playerWeaponUpgradeSelections[slot] = 0;
     this.playerLastInputTick[slot] = -1;
     this.spawn(slot, x, y);
     return entityId(ENTITY_KIND_PLAYER, slot, generation);
@@ -402,6 +415,39 @@ export class BattleWorld {
     return true;
   }
 
+  /** Purchases a branch once, then selects any unlocked branch for free. */
+  applyWeaponUpgrade(playerId: number, upgradeId: number): boolean {
+    if (!isWeaponUpgradeId(upgradeId)) return false;
+    const slot = activePlayerSlot(this, playerId);
+    const definition = weaponUpgradeById(upgradeId);
+    const bit = 1 << (upgradeId - 1);
+    if ((this.playerWeaponUpgradeUnlocks[slot]! & bit) === 0) {
+      if (this.playerCredits[slot]! < definition.cost) return false;
+      this.playerCredits[slot] = this.playerCredits[slot]! - definition.cost;
+      this.playerWeaponUpgradeUnlocks[slot] = this.playerWeaponUpgradeUnlocks[slot]! | bit;
+    }
+    const shift = (definition.weaponId - 1) * 2;
+    this.playerWeaponUpgradeSelections[slot] =
+      (this.playerWeaponUpgradeSelections[slot]! & ~(3 << shift)) | (definition.branch << shift);
+    return true;
+  }
+
+  selectWeaponUpgrade(playerId: number, upgradeId: number): boolean {
+    return this.applyWeaponUpgrade(playerId, upgradeId);
+  }
+
+  weaponUpgradeSelected(playerId: number, weaponId: number): number {
+    if (!isWeaponId(weaponId)) return 0;
+    const slot = playerSlot(playerId);
+    return (this.playerWeaponUpgradeSelections[slot]! >>> ((weaponId - 1) * 2)) & 3;
+  }
+
+  weaponUpgradeUnlocked(playerId: number, upgradeId: number): boolean {
+    if (!isWeaponUpgradeId(upgradeId)) return false;
+    const slot = playerSlot(playerId);
+    return (this.playerWeaponUpgradeUnlocks[slot]! & (1 << (upgradeId - 1))) !== 0;
+  }
+
   // --- reads ----------------------------------------------------------------
 
   readPlayer(playerId: number, output: PlayerView): boolean {
@@ -438,6 +484,8 @@ export class BattleWorld {
     output.botSkill = this.playerBotSkill[slot]!;
     output.chassisId = this.playerChassis[slot]!;
     output.chassisUnlocks = this.playerChassisUnlocks[slot]!;
+    output.weaponUpgradeUnlocks = this.playerWeaponUpgradeUnlocks[slot]!;
+    output.weaponUpgradeSelections = this.playerWeaponUpgradeSelections[slot]!;
     return active;
   }
 
@@ -711,6 +759,8 @@ export class BattleWorld {
   private tryFire(slot: number): void {
     if (this.playerCooldown[slot] !== 0 || this.playerHealth[slot]! <= 0) return;
     const weapon = weaponById(this.playerWeapon[slot]!);
+    const selectedUpgrade = this.selectedWeaponUpgrade(slot, weapon.id);
+    const upgrade = selectedUpgrade === 0 ? undefined : weaponUpgradeById(selectedUpgrade);
     if (weapon.maximumAmmo > 0) {
       if (this.ammoOf(slot, weapon.id) === 0) {
         // Out of ammunition falls back to the spawn weapon rather than jamming.
@@ -725,22 +775,24 @@ export class BattleWorld {
     const muzzleX = this.playerX[slot]! + Math.trunc((turretX * MUZZLE_OFFSET) / DIRECTION_SCALE);
     const muzzleY = this.playerY[slot]! + Math.trunc((turretY * MUZZLE_OFFSET) / DIRECTION_SCALE);
     const overdrive = this.playerOverdriveTicks[slot]! > 0;
-    const damage = (weapon.damage + this.playerDamageLevel[slot]! * 4) * (overdrive ? 2 : 1);
+    const damage = (weapon.damage + (upgrade?.damageDelta ?? 0) + this.playerDamageLevel[slot]! * 4) * (overdrive ? 2 : 1);
+    const pellets = Math.max(1, weapon.pellets + (upgrade?.pelletsDelta ?? 0));
+    const spread = Math.max(0, weapon.spread + (upgrade?.spreadDelta ?? 0));
 
-    for (let pellet = 0; pellet < weapon.pellets; pellet += 1) {
+    for (let pellet = 0; pellet < pellets; pellet += 1) {
       const projectile = this.acquireProjectile();
       if (projectile < 0) break;
-      if (weapon.spread === 0 && weapon.pellets === 1) {
+      if (spread === 0 && pellets === 1) {
         this.pelletDirection.x = turretX;
         this.pelletDirection.y = turretY;
       } else {
         // A fixed fan for multi-pellet weapons plus a deterministic jitter keyed
         // by tick and slot, so two clients predicting the same shot agree.
-        const fan = weapon.pellets > 1
-          ? Math.trunc((weapon.spread * (pellet * 2 - (weapon.pellets - 1))) / (weapon.pellets - 1))
+        const fan = pellets > 1
+          ? Math.trunc((spread * (pellet * 2 - (pellets - 1))) / (pellets - 1))
           : 0;
-        const jitter = weapon.spread === 0 ? 0
-          : (((this.tick * 2_246_822_519 + (slot + 1) * 374_761_393 + pellet * 668_265_263) >>> 0) % (weapon.spread * 2 + 1)) - weapon.spread;
+        const jitter = spread === 0 ? 0
+          : (((this.tick * 2_246_822_519 + (slot + 1) * 374_761_393 + pellet * 668_265_263) >>> 0) % (spread * 2 + 1)) - spread;
         spreadInto(turretX, turretY, fan + Math.trunc(jitter / 2), this.pelletDirection);
       }
       this.projectileActive[projectile] = 1;
@@ -751,16 +803,18 @@ export class BattleWorld {
       this.projectileDirectionY[projectile] = this.pelletDirection.y;
       this.projectileX[projectile] = muzzleX;
       this.projectileY[projectile] = muzzleY;
-      this.projectileLife[projectile] = weapon.lifetimeTicks;
-      this.projectileSpeed[projectile] = weapon.projectileSpeed;
-      this.projectileRadius[projectile] = weapon.projectileRadius;
-      this.projectileBounces[projectile] = weapon.bounces;
-      this.projectilePierce[projectile] = weapon.pierce;
+      this.projectileLife[projectile] = Math.max(1, weapon.lifetimeTicks + (upgrade?.lifetimeDelta ?? 0));
+      this.projectileSpeed[projectile] = Math.max(1, weapon.projectileSpeed + (upgrade?.projectileSpeedDelta ?? 0));
+      this.projectileRadius[projectile] = Math.max(1, weapon.projectileRadius + (upgrade?.projectileRadiusDelta ?? 0));
+      this.projectileBounces[projectile] = Math.max(0, weapon.bounces + (upgrade?.bouncesDelta ?? 0));
+      this.projectilePierce[projectile] = Math.max(0, weapon.pierce + (upgrade?.pierceDelta ?? 0));
+      this.projectileUpgrade[projectile] = selectedUpgrade;
     }
 
-    this.playerCooldown[slot] = weapon.cooldownTicks;
-    this.playerVelocityX[slot] = this.playerVelocityX[slot]! - Math.trunc((turretX * weapon.recoil) / DIRECTION_SCALE);
-    this.playerVelocityY[slot] = this.playerVelocityY[slot]! - Math.trunc((turretY * weapon.recoil) / DIRECTION_SCALE);
+    this.playerCooldown[slot] = Math.max(1, weapon.cooldownTicks + (upgrade?.cooldownDelta ?? 0));
+    const recoil = Math.max(0, weapon.recoil + (upgrade?.recoilDelta ?? 0));
+    this.playerVelocityX[slot] = this.playerVelocityX[slot]! - Math.trunc((turretX * recoil) / DIRECTION_SCALE);
+    this.playerVelocityY[slot] = this.playerVelocityY[slot]! - Math.trunc((turretY * recoil) / DIRECTION_SCALE);
     this.events.push(EVENT_FIRE, slot + 1, weapon.id, muzzleX, muzzleY, this.tick);
   }
 
@@ -936,10 +990,14 @@ export class BattleWorld {
 
   private detonate(projectile: number, x: number, y: number): void {
     const weapon = weaponById(this.projectileWeapon[projectile]!);
+    const upgradeId = this.projectileUpgrade[projectile]!;
+    const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
+    const splashRadius = Math.max(0, weapon.splashRadius + (upgrade?.splashRadiusDelta ?? 0));
+    const splashDamage = Math.max(0, weapon.splashDamage + (upgrade?.splashDamageDelta ?? 0));
     const ownerSlot = this.projectileOwner[projectile]! - 1;
     this.projectileActive[projectile] = 0;
-    if (weapon.splashRadius > 0) {
-      const radiusSquared = weapon.splashRadius * weapon.splashRadius;
+    if (splashRadius > 0) {
+      const radiusSquared = splashRadius * splashRadius;
       for (let target = 0; target < MAX_PLAYERS; target += 1) {
         if (this.playerActive[target] === 0 || this.playerHealth[target]! <= 0) continue;
         const dx = this.playerX[target]! - x;
@@ -949,7 +1007,7 @@ export class BattleWorld {
         // Splash falls off linearly and is halved on the shooter, which keeps
         // rocket-jumping viable without making it free.
         const distance = length(dx, dy);
-        let splash = Math.trunc((weapon.splashDamage * (weapon.splashRadius - distance)) / weapon.splashRadius);
+        let splash = Math.trunc((splashDamage * (splashRadius - distance)) / splashRadius);
         if (target === ownerSlot) splash = Math.trunc(splash / 2);
         else if (ownerSlot >= 0 && this.sameTeam(ownerSlot, target)) continue;
         if (splash <= 0) continue;
@@ -965,11 +1023,20 @@ export class BattleWorld {
 
   private expire(projectile: number): void {
     const weapon = weaponById(this.projectileWeapon[projectile]!);
-    if (weapon.splashRadius > 0) {
+    const upgradeId = this.projectileUpgrade[projectile]!;
+    const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
+    if (weapon.splashRadius + (upgrade?.splashRadiusDelta ?? 0) > 0) {
       this.detonate(projectile, this.projectileX[projectile]!, this.projectileY[projectile]!);
       return;
     }
     this.projectileActive[projectile] = 0;
+  }
+
+  private selectedWeaponUpgrade(slot: number, weaponId: number): number {
+    const branch = (this.playerWeaponUpgradeSelections[slot]! >>> ((weaponId - 1) * 2)) & 3;
+    if (branch < 1 || branch > 2) return 0;
+    const id = weaponUpgradeId(weaponId, branch);
+    return (this.playerWeaponUpgradeUnlocks[slot]! & (1 << (id - 1))) !== 0 ? id : 0;
   }
 
   private stepPickups(): void {
@@ -1081,7 +1148,7 @@ export function createPlayerView(): PlayerView {
     health: 0, armor: 0, score: 0, deaths: 0, credits: 0, weaponId: 0, ammo: 0,
     cooldown: 0, respawnTicks: 0, spawnProtectTicks: 0, overdriveTicks: 0,
     boostTicks: 0, damageLevel: 0, mobilityLevel: 0, armorLevel: 0, botSkill: 0,
-    chassisId: 1, chassisUnlocks: chassisUnlockBit(1),
+    chassisId: 1, chassisUnlocks: chassisUnlockBit(1), weaponUpgradeUnlocks: 0, weaponUpgradeSelections: 0,
   };
 }
 

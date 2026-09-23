@@ -483,7 +483,7 @@
     "maxSnapshotsIgnored": 0
   },
   "convergence": {
-    "authoritativeHash": 1046632383,
+    "authoritativeHash": 504457375,
     "allClientsConverged": true,
     "uniquePlayerIds": 32,
     "finalTick": 600
@@ -501,8 +501,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 16,
-      "bytes": 241303,
-      "sha256": "a5520a0a48cfd442b6b422600fe5ecea3a15c3a3acf89e8337d308df4f2d24f5"
+      "bytes": 255353,
+      "sha256": "89cc92296270bbf6bff575e66769c5d61e3d8d9bc55bb310ab8e71ee56ef10e9"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
@@ -541,5 +541,5 @@
       "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
     }
   ],
-  "sourceKey": "1209d9ab31c7ed1217beef43d6e7fb07ee3624d20c86c652321e78468cd4c952"
+  "sourceKey": "1116919c5008c6d5529bb877ad4fd2cc665916253db35b7b1347967ff5984696"
 }
