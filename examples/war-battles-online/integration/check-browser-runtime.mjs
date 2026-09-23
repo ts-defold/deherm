@@ -57,8 +57,6 @@ export const REQUIRED_ENGINE_MARKER_PATTERNS = Object.freeze([
 ]);
 
 export const REQUIRED_GAME_MARKERS = Object.freeze([
-  "war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
-  "war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
   "war-battles:ui-init",
   "war-battles:player-init:560.0:360.0",
   "war-battles:player-fire:560.0:360.0:1.00:0.00",
@@ -72,6 +70,11 @@ export const REQUIRED_GAME_MARKERS = Object.freeze([
   // marker is what distinguishes "the tutorial loop ran" from "the game started".
   "war-battles:arena-init:players=8:online=0",
   "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
+]);
+
+export const REQUIRED_GAME_MARKER_PATTERNS = Object.freeze([
+  /^war-battles:camera-init:zoom=([0-9]+(?:\.[0-9]+)?):view=([0-9]+)x([0-9]+):cameras=1$/u,
+  /^war-battles:camera-bounds:x=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]:y=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]$/u
 ]);
 
 /**
@@ -115,6 +118,11 @@ function missing(transcript) {
       absent.push({ kind: "pattern", marker: pattern.source });
     }
   }
+  for (const pattern of REQUIRED_GAME_MARKER_PATTERNS) {
+    if (!transcript.some((line) => pattern.test(line))) {
+      absent.push({ kind: "game-pattern", marker: pattern.source });
+    }
+  }
   for (const prefix of REQUIRED_GAME_MARKER_PREFIXES) {
     if (!transcript.some((line) => line.startsWith(prefix))) absent.push({ kind: "prefix", marker: prefix });
   }
@@ -124,6 +132,38 @@ function missing(transcript) {
     }
   }
   return absent;
+}
+
+function cameraGeometry(transcript) {
+  const init = transcript.map((line) => REQUIRED_GAME_MARKER_PATTERNS[0].exec(line)).find(Boolean);
+  const bounds = transcript.map((line) => REQUIRED_GAME_MARKER_PATTERNS[1].exec(line)).find(Boolean);
+  assert.ok(init, "Browser camera initialization marker is missing");
+  assert.ok(bounds, "Browser camera bounds marker is missing");
+  const geometry = {
+    zoom: Number(init[1]),
+    viewWidth: Number(init[2]),
+    viewHeight: Number(init[3]),
+    minX: Number(bounds[1]),
+    maxX: Number(bounds[2]),
+    minY: Number(bounds[3]),
+    maxY: Number(bounds[4])
+  };
+  assert.ok(geometry.zoom > 0, "Browser camera zoom must be positive");
+  assert.ok(Math.abs(geometry.viewWidth / geometry.viewHeight - 16 / 9) < 0.01,
+    "Browser camera view must preserve the authored 16:9 aspect ratio");
+  assert.ok(Math.abs(geometry.zoom * geometry.viewWidth - 1280) < 2,
+    "Browser auto-fit width must project the authored 1280-pixel display");
+  assert.ok(Math.abs(geometry.zoom * geometry.viewHeight - 720) < 2,
+    "Browser auto-fit height must project the authored 720-pixel display");
+  assert.ok(Math.abs(geometry.minX - geometry.viewWidth / 2 - (-312)) < 1,
+    "Browser camera minimum X must preserve the authored world bound");
+  assert.ok(Math.abs(geometry.maxX + geometry.viewWidth / 2 - 1608) < 1,
+    "Browser camera maximum X must preserve the authored world bound");
+  assert.ok(Math.abs(geometry.minY - geometry.viewHeight / 2 - (-352)) < 1,
+    "Browser camera minimum Y must preserve the authored world bound");
+  assert.ok(Math.abs(geometry.maxY + geometry.viewHeight / 2 - 1088) < 1,
+    "Browser camera maximum Y must preserve the authored world bound");
+  return geometry;
 }
 
 async function run() {
@@ -142,20 +182,16 @@ async function run() {
     chromeBinary,
     // This gate asserts over the whole transcript, so it keeps one.
     retain: true,
+    // Attach CDP and enable Runtime before the first Defold byte executes so
+    // engine/bootstrap console evidence cannot race the observer.
+    deferNavigation: true,
     keepProfile: argumentSet.has("--keep")
   });
   const { client, pageUrl, profile } = page;
 
   try {
-    // Clear before requesting the reload. Chrome can deliver
-    // executionContextsCleared after the new page has already logged its
-    // startup; clearing after that event discarded the very run being tested.
-    client.transcript.length = 0;
-    client.failures.length = 0;
-    const cleared = client.waitForEvent("Runtime.executionContextsCleared");
     const loaded = client.waitForEvent("Page.loadEventFired");
-    await client.send("Page.reload", { ignoreCache: true });
-    await cleared;
+    await client.send("Page.navigate", { url: pageUrl });
     await loaded;
 
     const timeoutMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_BROWSER_TIMEOUT_MS ?? "45000", 10);
@@ -163,8 +199,9 @@ async function run() {
       await waitFor(async () => missing(client.transcript).length === 0,
         { timeoutMs, intervalMs: 250, what: `the required marker set (absent: ${JSON.stringify(missing(client.transcript))})` });
     } catch (error) {
+      const head = client.transcript.slice(0, 40);
       const tail = client.transcript.slice(-40);
-      throw new Error(`${error.message}\nTranscript tail: ${JSON.stringify(tail)}\nPage failures: ${JSON.stringify(client.failures)}`);
+      throw new Error(`${error.message}\nTranscript head: ${JSON.stringify(head)}\nTranscript tail: ${JSON.stringify(tail)}\nPage failures: ${JSON.stringify(client.failures)}`);
     }
 
     const state = await client.send("Runtime.evaluate", {
@@ -195,6 +232,7 @@ async function run() {
     assert.deepEqual(fatal, [], `Browser page errors: ${JSON.stringify(fatal)}`);
 
     const cameraSamples = client.transcript.filter((line) => line.startsWith("war-battles:camera:"));
+    const observedCamera = cameraGeometry(client.transcript);
     const evidence = {
       schemaVersion: 2,
       projection: projectionEnvelope(PROJECTION_ID),
@@ -205,7 +243,9 @@ async function run() {
       requiredEngineMarkers: [...REQUIRED_ENGINE_MARKERS],
       requiredEngineMarkerPatterns: REQUIRED_ENGINE_MARKER_PATTERNS.map((pattern) => pattern.source),
       requiredGameMarkers: [...REQUIRED_GAME_MARKERS],
+      requiredGameMarkerPatterns: REQUIRED_GAME_MARKER_PATTERNS.map((pattern) => pattern.source),
       observedGameMarkers: client.transcript.filter((line) => line.startsWith("war-battles:") && !line.startsWith("war-battles:camera:")),
+      observedCamera,
       cameraSampleCount: cameraSamples.length,
       cameraClampStates: [...new Set(cameraSamples.map((line) => line.slice(line.lastIndexOf(":clamped=") + 9)))].sort(),
       pageErrors: fatal
@@ -220,6 +260,8 @@ async function run() {
       const recorded = JSON.parse(await readFile(evidencePath, "utf8"));
       assert.equal(recorded.bundleFingerprint, evidence.bundleFingerprint, "Recorded browser evidence is stale");
       assert.deepEqual(recorded.requiredGameMarkers, evidence.requiredGameMarkers, "Recorded browser marker set is stale");
+      assert.deepEqual(recorded.requiredGameMarkerPatterns, evidence.requiredGameMarkerPatterns,
+        "Recorded browser semantic marker set is stale");
       console.log(`war-battles-browser-runtime:evidence-fresh:${recorded.bundleFingerprint}`);
     }
     return evidence;

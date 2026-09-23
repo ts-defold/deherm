@@ -3,6 +3,7 @@ import test from "node:test";
 
 import {
   ArenaMap,
+  adoptServerWebTransportSession,
   BattleClient,
   CELL_WALL,
   cellOfX,
@@ -10,6 +11,7 @@ import {
   BattleWorld,
   BotController,
   BrowserWebTransportClient,
+  DenoWebTransportServer,
   CELL_FLOOR,
   CONTROL_BUY_UPGRADE,
   EVENT_KILL,
@@ -111,13 +113,14 @@ test("session messages round-trip and reject a foreign kind", () => {
   const welcome = new Uint8Array(WELCOME_BYTES);
   writeWelcome(welcome, {
     matchId: 77, playerId: 3, team: 1, maximumPlayers: 8, botCount: 5,
-    mapSeed: 0x1234_5678, serverTick: 4_321, tickRate: 60, resumeToken: token,
+    mapSeed: 0x1234_5678, serverTick: 4_321, tickRate: 60, snapshotIntervalTicks: 6, resumeToken: token,
   });
-  const observedWelcome = { matchId: 0, playerId: 0, team: 0, maximumPlayers: 0, botCount: 0, mapSeed: 0, serverTick: 0, tickRate: 0, resumeToken: new Uint8Array(RESUME_TOKEN_BYTES) };
+  const observedWelcome = { matchId: 0, playerId: 0, team: 0, maximumPlayers: 0, botCount: 0, mapSeed: 0, serverTick: 0, tickRate: 0, snapshotIntervalTicks: 0, resumeToken: new Uint8Array(RESUME_TOKEN_BYTES) };
   readWelcome(welcome, observedWelcome);
   assert.equal(observedWelcome.playerId, 3);
   assert.equal(observedWelcome.mapSeed, 0x1234_5678);
   assert.equal(observedWelcome.serverTick, 4_321);
+  assert.equal(observedWelcome.snapshotIntervalTicks, 6);
   assert.throws(() => readHello(welcome, observedHello), /not kind/);
 });
 
@@ -618,6 +621,22 @@ test("two clients join one authoritative match, replace bots and stay in sync", 
   server.close();
 });
 
+test("the first post-welcome input is accepted before the next server tick", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, inputBudgetPerTick: 1, onError: (error) => errors.push(error) });
+  const client = join(server, "eager", errors);
+  await settle();
+  assert.equal(client.state, "ready");
+  client.setControls({ moveX: 1, moveY: 0, fire: false });
+  client.update(TICK_MILLISECONDS);
+  await settle();
+  assert.equal(client.state, "ready");
+  assert.equal(server.stats.inputsAccepted, 1);
+  assert.equal(server.stats.inputsRejected, 0);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
 test("a client that falls behind reconciles by replaying its own inputs", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 4, botSkill: 1, onError: (error) => errors.push(error) });
@@ -641,6 +660,84 @@ test("a client that falls behind reconciles by replaying its own inputs", async 
   assert.ok(client.stats.snapshotsApplied > 0);
   assert.deepEqual(errors, []);
   server.close();
+});
+
+test("remote presentation uses bounded 20 Hz interpolation while local stays predicted", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, botSkill: 1, onError: (error) => errors.push(error) });
+  const client = join(server, "presenter", errors);
+  await settle();
+  // Three 60 Hz ticks are one authoritative 20 Hz snapshot interval.
+  server.step();
+  server.step();
+  server.step();
+  await settle();
+  client.update(0);
+  const remoteSlot = client.playerId === 1 ? 1 : 0;
+  const first = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
+  assert.equal(client.samplePlayerTransform(remoteSlot, first), true);
+
+  server.step();
+  server.step();
+  server.step();
+  await settle();
+  client.update(0);
+  const atSnapshot = { ...first };
+  assert.equal(client.samplePlayerTransform(remoteSlot, atSnapshot), true);
+  assert.deepEqual(atSnapshot, first, "a new snapshot starts the remote interpolation at the prior sample");
+  client.update(25);
+  const halfway = { ...first };
+  assert.equal(client.samplePlayerTransform(remoteSlot, halfway), true);
+  client.update(25);
+  const current = { ...first };
+  assert.equal(client.samplePlayerTransform(remoteSlot, current), true);
+  assert.equal(current.x, server.world.playerX[remoteSlot], "remote presentation reaches the authoritative sample");
+
+  client.setControls({ moveX: 1, moveY: 0, fire: false });
+  client.update(TICK_MILLISECONDS * 4);
+  const local = { ...first };
+  assert.equal(client.samplePlayerTransform(client.playerId - 1, local), true);
+  assert.equal(local.x, client.world.playerX[client.playerId - 1], "local presentation remains immediate prediction");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("remote interpolation follows a six-tick cadence after snapshot coalescing", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, botSkill: 1, snapshotIntervalTicks: 6, onError: (error) => errors.push(error) });
+  const client = join(server, "six-tick-presenter", errors);
+  await settle();
+
+  // Apply the first sample, then let two six-tick snapshots coalesce while the
+  // client is away. The presentation delay must remain one server interval,
+  // not the old hard-coded three ticks or the full received tick gap.
+  for (let tick = 0; tick < 6; tick += 1) server.step();
+  await settle();
+  client.update(0);
+  const remoteSlot = client.playerId === 1 ? 1 : 0;
+  const first = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
+  assert.equal(client.samplePlayerTransform(remoteSlot, first), true);
+  for (let tick = 0; tick < 12; tick += 1) server.step();
+  await settle();
+  client.update(0);
+  const halfway = { ...first };
+  client.update(50);
+  assert.equal(client.samplePlayerTransform(remoteSlot, halfway), true);
+  const current = { ...first };
+  client.update(50);
+  assert.equal(client.samplePlayerTransform(remoteSlot, current), true);
+  assert.equal(current.x, server.world.playerX[remoteSlot]);
+  assert.equal(halfway.x, Math.trunc((first.x + current.x) / 2));
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("client close lifecycle reports a pre-welcome failure", () => {
+  const closes = [];
+  const client = new BattleClient({ onClose: (close) => closes.push({ ...close }) });
+  client.onClose(4_002, "dial failed");
+  assert.equal(client.state, "closed");
+  assert.deepEqual(closes, [{ code: 4_002, reason: "dial failed", state: "closed", welcomed: false }]);
 });
 
 test("a session may only move its own tank and the match refuses a ninth human", async () => {
@@ -757,17 +854,126 @@ test("tick input never disguises a reliable fallback as a datagram", async () =>
   });
 });
 
+test("Deno WebTransport readiness failure closes and releases the pending receiver", async () => {
+  const errors = [];
+  const pending = new Map();
+  let closeOptions;
+  let sessionAccepted = false;
+  const session = {
+    url: "https://war.invalid/failed",
+    ready: Promise.reject(new Error("handshake rejected")),
+    closed: Promise.resolve({}),
+    close(options) { closeOptions = options; },
+  };
+  const incoming = { accept: async () => ({}) };
+  const listener = {
+    async *[Symbol.asyncIterator]() { yield incoming; },
+  };
+  const endpoint = {
+    listen() { return listener; },
+    close() {},
+  };
+  const runtime = {
+    QuicEndpoint: class {
+      constructor() { return endpoint; }
+    },
+    async upgradeWebTransport() { return session; },
+  };
+  const matchServer = new MatchServer();
+  const receiver = matchServer.createSession();
+  const server = DenoWebTransportServer.start({
+    hostname: "127.0.0.1",
+    port: 4_433,
+    cert: "cert",
+    key: "key",
+    runtime,
+    receiverForSession(url) {
+      assert.equal(url, session.url);
+      pending.set(receiver, receiver);
+      return receiver;
+    },
+    onSession() { sessionAccepted = true; },
+    onSessionError(url, failedReceiver) {
+      assert.equal(url, session.url);
+      pending.delete(failedReceiver);
+    },
+    onError(error) { errors.push(error); },
+  });
+  await server.completed;
+  await settle();
+  assert.equal(sessionAccepted, false);
+  assert.equal(receiver.closed, true, "the MatchServer receiver must release its session");
+  assert.equal(pending.size, 0, "failed handshakes must not leave pending receiver state");
+  assert.deepEqual(closeOptions, { closeCode: 4_006, reason: "session readiness failed" });
+  assert.equal(errors.length, 1);
+  server.close();
+  matchServer.close();
+});
+
+test("Deno WebTransport rejects a max-session connection whose readiness fails", async () => {
+  const errors = [];
+  let closeCount = 0;
+  let closeOptions;
+  const failedSession = {
+    url: "https://war.invalid/at-capacity",
+    ready: Promise.reject(new Error("capacity handshake rejected")),
+    closed: Promise.resolve({}),
+    close(options) {
+      closeCount += 1;
+      closeOptions = options;
+    },
+  };
+  const incomingInFlight = { accept: () => new Promise(() => {}) };
+  const incomingAtCapacity = { accept: async () => ({ id: 2 }) };
+  const listener = {
+    async *[Symbol.asyncIterator]() {
+      yield incomingInFlight;
+      yield incomingAtCapacity;
+    },
+  };
+  const endpoint = { listen() { return listener; }, close() {} };
+  const runtime = {
+    QuicEndpoint: class { constructor() { return endpoint; } },
+    async upgradeWebTransport(connection) {
+      assert.equal(connection.id, 2);
+      return failedSession;
+    },
+  };
+  const server = DenoWebTransportServer.start({
+    hostname: "127.0.0.1",
+    port: 4_434,
+    cert: "cert",
+    key: "key",
+    maximumSessions: 1,
+    runtime,
+    receiverForSession() { throw new Error("max-session path must not create a receiver"); },
+    onSession() { throw new Error("max-session path must not adopt a session"); },
+    onError(error) { errors.push(error); },
+  });
+  await server.completed;
+  await settle();
+  assert.equal(closeCount, 1, "a rejected max-session handshake must close exactly once");
+  assert.deepEqual(closeOptions, { closeCode: 4_006, reason: "session readiness failed" });
+  assert.equal(errors.length, 1);
+  server.close();
+});
+
 test("the browser adapter frames streams, handles fragmented reads, and checks datagram size", async () => {
   class FakeSession {
     ready = Promise.resolve();
     outgoingStreams = [];
+    outgoingBidirectionalStreams = [];
     outgoingDatagrams = [];
     closeResolve;
     incomingController;
+    incomingBidirectionalController;
     datagramController;
     closed = new Promise((resolve) => { this.closeResolve = resolve; });
     incomingUnidirectionalStreams = new ReadableStream({
       start: (controller) => { this.incomingController = controller; },
+    });
+    incomingBidirectionalStreams = new ReadableStream({
+      start: (controller) => { this.incomingBidirectionalController = controller; },
     });
     datagrams = {
       maxDatagramSize: 8,
@@ -779,31 +985,55 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
       }),
     };
     async createUnidirectionalStream() {
+      const session = this;
       const chunks = [];
+      this.outgoingStreams.push(chunks);
       return new WritableStream({
         write(chunk) { chunks.push(chunk.slice()); },
-        close: () => { this.outgoingStreams.push(chunks); },
       });
+    }
+    async createBidirectionalStream() {
+      const chunks = [];
+      return {
+        readable: new ReadableStream(),
+        writable: new WritableStream({
+          write(chunk) { chunks.push(chunk.slice()); },
+          close: () => { this.outgoingBidirectionalStreams.push(chunks); },
+        }),
+      };
     }
     close(options = {}) {
       this.incomingController.close();
+      this.incomingBidirectionalController.close();
       this.datagramController.close();
       this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
     }
-    pushReliable(channel, payload) {
-      const frame = new Uint8Array(5 + payload.length);
-      const view = new DataView(frame.buffer);
-      view.setUint8(0, channel);
-      view.setUint32(1, payload.length, true);
-      frame.set(payload, 5);
-      this.incomingController.enqueue(new ReadableStream({
+    pushReliable(channel, payload, direction = "client") {
+      this.pushReliableFrames([[channel, payload]], direction);
+    }
+    pushReliableFrames(frames, direction = "client") {
+      const bytes = new Uint8Array(frames.reduce((size, [, payload]) => size + 5 + payload.length, 0));
+      let offset = 0;
+      for (const [channel, payload] of frames) {
+        const view = new DataView(bytes.buffer);
+        view.setUint8(offset, channel);
+        view.setUint32(offset + 1, payload.length, true);
+        bytes.set(payload, offset + 5);
+        offset += 5 + payload.length;
+      }
+      const readable = new ReadableStream({
         start(controller) {
-          controller.enqueue(frame.subarray(0, 2));
-          controller.enqueue(frame.subarray(2, 6));
-          controller.enqueue(frame.subarray(6));
+          controller.enqueue(bytes.subarray(0, 2));
+          controller.enqueue(bytes.subarray(2, 6));
+          controller.enqueue(bytes.subarray(6));
           controller.close();
         },
-      }));
+      });
+      if (direction === "server") {
+        this.incomingBidirectionalController.enqueue({ readable, writable: new WritableStream() });
+      } else {
+        this.incomingController.enqueue(readable);
+      }
     }
   }
   const session = new FakeSession();
@@ -814,10 +1044,14 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
     onDatagram(payload) { events.push(["datagram", [...payload]]); },
     onClose(code, reason) { events.push(["close", code, reason]); },
   }, FakeConstructor);
-  assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_SESSION, Uint8Array.of(8, 9)), "sent");
-  assert.equal(session.outgoingStreams.length, 1);
-  assert.deepEqual([...session.outgoingStreams[0][0]], [TRANSPORT_CHANNEL_SESSION, 2, 0, 0, 0]);
-  assert.deepEqual([...session.outgoingStreams[0][1]], [8, 9]);
+  const reusedPayload = Uint8Array.of(8, 9);
+  const sendPromise = client.sendReliable(TRANSPORT_CHANNEL_SESSION, reusedPayload);
+  reusedPayload[0] = 99;
+  assert.equal(await sendPromise, "sent");
+  assert.equal(session.outgoingBidirectionalStreams.length, 1);
+  assert.equal(session.outgoingStreams.length, 0);
+  assert.deepEqual([...session.outgoingBidirectionalStreams[0][0]], [TRANSPORT_CHANNEL_SESSION, 2, 0, 0, 0]);
+  assert.deepEqual([...session.outgoingBidirectionalStreams[0][1]], [8, 9]);
   assert.equal(await client.trySendDatagram(Uint8Array.of(1, 2, 3)), "sent");
   assert.equal(await client.trySendDatagram(new Uint8Array(9)), "too-large");
   session.pushReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(5, 6, 7));
@@ -829,6 +1063,416 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
   ]);
   client.close(12, "finished");
   assert.deepEqual(events.at(-1), ["close", 12, "finished"]);
+
+  const serverSession = new FakeSession();
+  const serverEvents = [];
+  const serverTransport = await adoptServerWebTransportSession(serverSession, {
+    onReliable(channel, payload) { serverEvents.push(["reliable", channel, [...payload]]); },
+    onDatagram(payload) { serverEvents.push(["datagram", [...payload]]); },
+    onClose(code, reason) { serverEvents.push(["close", code, reason]); },
+  });
+  assert.equal(await serverTransport.sendReliable(TRANSPORT_CHANNEL_SESSION, Uint8Array.of(3, 4)), "sent");
+  assert.equal(serverSession.outgoingStreams.length, 1);
+  assert.equal(serverSession.outgoingBidirectionalStreams.length, 0);
+  assert.deepEqual([...serverSession.outgoingStreams[0][0]], [TRANSPORT_CHANNEL_SESSION, 2, 0, 0, 0, 3, 4]);
+  assert.equal(await serverTransport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(6)), "sent");
+  assert.equal(serverSession.outgoingStreams.length, 1, "server reliable messages share one persistent stream");
+  assert.deepEqual([...serverSession.outgoingStreams[0][1]], [TRANSPORT_CHANNEL_CONTROL, 1, 0, 0, 0, 6]);
+  serverSession.pushReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(7), "server");
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(serverEvents, [["reliable", TRANSPORT_CHANNEL_CONTROL, [7]]]);
+  serverTransport.close(12, "finished");
+});
+
+test("datagram staging owns caller bytes and has fixed in-flight capacity", async () => {
+  class DelayedDatagramSession {
+    ready = Promise.resolve();
+    incomingUnidirectionalStreams = new ReadableStream();
+    incomingBidirectionalStreams = new ReadableStream();
+    closeResolve;
+    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    writes = [];
+    writeResolves = [];
+    datagramAbortCalls = 0;
+    datagramReleaseCalls = 0;
+    writer = {
+      desiredSize: 1,
+      write: (chunk) => {
+        this.writes.push(chunk);
+        return new Promise((resolve) => { this.writeResolves.push(resolve); });
+      },
+      abort: async () => { this.datagramAbortCalls += 1; },
+      releaseLock: () => { this.datagramReleaseCalls += 1; },
+    };
+    datagrams = {
+      maxDatagramSize: 8,
+      readable: new ReadableStream(),
+      writable: { getWriter: () => this.writer },
+    };
+    createUnidirectionalStream() { throw new Error("not used"); }
+    createBidirectionalStream() { throw new Error("not used"); }
+    close(options = {}) { this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+  }
+
+  const session = new DelayedDatagramSession();
+  class FakeConstructor { constructor() { return session; } }
+  const client = await BrowserWebTransportClient.connect("https://example.invalid", {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  }, FakeConstructor);
+
+  const sends = [];
+  for (let index = 0; index < 4; index += 1) {
+    const source = Uint8Array.of(index, index + 10);
+    sends.push(client.trySendDatagram(source));
+    source[0] = 99;
+  }
+  assert.equal(await client.trySendDatagram(Uint8Array.of(4, 14)), "backpressured");
+  assert.equal(session.writes.length, 4);
+  assert.deepEqual([...session.writes[0]], [0, 10], "staging preserves bytes after caller reuse");
+
+  session.writeResolves.shift()();
+  assert.equal(await sends[0], "sent");
+  const replacement = client.trySendDatagram(Uint8Array.of(8, 18));
+  assert.equal(session.writes.length, 5, "a settled write returns one staging slot");
+  for (const resolve of session.writeResolves.splice(0)) resolve();
+  assert.equal(await replacement, "sent");
+  assert.deepEqual(await Promise.all(sends.slice(1)), ["sent", "sent", "sent"]);
+  client.close(12, "finished");
+  client.close(13, "ignored");
+  assert.equal(session.datagramAbortCalls, 1);
+  assert.equal(session.datagramReleaseCalls, 1);
+});
+
+test("repeated client reliable streams cancel their unused reverse directions", async () => {
+  class RepeatedBidiSession {
+    ready = Promise.resolve();
+    incomingController;
+    incomingUnidirectionalStreams = new ReadableStream();
+    incomingBidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closeResolve;
+    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    reverseCancels = 0;
+    close(options = {}) { this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+    createUnidirectionalStream() { throw new Error("not used"); }
+    createBidirectionalStream() {
+      const session = this;
+      const readable = new ReadableStream({ cancel() { session.reverseCancels += 1; } });
+      return { readable, writable: new WritableStream() };
+    }
+  }
+  const session = new RepeatedBidiSession();
+  class FakeConstructor { constructor() { return session; } }
+  const client = await BrowserWebTransportClient.connect("https://example.invalid", {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  }, FakeConstructor);
+  for (let index = 0; index < 8; index += 1) {
+    assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(index)), "sent");
+  }
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(session.reverseCancels, 8);
+  client.close(12, "finished");
+});
+
+test("server reliable streams close reverse writers without escalating peer resets", async () => {
+  class RepeatedServerSession {
+    ready = Promise.resolve();
+    incomingController;
+    incomingBidirectionalStreams = new ReadableStream({ start: (controller) => { this.incomingController = controller; } });
+    incomingUnidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closeResolve;
+    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closeCalls = 0;
+    reverseCloses = 0;
+    reverseReleases = 0;
+    push(channel, value, rejectClose = false) {
+      const session = this;
+      const bytes = Uint8Array.of(channel, 1, 0, 0, 0, value);
+      const readable = new ReadableStream({
+        start(controller) { controller.enqueue(bytes); controller.close(); },
+      });
+      const writable = {
+        getWriter() {
+          return {
+            close: () => {
+              session.reverseCloses += 1;
+              return rejectClose ? Promise.reject(new Error("peer reset")) : Promise.resolve();
+            },
+            releaseLock() { session.reverseReleases += 1; },
+          };
+        },
+      };
+      this.incomingController.enqueue({ readable, writable });
+    }
+    createUnidirectionalStream() { throw new Error("not used"); }
+    createBidirectionalStream() { throw new Error("not used"); }
+    close(options = {}) {
+      this.closeCalls += 1;
+      this.incomingController.close();
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
+  }
+  const session = new RepeatedServerSession();
+  const events = [];
+  const transport = await adoptServerWebTransportSession(session, {
+    onReliable(channel, payload) { events.push([channel, payload[0]]); },
+    onDatagram() {},
+    onClose(code, reason) { events.push(["close", code, reason]); },
+  });
+  for (let index = 0; index < 7; index += 1) session.push(TRANSPORT_CHANNEL_CONTROL, index, index === 6);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(events, [
+    [TRANSPORT_CHANNEL_CONTROL, 0],
+    [TRANSPORT_CHANNEL_CONTROL, 1],
+    [TRANSPORT_CHANNEL_CONTROL, 2],
+    [TRANSPORT_CHANNEL_CONTROL, 3],
+    [TRANSPORT_CHANNEL_CONTROL, 4],
+    [TRANSPORT_CHANNEL_CONTROL, 5],
+    [TRANSPORT_CHANNEL_CONTROL, 6],
+  ]);
+  assert.equal(session.reverseCloses, 7);
+  assert.equal(session.reverseReleases, 7);
+  assert.equal(session.closeCalls, 0, "a peer-reset reverse writer does not close the healthy session");
+  transport.close(12, "finished");
+});
+
+test("the persistent reliable decoder handles coalesced frames and rejects oversized lengths", async () => {
+  class DecoderSession {
+    ready = Promise.resolve();
+    incomingController;
+    datagramController;
+    closeResolve;
+    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closeCalls = 0;
+    incomingUnidirectionalStreams = new ReadableStream({
+      start: (controller) => { this.incomingController = controller; },
+    });
+    incomingBidirectionalStreams = new ReadableStream();
+    datagrams = {
+      maxDatagramSize: 8,
+      readable: new ReadableStream({
+        start: (controller) => { this.datagramController = controller; },
+      }),
+      writable: new WritableStream(),
+    };
+    createUnidirectionalStream() { throw new Error("not used"); }
+    createBidirectionalStream() { throw new Error("not used"); }
+    close(options = {}) {
+      this.closeCalls += 1;
+      this.incomingController.close();
+      this.datagramController.close();
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
+    pushBytes(bytes) {
+      this.incomingController.enqueue(new ReadableStream({
+        start: (controller) => {
+          controller.enqueue(bytes.subarray(0, 1));
+          controller.enqueue(bytes.subarray(1, 8));
+          controller.enqueue(bytes.subarray(8));
+          controller.close();
+        },
+      }));
+    }
+  }
+  const session = new DecoderSession();
+  class FakeConstructor { constructor() { return session; } }
+  const events = [];
+  const client = await BrowserWebTransportClient.connect("https://example.invalid", {
+    onReliable(channel, payload) { events.push(["reliable", channel, [...payload]]); },
+    onDatagram() {},
+    onClose(code, reason) { events.push(["close", code, reason]); },
+  }, FakeConstructor);
+  const frames = new Uint8Array([TRANSPORT_CHANNEL_CONTROL, 2, 0, 0, 0, 9, 8, TRANSPORT_CHANNEL_SESSION, 1, 0, 0, 0, 7]);
+  session.pushBytes(frames);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(events, [
+    ["reliable", TRANSPORT_CHANNEL_CONTROL, [9, 8]],
+    ["reliable", TRANSPORT_CHANNEL_SESSION, [7]],
+  ]);
+  const oversized = new Uint8Array(5);
+  new DataView(oversized.buffer).setUint32(1, 64 * 1024 + 1, true);
+  oversized[0] = TRANSPORT_CHANNEL_CONTROL;
+  session.pushBytes(oversized);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(events.at(-1)[0], "close");
+  assert.equal(events.at(-1)[1], 2);
+  assert.equal(session.closeCalls, 1, "decoder failure closes the underlying session exactly once");
+  client.close(12, "finished");
+});
+
+test("a remote WebTransport close is observed without issuing a second close", async () => {
+  class RemotelyClosedSession {
+    ready = Promise.resolve();
+    incomingUnidirectionalStreams = new ReadableStream();
+    incomingBidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closeCalls = 0;
+    closedResolve;
+    closed = new Promise((resolve) => { this.closedResolve = resolve; });
+    createUnidirectionalStream() { throw new Error("not used"); }
+    createBidirectionalStream() { throw new Error("not used"); }
+    close() { this.closeCalls += 1; }
+  }
+  const session = new RemotelyClosedSession();
+  class FakeConstructor { constructor() { return session; } }
+  const events = [];
+  await BrowserWebTransportClient.connect("https://example.invalid", {
+    onReliable() {},
+    onDatagram() {},
+    onClose(code, reason) { events.push([code, reason]); },
+  }, FakeConstructor);
+  session.closedResolve({ closeCode: 7, reason: "peer closed" });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(session.closeCalls, 0);
+  assert.deepEqual(events, [[7, "peer closed"]]);
+});
+
+test("server snapshots coalesce to one bounded pending frame under stream backpressure", async () => {
+  class BackpressuredSession {
+    ready = Promise.resolve();
+    outgoingStreams = [];
+    incomingBidirectionalStreams = new ReadableStream();
+    incomingUnidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closeResolve;
+    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closeCalls = 0;
+    capacity = 0;
+    readyResolve;
+    readyWaiters = 0;
+    async createUnidirectionalStream() {
+      const chunks = [];
+      this.outgoingStreams.push(chunks);
+      let ready = new Promise((resolve) => { this.readyResolve = resolve; });
+      const writer = {
+        get desiredSize() { return session.capacity; },
+        get ready() { session.readyWaiters += 1; return ready; },
+        write: async (chunk) => { chunks.push(chunk.slice()); this.capacity = 0; ready = new Promise((resolve) => { this.readyResolve = resolve; }); },
+        abort: async () => {},
+        releaseLock() {},
+      };
+      return { getWriter: () => writer };
+    }
+    createBidirectionalStream() { throw new Error("not used"); }
+    releaseCapacity() { this.capacity = 1; this.readyResolve?.(); }
+    close(options = {}) { this.closeCalls += 1; this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+  }
+  const session = new BackpressuredSession();
+  const transport = await adoptServerWebTransportSession(session, {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  });
+  assert.equal(await transport.sendReliable(3, Uint8Array.of(1)), "backpressured");
+  assert.equal(await transport.sendReliable(3, Uint8Array.of(2)), "backpressured");
+  assert.equal(session.outgoingStreams.length, 1);
+  assert.deepEqual(session.outgoingStreams[0], []);
+  session.releaseCapacity();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual([...session.outgoingStreams[0][0]], [3, 1, 0, 0, 0, 2], "only the latest snapshot is retained");
+  session.releaseCapacity();
+  assert.equal(await transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(4)), "sent");
+  assert.deepEqual([...session.outgoingStreams[0][1]], [TRANSPORT_CHANNEL_CONTROL, 1, 0, 0, 0, 4]);
+  transport.close(12, "finished");
+});
+
+test("server control backpressure has one bounded FIFO and fails closed on overflow", async () => {
+  class BackpressuredSession {
+    ready = Promise.resolve();
+    outgoingStreams = [];
+    incomingBidirectionalStreams = new ReadableStream();
+    incomingUnidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closeResolve;
+    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closeCalls = 0;
+    capacity = 0;
+    readyResolve;
+    readyWaiters = 0;
+    async createUnidirectionalStream() {
+      const chunks = [];
+      this.outgoingStreams.push(chunks);
+      let ready = new Promise((resolve) => { this.readyResolve = resolve; });
+      const session = this;
+      const writer = {
+        get desiredSize() { return session.capacity; },
+        get ready() { session.readyWaiters += 1; return ready; },
+        write: async (chunk) => {
+          chunks.push(chunk.slice());
+          this.capacity = 0;
+          ready = new Promise((resolve) => { this.readyResolve = resolve; });
+        },
+        abort: async () => {},
+        releaseLock() {},
+      };
+      return { getWriter: () => writer };
+    }
+    createBidirectionalStream() { throw new Error("not used"); }
+    close(options = {}) { this.closeCalls += 1; this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+  }
+
+  const session = new BackpressuredSession();
+  const transport = await adoptServerWebTransportSession(session, {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  });
+
+  const first = transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(1));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(session.readyWaiters, 1, "one pump owns writer.ready while blocked");
+  const queued = [first];
+  for (let index = 2; index <= 40; index += 1) {
+    queued.push(transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(index)));
+  }
+  assert.deepEqual(await Promise.all(queued), queued.map(() => "closed"));
+  assert.equal(session.closeCalls, 1, "queue overflow closes the session once");
+  assert.equal(session.readyWaiters, 1, "overflow does not add writer.ready waiters");
+});
+
+test("server reliable admission is bounded while stream creation is pending", async () => {
+  class DelayedStreamSession {
+    ready = Promise.resolve();
+    incomingBidirectionalStreams = new ReadableStream();
+    incomingUnidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closeResolve;
+    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closeCalls = 0;
+    createCalls = 0;
+    resolveCreate;
+    async createUnidirectionalStream() {
+      this.createCalls += 1;
+      return new Promise((resolve) => {
+        this.resolveCreate = () => resolve(new WritableStream());
+      });
+    }
+    createBidirectionalStream() { throw new Error("not used"); }
+    close(options = {}) { this.closeCalls += 1; this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+  }
+
+  const session = new DelayedStreamSession();
+  const transport = await adoptServerWebTransportSession(session, {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  });
+  const sends = [transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(0))];
+  assert.equal(session.createCalls, 0, "admission does not await stream creation per send");
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(session.createCalls, 1, "one pump owns pending stream creation");
+  for (let index = 1; index < 40; index += 1) {
+    sends.push(transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(index)));
+  }
+  assert.deepEqual(await Promise.all(sends), sends.map(() => "closed"));
+  assert.equal(session.closeCalls, 1, "pending-create overflow closes once");
+  session.resolveCreate?.();
+  void transport;
 });
 
 void CELL_FLOOR;

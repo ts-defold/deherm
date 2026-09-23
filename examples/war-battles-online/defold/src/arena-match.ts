@@ -19,6 +19,7 @@ import {
   UNITS_PER_PIXEL,
   WORLD_PIXEL_ORIGIN_X,
   WORLD_PIXEL_ORIGIN_Y,
+  type PlayerTransform,
   type PlayControls,
 } from "./generated-war-battles/index";
 import { hmrPersistentState } from "@deherm/project";
@@ -64,6 +65,28 @@ export class ArenaMatch {
   get localSlot(): number {
     if (this.mode === "online") return this.client === undefined ? -1 : this.client.playerId - 1;
     return 0;
+  }
+
+  /** Samples a tank transform through the active driver's presentation path. */
+  samplePlayerTransform(slot: number, output: PlayerTransform): boolean {
+    const world = this.world;
+    if (world === undefined || slot < 0 || slot >= world.playerX.length) return false;
+    if (this.mode === "online") return this.client?.samplePlayerTransform(slot, output) ?? false;
+    output.x = world.playerX[slot]!;
+    output.y = world.playerY[slot]!;
+    output.hullX = world.playerHullX[slot]!;
+    output.hullY = world.playerHullY[slot]!;
+    output.turretX = world.playerTurretX[slot]!;
+    output.turretY = world.playerTurretY[slot]!;
+    return true;
+  }
+
+  /** Returns to the already-created offline round after a pre-welcome failure. */
+  fallbackToOffline(): boolean {
+    if (this.mode !== "offline") return false;
+    this.client = undefined;
+    this.accumulator = 0;
+    return true;
   }
 
   setControls(moveX: number, moveY: number, fire: boolean, boost: boolean, weapon: number): void {

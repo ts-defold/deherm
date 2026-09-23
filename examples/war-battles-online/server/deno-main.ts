@@ -21,7 +21,10 @@ import {
   TICK_MILLISECONDS,
   type MatchServerOptions,
 } from "../core/index.ts";
-import { DenoWebTransportServer } from "../core/deno-webtransport-server.ts";
+import {
+  DenoWebTransportServer,
+  type DenoWebTransportLifecycleEvent,
+} from "../core/deno-webtransport-server.ts";
 import type { GameTransport, TransportReceiver } from "../core/transport.ts";
 import type { ServerSession } from "../core/match-server.ts";
 
@@ -94,6 +97,13 @@ async function certificateDigest(pem: string): Promise<string> {
   return hex;
 }
 
+function logTransportLifecycle(event: DenoWebTransportLifecycleEvent): void {
+  const detail = event.url === undefined
+    ? `id=${event.connectionId}`
+    : `id=${event.connectionId}:url=${event.url}`;
+  console.log(`war-battles-server:${event.phase}:${detail}`);
+}
+
 export async function main(argv: readonly string[]): Promise<void> {
   const options = parseArguments(argv);
   const cert = await Deno.readTextFile(options.certPath);
@@ -116,10 +126,14 @@ export async function main(argv: readonly string[]): Promise<void> {
     cert,
     key,
     maximumSessions: 32,
+    onLifecycle: logTransportLifecycle,
     receiverForSession: (): TransportReceiver => {
       const session = server.createSession();
       pending.set(session, session);
       return session;
+    },
+    onSessionError: (_url: string, receiver: TransportReceiver): void => {
+      pending.delete(receiver);
     },
     onSession: (url: string, transport: GameTransport, receiver: TransportReceiver): void => {
       const session = pending.get(receiver);
@@ -141,11 +155,20 @@ export async function main(argv: readonly string[]): Promise<void> {
   // A fixed-step loop driven by wall clock, so a slow tick does not make the
   // match run slow: it makes the next wake-up do more.
   let previous = Date.now();
+  // Keep the runtime proof bounded and machine-readable. This is deliberately
+  // derived from MatchServer.stats rather than from a client-side write result:
+  // the real gate must observe that the authoritative server accepted input.
+  const inputMilestone = 3;
+  let inputMilestoneLogged = false;
   const timer = setInterval(() => {
     const now = Date.now();
     const elapsed = now - previous;
     previous = now;
     server.advance(elapsed, 8);
+    if (!inputMilestoneLogged && server.stats.inputsAccepted >= inputMilestone) {
+      inputMilestoneLogged = true;
+      console.log(`war-battles-server:stats:inputs-accepted:count=${inputMilestone}`);
+    }
   }, TICK_MILLISECONDS);
 
   const stop = (): void => {

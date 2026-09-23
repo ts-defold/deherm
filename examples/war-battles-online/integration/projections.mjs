@@ -129,6 +129,30 @@ export const WAR_BATTLES_PROJECTIONS = Object.freeze({
       "the gameplay markers themselves, which the `native-arm64-macos` projection owns",
     ],
   }),
+  "browser-webtransport-loopback": declare({
+    id: "browser-webtransport-loopback",
+    title: "Production browser client and Deno server exchanging War Battles protocol traffic over loopback HTTP/3/WebTransport",
+    runtime: "browser+deno",
+    transport: ["webtransport-h3"],
+    reachableSet: "complete",
+    profile: "loopback-p256-pinned",
+    stage: "network-runtime",
+    evidence: "evidence/webtransport-quic-loopback.json",
+    producer: "node examples/war-battles-online/integration/check-real-webtransport.mjs --record-evidence",
+    observed: [
+      "A real headless-Chrome WebTransport client completed an HTTP/3/QUIC session with the Deno server using a short-lived pinned P-256 certificate.",
+      "The production BattleClient received the authoritative 32-player welcome and multiple snapshots over the server reliable lane.",
+      "The same client sent multiple gameplay inputs as QUIC datagrams, and a bounded MatchServer marker observed at least three inputs accepted server-side.",
+      "No transport rejection or client error was observed during the bounded loopback run.",
+    ],
+    excluded: [
+      "the packaged Defold HTML5 scene: this gate bundles the production core client directly and does not start the Defold engine",
+      "native Defold networking: native still requires its HTTP/3/WebTransport extension",
+      "WAN, ingress, NAT, loss, reordering, MTU, sustained load, and reconnect behavior",
+      "allocation, sanitizer, and performance claims",
+      "visual correctness",
+    ],
+  }),
 });
 
 /** The envelope a projection's evidence document must carry, verbatim. */

@@ -2,7 +2,7 @@
 //
 // The set gate over War Battles' runtime projections.
 //
-// Three JSON files in `evidence/` are otherwise three unrelated documents, and
+// The JSON files in `evidence/` are otherwise unrelated documents, and
 // a projection nobody ran leaves no trace at all - its absence looks exactly
 // like a projection that was never expected. This reads the declared set in
 // `projections.mjs` instead, and for every declaration requires an evidence
@@ -23,6 +23,10 @@ import {
   projectionKey,
   WAR_BATTLES_PROJECTIONS,
 } from "./projections.mjs";
+import {
+  assertWebTransportEvidence,
+  buildWebTransportSourceInputs,
+} from "./webtransport-evidence.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
@@ -68,6 +72,21 @@ export async function checkProjectionEvidence() {
       profile: declaration.profile,
       projectionKey: key,
     });
+  }
+  // The network projection has a stronger source/evidence contract than the
+  // common envelope. Keep it in the ordinary projection gate so a stale real
+  // browser observation cannot hide behind a valid-looking classification.
+  try {
+    const webtransportDeclaration = WAR_BATTLES_PROJECTIONS["browser-webtransport-loopback"];
+    const webtransportEvidence = JSON.parse(await readFile(
+      resolve(exampleRoot, webtransportDeclaration.evidence),
+      "utf8",
+    ));
+    assertWebTransportEvidence(webtransportEvidence, {
+      sourceInputs: await buildWebTransportSourceInputs(),
+    });
+  } catch (error) {
+    failures.push(`browser-webtransport-loopback evidence is stale or malformed: ${error.message}`);
   }
   if (failures.length) {
     throw new Error(`War Battles projection evidence is incomplete:\n  - ${failures.join("\n  - ")}`);

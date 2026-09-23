@@ -20,6 +20,23 @@ export interface DenoQuicRuntimeLike {
   upgradeWebTransport(connection: unknown): Promise<WebTransportSessionLike & { readonly url: string }>;
 }
 
+/**
+ * Transport milestones emitted by the Deno adapter. The connection id makes
+ * the trace useful when several handshakes are in flight at once, while the
+ * URL is only available after the WebTransport upgrade.
+ */
+export type DenoWebTransportLifecyclePhase =
+  | "incoming"
+  | "quic-accepted"
+  | "webtransport-upgraded"
+  | "session-ready";
+
+export interface DenoWebTransportLifecycleEvent {
+  readonly phase: DenoWebTransportLifecyclePhase;
+  readonly connectionId: number;
+  readonly url?: string;
+}
+
 export interface DenoWebTransportServerOptions {
   readonly hostname: string;
   readonly port: number;
@@ -27,6 +44,10 @@ export interface DenoWebTransportServerOptions {
   readonly key: string;
   readonly maximumSessions?: number;
   readonly runtime?: DenoQuicRuntimeLike;
+  /** Optional diagnostic hook. Exceptions are intentionally ignored. */
+  readonly onLifecycle?: (event: DenoWebTransportLifecycleEvent) => void;
+  /** Removes receiver/session bookkeeping when readiness fails before adoption. */
+  readonly onSessionError?: (url: string, receiver: TransportReceiver) => void;
   readonly receiverForSession: (url: string) => TransportReceiver;
   /**
    * Called once the session is adopted. The receiver this connection was built
@@ -48,6 +69,7 @@ export class DenoWebTransportServer {
   readonly completed: Promise<void>;
   private activeSessions = 0;
   private stopped = false;
+  private nextConnectionId = 1;
   private readonly endpoint: DenoQuicEndpointLike;
 
   private constructor(
@@ -90,11 +112,14 @@ export class DenoWebTransportServer {
     try {
       for await (const incoming of listener) {
         if (this.stopped) break;
+        const connectionId = this.nextConnectionId;
+        this.nextConnectionId += 1;
+        this.trace(options, { phase: "incoming", connectionId });
         if (this.activeSessions >= maximumSessions) {
-          void this.rejectOne(runtime, incoming, options.onError);
+          void this.rejectOne(runtime, incoming, options, connectionId);
           continue;
         }
-        void this.acceptOne(runtime, incoming, options);
+        void this.acceptOne(runtime, incoming, options, connectionId);
       }
     } catch (error: unknown) {
       if (!this.stopped) options.onError(error);
@@ -105,6 +130,7 @@ export class DenoWebTransportServer {
     runtime: DenoQuicRuntimeLike,
     incoming: DenoQuicIncomingLike,
     options: DenoWebTransportServerOptions,
+    connectionId: number,
   ): Promise<void> {
     this.activeSessions += 1;
     let counted = true;
@@ -113,19 +139,25 @@ export class DenoWebTransportServer {
       counted = false;
       this.activeSessions -= 1;
     };
+    let session: (WebTransportSessionLike & { readonly url: string }) | undefined;
+    let receiver: TransportReceiver | undefined;
     try {
       const connection = await incoming.accept();
-      const session = await runtime.upgradeWebTransport(connection);
-      const receiver = options.receiverForSession(session.url);
+      this.trace(options, { phase: "quic-accepted", connectionId });
+      session = await runtime.upgradeWebTransport(connection);
+      this.trace(options, { phase: "webtransport-upgraded", connectionId, url: session.url });
+      const sessionReceiver = options.receiverForSession(session.url);
+      receiver = sessionReceiver;
       const countedReceiver: TransportReceiver = {
-        onReliable: (channel, payload) => receiver.onReliable(channel, payload),
-        onDatagram: (payload) => receiver.onDatagram(payload),
+        onReliable: (channel, payload) => sessionReceiver.onReliable(channel, payload),
+        onDatagram: (payload) => sessionReceiver.onDatagram(payload),
         onClose: (code, reason) => {
           releaseSession();
-          receiver.onClose(code, reason);
+          sessionReceiver.onClose(code, reason);
         },
       };
       const transport = await adoptServerWebTransportSession(session, countedReceiver);
+      this.trace(options, { phase: "session-ready", connectionId, url: session.url });
       try {
         options.onSession(session.url, transport, receiver);
       } catch (error: unknown) {
@@ -134,6 +166,25 @@ export class DenoWebTransportServer {
       }
     } catch (error: unknown) {
       releaseSession();
+      if (receiver !== undefined) {
+        try {
+          options.onSessionError?.(session?.url ?? "", receiver);
+        } catch (callbackError: unknown) {
+          options.onError(callbackError);
+        }
+        try {
+          receiver.onClose(1, "session readiness failed");
+        } catch (receiverError: unknown) {
+          options.onError(receiverError);
+        }
+      }
+      if (session !== undefined) {
+        try {
+          session.close({ closeCode: 4_006, reason: "session readiness failed" });
+        } catch (closeError: unknown) {
+          options.onError(closeError);
+        }
+      }
       options.onError(error);
     }
   }
@@ -141,15 +192,38 @@ export class DenoWebTransportServer {
   private async rejectOne(
     runtime: DenoQuicRuntimeLike,
     incoming: DenoQuicIncomingLike,
-    onError: (error: unknown) => void,
+    options: DenoWebTransportServerOptions,
+    connectionId: number,
   ): Promise<void> {
+    let session: (WebTransportSessionLike & { readonly url: string }) | undefined;
+    let closeAttempted = false;
+    const closeSession = (closeCode: number, reason: string): void => {
+      if (session === undefined || closeAttempted) return;
+      closeAttempted = true;
+      try {
+        session.close({ closeCode, reason });
+      } catch (error: unknown) {
+        options.onError(error);
+      }
+    };
     try {
       const connection = await incoming.accept();
-      const session = await runtime.upgradeWebTransport(connection);
+      this.trace(options, { phase: "quic-accepted", connectionId });
+      session = await runtime.upgradeWebTransport(connection);
+      this.trace(options, { phase: "webtransport-upgraded", connectionId, url: session.url });
       await session.ready;
-      session.close({ closeCode: 4_001, reason: "server session limit reached" });
+      closeSession(4_001, "server session limit reached");
     } catch (error: unknown) {
-      onError(error);
+      closeSession(4_006, "session readiness failed");
+      options.onError(error);
+    }
+  }
+
+  private trace(options: DenoWebTransportServerOptions, event: DenoWebTransportLifecycleEvent): void {
+    try {
+      options.onLifecycle?.(event);
+    } catch {
+      // Diagnostics must never prevent a connection from being accepted.
     }
   }
 }

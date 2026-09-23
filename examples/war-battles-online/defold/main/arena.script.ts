@@ -300,10 +300,25 @@ function connectOnline(self: ArenaSelf): boolean {
     __defoldHostV1.log("info", "war-battles:arena-online-unavailable:no-webtransport");
     return false;
   }
-  const client = new BattleClient({
+  let client: BattleClient;
+  const fallback = (reason: string): void => {
+    // `ArenaMatch` creates its offline battle before dialing. Keep that battle
+    // and engage it when the handshake cannot reach welcome; a post-welcome
+    // disconnect is a real online lifecycle and is not silently converted.
+    if (!client || self.match.client !== client || self.match.mode !== "offline") return;
+    self.match.fallbackToOffline();
+    self.online = false;
+    __defoldHostV1.log("info", `war-battles:arena-online-fallback:${reason}`);
+    engage(self);
+  };
+  client = new BattleClient({
     name: "defold",
     onLog: (line: string) => __defoldHostV1.log("info", `war-battles:net:${line}`),
     onError: (error: unknown) => __defoldHostV1.log("info", `war-battles:net-error:${String(error)}`),
+    onReject: (reject) => fallback(`reject:${reject.code}:${reject.reason}`),
+    onClose: (close) => {
+      if (!close.welcomed) fallback(`close:${close.code}:${close.reason}`);
+    },
     onWelcome: () => {
       self.match.mode = "online";
       engage(self);
@@ -312,7 +327,10 @@ function connectOnline(self: ArenaSelf): boolean {
   self.match.client = client;
   void BrowserWebTransportClient.connect(url, client).then(
     (transport) => client.attach(transport),
-    (error: unknown) => __defoldHostV1.log("info", `war-battles:net-error:${String(error)}`),
+    (error: unknown) => {
+      __defoldHostV1.log("info", `war-battles:net-error:${String(error)}`);
+      fallback(`dial:${String(error)}`);
+    },
   );
   __defoldHostV1.log("info", `war-battles:arena-online-dialing:${url}`);
   return true;

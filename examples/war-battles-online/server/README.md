@@ -87,18 +87,22 @@ item 3 in the README's list of next gates.
 
 ## What is proven, and what is not
 
-Proven here, by `test/core.test.mjs` over the in-memory transport pair: two
+Proven by `test/core.test.mjs` over the in-memory transport pair: two
 clients joining one authoritative match and replacing bots; the client's local
 prediction agreeing with the server's state exactly; a client that falls behind
 reconciling by replaying its own inputs; a session being refused when the match
 is full; a session's forged packet for another player's slot being rejected; and
 an upgrade purchased over the reliable control lane.
 
-Not proven here: a real QUIC run. No WebTransport session has been opened
-against this server by this repository's gates, and this example records no
-network evidence. The transport adapter, the Deno host and the certificate
-procedure are written and typechecked; running them is the next gate, not a
-result already in hand.
+`pnpm runtime:webtransport` separately proves the production adapter against
+this Deno host with a real loopback Chrome HTTP/3/WebTransport session. It
+requires a 32-player welcome, at least three authoritative snapshots on the
+server reliable lane, at least three client input datagrams, and a bounded
+`MatchServer` stats marker proving those inputs were accepted server-side.
+`evidence/webtransport-quic-loopback.json` records the runtime and transport
+boundary; it does not claim a persistent-stream open count. It does not prove
+WAN ingress, native Defold transport, adverse-network behavior, 32 human
+clients, or production certificate policy.
 
 ## Protocol
 

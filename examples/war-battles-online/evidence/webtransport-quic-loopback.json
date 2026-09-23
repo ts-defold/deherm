@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "kind": "war-battles.real-webtransport-loopback",
+  "projection": {
+    "id": "browser-webtransport-loopback",
+    "title": "Production browser client and Deno server exchanging War Battles protocol traffic over loopback HTTP/3/WebTransport",
+    "runtime": "browser+deno",
+    "transport": [
+      "webtransport-h3"
+    ],
+    "reachableSet": "complete",
+    "profile": "loopback-p256-pinned",
+    "stage": "network-runtime",
+    "observed": [
+      "A real headless-Chrome WebTransport client completed an HTTP/3/QUIC session with the Deno server using a short-lived pinned P-256 certificate.",
+      "The production BattleClient received the authoritative 32-player welcome and multiple snapshots over the server reliable lane.",
+      "The same client sent multiple gameplay inputs as QUIC datagrams, and a bounded MatchServer marker observed at least three inputs accepted server-side.",
+      "No transport rejection or client error was observed during the bounded loopback run."
+    ],
+    "excluded": [
+      "the packaged Defold HTML5 scene: this gate bundles the production core client directly and does not start the Defold engine",
+      "native Defold networking: native still requires its HTTP/3/WebTransport extension",
+      "WAN, ingress, NAT, loss, reordering, MTU, sustained load, and reconnect behavior",
+      "allocation, sanitizer, and performance claims",
+      "visual correctness"
+    ]
+  },
+  "transport": {
+    "protocol": "webtransport-h3",
+    "reliableStreams": true,
+    "datagrams": true,
+    "maxDatagramBytes": 1024
+  },
+  "rosterSize": 32,
+  "playerId": 1,
+  "minimumSnapshotsApplied": 3,
+  "minimumInputsSent": 3,
+  "observedSnapshotsApplied": 3,
+  "observedInputsSent": 14,
+  "lastServerTick": 81,
+  "lastLocalTick": 88,
+  "input": {
+    "moveX": 1,
+    "moveY": 0,
+    "fire": false,
+    "boost": false,
+    "weapon": 0
+  },
+  "inputsDropped": 0,
+  "server": {
+    "inputsAcceptedAtLeast": 3,
+    "markers": [
+      "war-battles-server:listening:https://localhost:<port>",
+      "war-battles-server:roster:32:bots:2",
+      "war-battles-server:incoming:id=1",
+      "war-battles-server:quic-accepted:id=1",
+      "war-battles-server:webtransport-upgraded:id=1:url=https://localhost:<port>/",
+      "war-battles-server:session-ready:id=1:url=https://localhost:<port>/",
+      "war-battles-server:session-accepted:https://localhost:<port>/",
+      "war-battles-server:session-joined:chrome-quic-gate:slot=1",
+      "war-battles-server:stats:inputs-accepted:count=3"
+    ]
+  },
+  "runtime": {
+    "deno": "deno 2.9.7 (stable, release, aarch64-apple-darwin)",
+    "chrome": "Google Chrome 154.0.8037.57"
+  },
+  "sourceInputs": [
+    {
+      "path": "examples/war-battles-online/core",
+      "kind": "tree",
+      "fileCount": 16,
+      "bytes": 213409,
+      "sha256": "14624e727f6c24f1b37ac139ce9ee4dc40ac1cc76f1dd0d2859c0e9a898c95b4"
+    },
+    {
+      "path": "examples/war-battles-online/integration/check-real-webtransport.mjs",
+      "kind": "file",
+      "bytes": 14448,
+      "sha256": "0946b10cfe914794a28181b80336077727687aab740256294e0c376a760123fc"
+    },
+    {
+      "path": "examples/war-battles-online/integration/projections.mjs",
+      "kind": "file",
+      "bytes": 11002,
+      "sha256": "7398c64c7292c7e2e635b285b90f2d5967c5b2e2d53a5cdf2e696100bdc2a9cc"
+    },
+    {
+      "path": "examples/war-battles-online/integration/webtransport-evidence.mjs",
+      "kind": "file",
+      "bytes": 5965,
+      "sha256": "cc55d1f4919692d5c97d5439db551a03d952b48c534b4b0569e3043813d36702"
+    },
+    {
+      "path": "examples/war-battles-online/package.json",
+      "kind": "file",
+      "bytes": 3502,
+      "sha256": "a8ba1b080009f09491c07c1041da32c198a56be66624d0fa2604f909151591b6"
+    },
+    {
+      "path": "examples/war-battles-online/server/deno-main.ts",
+      "kind": "file",
+      "bytes": 7806,
+      "sha256": "a05af09fc4d19530dd5bea24bb1b216eadcb771ac2d9d5aa0f95f2604f7a2ffb"
+    },
+    {
+      "path": "package.json",
+      "kind": "file",
+      "bytes": 43106,
+      "sha256": "2aae366b9d68a40b84b79852a390a7826d872812e6ab713798a2513cede954a0"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "kind": "file",
+      "bytes": 78862,
+      "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
+    },
+    {
+      "path": "packages/cli/src/dev/browser-host.mjs",
+      "kind": "file",
+      "bytes": 13431,
+      "sha256": "8f85b23cb316de63981656a5c1f35fd55c09088ca1bc9138fda27f9ff237a9ba"
+    }
+  ],
+  "sourceKey": "9b0612ad1121ef8f541e475f6bf6d2b2e7e14d3eeacd018dcbdaba5c8c1c43e8",
+  "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence."
+}

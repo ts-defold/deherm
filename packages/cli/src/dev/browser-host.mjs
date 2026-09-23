@@ -296,9 +296,10 @@ export async function openBundlePage(options) {
   };
   try {
     const debuggingPort = options.debuggingPort ?? await freeLoopbackPort();
+    const initialUrl = options.deferNavigation === true ? "about:blank" : server.pageUrl;
     browser = await launchChrome({
       binary: options.chromeBinary,
-      url: server.pageUrl,
+      url: initialUrl,
       debuggingPort,
       headless: options.headless,
       spawn: options.spawn,
@@ -309,7 +310,7 @@ export async function openBundlePage(options) {
       { timeoutMs: options.serverTimeoutMs ?? 15_000, what: "the local bundle server" });
     const target = await waitFor(async () => {
       const targets = await (await fetch(`http://127.0.0.1:${debuggingPort}/json/list`)).json();
-      return targets.find((candidate) => candidate.type === "page" && candidate.url === server.pageUrl);
+      return targets.find((candidate) => candidate.type === "page" && candidate.url === initialUrl);
     }, { timeoutMs: options.browserTimeoutMs ?? 30_000, what: "the headless Chrome page target" });
     client = await connectCdp(target.webSocketDebuggerUrl, {
       retain: options.retain,

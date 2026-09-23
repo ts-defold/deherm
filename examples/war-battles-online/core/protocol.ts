@@ -146,7 +146,9 @@ export const RESUME_TOKEN_BYTES = 16;
 export const PLAYER_NAME_BYTES = 16;
 
 export const HELLO_BYTES = ENVELOPE_BYTES + 4 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES + 4;
-export const WELCOME_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
+const WELCOME_BASE_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
+/** The trailing cadence byte is an additive extension to the welcome frame. */
+export const WELCOME_BYTES = WELCOME_BASE_BYTES + 1;
 export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
 export const PING_BYTES = ENVELOPE_BYTES + 8;
 export const SNAPSHOT_MESSAGE_BYTES = ENVELOPE_BYTES + 4 + SNAPSHOT_BYTES;
@@ -179,6 +181,8 @@ export interface WelcomeMessage {
   mapSeed: number;
   serverTick: number;
   tickRate: number;
+  /** Ticks between authoritative snapshots; absent on legacy welcomes. */
+  snapshotIntervalTicks?: number;
   resumeToken: Uint8Array;
 }
 
@@ -253,11 +257,14 @@ export function writeWelcome(target: Uint8Array, message: Readonly<WelcomeMessag
   view.setUint32(12, message.mapSeed >>> 0, true);
   view.setUint32(16, message.serverTick >>> 0, true);
   target.set(message.resumeToken, 20);
+  view.setUint8(WELCOME_BASE_BYTES, message.snapshotIntervalTicks ?? 3);
   return WELCOME_BYTES;
 }
 
 export function readWelcome(payload: Uint8Array, output: WelcomeMessage): WelcomeMessage {
-  const view = expect(payload, MESSAGE_WELCOME, WELCOME_BYTES);
+  // Accept the pre-cadence frame while all current servers advertise the
+  // interval in the additive trailing byte.
+  const view = expect(payload, MESSAGE_WELCOME, WELCOME_BASE_BYTES);
   output.matchId = view.getUint32(4, true);
   output.playerId = view.getUint8(8);
   output.team = view.getUint8(9);
@@ -266,6 +273,7 @@ export function readWelcome(payload: Uint8Array, output: WelcomeMessage): Welcom
   output.mapSeed = view.getUint32(12, true);
   output.serverTick = view.getUint32(16, true);
   output.tickRate = TICK_RATE;
+  output.snapshotIntervalTicks = payload.byteLength >= WELCOME_BYTES ? view.getUint8(WELCOME_BASE_BYTES) : 3;
   output.resumeToken.set(payload.subarray(20, 20 + RESUME_TOKEN_BYTES));
   return output;
 }

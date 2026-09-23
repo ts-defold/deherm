@@ -158,6 +158,33 @@ Transport is selected after measuring Defold-supported native and browser
 options. The binding generator must ingest any chosen native extension instead
 of adding bespoke application bindings.
 
+## Bounded presentation and lifecycle tranche
+
+The online client now keeps a fixed-capacity pair of transform samples for all
+32 slots and samples remote hull/turret transforms across the authoritative
+snapshot interval advertised by the server (three ticks / 20 Hz by default).
+The local slot remains an immediate read from its predicted/reconciled world.
+Defold tank components consume this caller-owned sample, while a failed dial,
+pre-welcome reject, or pre-welcome close returns to the offline `PlayableBattle`
+that was created at arena start.
+This is presentation smoothing and connection fallback evidence; compact
+snapshots, reconnect after welcome, and the broader multiplayer release gate
+remain open work.
+
+## Real browser WebTransport tranche
+
+The production `GameTransport` adapter now passes a loopback Chrome-to-Deno 2.9
+HTTP/3/WebTransport gate. Chrome completes the 32-player authoritative welcome,
+applies multiple 20 Hz snapshots over the reliable lane, sends tick inputs as
+QUIC datagrams, and observes the authoritative MatchServer accept them.
+Repeated reliable frames use the existing bounded five-byte framing; focused
+adapter tests prove one persistent server stream and latest-only snapshot
+backpressure, while the loopback record makes no stream-open-count claim. The
+evidence artifact is mechanically source-bound, records the browser and Deno
+versions, and explicitly excludes WAN, ingress, native Defold, impairment,
+load, persistent-stream runtime, and allocation claims. Those remain separate
+gates rather than implied by loopback transport success.
+
 # Stage 3: over-the-top game expansion
 
 Use data-driven definitions for content so new items do not require new bridge

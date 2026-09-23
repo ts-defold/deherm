@@ -2220,3 +2220,79 @@ registration-profile mask for detection while keeping dispatch availability on
 the runtime adapter mask. All generated script families, including the constant
 adapter and the 405-route handle router across all six profiles, pass the broad
 sanitizer gate with the existing bounded-allocation and lifecycle assertions.
+
+## 2026-09-23 - Bounded online presentation and pre-welcome fallback
+
+The War Battles online client now has a fixed-capacity presentation history for
+the 32-player roster. Each remote hull/turret transform keeps the previous and
+current authoritative samples and is linearly sampled across the server-
+advertised snapshot cadence (three 60 Hz ticks / 20 Hz by default); the local
+player's transform continues to come directly from the predicted/reconciled
+`BattleWorld`. Defold's tank component
+uses the caller-owned sampler, so remote actors smooth without changing
+simulation state or allocating per frame. `BattleClient` also exposes reject
+and close lifecycle callbacks with a `welcomed` bit. The arena routes dial
+failure, pre-welcome rejection, and pre-welcome close into the already-created
+offline `PlayableBattle`; a post-welcome disconnect is deliberately not
+silently reclassified as offline. Focused tests cover the interpolation bounds,
+local immediacy, and pre-welcome close report. This tranche does not claim
+reconnect after welcome or delta-compressed snapshots. The Deno server adapter
+also closes a session whose readiness promise rejects, releases its receiver,
+and removes pending MatchServer bookkeeping; a deterministic focused test
+covers that failure path.
+
+## 2026-09-23 - Real Chrome-to-Deno WebTransport protocol gate
+
+War Battles now has an owned loopback integration gate that creates a short-lived
+P-256 certificate, launches the Deno 2.9 QUIC/HTTP3 server, bundles the real
+browser transport plus `BattleClient`, drives headless Chrome, and removes all
+resources on completion. The first real run proved the handshake, welcome and
+datagram lane but exposed Deno's server stream-credit limit because the adapter
+opened one unidirectional stream per snapshot. The server implementation now
+opens one persistent stream and repeats the existing bounded five-byte frames
+on it; fragmented and coalesced frames are decoded incrementally, and
+backpressure retains only the newest pending snapshot. Focused adapter tests
+prove the single-stream property; the real loopback gate deliberately does not
+promote that unit observation into a runtime stream-open count. The
+mechanically source-bound recorded run joined slot 1 in a 32-player roster,
+applied three authoritative snapshots, sent fourteen input datagrams, and observed
+the authoritative MatchServer accept at least three of them. This is genuine
+loopback HTTP/3/WebTransport protocol evidence; it is not WAN/ingress, native
+Defold, adverse-network, 32-human-load, persistent-stream runtime, or allocation
+evidence.
+
+A local adversarial pass then reproduced three transport ownership failures
+before this wave was committed: protocol errors released the logical player but
+did not close the QUIC session, each backpressured control frame could retain an
+independent waiter, and caller-owned reliable/datagram buffers could be mutated
+while an asynchronous write still referenced them. Protocol failure now closes
+the underlying session exactly once. Server control frames enter a fixed FIFO
+(32 frames / 256 KiB) before stream creation and one pump owns all backpressure;
+overflow closes fail-closed, while snapshots remain latest-only. Reliable
+payloads are owned before the first await, and tick datagrams use four
+preallocated staging slots, returning `backpressured` rather than allocating or
+growing a queue when all four are in flight. Focused delayed-writer and
+never-resolving-stream tests cover each bound. This is structural/unit evidence;
+the loopback run above separately proves successful real transport traffic.
+
+A final teardown pass closed the two remaining stream/session lifetime gaps.
+Each client-originated bidirectional reliable stream now cancels its unused
+readable half, while the server closes and releases the unused reverse writer;
+a peer reset of that reverse half remains stream-local rather than terminating
+the session. The datagram writer is aborted and released exactly once on
+terminal close. A capacity-rejected Deno connection also retains the upgraded
+session long enough to close it when `session.ready` rejects. Repeated-stream,
+peer-reset, datagram teardown, and rejected-readiness tests cover these paths.
+The source-bound loopback evidence was then regenerated on this exact tree and
+observed three snapshots, fourteen client inputs, and at least three inputs
+accepted by the authoritative match.
+
+The same integration wave rebuilt and re-observed the packaged arm64-macOS and
+HTML5/Wasm games. Native Defold loaded the current Dynamic Hermes bundle, ran
+the tutorial collision/score chain, engaged the offline arena and exited
+cleanly. The browser gate now attaches CDP before the first navigation so it
+cannot miss bootstrap logs, and checks Defold's viewport-dependent auto-fit
+camera by authored projection, aspect ratio and world bounds instead of pinning
+the native `2.00` zoom. The current Chrome run loaded all eight components,
+completed the tutorial, exercised every clamp state and engaged the arena with
+no page errors.

@@ -152,12 +152,16 @@ whose kind fixes the lane it is allowed on. Full table in
 **What is and is not proven.** The two-client match, the prediction agreeing with
 the server exactly, the reconciliation replay, the full-match refusal, the
 rejection of a packet claiming another player's slot, and the reliable control
-lane are all covered by `test/core.test.mjs` over the in-memory transport. **No
-real QUIC session has been opened by any gate in this repository.** The Deno
-host and the certificate procedure are written and typechecked; running them is
-the next gate, not a result in hand.
+lane are covered by `test/core.test.mjs` over the in-memory transport. The
+separate `pnpm runtime:webtransport` gate opens a real loopback
+Chrome-to-Deno HTTP/3/WebTransport session, completes the 32-player welcome,
+receives multiple authoritative snapshots over the server reliable lane, sends
+tick inputs through QUIC datagrams, and observes a MatchServer marker proving
+that at least three inputs were accepted server-side. The gate intentionally
+does not claim a persistent-stream open count. This is browser loopback
+evidence, not WAN/ingress, native Defold, load, loss, or allocation evidence.
 
-## Evidence, and what is currently stale
+## Evidence
 
 [`evidence/headless-soak.json`](./evidence/headless-soak.json) is a ten-minute
 32-bot match: 36,000 ticks, a 36,864,032-byte replay of the inputs the real bot
@@ -172,23 +176,32 @@ The source census excludes the generated `defold_hermes` and
 `defold_hermes_typed_native` installations so selecting a native or browser
 target cannot change an authored-game measurement.
 
-**The two packaged-engine evidence documents are stale.** Rebuilding the scene
-changed the authored project tree they are bound to, and re-recording them is a
-real engine run — Bob, a local Extender, a custom arm64-macOS engine, and for the
-browser a `wasm-web` bundle — which the change that broke them could not perform.
-The gates are unchanged and still refuse; the test suite names the debt with a
-skipped test and a companion test asserting that the gate does report staleness
-rather than passing quietly. See
-[`defold/PLAYABLE-BLOCKERS.md`](./defold/PLAYABLE-BLOCKERS.md) for the exact
-commands.
+[`evidence/webtransport-quic-loopback.json`](./evidence/webtransport-quic-loopback.json)
+records the real browser transport gate: Chrome connects to the Deno 2.9 QUIC
+endpoint with a short-lived pinned P-256 certificate, joins the 32-player
+authoritative match, applies at least three snapshots, sends at least three
+input datagrams, and observes at least three server-accepted inputs. Regenerate
+it with `pnpm runtime:webtransport --
+--record-evidence`; the gate owns and removes its certificate, server, browser
+profile, and static host.
 
-The marker contract those gates assert on is deliberately preserved: the scripted
-demonstration, its coordinates and all ten of its markers are unchanged, and two
-markers were added on purpose — `war-battles:arena-init` and
-`war-battles:arena-engaged` — so a re-recorded run observes that the match itself
-started and not only that the tutorial loop ran. The browser gate's in-engine
-component count moved from five to eight for the same reason, and
-`test/integration.test.mjs` asserts that number against the generated component
+The packaged native and HTML5 evidence documents are current for this tree.
+[`evidence/packaged-runtime-arm64-macos.json`](./evidence/packaged-runtime-arm64-macos.json)
+records the custom-engine run through the tutorial collision/score chain and
+arena engagement. [`evidence/browser-runtime-wasm-web.json`](./evidence/browser-runtime-wasm-web.json)
+records the same game in Chrome through the browser host, including the real
+auto-fit camera projection and all three clamp states. Both are artifact- and
+source-bound; their tests fail when code, generated output, or packaged bytes
+change without a fresh engine observation.
+
+The marker contract preserves the scripted demonstration, collision and score
+coordinates, then requires `war-battles:arena-init` and
+`war-battles:arena-engaged` so a run observes the match itself rather than only
+the tutorial loop. Native camera geometry remains exact. Browser camera geometry
+is checked semantically because Defold auto-fit is viewport-dependent: it must
+preserve the authored 1280x720 projection, 16:9 aspect ratio and world bounds.
+The browser gate's in-engine component count is eight, and
+`test/integration.test.mjs` asserts that count against the generated component
 manifest so the two cannot drift.
 
 ## Commands

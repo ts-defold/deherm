@@ -27,8 +27,8 @@
     ]
   },
   "platform": "wasm-web",
-  "bundleFingerprint": "cc048e6691d9d087cf034e694fb470ca9bbfde1a90cd9ede6a0c8d3297a0f67e",
-  "bundleSha256": "6f024d0f88621cc6217c97f67ceffafadfa41c9d9c077690469eaee4f55264e6",
+  "bundleFingerprint": "2f5471750d0e09db248111715828be2519e0a1089b64c469e9861bd34db58bf5",
+  "bundleSha256": "aeb2003e480f425557cc39c8be6a61a005e00eb3400da1721f46570f6cd8ccaa",
   "state": {
     "documentReady": "complete",
     "engineStarted": true,
@@ -42,7 +42,7 @@
       "ExampleMath",
       "Timer"
     ],
-    "bundleFingerprint": "cc048e6691d9d087cf034e694fb470ca9bbfde1a90cd9ede6a0c8d3297a0f67e",
+    "bundleFingerprint": "2f5471750d0e09db248111715828be2519e0a1089b64c469e9861bd34db58bf5",
     "canvas": {
       "width": 756,
       "height": 425
@@ -56,8 +56,6 @@
     "^INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from [1-9][0-9]* generated Lua symbols$"
   ],
   "requiredGameMarkers": [
-    "war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
-    "war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
     "war-battles:ui-init",
     "war-battles:player-init:560.0:360.0",
     "war-battles:player-fire:560.0:360.0:1.00:0.00",
@@ -68,11 +66,16 @@
     "war-battles:player-moved:1592.0:1072.0",
     "war-battles:arena-init:players=8:online=0",
     "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
+  ],
+  "requiredGameMarkerPatterns": [
+    "^war-battles:camera-init:zoom=([0-9]+(?:\\.[0-9]+)?):view=([0-9]+)x([0-9]+):cameras=1$",
+    "^war-battles:camera-bounds:x=\\[(-?[0-9]+(?:\\.[0-9]+)?),(-?[0-9]+(?:\\.[0-9]+)?)\\]:y=\\[(-?[0-9]+(?:\\.[0-9]+)?),(-?[0-9]+(?:\\.[0-9]+)?)\\]$"
   ],
   "observedGameMarkers": [
     "war-battles:arena-init:players=8:online=0",
-    "war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
-    "war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
+    "war-battles:hmr-reload:edit=initial:tick=0:entities=40:elapsed=0.000",
+    "war-battles:camera-init:zoom=1.18:view=1084x610:cameras=1",
+    "war-battles:camera-bounds:x=[230.1,1065.9]:y=[-47.1,783.1]",
     "war-battles:ui-init",
     "war-battles:player-init:560.0:360.0",
     "war-battles:rocket-init:1.00:0.00",
@@ -83,6 +86,15 @@
     "war-battles:player-moved:1592.0:1072.0",
     "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
   ],
+  "observedCamera": {
+    "zoom": 1.18,
+    "viewWidth": 1084,
+    "viewHeight": 610,
+    "minX": 230.1,
+    "maxX": 1065.9,
+    "minY": -47.1,
+    "maxY": 783.1
+  },
   "cameraSampleCount": 11,
   "cameraClampStates": [
     "none",

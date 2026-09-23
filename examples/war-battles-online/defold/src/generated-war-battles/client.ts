@@ -17,6 +17,7 @@ import {
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
   INPUT_HISTORY_TICKS,
+  MAX_PLAYERS,
   TICK_MILLISECONDS,
 } from "./constants";
 import { isWeaponId } from "./content";
@@ -33,6 +34,7 @@ import {
   PING_BYTES,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_BODY_OFFSET,
+  WELCOME_BYTES,
   createInputCommand,
   messageKind,
   readReject,
@@ -59,14 +61,38 @@ import { BattleWorld } from "./world";
 
 export type ClientState = "idle" | "connecting" | "ready" | "rejected" | "closed";
 
+/** A caller-owned presentation transform. Values are simulation units/directions. */
+export interface PlayerTransform {
+  x: number;
+  y: number;
+  hullX: number;
+  hullY: number;
+  turretX: number;
+  turretY: number;
+}
+
+export interface ClientClose {
+  readonly code: number;
+  readonly reason: string;
+  readonly state: ClientState;
+  /** True when the welcome handshake completed before this close. */
+  readonly welcomed: boolean;
+}
+
+/** Default cadence used by legacy welcomes and callers without a configuration. */
+export const REMOTE_INTERPOLATION_TICKS = 3;
+
 export interface BattleClientOptions {
   readonly name?: string;
+  /** Optional override for servers that do not advertise their snapshot cadence. */
+  readonly snapshotIntervalTicks?: number;
   /** Ticks the client runs ahead of the last snapshot it applied. */
   readonly leadTicks?: number;
   /** Turret assist, as in the offline match. Disable for a pointing device. */
   readonly assistAim?: boolean;
   readonly onWelcome?: (welcome: Readonly<WelcomeMessage>) => void;
   readonly onReject?: (reject: Readonly<RejectMessage>) => void;
+  readonly onClose?: (close: Readonly<ClientClose>) => void;
   readonly onError?: (error: unknown) => void;
   readonly onLog?: (line: string) => void;
 }
@@ -98,6 +124,7 @@ export class BattleClient implements TransportReceiver {
   private transport?: GameTransport;
   private readonly options: BattleClientOptions;
   private readonly assistAim: boolean;
+  private readonly configuredSnapshotIntervalTicks?: number;
   private readonly welcome: WelcomeMessage = {
     matchId: 0, playerId: 0, team: 0, maximumPlayers: 0, botCount: 0,
     mapSeed: 0, serverTick: 0, tickRate: 60, resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
@@ -112,12 +139,33 @@ export class BattleClient implements TransportReceiver {
   private readonly aim: Direction = createDirection();
   private readonly staging: InputCommand;
 
+  // Presentation history is deliberately fixed-capacity. The simulation world
+  // remains authoritative/predicted; these stores only hold the two remote
+  // transform samples needed by the Defold render components.
+  private readonly remotePreviousX = new Int32Array(MAX_PLAYERS);
+  private readonly remotePreviousY = new Int32Array(MAX_PLAYERS);
+  private readonly remotePreviousHullX = new Int16Array(MAX_PLAYERS);
+  private readonly remotePreviousHullY = new Int16Array(MAX_PLAYERS);
+  private readonly remotePreviousTurretX = new Int16Array(MAX_PLAYERS);
+  private readonly remotePreviousTurretY = new Int16Array(MAX_PLAYERS);
+  private readonly remoteCurrentX = new Int32Array(MAX_PLAYERS);
+  private readonly remoteCurrentY = new Int32Array(MAX_PLAYERS);
+  private readonly remoteCurrentHullX = new Int16Array(MAX_PLAYERS);
+  private readonly remoteCurrentHullY = new Int16Array(MAX_PLAYERS);
+  private readonly remoteCurrentTurretX = new Int16Array(MAX_PLAYERS);
+  private readonly remoteCurrentTurretY = new Int16Array(MAX_PLAYERS);
+  private readonly remoteHaveSample = new Uint8Array(MAX_PLAYERS);
+
   private accumulator = 0;
+  private remoteInterpolationMilliseconds = 0;
+  private remoteInterpolationTicks = REMOTE_INTERPOLATION_TICKS;
   private localTick = 0;
   private appliedSnapshotTick = -1;
   private snapshotAckBits = 0;
   private sequence = 0;
   private pendingSnapshot?: Uint8Array;
+  private pendingSnapshotTick = -1;
+  private welcomed = false;
 
   private moveX = 0;
   private moveY = 0;
@@ -131,6 +179,10 @@ export class BattleClient implements TransportReceiver {
     this.options = options;
     this.leadTicks = clamp(Math.trunc(options.leadTicks ?? 2), 0, 16);
     this.assistAim = options.assistAim ?? true;
+    this.configuredSnapshotIntervalTicks = options.snapshotIntervalTicks === undefined
+      ? undefined
+      : clamp(Math.trunc(options.snapshotIntervalTicks), 1, 30);
+    this.remoteInterpolationTicks = this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS;
     this.staging = createInputCommand(0, 1);
     for (let index = 0; index < INPUT_HISTORY_TICKS; index += 1) this.history.push(createInputCommand(0, 1));
     this.historyTick.fill(-1);
@@ -166,6 +218,33 @@ export class BattleClient implements TransportReceiver {
   }
 
   /**
+   * Samples one tank for presentation into caller-owned storage. The local
+   * predicted tank is always read immediately from `world`; remote tanks use
+   * the bounded pair of authoritative samples at the advertised cadence.
+   */
+  samplePlayerTransform(slot: number, output: PlayerTransform): boolean {
+    const world = this.world;
+    if (world === undefined || !Number.isInteger(slot) || slot < 0 || slot >= MAX_PLAYERS) return false;
+    if (slot === this.playerId - 1 || this.remoteHaveSample[slot] === 0) {
+      output.x = world.playerX[slot]!;
+      output.y = world.playerY[slot]!;
+      output.hullX = world.playerHullX[slot]!;
+      output.hullY = world.playerHullY[slot]!;
+      output.turretX = world.playerTurretX[slot]!;
+      output.turretY = world.playerTurretY[slot]!;
+      return true;
+    }
+    const alpha = Math.min(1, this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * this.remoteInterpolationTicks));
+    output.x = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
+    output.y = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
+    output.hullX = interpolate(this.remotePreviousHullX[slot]!, this.remoteCurrentHullX[slot]!, alpha);
+    output.hullY = interpolate(this.remotePreviousHullY[slot]!, this.remoteCurrentHullY[slot]!, alpha);
+    output.turretX = interpolate(this.remotePreviousTurretX[slot]!, this.remoteCurrentTurretX[slot]!, alpha);
+    output.turretY = interpolate(this.remotePreviousTurretY[slot]!, this.remoteCurrentTurretY[slot]!, alpha);
+    return true;
+  }
+
+  /**
    * Advances the local clock. Applies at most one pending snapshot per call, so
    * a burst that arrives while the caller was away costs one reconciliation
    * rather than one per snapshot.
@@ -173,6 +252,10 @@ export class BattleClient implements TransportReceiver {
   update(elapsedMilliseconds: number, maximumSteps = 8): number {
     if (this.state !== "ready" || this.world === undefined) return 0;
     this.applyPendingSnapshot();
+    this.remoteInterpolationMilliseconds = Math.min(
+      TICK_MILLISECONDS * this.remoteInterpolationTicks,
+      this.remoteInterpolationMilliseconds + Math.max(0, elapsedMilliseconds),
+    );
     this.accumulator += elapsedMilliseconds;
     let steps = 0;
     while (this.accumulator >= TICK_MILLISECONDS && steps < maximumSteps) {
@@ -226,6 +309,7 @@ export class BattleClient implements TransportReceiver {
     // caller that only sees "closed" cannot tell a full match from a dead link.
     if (this.state !== "rejected") this.state = "closed";
     this.options.onLog?.(`client-closed:${code}:${reason}`);
+    this.options.onClose?.({ code, reason, state: this.state, welcomed: this.welcomed });
   }
 
   // --- internals ------------------------------------------------------------
@@ -236,7 +320,12 @@ export class BattleClient implements TransportReceiver {
     this.team = this.welcome.team;
     this.rosterSize = this.welcome.maximumPlayers;
     this.resumeToken.set(this.welcome.resumeToken);
+    this.remoteInterpolationTicks = payload.byteLength >= WELCOME_BYTES
+      ? clamp(Math.trunc(this.welcome.snapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS), 1, 30)
+      : (this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS);
     this.world = new BattleWorld(this.welcome.matchId, this.welcome.mapSeed);
+    this.remoteHaveSample.fill(0);
+    this.remoteInterpolationMilliseconds = 0;
     // The roster is fixed for the round, so the client can build it up front and
     // let the first snapshot overwrite everything it just guessed.
     for (let playerId = 1; playerId <= this.welcome.maximumPlayers; playerId += 1) {
@@ -253,6 +342,7 @@ export class BattleClient implements TransportReceiver {
     this.staging.matchId = this.welcome.matchId;
     this.staging.playerId = this.welcome.playerId;
     this.state = "ready";
+    this.welcomed = true;
     this.options.onWelcome?.(this.welcome);
     this.options.onLog?.(`client-welcome:player=${this.playerId}:tick=${this.welcome.serverTick}:seed=${this.welcome.mapSeed}`);
   }
@@ -266,13 +356,14 @@ export class BattleClient implements TransportReceiver {
 
   private handleSnapshot(payload: Uint8Array): void {
     const tick = readSnapshotTick(payload);
-    if (tick <= this.appliedSnapshotTick) {
+    if (tick <= this.appliedSnapshotTick || tick <= this.pendingSnapshotTick) {
       this.stats.snapshotsIgnored += 1;
       return;
     }
     // Copy: the transport's buffer belongs to the transport, and the snapshot is
     // applied on the next `update` rather than inside a receive callback.
     this.pendingSnapshot = payload.slice();
+    this.pendingSnapshotTick = tick;
   }
 
   private handlePong(payload: Uint8Array): void {
@@ -286,6 +377,7 @@ export class BattleClient implements TransportReceiver {
     const payload = this.pendingSnapshot;
     if (payload === undefined || this.world === undefined) return;
     this.pendingSnapshot = undefined;
+    this.pendingSnapshotTick = -1;
     const tick = readSnapshotTick(payload);
     if (tick <= this.appliedSnapshotTick) {
       this.stats.snapshotsIgnored += 1;
@@ -294,6 +386,7 @@ export class BattleClient implements TransportReceiver {
     const world = this.world;
     const target = this.localTick;
     world.restoreSnapshot(payload, SNAPSHOT_BODY_OFFSET);
+    this.captureRemoteSnapshot(world);
     this.appliedSnapshotTick = tick;
     this.snapshotAckBits = ((this.snapshotAckBits << 1) | 1) >>> 0;
     this.stats.snapshotsApplied += 1;
@@ -316,6 +409,36 @@ export class BattleClient implements TransportReceiver {
     }
     this.localTick = world.tick;
     this.stats.replayedTicks += replayed;
+  }
+
+  private captureRemoteSnapshot(world: BattleWorld): void {
+    for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+      if (slot === this.playerId - 1) continue;
+      if (this.remoteHaveSample[slot] !== 0) {
+        this.remotePreviousX[slot] = this.remoteCurrentX[slot]!;
+        this.remotePreviousY[slot] = this.remoteCurrentY[slot]!;
+        this.remotePreviousHullX[slot] = this.remoteCurrentHullX[slot]!;
+        this.remotePreviousHullY[slot] = this.remoteCurrentHullY[slot]!;
+        this.remotePreviousTurretX[slot] = this.remoteCurrentTurretX[slot]!;
+        this.remotePreviousTurretY[slot] = this.remoteCurrentTurretY[slot]!;
+      }
+      this.remoteCurrentX[slot] = world.playerX[slot]!;
+      this.remoteCurrentY[slot] = world.playerY[slot]!;
+      this.remoteCurrentHullX[slot] = world.playerHullX[slot]!;
+      this.remoteCurrentHullY[slot] = world.playerHullY[slot]!;
+      this.remoteCurrentTurretX[slot] = world.playerTurretX[slot]!;
+      this.remoteCurrentTurretY[slot] = world.playerTurretY[slot]!;
+      if (this.remoteHaveSample[slot] === 0) {
+        this.remotePreviousX[slot] = this.remoteCurrentX[slot]!;
+        this.remotePreviousY[slot] = this.remoteCurrentY[slot]!;
+        this.remotePreviousHullX[slot] = this.remoteCurrentHullX[slot]!;
+        this.remotePreviousHullY[slot] = this.remoteCurrentHullY[slot]!;
+        this.remotePreviousTurretX[slot] = this.remoteCurrentTurretX[slot]!;
+        this.remotePreviousTurretY[slot] = this.remoteCurrentTurretY[slot]!;
+        this.remoteHaveSample[slot] = 1;
+      }
+    }
+    this.remoteInterpolationMilliseconds = 0;
   }
 
   private advanceOneTick(): void {
@@ -395,4 +518,8 @@ export class BattleClient implements TransportReceiver {
       this.options.onError?.(error);
     }
   }
+}
+
+function interpolate(previous: number, current: number, alpha: number): number {
+  return Math.trunc(previous + (current - previous) * alpha);
 }

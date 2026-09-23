@@ -386,9 +386,15 @@ export class ServerSession implements TransportReceiver {
       mapSeed: this.server.world.mapSeed,
       serverTick: this.server.world.tick,
       tickRate: TICK_RATE,
+      snapshotIntervalTicks: this.server.snapshotIntervalTicks,
       resumeToken: this.resumeToken,
     });
     this.ready = true;
+    // The client can send its first datagram immediately after processing the
+    // welcome, before the match's next fixed tick calls beginTick(). Grant the
+    // same bounded initial budget here so a healthy first input is not mistaken
+    // for a rate-limit violation.
+    this.inputBudget = this.server.inputBudgetPerTick;
     this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.welcomeBuffer);
     this.server.log(`session-joined:${this.name}:slot=${slot + 1}`);
   }

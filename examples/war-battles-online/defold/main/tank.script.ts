@@ -9,6 +9,7 @@ import {
 } from "@deherm/project";
 
 import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
+import type { PlayerTransform } from "../src/generated-war-battles/index";
 
 /**
  * One visible part of one tank: a hull or a turret.
@@ -55,6 +56,7 @@ interface TankSelf {
   turret: boolean;
   wrecked: boolean;
   z: number;
+  transform: PlayerTransform;
 }
 
 /**
@@ -82,6 +84,7 @@ export default defineComponent({
     self.turret = Math.trunc(self.part) === PART_TURRET;
     self.wrecked = false;
     self.z = go.getPosition().z;
+    self.transform = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
     const match = arenaMatch();
     const world = match?.world;
     const team = world === undefined ? 0 : world.playerTeam[Math.trunc(self.slot)]!;
@@ -90,7 +93,8 @@ export default defineComponent({
   },
 
   update(self: TankSelf, _dt: number): void {
-    const world = arenaMatch()?.world;
+    const match = arenaMatch();
+    const world = match?.world;
     if (world === undefined) return;
     const slot = Math.trunc(self.slot);
     if (world.playerActive[slot] === 0) {
@@ -110,10 +114,12 @@ export default defineComponent({
     }
     if (dead && self.turret) return;
 
-    go.setPosition(vmath.vector3(pixelX(world.playerX[slot]!), pixelY(world.playerY[slot]!), self.z));
+    const sampled = match?.samplePlayerTransform(slot, self.transform) ?? false;
+    if (!sampled) return;
+    go.setPosition(vmath.vector3(pixelX(self.transform.x), pixelY(self.transform.y), self.z));
     if (dead) return;
-    const directionX = self.turret ? world.playerTurretX[slot]! : world.playerHullX[slot]!;
-    const directionY = self.turret ? world.playerTurretY[slot]! : world.playerHullY[slot]!;
+    const directionX = self.turret ? self.transform.turretX : self.transform.hullX;
+    const directionY = self.turret ? self.transform.turretY : self.transform.hullY;
     go.setRotation(vmath.quatRotationZ(directionRadians(directionX, directionY)));
   },
 });
