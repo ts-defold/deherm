@@ -196,6 +196,33 @@ result types where a single-result function pushes one kind.
 `lua_pushnumber`/`lua_pushinteger` + `lua_setfield` inside a registration
 function are recorded as constants.
 
+## Script constant lowering
+
+Generated script modules consume the source-derived values carried by
+`defold-lua-registration-surface.json`; there is no per-name package override.
+The lowering report reconciles all 483 SDK constants against the two pinned
+registration trees and the six runtime manifest profiles. A finite number or
+string is emitted as a TypeScript literal only when the pinned registrations
+agree and their registration scope is an unconditional core Lua table, so
+`camera.ORTHO_MODE_FIXED = 0` works identically in Dynamic Hermes, Static
+Hermes, and the browser. Generic `physics` tables are core-registered even
+when the selected backend is `physics_null`; `b2d` and `bullet3d` scopes are
+derived from the profile catalog's documented feature roots. Registered values
+from feature-gated or unknown scopes, even equal literals, use a generated
+zero-argument stable-ID universal operation resolved by the existing
+ScriptCallFrame/Lua adapter. The report's `profiles` matrix and
+`profileAvailability` records carry registration scope and runtime-profile
+availability for each row.
+
+Declarations absent from both selected registration trees remain explicit
+`profile-unavailable` entries with the machine-readable
+`constant-not-registered` reason, while retaining the same generated stable-ID
+operation so a profile that supplies the module can execute it. Truly
+impossible entries remain a separate state and fail closed. No accessor
+silently falls back to a name-addressed lookup or an unconditional "not
+reviewed" throw. Hash-shaped literals remain subject to the same exact uint64
+safety rule when a future Defold registration exposes one.
+
 ## Fail closed
 
 Everything the parser cannot decide is an explicit blocker with a code, a

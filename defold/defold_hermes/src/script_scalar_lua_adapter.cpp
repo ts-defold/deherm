@@ -1889,7 +1889,7 @@ bool ScriptAdapter::bindUniversalValue(
     }
     lua_getfield(state_, -1, operation.member);
   }
-  if (!lua_isfunction(state_, -1)) {
+  if (!operation.constant && !lua_isfunction(state_, -1)) {
     lua_settop(state_, baseTop);
     return fail("Universal-value Lua function is unavailable");
   }
@@ -1940,7 +1940,8 @@ bool ScriptAdapter::readUniversalValue(
     }
     case LUA_TFUNCTION:
       return captureLuaClosure(absoluteIndex, output);
-    case LUA_TUSERDATA: {
+    case LUA_TUSERDATA:
+    case LUA_TLIGHTUSERDATA: {
       if (auto* value = dmScript::ToVector3(state_, absoluteIndex)) {
         output->tag = ScriptValueTag::kDefoldValue;
         output->defoldKind = ScriptDefoldValueKind::kVector3;
@@ -2179,11 +2180,11 @@ universal_value::DispatchStatus ScriptAdapter::invokeUniversalValue(
   for (uint32_t index = 0; index < frame->argumentCount; ++index) {
     if (!pushStructuredValue(frame->arguments[index], frame)) { ok = false; break; }
   }
-  if (ok && lua_pcall(state_, static_cast<int>(frame->argumentCount), LUA_MULTRET, 0) != 0) {
+  if (ok && !operation.constant && lua_pcall(state_, static_cast<int>(frame->argumentCount), LUA_MULTRET, 0) != 0) {
     const char* message = lua_tostring(state_, -1);
     ok = fail(message ? message : "Universal-value Lua call failed without an error string");
   }
-  const int actualResultCount = ok ? lua_gettop(state_) - callBase : 0;
+  const int actualResultCount = ok ? (operation.constant ? 1 : lua_gettop(state_) - callBase) : 0;
   if (ok && (actualResultCount < operation.minimumResultCount ||
              actualResultCount > operation.maximumResultCount)) {
     ok = fail("Universal-value Lua result count is outside the generated range");

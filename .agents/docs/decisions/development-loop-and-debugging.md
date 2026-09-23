@@ -243,6 +243,13 @@ disconnected, replaced-session, unknown, and schema-stale rows disappear rather
 than retaining or guessing values; ordinary TypeScript semantics remain with
 VS Code's built-in service.
 
+Each live-value CodeLens carries only the already-open document's normalized
+project root and authored TypeScript path as its navigation payload. The thin
+client's reveal command validates both fields against the refreshed project
+registry and the authored resource suffix before opening the document; runtime
+component data never supplies a URI or arbitrary path. Invalid, stale, or
+foreign payloads are silent no-ops.
+
 # Profiling
 
 The development Hermes build enables sampling-profiler support and carries the

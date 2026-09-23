@@ -26,9 +26,9 @@ test("final-build selection retains only reachable compatible units and shared p
     profile: "default-legacy-bullet"
   });
   assert.deepEqual(result.units.map(({ id }) => id), [...selectedIds].sort());
-  assert.equal(result.treeShaking.totalPlanUnits, 2287);
+  assert.equal(result.treeShaking.totalPlanUnits, 2428);
   assert.equal(result.treeShaking.selectedForEmissionUnits, 3);
-  assert.equal(result.treeShaking.notSelectedUnits, 2284);
+  assert.equal(result.treeShaking.notSelectedUnits, 2425);
   assert.ok(result.treeShaking.retainedMarshallingPrograms <= 3);
   assert.ok(result.treeShaking.retainedMarshallingPrograms < result.treeShaking.totalMarshallingPrograms);
   assert.deepEqual(result.diagnostics, []);
@@ -90,7 +90,7 @@ test("dynamic access chooses the full currently compatible pre-generated target 
   });
   const sourceRows = new Map(scriptProjection.rows.map((row, index) => [index, row]));
   const profileAvailable = (unit) => {
-    if (unit.identity.surface !== "script") return true;
+    if (unit.identity.surface !== "script" || unit.sourceRef.input !== "scriptProjection") return true;
     const availability = sourceRows.get(unit.sourceRef.row).availability;
     return availability.token === "core" || availability.token === "html5-host" ||
       availability.runtimeProfiles?.includes("default-legacy-bullet") === true;
@@ -100,7 +100,7 @@ test("dynamic access chooses the full currently compatible pre-generated target 
   const expectedDiagnostics = plan.units.filter((unit) =>
     unit.backends.dynamicHermesJsi.selection !== "emit" && profileAvailable(unit)).length;
   assert.equal(result.treeShaking.selectedForEmissionUnits, expected);
-  assert.equal(result.usage.requestedCount, 2287);
+  assert.equal(result.usage.requestedCount, 2428);
   assert.equal(result.diagnostics.length, expectedDiagnostics);
 });
 

@@ -43,6 +43,7 @@ import {
 } from "./binding-lowering-plan-recipe.mjs";
 
 const SCRIPT_IR = "defold-script-api-ir.json";
+const SCRIPT_CONSTANT_LOWERING = "defold-script-constant-lowering.json";
 const SCRIPT_DOCUMENTATION = "defold-script-sdk-documentation.json";
 const DMSDK_IR = "defold-sdk-ir.json";
 const DMSDK_DOCUMENTATION = "defold-dmsdk-sdk-documentation.json";
@@ -134,13 +135,14 @@ function semanticHandleTypes(handleLowering) {
   return result;
 }
 
-function renderScriptSdk(scriptIr, documentation, handleLowering) {
+function renderScriptSdk(scriptIr, documentation, handleLowering, constantLowering) {
   const model = scriptModel(scriptIr, documentation);
   const renderer = createScriptTypeRenderer(model);
   const trees = buildApiTrees(model);
   return {
     "script/types.ts": generateScriptTypes(model, renderer, trees, semanticHandleTypes(handleLowering)),
-    "script/modules.ts": generateScriptModules(trees),
+    "script/modules.ts": generateScriptModules(trees, new Map(
+      constantLowering.entries.map((entry) => [entry.name, entry]))),
     "script/runtime.ts": generateScriptRuntime(),
     "script/index.ts": generateScriptIndex(trees)
   };
@@ -393,8 +395,13 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   const documents = await realizeCompilerDocuments(compiler.documents ?? {});
   const recipes = compiler.realizationRecipes;
   if (!recipes || typeof recipes !== "object") throw new Error("Policy compiler surface has no realization recipes");
-  for (const required of [SCRIPT_IR, SCRIPT_DOCUMENTATION, DMSDK_IR, DMSDK_DOCUMENTATION, HANDLE_LOWERING]) {
+  for (const required of [SCRIPT_IR, SCRIPT_CONSTANT_LOWERING, SCRIPT_DOCUMENTATION, DMSDK_IR, DMSDK_DOCUMENTATION, HANDLE_LOWERING]) {
     if (!documents[required]) throw new Error(`Policy compiler surface is missing ${required}`);
+  }
+  const constantLowering = documents[SCRIPT_CONSTANT_LOWERING];
+  if (constantLowering.schemaVersion !== 1 || constantLowering.kind !== "deherm.script-constant-lowering" ||
+      constantLowering.defoldRevision !== revision || !Array.isArray(constantLowering.entries)) {
+    throw new Error(`${SCRIPT_CONSTANT_LOWERING}: invalid policy constant-lowering document`);
   }
   assertDmSdkUniversalStaticFrameCapacity(documents["defold-dmsdk-universal-bindings.json"]);
   for (const name of Object.keys(documents)) {
@@ -409,7 +416,7 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   }
 
   const rendered = {
-    ...renderScriptSdk(documents[SCRIPT_IR], documents[SCRIPT_DOCUMENTATION], documents[HANDLE_LOWERING]),
+    ...renderScriptSdk(documents[SCRIPT_IR], documents[SCRIPT_DOCUMENTATION], documents[HANDLE_LOWERING], constantLowering),
     ...renderDmSdk(documents[DMSDK_IR], documents[DMSDK_DOCUMENTATION]),
     "script/handle-lowering.ts": generateScriptHandleLowering(documents[HANDLE_LOWERING]),
     "script/universal-value-bindings.ts": generateScriptUniversalValue(documents["defold-script-universal-value-bindings.json"]),

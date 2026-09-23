@@ -125,7 +125,11 @@ test("live lenses consume only server-enriched current schemas for the exact aut
   }), [{
     targetId: "local-engine",
     componentId: "player",
-    title: "$(pulse) local-engine · player [3:1] · health=100, label=\"ready\""
+    title: "$(pulse) local-engine · player [3:1] · health=100, label=\"ready\"",
+    navigation: {
+      projectRoot: "/work/game",
+      documentPath: "/work/game/main/player.script.ts"
+    }
   }]);
   assert.deepEqual(liveValueLenses({
     state: fixtureState(),

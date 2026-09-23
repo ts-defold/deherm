@@ -537,7 +537,7 @@ test("dynamic access must be declared before a release retains the whole surface
   // Declaring it is not free: it costs the entire profile-available surface.
   const profileAvailable = plan.units.filter((unit) => {
     if (unit.backends.dynamicHermesJsi.selection !== "emit") return false;
-    if (unit.identity.surface !== "script") return true;
+    if (unit.identity.surface !== "script" || unit.sourceRef.input !== "scriptProjection") return true;
     const availability = projection.rows[unit.sourceRef.row].availability;
     return availability.token === "core" || availability.token === "html5-host" ||
       availability.runtimeProfiles?.includes(emission.profileId) === true;

@@ -6,6 +6,7 @@ import {
   dehermCliCandidates,
   languageServerLaunch,
   owningDehermProject,
+  resolveLiveValueDocument,
   resolveDehermCli,
   selectDehermProject,
   type DehermProject
@@ -86,6 +87,40 @@ test("the deepest nested Defold project exclusively owns its documents", () => {
   assert.equal(owningDehermProject(projects, "/work/main/root.script.ts", "linux")?.projectRoot, "/work");
   assert.equal(owningDehermProject(projects, "/work/examples/game/main/player.script.ts", "linux")?.projectRoot, "/work/examples/game");
   assert.equal(owningDehermProject(projects, "/outside/file.ts", "linux"), undefined);
+});
+
+test("live-value navigation resolves only an absolute authored resource owned by the named project", () => {
+  const projects: DehermProject[] = [
+    { workspaceRoot: "/work", projectRoot: "/work/game" },
+    { workspaceRoot: "/work", projectRoot: "/work/game/nested" }
+  ];
+  assert.equal(resolveLiveValueDocument(projects, {
+    projectRoot: "/work/game",
+    documentPath: "/work/game/main/player.script.ts"
+  }, "linux"), "/work/game/main/player.script.ts");
+  assert.equal(resolveLiveValueDocument(projects, {
+    projectRoot: "/work/game",
+    documentPath: "/work/game/main/player.lua"
+  }, "linux"), undefined);
+  assert.equal(resolveLiveValueDocument(projects, {
+    projectRoot: "/work/game",
+    documentPath: "/work/game/../foreign/main/player.script.ts"
+  }, "linux"), undefined);
+  assert.equal(resolveLiveValueDocument(projects, {
+    projectRoot: "/work/game",
+    documentPath: "/work/game/nested/main/player.script.ts"
+  }, "linux"), undefined);
+  assert.equal(resolveLiveValueDocument(projects, {
+    projectRoot: "/work/game",
+    documentPath: "main/player.script.ts"
+  }, "linux"), undefined);
+  assert.equal(resolveLiveValueDocument([{
+    workspaceRoot: "C:\\work",
+    projectRoot: "C:\\work\\game"
+  }], {
+    projectRoot: "c:\\work\\game",
+    documentPath: "C:\\work\\game\\main\\hud.gui.ts"
+  }, "win32"), "C:\\work\\game\\main\\hud.gui.ts");
 });
 
 test("language-server and debug launches use the selected Node executable with exact CLI arguments", () => {

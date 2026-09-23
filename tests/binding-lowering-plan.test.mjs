@@ -29,10 +29,12 @@ function replaceJson(text, mutate) {
 test("the canonical plan contains every API unit and all five backend dispositions", async () => {
   assert.equal(generated.schemaVersion, 2);
   assert.deepEqual(generated.coverage, {
-    units: 2287,
-    scriptUnits: 926,
+    units: 2428,
+    scriptUnits: 1067,
+    scriptFunctionUnits: 926,
+    scriptConstantUnits: 141,
     dmsdkUnits: 1361,
-    backendRecords: 11435,
+    backendRecords: 12140,
     identitySelectedPolicyRules: 0
   });
   assert.deepEqual(generated.targetOrder, [
@@ -42,9 +44,22 @@ test("the canonical plan contains every API unit and all five backend dispositio
     "luaStack",
     "browserWasmHost"
   ]);
-  assert.equal(new Set(generated.units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size, 2287);
+  assert.equal(new Set(generated.units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size, 2428);
   assert.ok(generated.units.every(({ backends }) => Object.keys(backends).join(",") === generated.targetOrder.join(",")));
-  assert.equal(generated.selectionSummary.typescriptSdk.emit, 2287);
+  const constantPolicy = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-script-constant-lowering.json"), "utf8"));
+  const constantUnits = generated.units.filter(({ sourceRef }) => sourceRef?.input === "scriptConstantLowering");
+  assert.equal(constantUnits.length, constantPolicy.entries.length - constantPolicy.counts.inlined);
+  for (const unit of constantUnits) {
+    const entry = constantPolicy.entries[unit.sourceRef.row];
+    assert.equal(unit.identity.id, `script:constant.${entry.name}`);
+    assert.equal(unit.identity.stableId, entry.stableId);
+  }
+  const physicsConstant = generated.units.find(({ identity }) => identity.id === "script:constant.physics.SHAPE_TYPE_MESH");
+  assert.equal(physicsConstant.availability.profileAvailability.kind, "runtime-profile-gated");
+  assert.ok(physicsConstant.availability.profiles.includes("no-physics"));
+  const cameraConstant = generated.units.find(({ identity }) => identity.id === "script:constant.camera.ORTHO_MODE_FIXED");
+  assert.equal(cameraConstant, undefined, "compile-time-intrinsic constants do not need universal lowering units");
+  assert.equal(generated.selectionSummary.typescriptSdk.emit, 2428);
   assert.equal(generated.evidenceBoundary.compilation, "not-claimed");
   assert.equal(generated.evidenceBoundary.runtime, "not-claimed");
   assert.match(generated.planSha256, /^[a-f0-9]{64}$/);
@@ -159,7 +174,9 @@ test("typed-native bridge exactly realizes the canonical script selection, inclu
   const selection = selectTypedNativeRoutes(generated, universal);
   const planned = generated.units.filter((unit) =>
     unit.identity.surface === "script" && unit.backends.staticHermesCAbi.selection === "emit");
-  assert.equal(planned.length, 325);
+  assert.equal(planned.filter(({ sourceState }) => sourceState.loweringFamily !== "script-constant").length, 325);
+  assert.equal(planned.filter(({ sourceState }) => sourceState.loweringFamily === "script-constant").length, 141);
+  assert.equal(planned.length, 466);
   assert.equal(selection.claimed.length, planned.length);
   assert.deepEqual(selection.declined, []);
   assert.equal(selection.maximumArgumentCount, universal.bounds.maximumArguments);

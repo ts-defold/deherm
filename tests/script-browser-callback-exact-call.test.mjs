@@ -10,10 +10,13 @@ import {
 
 test("browser exact vectors close every emitted direct-memory and callback route", async () => {
   const materialized = await materializeScriptBrowserCallbackExactVectors();
-  assert.equal(materialized.vectors.length, 911);
-  assert.equal(materialized.vectors.filter(({ lane }) => lane === "browser-wasm-direct-memory").length, 888);
-  assert.equal(materialized.vectors.filter(({ lane }) => lane === "browser-wasm-callback-registry").length, 23);
-  assert.equal(materialized.vectors.reduce((count, vector) => count + vector.callbackSlots.length, 0), 23);
+  const browserSummary = materialized.report.summary.browserExact;
+  const callbackRouteCount = browserSummary.callbackRouteCount;
+  assert.equal(materialized.vectors.length, browserSummary.routeCount);
+  assert.equal(materialized.vectors.filter(({ lane }) => lane === "browser-wasm-direct-memory").length,
+    browserSummary.routeCount - callbackRouteCount);
+  assert.equal(materialized.vectors.filter(({ lane }) => lane === "browser-wasm-callback-registry").length, callbackRouteCount);
+  assert.equal(materialized.vectors.reduce((count, vector) => count + vector.callbackSlots.length, 0), browserSummary.callbackCount);
   assert.ok(materialized.vectors.every((vector) =>
     Number.isInteger(vector.stableId) && vector.stableId > 0 &&
     vector.contract &&
@@ -24,7 +27,17 @@ test("browser exact vectors close every emitted direct-memory and callback route
     vector.callbackInvocation.resultValues.length === 2 &&
     typeof vector.lifecycle.lifetime === "string" &&
     typeof vector.lifecycle.owner === "string"));
-  assert.equal(new Set(materialized.vectors.map(({ stableId }) => stableId)).size, 911);
+  assert.equal(new Set(materialized.vectors.map(({ stableId }) => stableId)).size, browserSummary.routeCount);
+  const constantRoutes = materialized.report.routes.filter(({ loweringFamily, applicability }) =>
+    loweringFamily === "script-constant" &&
+    materialized.report.applicabilityCatalog.lanes[applicability[materialized.report.applicabilityCatalog.targets.indexOf("browser-wasm")]].status === "exercise");
+  const constantVectors = materialized.vectors.filter(({ id }) =>
+    constantRoutes.some((route) => route.id === id));
+  assert.equal(constantVectors.length, constantRoutes.length);
+  const constant = constantVectors.find(({ id }) => id === "script:constant.physics.SHAPE_TYPE_MESH");
+  assert.ok(constant, "generated browser exact vectors omit a constant route");
+  assert.equal(constant.lane, "browser-wasm-direct-memory");
+  assert.deepEqual([constant.contract.argumentValues, constant.contract.resultValues], [[], ["num:257"]]);
   assert.match(materialized.manifestSha256, /^[0-9a-f]{64}$/);
 });
 

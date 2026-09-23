@@ -43,6 +43,7 @@ struct Operation {
   uint16_t outputTableEntryCapacity;
   uint8_t matrix4Arena;
   uint8_t urlArena;
+  uint8_t constant;
 };
 
 struct LuaApi {
@@ -50,7 +51,7 @@ struct LuaApi {
   DispatchStatus (*invoke)(void*, const Operation&, ScriptCallFrame*, char*, size_t) noexcept = nullptr;
 };
 
-inline constexpr size_t kOperationCount = 915;
+inline constexpr size_t kOperationCount = 1056;
 inline constexpr size_t kMaximumArgumentCount = 32;
 inline constexpr size_t kMaximumResultCount = 4;
 inline constexpr uint32_t kMaximumDepth = 8;

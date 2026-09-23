@@ -8,7 +8,7 @@ export interface DefoldScriptBridge {
   call(stableId: number, args: readonly unknown[]): unknown;
   /** Generated execution target used to fail closed before unsupported host codecs run. */
   readonly target?: "native-hermes" | "html5-browser-host";
-  /** Constants remain name-addressed until generated constant IDs join the universal ABI. */
+  /** Legacy name-addressed constant lookup, retained for host integrations. Generated constants do not use it. */
   get?(modulePath: string, memberName: string): unknown;
 }
 
@@ -36,8 +36,16 @@ export function callScriptApi(stableId: number, args: readonly unknown[]): unkno
   return installed.call(stableId, args);
 }
 
-export function getScriptApiValue(modulePath: string, memberName: string): unknown {
-  const installed = bridge();
-  if (!installed.get) throw new Error("Defold script constants are not executable through the universal bridge yet");
-  return installed.get(modulePath, memberName);
+export function failScriptApiConstant(modulePath: string, memberName: string, reason: string): never {
+  const error = new Error("Defold script constant " + modulePath + "." + memberName + " is not executable: " + reason) as Error & {
+    code?: string;
+    modulePath?: string;
+    memberName?: string;
+    reason?: string;
+  };
+  error.code = "DEHERM_SCRIPT_CONSTANT_NOT_INLINED";
+  error.modulePath = modulePath;
+  error.memberName = memberName;
+  error.reason = reason;
+  throw error;
 }

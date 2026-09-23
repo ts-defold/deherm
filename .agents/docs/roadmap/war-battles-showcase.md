@@ -113,13 +113,18 @@ pinned local-Extender arm64-macOS engine:
   out of the tutorial's own four ground tiles and single 4x2 prop; the authored
   51x49 map is preserved verbatim inside it and every original world coordinate
   is unchanged.
-* The scale policy is a fixed integer camera zoom: reference display 1280x720,
-  `orthographic_projection` with `ORTHO_MODE_FIXED` and `orthographic_zoom = 2`,
-  which the engine turns into a 640x360 world-unit view. It is written down with
-  its rejected alternatives in the project README.
-* The camera script derives its clamp rectangle by reading
-  `orthographic_zoom` back off the active render camera, so the clamp and the
-  projection cannot drift apart.
+* The scale policy uses a 1280x720 reference display,
+  `orthographic_projection` with `ORTHO_MODE_AUTO_FIT`, and an authored
+  `orthographic_zoom = 2`. The camera script multiplies that authored zoom by
+  `camera.getOrthographicAutoZoom(active)` to derive the effective zoom and
+  clamp the world to the actual viewport; the rejected alternatives are written
+  down in the project README.
+* The current HTML5 playability gate proves WebGL2 input, restart, sound, and
+  visible composed pixels after the auto-fit camera fix. It retains
+  `build/evidence/war-battles-html5.png` (SHA-256
+  `1d1f6631f47163a4118024b6fb170d7c07d5009cb856fc1604cd0cccce7507f0`) as
+  human-review evidence; the assertion is the machine-checked playability
+  markers and viewport visibility, not screenshot aesthetics alone.
 
 The stage found the binding gap it was supposed to find. World-space addressing
 is declared but not implemented: `go.get_position`, `go.set_position` and

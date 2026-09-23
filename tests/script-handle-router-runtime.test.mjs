@@ -17,14 +17,14 @@ test("all generated native handle routes cross the pinned Lua 5.1 router", { tim
     cwd: root,
     encoding: "utf8"
   });
-  assert.match(output, /script-handle-router:routes:343:ok/);
+  assert.match(output, /script-handle-router:routes:405:ok/);
   assert.match(output, /script-handle-router:profiles:6:ok/);
-  assert.match(output, /script-handle-router:profile:default-legacy-bullet:routes:253:ok/);
-  assert.match(output, /script-handle-router:profile:v3-bullet:routes:318:ok/);
-  assert.match(output, /script-handle-router:profile:legacy-no-bullet:routes:122:ok/);
-  assert.match(output, /script-handle-router:profile:v3-no-bullet:routes:187:ok/);
-  assert.match(output, /script-handle-router:profile:bullet-only:routes:139:ok/);
-  assert.match(output, /script-handle-router:profile:no-physics:routes:8:ok/);
+  assert.match(output, /script-handle-router:profile:default-legacy-bullet:routes:313:ok/);
+  assert.match(output, /script-handle-router:profile:v3-bullet:routes:380:ok/);
+  assert.match(output, /script-handle-router:profile:legacy-no-bullet:routes:182:ok/);
+  assert.match(output, /script-handle-router:profile:v3-no-bullet:routes:249:ok/);
+  assert.match(output, /script-handle-router:profile:bullet-only:routes:201:ok/);
+  assert.match(output, /script-handle-router:profile:no-physics:routes:70:ok/);
   assert.match(output, /script-handle-router:protected-errors:7:ok/);
   assert.match(output, /script-handle-router:profile-detection-negatives:6:ok/);
   assert.match(output, /script-handle-router:profile-detection-allocations:0/);

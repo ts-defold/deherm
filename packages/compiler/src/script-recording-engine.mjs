@@ -357,8 +357,24 @@ export function buildRecordingEngineModel(inputs) {
     errorModel: "status-return-and-target-exception",
     scratch: "caller-owned-bounded-reentrant-scratch"
   });
+  // Constant universal operations are generated from the revision-derived
+  // registration surface rather than the callable projection IR. They still
+  // have an exact zero-argument/one-result transport contract, so give the
+  // recording model that mechanical contract instead of pretending a
+  // function projection row exists.
+  const rowForBinding = (binding) => projectionRows.get(binding.id) ??
+    (binding.loweringFamily === "script-constant" ? {
+      context: { token: "unspecified" },
+      effects: {},
+      runtimeModulePath: binding.modulePath,
+      runtimeMember: binding.member,
+      signature: {
+        parameters: [],
+        returns: [{ value: { kind: "dynamic" } }]
+      }
+    } : null);
   const fallbackContracts = [...new Set(universal.bindings.map((binding) => {
-    const row = projectionRows.get(binding.id);
+    const row = rowForBinding(binding);
     assert(row, `universal binding ${binding.id} has no projection row`);
     return canonicalJson(projectionContract(row));
   }))].sort(compareCodeUnits);
@@ -486,7 +502,7 @@ export function buildRecordingEngineModel(inputs) {
 
   const routes = [];
   for (const binding of [...universal.bindings].sort((left, right) => compareCodeUnits(left.id, right.id))) {
-    const row = projectionRows.get(binding.id);
+    const row = rowForBinding(binding);
     assert(row, `universal binding ${binding.id} has no projection row`);
     const canonicalUnit = planUnits.get(binding.id);
     const fallbackContract = projectionContract(row);

@@ -70,7 +70,11 @@ export function buildScriptRouteSymbolIndex(scriptApiIr, loweringPlan) {
   }
   const functions = new Map(scriptApiIr.functions.map((item) => [item.id, item]));
   if (functions.size !== scriptApiIr.functions.length) throw new Error("Script API IR contains duplicate route ids");
-  const scriptUnits = loweringPlan.units.filter(({ identity }) => identity.surface === "script");
+  // Constants have generated stable-ID transport units in the lowering plan,
+  // but their TypeScript surface is literal/intrinsic and therefore has no
+  // callable member path for the checker to resolve.
+  const scriptUnits = loweringPlan.units.filter(({ identity, sourceRef }) =>
+    identity.surface === "script" && sourceRef?.input === "scriptProjection");
   const members = {};
   const byStableId = {};
   const namespaces = {};

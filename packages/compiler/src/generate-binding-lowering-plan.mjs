@@ -21,6 +21,7 @@ export const inputPaths = Object.freeze({
   scriptUrlAddress: "packages/bindings/generated/defold-script-url-address-classification.json",
   scriptHandleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
   scriptUniversalValue: "packages/bindings/generated/defold-script-universal-value-bindings.json",
+  scriptConstantLowering: "packages/bindings/generated/defold-script-constant-lowering.json",
   defoldValueLayouts: "packages/bindings/generated/defold-value-layouts.json",
   dmsdkProjection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   dmsdkUniversal: "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
@@ -198,6 +199,56 @@ function scriptUnit(row, rowIndex) {
       loweringFamily: row.loweringFamily,
       accountingCategory: row.evidence.accountingCategory,
       currentTargets: row.targets
+    }
+  };
+}
+
+function scriptConstantUnit(binding, entry, rowIndex) {
+  if (!entry || entry.stableId !== binding.stableId) {
+    throw new Error(`script-constant: stable identity drift for ${binding.id}`);
+  }
+  return {
+    identity: { surface: "script", id: binding.id, stableId: binding.stableId },
+    sourceRef: { input: "scriptConstantLowering", row: rowIndex },
+    publicSignature: {
+      parameters: [],
+      returns: [{ value: { kind: "dynamic" } }]
+    },
+    availability: {
+      kind: entry.state,
+      linkage: "generated-lua-registration",
+      runtimeAvailable: (entry.profileAvailability?.runtimeProfiles?.length ?? 0) > 0,
+      profiles: entry.profileAvailability?.runtimeProfiles ?? [],
+      profileAvailability: entry.profileAvailability
+    },
+    resolvedContract: {
+      context: { token: "unspecified" },
+      ownership: { token: "borrowed-static-constant" },
+      lifetime: { token: "runtime-profile-lifetime" },
+      thread: { token: "defold-script-thread-from-context" },
+      callback: { token: "none" },
+      invalidation: { token: "none" },
+      errorModel: { token: "status-return-and-target-exception" },
+      scratch: { token: "caller-owned-bounded-reentrant-scratch" }
+    },
+    abi: {
+      state: "existing-generated-entry",
+      symbol: `deherm_script_route_${binding.stableId.toString(16).padStart(8, "0")}`,
+      version: 1,
+      callingConvention: "extern-c",
+      statusReturn: "i32",
+      invoker: { kind: "cached-lua-route", stableId: binding.stableId }
+    },
+    shapeKinds: ["dynamic"],
+    unresolvedTokens: [],
+    sourceState: {
+      loweringFamily: "script-constant",
+      accountingCategory: "executable-stable-id",
+      currentTargets: {
+        nativeDynamicHermes: { disposition: "backend-emitted" },
+        nativeStaticHermes: { disposition: "backend-emitted" },
+        html5BrowserHost: { disposition: "backend-emitted" }
+      }
     }
   };
 }
@@ -397,7 +448,7 @@ function genericImplementationRecord(definition, entry, reportRow) {
 }
 
 function implementationLaneIndex(units, inputs, defoldRevision) {
-  const { scriptHandleLowering, scriptUniversalValue, dmsdkUniversal, dmsdkCStringValue, dmsdkBorrowedHandle } = inputs;
+  const { scriptHandleLowering, scriptUniversalValue, scriptConstantLowering, dmsdkUniversal, dmsdkCStringValue, dmsdkBorrowedHandle } = inputs;
   const unitsById = new Map(units.map((unit) => [unit.identity.id, unit]));
   const lanes = new Map(units.map((unit) => [unit.identity.id, []]));
   const laneIds = new Set();
@@ -426,6 +477,11 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
       scriptUniversalValue.defoldRevision !== defoldRevision ||
       scriptUniversalValue.bindings.length !== scriptUniversalValue.candidateCount) {
     throw new Error("Script universal-value implementation lane schema, revision, or census drifted");
+  }
+  if (scriptConstantLowering.schemaVersion !== 1 ||
+      scriptConstantLowering.defoldRevision !== defoldRevision ||
+      scriptConstantLowering.entries.length !== scriptConstantLowering.counts.total) {
+    throw new Error("Script constant-lowering implementation lane schema, revision, or census drifted");
   }
   for (let reportRow = 0; reportRow < scriptUniversalValue.bindings.length; ++reportRow) {
     const binding = scriptUniversalValue.bindings[reportRow];
@@ -767,7 +823,8 @@ function backendRecord(unit, target, resolutions, implementationLanes, valueType
   } else if (!target.surfaces.includes(unit.identity.surface)) {
     selection = "blocked-capability";
     blockers.push(`surface:${unit.identity.surface}`);
-  } else if (unit.identity.surface === "script" && unit.availability.runtimeAvailable === false) {
+  } else if (unit.identity.surface === "script" && unit.availability.runtimeAvailable === false &&
+    !(unit.sourceState.loweringFamily === "script-constant" && universalScriptTarget)) {
     selection = "omit-profile";
     blockers.push("unavailable-in-all-pinned-runtime-profiles");
   } else if (unit.sourceState.accountingCategory === "component-property-compiler") {
@@ -871,6 +928,7 @@ function compactUnits(units, implementationLanes) {
   const compact = units.map((unit) => ({
     identity: unit.identity,
     sourceRef: unit.sourceRef,
+    ...(unit.sourceState.loweringFamily === "script-constant" ? { availability: unit.availability } : {}),
     signatureSha256: sha256(JSON.stringify(unit.publicSignature)),
     contract: compactContract(unit.resolvedContract),
     contractDetails: contracts.intern(unit.resolvedContract),
@@ -960,10 +1018,17 @@ function runtimeCoverage(units, targets) {
 
 export function generateBindingLoweringPlan(inputs) {
   const parsed = Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, JSON.parse(content)]));
-  const { scriptProjection, dmsdkProjection, semanticPolicies } = parsed;
+  const { scriptProjection, scriptUniversalValue, scriptConstantLowering, dmsdkProjection, semanticPolicies } = parsed;
   if (scriptProjection.defoldRevision !== dmsdkProjection.defoldRevision) throw new Error("Projection Defold revisions differ");
   if (scriptProjection.routeCount !== 926 || scriptProjection.rows.length !== 926) throw new Error("Script projection census drifted");
   if (dmsdkProjection.coverage.projectedDeclarations !== 1361 || dmsdkProjection.rows.length !== 1361) throw new Error("dmSDK projection census drifted");
+  const constantEntriesByName = new Map(scriptConstantLowering.entries.map((entry, rowIndex) => [entry.name, { entry, rowIndex }]));
+  const constantBindings = scriptUniversalValue.bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant");
+  if (constantEntriesByName.size !== scriptConstantLowering.entries.length ||
+      scriptConstantLowering.entries.length !== scriptConstantLowering.counts.total ||
+      constantBindings.length !== scriptConstantLowering.counts.runtimeBacked + scriptConstantLowering.counts.profileUnavailable) {
+    throw new Error("Script constant lowering and universal binding censuses differ");
+  }
   const targets = targetOrder.map((name) => parsed[name]);
   if (new Set(targets.map(({ target }) => target)).size !== targetOrder.length) throw new Error("Target capability names are duplicated");
   for (let index = 0; index < targets.length; index += 1) {
@@ -976,10 +1041,15 @@ export function generateBindingLoweringPlan(inputs) {
   }
   const units = [
     ...scriptProjection.rows.map(scriptUnit),
+    ...constantBindings.map((binding) => {
+      const source = constantEntriesByName.get(binding.id.slice("script:constant.".length));
+      if (!source) throw new Error(`script constant ${binding.id} has no lowering-policy entry`);
+      return scriptConstantUnit(binding, source.entry, source.rowIndex);
+    }),
     ...dmsdkProjection.rows.map(dmsdkUnit)
   ].sort((left, right) => compareCodeUnits(left.identity.surface, right.identity.surface) || compareCodeUnits(left.identity.id, right.identity.id));
-  if (units.length !== 2287 || new Set(units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size !== 2287) {
-    throw new Error("Unified lowering plan must contain 2,287 unique units");
+  if (units.length !== 2428 || new Set(units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size !== 2428) {
+    throw new Error("Unified lowering plan must contain 2,428 unique units");
   }
   const { resolutions, ruleMatches } = applySemanticPolicies(units, semanticPolicies);
   const implementationLanes = implementationLaneIndex(
@@ -1019,6 +1089,8 @@ export function generateBindingLoweringPlan(inputs) {
     coverage: {
       units: units.length,
       scriptUnits: units.filter(({ identity }) => identity.surface === "script").length,
+      scriptFunctionUnits: scriptProjection.rows.length,
+      scriptConstantUnits: constantBindings.length,
       dmsdkUnits: units.filter(({ identity }) => identity.surface === "dmsdk").length,
       backendRecords: units.length * targetOrder.length,
       identitySelectedPolicyRules: 0

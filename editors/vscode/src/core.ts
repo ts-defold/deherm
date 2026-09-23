@@ -52,6 +52,32 @@ export function owningDehermProject(
 }
 
 /**
+ * Resolve the editor-owned navigation payload carried by a live-value lens.
+ *
+ * Runtime rows never contribute either path. Revalidating the payload here
+ * still matters because VS Code commands are public and can be invoked by
+ * other extensions or stale UI state.
+ */
+export function resolveLiveValueDocument(
+  projects: readonly DehermProject[],
+  navigation: unknown,
+  platform: NodeJS.Platform = process.platform
+): string | undefined {
+  if (navigation === null || typeof navigation !== "object") return undefined;
+  const candidate = navigation as { projectRoot?: unknown; documentPath?: unknown };
+  if (typeof candidate.projectRoot !== "string" || typeof candidate.documentPath !== "string") return undefined;
+
+  const paths = pathsFor(platform);
+  if (!paths.isAbsolute(candidate.projectRoot) || !paths.isAbsolute(candidate.documentPath)) return undefined;
+  const projectRoot = paths.resolve(candidate.projectRoot);
+  const documentPath = paths.resolve(candidate.documentPath);
+  const project = projects.find((entry) => samePath(paths.resolve(entry.projectRoot), projectRoot, platform));
+  if (!project || owningDehermProject(projects, documentPath, platform) !== project ||
+      !/\.(?:script|gui|render)\.ts$/u.test(documentPath)) return undefined;
+  return documentPath;
+}
+
+/**
  * Return the deterministic Node-style search for the project-local CLI.
  *
  * The search stops at the workspace boundary when that boundary contains the

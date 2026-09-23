@@ -31,6 +31,7 @@ import {
   documentedNameOf,
   interpretRegistrations
 } from "./lib/lua-c-registration.mjs";
+import { deriveConstantValues } from "./lib/defold-constant-values.mjs";
 
 const repositoryRoot = fileURLToPath(new URL("../", import.meta.url));
 const defaultPolicy = "packages/bindings/overrides/lua-registration-surface-targets.json";
@@ -653,6 +654,11 @@ async function analyzeTarget(target, policy) {
   const blockers = [...interpretation.blockers.map((item) => ({ ...item, route: null }))];
   for (const file of project.files) for (const item of file.blockers) blockers.push({ ...item, route: null });
   const { routes, constants, commentedOut } = registeredRoutes(interpretation, project, helpers, blockers);
+  const constantValues = deriveConstantValues([...collected.sources, ...collected.headers], constants);
+  for (const constant of constants) {
+    const value = constantValues.get(constant.name);
+    if (value) Object.assign(constant, value);
+  }
 
   const diagnostics = [];
   let declared;
@@ -999,6 +1005,17 @@ async function generate(options) {
   };
   const surface = `${JSON.stringify(report, null, 2)}\n`;
 
+  // Constant values are additive realization evidence. They must not churn
+  // the route-registration gate (and every downstream route-evidence digest)
+  // when the registered route surface itself is unchanged.
+  const gateSourceReport = structuredClone(report);
+  for (const target of Object.values(gateSourceReport.targets)) {
+    for (const constant of target.registeredConstants ?? []) {
+      delete constant.value;
+      delete constant.source;
+    }
+  }
+
   // The gate only speaks for the engine, whose targets are the mutually
   // exclusive build variants of one tree. An extension target is a separate
   // product with its own emission decision, and an unverifiable target has no
@@ -1019,7 +1036,7 @@ async function generate(options) {
       "require-parameter": "The documented parameter is optional but the C body refuses its omission on every path. A generated signature must mark it required, or block the route."
     },
     sourceReport: defaultOutput,
-    sourceReportSha256: sha256(surface),
+    sourceReportSha256: sha256(`${JSON.stringify(gateSourceReport, null, 2)}\n`),
     engineTargets: engineTargetIds,
     counts: gated.counts,
     findings: gated.findings

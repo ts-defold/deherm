@@ -2127,6 +2127,12 @@ void installProviders(lua_State* state) {
     const auto* operation=defold_hermes::universal_value::find(kDehermRecordingRoutes[route].stableId);
     expect(operation!=nullptr,"missing-universal-operation",route,"stable id not found");
     if(operation->modulePath[0])ensureModule(state,operation->modulePath);
+    if(operation->constant){
+      // Constant routes are bound values; ScriptAdapter does not lua_pcall them.
+      lua_pushnumber(state,257.0);
+      if(operation->modulePath[0]){lua_setfield(state,-2,operation->member);lua_pop(state,1);}else lua_setglobal(state,operation->member);
+      continue;
+    }
     lua_pushinteger(state,route);lua_pushcclosure(state,LuaProvider,1);
     if(operation->modulePath[0]){lua_setfield(state,-2,operation->member);lua_pop(state,1);}else lua_setglobal(state,operation->member);
   }
@@ -2238,7 +2244,7 @@ int main(){
     if(pushed){expect(adapter.pushComponentContext(selected),"component-context-push",route,adapter.lastError());}
     const bool ok=api.dispatch(api.context,&frame);
     if(pushed){adapter.popComponentContext();}
-    expect(ok,"adapter-dispatch",route,api.lastError(api.context));expect(gFailure.code[0]=='\\0',gFailure.code,route,gFailure.detail.c_str());expect(gCalls[route]==1,"provider-call-count",route,"");expect(lua_gettop(state)==before,"lua-stack-not-restored",route,"");expect(currentInstance(state)==gPreviousInstance,"instance-not-restored",route,"");expect(frame.resultCount==descriptor.resultCount,"result-count-mismatch",route,"");
+    expect(ok,"adapter-dispatch",route,api.lastError(api.context));expect(gFailure.code[0]=='\\0',gFailure.code,route,gFailure.detail.c_str());const auto* universalOperation=defold_hermes::universal_value::find(descriptor.stableId);expect(universalOperation!=nullptr,"missing-universal-operation",route,"");if(!universalOperation->constant)expect(gCalls[route]==1,"provider-call-count",route,"");expect(lua_gettop(state)==before,"lua-stack-not-restored",route,"");expect(currentInstance(state)==gPreviousInstance,"instance-not-restored",route,"");expect(frame.resultCount==descriptor.resultCount,"result-count-mismatch",route,"");
     for(uint32_t i=0;i<frame.resultCount;++i){const uint32_t shape=kDehermRecordingShapeRefs[descriptor.resultFirst+i];const auto* tailRoute=defold_hermes::value_tail::find(descriptor.stableId);const bool domainResult=i==0&&tailRoute&&defold_hermes::value_tail::resultDomainCounts()[tailRoute->index];if(domainResult){const double expected=defold_hermes::value_tail::resultDomainValues()[defold_hermes::value_tail::resultDomainOffsets()[tailRoute->index]];expect(frame.results[i].tag==ScriptValueTag::kNumber&&frame.results[i].number==expected,"result-domain-value-mismatch",route,"");continue;}const std::string actual=scriptSpec(frame.results[i],shape,257+i);const std::string expected=expectedSpec(shape,257+i);expect(actual==expected,"result-value-mismatch",route,(actual+" != "+expected).c_str());}
   }
   expect(exercised==DEHERM_RECORDING_LUA_EXACT_COUNT&&skipped==DEHERM_RECORDING_LUA_SKIP_COUNT,"generated-partition-drift",0,"");
@@ -2602,6 +2608,18 @@ function browserExactRoutes(model) {
         `${route.id}: browser callback applicability has no callback exact vector`);
     }
     const contract = model.exactVectorCatalog.vectors[route.exactVector.contract];
+    if (route.loweringFamily === "script-constant") {
+      assert(route.argumentShapes.length === 0,
+        `${route.id}: browser constant exact vector must have zero arguments`);
+      assert(route.resultShapes.length === 1,
+        `${route.id}: browser constant exact vector must have one value result`);
+      assert(contract.argumentValues.length === 0,
+        `${route.id}: browser constant contract must have zero argument values`);
+      assert(contract.resultValues.length === 1,
+        `${route.id}: browser constant contract must have one result value`);
+      assert(override === undefined,
+        `${route.id}: browser constants cannot enter the callback registry lane`);
+    }
     return [{ route, routeIndex, override: override ?? null, contract }];
   });
 }

@@ -17,6 +17,13 @@ export interface LiveValueLens {
   readonly targetId: string;
   readonly componentId: string;
   readonly title: string;
+  /** Trusted editor-owned identity; never derived from runtime component data. */
+  readonly navigation: LiveValueNavigation;
+}
+
+export interface LiveValueNavigation {
+  readonly projectRoot: string;
+  readonly documentPath: string;
 }
 
 interface SnapshotValue {
@@ -254,7 +261,11 @@ export function liveValueLenses({
       lenses.push({
         targetId: target.id,
         componentId: instance.componentId,
-        title: instanceTitle(target.id, instance)
+        title: instanceTitle(target.id, instance),
+        navigation: {
+          projectRoot: path.resolve(projectRoot),
+          documentPath: path.resolve(documentPath)
+        }
       });
     }
   }

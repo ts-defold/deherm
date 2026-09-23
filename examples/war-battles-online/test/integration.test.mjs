@@ -201,7 +201,7 @@ test("Defold-local deterministic sources are fresh copies of the canonical core"
 
 test("the built project is the arena, and the mockup stays out of the build", async () => {
   const [collection, playerObject, rocketObject, tankObject, arenaObject, levelObject, scene,
-    playerSource, rocketSource, arenaSource, uiSource, inputBinding, blockers] =
+    cameraObject, playerSource, rocketSource, arenaSource, uiSource, cameraSource, inputBinding, blockers] =
     await Promise.all([
       readFile(fromExample("defold/main/main.collection"), "utf8"),
       readFile(fromExample("defold/main/player.go"), "utf8"),
@@ -210,10 +210,12 @@ test("the built project is the arena, and the mockup stays out of the build", as
       readFile(fromExample("defold/main/arena.go"), "utf8"),
       readFile(fromExample("defold/main/level.go"), "utf8"),
       readFile(fromExample("defold/main/ui.gui"), "utf8"),
+      readFile(fromExample("defold/main/camera.go"), "utf8"),
       readFile(fromExample("defold/main/player.script.ts"), "utf8"),
       readFile(fromExample("defold/main/rocket.script.ts"), "utf8"),
       readFile(fromExample("defold/main/arena.script.ts"), "utf8"),
       readFile(fromExample("defold/main/ui.gui.ts"), "utf8"),
+      readFile(fromExample("defold/main/camera.script.ts"), "utf8"),
       readFile(fromExample("defold/input/game.input_binding"), "utf8"),
       readFile(fromExample("defold/PLAYABLE-BLOCKERS.md"), "utf8"),
     ]);
@@ -251,6 +253,11 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(playerSource, /msg\.post\(ARENA, "restart"\)/);
   assert.match(arenaSource, /war-battles:arena-restart:round=/);
   assert.match(arenaSource, /sound\.play\(url\)/);
+  // Camera clamps must use the effective auto-fit zoom. The HTML5 canvas is
+  // responsive, so fixed-mode reference dimensions place the first spawn
+  // partly outside the viewport even though the map bounds are correct.
+  assert.match(cameraSource, /getOrthographicAutoZoom/);
+  assert.match(cameraObject, /orthographic_mode: ORTHO_MODE_AUTO_FIT/);
 
   assert.match(scene, /script: "\/main\/ui\.gui_script"/);
   assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 4);

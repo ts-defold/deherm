@@ -183,7 +183,7 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
   for (const id of candidates) {
     const { unit, unitIndex } = byId.get(id);
     const backend = unit.backends[target];
-    if (unit.identity.surface === "script") {
+    if (unit.identity.surface === "script" && unit.sourceRef.input === "scriptProjection") {
       const row = sourceScriptRows.get(unit.sourceRef.row);
       if (!row || row.id !== id) throw new Error(`${id}: script projection reference drifted`);
       if (!scriptAvailableInProfile(row, profileId)) {

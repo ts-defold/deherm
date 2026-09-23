@@ -60,14 +60,14 @@ and the turret rotate independently, and each has to be the thing that rotates.
 ### Scale policy
 
 The reference display stays **1280x720 with `high_dpi = 1`**, and the world is
-drawn through a **camera component with a fixed orthographic zoom of 2**
-(`orthographic_projection: 1`, `orthographic_mode` left at its
-`ORTHO_MODE_FIXED` default). The engine builds an orthographic camera frustum
-as `window_width / display_scale / zoom`, so the visible world rectangle is
-exactly **640x360 world units**: one world pixel is two logical pixels, and four
-physical pixels on a 2x display. Every step of that chain is an integer, and it
-stays an integer whether `high_dpi` is on or off, so 16 px tiles are never
-resampled.
+drawn through a **camera component with an authored orthographic zoom of 2**
+(`orthographic_projection: 1`, `orthographic_mode: ORTHO_MODE_AUTO_FIT`). The
+auto-fit mode preserves the 1280x720 reference view as the HTML5 canvas is
+resized to its containing element; the camera script reads the effective auto
+zoom before deriving its map clamp rectangle. At the reference size the
+visible world rectangle is **640x360 world units**: one world pixel is two
+logical pixels. Every step of that reference chain is an integer, and the
+browser's responsive scaling cannot put a spawn outside the actual viewport.
 
 This is a deliberate choice among three that Defold makes available:
 
@@ -79,12 +79,12 @@ This is a deliberate choice among three that Defold makes available:
 * `use_fixed_fit_projection` picks `min(window/reference)` as its zoom, which is
   a non-integer factor for any window that is not an exact multiple.
 
-A fixed integer zoom on a camera component keeps the window large, the art
-legible, and the scale factor exact. `main/camera.script.ts` reads
-`orthographic_zoom` back off the active render camera (`camera.get_cameras()`
-then `camera.get_orthographic_zoom()`) and divides the reference display size by
-it, so the clamp arithmetic can never drift away from the projection, and it
-rounds the view origin to whole world pixels every frame.
+An authored integer zoom on a camera component keeps the window large and the
+art legible. `main/camera.script.ts` reads both `orthographic_zoom` and
+`orthographic_auto_zoom` back off the active camera, multiplies them, and
+divides the reference display size by that effective zoom, so the clamp
+arithmetic tracks the projection at every browser size; it rounds the view
+origin to whole world pixels every frame.
 
 The GUI is untouched by all of this: the built-in render script draws the world
 predicate through the camera component and the `gui` predicate through its own

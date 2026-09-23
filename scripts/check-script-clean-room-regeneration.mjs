@@ -326,8 +326,8 @@ function ids(rows, label) {
 
 async function validateRouteProvenance(cleanRoot) {
   const load = async (relativePath) => JSON.parse(await readFile(path.join(cleanRoot, relativePath), "utf8"));
-  const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload, universal, profiles, projection,
-    typedNative, loweringPlan] = await Promise.all([
+  const [inventory, ir, accounting, scalar, value, tuple, url, valueTail, overload, universal, constantLowering,
+    profiles, projection, typedNative, loweringPlan] = await Promise.all([
     load("packages/bindings/generated/defold-script-api-inventory.json"),
     load("packages/bindings/generated/defold-script-api-ir.json"),
     load("packages/bindings/generated/defold-script-api-accounting.json"),
@@ -338,6 +338,7 @@ async function validateRouteProvenance(cleanRoot) {
     load("packages/bindings/generated/defold-script-value-tail-bindings.json"),
     load("packages/bindings/generated/defold-script-overload-dispatch.json"),
     load("packages/bindings/generated/defold-script-universal-value-bindings.json"),
+    load("packages/bindings/generated/defold-script-constant-lowering.json"),
     load("packages/bindings/generated/defold-script-route-availability-profiles.json"),
     load("packages/bindings/generated/defold-script-projection-ir.json"),
     load("packages/bindings/generated/defold-typed-native-bridge.json"),
@@ -376,10 +377,33 @@ async function validateRouteProvenance(cleanRoot) {
   ];
   assert(new Set(executableIds).size === executableIds.length, "Executable route generators overlap");
   for (const id of executableIds) assert(irIds.has(id), `Generated executable route is absent from pinned IR: ${id}`);
-  const universalIds = ids(universal.bindings, "universal fallback routes");
-  assert(universalIds.size === 915 && universal.candidateCount === universalIds.size,
+  const universalCallableIds = ids(
+    universal.bindings.filter(({ loweringFamily }) => loweringFamily !== "script-constant"),
+    "universal callable fallback routes");
+  const universalConstantIds = ids(
+    universal.bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant"),
+    "universal constant routes");
+  assert(universalCallableIds.size === 915,
     "Universal fallback must cover exactly the 915 callable non-intrinsic script routes");
-  for (const id of universalIds) assert(irIds.has(id), `Universal fallback route is absent from pinned IR: ${id}`);
+  for (const id of universalCallableIds) assert(irIds.has(id), `Universal fallback route is absent from pinned IR: ${id}`);
+  assert(universalConstantIds.size === 141,
+    "Universal constant machinery must cover exactly the 141 non-inlined constants");
+  const constantEntries = constantLowering.entries;
+  assert(constantEntries.length === 483 && constantLowering.counts?.total === 483,
+    "Constant lowering policy must cover all 483 documented constants");
+  const runtimeConstantIds = new Set(constantEntries
+    .filter(({ state }) => state !== "inlined")
+    .map(({ name }) => `script:constant.${name}`));
+  assert(runtimeConstantIds.size === 141 &&
+    JSON.stringify([...runtimeConstantIds].sort()) === JSON.stringify([...universalConstantIds].sort()),
+  "Every non-inlined constant must have exactly one generated universal route");
+  assert(constantEntries.every((entry) => Number.isInteger(entry.stableId) && entry.stableId > 0 &&
+    Array.isArray(entry.profiles) && entry.profiles.length === constantLowering.targets.length &&
+    entry.profiles.every((profile) => typeof profile.id === "string" && typeof profile.registered === "boolean")),
+  "Every documented constant must retain generated stable identity and profile metadata");
+  assert(constantEntries.filter(({ state }) => state === "inlined").every(({ value, profiles: rows }) =>
+    value !== undefined && rows.every((profile) => profile.registered && profile.value === value)),
+  "Every inlined constant must retain one source-derived value across selected profiles");
   const plannedTypedNative = loweringPlan.units.filter((unit) =>
     unit.identity.surface === "script" &&
     unit.backends?.staticHermesCAbi?.selection === "emit")
@@ -407,7 +431,9 @@ async function validateRouteProvenance(cleanRoot) {
     routeCount: irIds.size,
     accountedRouteCount: accountingIds.size,
     executableRouteCount: executableIds.length,
-    universalRouteCount: universalIds.size,
+    universalRouteCount: universalCallableIds.size,
+    universalConstantRouteCount: universalConstantIds.size,
+    constantPolicyCount: constantEntries.length,
     scalarRouteCount: scalar.bindingCount,
     valueRouteCount: value.bindingCount,
     fixedTupleRouteCount: tuple.bindingCount,

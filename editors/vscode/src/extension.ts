@@ -13,6 +13,7 @@ import {
   debugAdapterLaunch,
   languageServerLaunch,
   owningDehermProject,
+  resolveLiveValueDocument,
   resolveDehermCli,
   selectDehermProject,
   type DehermProject
@@ -240,10 +241,22 @@ class DehermLiveValues implements vscode.CodeLensProvider, vscode.Disposable {
       state,
       projectRoot: project.projectRoot,
       documentPath: document.uri.fsPath
-    }).map(({ title }) => new vscode.CodeLens(
+    }).map(({ title, navigation }) => new vscode.CodeLens(
       new vscode.Range(0, 0, 0, 0),
-      { title, command: "deherm.liveValues.noop" }
+      { title, command: "deherm.liveValues.reveal", arguments: [navigation] }
     ));
+  }
+
+  async reveal(navigation: unknown): Promise<void> {
+    const documentPath = resolveLiveValueDocument(this.projects.all(), navigation);
+    if (!documentPath) return;
+    try {
+      const document = await vscode.workspace.openTextDocument(vscode.Uri.file(documentPath));
+      await vscode.window.showTextDocument(document, { preview: true });
+    } catch {
+      // The payload is intentionally fail-closed: an unavailable authored
+      // resource must not turn into a runtime-provided path or URI.
+    }
   }
 
   private clear(projectRoot: string, failure?: string): void {
@@ -345,7 +358,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
       { scheme: "file", language: "typescript", pattern: "**/*.gui.ts" },
       { scheme: "file", language: "typescript", pattern: "**/*.render.ts" }
     ], activeLiveValues),
-    vscode.commands.registerCommand("deherm.liveValues.noop", () => {}),
+    vscode.commands.registerCommand("deherm.liveValues.reveal", (navigation: unknown) =>
+      activeLiveValues?.reveal(navigation)),
     vscode.debug.registerDebugConfigurationProvider("deherm", new DehermDebugConfigurationProvider()),
     vscode.debug.registerDebugAdapterDescriptorFactory("deherm", new DehermDebugAdapterFactory(projects)),
     vscode.commands.registerCommand("deherm.restartLanguageServer", async () => {

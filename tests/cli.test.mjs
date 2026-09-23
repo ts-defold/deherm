@@ -858,8 +858,11 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(manifest.generation.nativeExtensionGeneratorSha256, /^[0-9a-f]{64}$/);
   assert.match(manifest.defoldRevision, /^[a-f0-9]{40}$/);
   assert.equal(manifest.coverage.script.functions, 926);
+  assert.equal(manifest.coverage.script.constants, 141);
   assert.equal(manifest.coverage.script.typeSurfaceUnresolved, 0);
   assert.equal(manifest.coverage.script.universalRecipes, 915);
+  assert.equal(manifest.coverage.script.constantUniversalRecipes, 141);
+  assert.equal(manifest.coverage.script.universalRecipeTotal, 1056);
   assert.equal(manifest.coverage.script.universalExclusions, 8);
   assert.deepEqual(manifest.coverage.script.accounting, {
     "executable-stable-id": 915,
@@ -885,7 +888,8 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   });
   assert.deepEqual(manifest.coverage.script.runtimeLanes, {
     generatedScalarDispatch: 90,
-    universalStableId: 915
+    universalStableId: 915,
+    constantStableId: 141
   });
   assert.equal(manifest.coverage.dmsdk.declarations, 2141);
   assert.equal(manifest.coverage.dmsdk.typeSurfaceUnresolved, 0);
@@ -907,7 +911,10 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(await readFile(path.join(output.root, "sdk", "generated", "dmsdk", "types.ts"), "utf8"), /export interface DmSdkCalls/);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-scalar-dispatch.json"), "utf8")).bindingCount, 90);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-api-accounting.json"), "utf8")).categoryCounts.pending, 0);
-  assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "script-universal-value-bindings.json"), "utf8")).candidateCount, 915);
+  const universalBindings = JSON.parse(await readFile(path.join(output.root, "ir", "script-universal-value-bindings.json"), "utf8"));
+  assert.equal(universalBindings.candidateCount, 1056);
+  assert.equal(universalBindings.bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant").length, 141);
+  assert.equal(universalBindings.bindings.filter(({ loweringFamily }) => loweringFamily !== "script-constant").length, 915);
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk-universal-bindings.json"), "utf8")).coverage.recipes, 1361);
   const profiles = JSON.parse(await readFile(path.join(output.root, "ir", "script-route-profiles.json"), "utf8"));
   const loweringPlan = JSON.parse(await readFile(path.join(output.root, "ir", "binding-lowering-plan.json"), "utf8"));
@@ -919,8 +926,8 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(manifest.engineProfiles.handshakeSchema, "deherm.script-route-capabilities/v1");
   assert.deepEqual(manifest.loweringPlan, {
     sha256: loweringPlan.planSha256,
-    units: 2287,
-    backendRecords: 11435
+    units: 2428,
+    backendRecords: 12140
   });
   assert.equal(JSON.parse(await readFile(path.join(output.root, "ir", "dmsdk-scalar-thunks.json"), "utf8")).coverage.generated, 26);
   const lock = JSON.parse(await readFile(path.join(project, "deherm.lock"), "utf8"));
@@ -1005,11 +1012,11 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(baseConfig.compilerOptions.plugins[0].enabled, true);
   const guiConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.gui.json"), "utf8"));
   assert.deepEqual(guiConfig.include, ["**/*.ts", ".deherm/**/*.ts"]);
-  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
+  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts", ".deherm/cache/**/*.ts", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
   assert.deepEqual(guiConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/contexts/gui.ts"]);
   const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
   assert.deepEqual(bundleConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
-  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
+  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/cache/**/*.ts", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
   const releaseConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.release.json"), "utf8"));
   assert.equal(releaseConfig.compilerOptions.plugins[0].profile, "release");
   assert.equal(releaseConfig.compilerOptions.plugins[0].dmsdkSymbols,
@@ -1167,18 +1174,21 @@ test("project generation merges editor recommendations and never overwrites an a
 test("script context projection requires an exact route-id bijection and records unknown tokens as unresolved", async () => {
   const scriptIr = JSON.parse(await readFile(path.resolve("packages/bindings/generated/defold-script-api-ir.json"), "utf8"));
   const loweringPlan = JSON.parse(await readFile(path.resolve("packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
-  const scriptUnits = loweringPlan.units.filter(({ identity }) => identity.surface === "script");
+  const scriptUnits = loweringPlan.units.filter(({ identity, sourceRef }) =>
+    identity.surface === "script" && sourceRef?.input === "scriptProjection");
   assert.throws(() => buildScriptContextCapabilities(scriptIr, { ...loweringPlan, schemaVersion: 1 }), /schema v2/);
   const duplicated = structuredClone(loweringPlan);
   const first = scriptUnits[0].identity.id;
   const omitted = scriptUnits.at(-1).identity.id;
-  duplicated.units.find(({ identity }) => identity.surface === "script" && identity.id === omitted).identity.id = first;
+  duplicated.units.find(({ identity, sourceRef }) =>
+    identity.surface === "script" && sourceRef?.input === "scriptProjection" && identity.id === omitted).identity.id = first;
   delete duplicated.planSha256;
   duplicated.planSha256 = createHash("sha256").update(JSON.stringify(duplicated)).digest("hex");
   assert.throws(() => buildScriptContextCapabilities(scriptIr, duplicated), /duplicate route id|exactly match/i);
 
   const unknown = structuredClone(loweringPlan);
-  unknown.units.find(({ identity }) => identity.surface === "script").contract.context = "future-context-token";
+  unknown.units.find(({ identity, sourceRef }) =>
+    identity.surface === "script" && sourceRef?.input === "scriptProjection").contract.context = "future-context-token";
   delete unknown.planSha256;
   unknown.planSha256 = createHash("sha256").update(JSON.stringify(unknown)).digest("hex");
   const projected = buildScriptContextCapabilities(scriptIr, unknown);

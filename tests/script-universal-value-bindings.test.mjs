@@ -16,12 +16,14 @@ function run(command, args, options = {}) {
 test("universal-value generation is mechanical, complete for its selected families, and deterministic", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const projection = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-script-projection-ir.json"), "utf8"));
+  const constants = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-script-constant-lowering.json"), "utf8"));
   const expected = projection.rows.filter((row) =>
     report.selection.loweringFamilies.includes(row.loweringFamily) &&
     !report.selection.excludedLoweringFamilies.includes(row.loweringFamily) &&
     !report.selection.excludedContexts.includes(row.context.token));
-  assert.equal(report.candidateCount, expected.length);
-  assert.deepEqual(new Set(report.bindings.map(({ id }) => id)), new Set(expected.map(({ id }) => id)));
+  const expectedIds = [...expected.map(({ id }) => id), ...constants.entries.filter(({ state }) => state === "runtime-backed" || state === "profile-unavailable").map(({ name }) => `script:constant.${name}`)];
+  assert.equal(report.candidateCount, expectedIds.length);
+  assert.deepEqual(new Set(report.bindings.map(({ id }) => id)), new Set(expectedIds));
   assert.ok(report.bindings.every(({ shapeKinds }) => Array.isArray(shapeKinds)));
   assert.ok(report.bindings.every(({ minimumResultCount, maximumResultCount, resultCount }) =>
     Number.isInteger(minimumResultCount) && minimumResultCount >= 0 &&
@@ -71,8 +73,8 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
   // stack frame from it. Both are generated, so the only thing worth asserting
   // is that they are still the same numbers - a frame narrower than the
   // descriptor would reject calls the descriptor accepts.
-  const declared = [...descriptors.matchAll(/^ {2}\{0x([0-9a-f]{8})u, "([^"]+)", "([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
-    .map(([, stableId, id, modulePath, member, , maximumArgumentCount, , maximumResultCount, , resultSemanticKind, inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena]) => ({
+  const declared = [...descriptors.matchAll(/^ {2}\{0x([0-9a-f]{8})u, "([^"]+)", "([^"]*)", "([^"]*)", (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\},$/gm)]
+    .map(([, stableId, id, modulePath, member, , maximumArgumentCount, , maximumResultCount, , resultSemanticKind, inputTableEntryCapacity, outputTableEntryCapacity, matrix4Arena, urlArena, constant]) => ({
       id,
       stableId: Number.parseInt(stableId, 16),
       modulePath,
@@ -83,7 +85,8 @@ test("per-call frame scratch is sized from the same contract the dispatcher enfo
       inputTableEntryCapacity: Number(inputTableEntryCapacity),
       outputTableEntryCapacity: Number(outputTableEntryCapacity),
       matrix4Arena: matrix4Arena === "1",
-      urlArena: urlArena === "1"
+      urlArena: urlArena === "1",
+      constant: constant === "1"
     }));
   assert.equal(declared.length, report.candidateCount);
   assert.deepEqual(declared.map(({ id }) => id), report.bindings.map(({ id }) => id));

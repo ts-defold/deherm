@@ -80,6 +80,7 @@ const generatedDir = path.join(root, "packages", "bindings", "generated");
 export const compilerSurfaceDocuments = Object.freeze({
   "defold-value-layouts.json": "defold-value-layouts.json",
   "defold-script-api-ir.json": "defold-script-api-ir.json",
+  "defold-script-constant-lowering.json": "defold-script-constant-lowering.json",
   "defold-script-sdk-documentation.json": "defold-script-sdk-documentation.json",
   "defold-sdk-ir.json": "defold-sdk-ir.json",
   "defold-dmsdk-sdk-documentation.json": "defold-dmsdk-sdk-documentation.json",
@@ -145,7 +146,7 @@ const locallyRenderedSdkInputs = Object.freeze({
     "defold-script-sdk-documentation.json",
     "defold-script-handle-lowering.json"
   ]),
-  "script/modules.ts": Object.freeze(["defold-script-api-ir.json"]),
+  "script/modules.ts": Object.freeze(["defold-script-api-ir.json", "defold-script-constant-lowering.json"]),
   "script/runtime.ts": Object.freeze([]),
   "script/index.ts": Object.freeze(["defold-script-api-ir.json"]),
   "dmsdk/types.ts": Object.freeze(["defold-sdk-ir.json", "defold-dmsdk-sdk-documentation.json"]),

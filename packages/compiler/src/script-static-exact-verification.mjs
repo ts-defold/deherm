@@ -5,6 +5,7 @@ import { renderShapeSpec, shapeCodes } from "./script-recording-engine.mjs";
 const STATIC_TARGET = "static-hermes";
 const STATIC_LANE = "static-hermes-typed-native";
 const IMPLEMENTED_FAMILIES = Object.freeze([
+  "script-constant",
   "defold-value",
   "scalar",
   "lua-table",

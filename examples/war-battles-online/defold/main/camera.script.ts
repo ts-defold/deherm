@@ -104,9 +104,9 @@ function commit(self: CameraSelf): void {
   self.clampedY = y !== self.viewY;
   self.viewX = x;
   self.viewY = y;
-  // The scale policy is a whole-pixel integer zoom, so the view origin is
+  // The reference scale is a whole-pixel integer zoom, so the view origin is
   // snapped to whole world pixels; a fractional origin would shimmer the
-  // tilemap at 2x.
+  // tilemap at the authored scale.
   go.setPosition(vmath.vector3(Math.round(x), Math.round(y), self.viewZ));
 }
 
@@ -126,12 +126,16 @@ export default defineComponent({
 
   init(self: CameraSelf): void {
     // The visible world rectangle is the reference display size divided by the
-    // camera's orthographic zoom, which is authored on the camera component.
-    // Reading it back off the active render camera keeps the clamp arithmetic
-    // and the projection from drifting apart.
+    // camera's effective orthographic zoom. Auto-fit contributes a
+    // browser-size-dependent multiplier; reading it from the active camera
+    // keeps clamp arithmetic and projection from drifting apart.
     const cameras = camera.getCameras();
     const active = cameras.length > 0 ? cameras[0] : undefined;
-    const zoom = active === undefined ? self.zoom : camera.getOrthographicZoom(active);
+    const zoomMultiplier = active === undefined ? self.zoom : camera.getOrthographicZoom(active);
+    // Defold specifies 1.0 for fixed mode, so this call covers every mode
+    // without evaluating a generated script constant at runtime.
+    const autoZoom = active === undefined ? 1 : camera.getOrthographicAutoZoom(active);
+    const zoom = zoomMultiplier * autoZoom;
     const displayWidth = sys.getConfigNumber("display.width", 1280);
     const displayHeight = sys.getConfigNumber("display.height", 720);
     self.halfWidth = displayWidth / zoom / 2;

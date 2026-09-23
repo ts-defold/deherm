@@ -333,6 +333,7 @@ jobs:
           cmake --build build/native --target \
             defold-hermes-script-recording-engine \
             defold-hermes-script-recording-lua-adapter \
+            defold-hermes-script-constant-lua-adapter-test \
             defold-hermes-script-recording-native-pod \
             defold-hermes-lua-bridge-test \
             defold-hermes-lua-hermes-e2e \
@@ -343,6 +344,7 @@ jobs:
             tests/fixtures/generated_script_recording_expected_trace.txt \
             build/script-recording-engine-trace.txt
           build/native/defold-hermes-script-recording-lua-adapter
+          build/native/defold-hermes-script-constant-lua-adapter-test
           build/native/defold-hermes-script-recording-native-pod \
             tests/fixtures/generated_script_recording_native_pod_driver.js
           build/native/defold-hermes-lua-bridge-test

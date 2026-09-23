@@ -112,7 +112,7 @@ below without changing its completion rule.
    [issue #120](https://github.com/ts-defold/deherm/issues/120) is complete. Its
    stronger review exposed and fixed a module-singleton regression: the public
    `hmrPersistentState` cell now retains explicitly keyed module state, and a
-   fresh installed six-edit soak observed 50 transient detaches after the first
+   fresh installed six-edit soak observed 56 transient detaches after the first
    accepted generation while runtime id `1`, arena instance `0:1`, and all 19
    persistent identities remained stable. The remaining tooling observation is
    literal VS Code presentation.
@@ -273,10 +273,13 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
    the thin client resolves only the workspace-local déherm package and launches
    both LSP and DAP. Native/browser live instance and property telemetry now
    reaches the TUI and a schema-current CodeLens beside authored component
-   files through the authenticated project state endpoint. A packaged
-   arm64-macOS War Battles engine has emitted that live state through the public
-   dev session; record the actual VS Code visual observation and finish the remaining route-specific
-   Defold semantic projections.
+   files through the authenticated project state endpoint. Those lenses now
+   reveal only their still-registered owning authored resource through a
+   revalidated project/document payload; arbitrary runtime paths fail closed.
+   A packaged arm64-macOS War Battles engine has emitted that live state through
+   the public dev session. The installed VSIX's provider and reveal command now
+   pass a real Extension Host observation; record the actual VS Code visual observation
+   and finish the remaining route-specific Defold semantic projections.
 
 ## 5. Finish public API ergonomics and project integration
 

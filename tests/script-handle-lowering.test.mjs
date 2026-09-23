@@ -70,6 +70,25 @@ test("selects all 407 borrowed-handle routes from shape and effect predicates", 
   assert.equal(inputs.policy.includes("script:"), false, "policy must not contain a route allowlist");
 });
 
+test("keeps Lua registration profiles distinct from adapter-executable profiles", () => {
+  assert.equal(generated.routes.some(({ id }) => id.startsWith("script:constant.")), false,
+    "borrowed-handle lowering must remain a function-only surface");
+  for (const id of ["script:b2d.body.get_world", "script:b2d.get_world"]) {
+    const route = generated.routes.find((candidate) => candidate.id === id);
+    assert.ok(route, `${id} route is generated`);
+    assert.deepEqual(route.profiles.registration, [
+      "default-legacy-bullet", "legacy-no-bullet", "v3-bullet", "v3-no-bullet"
+    ]);
+    assert.deepEqual(route.profiles.runtime, ["v3-bullet", "v3-no-bullet"]);
+  }
+  const defaultProfile = generated.runtimeProfiles.find(({ id }) => id === "default-legacy-bullet");
+  assert.deepEqual(
+    [defaultProfile.sourceRouteCount, defaultProfile.adapterExecutableRouteCount],
+    [343, 313],
+    "profile detection must use the registration surface while dispatch uses the adapter surface"
+  );
+});
+
 test("descriptor selection is independent of compile/link/runtime evidence state", () => {
   const promoted = {
     ...inputs,

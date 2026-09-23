@@ -34,6 +34,7 @@ import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 export const surfaceIrFiles = Object.freeze({
   valueLayoutsPath: "defold-value-layouts.json",
   scriptIrPath: "defold-script-api-ir.json",
+  scriptConstantLoweringPath: "defold-script-constant-lowering.json",
   dmsdkIrPath: "defold-sdk-ir.json",
   scriptDispatchPath: "defold-script-scalar-dispatch.json",
   scriptPatternsPath: "defold-script-binding-patterns.json",

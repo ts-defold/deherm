@@ -640,6 +640,10 @@ export function getExtensionValue(moduleName: string, memberName: string): unkno
 const ignoredAuthoredGlobs = ["node_modules/**", ".internal/**", "build/**", "dist/**"];
 function generatedCompilerOnlyGlobs(generated) {
   return [...new Set([
+    // Authenticated revision surfaces are materialized below the project
+    // output root for offline reuse. Their compatibility sources are inputs
+    // to native assembly, not authored TypeScript modules for ttsc.
+    `${generated}/cache/**/*.ts`,
     `${generated}/static-hermes/**/*.ts`,
     // Typed-native assembly deliberately stages at this stable project path so
     // shermes source locations are reproducible, independent of --out-dir.
@@ -728,7 +732,10 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
   }
   const functions = new Map(scriptIr.functions.map((item) => [item.id, item]));
   if (functions.size !== scriptIr.functions.length) throw new Error("Script API IR contains duplicate route ids");
-  const scriptUnits = loweringPlan.units.filter(({ identity }) => identity.surface === "script");
+  // Constant units are executable transport records, but their TypeScript
+  // surface is emitted as literals and has no callable context projection.
+  const scriptUnits = loweringPlan.units.filter(({ identity, sourceRef }) =>
+    identity.surface === "script" && sourceRef?.input === "scriptProjection");
   const unitIds = new Set();
   for (const unit of scriptUnits) {
     if (unitIds.has(unit.identity.id)) throw new Error(`Lowering plan contains duplicate route id ${unit.identity.id}`);
@@ -1212,9 +1219,14 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   };
 }
 
-function loweringTargetMatrix(plan, surface) {
+function loweringTargetMatrix(plan, surface, loweringFamily) {
   const matrix = {};
-  const units = plan.units.filter((unit) => unit.identity.surface === surface);
+  const units = plan.units.filter((unit) => unit.identity.surface === surface && (
+    loweringFamily === undefined ||
+    (loweringFamily === "script-functions"
+      ? unit.sourceState?.loweringFamily !== "script-constant"
+      : unit.sourceState?.loweringFamily === loweringFamily)
+  ));
   for (const target of plan.targetOrder) {
     const selections = {};
     for (const unit of units) {
@@ -1224,6 +1236,13 @@ function loweringTargetMatrix(plan, surface) {
     matrix[target] = selections;
   }
   return matrix;
+}
+
+function scriptUniversalCoverage(report) {
+  const bindings = report.bindings ?? [];
+  const constants = bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant");
+  const functions = bindings.filter(({ loweringFamily }) => loweringFamily !== "script-constant");
+  return { functions, constants };
 }
 
 function validateEngineProfiles(engineProfiles, catalog) {
@@ -1656,15 +1675,20 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     coverage: {
       script: {
         functions: core.scriptIr.counts.functions,
+        constants: scriptUniversalCoverage(core.scriptUniversal).constants.length,
         types: core.scriptIr.counts.classes + core.scriptIr.counts.aliases + core.scriptIr.counts.enums,
         typeSurfaceUnresolved: core.scriptIr.typeSurfaceUnresolvedCount,
-        universalRecipes: core.scriptUniversal.candidateCount,
+        universalRecipes: scriptUniversalCoverage(core.scriptUniversal).functions.length,
+        constantUniversalRecipes: scriptUniversalCoverage(core.scriptUniversal).constants.length,
+        universalRecipeTotal: core.scriptUniversal.candidateCount,
         universalExclusions: core.scriptUniversal.excludedCount,
         accounting: core.scriptAccounting.categoryCounts,
-        targetMatrix: loweringTargetMatrix(core.loweringPlan, "script"),
+        targetMatrix: loweringTargetMatrix(core.loweringPlan, "script", "script-functions"),
+        constantTargetMatrix: loweringTargetMatrix(core.loweringPlan, "script", "script-constant"),
         runtimeLanes: {
           generatedScalarDispatch: core.scriptDispatch.bindingCount,
-          universalStableId: core.scriptUniversal.candidateCount
+          universalStableId: scriptUniversalCoverage(core.scriptUniversal).functions.length,
+          constantStableId: scriptUniversalCoverage(core.scriptUniversal).constants.length
         }
       },
       dmsdk: {

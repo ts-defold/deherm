@@ -485,6 +485,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
 endif()
 target_link_libraries(defold-hermes-scalar-lua-dispatch-test PRIVATE defold-hermes-lua-bridge)
 
+add_executable(defold-hermes-script-constant-lua-adapter-test native/script_constant_lua_adapter_test.cpp)
+target_compile_features(defold-hermes-script-constant-lua-adapter-test PRIVATE cxx_std_17)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  target_compile_options(defold-hermes-script-constant-lua-adapter-test PRIVATE
+    -Wall -Wextra -Werror -Wno-zero-length-array -pedantic
+  )
+endif()
+target_link_libraries(defold-hermes-script-constant-lua-adapter-test PRIVATE defold-hermes-lua-bridge)
+
 add_executable(defold-hermes-script-value-binding-test native/script_value_binding_test.cpp)
 target_compile_features(defold-hermes-script-value-binding-test PRIVATE cxx_std_17)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")

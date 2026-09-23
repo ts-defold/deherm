@@ -1,5 +1,25 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - War Battles HTML5 camera uses the effective browser projection
+
+The War Battles playability screenshot's left-edge tank was deterministic, not
+an input or restart timing artifact. The HTML5 canvas is resized from the
+1280x720 reference to the browser viewport (the gate observed 756x425), while
+the camera was authored in fixed orthographic mode and clamped using the
+reference dimensions. At the left map clamp, the first simulation spawn was
+therefore placed partly outside the actual viewport. The camera now uses
+Defold's `ORTHO_MODE_AUTO_FIT` and multiplies the authored zoom by
+`camera.getOrthographicAutoZoom()` before deriving its clamp rectangle. Native
+fixed-size behavior remains unchanged (`autoZoom` is 1), while browser bounds
+track the real projection. The focused integration test asserts both the
+auto-fit camera resource and effective-zoom calculation. TypeScript context
+checking and that focused test pass. A fresh bundle then compiled through the
+pinned Bob and local Extender path and passed the Chrome playability gate:
+keyboard-to-arena latency was 215 ms, fire/restart/audio markers all arrived,
+the 756x425 WebGL 2 context remained live, and the composed screenshot showed
+the player tank wholly inside the viewport. The PNG is 263,681 bytes with
+SHA-256 `aebeb2ff47b4fe9ae05c8e81d0ee02b7dd0c6dd7ccdaa34fc6ca72e902b44158`.
+
 ## 2026-09-23 - Component-only native HMR keeps the live realm and authored state
 
 Native component-only reloads now validate a complete candidate in a disposable
@@ -300,6 +320,25 @@ including genuine slot/generation identities and declared-property counts.
 That is packaged-engine-to-control-plane evidence. The CodeLens behavior is
 covered by its client tests, but this wave did not record the values visibly
 rendered inside an actual VS Code window.
+
+## 2026-09-23 - Live CodeLens navigation is project-owned and fail-closed
+
+The thin VS Code client no longer binds live-value lenses to a no-op command.
+Each lens carries a normalized `{projectRoot, documentPath}` payload created
+from the editor document that already passed exact server-enriched source
+ownership filtering. The `deherm.liveValues.reveal` command revalidates that
+the project is still registered as the owning project and that the path is an
+authored `.script.ts`, `.gui.ts`, or `.render.ts` resource before opening it;
+invalid or foreign payloads do nothing. Runtime component rows still cannot
+contribute arbitrary paths or URIs. Evidence is the focused thin-extension
+TypeScript build and 15-test suite, including Linux/Windows ownership,
+traversal, nested-project, suffix, and relative-path rejection. A fresh
+installed VSIX then ran in a real VS Code Extension Host against the packaged
+War Battles engine. `vscode.executeCodeLensProvider` returned the arena lens
+with instance `[0:1]` and `players=8`, `botSkill=2`, `mapSeed=0`; executing its
+`deherm.liveValues.reveal` command from a different editor made the exact
+authored `main/arena.script.ts` document active. The locked macOS display still
+prevents a distinct human-visible screenshot of the lens text.
 
 ## 2026-09-22 - Installed Defold semantic LSP and thin VS Code client
 
@@ -2147,3 +2186,37 @@ and custom Defold engine. Gameplay reached tick 918; component counts were
 first accepted generation. This is installed native HMR evidence for the
 packed package and current arm64-macOS engine, not Windows cleanup or browser
 HMR evidence.
+## 2026-09-23 - Source-derived script constant lowering and stable runtime transport
+
+The packaged War Battles run exposed that `camera.ORTHO_MODE_FIXED` was still
+generated as `getScriptApiValue`, which had no universal provider. Constant
+values are now mechanically derived from the pinned Defold C/C++ registration
+surface and headers. The generated report reconciles all 483 SDK constants
+against the v3/v2 registration trees and six runtime manifest profiles: 342
+are identical source literals from unconditional core registration tables and
+inline in Dynamic Hermes, Static Hermes, and browser output; 94 registered but
+feature-gated or non-literal values use generated stable IDs through the
+universal ScriptCallFrame/Lua adapter; 47 declarations are
+`profile-unavailable` in the selected registration trees, retain generated
+stable operations, and carry `constant-not-registered` availability evidence
+rather than being mislabeled globally impossible. Generic `physics` constants
+are core-registered even when the selected backend is `physics_null`, while
+optional `b2d`/`bullet3d` routes carry their feature profiles. Equal literals
+from an unclassified or optional scope remain runtime-backed. `camera.ORTHO_MODE_FIXED`
+is source-derived as `0`, not a hand-curated override. Runtime-backed constants
+are represented as zero-argument universal operations (including generated
+browser/static tables), so no accessor relies on the removed name-addressed
+lookup. A native adapter fixture now checks exact nested lookup, zero arity,
+stack balance, profile absence, and `json.null` as a retained generic Lua
+userdata/lightuserdata handle distinct from `nil`. This is generated transport
+and source-evaluation evidence;
+packaged engine execution remains a separate gate.
+
+The broad generated-family ASan/UBSan run also exposed a fixture-only profile
+detection mismatch in the handle-router test: the fixture had installed only
+adapter-executable routes even though production profile detection compares the
+source registration surface. The fixture now installs the generated
+registration-profile mask for detection while keeping dispatch availability on
+the runtime adapter mask. All generated script families, including the constant
+adapter and the 405-route handle router across all six profiles, pass the broad
+sanitizer gate with the existing bounded-allocation and lifecycle assertions.

@@ -24,6 +24,7 @@
     "build/**",
     "dist/**",
     ".deherm/generated/components/registry.ts",
+    ".deherm/cache/**/*.ts",
     ".deherm/static-hermes/**/*.ts",
     ".deherm/build/generated/typed-native/**/*.ts"
   ]

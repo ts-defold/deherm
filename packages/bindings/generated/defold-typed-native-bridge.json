@@ -4,13 +4,13 @@
   "transport": "typed-native",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "inputHashes": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "bc8a34b7b7595db29ebb0ef6816615e4f61d602d3cfac2f157ec6978b27f38a2",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "15ab3bb4bfb002a017f0bc631761f1d5c3f27a52a602d16ba7189fd5d0254f2c",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "c6d8f311dcdfba43f1606492b3590a851c5214d43cbaa741533f29d402ff56e4",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "231ccfb4408ce646e2053cf5e8c225aad50864e7b6612d3bcada41df7e4a1559",
     "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp": "5abcca927b7d97ca7e1e07103f490d485c345ba9072db64e93ffe328e580267c"
   },
-  "planTypedNativeEmit": 325,
-  "planTypedNativeBackendEmit": 351,
-  "claimedRouteCount": 325,
+  "planTypedNativeEmit": 466,
+  "planTypedNativeBackendEmit": 492,
+  "claimedRouteCount": 466,
   "declinedRouteCount": 0,
   "maximumArgumentCount": 32,
   "claimedRoutes": [
@@ -40,6 +40,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.physics.SHAPE_TYPE_MESH",
+      "stableId": 67600555,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:camera.get_near_z",
       "stableId": 94225445,
       "maximumArgumentCount": 1
@@ -50,9 +55,29 @@
       "maximumArgumentCount": 5
     },
     {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_UNIVERSAL",
+      "stableId": 97010466,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.COORDINATE_SPACE_WORLD",
+      "stableId": 103789207,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:resource.create_sound_data",
       "stableId": 109392419,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_GEAR",
+      "stableId": 118929799,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_VIEWPROJ_INVERSE",
+      "stableId": 137691660,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:bit.bor",
@@ -64,6 +89,11 @@
       "id": "script:sys.set_connectivity_host",
       "stableId": 161653622,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.b2d.body.B2_KINEMATIC_BODY",
+      "stableId": 162757313,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:image.load",
@@ -111,6 +141,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.bullet3d.collision_object.CF_STATIC_OBJECT",
+      "stableId": 319254593,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:camera.get_orthographic_auto_zoom",
       "stableId": 333496520,
       "maximumArgumentCount": 1
@@ -136,9 +171,24 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_CONE_TWIST",
+      "stableId": 458334542,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_PAGE_INDEX",
+      "stableId": 458450225,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.serialize",
       "stableId": 466939425,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_WORLD",
+      "stableId": 470729039,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:html5.run",
@@ -166,9 +216,24 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_REVOLUTE",
+      "stableId": 544978474,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.tilemap.ROTATE_90",
+      "stableId": 547867591,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:bit.lshift",
       "stableId": 553650099,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.WANTS_DEACTIVATION",
+      "stableId": 567719192,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:bit.tobit",
@@ -191,9 +256,19 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.b2d.joint.LIMIT_STATE_AT_UPPER",
+      "stableId": 604173434,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.set_render_enable",
       "stableId": 606958618,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.graphics.COORDINATE_SPACE_LOCAL",
+      "stableId": 608107860,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:go.set_position",
@@ -201,8 +276,18 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.tilemap.ROTATE_270",
+      "stableId": 608947571,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.get_connectivity",
       "stableId": 610646079,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_UNKNOWN",
+      "stableId": 615496311,
       "maximumArgumentCount": 0
     },
     {
@@ -221,6 +306,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.graphics.TEXTURE_USAGE_FLAG_COLOR",
+      "stableId": 641448213,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.quat_rotation_z",
       "stableId": 653417741,
       "maximumArgumentCount": 1
@@ -231,14 +321,29 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.bullet3d.collision_object.CF_NO_CONTACT_RESPONSE",
+      "stableId": 665620171,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:resource.create_buffer",
       "stableId": 684194101,
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_POLYGON",
+      "stableId": 721499402,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:render.set_blend_equation_separate",
       "stableId": 721632055,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_VIEW_INVERSE",
+      "stableId": 745211655,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:hash_to_hex",
@@ -281,6 +386,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_TEXTURE",
+      "stableId": 830591864,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.ACTIVE_TAG",
+      "stableId": 838798578,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:profiler.enable_ui",
       "stableId": 844414261,
       "maximumArgumentCount": 1
@@ -296,6 +411,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_USER",
+      "stableId": 887839062,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.matrix4_translation",
       "stableId": 889923285,
       "maximumArgumentCount": 1
@@ -304,6 +424,21 @@
       "id": "script:socket.sleep",
       "stableId": 902564824,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.graphics.COMPRESSION_TYPE_DEFAULT",
+      "stableId": 908807166,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_MORPH_TARGET_WEIGHTS",
+      "stableId": 952883801,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_FRICTION",
+      "stableId": 979522742,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:b2d.get_version",
@@ -318,6 +453,16 @@
     {
       "id": "script:camera.get_cameras",
       "stableId": 1001666066,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_PROJECTION",
+      "stableId": 1022790652,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.gui.PLAYBACK_ONCE_FORWARD",
+      "stableId": 1023621442,
       "maximumArgumentCount": 0
     },
     {
@@ -338,6 +483,11 @@
     {
       "id": "script:socket.gettime",
       "stableId": 1053915798,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.shape.SHAPE_TYPE_SPHERE",
+      "stableId": 1054430466,
       "maximumArgumentCount": 0
     },
     {
@@ -366,6 +516,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_CAPSULE",
+      "stableId": 1096045379,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:msg.post",
       "stableId": 1111726479,
       "maximumArgumentCount": 3
@@ -386,6 +541,21 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.graphics.COMPRESSION_TYPE_BASIS_UASTC",
+      "stableId": 1163541508,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_COLOR",
+      "stableId": 1169805032,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_WORLDVIEWPROJ_INVERSE",
+      "stableId": 1171345682,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.get_ifaddrs",
       "stableId": 1174885233,
       "maximumArgumentCount": 0
@@ -399,6 +569,11 @@
       "id": "script:crash.set_user_field",
       "stableId": 1193509462,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_INVAL",
+      "stableId": 1207536107,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:physics.get_shape",
@@ -431,6 +606,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.graphics.COMPRESSION_TYPE_WEBP",
+      "stableId": 1251079731,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.load",
       "stableId": 1260100361,
       "maximumArgumentCount": 1
@@ -461,6 +641,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.liveupdate.LIVEUPDATE_OK",
+      "stableId": 1296084433,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:socket.dns.tohostname",
       "stableId": 1298827590,
       "maximumArgumentCount": 1
@@ -481,6 +666,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_BOX",
+      "stableId": 1351579437,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.LIMIT_STATE_AT_LOWER",
+      "stableId": 1366308699,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:socket.dns.gethostname",
       "stableId": 1367399751,
       "maximumArgumentCount": 0
@@ -496,9 +691,24 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:constant.gui.PLAYBACK_ONCE_PINGPONG",
+      "stableId": 1416847115,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_IO_ERROR",
+      "stableId": 1418524846,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.exists",
       "stableId": 1421868765,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_NORMAL",
+      "stableId": 1430186134,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:physics.get_joint_reaction_torque",
@@ -516,9 +726,19 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:constant.socket._SETSIZE",
+      "stableId": 1452708693,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.quat_from_to",
       "stableId": 1458980654,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_ENGINE_VERSION_MISMATCH",
+      "stableId": 1471845247,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:go.get_id",
@@ -541,6 +761,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_DISTANCE",
+      "stableId": 1498817359,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sound.pause",
       "stableId": 1502096075,
       "maximumArgumentCount": 2
@@ -551,6 +776,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.liveupdate.LIVEUPDATE_INVALID_HEADER",
+      "stableId": 1517017178,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:json.decode",
       "stableId": 1547570734,
       "maximumArgumentCount": 2
@@ -559,6 +789,11 @@
       "id": "script:label.get_text",
       "stableId": 1547809370,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_WORLDVIEW_INVERSE",
+      "stableId": 1563198729,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:sys.set_vsync_swap_interval",
@@ -581,6 +816,21 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.liveupdate.LIVEUPDATE_SCHEME_MISMATCH",
+      "stableId": 1673471085,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.gui.PLAYBACK_LOOP_FORWARD",
+      "stableId": 1676540133,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_PULLEY",
+      "stableId": 1688568905,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:render.set_stencil_func",
       "stableId": 1699887816,
       "maximumArgumentCount": 3
@@ -589,6 +839,11 @@
       "id": "script:sprite.set_hflip",
       "stableId": 1703142815,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.DISABLE_SIMULATION",
+      "stableId": 1703144173,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:sys.get_sys_info",
@@ -636,6 +891,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_EDGE",
+      "stableId": 1885939433,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:label.set_text",
       "stableId": 1888249062,
       "maximumArgumentCount": 2
@@ -646,13 +906,33 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_WORLDVIEW",
+      "stableId": 1901890586,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:gui.set_safe_area_mode",
       "stableId": 1932609869,
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.bullet3d.collision_object.DISABLE_DEACTIVATION",
+      "stableId": 1932958949,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.physics.SHAPE_TYPE_HULL",
+      "stableId": 1933487377,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:graphics.get_engine_adapters",
       "stableId": 1938117379,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_BUNDLED_RESOURCE_MISMATCH",
+      "stableId": 1942270651,
       "maximumArgumentCount": 0
     },
     {
@@ -676,6 +956,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_GENERIC_6DOF_SPRING",
+      "stableId": 2017395676,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:bit.band",
       "stableId": 2020799616,
       "maximumArgumentCount": 32,
@@ -692,9 +977,19 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_MOUSE",
+      "stableId": 2060398599,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.open_url",
       "stableId": 2064699563,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.render.RENDER_TARGET_DEFAULT",
+      "stableId": 2078977746,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:camera.set_far_z",
@@ -724,6 +1019,11 @@
     {
       "id": "script:crash.load_previous",
       "stableId": 2128448069,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_VIEWPROJ",
+      "stableId": 2130239263,
       "maximumArgumentCount": 0
     },
     {
@@ -772,9 +1072,34 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:constant.graphics.TEXTURE_USAGE_FLAG_MEMORYLESS",
+      "stableId": 2192812784,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_BONE_WEIGHTS",
+      "stableId": 2199462281,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_CIRCLE",
+      "stableId": 2206548408,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.shape.SHAPE_TYPE_CAPSULE",
+      "stableId": 2210957018,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:profiler.set_ui_mode",
       "stableId": 2218436408,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_WORLD_MATRIX",
+      "stableId": 2254238957,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:socket.dns.getnameinfo",
@@ -822,6 +1147,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_PRISMATIC",
+      "stableId": 2343026940,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:profiler.recorded_frame_count",
       "stableId": 2347140851,
       "maximumArgumentCount": 0
@@ -842,6 +1172,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.bullet3d.rigid_body.BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_WORLD",
+      "stableId": 2394952195,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:crash.set_file_path",
       "stableId": 2406941902,
       "maximumArgumentCount": 1
@@ -859,6 +1194,11 @@
     {
       "id": "script:render.disable_material",
       "stableId": 2431147342,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.COORDINATE_SPACE_DEFAULT",
+      "stableId": 2439630514,
       "maximumArgumentCount": 0
     },
     {
@@ -903,6 +1243,16 @@
       "maximumArgumentCount": 3
     },
     {
+      "id": "script:constant.bullet3d.collision_object.CO_GHOST_OBJECT",
+      "stableId": 2501301457,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_SIGNATURE_MISMATCH",
+      "stableId": 2505337528,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.matrix4_rotation_y",
       "stableId": 2509648852,
       "maximumArgumentCount": 1
@@ -928,6 +1278,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_PROJECTION_INVERSE",
+      "stableId": 2533637119,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:render.draw_debug3d",
       "stableId": 2546261723,
       "maximumArgumentCount": 1
@@ -936,6 +1291,16 @@
       "id": "script:vmath.matrix4_rotation_z",
       "stableId": 2559981709,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_INVALID_RESOURCE",
+      "stableId": 2577877495,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.CF_DYNAMIC_OBJECT",
+      "stableId": 2591705490,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:types.is_matrix4",
@@ -959,6 +1324,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_HINGE",
+      "stableId": 2617416228,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:camera.set_near_z",
       "stableId": 2620899633,
       "maximumArgumentCount": 2
@@ -972,6 +1342,16 @@
       "id": "script:vmath.quat_to_euler",
       "stableId": 2641296689,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.CF_CUSTOM_MATERIAL_CALLBACK",
+      "stableId": 2641929294,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_WHEEL",
+      "stableId": 2642708459,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:physics.raycast_async",
@@ -994,6 +1374,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_TEXCOORD",
+      "stableId": 2698797283,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.dot",
       "stableId": 2708084985,
       "maximumArgumentCount": 2
@@ -1009,14 +1394,39 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.json.null",
+      "stableId": 2721658387,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sound.get_peak",
       "stableId": 2722214421,
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_TIME",
+      "stableId": 2732930656,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.physics.SHAPE_TYPE_SPHERE",
+      "stableId": 2733733103,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:camera.set_fov",
       "stableId": 2734551893,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.graphics.COMPRESSION_TYPE_WEBP_LOSSY",
+      "stableId": 2741389118,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.gui.PLAYBACK_ONCE_BACKWARD",
+      "stableId": 2742180220,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:sys.get_config_string",
@@ -1049,6 +1459,11 @@
       "maximumArgumentCount": 4
     },
     {
+      "id": "script:constant.liveupdate.LIVEUPDATE_VERSION_MISMATCH",
+      "stableId": 2817418854,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:go.get_world_rotation",
       "stableId": 2823544550,
       "maximumArgumentCount": 1
@@ -1069,6 +1484,16 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_TEXTURE_TRANSFORM_2D",
+      "stableId": 2858724926,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.tilemap.V_FLIP",
+      "stableId": 2863698086,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:camera.set_orthographic_mode",
       "stableId": 2873442090,
       "maximumArgumentCount": 2
@@ -1079,14 +1504,29 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.bullet3d.collision_object.CF_CHARACTER_OBJECT",
+      "stableId": 2898687644,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:go.delete",
       "stableId": 2920192283,
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_HINGE2",
+      "stableId": 2920845474,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:physics.set_shape",
       "stableId": 2940108129,
       "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_TANGENT",
+      "stableId": 2940576050,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:camera.set_aspect_ratio",
@@ -1110,6 +1550,11 @@
       "arity": "bounded-variadic"
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_USER_MATRIX4",
+      "stableId": 2980368094,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.length_sqr",
       "stableId": 2981849211,
       "maximumArgumentCount": 1
@@ -1120,8 +1565,18 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_FILTER",
+      "stableId": 3006798534,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:render.get_width",
       "stableId": 3019471645,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.physics.SHAPE_TYPE_CAPSULE",
+      "stableId": 3021557677,
       "maximumArgumentCount": 0
     },
     {
@@ -1133,6 +1588,11 @@
       "id": "script:vmath.cross",
       "stableId": 3022880242,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_GRID",
+      "stableId": 3024631652,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:gui.get_layout",
@@ -1180,6 +1640,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.graphics.TEXTURE_USAGE_FLAG_STORAGE",
+      "stableId": 3084670023,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_WORLDVIEWPROJ",
+      "stableId": 3085992577,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:compute.set_samplers",
       "stableId": 3114313573,
       "maximumArgumentCount": 2
@@ -1203,6 +1673,21 @@
       "id": "script:physics.set_maskbit",
       "stableId": 3160984935,
       "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_NONE",
+      "stableId": 3184577739,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_SLIDER",
+      "stableId": 3188142228,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.rigid_body.BT_DISABLE_WORLD_GRAVITY",
+      "stableId": 3188522158,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:render.enable_state",
@@ -1230,6 +1715,36 @@
       "maximumArgumentCount": 4
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_WORLD_INVERSE",
+      "stableId": 3210102076,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.CO_SOFT_BODY",
+      "stableId": 3222245995,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.body.B2_STATIC_BODY",
+      "stableId": 3233150518,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_NORMAL_MATRIX",
+      "stableId": 3235051930,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.LIMIT_STATE_EQUAL",
+      "stableId": 3243502304,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.LIMIT_STATE_INACTIVE",
+      "stableId": 3271011993,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:crash.get_extra_data",
       "stableId": 3280962645,
       "maximumArgumentCount": 1
@@ -1238,6 +1753,11 @@
       "id": "script:sound.get_group_gain",
       "stableId": 3299788677,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_SEGMENT",
+      "stableId": 3307150909,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:vmath.quat_matrix4",
@@ -1275,6 +1795,26 @@
       "maximumArgumentCount": 3
     },
     {
+      "id": "script:constant.gui.PLAYBACK_LOOP_BACKWARD",
+      "stableId": 3389536593,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_UNKNOWN",
+      "stableId": 3437012774,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.shape.SHAPE_TYPE_CHAIN",
+      "stableId": 3463065453,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.body.B2_DYNAMIC_BODY",
+      "stableId": 3470556533,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:liveupdate.remove_mount",
       "stableId": 3486747409,
       "maximumArgumentCount": 1
@@ -1305,9 +1845,19 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.bullet3d.collision_object.CF_DISABLE_VISUALIZE_OBJECT",
+      "stableId": 3500451038,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:factory.get_status",
       "stableId": 3501057803,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_POSITION",
+      "stableId": 3506077402,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:factory.set_prototype",
@@ -1325,6 +1875,11 @@
       "maximumArgumentCount": 5
     },
     {
+      "id": "script:constant.bullet3d.collision_object.CO_HF_FLUID",
+      "stableId": 3541950827,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.vector4",
       "stableId": 3541966743,
       "maximumArgumentCount": 4
@@ -1338,6 +1893,11 @@
       "id": "script:types.is_vector4",
       "stableId": 3566590891,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.CO_COLLISION_OBJECT",
+      "stableId": 3568752572,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:particlefx.reset_constant",
@@ -1365,14 +1925,44 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.gui.PLAYBACK_LOOP_PINGPONG",
+      "stableId": 3606905258,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:sys.get_engine_info",
       "stableId": 3618995147,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.render.TEXTURE_BIT",
+      "stableId": 3619245755,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_ROPE",
+      "stableId": 3630927040,
       "maximumArgumentCount": 0
     },
     {
       "id": "script:tilemap.reset_constant",
       "stableId": 3635172296,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.bullet3d.shape.SHAPE_TYPE_HULL",
+      "stableId": 3640717456,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.ISLAND_SLEEPING",
+      "stableId": 3648628010,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.CF_KINEMATIC_OBJECT",
+      "stableId": 3648954998,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:types.is_vector3",
@@ -1390,9 +1980,24 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.physics.SHAPE_TYPE_BOX",
+      "stableId": 3684193631,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:vmath.rotate",
       "stableId": 3691011585,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.graphics.COMPRESSION_TYPE_BASIS_ETC1S",
+      "stableId": 3691704956,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_MEM_ERROR",
+      "stableId": 3695873853,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:compute.set_constants",
@@ -1400,9 +2005,24 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.bullet3d.rigid_body.BT_ENABLE_GYROSCOPIC_FORCE_IMPLICIT_BODY",
+      "stableId": 3706528325,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:camera.get_enabled",
       "stableId": 3707335843,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.bullet3d.collision_object.CO_RIGID_BODY",
+      "stableId": 3710077550,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.socket._VERSION",
+      "stableId": 3720653672,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:collectionfactory.set_prototype",
@@ -1410,9 +2030,29 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_GENERIC_6DOF",
+      "stableId": 3724426088,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:gui.set_render_order",
       "stableId": 3733202233,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.graphics.TEXTURE_USAGE_FLAG_SAMPLE",
+      "stableId": 3744023704,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.rigid_body.BT_ENABLE_GYROSCOPIC_FORCE_EXPLICIT",
+      "stableId": 3744561603,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.material.CONSTANT_TYPE_VIEW",
+      "stableId": 3748232308,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:bit.rol",
@@ -1423,6 +2063,11 @@
       "id": "script:render.enable_material",
       "stableId": 3764411239,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_BONE_INDICES",
+      "stableId": 3768632141,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:bit.bnot",
@@ -1460,6 +2105,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_WELD",
+      "stableId": 3866682388,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.bullet3d.shape.SHAPE_TYPE_MESH",
+      "stableId": 3889016602,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:go.get_position",
       "stableId": 3918772974,
       "maximumArgumentCount": 1
@@ -1468,6 +2123,11 @@
       "id": "script:physics.update_mass",
       "stableId": 3925799645,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.graphics.DATA_TYPE_FLOAT",
+      "stableId": 3933134269,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:image.get_astc_header",
@@ -1495,6 +2155,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_POINT_TO_POINT",
+      "stableId": 3964758702,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:physics.get_group",
       "stableId": 3971564819,
       "maximumArgumentCount": 1
@@ -1510,6 +2175,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:constant.bullet3d.collision_object.CF_DISABLE_SPU_COLLISION_PROCESSING",
+      "stableId": 4010239251,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.liveupdate.LIVEUPDATE_FORMAT_ERROR",
+      "stableId": 4013144817,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:socket.dns.getaddrinfo",
       "stableId": 4017512905,
       "maximumArgumentCount": 1
@@ -1522,6 +2197,11 @@
     {
       "id": "script:window.get_mouse_lock",
       "stableId": 4036039488,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.SEMANTIC_TYPE_NORMAL",
+      "stableId": 4037473378,
       "maximumArgumentCount": 0
     },
     {
@@ -1555,9 +2235,24 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.material.CONSTANT_TYPE_USER_COLOR",
+      "stableId": 4056642538,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:physics.set_vflip",
       "stableId": 4109527981,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:constant.bullet3d.shape.SHAPE_TYPE_BOX",
+      "stableId": 4110898104,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.b2d.joint.JOINT_TYPE_MOTOR",
+      "stableId": 4111805589,
+      "maximumArgumentCount": 0
     },
     {
       "id": "script:vmath.quat_axis_angle",
@@ -1580,6 +2275,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:constant.tilemap.ROTATE_180",
+      "stableId": 4145401925,
+      "maximumArgumentCount": 0
+    },
+    {
       "id": "script:model.set_blend_weights",
       "stableId": 4149119709,
       "maximumArgumentCount": 2
@@ -1597,6 +2297,11 @@
     {
       "id": "script:bullet3d.get_version",
       "stableId": 4161320994,
+      "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:constant.graphics.TEXTURE_USAGE_FLAG_INPUT",
+      "stableId": 4168098342,
       "maximumArgumentCount": 0
     },
     {
@@ -1647,7 +2352,7 @@
   ],
   "declinedRoutes": [],
   "generatedSha256": {
-    "typescript": "a0cf0fa42bc363738602ca9811768ed3bd4f7cd7ac45b4d06c80734f390417ac"
+    "typescript": "562854b576634573f0790def0bde422b21c52f6d1b16eb1407439ca66d8889ec"
   },
   "evidenceBoundary": {
     "routeSelection": "derived-from-the-canonical-lowering-plan",
@@ -1656,5 +2361,5 @@
     "linkage": "not-claimed",
     "runtime": "not-claimed"
   },
-  "reportSha256": "9786a15cc62a12dd18e4869d83f7f48a4c578fd7a304d4255bef6f56e8c232d2"
+  "reportSha256": "7c6e4a471cc3b2ddfeec7671715acb3e2a96c219dd0be4012baea52f87c88a23"
 }

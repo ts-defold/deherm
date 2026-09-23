@@ -51,13 +51,21 @@ test("the recording engine is generated from the same IR as the bindings, and is
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const universal = JSON.parse(await readFile(
     path.join(root, "packages/bindings/generated/defold-script-universal-value-bindings.json"), "utf8"));
+  const constantCount = universal.bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant").length;
+  const routeCount = universal.bindings.length;
 
-  // Every callable non-intrinsic route is modelled exactly once.
+  // Every generated universal route, including constant value operations, is
+  // modelled exactly once.
   assert.equal(report.routes.length, universal.bindings.length);
   assert.deepEqual(
     new Set(report.routes.map(({ id }) => id)),
     new Set(universal.bindings.map(({ id }) => id)));
   assert.equal(new Set(report.order).size, report.routes.length);
+  const constantRoute = report.routes.find(({ id }) => id === "script:constant.physics.SHAPE_TYPE_MESH");
+  assert.ok(constantRoute, "generated constant route is missing from the recording model");
+  assert.deepEqual(
+    [constantRoute.runtimeModulePath, constantRoute.runtimeMember, constantRoute.argumentShapes.length, constantRoute.resultShapes.length],
+    [["physics"], "SHAPE_TYPE_MESH", 0, 1]);
 
   // Contracts are the canonical lowering plan's interned indices, so a later
   // real-engine differential can diff this trace per contract.
@@ -81,7 +89,7 @@ test("the recording engine is generated from the same IR as the bindings, and is
   // JSI emits every universal row. Two documented input handle kinds have no
   // public constructor/return path, so deterministic provider fixtures mint
   // genuine HostObjects through the bridge before the census begins.
-  assert.deepEqual(report.summary.harnessByTransport.jsi, { exercised: 915, skipped: 0 });
+  assert.deepEqual(report.summary.harnessByTransport.jsi, { exercised: routeCount, skipped: 0 });
   assert.deepEqual(
     report.handleSeeds.map(({ name }) => name),
     ["box2d-shape", "graphics-texture"],
@@ -94,47 +102,47 @@ test("the recording engine is generated from the same IR as the bindings, and is
   // harness limitation. Only callback rows remain transport-inapplicable:
   // browser callbacks need the HTML5 registry and Static Hermes falls back to
   // JSI for function values.
-  assert.deepEqual(report.summary.harnessByTransport["direct-memory"], { exercised: 890, skipped: 25 });
-  assert.deepEqual(report.summary.harnessByTransport["typed-native"], { exercised: 890, skipped: 25 });
+  assert.deepEqual(report.summary.harnessByTransport["direct-memory"], { exercised: 890 + constantCount, skipped: 25 });
+  assert.deepEqual(report.summary.harnessByTransport["typed-native"], { exercised: 890 + constantCount, skipped: 25 });
   assert.deepEqual(report.summary.luaAdapter, {
     profile: "generated-runtime-profile-union",
-    installed: 915,
-    exercised: 882,
+    installed: routeCount,
+    exercised: 882 + constantCount,
     skipped: 33,
     failureSchema: "deherm-script-lua-exact-failure/v1"
   });
   assert.deepEqual(report.summary.targetApplicability["dynamic-hermes"], {
-    status: { exercise: 913, blocked: 0, omit: 2 },
+    status: { exercise: 913 + constantCount, blocked: 0, omit: 2 },
     lanes: {
-      "dynamic-hermes-jsi-lua-stack": 882,
+      "dynamic-hermes-jsi-lua-stack": 882 + constantCount,
       "dynamic-hermes-native-pod": 31,
       "not-emitted": 2
     }
   });
   assert.deepEqual(report.summary.targetApplicability["browser-wasm"], {
-    status: { exercise: 911, blocked: 2, omit: 2 },
+    status: { exercise: 911 + constantCount, blocked: 2, omit: 2 },
     lanes: {
-      "browser-wasm-direct-memory": 888,
+      "browser-wasm-direct-memory": 888 + constantCount,
       "browser-wasm-callback-registry": 23,
       "not-emitted": 4
     }
   });
   assert.deepEqual(report.summary.targetApplicability["static-hermes"], {
-    status: { exercise: 325, blocked: 588, omit: 2 },
-    lanes: { "static-hermes-typed-native": 325, "not-emitted": 590 }
+    status: { exercise: 325 + constantCount, blocked: 588, omit: 2 },
+    lanes: { "static-hermes-typed-native": 325 + constantCount, "not-emitted": 590 }
   });
   assert.deepEqual(report.summary.targetApplicability["lua-stack"], {
-    status: { exercise: 911, blocked: 2, omit: 2 },
-    lanes: { "lua-stack": 911, "not-emitted": 4 }
+    status: { exercise: 911 + constantCount, blocked: 2, omit: 2 },
+    lanes: { "lua-stack": 911 + constantCount, "not-emitted": 4 }
   });
   assert.equal(report.applicabilityCatalog.schema, "deherm-script-target-applicability/v1");
   assert.deepEqual(report.applicabilityCatalog.targets,
     ["dynamic-hermes", "static-hermes", "browser-wasm", "lua-stack"]);
-  assert.equal(report.applicabilityCatalog.routeCount, 915);
+  assert.equal(report.applicabilityCatalog.routeCount, routeCount);
   assert.equal(report.applicabilityCatalog.rule,
     "canonical-lowering-selection-plus-generated-adapter-specialization");
   assert.equal(report.applicabilityCatalog.lanes.reduce((count, lane) => count + lane.routeCount, 0),
-    915 * report.applicabilityCatalog.targets.length);
+    routeCount * report.applicabilityCatalog.targets.length);
   const applicability = (route, target) => {
     const targetIndex = report.applicabilityCatalog.targets.indexOf(target);
     return report.applicabilityCatalog.lanes[route.applicability[targetIndex]];
@@ -164,7 +172,7 @@ test("the recording engine is generated from the same IR as the bindings, and is
     lifecycleCoverage: "generic-token-round-trip"
   });
   assert.deepEqual(report.summary.browserExact, {
-    routeCount: 911,
+    routeCount: 911 + constantCount,
     callbackRouteCount: 23,
     callbackCount: 23,
     resultSchema: "deherm-script-browser-exact-result/v1",

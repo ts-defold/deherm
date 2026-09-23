@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:e4490f9ba2f68eeac9e76506a48ff9b2b15bada4391517e148e884243a3d6f4a",
+  "generator": "sha256:920a795880e1dd3463fb355d42d458e3ae0b24fca7b4052b99e803a175d7b388",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "d0dff4fb54b266bdc720b21af76c84e7a4de58653333339ec82e78a6f86e13ee",
+  "policyRoot": "651b6f832fa558458759e5539a2bc25d7c9d1f611e4537523953547d06b9b727",
   "layoutVersion": "v1",
   "counts": {
-    "subtrees": 192,
+    "subtrees": 193,
     "namespaces": 52,
-    "objectBytes": 24359874,
+    "objectBytes": 25032517,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,12 +54,12 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "6486879bddba2dbe54c0d2454161b798e20fd9e5bcbb5d4630a0bf4e778e6bb9",
-      "bytes": 66839
+      "hash": "63febe9bcee6fdae41fa71d00f8ef54446b6c82caf06cfe02ff00b3369d7734e",
+      "bytes": 67114
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
-      "hash": "1c13148043dc7a58d7046ecf34c3a23c55e5f7f36b9c4a378fe86fcbabe0eaab",
-      "bytes": 2573324
+      "hash": "d4027297b0a5cc5d90984c821b92e257ee179d14dfacce85adeda8a86e956f3b",
+      "bytes": 2673248
     },
     "@compiler:document:defold-dmsdk-binding-patterns.json": {
       "hash": "44402523e06aa9afd60364c4949c247b1778ababd98dda7dba287a947e564019",
@@ -93,6 +93,10 @@
       "hash": "fce4b46a3d02525569b55679e48a5179800dac83c20d3ab26cb2a41977ca52ae",
       "bytes": 463509
     },
+    "@compiler:document:defold-script-constant-lowering.json": {
+      "hash": "3a71f5c987c7b32bb92a12c6ab1e4aa4f920fa084bc8443507f30b4c4057dc76",
+      "bytes": 415014
+    },
     "@compiler:document:defold-script-handle-lowering.json": {
       "hash": "dcf51cd96db7a8cc809e1b811a4d1dcab589cda67ce3158f75cfc3e859f4f1b9",
       "bytes": 819922
@@ -118,8 +122,8 @@
       "bytes": 542
     },
     "@compiler:document:defold-script-universal-value-bindings.json": {
-      "hash": "fd87ed8ce3005e61b382cf8ed65e511168dae33da958fd0dacb571017ed3dd5d",
-      "bytes": 564468
+      "hash": "2757382f521b7649f571e6b931dc3e517b36ca9a91012e96d8ddf2c6946aa676",
+      "bytes": 645215
     },
     "@compiler:document:defold-sdk-ir.json": {
       "hash": "8d83102a3baaeeb6746f22ccc62bc147e9edf5f71b365dea990e8314e926fcc5",
@@ -274,8 +278,8 @@
       "bytes": 5833
     },
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp": {
-      "hash": "dc68e3d8868f8786790d6b220b9f9c4ee25678aa45caeaf2caacff858c2a97f5",
-      "bytes": 2701
+      "hash": "ed9d1e091c689244aac55972fe54047ddca9d32b0d9709550c932920aa86b16d",
+      "bytes": 2723
     },
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": {
       "hash": "22d404476fa68126934b2a882d1c3b3b96cc0977d10969fe4305813944d22cfd",
@@ -510,12 +514,12 @@
       "bytes": 16383
     },
     "@compiler:output:defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": {
-      "hash": "852d4fcaaf6a7d99a0f47a1c4f596ae8d4d9904c446a51ad373959402d83be8f",
-      "bytes": 112126
+      "hash": "5ea4d8258c60bb9ffb0105ced7d5cb3001cc47999ad591544a6288e149ced7ab",
+      "bytes": 136079
     },
     "@compiler:output:defold/defold_hermes/src/generated_script_universal_value_capi.cpp": {
-      "hash": "db5519f940513b999e39ad26434fa634b7e8c9947ce937ea57b137bb7a34f88d",
-      "bytes": 117207
+      "hash": "3baf2c051b381a2501628e5badfc62e78e445a6a35f9a69ef781a18c7359d890",
+      "bytes": 130088
     },
     "@compiler:output:defold/defold_hermes/src/generated_script_url_bindings.cpp": {
       "hash": "e821b2f6c81cd744c973bb0f88c7538011699464fc3f4046f15f8ec6160b71c9",
@@ -542,8 +546,8 @@
       "bytes": 1496
     },
     "@compiler:output:packages/static-hermes/src/generated/script-typed-native-bridge.ts": {
-      "hash": "ed388a4ce0ae7ca063dff152643962b5bad62b1622d1e062e12d374d67980238",
-      "bytes": 17619
+      "hash": "099fe3414343a16f475c4c1bd5be9e9fdf48190fbcac56a250d61814f37a2620",
+      "bytes": 19336
     },
     "@compiler:output:packages/static-hermes/src/generated/script-universal-value.ts": {
       "hash": "521f721fa97d15cf0a305e96bbbe0edc0dd73fd74577ed300b9d4bd24cf1562a",
@@ -626,8 +630,8 @@
       "bytes": 37506
     },
     "buffer": {
-      "hash": "5b683d38e217b73321118ac62ad6dc26699fd5baa86f5b09f068046eaf71315e",
-      "bytes": 45688
+      "hash": "29d7fc2b4270260c14cb974d5f13ec9640d2df45061ef044849c158d57822fb0",
+      "bytes": 46894
     },
     "builtins": {
       "hash": "4dbb30c1092f3531aa881cfd146c00dbadea655fd124049692e8455dda119597",
@@ -638,24 +642,24 @@
       "bytes": 757669
     },
     "camera": {
-      "hash": "4cc5d50a5770ce6094d5765639951882779566a53be74030a0cfc434f4c71505",
-      "bytes": 82994
+      "hash": "8a3b8a6ec1d15a61f8094f18f3cf4405c53df506cf1c4ce473492afc10d59528",
+      "bytes": 83378
     },
     "collectionfactory": {
-      "hash": "95174e966aa602e12bfcd34004187298f82e893cc2215febf9375353b4d38598",
-      "bytes": 30527
+      "hash": "b8024bd036a58db87aebed46bd2136161a84f250bfbcbc3891af16f0cc54997e",
+      "bytes": 31001
     },
     "collectionproxy": {
-      "hash": "6236e4626b63de81908f2de1d37879df4460ecd05133da2f6bc0b79b17b48cd8",
-      "bytes": 30607
+      "hash": "4e6d52eb345d2803baca24b75e47f91d57eec5df292cce76abcf41fdba42b21a",
+      "bytes": 31069
     },
     "compute": {
       "hash": "94ecd4e64585ec7dcd59099175bf3a4c312d923361b9884bdbce5733cc86783c",
       "bytes": 22126
     },
     "crash": {
-      "hash": "163fe5df412a025926968f88713d1138b3caaeff81986649c78a1016c313c06b",
-      "bytes": 40493
+      "hash": "8226245102be02b717d60f1342f0204af18e0083534270a3a9e93ad1e896714b",
+      "bytes": 41749
     },
     "ddf": {
       "hash": "b3a809b17e9c51f05d6def545a431cd0fbaab32bca580f380effd627e5aeb554",
@@ -674,8 +678,8 @@
       "bytes": 74819
     },
     "factory": {
-      "hash": "4417bd9424c4f115ea145a30d8d414f18ef4d6a0678381b99aa13e7121bcbc33",
-      "bytes": 27541
+      "hash": "a844d948fcda32e9b895e0a5ae0e0a3fb9b6d3811d71583c41d0018c779f2f6e",
+      "bytes": 27949
     },
     "font": {
       "hash": "9657eb61018720c6bd26c1504e6b1c7a94325fee579ac344e5b58fc042f7239a",
@@ -690,16 +694,16 @@
       "bytes": 286527
     },
     "go": {
-      "hash": "7527903aa19411e70fe62a0b877b86a3d1cda16f764d0ceb31ff6af1bd14922b",
-      "bytes": 153782
+      "hash": "11eeebb1371dfdb4f520d1da021e90ee6b1282e7ada2c884a6575f474809ac23",
+      "bytes": 160468
     },
     "graphics": {
-      "hash": "c68ec90fdbf998b68ebe34eaf4252e597f8cf8bc2dbd95fc961efa90f3766375",
-      "bytes": 464832
+      "hash": "1bca2b65ca2896ff912ce247e397b2847391719dbf4d925cfb0e406b6170f1e1",
+      "bytes": 477268
     },
     "gui": {
-      "hash": "26094ce635c610810a75f68e722b4abcea62402b79aaf401c6f1a276a0d7b220",
-      "bytes": 532106
+      "hash": "1f0053a169b83b1917be013d5c719e01ab49a27f15c2abddb3718cd74c4fe007",
+      "bytes": 541358
     },
     "hid": {
       "hash": "f9beed313b21c99fb49320430bc9583fb71649967fcdefbf15e83f294f39d810",
@@ -714,8 +718,8 @@
       "bytes": 19088
     },
     "image": {
-      "hash": "04048cd99163fed015b27132a3d2d7cd77985201af2e3bedbd6b023e270d2f4b",
-      "bytes": 18033
+      "hash": "8588f293cbc50e735f2682d77023e23b99dc9b62688bd408a3079d2ac95c8598",
+      "bytes": 18589
     },
     "json": {
       "hash": "212a59120fb375bd01986419cc9b18ad7ceaf82729ebf3d969d7f8f62d750121",
@@ -750,24 +754,24 @@
       "bytes": 11111
     },
     "particlefx": {
-      "hash": "0ed5806e97bb3986fd11d5b8609b511ea02f34f705275000f82d8cd1ec15752f",
-      "bytes": 27331
+      "hash": "294f377212bf9223a55d076de1eda6a1f860beee00b9ddc3e9b05b55277dd7a3",
+      "bytes": 27899
     },
     "physics": {
-      "hash": "c7b9b45e105ce5ec7018cc977b9f21a95097460f53277c1d14dd19250e448897",
-      "bytes": 131191
+      "hash": "3a02a593fa635ce436ee786cb3dca4ec3c9e9dad7a6344a09ca326dc90e6c0a1",
+      "bytes": 132075
     },
     "platform": {
       "hash": "990ca65f962a60924515899493afef38be710f5b7589a5c6b0ca0df924dea1a9",
       "bytes": 25918
     },
     "profiler": {
-      "hash": "b8e99c3f691114fed9a3457edcd119e284d88b6e233a71a90a31b2252f1cb8c4",
-      "bytes": 42696
+      "hash": "cdb5fa429288a2de1425ff338e46f016fda454015c2228f315876cf7184cf90e",
+      "bytes": 43260
     },
     "render": {
-      "hash": "3e96b341544dd212b6d84920c64af8c68ceac0c992fe0581f00c4df51b9c55e2",
-      "bytes": 285243
+      "hash": "20d7a2f3c33fb708293e220f667e4c595541d299ccadd7f28c43a36760945041",
+      "bytes": 286041
     },
     "resource": {
       "hash": "bc5e96222bf48b6de517b70d4fa57ecc7ef34e8225e19cb9277d619df0d22edb",
@@ -794,16 +798,16 @@
       "bytes": 26389
     },
     "sys": {
-      "hash": "a35cd080c4fee51206ce41b6bd457d12372de479a4d3bfff67bf86ec8c6ce167",
-      "bytes": 123593
+      "hash": "6134a0cea5298645942e5fca602755fd0030475879b8c2e82bc7b3b2047a3975",
+      "bytes": 124311
     },
     "tilemap": {
-      "hash": "12b6dc7c5c3d6a99aa59895b663950b4e48e06e9382b7342c3d5414f92b664a2",
-      "bytes": 39382
+      "hash": "01fbe9d910c4e777bf535671247df892687236404842afcee1da992339e29992",
+      "bytes": 39518
     },
     "timer": {
-      "hash": "4b11d93c985eb1348960c61f8b7374bcf512d28db35767e4eb1118018067bbb7",
-      "bytes": 16865
+      "hash": "ea8591336d19114be273b8270a8344be20ae6b4fb0397b4863145288b5cf96a9",
+      "bytes": 16981
     },
     "types": {
       "hash": "c811ab5fca34a9a4979de2cb6a81a2037c361eef813533987eea15a7768d7b15",
@@ -814,8 +818,8 @@
       "bytes": 154144
     },
     "window": {
-      "hash": "641c641a36a6bc4e8e8f412f924e3016858033f8868a26a06106d29676b69b68",
-      "bytes": 40117
+      "hash": "f9eaca444a744d06aae128d01805ee2907c8a87761c62c83fcadbcbeaa936948",
+      "bytes": 41323
     },
     "zlib": {
       "hash": "0de6a660fe7dac862793f8e413952f5ca05d4b1bc80bc8b8124aab031ddd3bbf",

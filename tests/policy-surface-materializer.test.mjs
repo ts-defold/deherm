@@ -43,7 +43,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 19);
+  assert.equal(first.descriptor.documents.length, 20);
   for (const name of [
     "defold-script-binding-patterns.json",
     "defold-dmsdk-binding-patterns.json",
@@ -56,6 +56,10 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.deepEqual(
     compiler.value.sdk.entries["script/types.ts"].inputs,
     ["defold-script-api-ir.json", "defold-script-sdk-documentation.json", "defold-script-handle-lowering.json"]
+  );
+  assert.deepEqual(
+    compiler.value.sdk.entries["script/modules.ts"].inputs,
+    ["defold-script-api-ir.json", "defold-script-constant-lowering.json"]
   );
   assert.deepEqual(
     compiler.value.sdk.entries["dmsdk/types.ts"].inputs,
@@ -101,7 +105,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_870_554, snapshots: 105_573 },
+  assert.deepEqual(bytesByMode, { rendered: 3_908_177, snapshots: 105_573 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const expectedOutputs = await discoverCompilerSurfaceOutputs();
@@ -118,7 +122,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), sha256(expected), `${relative} drifted from the source pipeline`);
     outputBytesByMode[first.descriptor.outputs[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(outputBytesByMode, { rendered: 5_372, snapshots: 1_675_950 },
+  assert.deepEqual(outputBytesByMode, { rendered: 5_372, snapshots: 1_713_631 },
     "package-emitter versus revision-output snapshot debt changed");
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));
@@ -184,6 +188,20 @@ test("policy materialization fails closed when the dmSDK catalog exceeds the pac
 test("package-owned SDK and revision-output recipes fail closed on manifest drift", async () => {
   const policy = await currentResolvedPolicy();
   const compiler = policy.objects.get("@compiler");
+
+  const missingConstantDocument = structuredClone(compiler.value);
+  delete missingConstantDocument.documents.entries["defold-script-constant-lowering.json"];
+  delete missingConstantDocument.realizationRecipes.documents["defold-script-constant-lowering.json"];
+  missingConstantDocument.sdk.entries["script/modules.ts"].inputs = ["defold-script-api-ir.json"];
+  await assert.rejects(
+    materializePolicySurface({
+      ...policy,
+      objects: new Map(policy.objects).set("@compiler", { ...compiler, value: missingConstantDocument })
+    }, {
+      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-constant-document-missing-test-"))
+    }),
+    /missing defold-script-constant-lowering\.json/u
+  );
 
   const scriptDocumentationKey = compiler.value.documents.entries["defold-script-sdk-documentation.json"].object;
   const scriptDocumentationObject = policy.objects.get(scriptDocumentationKey);
