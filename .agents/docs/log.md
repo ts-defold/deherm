@@ -1,5 +1,29 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Fresh HTML5 replay keeps restart input observable
+
+Both GitHub workflows for `79318020993fd1c1e1ba6802e85ab522cdabad5d`
+completed successfully before a fresh local `wasm-web` bundle was produced.
+The browser runtime gate observed the complete tutorial and eight-player arena
+marker set from bundle fingerprint
+`be4d20399b4388c064bbd5acbb7d223058d5b826b6945cbc8c0f32f551e6f6bc`.
+The separate playability gate measured 52 ms from keyboard input to arena
+engagement, observed the fire and round sound-call markers, restarted into
+round two, and found no page errors or lost graphics context.
+
+The first playability attempt exposed a synthetic-input race in the gate: its
+restart key-down and key-up events were queued back-to-back before Defold could
+sample an engine frame. The gate now holds `R` for 100 ms, matching a laptop
+keyboard interaction instead of a zero-duration pulse. The rerun reported a
+live WebGL 2 / GLSL ES 3.00 context through ANGLE/SwiftShader and a composed
+frame with 4,000 visible, non-black sample pixels across 78 colour buckets.
+The inspected 70,060-byte screenshot at
+`build/evidence/war-battles-html5.png` has SHA-256
+`14ceef94d7c633170dc4de57656c210f760cd125d5315052a31d91887e15c80c`
+and shows the textured arena, obstacles, pickups, tank sprites, HUD, controls,
+and round-two state. This is local packaged-browser correctness evidence under
+software WebGL; it is not hardware-GPU performance or physical-speaker output.
+
 ## 2026-09-22 - Installed web launch uses the native user cache
 
 A real `deherm dev --web` War Battles session reproduced an installed-path

@@ -110,6 +110,11 @@ async function run() {
     );
 
     await key(client, { type: "keyDown", key: "r", code: "KeyR", virtualKeyCode: 82 });
+    // Keep the key down across several browser/engine frames. Sending down and
+    // up back-to-back can leave both events in the Emscripten queue before
+    // Defold samples input, which tests a zero-duration synthetic pulse rather
+    // than the laptop-keyboard interaction this gate is meant to prove.
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, 100));
     await key(client, { type: "keyUp", key: "r", code: "KeyR", virtualKeyCode: 82 });
     await waitFor(
       () => client.transcript.includes("war-battles:arena-restart:round=2"),
