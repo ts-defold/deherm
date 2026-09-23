@@ -1854,6 +1854,16 @@ trees. Their target-dependent presence had made the authored-game evidence vary
 with local build state. Bundle artifacts remain measured exactly; only the
 source census boundary was corrected.
 
+The subsequent full-package check found one remaining target-owned input in
+that census: typed-native target selection creates a project-root `.defignore`.
+The measurement now excludes that generated selector state as well. The source
+census is again 495 files; the checked bundle artifacts themselves are byte
+unchanged. After the correction, generated project and component verification,
+all four TypeScript context checks, art and tilemap freshness, and 53 executable
+tests passed. A 3,600-tick, 32-player headless match also produced identical
+baseline and rollback state/replay hashes with 142 kills. This is deterministic
+simulation and local runtime evidence; it is not networked multi-host evidence.
+
 ## 2026-09-22 - Defold deprecations reach generated TypeScript hovers
 
 The script and dmSDK SDK generators now derive TSDoc `@deprecated` tags from

@@ -76,7 +76,11 @@ async function walk(directory, output) {
     // Source evidence must not depend on whether this checkout has staged the
     // generated runtime extension or an optional typed-native unit. Both trees
     // are installed build inputs with their own manifests, not War Battles
-    // source, and their contents legitimately vary by selected target.
+    // source, and their contents legitimately vary by selected target. The
+    // typed-native selector also owns the project-root `.defignore`; its
+    // presence changes with the requested Bob target and belongs to that same
+    // generated build state rather than the authored source census.
+    if (entry.isFile() && entry.name === ".defignore") continue;
     if (entry.isDirectory() && [
       ".deherm",
       ".internal",
