@@ -26,12 +26,18 @@ import {
   MAX_PLAYERS,
   MatchServer,
   PICKUP_HEALTH,
+  REJECT_BAD_RESUME,
   PlayableBattle,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_BYTES,
+  SNAPSHOT_DELTA,
+  SNAPSHOT_KEYFRAME,
+  SNAPSHOT_KEYFRAME_INTERVAL,
+  SNAPSHOT_MESSAGE_BYTES,
   TICK_MILLISECONDS,
   TRANSPORT_CHANNEL_CONTROL,
   TRANSPORT_CHANNEL_SESSION,
+  TRANSPORT_CHANNEL_SNAPSHOT,
   UPGRADE_DAMAGE,
   WELCOME_BYTES,
   WEAPON_AUTOCANNON,
@@ -45,10 +51,13 @@ import {
   isqrt,
   readHello,
   readInputPacket,
+  readSnapshotFrame,
   readWelcome,
   sendTickInput,
   writeHello,
   writeInputPacket,
+  writeSnapshotDelta,
+  writeSnapshotKeyframe,
   writeWelcome,
 } from "../core/index.ts";
 import { UPGRADE_MOBILITY } from "../core/content.ts";
@@ -122,6 +131,192 @@ test("session messages round-trip and reject a foreign kind", () => {
   assert.equal(observedWelcome.serverTick, 4_321);
   assert.equal(observedWelcome.snapshotIntervalTicks, 6);
   assert.throws(() => readHello(welcome, observedHello), /not kind/);
+});
+
+test("32-player snapshot deltas are compact and keyframes recover the baseline", () => {
+  const world = new BattleWorld(77);
+  for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) world.addPlayer(playerId);
+  const first = new Uint8Array(SNAPSHOT_BYTES);
+  const second = new Uint8Array(SNAPSHOT_BYTES);
+  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  world.writeSnapshot(first);
+  for (let tick = 1; tick <= 3; tick += 1) {
+    for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
+      const input = createInputCommand(77, playerId);
+      input.tick = tick;
+      input.sequence = tick;
+      input.moveX = playerId % 2 === 0 ? -1 : 1;
+      world.submitInput(input);
+    }
+    world.step();
+  }
+  world.writeSnapshot(second);
+  const keyframeLength = writeSnapshotKeyframe(frame, world.tick, first);
+  const deltaLength = writeSnapshotDelta(frame, world.tick, 0, first, second);
+  assert.equal(keyframeLength, SNAPSHOT_MESSAGE_BYTES);
+  assert.ok(deltaLength > 0 && deltaLength < keyframeLength, `delta ${deltaLength} must beat keyframe ${keyframeLength}`);
+
+  const scratch = {
+    baseline: new Uint8Array(SNAPSHOT_BYTES),
+    decoded: new Uint8Array(SNAPSHOT_BYTES),
+    baselineTick: -1,
+  };
+  writeSnapshotKeyframe(frame, 0, first);
+  const legacyV2Frame = frame.slice();
+  legacyV2Frame[2] = 2;
+  assert.throws(() => readSnapshotFrame(legacyV2Frame, scratch), /envelope mismatch/);
+  const reservedByteFrame = frame.slice();
+  reservedByteFrame[9] = 1;
+  assert.throws(() => readSnapshotFrame(reservedByteFrame, scratch), /reserved byte/);
+  const keyframeBaseFrame = frame.slice();
+  keyframeBaseFrame[10] = 1;
+  assert.throws(() => readSnapshotFrame(keyframeBaseFrame, scratch), /invalid snapshot keyframe/);
+  assert.equal(readSnapshotFrame(frame, scratch), 0);
+  writeSnapshotDelta(frame, world.tick, 0, first, second);
+  assert.equal(readSnapshotFrame(frame.subarray(0, deltaLength), scratch), world.tick);
+  assert.deepEqual(scratch.decoded, second);
+
+  const validDelta = frame.slice(0, deltaLength);
+  const malformed = validDelta.slice();
+  malformed[18] = 0;
+  malformed[19] = 0;
+  writeSnapshotKeyframe(frame, 0, first);
+  readSnapshotFrame(frame, scratch);
+  assert.throws(() => readSnapshotFrame(malformed, scratch), /run is invalid/);
+
+  const missingBase = { ...scratch, baselineTick: -1 };
+  assert.throws(() => readSnapshotFrame(validDelta, missingBase), /base is unavailable/);
+});
+
+test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", () => {
+  const world = new BattleWorld(77);
+  const bots = new BotController();
+  for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
+    world.addPlayer(playerId);
+    world.setBotSkill(playerId, 2);
+  }
+  const previous = new Uint8Array(SNAPSHOT_BYTES);
+  const current = new Uint8Array(SNAPSHOT_BYTES);
+  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  const lengths = [];
+  let baselineTick = -1;
+  let framesSinceKeyframe = SNAPSHOT_KEYFRAME_INTERVAL;
+  for (let tick = 1; tick <= 600; tick += 1) {
+    for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
+      const input = createInputCommand(77, playerId);
+      bots.stage(world, input, playerId, tick);
+      world.submitInput(input);
+    }
+    world.step();
+    if (world.tick % 3 !== 0) continue;
+    world.writeSnapshot(current);
+    let length = -1;
+    if (framesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1) {
+      length = writeSnapshotDelta(frame, world.tick, baselineTick, previous, current);
+    }
+    if (length < 0) {
+      length = writeSnapshotKeyframe(frame, world.tick, current);
+      framesSinceKeyframe = 0;
+    } else {
+      framesSinceKeyframe += 1;
+    }
+    lengths.push(length);
+    previous.set(current);
+    baselineTick = world.tick;
+  }
+  lengths.sort((left, right) => left - right);
+  assert.equal(lengths.length, 200);
+  assert.equal(lengths[0], 2_015);
+  assert.equal(lengths.at(-1), SNAPSHOT_MESSAGE_BYTES);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_398);
+  assert.equal(lengths.filter((length) => length === SNAPSHOT_MESSAGE_BYTES).length, 10);
+  const normal = lengths.filter((length) => length !== SNAPSHOT_MESSAGE_BYTES);
+  assert.equal(normal.at(-1), 3_262);
+});
+
+test("a replaced in-flight snapshot forces a recovery keyframe", async () => {
+  const server = new MatchServer({ rosterSize: 2 });
+  const session = server.createSession();
+  const frames = [];
+  let releaseFirst;
+  const transport = {
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(_channel, payload) {
+      frames.push(payload.slice());
+      if (releaseFirst === undefined) return new Promise((resolve) => { releaseFirst = resolve; });
+      return Promise.resolve("sent");
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  };
+  session.attach(transport);
+  const first = new Uint8Array(SNAPSHOT_BYTES);
+  const second = new Uint8Array(SNAPSHOT_BYTES).fill(7);
+  session.sendSnapshot(first, 3);
+  session.sendSnapshot(second, 6);
+  assert.equal(frames.length, 1);
+  assert.equal(frames[0][8], SNAPSHOT_KEYFRAME);
+  releaseFirst("sent");
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(frames.length, 2);
+  assert.equal(frames[1][8], SNAPSHOT_KEYFRAME, "pending replacement cannot depend on an undelivered delta");
+  assert.notEqual(frames[1][8], SNAPSHOT_DELTA);
+  server.close();
+});
+
+test("a rejected snapshot send drops its stale pending replacement", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const session = server.createSession();
+  const frames = [];
+  let first = true;
+  const transport = {
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(_channel, payload) {
+      frames.push(payload.slice());
+      if (first) {
+        first = false;
+        return Promise.reject(new Error("snapshot send rejected"));
+      }
+      return Promise.resolve("sent");
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  };
+  session.attach(transport);
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES), 3);
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(7), 6);
+  await new Promise((resolve) => setImmediate(resolve));
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(9), 9);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(frames.length, 2, "the rejected frame's stale pending replacement must not replay");
+  assert.equal(frames[1][8], SNAPSHOT_KEYFRAME, "the next usable frame recovers with a keyframe");
+  assert.equal(errors.length, 1);
+  server.close();
+});
+
+test("a closed snapshot send releases the server session", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 1, onError: (error) => errors.push(error) });
+  const client = new BattleClient({ name: "closing", onError: (error) => errors.push(error) });
+  const session = server.createSession();
+  const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
+  const sendReliable = serverTransport.sendReliable.bind(serverTransport);
+  serverTransport.sendReliable = (channel, payload, signal) => channel === TRANSPORT_CHANNEL_SNAPSHOT
+    ? Promise.resolve("closed")
+    : sendReliable(channel, payload, signal);
+  session.attach(serverTransport);
+  client.attach(clientTransport);
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(server.countHumans(), 1);
+  server.step();
+  server.step();
+  server.step();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(session.closed, true);
+  assert.equal(server.countHumans(), 0, "a terminal snapshot send must release its claimed slot");
+  assert.deepEqual(errors, []);
+  server.close();
 });
 
 // --- arena ------------------------------------------------------------------
@@ -430,6 +625,17 @@ test("a full snapshot restores and deterministically replays queued inputs", () 
   assert.equal(world.stateHash(), expectedHash);
 });
 
+test("a full snapshot restores player boost ticks for rollback", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1);
+  world.playerBoostTicks[0] = 19;
+  const snapshot = new Uint8Array(SNAPSHOT_BYTES);
+  world.writeSnapshot(snapshot);
+  world.playerBoostTicks[0] = 0;
+  world.restoreSnapshot(snapshot);
+  assert.equal(world.playerBoostTicks[0], 19);
+});
+
 test("a snapshot from another arena is refused rather than silently applied", () => {
   const first = new BattleWorld(77, 1);
   const second = new BattleWorld(77, 2);
@@ -572,6 +778,7 @@ test("playable orchestration is deterministic and supports restart and upgrades"
 /** Wires a client to a server session over the in-memory transport pair. */
 function join(server, name, errors, options = {}) {
   const client = new BattleClient({ name, onError: (error) => errors.push(error), ...options });
+  if (options.resumeToken !== undefined) client.resumeToken.set(options.resumeToken);
   const session = server.createSession();
   const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session, options.transport);
   session.attach(serverTransport);
@@ -580,7 +787,347 @@ function join(server, name, errors, options = {}) {
   return client;
 }
 
+/** Connects a client to a session whose welcome delivery deliberately fails. */
+function failWelcome(server, client, disposition) {
+  const session = server.createSession();
+  const capabilities = { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 };
+  const clientTransport = {
+    capabilities,
+    sendReliable(channel, payload) {
+      session.onReliable(channel, payload.slice());
+      return Promise.resolve("sent");
+    },
+    trySendDatagram: async () => "closed",
+    close(code, reason) {
+      session.onClose(code, reason);
+      client.onClose(code, reason);
+    },
+  };
+  const serverTransport = {
+    capabilities,
+    sendReliable(channel, payload) {
+      if (channel === TRANSPORT_CHANNEL_SESSION && payload[3] === 2) {
+        if (disposition === "reject") return Promise.reject(new Error("welcome send rejected"));
+        return Promise.resolve("closed");
+      }
+      client.onReliable(channel, payload.slice());
+      return Promise.resolve("sent");
+    },
+    trySendDatagram: async () => "closed",
+    close(code, reason) {
+      client.onClose(code, reason);
+      session.onClose(code, reason);
+    },
+  };
+  session.attach(serverTransport);
+  client.attach(clientTransport);
+  return session;
+}
+
 const settle = () => new Promise((resolve) => setImmediate(resolve));
+
+test("a welcomed player resumes its slot and the new stream starts from a keyframe", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, botSkill: 1, onError: (error) => errors.push(error) });
+  const first = join(server, "commander", errors);
+  await settle();
+  assert.equal(first.state, "ready");
+  const playerId = first.playerId;
+  const tokenBeforeDisconnect = first.resumeToken.slice();
+  server.world.playerScore[playerId - 1] = 7;
+  server.world.playerCredits[playerId - 1] = 425;
+  const stateBeforeDisconnect = [
+    server.world.playerScore[playerId - 1],
+    server.world.playerCredits[playerId - 1],
+    server.world.playerHealth[playerId - 1],
+  ];
+  // Establish and consume the old session's baseline, then disconnect after
+  // welcome. The world remains authoritative while the bot fills the slot.
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  first.update(0);
+  first.close(1_001, "link lost");
+  assert.equal(server.countHumans(), 0);
+
+  const resumed = new BattleClient({ name: "renamed", onError: (error) => errors.push(error) });
+  resumed.resumeToken.set(tokenBeforeDisconnect);
+  const resumedSession = server.createSession();
+  const [clientTransport, serverTransport] = createInMemoryTransportPair(resumed, resumedSession);
+  const frames = [];
+  const sendReliable = serverTransport.sendReliable.bind(serverTransport);
+  serverTransport.sendReliable = async (channel, payload, signal) => {
+    if (channel === 3) frames.push(payload.slice());
+    return sendReliable(channel, payload, signal);
+  };
+  resumedSession.attach(serverTransport);
+  resumed.attach(clientTransport);
+  await settle();
+  assert.equal(resumed.state, "ready");
+  assert.equal(resumed.playerId, playerId, "resume must restore the authenticated player slot");
+  assert.deepEqual([
+    server.world.playerScore[playerId - 1],
+    server.world.playerCredits[playerId - 1],
+    server.world.playerHealth[playerId - 1],
+  ], stateBeforeDisconnect, "resume must not reset authoritative player state");
+
+  server.step();
+  server.step();
+  server.step();
+  await settle();
+  assert.ok(frames.length > 0);
+  assert.equal(frames[0][8], SNAPSHOT_KEYFRAME, "a resumed session cannot depend on the old baseline");
+  resumed.update(0);
+  assert.equal(resumed.stats.snapshotsApplied, 1);
+  assert.equal(resumed.stats.lastServerTick, server.world.tick);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("non-zero invalid, stale, and foreign resume tokens fail closed", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, resumeGraceTicks: 2, onError: (error) => errors.push(error) });
+  const first = join(server, "owner", errors);
+  await settle();
+  const originalToken = first.resumeToken.slice();
+  first.close(1_001, "link lost");
+
+  const invalidRejected = [];
+  const invalid = join(server, "invalid", errors, {
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES).fill(0x5a),
+    onReject: (reject) => invalidRejected.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(invalid.state, "rejected");
+  assert.equal(invalidRejected[0].code, REJECT_BAD_RESUME);
+  assert.equal(server.countHumans(), 0);
+
+  // A valid resume rotates the credential. The old one is then stale even
+  // after the resumed connection disconnects.
+  const resumed = join(server, "owner-again", errors, { resumeToken: originalToken });
+  await settle();
+  assert.equal(resumed.state, "ready");
+  assert.notDeepEqual([...resumed.resumeToken], [...originalToken]);
+  resumed.close(1_001, "link lost again");
+  const staleRejected = [];
+  const stale = join(server, "stale", errors, {
+    resumeToken: originalToken,
+    onReject: (reject) => staleRejected.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(stale.state, "rejected");
+  assert.equal(staleRejected[0].code, REJECT_BAD_RESUME);
+
+  const expiringServer = new MatchServer({ rosterSize: 1, resumeGraceTicks: 1 });
+  const expiring = join(expiringServer, "expiring", errors);
+  await settle();
+  const expiringToken = expiring.resumeToken.slice();
+  expiring.close(1_001, "link lost");
+  expiringServer.step();
+  expiringServer.step();
+  const expiredRejected = [];
+  const expired = join(expiringServer, "expired", errors, {
+    resumeToken: expiringToken,
+    onReject: (reject) => expiredRejected.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(expired.state, "rejected");
+  assert.equal(expiredRejected[0].code, REJECT_BAD_RESUME);
+  expiringServer.close();
+
+  const otherServer = new MatchServer({ rosterSize: 2 });
+  const foreign = join(otherServer, "foreign", errors);
+  await settle();
+  assert.notDeepEqual([...foreign.resumeToken], [...resumed.resumeToken], "same-match servers need distinct bearer secrets");
+  const foreignRejected = [];
+  const foreignAttempt = join(server, "foreign-attempt", errors, {
+    resumeToken: foreign.resumeToken,
+    onReject: (reject) => foreignRejected.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(foreignAttempt.state, "rejected");
+  assert.equal(foreignRejected[0].code, REJECT_BAD_RESUME);
+  otherServer.close();
+  server.close();
+  assert.deepEqual(errors, []);
+});
+
+test("failed welcome delivery does not consume an old or initial resume credential", async () => {
+  const errors = [];
+  const initialServer = new MatchServer({ rosterSize: 1 });
+  const initialFailure = new BattleClient({ onError: (error) => errors.push(error) });
+  failWelcome(initialServer, initialFailure, "closed");
+  await settle();
+  assert.equal(initialFailure.state, "closed");
+  assert.equal(initialServer.countHumans(), 0);
+  const initialRetry = join(initialServer, "initial-retry", errors);
+  await settle();
+  assert.equal(initialRetry.state, "ready", "an initial failed welcome must release its anonymous slot");
+  initialServer.close();
+
+  const server = new MatchServer({ rosterSize: 1 });
+  const owner = join(server, "owner", errors);
+  await settle();
+  const oldToken = owner.resumeToken.slice();
+  const playerId = owner.playerId;
+  owner.close(1_001, "link lost");
+
+  const failedResume = new BattleClient({ onError: (error) => errors.push(error) });
+  failedResume.resumeToken.set(oldToken);
+  failWelcome(server, failedResume, "reject");
+  await settle();
+  assert.equal(failedResume.state, "closed");
+  assert.equal(server.countHumans(), 0);
+
+  const retry = join(server, "retry", errors, { resumeToken: oldToken });
+  await settle();
+  assert.equal(retry.state, "ready");
+  assert.equal(retry.playerId, playerId, "the old credential must remain usable after failed welcome delivery");
+  assert.notDeepEqual([...retry.resumeToken], [...oldToken], "a successfully sent welcome must rotate the credential");
+
+  const staleRejects = [];
+  const stale = join(server, "stale", errors, {
+    resumeToken: oldToken,
+    onReject: (reject) => staleRejects.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(stale.state, "rejected");
+  assert.equal(staleRejects[0].code, REJECT_BAD_RESUME);
+  server.close();
+  assert.deepEqual(errors, []);
+});
+
+test("a failed resumed welcome preserves the original grace deadline", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 1, resumeGraceTicks: 2 });
+  const owner = join(server, "owner", errors);
+  await settle();
+  const oldToken = owner.resumeToken.slice();
+  owner.close(1_001, "link lost");
+  server.step();
+
+  const failedResume = new BattleClient({ onError: (error) => errors.push(error) });
+  failedResume.resumeToken.set(oldToken);
+  failWelcome(server, failedResume, "closed");
+  await settle();
+  assert.equal(failedResume.state, "closed");
+
+  server.step();
+  server.step();
+  const rejects = [];
+  const expired = join(server, "expired", errors, {
+    resumeToken: oldToken,
+    onReject: (reject) => rejects.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(expired.state, "rejected");
+  assert.equal(rejects[0].code, REJECT_BAD_RESUME);
+  server.close();
+  assert.deepEqual(errors, []);
+});
+
+test("a failed fresh takeover does not resurrect an expired resume credential", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, resumeGraceTicks: 1 });
+  const occupied = join(server, "occupied", errors);
+  await settle();
+  const expiring = join(server, "expiring", errors);
+  await settle();
+  const staleToken = expiring.resumeToken.slice();
+  expiring.close(1_001, "link lost");
+  server.step();
+  server.step();
+
+  const failedFresh = new BattleClient({ onError: (error) => errors.push(error) });
+  failWelcome(server, failedFresh, "reject");
+  await settle();
+  assert.equal(failedFresh.state, "closed");
+  assert.equal(server.countHumans(), 1, "the failed takeover must release its claimed slot");
+
+  const staleRejects = [];
+  const stale = join(server, "stale", errors, {
+    resumeToken: staleToken,
+    onReject: (reject) => staleRejects.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(stale.state, "rejected");
+  assert.equal(staleRejects[0].code, REJECT_BAD_RESUME);
+  occupied.close(1_001, "test done");
+  server.close();
+  assert.deepEqual(errors, []);
+});
+
+test("snapshot decode failure latches until a keyframe and reports only its root error", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = join(server, "decoder", errors);
+  await settle();
+  server.step();
+  server.step();
+  server.step();
+  await settle();
+  client.update(0);
+  const baseline = new Uint8Array(SNAPSHOT_BYTES);
+  server.world.writeSnapshot(baseline);
+  const nextWorld = new BattleWorld(server.world.matchId, server.world.mapSeed);
+  nextWorld.restoreSnapshot(baseline);
+  nextWorld.step();
+  const next = new Uint8Array(SNAPSHOT_BYTES);
+  nextWorld.writeSnapshot(next);
+  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+
+  const missingBaseLength = writeSnapshotDelta(frame, 6, 999, baseline, baseline);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, missingBaseLength));
+  assert.equal(errors.length, 1);
+  const ignoredAfterRoot = client.stats.snapshotsIgnored;
+  const dependentLength = writeSnapshotDelta(frame, 9, 3, baseline, baseline);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, dependentLength));
+  assert.equal(errors.length, 1, "dependent deltas must not report a second error");
+  assert.equal(client.stats.snapshotsIgnored, ignoredAfterRoot + 1);
+
+  const keyframeLength = writeSnapshotKeyframe(frame, 12, baseline);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, keyframeLength));
+  // The keyframe and its dependent delta can arrive in one receive burst. The
+  // decoded keyframe must release the latch before the delta is considered.
+  const recoveredDeltaLength = writeSnapshotDelta(frame, 15, 12, baseline, next);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, recoveredDeltaLength));
+  client.update(0);
+  assert.equal(client.stats.snapshotsApplied, 2, "a valid keyframe must recover a same-burst dependent delta");
+  assert.equal(client.world.stateHash(), nextWorld.stateHash(), "the latest valid burst state must be applied");
+  const nextDeltaLength = writeSnapshotDelta(frame, 18, 15, next, next);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, nextDeltaLength));
+  client.update(0);
+  assert.equal(client.stats.snapshotsApplied, 3, "the recovered delta chain must remain usable");
+  assert.equal(errors.length, 1);
+  server.close();
+});
+
+test("snapshot restore failures are reported without escaping update and recover by keyframe", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2 });
+  const client = join(server, "restore-guard", errors);
+  await settle();
+  server.step();
+  server.step();
+  server.step();
+  await settle();
+  client.update(0);
+  const baseline = new Uint8Array(SNAPSHOT_BYTES);
+  server.world.writeSnapshot(baseline);
+  const bad = baseline.slice();
+  bad[0] ^= 1;
+  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  const badLength = writeSnapshotKeyframe(frame, 6, bad);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, badLength));
+  assert.doesNotThrow(() => client.update(0));
+  assert.equal(errors.length, 1);
+
+  const goodLength = writeSnapshotKeyframe(frame, 9, baseline);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, goodLength));
+  assert.doesNotThrow(() => client.update(0));
+  assert.equal(client.stats.snapshotsApplied, 2);
+  assert.equal(errors.length, 1);
+  server.close();
+});
 
 test("two clients join one authoritative match, replace bots and stay in sync", async () => {
   const errors = [];

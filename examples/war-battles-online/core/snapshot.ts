@@ -9,10 +9,194 @@ import {
   SNAPSHOT_HEADER_BYTES,
 } from "./constants.ts";
 import { WEAPON_COUNT } from "./content.ts";
+import {
+  ENVELOPE_MAGIC,
+  MESSAGE_SNAPSHOT,
+  PROTOCOL_VERSION,
+  SNAPSHOT_DELTA,
+  SNAPSHOT_FRAME_HEADER_BYTES,
+  SNAPSHOT_KEYFRAME,
+  SNAPSHOT_MESSAGE_BYTES,
+} from "./protocol.ts";
 import type { BattleWorld } from "./world.ts";
 
 const SNAPSHOT_MAGIC = 0x57425331;
 const SNAPSHOT_VERSION = 2;
+
+export interface SnapshotFrameScratch {
+  readonly baseline: Uint8Array;
+  readonly decoded: Uint8Array;
+  baselineTick: number;
+}
+
+/**
+ * Writes a complete authoritative keyframe. The source is the raw world
+ * snapshot, not a framed protocol message. `-1` is never returned here:
+ * callers size the fixed frame buffer with `SNAPSHOT_MESSAGE_BYTES`.
+ */
+export function writeSnapshotKeyframe(
+  target: Uint8Array,
+  tick: number,
+  source: Uint8Array,
+): number {
+  if (source.byteLength < SNAPSHOT_BYTES) throw new RangeError("snapshot keyframe source is truncated");
+  requireFrameCapacity(target);
+  frameHeader(target, tick, SNAPSHOT_KEYFRAME, 0);
+  copyBytes(target, SNAPSHOT_FRAME_HEADER_BYTES, source, 0, SNAPSHOT_BYTES);
+  return SNAPSHOT_FRAME_HEADER_BYTES + SNAPSHOT_BYTES;
+}
+
+/**
+ * Writes a deterministic run-list delta against `baseline`. Runs are sorted,
+ * non-overlapping and contain only changed bytes. If the delta would be no
+ * smaller than a keyframe, `-1` asks the caller to send a keyframe instead.
+ */
+export function writeSnapshotDelta(
+  target: Uint8Array,
+  tick: number,
+  baselineTick: number,
+  baseline: Uint8Array,
+  current: Uint8Array,
+): number {
+  if (baseline.byteLength < SNAPSHOT_BYTES || current.byteLength < SNAPSHOT_BYTES) {
+    throw new RangeError("snapshot delta source is truncated");
+  }
+  requireFrameCapacity(target);
+  frameHeader(target, tick, SNAPSHOT_DELTA, baselineTick);
+  let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
+  let runCount = 0;
+  let index = 0;
+  while (index < SNAPSHOT_BYTES) {
+    while (index < SNAPSHOT_BYTES && baseline[index] === current[index]) index += 1;
+    if (index === SNAPSHOT_BYTES) break;
+    const start = index;
+    while (index < SNAPSHOT_BYTES && baseline[index] !== current[index] && index - start < 0xffff) index += 1;
+    const length = index - start;
+    if (runCount >= 0xffff || cursor + 4 + length > SNAPSHOT_MESSAGE_BYTES) return -1;
+    writeUint16LE(target, cursor, start);
+    writeUint16LE(target, cursor + 2, length);
+    copyBytes(target, cursor + 4, current, start, length);
+    cursor += 4 + length;
+    runCount += 1;
+  }
+  writeUint16LE(target, 14, runCount);
+  // A delta header plus its runs is useful only when it is smaller than the
+  // keyframe. Equal-sized frames are kept as keyframes for recovery clarity.
+  return cursor < SNAPSHOT_MESSAGE_BYTES ? cursor : -1;
+}
+
+/**
+ * Decodes one frame into caller-owned storage. A delta without the exact
+ * advertised base tick is rejected; callers must wait for the next keyframe.
+ */
+export function readSnapshotFrame(
+  payload: Uint8Array,
+  scratch: SnapshotFrameScratch,
+): number {
+  if (payload.byteLength < SNAPSHOT_FRAME_HEADER_BYTES) throw new Error("snapshot frame is truncated");
+  if (readUint16LE(payload, 0) !== ENVELOPE_MAGIC) throw new Error("snapshot frame envelope magic mismatch");
+  if (payload[2] !== PROTOCOL_VERSION || payload[3] !== MESSAGE_SNAPSHOT) throw new Error("snapshot frame envelope mismatch");
+  const tick = readUint32LE(payload, 4);
+  const kind = payload[8]!;
+  if (payload[9] !== 0) throw new Error("snapshot frame reserved byte is nonzero");
+  const baseTick = readUint32LE(payload, 10);
+  const runCount = readUint16LE(payload, 14);
+  if (scratch.baseline.byteLength < SNAPSHOT_BYTES || scratch.decoded.byteLength < SNAPSHOT_BYTES) {
+    throw new RangeError("snapshot decode storage is truncated");
+  }
+  if (kind === SNAPSHOT_KEYFRAME) {
+    if (baseTick !== 0 || runCount !== 0 || payload.byteLength !== SNAPSHOT_MESSAGE_BYTES) throw new Error("invalid snapshot keyframe");
+    copyBytes(scratch.decoded, 0, payload, SNAPSHOT_FRAME_HEADER_BYTES, SNAPSHOT_BYTES);
+  } else if (kind === SNAPSHOT_DELTA) {
+    if (scratch.baselineTick < 0 || baseTick !== (scratch.baselineTick >>> 0)) {
+      throw new Error("snapshot delta base is unavailable");
+    }
+    scratch.decoded.set(scratch.baseline);
+    let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
+    let previousEnd = 0;
+    for (let run = 0; run < runCount; run += 1) {
+      if (cursor + 4 > payload.byteLength) throw new Error("snapshot delta run header is truncated");
+      const offset = readUint16LE(payload, cursor);
+      const length = readUint16LE(payload, cursor + 2);
+      if (length === 0 || offset < previousEnd || offset + length > SNAPSHOT_BYTES) {
+        throw new Error("snapshot delta run is invalid");
+      }
+      if (cursor + 4 + length > payload.byteLength) throw new Error("snapshot delta run is truncated");
+      copyBytes(scratch.decoded, offset, payload, cursor + 4, length);
+      cursor += 4 + length;
+      previousEnd = offset + length;
+    }
+    if (cursor !== payload.byteLength) throw new Error("snapshot delta has trailing bytes");
+  } else {
+    throw new Error("unknown snapshot frame kind");
+  }
+  scratch.baseline.set(scratch.decoded);
+  scratch.baselineTick = tick;
+  return tick;
+}
+
+function frameHeader(target: Uint8Array, tick: number, kind: number, baseTick: number): void {
+  writeUint16LE(target, 0, ENVELOPE_MAGIC);
+  target[2] = PROTOCOL_VERSION;
+  target[3] = MESSAGE_SNAPSHOT;
+  writeUint32LE(target, 4, tick);
+  target[8] = kind;
+  target[9] = 0;
+  writeUint32LE(target, 10, baseTick);
+  writeUint16LE(target, 14, 0);
+}
+
+function requireFrameCapacity(target: Uint8Array): void {
+  if (target.byteLength < SNAPSHOT_MESSAGE_BYTES) {
+    throw new RangeError(`snapshot frame requires ${SNAPSHOT_MESSAGE_BYTES} bytes`);
+  }
+}
+
+function writeUint16LE(target: Uint8Array, offset: number, value: number): void {
+  requireFrameRange(target, offset, 2);
+  target[offset] = value & 0xff;
+  target[offset + 1] = (value >>> 8) & 0xff;
+}
+
+function writeUint32LE(target: Uint8Array, offset: number, value: number): void {
+  requireFrameRange(target, offset, 4);
+  target[offset] = value & 0xff;
+  target[offset + 1] = (value >>> 8) & 0xff;
+  target[offset + 2] = (value >>> 16) & 0xff;
+  target[offset + 3] = (value >>> 24) & 0xff;
+}
+
+function readUint16LE(source: Uint8Array, offset: number): number {
+  requireFrameRange(source, offset, 2);
+  return source[offset]! | (source[offset + 1]! << 8);
+}
+
+function readUint32LE(source: Uint8Array, offset: number): number {
+  requireFrameRange(source, offset, 4);
+  return (
+    source[offset]!
+    | (source[offset + 1]! << 8)
+    | (source[offset + 2]! << 16)
+    | (source[offset + 3]! << 24)
+  ) >>> 0;
+}
+
+function requireFrameRange(bytes: Uint8Array, offset: number, width: number): void {
+  if (offset < 0 || offset + width > bytes.byteLength) throw new RangeError("snapshot frame field is out of bounds");
+}
+
+/** Copies a bounded byte range without allocating a transient typed-array view. */
+function copyBytes(
+  target: Uint8Array,
+  targetOffset: number,
+  source: Uint8Array,
+  sourceOffset: number,
+  length: number,
+): void {
+  for (let index = 0; index < length; index += 1) {
+    target[targetOffset + index] = source[sourceOffset + index]!;
+  }
+}
 
 /**
  * A caller-owned full snapshot. The arena grid is deliberately absent: it is
@@ -70,7 +254,7 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
     view.setUint8(cursor + 72, world.playerLastButtons[slot]!);
     view.setUint8(cursor + 73, world.playerWeaponRequest[slot]!);
     view.setUint8(cursor + 74, world.playerBotSkill[slot]!);
-    view.setUint8(cursor + 75, 0);
+    view.setUint8(cursor + 75, world.playerBoostTicks[slot]!);
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
       view.setUint16(cursor + 76 + weapon * 2, world.playerAmmo[slot * WEAPON_COUNT + weapon]!, true);
     }
@@ -158,6 +342,7 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     world.playerLastButtons[slot] = view.getUint8(cursor + 72);
     world.playerWeaponRequest[slot] = view.getUint8(cursor + 73);
     world.playerBotSkill[slot] = view.getUint8(cursor + 74);
+    world.playerBoostTicks[slot] = view.getUint8(cursor + 75);
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
       world.playerAmmo[slot * WEAPON_COUNT + weapon] = view.getUint16(cursor + 76 + weapon * 2, true);
     }

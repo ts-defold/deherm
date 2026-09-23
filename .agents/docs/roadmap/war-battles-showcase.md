@@ -168,8 +168,8 @@ Defold tank components consume this caller-owned sample, while a failed dial,
 pre-welcome reject, or pre-welcome close returns to the offline `PlayableBattle`
 that was created at arena start.
 This is presentation smoothing and connection fallback evidence; compact
-snapshots, reconnect after welcome, and the broader multiplayer release gate
-remain open work.
+snapshots and reconnect-after-welcome are now covered by focused in-process
+evidence; the broader multiplayer release gate remains open.
 
 ## Real browser WebTransport tranche
 
@@ -234,6 +234,60 @@ runtime gates prove the updated HUD still loads, renders, and tears down. They
 do not claim that a particular kill or round notice was observed during their
 short fixed runtime windows; event-specific visual observation remains a
 separate runtime scenario.
+
+## Bounded compact snapshot tranche
+
+Authoritative snapshots now use a session-local fixed-capacity baseline. A
+joining or recovering session receives a complete 17,576-byte keyframe (the
+16-byte protocol/codec header plus the 17,560-byte raw world image). Established
+sessions receive sorted, non-overlapping changed-byte runs against their last
+sent baseline, with a keyframe at least every 20 snapshot frames. The browser
+transport's latest-only backpressure path forces the next frame to be a
+keyframe, so replacing a pending delta cannot poison the client's base tick.
+The server permits one snapshot send in flight and retains exactly one latest
+pending raw state; a pending replacement is always encoded as a keyframe after
+the in-flight result resolves.
+The client rejects a delta whose exact base is unavailable and waits for the
+next periodic keyframe; it never applies a partial state.
+The frame decoder also rejects nonzero reserved/header fields. After any decode
+or world-restore failure, the client reports the root error once, drops pending
+dependent deltas, and waits for a valid keyframe before accepting the stream
+again.
+
+## Bounded reconnect/resume tranche
+
+After a welcome, the server issues one rotating resume credential per player
+slot. Closing an authenticated session releases the connection but reserves
+that slot for a bounded, tick-based grace window; the world continues from its
+existing player state with the bot takeover policy already used for a missing
+human. A reconnect with the current token restores the same player id and
+state, rotates the token again, and starts a fresh session-local snapshot
+baseline. Its first authoritative frame is therefore a complete keyframe, and
+the client clears all pending bytes and acknowledgement bits at the welcome
+boundary before applying it. Token rotation is two-phase: a staged credential
+becomes current only after the reliable welcome reports `sent`; failed or
+closed delivery releases the slot while retaining the prior credential and its
+original grace deadline. A snapshot send that reports a terminal transport
+also closes the server session and releases the claimed slot.
+
+Non-zero resume attempts never fall through to a new anonymous slot. Unknown,
+stale, active-session, and foreign-match tokens all receive `REJECT_BAD_RESUME`;
+anonymous joins can use only never-authenticated or expired reservations. The
+credential is deliberately a deterministic in-process placeholder, not signed
+authentication; a deployment must replace issuance and verification with its
+authenticated token service. Focused tests cover identity/state retention,
+keyframe recovery, token rotation, and invalid/stale/foreign rejection. They
+do not claim persistence across process restart or cryptographic security.
+
+The focused 32-player codec test measured 2,015–3,262-byte normal deltas (p50
+2,398) across a 200-frame veteran-bot trace, compared with the former fixed
+17,568-byte message. The test proves keyframe reconstruction, exact-base
+enforcement and malformed-run rejection. The codec loops use direct indexed
+copies, so they create no typed-array views or heap objects after setup; the
+server's final bounded payload view is a separate transport send-boundary
+concern. These are in-process protocol and allocation-shape claims; they do
+not claim WAN compression, packet-loss recovery latency, or a VM allocation
+benchmark.
 
 # Stage 3: over-the-top game expansion
 

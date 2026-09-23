@@ -18,6 +18,7 @@ import {
   INPUT_BUTTON_FIRE,
   INPUT_HISTORY_TICKS,
   MAX_PLAYERS,
+  SNAPSHOT_BYTES,
   TICK_MILLISECONDS,
 } from "./constants";
 import { isWeaponId } from "./content";
@@ -33,7 +34,7 @@ import {
   MESSAGE_WELCOME,
   PING_BYTES,
   RESUME_TOKEN_BYTES,
-  SNAPSHOT_BODY_OFFSET,
+  SNAPSHOT_KEYFRAME,
   WELCOME_BYTES,
   createInputCommand,
   messageKind,
@@ -48,6 +49,7 @@ import {
   type RejectMessage,
   type WelcomeMessage,
 } from "./protocol";
+import { readSnapshotFrame, type SnapshotFrameScratch } from "./snapshot";
 import {
   TRANSPORT_CHANNEL_CONTROL,
   TRANSPORT_CHANNEL_SESSION,
@@ -163,8 +165,18 @@ export class BattleClient implements TransportReceiver {
   private appliedSnapshotTick = -1;
   private snapshotAckBits = 0;
   private sequence = 0;
-  private pendingSnapshot?: Uint8Array;
+  private readonly pendingSnapshot = new Uint8Array(SNAPSHOT_BYTES);
+  private readonly snapshotBaseline = new Uint8Array(SNAPSHOT_BYTES);
+  private readonly snapshotDecoded = new Uint8Array(SNAPSHOT_BYTES);
+  private readonly snapshotScratch: SnapshotFrameScratch = {
+    baseline: this.snapshotBaseline,
+    decoded: this.snapshotDecoded,
+    baselineTick: -1,
+  };
+  private pendingSnapshotReady = false;
   private pendingSnapshotTick = -1;
+  private pendingSnapshotKeyframe = false;
+  private awaitingSnapshotKeyframe = false;
   private welcomed = false;
 
   private moveX = 0;
@@ -192,6 +204,15 @@ export class BattleClient implements TransportReceiver {
   attach(transport: GameTransport): void {
     this.transport = transport;
     this.state = "connecting";
+    // A transport reconnect starts a fresh snapshot stream. Keep the resume
+    // credential and predicted world until the new welcome arrives, but make
+    // any late frame from the old connection unable to seed the new baseline.
+    this.snapshotScratch.baselineTick = -1;
+    this.pendingSnapshotReady = false;
+    this.pendingSnapshotTick = -1;
+    this.pendingSnapshotKeyframe = false;
+    this.awaitingSnapshotKeyframe = false;
+    this.snapshotAckBits = 0;
     writeHello(this.helloBuffer, {
       clientSalt: (Date.now() & 0xffff_ffff) >>> 0,
       name: this.options.name ?? "",
@@ -324,6 +345,18 @@ export class BattleClient implements TransportReceiver {
       ? clamp(Math.trunc(this.welcome.snapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS), 1, 30)
       : (this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS);
     this.world = new BattleWorld(this.welcome.matchId, this.welcome.mapSeed);
+    // A welcome is the authentication boundary for this connection. The
+    // server's first post-welcome snapshot is always a keyframe, so discard
+    // every byte and acknowledgement bit belonging to the previous stream.
+    this.snapshotBaseline.fill(0);
+    this.snapshotDecoded.fill(0);
+    this.pendingSnapshot.fill(0);
+    this.snapshotScratch.baselineTick = -1;
+    this.pendingSnapshotReady = false;
+    this.pendingSnapshotTick = -1;
+    this.pendingSnapshotKeyframe = false;
+    this.awaitingSnapshotKeyframe = false;
+    this.snapshotAckBits = 0;
     this.remoteHaveSample.fill(0);
     this.remoteInterpolationMilliseconds = 0;
     // The roster is fixed for the round, so the client can build it up front and
@@ -355,15 +388,45 @@ export class BattleClient implements TransportReceiver {
   }
 
   private handleSnapshot(payload: Uint8Array): void {
-    const tick = readSnapshotTick(payload);
-    if (tick <= this.appliedSnapshotTick || tick <= this.pendingSnapshotTick) {
+    const isKeyframe = payload.byteLength >= 9 && payload[8] === SNAPSHOT_KEYFRAME;
+    // Once a frame fails to decode, only a complete keyframe can re-establish
+    // the baseline. Dependent deltas are dropped without repeatedly surfacing
+    // the same root error or touching the partially decoded storage.
+    if (this.awaitingSnapshotKeyframe && !isKeyframe) {
       this.stats.snapshotsIgnored += 1;
       return;
     }
-    // Copy: the transport's buffer belongs to the transport, and the snapshot is
-    // applied on the next `update` rather than inside a receive callback.
-    this.pendingSnapshot = payload.slice();
-    this.pendingSnapshotTick = tick;
+    try {
+      const tick = readSnapshotTick(payload);
+      if (tick <= this.appliedSnapshotTick || tick <= this.pendingSnapshotTick) {
+        this.stats.snapshotsIgnored += 1;
+        return;
+      }
+      // Decode into fixed caller-owned storage: the transport's buffer belongs
+      // to the transport, and the snapshot is applied on the next `update`
+      // rather than inside a receive callback. A delta without its exact base
+      // fails closed and waits for the next periodic keyframe.
+      readSnapshotFrame(payload, this.snapshotScratch);
+      // The decoded keyframe is now the exact base for any following frames
+      // already buffered by the transport. Restore remains guarded below; if
+      // it fails, applyPendingSnapshot re-latches the stream before exposing
+      // any state to the simulation.
+      if (isKeyframe) this.awaitingSnapshotKeyframe = false;
+      this.pendingSnapshot.set(this.snapshotDecoded);
+      this.pendingSnapshotReady = true;
+      this.pendingSnapshotTick = tick;
+      this.pendingSnapshotKeyframe = isKeyframe;
+    } catch (error: unknown) {
+      this.snapshotScratch.baselineTick = -1;
+      this.pendingSnapshotReady = false;
+      this.pendingSnapshotTick = -1;
+      this.pendingSnapshotKeyframe = false;
+      this.stats.snapshotsIgnored += 1;
+      if (!this.awaitingSnapshotKeyframe) {
+        this.awaitingSnapshotKeyframe = true;
+        this.options.onError?.(error);
+      }
+    }
   }
 
   private handlePong(payload: Uint8Array): void {
@@ -374,23 +437,34 @@ export class BattleClient implements TransportReceiver {
   }
 
   private applyPendingSnapshot(): void {
-    const payload = this.pendingSnapshot;
-    if (payload === undefined || this.world === undefined) return;
-    this.pendingSnapshot = undefined;
+    if (!this.pendingSnapshotReady || this.world === undefined) return;
+    const snapshotTick = this.pendingSnapshotTick;
+    this.pendingSnapshotReady = false;
     this.pendingSnapshotTick = -1;
-    const tick = readSnapshotTick(payload);
-    if (tick <= this.appliedSnapshotTick) {
+    const snapshotKeyframe = this.pendingSnapshotKeyframe;
+    this.pendingSnapshotKeyframe = false;
+    if (snapshotTick <= this.appliedSnapshotTick) {
       this.stats.snapshotsIgnored += 1;
       return;
     }
     const world = this.world;
     const target = this.localTick;
-    world.restoreSnapshot(payload, SNAPSHOT_BODY_OFFSET);
+    try {
+      world.restoreSnapshot(this.pendingSnapshot);
+    } catch (error: unknown) {
+      const report = !this.awaitingSnapshotKeyframe;
+      this.snapshotScratch.baselineTick = -1;
+      this.awaitingSnapshotKeyframe = true;
+      this.stats.snapshotsIgnored += 1;
+      if (report) this.options.onError?.(error);
+      return;
+    }
     this.captureRemoteSnapshot(world);
-    this.appliedSnapshotTick = tick;
+    this.appliedSnapshotTick = snapshotTick;
     this.snapshotAckBits = ((this.snapshotAckBits << 1) | 1) >>> 0;
     this.stats.snapshotsApplied += 1;
-    this.stats.lastServerTick = tick;
+    this.stats.lastServerTick = snapshotTick;
+    if (snapshotKeyframe) this.awaitingSnapshotKeyframe = false;
 
     // Replay the local inputs the server has not yet folded in. If the client
     // had fallen behind the server, there is nothing to replay and the local

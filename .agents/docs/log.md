@@ -2343,3 +2343,85 @@ camera by authored projection, aspect ratio and world bounds instead of pinning
 the native `2.00` zoom. The current Chrome run loaded all eight components,
 completed the tutorial, exercised every clamp state and engaged the arena with
 no page errors.
+
+## 2026-09-23 - Compact authoritative snapshot tranche
+
+The War Battles server/client snapshot lane now has a session-local fixed-capacity
+baseline. New or recovering sessions receive a 17,576-byte keyframe (16-byte
+codec header plus the existing 17,560-byte raw world image); established
+sessions receive sorted, non-overlapping changed-byte runs. Keyframes recur at
+least every 20 snapshot frames, and a latest-only backpressure/replacement
+result forces the next frame to be a keyframe. The client rejects a delta whose
+base tick is unavailable rather than applying partial state.
+
+The focused `test/core.test.mjs` codec case proves a 32-player reconstruction,
+exact-base enforcement, and malformed-run rejection. An independent 200-frame
+32-player veteran-bot measurement recorded normal deltas from 2,015 to 3,262
+bytes (p50 2,398), compared with the previous fixed 17,568-byte message. This
+is in-process protocol evidence and a fixed-storage design claim; it is not a
+WAN compression, packet-loss latency, or VM allocation benchmark. The core
+sources and generated Defold mirror were synchronized with `pnpm sync`.
+
+An adversarial backpressure test then found that advancing a session baseline
+before an asynchronous latest-only send completed could let a replacement
+delta depend on an undelivered frame. `ServerSession` now allows one snapshot
+send in flight, retains exactly one latest pending raw state, and forces that
+pending frame to a keyframe. The focused regression delivers a blocked first
+frame followed by a replacement and asserts that the replacement is a
+keyframe, not a dependent delta. This closes the baseline/replacement claim
+without adding a queue.
+
+Because the snapshot envelope changed, the protocol version is now 3. The
+focused codec test mutates a valid frame to legacy version 2 and proves the
+decoder rejects it at the envelope gate; the generated Defold mirror and the
+protocol documentation were refreshed with `pnpm sync`.
+
+The codec review also found four transient `Uint8Array.subarray` views inside
+the encode/decode loops. Those copies now use a bounded indexed helper, so the
+codec itself creates no typed-array views or heap objects after setup. The
+server's final `snapshotFrame` payload view remains at the transport send
+boundary and is explicitly outside this codec claim. The 200-frame veteran-bot
+measurement is now a deterministic focused test with exact results: 200 frames,
+10 keyframes, normal minimum 2,015 bytes, p50 2,398 bytes, and keyframe maximum
+17,576 bytes.
+
+The same rollback review closed an omitted `playerBoostTicks` byte in the
+generated snapshot path. The source serializer and restore now carry the
+field, and the core test sets a nonzero boost timer, restores it, and asserts
+the value survives; the 32-player ten-minute replay also continues to match
+its uninterrupted state hash.
+
+## 2026-09-23 - War Battles reconnect/resume tranche
+
+The post-welcome lifecycle now keeps one rotating resume credential per slot.
+When an authenticated transport closes, its slot is released for bot takeover
+but remains reserved for a bounded tick-based grace window. A new connection
+that presents the current credential restores the same player id and existing
+world state, rotates the credential, and starts a new session-local snapshot
+baseline; the first frame is consequently a complete keyframe. The client
+clears pending snapshot bytes and acknowledgement bits at reconnect/welcome so
+no old delta can seed the new stream.
+
+Unknown, stale, active-session, and foreign-match non-zero credentials fail
+closed with `REJECT_BAD_RESUME`; they never consume a fresh anonymous slot.
+The focused core tests cover state and identity retention, keyframe recovery,
+credential rotation, grace expiry, and invalid/stale/foreign rejection. This
+is deterministic in-process lifecycle evidence. The token generator remains a
+non-cryptographic placeholder and does not claim persistence or deployment
+authentication.
+
+Welcome credential issuance is two-phase: the next token is staged into the
+welcome buffer and committed only after a reliable `sent` disposition. A
+rejected or closed welcome releases the slot without invalidating the prior
+credential, including the initial anonymous join case; focused tests cover
+both retry paths and successful rotation making the old token stale. A failed
+resumed welcome also retains the original grace deadline rather than turning
+the prior credential into an unbounded reservation. Separately, a terminal
+snapshot-send disposition now closes the server session and releases its slot;
+focused regressions cover both lifecycle edges.
+
+The follow-up snapshot hardening rejects nonzero reserved bytes and keyframes
+with a nonzero base tick. Client decode and restore failures now invalidate the
+baseline, report only the first root error, drop dependent deltas, and accept
+frames again only after a valid keyframe. Focused regressions cover both codec
+header rejection and recovery after decode/restore failure.

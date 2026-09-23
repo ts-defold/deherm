@@ -82,8 +82,12 @@ doorway, long walls, crate clusters and sandbag lines, on a 15-tile lattice that
 guarantees at least eight tiles of corridor between any two blocks. Every open
 cell is reachable — the test suite floods the map to prove it. Cover is
 **not destructible**, on purpose: the grid is derived from a four-byte seed
-rather than stored, so a joining client rebuilds it exactly and the snapshot
-stays a fixed 17,560 bytes with no terrain delta codec.
+rather than stored, so a joining client rebuilds it exactly and the raw world
+state stays a fixed 17,560 bytes. Network snapshots use a 17,576-byte keyframe
+only for join/recovery and a bounded changed-byte delta thereafter; a 32-player
+bot trace measured 2,015–3,262-byte normal deltas (p50 2,398) over 200 frames,
+versus the former fixed 17,568-byte message. The codec sends a keyframe at least
+every 20 snapshots.
 
 **Bots that are worth fighting.** A bot is a client, not a special case: it reads
 the world and emits the same 32-byte input packet a keyboard does, which is why
@@ -142,7 +146,7 @@ snaps to the truth. Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 2, the
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 3, the
 tick input packet is still exactly 32 bytes (version 1 reserved byte 15 and
 wrote zero; it is now the weapon request, so every other offset is unchanged),
 and the session, control and snapshot lanes now carry a typed four-byte envelope
@@ -160,6 +164,14 @@ tick inputs through QUIC datagrams, and observes a MatchServer marker proving
 that at least three inputs were accepted server-side. The gate intentionally
 does not claim a persistent-stream open count. This is browser loopback
 evidence, not WAN/ingress, native Defold, load, loss, or allocation evidence.
+
+The compact snapshot unit test independently proves the codec against a full
+32-player world: the former 17,568-byte frame is now a 17,576-byte keyframe,
+while the measured 20 Hz bot trace uses 2,015–3,262-byte deltas (p50 2,398).
+The test also proves keyframe reconstruction, exact-base enforcement, sorted
+run bounds, and rejection of a delta without its baseline. This is protocol and
+in-process evidence; it is not a WAN compression, packet-loss, or allocation
+benchmark.
 
 ## Evidence
 
@@ -239,9 +251,11 @@ runtime. It deliberately describes semantics instead of naming a vendor:
 - the negotiated maximum datagram size is checked for every send;
 - unsupported datagrams never silently become “UDP”; and
 - reconnect/session resume lives above the connection. A new connection presents
-  a signed resume token plus the last acknowledged authoritative snapshot, then
-  the server either restores the player slot and sends a fresh full snapshot or
-  refuses the resume. A transport connection itself is never assumed resumable.
+  its current resume token, then the server either restores the player slot and
+  sends a fresh full snapshot or refuses the resume. A transport connection
+  itself is never assumed resumable. This example's token is deterministic and
+  in-process only; deployment authentication must replace it with a signed or
+  otherwise authenticated credential service.
 
 The browser adapter places each reliable protocol message on an independent
 unidirectional stream. That avoids cross-lane ordered head-of-line blocking and

@@ -12,3 +12,4 @@ export * from "./deno-webtransport-server.ts";
 export * from "./match-server.ts";
 export * from "./client.ts";
 export * from "./world.ts";
+export * from "./snapshot.ts";

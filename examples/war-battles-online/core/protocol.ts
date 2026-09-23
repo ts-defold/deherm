@@ -2,12 +2,14 @@ import { INPUT_BUTTON_MASK, MAX_PLAYERS, SNAPSHOT_BYTES, TICK_RATE } from "./con
 import { WEAPON_COUNT } from "./content.ts";
 
 /**
- * Version 2 adds the weapon-request byte to the tick input packet and the
- * reliable session/control envelope below. The packet is still exactly 32 bytes:
- * version 1 left byte 15 reserved and zero, and that is the byte the weapon
- * request now occupies, so the layout of every other field is unchanged.
+ * Version 3 adds the compact keyframe/delta snapshot framing to the reliable
+ * session/control envelope below. Version 2 added the weapon-request byte to
+ * the tick input packet; the packet is still exactly 32 bytes because version 1
+ * left byte 15 reserved and zero. The snapshot wire change is intentionally a
+ * protocol bump so older peers fail closed rather than interpreting a frame
+ * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 2;
+export const PROTOCOL_VERSION = 3;
 export const INPUT_PACKET_BYTES = 32;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
@@ -132,7 +134,7 @@ export function readInputPacket(
 // rejects it instead of guessing.
 
 const ENVELOPE_BYTES = 4;
-const ENVELOPE_MAGIC = 0x5743;
+export const ENVELOPE_MAGIC = 0x5743;
 
 export const MESSAGE_HELLO = 1;
 export const MESSAGE_WELCOME = 2;
@@ -151,7 +153,13 @@ const WELCOME_BASE_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
 export const WELCOME_BYTES = WELCOME_BASE_BYTES + 1;
 export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
 export const PING_BYTES = ENVELOPE_BYTES + 8;
-export const SNAPSHOT_MESSAGE_BYTES = ENVELOPE_BYTES + 4 + SNAPSHOT_BYTES;
+/** Snapshot frames carry a small codec header after the reliable envelope. */
+export const SNAPSHOT_FRAME_HEADER_BYTES = ENVELOPE_BYTES + 12;
+export const SNAPSHOT_KEYFRAME = 0;
+export const SNAPSHOT_DELTA = 1;
+/** A keyframe is required often enough to bound late-join/recovery cost. */
+export const SNAPSHOT_KEYFRAME_INTERVAL = 20;
+export const SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_FRAME_HEADER_BYTES + SNAPSHOT_BYTES;
 export const REJECT_HEADER_BYTES = ENVELOPE_BYTES + 2;
 export const REJECT_MAXIMUM_BYTES = REJECT_HEADER_BYTES + 96;
 
@@ -331,19 +339,8 @@ export function readReject(payload: Uint8Array, output: RejectMessage): RejectMe
   return output;
 }
 
-/** Frames an already-written snapshot. `target` must be `SNAPSHOT_MESSAGE_BYTES`. */
-export function writeSnapshotHeader(target: Uint8Array, tick: number): number {
-  requireCapacity(target, SNAPSHOT_MESSAGE_BYTES);
-  const view = envelope(target, MESSAGE_SNAPSHOT);
-  view.setUint32(4, tick >>> 0, true);
-  return ENVELOPE_BYTES + 4;
-}
-
-/** The byte offset of the snapshot body inside a snapshot message. */
-export const SNAPSHOT_BODY_OFFSET = ENVELOPE_BYTES + 4;
-
 export function readSnapshotTick(payload: Uint8Array): number {
-  const view = expect(payload, MESSAGE_SNAPSHOT, SNAPSHOT_MESSAGE_BYTES);
+  const view = expect(payload, MESSAGE_SNAPSHOT, SNAPSHOT_FRAME_HEADER_BYTES);
   return view.getUint32(4, true);
 }
 
