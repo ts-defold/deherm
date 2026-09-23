@@ -410,6 +410,10 @@ async function validateRouteProvenance(cleanRoot) {
     .map((unit) => `${unit.identity.stableId}:${unit.identity.id}`).sort();
   const generatedTypedNative = typedNative.claimedRoutes
     .map((route) => `${route.stableId}:${route.id}`).sort();
+  const typedNativeFunctionRouteCount = typedNative.claimedRoutes
+    .filter(({ id }) => !id.startsWith("script:constant.")).length;
+  const typedNativeConstantRouteCount = typedNative.claimedRoutes
+    .filter(({ id }) => id.startsWith("script:constant.")).length;
   assert(typedNative.planTypedNativeEmit === plannedTypedNative.length,
     "Typed-native report does not carry the canonical script plan count");
   assert(typedNative.claimedRouteCount === plannedTypedNative.length && typedNative.declinedRouteCount === 0,
@@ -441,6 +445,8 @@ async function validateRouteProvenance(cleanRoot) {
     valueTailRouteCount: valueTail.candidateCount,
     overloadRouteCount: overload.generatedFamilyCandidateCount,
     typedNativeRouteCount: typedNative.claimedRouteCount,
+    typedNativeFunctionRouteCount,
+    typedNativeConstantRouteCount,
     projectedRouteCount: projection.routeCount,
     defaultProfileRouteCount: profiles.profiles["default-legacy-bullet"].availableRouteCount,
     defoldRevision: ir.defoldRevision

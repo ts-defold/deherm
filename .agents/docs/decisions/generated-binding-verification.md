@@ -130,7 +130,7 @@ authoritative. The scalar wave's native exact unit executed 217 routes (127
 `defold-value` plus 90 `scalar`). The tail expansion now uses one recursive
 shape-tree plan for Lua-table records, sequences, and maps, separates driven
 arity from the larger dynamic/overload frame capacity, and checks ordered
-multi-results. The same generated unit executes all 325 Static-emitted
+multi-results. The same generated unit executes all 325 Static-emitted function
 universal routes: Lua-table 70, dynamic-values 14, multi-result 12, and
 overload-dispatch 12 join the earlier 217. Its normal and ASan/UBSan targets
 pass with zero recording violations or result mismatches. The emitted-target

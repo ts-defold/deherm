@@ -35,5 +35,10 @@ test("all 926 script routes regenerate byte-for-byte from pinned inputs", async 
   assert.equal(report.universalRouteCount, 915);
   assert.equal(report.universalConstantRouteCount, 141);
   assert.equal(report.constantPolicyCount, 483);
-  assert.equal(report.typedNativeRouteCount, 325);
+  assert.equal(report.typedNativeFunctionRouteCount, 325);
+  assert.equal(report.typedNativeConstantRouteCount, report.universalConstantRouteCount);
+  assert.equal(
+    report.typedNativeRouteCount,
+    report.typedNativeFunctionRouteCount + report.typedNativeConstantRouteCount
+  );
 });

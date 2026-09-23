@@ -32,8 +32,10 @@ This is the current implementation queue. It refines the broader ordered work
 below without changing its completion rule.
 
 1. **Completed — Static script exact calls.** The sound-typed executable runs
-   all 325 Static universal routes; the three timer routes make the applicable
-   target total 328/328. The policy graph must continue to build and execute
+   all 325 Static universal function routes; the three timer routes make the
+   applicable function target total 328/328. The generated constant lane adds
+   141 zero-argument Static routes, so clean-room typed-native ownership is now
+   466 routes in total. The policy graph must continue to build and execute
    this target rather than relying only on local evidence.
 2. **Completed — dmSDK hash-state 10.** All
    `dmHash{Init,Clone,UpdateBuffer,Final,Release}{32,64}` routes use the bounded,
