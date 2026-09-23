@@ -1,9 +1,13 @@
-import { defineComponent, gui, hashLiteral, type DefoldHash, type Node } from "@deherm/project";
+import { defineComponent, gui, hashLiteral, vmath, type DefoldHash, type Node, type Vector4 } from "@deherm/project";
 
 import {
+  EVENT_KILL,
   MAX_PLAYERS,
   createPlayerView,
   weaponById,
+  createBattleEvent,
+  type BattleEvent,
+  type BattleWorld,
   type PlayerView,
 } from "../src/generated-war-battles/index";
 import { arenaMatch } from "../src/arena-match";
@@ -19,6 +23,8 @@ const LEADERBOARD_INTERVAL = 15;
 const LEADERBOARD_ROWS = 5;
 /** Characters in the health and ammunition bars. */
 const BAR_CELLS = 20;
+/** Presentation notices live for exactly three seconds at the 60 Hz update rate. */
+const ANNOUNCEMENT_TICKS = 180;
 
 interface UiSelf {
   score: number;
@@ -26,9 +32,19 @@ interface UiSelf {
   status: Node;
   frags: Node;
   hint: Node;
+  announcement: Node;
   view: PlayerView;
   order: Int32Array;
+  event: BattleEvent;
+  presentationWorld: BattleWorld | undefined;
+  killColor: Vector4;
+  deathColor: Vector4;
+  remoteKillColor: Vector4;
+  roundColor: Vector4;
   countdown: number;
+  eventCursor: number;
+  announcementTicks: number;
+  round: number;
   engaged: boolean;
 }
 
@@ -99,6 +115,64 @@ function leaderboard(self: UiSelf): string {
   return text;
 }
 
+function announce(self: UiSelf, text: string, color: Vector4): void {
+  // This is deliberately one authored node. A kill storm replaces the current
+  // notice rather than allocating GUI nodes or retaining a queue.
+  gui.setText(self.announcement, text);
+  gui.setColor(self.announcement, color);
+  gui.setEnabled(self.announcement, true);
+  self.announcementTicks = ANNOUNCEMENT_TICKS;
+}
+
+function drainPresentation(self: UiSelf, match: ReturnType<typeof arenaMatch>): void {
+  if (match === undefined) return;
+  const world = match.world;
+  if (world === undefined) return;
+
+  // An offline restart or online reconnect can replace the world with a new
+  // ring whose sequence is greater than the old cursor. Identity, not sequence
+  // ordering, is therefore the authoritative reset signal.
+  if (self.presentationWorld !== world) {
+    self.presentationWorld = world;
+    self.eventCursor = world.events.oldest();
+  }
+  if (self.eventCursor < world.events.oldest()) self.eventCursor = world.events.oldest();
+  const localPlayerId = match.localSlot + 1;
+  while (self.eventCursor < world.events.sequence) {
+    if (!world.events.read(self.eventCursor, self.event)) break;
+    self.eventCursor += 1;
+    if (self.event.kind !== EVENT_KILL) continue;
+    const attacker = self.event.a;
+    const victim = self.event.b;
+    if (attacker === localPlayerId) {
+      announce(self, `YOU DESTROYED P${victim}`, self.killColor);
+    } else if (victim === localPlayerId) {
+      announce(self, `P${attacker} DESTROYED YOU`, self.deathColor);
+    } else {
+      announce(self, `P${attacker} DESTROYED P${victim}`, self.remoteKillColor);
+    }
+  }
+
+  // PlayableBattle owns the authoritative round counter. The event ring is
+  // presentation-only, so round changes are sampled once at the same boundary
+  // and rendered through the same coalescing/expiry path.
+  const round = match.mode === "offline" ? match.battle.round : self.round;
+  if (self.round === 0) {
+    self.round = round;
+  } else if (round !== self.round) {
+    self.round = round;
+    announce(self, `ROUND ${round}`, self.roundColor);
+  }
+}
+
+function ageAnnouncement(self: UiSelf): void {
+  if (self.announcementTicks <= 0) return;
+  self.announcementTicks -= 1;
+  if (self.announcementTicks > 0) return;
+  gui.setText(self.announcement, "");
+  gui.setEnabled(self.announcement, false);
+}
+
 export default defineComponent({
   init(self: UiSelf): void {
     self.score = 0;
@@ -106,11 +180,23 @@ export default defineComponent({
     self.status = gui.getNode("status");
     self.frags = gui.getNode("frags");
     self.hint = gui.getNode("hint");
+    self.announcement = gui.getNode("announcement");
     self.view = createPlayerView();
     self.order = new Int32Array(MAX_PLAYERS);
+    self.event = createBattleEvent();
+    self.presentationWorld = undefined;
+    self.killColor = vmath.vector4(1, 0.86, 0.2, 1);
+    self.deathColor = vmath.vector4(1, 0.3, 0.25, 1);
+    self.remoteKillColor = vmath.vector4(0.45, 0.9, 1, 1);
+    self.roundColor = vmath.vector4(0.82, 1, 0.54, 1);
     self.countdown = 0;
+    self.eventCursor = 0;
+    self.announcementTicks = 0;
+    self.round = 0;
     self.engaged = false;
     gui.setText(self.node, "SCORE 0");
+    gui.setText(self.announcement, "");
+    gui.setEnabled(self.announcement, false);
     __defoldHostV1.log("info", "war-battles:ui-init");
   },
 
@@ -122,6 +208,8 @@ export default defineComponent({
       gui.setText(self.hint, "ARROWS/WASD DRIVE   SPACE FIRE   SHIFT BOOST   1-6 WEAPON   R RESTART");
     }
     gui.setText(self.status, statusLine(self));
+    drainPresentation(self, match);
+    ageAnnouncement(self);
     if (self.countdown > 0) {
       self.countdown -= 1;
       return;

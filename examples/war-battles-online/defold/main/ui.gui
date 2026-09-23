@@ -5,6 +5,28 @@ fonts {
 }
 nodes {
   position {
+    x: 640.0
+    y: 650.0
+    z: 0.0
+  }
+  size {
+    x: 1000.0
+    y: 44.0
+  }
+  color {
+    x: 1.0
+    y: 0.86
+    z: 0.2
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  text: ""
+  font: "score_font"
+  id: "announcement"
+  pivot: PIVOT_N
+}
+nodes {
+  position {
     x: 24.0
     y: 696.0
     z: 0.0

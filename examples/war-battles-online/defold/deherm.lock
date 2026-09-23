@@ -460,9 +460,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "de7222a12f0febaf3fe1c9cc799a19a7f1b4f916e8719ef2007c743043aa93b1",
+        "fingerprint": "a57a169c853b36fe1395c9ff14f5c2541d97a15500c8780621f75a5330f5c6d2",
         "outputs": {
-          "deherm/app.dehermc": "bb6ca3b3f924614307df176ecb7c6bda123832e4bbe109f324dccdfe272e11bd"
+          "deherm/app.dehermc": "d0d23dcf5b93f122a7e48d372b997c2ae583a60a5546738ac404876dd6c14017"
         },
         "build": {
           "entryPoint": "main/arena.script.ts",
@@ -483,12 +483,12 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "51f66384e1395f6cc0e9ed7779c79ec72566bba1c68b2768ad40ba5cee75531e",
+          "digest": "90c2f60818b8bd3b68b2508972a6bddd8713bb948a50f686fbce524d4b0551e0",
           "fileCount": 68,
           "files": {
             ".deherm/generated/components/registry.ts": "442a3864f95018529f415bf4c125a33c4450308ac6b2797be8ad86f1f95b77e9",
             ".deherm/generated/dmsdk-call-symbol-index.json": "5b42fdf93957d7f5448f21e7f3b8cb6e5335dc6431d84136a0dad3d9d91f2b88",
-            ".deherm/generated/resource-symbols.json": "5c5ba8a2b9cbd78948bbc6aab146fdc57986b310cb7b4b71aae71609ee4314c6",
+            ".deherm/generated/resource-symbols.json": "40f7abb4c2a3011f73dd228b08e6f163519afc79a91686a0c01414f3638f69a3",
             ".deherm/generated/script-route-symbol-index.json": "b01d3f6d7f2d50b0bdab68adeff9bbe30db4de91e8785ba0af30dc9bcd2d502c",
             ".deherm/sdk/address.ts": "32420294482945e853794417e35e5614224af893df0338901259e63b62176649",
             ".deherm/sdk/component.ts": "64b6d6b295d2843f5c86147df0a52f68b802c20a6a993ab2b30290d3add0f614",
@@ -533,7 +533,7 @@
             "main/player.script.ts": "d15a74cb995a762a51e7a1fc8651c9bab952bb160c62596cde0222a78692e389",
             "main/rocket.script.ts": "08c1620a9e9fb9258404c5f78d44ac899bc233a794b0c24a95559a3018cedffd",
             "main/tank.script.ts": "461f5bc82bcd61ffabca9557a719d0ae879e2a9aa3572b97dd8c837cb63b83bf",
-            "main/ui.gui.ts": "fc2628f1859217c5e6b55cdd8105c216528793ef4bb9668c02e81dfbf057fd37",
+            "main/ui.gui.ts": "244a3927d64171f6d1d370ac1c43532d7b6d467d95ef6852a56d40e306446d4f",
             "reference/battle.gui.ts": "712eb7b8775a9a5f9447a64b954181dd70f4a0313a2e25e7abf7e10f8d7405f8",
             "src/arena-match.ts": "d0326d976fb3ad436f6d4b62138aa0a59e1e7b71d5e47e7dc90f56f9ce3ddc53",
             "src/capability-snapshot.ts": "1cc3bcb6342ff5dbbe53769645d426bb24e0f99eec5067a3995762e091625bf7",

@@ -217,6 +217,24 @@ post-shake clamp structurally. Existing native and browser runtime gates prove
 the updated project still loads, renders, and tears down; they do not claim a
 specific combat event was visually observed during their fixed runtime window.
 
+## Bounded announcer tranche
+
+The GUI now has one authored `announcement` text node. It consumes the
+authoritative presentation event ring and coalesces the newest kill notice:
+local kills are emphasized as `YOU DESTROYED P#`, local deaths as
+`P# DESTROYED YOU`, and remote-versus-remote kills remain visible without
+claiming local credit. Offline round transitions use the authoritative
+`PlayableBattle.round` counter through the same node. Notices have a fixed
+180-update lifetime and are disabled in place when they expire; no GUI nodes,
+queues, or per-event bridge objects are created at runtime.
+
+The focused integration gate proves the authored node, kill-event route,
+coalescing/expiry constants, and round text path. Existing native and browser
+runtime gates prove the updated HUD still loads, renders, and tears down. They
+do not claim that a particular kill or round notice was observed during their
+short fixed runtime windows; event-specific visual observation remains a
+separate runtime scenario.
+
 # Stage 3: over-the-top game expansion
 
 Use data-driven definitions for content so new items do not require new bridge

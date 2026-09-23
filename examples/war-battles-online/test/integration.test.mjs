@@ -273,9 +273,17 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(cameraSource, /Clamp after applying the impulse/);
 
   assert.match(scene, /script: "\/main\/ui\.gui_script"/);
-  assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 4);
+  assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 5);
   assert.match(scene, /id: "score"/);
   assert.match(scene, /id: "status"/);
+  assert.match(scene, /id: "announcement"/);
+  assert.match(uiSource, /EVENT_KILL/);
+  assert.match(uiSource, /gui\.setEnabled\(self\.announcement, false\)/);
+  assert.match(uiSource, /ANNOUNCEMENT_TICKS = 180/);
+  assert.match(uiSource, /self\.presentationWorld !== world/);
+  assert.match(uiSource, /YOU DESTROYED P\$\{victim\}/);
+  assert.match(uiSource, /P\$\{attacker\} DESTROYED YOU/);
+  assert.match(uiSource, /ROUND \$\{round\}/);
 
   // The scripted demonstration the runtime gates observe is still exactly what
   // it was, and still reaches the same markers.
