@@ -1,5 +1,19 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Workflow artifact transport moved off the Node 20 runtime
+
+Every GitHub Actions workflow now uses the official Node 24 artifact-action
+majors: `actions/upload-artifact@v6` and `actions/download-artifact@v7`.
+Uploads had been pinned to `@v4`, while downloads were split between `@v4`
+and `@v5`; both families otherwise use the same artifact names, paths,
+retention, and extraction layout. The update therefore changes only the action
+runtime, not the evidence or artifact contents. A workflow regression test
+enumerates all four committed workflows and rejects a mixed or older artifact
+major. The official action metadata requires Actions Runner `2.327.1` or
+newer for these Node 24 actions; the hosted `ubuntu-24.04`, `macos-15`, and
+`windows-2025`/`windows-2022` runners used here are managed runners, so no
+self-hosted runner migration is part of this change.
+
 ## 2026-09-23 - War Battles HTML5 camera uses the effective browser projection
 
 The War Battles playability screenshot's left-edge tank was deterministic, not

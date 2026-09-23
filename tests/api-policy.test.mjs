@@ -43,6 +43,10 @@ import { apiPolicyGenerator } from "../scripts/lib/script-generator-pipeline.mjs
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const generated = path.join(repositoryRoot, "packages", "bindings", "generated");
+const node24ArtifactActions = {
+  upload: "actions/upload-artifact@v6",
+  download: "actions/download-artifact@v7"
+};
 
 const readJson = async (file) => JSON.parse(await readFile(file, "utf8"));
 
@@ -75,7 +79,7 @@ test("policy host parity materializes every authoritative generator input", asyn
   const publish = workflow.slice(workflow.indexOf("  publish-site:"));
   const packedSurface = workflow.slice(
     workflow.indexOf("      - name: Pack the exact generated surface"),
-    workflow.indexOf("      - uses: actions/upload-artifact@v4", workflow.indexOf("      - name: Pack the exact generated surface"))
+    workflow.indexOf(`      - uses: ${node24ArtifactActions.upload}`, workflow.indexOf("      - name: Pack the exact generated surface"))
   );
 
   for (const { root: revisionRoot } of REVISION_OUTPUT_ROOTS) {
@@ -132,6 +136,23 @@ test("policy host parity materializes every authoritative generator input", asyn
   assert.match(engine, /Enforce engine-lane infrastructure health[\s\S]*steps\.engine\.outcome != 'success'[\s\S]*exit 1/u);
   assert.match(workflow, /consumer-smoke:[\s\S]*needs: \[derive, publish-site\]/u);
   assert.match(workflow, /check-published-policy\.mjs/u);
+});
+
+test("all workflow artifact actions use their Node 24-compatible official majors", async () => {
+  const workflows = await Promise.all([
+    "commit-provenance.yml",
+    "end-to-end.yml",
+    "native-artifacts.yml",
+    "policy.yml"
+  ].map(async (name) => [name, await readFile(path.join(repositoryRoot, ".github/workflows", name), "utf8")]));
+  const allWorkflowText = workflows.map(([, text]) => text).join("\n");
+  const uploadRefs = [...allWorkflowText.matchAll(/actions\/upload-artifact@v\d+/gu)].map(([ref]) => ref);
+  const downloadRefs = [...allWorkflowText.matchAll(/actions\/download-artifact@v\d+/gu)].map(([ref]) => ref);
+
+  assert.ok(uploadRefs.length > 0, "workflows must retain artifact uploads");
+  assert.ok(downloadRefs.length > 0, "workflows must retain artifact downloads");
+  assert.ok(uploadRefs.every((ref) => ref === node24ArtifactActions.upload), `unexpected upload refs: ${uploadRefs.join(", ")}`);
+  assert.ok(downloadRefs.every((ref) => ref === node24ArtifactActions.download), `unexpected download refs: ${downloadRefs.join(", ")}`);
 });
 
 test("published smoke waits for the exact derived entries at the configured site", () => {

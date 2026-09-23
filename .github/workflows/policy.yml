@@ -198,11 +198,11 @@ jobs:
             examples/runtime-smoke/src/generated \
             tests/fixtures \
             .agents/docs/research
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface.tar.gz
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: policy-derivation-reports
@@ -231,7 +231,7 @@ jobs:
         shell: bash
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
@@ -282,7 +282,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with: { submodules: recursive }
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
@@ -396,7 +396,7 @@ jobs:
             node scripts/generate-route-verification.mjs 2>&1 || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         with:
           name: policy-engine-evidence
@@ -500,7 +500,7 @@ jobs:
           repository: ts-defold/deherm
           ref: deherm-policy-site
           path: build/published-policy-site
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
@@ -610,7 +610,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/download-artifact@v5
+      - uses: actions/download-artifact@v7
         with:
           name: policy-surface
           path: ${{ runner.temp }}/policy-surface
