@@ -162,6 +162,24 @@ function documentation(value, indent = "") {
   return [`${indent}/**`, ...clean.split(/\r?\n/).map((line) => `${indent} * ${line.trim()}`), `${indent} */`];
 }
 
+function deprecationNotice(...values) {
+  for (const value of values.flat(Infinity)) {
+    if (typeof value !== "string") continue;
+    const line = value.split(/\r?\n/u).map((item) => item.trim()).find((item) => /\bdeprecated\b/iu.test(item));
+    if (line) return line;
+  }
+  return undefined;
+}
+
+function declarationDocumentation(declaration, { includeDescription = true } = {}) {
+  const notes = (declaration.notes ?? []).filter((note) => note !== declaration.deprecated);
+  return [
+    includeDescription ? declaration.description : "",
+    notes.length ? `@remarks ${notes.join("\n\n")}` : "",
+    declaration.deprecated ? `@deprecated ${declaration.deprecated}` : ""
+  ].filter(Boolean).join("\n\n");
+}
+
 function docsByHeader(archive) {
   const decoder = new TextDecoder();
   const result = new Map();
@@ -196,9 +214,12 @@ function attachDocumentation(inventory, docs) {
     const element = headerDocs.get(declaration.name)?.[0] ?? headerDocs.get(shortName)?.[0];
     if (!element) return declaration;
     const parameterDocs = new Map((element.parameters ?? []).map((item) => [item.name, item.doc ?? ""]));
+    const deprecated = deprecationNotice(element.description, element.brief, element.notes ?? []);
     return {
       ...declaration,
       description: element.description || element.brief || "",
+      ...((element.notes ?? []).length ? { notes: [...element.notes] } : {}),
+      ...(deprecated ? { deprecated } : {}),
       parameters: (declaration.parameters ?? []).map((item) => ({ ...item, description: parameterDocs.get(item.name) ?? "" })),
       returnDescription: (element.returnvalues ?? []).map((item) => item.doc).filter(Boolean).join("; ")
     };
@@ -299,6 +320,9 @@ export function dmSdkRuntimeOverloads(ir, renderer) {
 
 function signatureDocumentation(declaration) {
   const lines = [];
+  const notes = (declaration.notes ?? []).filter((note) => note !== declaration.deprecated);
+  if (notes.length) lines.push(`@remarks ${notes.join("\n\n")}`);
+  if (declaration.deprecated) lines.push(`@deprecated ${declaration.deprecated}`);
   for (const [index, item] of (declaration.parameters ?? []).entries()) {
     if (item.description) lines.push(`@param ${parameter(item.name, index)} ${item.description}`);
   }
@@ -387,7 +411,10 @@ export function generateTypes(ir, renderer) {
     const members = resolvedEnumMembers(declaration);
     if (!members.length) continue;
     const name = enumExportName(declaration);
-    lines.push(...documentation(declaration.description || `Native enum ${declaration.name}.`, ""));
+    lines.push(...documentation(declarationDocumentation({
+      ...declaration,
+      description: declaration.description || `Native enum ${declaration.name}.`
+    }), ""));
     lines.push(`export const ${name} = {`);
     for (const member of members) lines.push(`  ${property(member.name)}: ${member.value},`);
     lines.push(`} as const;`, `export type ${name} = (typeof ${name})[keyof typeof ${name}];`, "");
@@ -399,6 +426,7 @@ export function generateTypes(ir, renderer) {
       : declaration.kind === "enum"
         ? enumType(declaration)
         : renderType(declaration.type, declaration.name);
+    lines.push(...documentation(declarationDocumentation(declaration), "  "));
     lines.push(`  readonly ${property(name)}: ${type};`);
   }
   lines.push("}", "");
@@ -406,6 +434,7 @@ export function generateTypes(ir, renderer) {
   const variables = new Map();
   for (const declaration of ir.declarations.filter((item) => item.kind === "variable")) variables.set(declaration.name, declaration);
   for (const [name, declaration] of [...variables].sort(([left], [right]) => compareCodeUnits(left, right))) {
+    lines.push(...documentation(declarationDocumentation(declaration), "  "));
     lines.push(`  readonly ${property(name)}: ${renderType(declaration.type, declaration.name)};`);
   }
   lines.push("}", "");
@@ -496,7 +525,14 @@ export async function runDmSdkGenerator() {
     .sort(([left], [right]) => compareCodeUnits(left, right))
     .map(([name, item]) => ({ name, reason: item.reason, contexts: [...item.contexts].sort() }));
   ir.typeSurfaceUnresolvedCount = ir.unresolvedTypes.length;
-  await output(irPath, JSON.stringify(ir, null, 2));
+  // Notes and deprecation tags are documentation inputs for generated
+  // TypeScript. They are deliberately excluded from the runtime IR so prose
+  // changes do not invalidate ABI classifications or executable evidence.
+  const runtimeIr = {
+    ...ir,
+    declarations: ir.declarations.map(({ deprecated: _deprecated, notes: _notes, ...declaration }) => declaration)
+  };
+  await output(irPath, JSON.stringify(runtimeIr, null, 2));
   await output(path.join(generatedRoot, "types.ts"), typesSource);
   await output(path.join(generatedRoot, "runtime.ts"), runtimeSource);
   await output(

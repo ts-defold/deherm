@@ -242,6 +242,7 @@ export interface DmSdkCalls {
    */
   readonly EnsureSize: {
     /**
+     * @remarks May grow but not shrink capacity
      * @param size size of the array
      */
     (size: number): void;
@@ -291,6 +292,7 @@ export interface DmSdkCalls {
    */
   readonly ExtensionAppParamsGetContext: {
     /**
+     * @deprecated Deprecated. Use [ref:ContextRegistryGetByHash] on [ref:HContextRegistry] instead.
      * @param params the params
      * @param name_hash the context name hash
      * @returns The context, if it exists
@@ -302,6 +304,7 @@ export interface DmSdkCalls {
    */
   readonly ExtensionAppParamsGetContextByName: {
     /**
+     * @deprecated Deprecated. Use [ref:ContextRegistryGet] on [ref:HContextRegistry] instead.
      * @param params the params
      * @param name the context name
      * @returns The context, if it exists
@@ -333,6 +336,7 @@ export interface DmSdkCalls {
    */
   readonly ExtensionAppParamsSetContext: {
     /**
+     * @deprecated Deprecated. Use [ref:ContextRegistrySet] on [ref:HContextRegistry] instead.
      * @param params the params
      * @param name the context name
      * @param context the context
@@ -351,6 +355,7 @@ export interface DmSdkCalls {
    */
   readonly ExtensionParamsGetContext: {
     /**
+     * @deprecated Deprecated. Use [ref:ContextRegistryGetByHash] on [ref:HContextRegistry] instead.
      * @param params the params
      * @param name_hash the context name hash
      * @returns The context, if it exists
@@ -362,6 +367,7 @@ export interface DmSdkCalls {
    */
   readonly ExtensionParamsGetContextByName: {
     /**
+     * @deprecated Deprecated. Use [ref:ContextRegistryGet] on [ref:HContextRegistry] instead.
      * @param params the params
      * @param name the context name
      * @returns The context, if it exists
@@ -393,6 +399,7 @@ export interface DmSdkCalls {
    */
   readonly ExtensionParamsSetContext: {
     /**
+     * @deprecated Deprecated. Use [ref:ContextRegistrySet] on [ref:HContextRegistry] instead.
      * @param params the params
      * @param name the context name
      * @param context the context
@@ -425,6 +432,9 @@ export interface DmSdkCalls {
    */
   readonly ExtensionRegisteriOSUIApplicationDelegate: {
     /**
+     * @remarks Note that the delegate needs to be registered before the UIApplicationMain in order to
+     * handle any earlier callbacks.
+     * This function is only available on iOS. [icon:ios]
      * @param delegate An id , see: https://developer.apple.com/documentation/uikit/uiapplicationdelegate?language=objc
      */
     (delegate: DmPointer<"void">): void;
@@ -444,6 +454,7 @@ export interface DmSdkCalls {
    */
   readonly FontCollectionAddFont: {
     /**
+     * @remarks No ownership transfer occurrs. HFont must be alive during the lifetime of the font collection
      * @param coll the font collection
      * @param font the font
      * @returns the result. FONT_RESULT_OK if successful
@@ -604,6 +615,7 @@ export interface DmSdkCalls {
    */
   readonly FontGetPathHash: {
     /**
+     * @remarks We use a 32bit hash to make it easier to pair with a glyph index into a 64-bit key
      * @param font The font
      * @returns The path
      */
@@ -1053,6 +1065,7 @@ export interface DmSdkCalls {
    */
   readonly JobSystemCancelJob: {
     /**
+     * @remarks Cancelled jobs will be flushed at the next JobSystemUpdate()
      * @param context the job system context
      * @param job the job to cancel
      * @returns Returns JOBSYSTEM_RESULT_CANCELED if canceled, JOBSYSTEM_RESULT_PENDING if the job (or any child) is still in flight, or JOBSYSTEM_RESULT_INVALID_HANDLE if the handle is invalid
@@ -1074,6 +1087,7 @@ export interface DmSdkCalls {
    */
   readonly JobSystemCreateJob: {
     /**
+     * @remarks Parent job will only run after all children has finished
      * @param context the job system context
      * @param job the job creation parameters. This pointer is not stored, the data is copied as-is.
      * @returns returns the job if successful. 0 otherwise.
@@ -1126,6 +1140,7 @@ export interface DmSdkCalls {
    */
   readonly JobSystemPushJob: {
     /**
+     * @remarks A parent job needs to be pushed after its children
      * @param context the job system context
      * @param job the job to add to the work queue
      * @returns return JOBSYSTEM_RESULT_OK if job was pushed
@@ -1137,6 +1152,7 @@ export interface DmSdkCalls {
    */
   readonly JobSystemSetParent: {
     /**
+     * @remarks Parent job will only run after all children has finished
      * @param context the job system context
      * @param child the child job
      * @param parent the parent job
@@ -1221,6 +1237,7 @@ export interface DmSdkCalls {
    */
   readonly ProfileFrameBegin: {
     /**
+     * @remarks NULL is returned if profiling is disabled
      * @returns The current profiling context. Must be released by #EndFrame
      */
     (): DmSdkTypes["HProfile"];
@@ -1433,6 +1450,8 @@ export interface DmSdkCalls {
    */
   readonly ResourceCreateResource: {
     /**
+     * @remarks The input data pointer is not stored
+     * The reference count is 1, so make sure it's destruction is handled
      * @param factory Factory handle
      * @param name Resource name
      * @param data Resource data
@@ -1457,6 +1476,7 @@ export interface DmSdkCalls {
    */
   readonly ResourceDescriptorGetPrevResource: {
     /**
+     * @remarks only used when recreating a resource
      * @param rd The resource handle
      * @returns The resource data
      */
@@ -1507,6 +1527,7 @@ export interface DmSdkCalls {
    */
   readonly ResourceDescriptorSetPrevResource: {
     /**
+     * @remarks only used when recreating a resource
      * @param rd The resource handle
      * @param resource The resource data
      */
@@ -1537,6 +1558,7 @@ export interface DmSdkCalls {
    */
   readonly ResourceGet: {
     /**
+     * @remarks if successful, it increments the ref count by one
      * @param factory Factory handle
      * @param path Resource path
      * @param resource Created resource
@@ -1549,6 +1571,8 @@ export interface DmSdkCalls {
    */
   readonly ResourceGetByHash: {
     /**
+     * @remarks this currently doesn't load a resource
+     * if successful, it increments the ref count by one
      * @param factory Factory handle
      * @param path_hash Resource path hash
      * @param resource Created resource
@@ -1671,6 +1695,7 @@ export interface DmSdkCalls {
    */
   readonly ResourceGetWithExt: {
     /**
+     * @remarks if successful, it increments the ref count by one
      * @param factory Factory handle
      * @param path Resource path
      * @param ext Resource extension (e.g. "texturec", "ttf"). Must match the extension of the path.
@@ -1757,6 +1782,7 @@ export interface DmSdkCalls {
    */
   readonly ResourceRelease: {
     /**
+     * @remarks Decreases ref count by 1. If it reaches 0, the resource destroy function is called.
      * @param factory Factory handle
      * @param resource Resource pointer
      */
@@ -2325,6 +2351,7 @@ export interface DmSdkCalls {
    */
   readonly "dmArray::dmArray::EnsureSize": {
     /**
+     * @remarks May grow but not shrink capacity
      * @param size size of the array
      */
     (size: number): void;
@@ -2554,6 +2581,7 @@ export interface DmSdkCalls {
    */
   readonly dmAtomicGet32: {
     /**
+     * @remarks Retrieves the current value by adding 0
      * @param ptr Pointer to an int32_atomic_t to get from.
      * @returns Current value
      */
@@ -2971,6 +2999,8 @@ export interface DmSdkCalls {
    */
   readonly "dmCrypt::Base64Decode": {
     /**
+     * @remarks Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len
+     * An empty input (src_len = 0) decodes into zero bytes: the function returns true with *dst_len = 0
      * @param src The source data to encode
      * @param src_len key The length of source data in bytes
      * @param dst The destination buffer
@@ -2983,6 +3013,8 @@ export interface DmSdkCalls {
    */
   readonly "dmCrypt::Base64Encode": {
     /**
+     * @remarks Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len
+     * An empty input (src_len = 0) still requires one byte for the terminating null, and encodes into *dst_len = 0
      * @param src The source data to encode
      * @param src_len key The length of source data in bytes
      * @param dst The destination buffer
@@ -3274,6 +3306,7 @@ export interface DmSdkCalls {
    */
   readonly "dmEngine::GetWebServer": {
     /**
+     * @remarks Only valid in debug builds
      * @param app_params The app params sent to the extension dmExtension::AppInitialize / dmExtension::AppInitialize
      * @returns The web server handle
      */
@@ -3406,6 +3439,9 @@ export interface DmSdkCalls {
    */
   readonly "dmExtension::RegisteriOSUIApplicationDelegate": {
     /**
+     * @remarks Note that the delegate needs to be registered before the UIApplicationMain in order to
+     * handle any earlier callbacks.
+     * This function is only available on iOS. [icon:ios]
      * @param delegate An id , see: https://developer.apple.com/documentation/uikit/uiapplicationdelegate?language=objc
      */
     (delegate: DmPointer<"void">): void;
@@ -4224,6 +4260,7 @@ export interface DmSdkCalls {
    */
   readonly "dmGameObject::New": {
     /**
+     * @remarks Calling this function during update is not permitted. Use #Spawn instead for deferred creation
      * @param collection Gameobject collection
      * @returns New gameobject instance. NULL if any error occured
      */
@@ -4658,6 +4695,8 @@ export interface DmSdkCalls {
    */
   readonly "dmGameObject::TraverseGetRoot": {
     /**
+     * @remarks The dmGameObject::HRegister is obtained from the `dmEngine::GetGameObjectRegister(dmExtension::AppParams)`
+     * Traversing the scene like this is not efficient. These functions are here for inspection and testing purposes only.
      * @param regist the full gameobject register
      * @param node the node to inspect
      * @returns True if successful
@@ -4689,6 +4728,8 @@ export interface DmSdkCalls {
    */
   readonly "dmGameObject::TraverseIterateProperties": {
     /**
+     * @remarks Getting the properties like this is not efficient. These functions are here for inspection and testing purposes only.
+     * Reverse hashes via `dmHashReverseSafe64()` isn't available in release builds.
      * @param node the node to inspect
      * @returns the property iterator
      */
@@ -4996,6 +5037,7 @@ export interface DmSdkCalls {
    */
   readonly "dmGameSystem::HashRenderConstants": {
     /**
+     * @remarks Also updates the internal state of the constants container. After a call to this function, the `AreRenderConstantsUpdated` will always return false.
      * @param constants the constants
      * @param state the hash state to update
      */
@@ -5044,6 +5086,7 @@ export interface DmSdkCalls {
    */
   readonly "dmGameSystem::ResFontAddFontByPath": {
     /**
+     * @remarks Loads the resource if not already loaded
      * @param factory The factory
      * @param font The font collection (.fontc)
      * @param ttf_path The .ttf path
@@ -5056,6 +5099,7 @@ export interface DmSdkCalls {
    */
   readonly "dmGameSystem::ResFontAddFontByPathHash": {
     /**
+     * @remarks the ttf resource must already be loaded
      * @param factory The factory
      * @param font The font collection (.fontc)
      * @param ttf_hash The ttf path hash (.ttf)
@@ -6074,6 +6118,7 @@ export interface DmSdkCalls {
    */
   readonly "dmGraphics::NewIndexBuffer": {
     /**
+     * @remarks The caller need to track if the indices are 16 or 32 bit.
      * @param context the context
      * @param size the size of the buffer (in bytes). May be 0
      * @param data the data
@@ -6828,6 +6873,7 @@ export interface DmSdkCalls {
    */
   readonly "dmGui::SetNodeId": {
     /**
+     * @remarks The id must be unique
      * @param scene the gui scene
      * @param node the gui node
      * @param id the id
@@ -7215,6 +7261,7 @@ export interface DmSdkCalls {
    */
   readonly dmHashReverseSafe32: {
     /**
+     * @remarks Do not store this pointer
      * @param hash hash value
      * @returns Original string value or " " if it wasn't found.
      */
@@ -7225,6 +7272,8 @@ export interface DmSdkCalls {
    */
   readonly dmHashReverseSafe32Alloc: {
     /**
+     * @remarks This function is thread safe
+     * The pointer is valid during the scope of the allocator
      * @param allocator The reverse hash allocator
      * @param hash hash value
      * @returns Original string value or " " if it wasn't found,
@@ -7239,6 +7288,7 @@ export interface DmSdkCalls {
    */
   readonly dmHashReverseSafe64: {
     /**
+     * @remarks Do not store this pointer
      * @param hash hash value
      * @returns Original string value or " " if it wasn't found.
      */
@@ -7249,6 +7299,8 @@ export interface DmSdkCalls {
    */
   readonly dmHashReverseSafe64Alloc: {
     /**
+     * @remarks This function is thread safe
+     * The pointer is valid during the scope of the allocator
      * @param allocator The reverse hash allocator
      * @param hash hash value
      * @returns Original string value or " " if it wasn't found,
@@ -7306,6 +7358,7 @@ export interface DmSdkCalls {
    */
   readonly "dmHashTable::dmHashTable::Erase": {
     /**
+     * @remarks Only valid if key exists in table
      * @param key Key to remove
      */
     (key: DmNativeType<"KEY">): void;
@@ -7430,13 +7483,22 @@ export interface DmSdkCalls {
    * Hashtable with chaining for collision resolution, memcpy-copy semantics (POD types) and 32-bit indicies instead of pointers. (NUMA-friendly)
    */
   readonly "dmHashTable::dmHashTable::dmHashTable<KEY, T>": {
+    /**
+     * @remarks The key type needs to support == and % operators
+     */
     (): void;
+    /**
+     * @remarks The key type needs to support == and % operators
+     */
     (user_allocated: DmPointer<"void">, table_size: number, capacity: number): void;
   };
   /**
    * Hashtable with chaining for collision resolution, memcpy-copy semantics (POD types) and 32-bit indicies instead of pointers. (NUMA-friendly)
    */
   readonly "dmHashTable::dmHashTable::~dmHashTable<KEY, T>": {
+    /**
+     * @remarks The key type needs to support == and % operators
+     */
     (): void;
   };
   /**
@@ -7466,6 +7528,7 @@ export interface DmSdkCalls {
    */
   readonly "dmHttpClient::ParseHeader": {
     /**
+     * @remarks This function is destructive to the input data.
      * @param header_str http response headers. Must be a null terminated string.
      * @param user_data user data to the callbacks.
      * @param end_of_receive true if there is no more data
@@ -7655,6 +7718,9 @@ export interface DmSdkCalls {
    * This listener receive logs even in release bundle.
    */
   readonly dmLogRegisterListener: {
+    /**
+     * @remarks Any calls to dmLogInfo et al from within the calllback will be ignored
+     */
     (listener: DmSdkTypes["FLogListener"]): void;
   };
   /**
@@ -7809,6 +7875,7 @@ export interface DmSdkCalls {
    */
   readonly "dmMessage::Post": {
     /**
+     * @remarks Message data is copied by value
      * @param sender The sender URL if the receiver wants to respond. 0x0 is accepted
      * @param receiver The receiver URL, must not be 0x0
      * @param message_id Message id
@@ -7827,6 +7894,7 @@ export interface DmSdkCalls {
    */
   readonly "dmMessage::PostDDF": {
     /**
+     * @remarks Message data is copied by value
      * @returns if the message was posted
      */
     (): void;
@@ -7995,6 +8063,7 @@ export interface DmSdkCalls {
    */
   readonly "dmObjectPool::dmObjectPool::GetRawObjects": {
     /**
+     * @remarks The order of objects in this array may change if Alloc() or Free() has been called
      * @returns a reference to the array of objects
      */
     (): DmReference<DmNativeType<"dmArray<T>">>;
@@ -8179,6 +8248,7 @@ export interface DmSdkCalls {
    */
   readonly "dmRender::GetNamedConstant": {
     /**
+     * @remarks This give access to the internal memory of the constant
      * @param buffer the constants buffer
      * @param name_hash the name of the constant
      * @param values (out) the values. May not be null.
@@ -8187,6 +8257,7 @@ export interface DmSdkCalls {
      */
     (buffer: DmSdkTypes["dmRender::HNamedConstantBuffer"], name_hash: DmSdkTypes["dmhash_t"], values: DmPointer<"dmVMath::Vector4">, num_values: DmPointer<"uint32_t">): boolean;
     /**
+     * @remarks This give access to the internal memory of the constant
      * @param buffer the constants buffer
      * @param name_hash the name of the constant
      * @param values (out) the values. May not be null.
@@ -8262,6 +8333,7 @@ export interface DmSdkCalls {
    */
   readonly "dmRender::RenderListAlloc": {
     /**
+     * @remarks Do not store a pointer into this array, as they're reused next frame
      * @param context the context
      * @param entries the number of entries to allocate
      * @returns the render list entry array
@@ -8424,6 +8496,8 @@ export interface DmSdkCalls {
    */
   readonly "dmResource::CreateResource": {
     /**
+     * @remarks The input data pointer is not stored
+     * The reference count is 1, so make sure it's destruction is handled
      * @param factory Factory handle
      * @param name Resource name
      * @param data Resource data
@@ -8668,6 +8742,9 @@ export interface DmSdkCalls {
     (factory: DmSdkTypes["dmResource::HFactory"], callback: DmSdkTypes["FResourceReloadedCallback"], user_data: DmPointer<"void">): void;
   };
   readonly "dmResource::RegisterType": {
+    /**
+     * @deprecated Deprecated in favor of ResourceRegisterTypeCreatorDesc
+     */
     (factory: DmSdkTypes["dmResource::HFactory"], extension: DmReadonlyPointer<"char">, context: DmPointer<"void">, preload_function: DmSdkTypes["dmResource::FResourcePreload"], create_function: DmSdkTypes["dmResource::FResourceCreate"], post_create_function: DmSdkTypes["dmResource::FResourcePostCreate"], destroy_function: DmSdkTypes["dmResource::FResourceDestroy"], recreate_function: DmSdkTypes["dmResource::FResourceRecreate"]): DmSdkTypes["dmResource::Result"];
   };
   /**
@@ -8716,6 +8793,9 @@ export interface DmSdkCalls {
    * Setup function pointers and context for a resource type
    */
   readonly "dmResource::SetupType": {
+    /**
+     * @deprecated C++ Helper function. Deprecated in favor of ResourceRegisterTypeCreatorDesc et al
+     */
     (ctx: DmSdkTypes["HResourceTypeContext"], type: DmSdkTypes["HResourceType"], context: DmPointer<"void">, preload_function: DmSdkTypes["FResourcePreload"], create_function: DmSdkTypes["FResourceCreate"], post_create_function: DmSdkTypes["FResourcePostCreate"], destroy_function: DmSdkTypes["FResourceDestroy"], recreate_function: DmSdkTypes["FResourceRecreate"]): DmSdkTypes["dmResource::Result"];
   };
   readonly "dmResource::UnregisterResourceReloadedCallback": {
@@ -8875,6 +8955,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckBuffer": {
     /**
+     * @remarks The dmBuffer::IsBufferValid is already called on the returned buffer
      * @param L lua state
      * @param index Index of the value
      * @returns pointer to dmScript::LuaHBuffer
@@ -8887,6 +8968,9 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckBufferNoError": {
     /**
+     * @remarks Returns 0 on error. Does not invoke lua_error.
+     * The dmBuffer::IsBufferValid is already called on the returned buffer
+     * @deprecated deprecated. Prefer ToBuffer() instead.
      * @param L lua state
      * @param index Index of the value
      * @returns pointer to dmScript::LuaHBuffer or 0 if not valid
@@ -8899,6 +8983,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckBufferUnpack": {
     /**
+     * @remarks The dmBuffer::IsBufferValid is already called on the returned buffer
      * @param L lua state
      * @param index Index of the value
      * @returns buffer if valid, 0 otherwise
@@ -8911,6 +8996,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckBufferUnpackNoError": {
     /**
+     * @remarks The dmBuffer::IsBufferValid is already called on the returned buffer
      * @param L lua state
      * @param index Index of the value
      * @returns buffer if valid, 0 otherwise
@@ -8922,6 +9008,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckCollection": {
     /**
+     * @remarks Works from both a .script/.gui_script
      * @param L lua state
      * @returns gameobject instance
      */
@@ -8969,6 +9056,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckMatrix4": {
     /**
+     * @remarks throws a luaL_error if it's not the correct type
      * @param L Lua state
      * @param index Index of the value
      * @returns The pointer to the value
@@ -8980,6 +9068,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckQuat": {
     /**
+     * @remarks throws a luaL_error if it's not the correct type
      * @param L Lua state
      * @param index Index of the value
      * @returns The pointer to the value
@@ -9033,6 +9122,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckVector3": {
     /**
+     * @remarks throws a luaL_error if it's not the correct type
      * @param L Lua state
      * @param index Index of the value
      * @returns The pointer to the value
@@ -9044,6 +9134,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::CheckVector4": {
     /**
+     * @remarks throws a luaL_error if it's not the correct type
      * @param L Lua state
      * @param index Index of the value
      * @returns The pointer to the value
@@ -9090,6 +9181,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::GetComponentFromLua": {
     /**
+     * @remarks The object referenced by the url must be in the same collection as the caller.
      * @param L Lua state
      * @param index index to argument (a url)
      * @param component_type E.g. "factoryc". The call will fail if the found component does not have the specified extension
@@ -9241,6 +9333,7 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::JsonToLua": {
     /**
+     * @remarks Throws Lua error if it fails to parser the json
      * @param L lua state
      * @param json json string
      * @param json_len length of json string
@@ -9248,6 +9341,7 @@ export interface DmSdkCalls {
      */
     (L: DmPointer<"lua_State">, json: DmReadonlyPointer<"char">, json_len: number): number;
     /**
+     * @remarks Throws Lua error if it fails to parser the json
      * @param L lua state
      * @param options_index lua stack index to check for an options table
      * @param json json string
@@ -9504,6 +9598,8 @@ export interface DmSdkCalls {
    */
   readonly "dmScript::ToBuffer": {
     /**
+     * @remarks Returns 0 on error. Does not invoke lua_error.
+     * The dmBuffer::IsBufferValid is already called on the returned buffer
      * @param L lua state
      * @param index Index of the value
      * @returns pointer to dmScript::LuaHBuffer or 0 if not valid
@@ -9688,6 +9784,8 @@ export interface DmSdkCalls {
    */
   readonly "dmSocket::New": {
     /**
+     * @remarks SIGPIPE is disabled on applicable platforms. This has the implication
+     * that Receive can return zero bytes when the connection is closed by remote peer.
      * @param type Socket type
      * @param protocol Protocol
      * @param socket Pointer to socket
@@ -9700,6 +9798,8 @@ export interface DmSdkCalls {
    */
   readonly "dmSocket::Receive": {
     /**
+     * @remarks For dmSocket::Recv() and dmSocket::Send() function ETIMEDOUT is translated to EWOULDBLOCK
+     * on win32 for compatibility with BSD sockets.
      * @param socket Socket to receive data on
      * @param length Receive buffer length
      * @returns RESULT_OK on success
@@ -9781,6 +9881,8 @@ export interface DmSdkCalls {
    */
   readonly "dmSocket::Send": {
     /**
+     * @remarks For dmSocket::Recv() and dmSocket::Send() function ETIMEDOUT is translated to EWOULDBLOCK
+     * on win32 for compatibility with BSD sockets.
      * @param socket Socket to send a message on
      * @param buffer Buffer to send
      * @param length Length of buffer to send
@@ -9826,6 +9928,7 @@ export interface DmSdkCalls {
    */
   readonly "dmSocket::SetQuickAck": {
     /**
+     * @remarks This is a no op on platforms that doesn't support it
      * @param socket Socket to set TCP_QUICKACK on
      * @param use_quick_ack False to disable quick ack
      * @returns RESULT_OK on success
@@ -9837,6 +9940,8 @@ export interface DmSdkCalls {
    */
   readonly "dmSocket::SetReceiveTimeout": {
     /**
+     * @remarks Timeout resolution might be in milliseconds, e.g. windows. Use values
+     * larger than or equal to 1000
      * @param socket socket
      * @param timeout timeout in microseconds
      * @returns RESULT_OK on success
@@ -9859,6 +9964,8 @@ export interface DmSdkCalls {
    */
   readonly "dmSocket::SetSendTimeout": {
     /**
+     * @remarks Timeout resolution might be in milliseconds, e.g. windows. Use values
+     * larger than or equal to 1000.
      * @param socket socket
      * @param timeout timeout in microseconds
      * @returns RESULT_OK on success
@@ -10032,6 +10139,7 @@ export interface DmSdkCalls {
    */
   readonly "dmSys::Rename": {
     /**
+     * @remarks This operation is atomic
      * @param dst_path the destination path. The file which contents is to be overwritten.
      * @param src_path the source path. The contents will be written to the destination path and the file unlinked if successful.
      * @returns on success
@@ -10142,6 +10250,7 @@ export interface DmSdkCalls {
    */
   readonly "dmThread::New": {
     /**
+     * @remarks thread name currently not supported on win32
      * @param thread_start Thread entry function
      * @param stack_size Stack size
      * @param arg Thread argument
@@ -10155,6 +10264,7 @@ export interface DmSdkCalls {
    */
   readonly "dmThread::SetThreadName": {
     /**
+     * @remarks The thread argument is unused on Darwin (uses current thread)
      * @param thread the thread
      * @param name the thread name
      */
@@ -10395,6 +10505,7 @@ export interface DmSdkCalls {
    */
   readonly "dmURI::Decode": {
     /**
+     * @remarks The output will never be larger than the input.
      * @param src Input
      * @param dst Decoded output
      */
@@ -10405,6 +10516,7 @@ export interface DmSdkCalls {
    */
   readonly "dmURI::Encode": {
     /**
+     * @remarks If dst=0 the bytes_written will return the number of required bytes (including null character)
      * @param src string to encode
      * @param dst the destination buffer
      * @param dst_size size of the provided out buffer
@@ -10416,6 +10528,9 @@ export interface DmSdkCalls {
    */
   readonly "dmURI::Parse": {
     /**
+     * @remarks This is a simplified URI parser and does not conform to rfc2396.
+     * Missing features are: parameters, query, fragment part of URI and support for escaped sequences
+     * For http m_Port is set to 80 if not specified in uri.
      * @param uri URI to parse
      * @param parts Result
      * @returns on success
@@ -10467,6 +10582,7 @@ export interface DmSdkCalls {
    */
   readonly "dmUtf8::ToUtf8": {
     /**
+     * @remarks Buffer must be of at least 4 characters. The string is *not* NULL-terminated
      * @param chr Character to convert
      * @param buf output Buffer (at least 4 bytes)
      * @returns Number of characters in buffer
@@ -10590,6 +10706,7 @@ export interface DmSdkCalls {
    */
   readonly "dmVMath::Lerp": {
     /**
+     * @remarks Does not clamp t to between 0 and 1
      * @param t the unit time
      * @param a the start vector (t == 0)
      * @param b the end vector (t == 1)
@@ -10597,6 +10714,7 @@ export interface DmSdkCalls {
      */
     (t: number, a: DmSdkTypes["dmVMath::Vector3"], b: DmSdkTypes["dmVMath::Vector3"]): DmSdkTypes["dmVMath::Vector3"];
     /**
+     * @remarks Does not clamp t to between 0 and 1
      * @param t the unit time
      * @param a the start vector (t == 0)
      * @param b the end vector (t == 1)
@@ -10604,6 +10722,7 @@ export interface DmSdkCalls {
      */
     (t: number, a: DmSdkTypes["dmVMath::Vector4"], b: DmSdkTypes["dmVMath::Vector4"]): DmSdkTypes["dmVMath::Vector4"];
     /**
+     * @remarks Does not clamp t to between 0 and 1
      * @param t the unit time
      * @param a the start vector (t == 0)
      * @param b the end vector (t == 1)
@@ -10701,6 +10820,8 @@ export interface DmSdkCalls {
    */
   readonly "dmVMath::Slerp": {
     /**
+     * @remarks Does not clamp t to between 0 and 1
+     * Unpredicatable results if a and b point in opposite direction
      * @param t the unit time
      * @param a the start vector (t == 0)
      * @param b the end vector (t == 1)
@@ -10708,6 +10829,8 @@ export interface DmSdkCalls {
      */
     (t: number, a: DmSdkTypes["dmVMath::Vector3"], b: DmSdkTypes["dmVMath::Vector3"]): DmSdkTypes["dmVMath::Vector3"];
     /**
+     * @remarks Does not clamp t to between 0 and 1
+     * Unpredicatable results if a and b point in opposite direction
      * @param t the unit time
      * @param a the start vector (t == 0)
      * @param b the end vector (t == 1)
@@ -10715,6 +10838,8 @@ export interface DmSdkCalls {
      */
     (t: number, a: DmSdkTypes["dmVMath::Vector4"], b: DmSdkTypes["dmVMath::Vector4"]): DmSdkTypes["dmVMath::Vector4"];
     /**
+     * @remarks Does not clamp t to between 0 and 1
+     * Unpredicatable results if a and b point in opposite direction
      * @param t the unit time
      * @param a the start vector (t == 0)
      * @param b the end vector (t == 1)
@@ -10813,6 +10938,7 @@ export interface DmSdkCalls {
    */
   readonly "dmWebServer::SetStatusCode": {
     /**
+     * @remarks Only valid to invoke before #Send is invoked
      * @param request Request
      * @param status_code Status code to set
      * @returns RESULT_OK on success
@@ -14088,6 +14214,7 @@ export type DmHIDMouseButton = (typeof DmHIDMouseButton)[keyof typeof DmHIDMouse
 
 /**
  * touch phase enumeration
+ * @remarks By convention the enumeration corresponds to the iOS values
  */
 export const DmHIDPhase = {
   PHASE_BEGAN: 0,
@@ -14658,95 +14785,360 @@ export interface DmSdkTypes {
   readonly ContextRegistry: DmNativeType<"ContextRegistry">;
   readonly EGLContext: DmPointer<"void">;
   readonly EGLSurface: DmPointer<"void">;
+  /**
+   * Engine exit code.
+   */
   readonly ExtensionAppExitCode: ExtensionAppExitCode;
+  /**
+   * The extension app parameters
+   */
   readonly ExtensionAppParams: Readonly<{ m_ConfigFile: DmSdkTypes["HConfigFile"]; m_ExitStatus: DmSdkTypes["ExtensionAppExitCode"]; m_Impl: DmPointer<"ExtensionAppParams::ExtensionParamsImpl"> }>;
   readonly "ExtensionAppParams::ExtensionParamsImpl": DmNativeType<"ExtensionAppParams::ExtensionParamsImpl">;
+  /**
+   * Extra callback type for RegisterCallback function.
+   */
   readonly ExtensionCallbackType: ExtensionCallbackType;
+  /**
+   * Extension event
+   */
   readonly ExtensionEvent: Readonly<{ m_Event: DmSdkTypes["ExtensionEventID"] }>;
+  /**
+   * Event id enumeration.
+   * EVENT_ID_ICONIFYAPP and EVENT_ID_DEICONIFYAPP only available on
+   */
   readonly ExtensionEventID: ExtensionEventID;
+  /**
+   * The global parameters avalable when registering and unregistering an extension
+   */
   readonly ExtensionParams: Readonly<{ m_ConfigFile: DmSdkTypes["HConfigFile"]; m_ResourceFactory: DmSdkTypes["HResourceFactory"]; m_L: DmPointer<"lua_State">; m_Impl: DmPointer<"ExtensionAppParams::ExtensionParamsImpl"> }>;
+  /**
+   * Result enumeration.
+   */
   readonly ExtensionResult: ExtensionResult;
+  /**
+   * Called when config file extension is created
+   */
   readonly FConfigFileCreate: DmNativeCallback;
+  /**
+   * Called when config file extension is destroyed
+   */
   readonly FConfigFileDestroy: DmNativeCallback;
+  /**
+   * Called when a float is requested from the config file extension
+   */
   readonly FConfigFileGetFloat: DmNativeCallback;
+  /**
+   * Called when an integer is requested from the config file extension
+   */
   readonly FConfigFileGetInt: DmNativeCallback;
+  /**
+   * Called when a string is requested from the config file extension
+   */
   readonly FConfigFileGetString: DmNativeCallback;
+  /**
+   * Callback when the app is being finalized
+   */
   readonly FExtensionAppFinalize: DmNativeCallback;
+  /**
+   * Callback when the app is being initialized. Called before  FExtensionInitialize
+   * @remarks There is no guarantuee of initialization order. If an extension requires another extension to be initialized,
+   * that should be handled in [ref:FExtensionInitialize].
+   */
   readonly FExtensionAppInitialize: DmNativeCallback;
+  /**
+   * Callback typedef for functions passed to RegisterCallback().
+   */
   readonly FExtensionCallback: DmNativeCallback;
+  /**
+   * Calls for the finalization of an extension
+   * @remarks All extensions will be called with `FExtensionFinalize` before moving on to the next step, the [ref:FExtensionAppFinalize]
+   */
   readonly FExtensionFinalize: DmNativeCallback;
+  /**
+   * Callback after all extensions have been called with  FExtensionAppInitialize
+   */
   readonly FExtensionInitialize: DmNativeCallback;
+  /**
+   * Receives an event from the engine
+   */
   readonly FExtensionOnEvent: DmNativeCallback;
+  /**
+   * Updates an extension. Called for each game frame.
+   */
   readonly FExtensionUpdate: DmNativeCallback;
+  /**
+   * The callback to process the user data.
+   * @remarks This call occurs on the game main thread
+   */
   readonly FJobCallback: DmNativeCallback;
+  /**
+   * The callback to process the user data.
+   * @remarks This call may occur on a separate thread
+   */
   readonly FJobProcess: DmNativeCallback;
+  /**
+   * dmLog listener function type. Provides all logs from dmLog* functions and print/pprint Lua functions.
+   * Used with dmLogRegisterListener() and dmLogUnregisterListener()
+   */
   readonly FLogListener: DmNativeCallback;
+  /**
+   * Resource create function
+   */
   readonly FResourceCreate: DmNativeCallback;
+  /**
+   * Encrypts a resource in-place
+   */
   readonly FResourceDecryption: DmNativeCallback;
+  /**
+   * Resource destroy function
+   */
   readonly FResourceDestroy: DmNativeCallback;
+  /**
+   * Resource postcreate function
+   * @remarks returning RESOURCE_CREATE_RESULT_PENDING will result in a repeated callback the following update.
+   */
   readonly FResourcePostCreate: DmNativeCallback;
+  /**
+   * Resource preloading function. This may be called from a separate loading thread
+   * but will not keep any mutexes held while executing the call. During this call
+   * PreloadHint can be called with the supplied hint_info handle.
+   * If RESULT_OK is returned, the resource Create function is guaranteed to be called
+   * with the preload_data value supplied.
+   */
   readonly FResourcePreload: DmNativeCallback;
+  /**
+   * Resource recreate function. Recreate resource in-place.
+   * @remarks Beware that any "in flight" resource pointers to the actual resource must remain valid after this call.
+   */
   readonly FResourceRecreate: DmNativeCallback;
+  /**
+   * Function called when a resource has been reloaded.
+   */
   readonly FResourceReloadedCallback: DmNativeCallback;
+  /**
+   * Resource type destroy function. Generally used to destroy the registered resource type context.
+   */
   readonly FResourceTypeDeregister: DmNativeCallback;
+  /**
+   * Resource type setup function.
+   * @remarks The type is already cerate, and name and name hash properties are valid to get using the RsourceTypeGetName()/RsourceTypeGetNameHash() functions
+   */
   readonly FResourceTypeRegister: DmNativeCallback;
+  /**
+   * Called during the layout's final release for each resolved sprite.
+   * The callback may be null when the resolver never acquires resources.
+   */
   readonly FTextLayoutReleaseObject: DmNativeCallback;
+  /**
+   * Called once for every sprite, including cache misses. The proposed
+   * dimensions already include explicit markup dimensions; each unspecified
+   * dimension is one em. The callback must set  object-&gt;m_Width  and
+   * object-&gt;m_Height , and may store an acquired resource handle in
+   * object-&gt;m_Resource . Returning false aborts markup layout creation.
+   * source  and  attributes  are borrowed and valid for the duration of the
+   * callback. Equivalent data can later be obtained from the created layout.
+   */
   readonly FTextLayoutResolveObject: DmNativeCallback;
+  /**
+   * Called when a character is entered from keyboard input.
+   */
   readonly FWindowAddKeyboardCharCallback: DmNativeCallback;
+  /**
+   * Called when the window is requested to close.
+   * Return non-zero to allow close, or zero to cancel close.
+   */
   readonly FWindowCloseCallback: DmNativeCallback;
+  /**
+   * Called when keyboard input device status changes.
+   */
   readonly FWindowDeviceChangedCallback: DmNativeCallback;
+  /**
+   * Called when the window focus changes.
+   */
   readonly FWindowFocusCallback: DmNativeCallback;
+  /**
+   * Called when the window is iconified/minimized or restored.
+   */
   readonly FWindowIconifyCallback: DmNativeCallback;
+  /**
+   * Called when the window size changes.
+   */
   readonly FWindowResizeCallback: DmNativeCallback;
+  /**
+   * Called when IME marked text is updated.
+   */
   readonly FWindowSetMarkedTextCallback: DmNativeCallback;
   readonly Font: DmNativeType<"Font">;
   readonly FontCollection: DmNativeType<"FontCollection">;
+  /**
+   * Represents a glyph.
+   * If there's an associated image, it is of size width * height * channels.
+   * @remarks The baseline of a glyph bitmap is calculated: `base = glyph.bitmap.height - glyph.ascent`
+   */
   readonly FontGlyph: Readonly<{ m_Bitmap: DmSdkTypes["FontGlyphBitmap"]; m_Codepoint: number; m_GlyphIndex: number; m_Width: number; m_Height: number; m_Advance: number; m_LeftBearing: number; m_Ascent: number; m_Descent: number }>;
+  /**
+   * Holds the bitmap data of a glyph.
+   * If there's an associated image, it is of size width * height * channels.
+   */
   readonly FontGlyphBitmap: Readonly<{ m_Data: DmPointer<"uint8_t">; m_DataSize: number; m_Width: number; m_Height: number; m_Channels: number; m_Flags: number }>;
+  /**
+   * FontGlyphBitmapFlags
+   */
   readonly FontGlyphBitmapFlags: FontGlyphBitmapFlags;
+  /**
+   * Holds the bitmap data of a glyph.
+   * If there's an associated image, it is of size width * height * channels.
+   */
   readonly FontGlyphOptions: Readonly<{ m_Scale: number; m_GenerateImage: boolean; m_StbttSDFPadding: number; m_StbttSDFOnEdgeValue: number }>;
+  /**
+   * FontResult
+   */
   readonly FontResult: FontResult;
+  /**
+   * FontType
+   */
   readonly FontType: FontType;
   readonly GLXContext: DmPointer<"void">;
+  /**
+   * Each game session has a single config file that holds all parameters from game.project and any overridden values.
+   * @remarks Properties can be overridden on command line or via the config file extension system. (See [ref:DM_DECLARE_CONFIGFILE_EXTENSION])
+   */
   readonly HConfigFile: DmPointer<"ConfigFile">;
+  /**
+   * Context registry handle.
+   */
   readonly HContextRegistry: DmPointer<"ContextRegistry">;
   readonly HFont: DmPointer<"Font">;
+  /**
+   * Handle that holds a collection of fonts to use during text shaping
+   */
   readonly HFontCollection: DmPointer<"FontCollection">;
   readonly HGLRC: DmPointer<"void">;
+  /**
+   * Job handle
+   */
   readonly HJob: bigint;
+  /**
+   * Job system context
+   */
   readonly HJobContext: DmPointer<"JobContext">;
+  /**
+   * Handle to a an active profile frame
+   */
   readonly HProfile: number;
+  /**
+   * Holds information about a currently loaded resource.
+   */
   readonly HResourceDescriptor: DmPointer<"ResourceDescriptor">;
+  /**
+   * Resource factory handle. Holds references to all currently loaded resources.
+   */
   readonly HResourceFactory: DmPointer<"ResourceFactory">;
+  /**
+   * Holds information about preloading resources
+   */
   readonly HResourcePreloadHintInfo: DmPointer<"ResourcePreloadHintInfo">;
+  /**
+   * Represents a resource type, with a context and type functions for creation and destroying a resource.
+   */
   readonly HResourceType: DmPointer<"ResourceType">;
+  /**
+   * Holds the resource types, as well as extra in engine contexts that can be shared across type functions.
+   */
   readonly HResourceTypeContext: DmPointer<"ResourceTypeContext">;
+  /**
+   * A handle representing a text layout
+   */
   readonly HTextLayout: DmPointer<"TextLayout">;
   readonly HWND: DmPointer<"void">;
+  /**
+   * Window handle
+   */
   readonly HWindow: DmPointer<"dmWindow">;
+  /**
+   * Hash state used for 32-bit incremental hashing
+   */
   readonly HashState32: Readonly<{ m_Hash: number; m_Tail: number; m_Count: number; m_Size: number; m_ReverseHashEntryIndex: number }>;
+  /**
+   * Hash state used for 64-bit incremental hashing
+   */
   readonly HashState64: Readonly<{ m_Hash: bigint; m_Tail: bigint; m_Count: number; m_Size: number; m_ReverseHashEntryIndex: number }>;
+  /**
+   * Return value from HttpResponseCallback.
+   */
   readonly HttpCallbackResult: HttpCallbackResult;
+  /**
+   * The caller owns the request until HttpPushRequest() succeeds.
+   */
   readonly HttpRequest: DmNativeType<"HttpRequest">;
+  /**
+   * Opaque service-local value identifying a request after ownership has been
+   * transferred to the HTTP service.
+   */
   readonly HttpRequestHandle: number;
+  /**
+   * Called from the HTTP client worker thread. HTTP_RESPONSE_EVENT_DATA events
+   * are sent as response chunks arrive; the receiver is responsible for
+   * processing or copying them before returning. The receiver is also responsible
+   * for synchronizing with other threads. Pointers in HttpResponseInfo are valid
+   * only for the duration of the callback. Returning HTTP_CALLBACK_RESULT_CANCEL
+   * from header, data, or progress events cancels the request.
+   */
   readonly HttpResponseCallback: DmNativeCallback;
+  /**
+   * HTTP response event
+   */
   readonly HttpResponseEvent: HttpResponseEvent;
+  /**
+   * Opaque data passed to HttpResponseCallback.
+   */
   readonly HttpResponseInfo: DmNativeType<"HttpResponseInfo">;
+  /**
+   * HTTP result values
+   */
   readonly HttpResult: HttpResult;
+  /**
+   * HTTP service context provided by the engine.
+   */
   readonly HttpService: DmNativeType<"HttpService">;
   readonly JavaVM: DmPointer<"void">;
+  /**
+   * Job parameters
+   * @remarks This call may occur on a separate thread
+   */
   readonly Job: Readonly<{ m_Process: DmSdkTypes["FJobProcess"]; m_Callback: DmSdkTypes["FJobCallback"]; m_Context: DmPointer<"void">; m_Data: DmPointer<"void"> }>;
   readonly JobContext: DmNativeType<"JobContext">;
+  /**
+   * creation parameters
+   */
   readonly JobSystemCreateParams: Readonly<{ m_ThreadNamePrefix: DmReadonlyPointer<"char">; m_ThreadCount: number }>;
+  /**
+   * job result enumeration
+   */
   readonly JobSystemResult: JobSystemResult;
+  /**
+   * job status enumeration
+   */
   readonly JobSystemStatus: JobSystemStatus;
+  /**
+   * Parameters for dmLogInitialize().
+   */
   readonly LogParams: Readonly<{ m_Reserved: number }>;
+  /**
+   * Log severity
+   */
   readonly LogSeverity: LogSeverity;
   readonly ProfileCreateListenerFn: DmNativeCallback;
   readonly ProfileDestroyListenerFn: DmNativeCallback;
   readonly ProfileFrameBeginFn: DmNativeCallback;
   readonly ProfileFrameEndFn: DmNativeCallback;
+  /**
+   * Index type to hold internal references of samplers and properties
+   */
   readonly ProfileIdx: bigint;
+  /**
+   * Structure for registering a profile listener
+   */
   readonly ProfileListener: Readonly<{ m_Name: DmSpan<number>; m_Next: DmPointer<"ProfileListener">; m_Ctx: DmPointer<"void">; m_Disabled: boolean; m_Create: DmSdkTypes["ProfileCreateListenerFn"]; m_Destroy: DmSdkTypes["ProfileDestroyListenerFn"]; m_FrameBegin: DmSdkTypes["ProfileFrameBeginFn"]; m_FrameEnd: DmSdkTypes["ProfileFrameEndFn"]; m_ScopeBegin: DmSdkTypes["ProfileScopeBeginFn"]; m_ScopeEnd: DmSdkTypes["ProfileScopeEndFn"]; m_SetThreadName: DmSdkTypes["ProfileSetThreadNameFn"]; m_LogText: DmSdkTypes["ProfileLogTextFn"]; m_CreatePropertyGroup: DmSdkTypes["ProfilePropertyCreateGroupFn"]; m_CreatePropertyBool: DmSdkTypes["ProfilePropertyCreateBoolFn"]; m_CreatePropertyS32: DmSdkTypes["ProfilePropertyCreateS32Fn"]; m_CreatePropertyU32: DmSdkTypes["ProfilePropertyCreateU32Fn"]; m_CreatePropertyF32: DmSdkTypes["ProfilePropertyCreateF32Fn"]; m_CreatePropertyS64: DmSdkTypes["ProfilePropertyCreateS64Fn"]; m_CreatePropertyU64: DmSdkTypes["ProfilePropertyCreateU64Fn"]; m_CreatePropertyF64: DmSdkTypes["ProfilePropertyCreateF64Fn"]; m_PropertySetBool: DmSdkTypes["ProfilePropertySetBoolFn"]; m_PropertySetS32: DmSdkTypes["ProfilePropertySetS32Fn"]; m_PropertySetU32: DmSdkTypes["ProfilePropertySetU32Fn"]; m_PropertySetF32: DmSdkTypes["ProfilePropertySetF32Fn"]; m_PropertySetS64: DmSdkTypes["ProfilePropertySetS64Fn"]; m_PropertySetU64: DmSdkTypes["ProfilePropertySetU64Fn"]; m_PropertySetF64: DmSdkTypes["ProfilePropertySetF64Fn"]; m_PropertyAddS32: DmSdkTypes["ProfilePropertyAddS32Fn"]; m_PropertyAddU32: DmSdkTypes["ProfilePropertyAddU32Fn"]; m_PropertyAddF32: DmSdkTypes["ProfilePropertyAddF32Fn"]; m_PropertyAddS64: DmSdkTypes["ProfilePropertyAddS64Fn"]; m_PropertyAddU64: DmSdkTypes["ProfilePropertyAddU64Fn"]; m_PropertyAddF64: DmSdkTypes["ProfilePropertyAddF64Fn"]; m_PropertyReset: DmSdkTypes["ProfilePropertyResetFn"] }>;
   readonly ProfileLogTextFn: DmNativeCallback;
   readonly ProfilePropertyAddF32Fn: DmNativeCallback;
@@ -14763,6 +15155,9 @@ export interface DmSdkTypes {
   readonly ProfilePropertyCreateS64Fn: DmNativeCallback;
   readonly ProfilePropertyCreateU32Fn: DmNativeCallback;
   readonly ProfilePropertyCreateU64Fn: DmNativeCallback;
+  /**
+   * Set of bit flags to be used when declaring propertis
+   */
   readonly ProfilePropertyFlags: ProfilePropertyFlags;
   readonly ProfilePropertyResetFn: DmNativeCallback;
   readonly ProfilePropertySetBoolFn: DmNativeCallback;
@@ -14772,38 +15167,113 @@ export interface DmSdkTypes {
   readonly ProfilePropertySetS64Fn: DmNativeCallback;
   readonly ProfilePropertySetU32Fn: DmNativeCallback;
   readonly ProfilePropertySetU64Fn: DmNativeCallback;
+  /**
+   * Enum to describe type of a property
+   */
   readonly ProfilePropertyType: ProfilePropertyType;
+  /**
+   * Union to hold a property value
+   */
   readonly ProfilePropertyValue: DmNativeType<"ProfilePropertyValue">;
+  /**
+   * Enum to describe the result of a profiler operation
+   */
   readonly ProfileResult: ProfileResult;
   readonly ProfileScope: Readonly<{ m_Internal: DmPointer<"void"> }>;
   readonly ProfileScopeBeginFn: DmNativeCallback;
   readonly ProfileScopeEndFn: DmNativeCallback;
   readonly ProfileScopeHelper: Readonly<{ m_ScopeInfo: DmPointer<"ProfileScope">; m_Name: DmReadonlyPointer<"char">; m_NameHash: DmPointer<"uint64_t"> }>;
   readonly ProfileSetThreadNameFn: DmNativeCallback;
+  /**
+   * Parameters to ResourceCreate function of the resource type
+   */
   readonly ResourceCreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_PreloadData: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
   readonly ResourceDescriptor: DmNativeType<"ResourceDescriptor">;
+  /**
+   * Parameters to ResourceDestroy function of the resource type
+   */
   readonly ResourceDestroyParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
   readonly ResourceFactory: DmNativeType<"ResourceFactory">;
+  /**
+   * Parameters to ResourcePostCreate function of the resource type
+   */
   readonly ResourcePostCreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_PreloadData: DmPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
   readonly ResourcePreloadHintInfo: DmNativeType<"ResourcePreloadHintInfo">;
+  /**
+   * Parameters to ResourcePreload function of the resource type
+   */
   readonly ResourcePreloadParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_IsBufferTransferrable: number; m_HintInfo: DmSdkTypes["HResourcePreloadHintInfo"]; m_Type: DmSdkTypes["HResourceType"]; m_PreloadData: DmPointer<"void">; m_IsBufferOwnershipTransferred: DmPointer<"bool"> }>;
+  /**
+   * Parameters to ResourceRecreate function of the resource type
+   */
   readonly ResourceRecreateParams: Readonly<{ m_Factory: DmSdkTypes["HResourceFactory"]; m_Context: DmPointer<"void">; m_FilenameHash: DmSdkTypes["dmhash_t"]; m_Filename: DmReadonlyPointer<"char">; m_Buffer: DmReadonlyPointer<"void">; m_BufferSize: number; m_FileSize: number; m_IsBufferPartial: number; m_Message: DmReadonlyPointer<"void">; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
+  /**
+   * Parameters to ResourceReloaded function of the resource type
+   */
   readonly ResourceReloadedParams: Readonly<{ m_UserData: DmPointer<"void">; m_Filename: DmReadonlyPointer<"char">; m_FilenameHash: bigint; m_Resource: DmSdkTypes["HResourceDescriptor"]; m_Type: DmSdkTypes["HResourceType"] }>;
+  /**
+   * ResourceResult
+   */
   readonly ResourceResult: ResourceResult;
   readonly ResourceType: DmNativeType<"ResourceType">;
   readonly ResourceTypeContext: DmNativeType<"ResourceTypeContext">;
+  /**
+   * Decorations contain backend-independent geometry after shaping, BiDi
+   * reordering, and line wrapping.  m_Y  is relative to the line baseline. The
+   * original underline or strike type is deliberately omitted because its font
+   * metrics have already been resolved into  m_Y  and  m_Thickness .
+   */
   readonly TextDecoration: Readonly<{ m_X: number; m_Y: number; m_Length: number; m_Thickness: number; m_PatternOffset: number; m_GlyphStart: number; m_GlyphCount: number; m_LineIndex: number; m_Pattern: number }>;
+  /**
+   * Text decoration pattern
+   */
   readonly TextDecorationPattern: TextDecorationPattern;
+  /**
+   * An enum representing text layout directions
+   */
   readonly TextDirection: TextDirection;
+  /**
+   * Glyph representing the final position within a layout
+   */
   readonly TextGlyph: Readonly<{ m_Font: DmSdkTypes["HFont"]; m_X: number; m_Y: number; m_Width: number; m_Height: number; m_RenderScale: number; m_Codepoint: number; m_Cluster: number; m_GlyphIndex: number; m_StyleIndex: number; m_BaseStyleIndex: number; m_MarkupSpanIndex: number; m_BaseMarkupSpanIndex: number; m_Flags: number; m_Advance: number; m_LeftBearing: number }>;
+  /**
+   * Text glyph flags
+   */
   readonly TextGlyphFlags: TextGlyphFlags;
   readonly TextLayout: DmNativeType<"TextLayout">;
+  /**
+   * Sprite objects have resolved dimensions and an opaque value owned by the
+   * resolver. Their dimensions reserve inline layout space; rendering the
+   * sprite is the caller's responsibility. Link objects describe their visible
+   * UTF-32 text range and have zero dimensions until their geometry is queried.
+   */
   readonly TextLayoutObject: Readonly<{ m_Resource: bigint; m_Id: bigint; m_Width: number; m_Height: number; m_TextOffset: number; m_TextLength: number; m_AttributeIndex: number; m_AttributeCount: number; m_Tag: DmSdkTypes["dmhash_t"] }>;
+  /**
+   * Offsets and lengths are UTF-8 byte ranges in the string returned by
+   * TextLayoutGetObjectSource() .
+   */
   readonly TextLayoutObjectAttribute: Readonly<{ m_NameOffset: number; m_ValueOffset: number; m_NameLength: number; m_ValueLength: number }>;
+  /**
+   * Describes how to do a text layout
+   */
   readonly TextLayoutSettings: Readonly<{ m_Size: number; m_Width: number; m_Leading: number; m_Tracking: number; m_ResolveObject: DmSdkTypes["FTextLayoutResolveObject"]; m_ReleaseObject: DmSdkTypes["FTextLayoutReleaseObject"]; m_ObjectContext: DmPointer<"void">; m_BaseStyle: DmSdkTypes["dmhash_t"]; m_Padding: number; m_LineBreak: number; m_Monospace: number; m_UseBaseStyle: number }>;
+  /**
+   * An enum representing text layout features
+   * Each font supports a layout type
+   * The selected layout type it the minimum value of layout types
+   */
   readonly TextLayoutType: TextLayoutType;
+  /**
+   * Represents a line of glyphs
+   */
   readonly TextLine: Readonly<{ m_Width: number; m_Baseline: number; m_Index: number; m_Length: number; m_ParagraphIndex: number }>;
+  /**
+   * Represents a paragraph of lines
+   */
   readonly TextParagraph: Readonly<{ m_TextIndex: number; m_TextLength: number; m_LineIndex: number; m_LineCount: number; m_Direction: DmSdkTypes["TextDirection"] }>;
+  /**
+   * An enum representing text layout results
+   */
   readonly TextResult: TextResult;
   readonly "Vectormath::Aos::Matrix3": DmNativeType<"Vectormath::Aos::Matrix3">;
   readonly "Vectormath::Aos::Matrix4": DmNativeType<"Vectormath::Aos::Matrix4">;
@@ -14834,89 +15304,296 @@ export interface DmSdkTypes {
   readonly WGPUTexture: number;
   readonly WGPUTextureView: number;
   readonly Window: DmPointer<"void">;
+  /**
+   * window parameters
+   */
   readonly WindowCreateParams: Readonly<{ m_GraphicsApi: DmSdkTypes["WindowsGraphicsApi"]; m_ResizeCallback: DmSdkTypes["FWindowResizeCallback"]; m_ResizeCallbackUserData: DmPointer<"void">; m_CloseCallback: DmSdkTypes["FWindowCloseCallback"]; m_CloseCallbackUserData: DmPointer<"void">; m_FocusCallback: DmSdkTypes["FWindowFocusCallback"]; m_FocusCallbackUserData: DmPointer<"void">; m_IconifyCallback: DmSdkTypes["FWindowIconifyCallback"]; m_IconifyCallbackUserData: DmPointer<"void">; m_Title: DmReadonlyPointer<"char">; m_Width: number; m_Height: number; m_Samples: number; m_BackgroundColor: number; m_ContextAlphabits: number; m_GraphicsApiVersionHint: number; m_OpenGLUseCoreProfileHint: number; m_Hidden: number; m_Fullscreen: number; m_PrintDeviceInfo: number; m_HighDPI: number; m_FocusOnShow: number }>;
+  /**
+   * result enumeration
+   */
   readonly WindowResult: WindowResult;
+  /**
+   * window state enumeration
+   */
   readonly WindowState: WindowState;
+  /**
+   * graphics api enumeration
+   */
   readonly WindowsGraphicsApi: WindowsGraphicsApi;
   readonly android_app: DmPointer<"void">;
   readonly dmAllocator: Readonly<{ m_Alloc: DmNativeCallback; m_Free: DmNativeCallback; m_UserData: DmPointer<"void"> }>;
+  /**
+   * The backing storage is either auto-allocated (dynamically allocated) or user-allocated (supplied by user).
+   * With exception of changing the size and capacity, all operations are guaranteed to be O(1).
+   */
   readonly "dmArray::dmArray": DmNativeType<"dmArray::dmArray">;
+  /**
+   * typedef     uint32_t     HBuffer  ;
+   */
   readonly "dmBuffer::HBuffer": number;
+  /**
+   * Result enumeration.
+   */
   readonly "dmBuffer::Result": DmBufferResult;
+  /**
+   * Buffer stream declaration structure
+   */
   readonly "dmBuffer::StreamDeclaration": Readonly<{ m_Name: DmSdkTypes["dmhash_t"]; m_Type: DmSdkTypes["dmBuffer::ValueType"]; m_Count: number; m_Flags: number; m_Reserved: number }>;
+  /**
+   * ValueType enumeration.
+   */
   readonly "dmBuffer::ValueType": DmBufferValueType;
   readonly "dmBufferDDF::BufferDesc": Readonly<{ m_Streams: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/buffer_ddf.h:98:9)"> }>;
   readonly "dmBufferDDF::ValueType": DmBufferDDFValueType;
   readonly "dmCollectionProxyDDF::CollectionProxyDesc": Readonly<{ m_Collection: DmReadonlyPointer<"char">; m_Exclude: boolean }>;
   readonly "dmConditionVariable::ConditionVariable": DmNativeType<"dmConditionVariable::ConditionVariable">;
+  /**
+   * typedef     struct     ConditionVariable  *     HConditionVariable  ;
+   */
   readonly "dmConditionVariable::HConditionVariable": DmPointer<"dmConditionVariable::ConditionVariable">;
+  /**
+   * Each game session has a single config file that holds all parameters from game.project and any overridden values.
+   * @remarks Properties can be overridden on command line or via the config file extension system. (See [ref:DM_DECLARE_CONFIGFILE_EXTENSION])
+   */
   readonly "dmConfigFile::HConfig": DmSdkTypes["HConfigFile"];
   readonly "dmConnectionPool::ConnectionPool": DmNativeType<"dmConnectionPool::ConnectionPool">;
+  /**
+   * Connection handle
+   */
   readonly "dmConnectionPool::HConnection": number;
+  /**
+   * Connection pool handle
+   */
   readonly "dmConnectionPool::HPool": DmPointer<"dmConnectionPool::ConnectionPool">;
+  /**
+   * Creation parameters
+   */
   readonly "dmConnectionPool::Params": Readonly<{ m_MaxConnections: number; m_MaxKeepAlive: number }>;
+  /**
+   * Result enumeration.
+   */
   readonly "dmConnectionPool::Result": DmConnectionPoolResult;
+  /**
+   * encryption algorithm enumeration
+   */
   readonly "dmCrypt::Algorithm": DmCryptAlgorithm;
+  /**
+   * result enumeration
+   */
   readonly "dmCrypt::Result": DmCryptResult;
+  /**
+   * Opaque pointer that holds info about a message type.
+   */
   readonly "dmDDF::Descriptor": DmNativeType<"dmDDF::Descriptor">;
+  /**
+   * Result enumeration.
+   */
   readonly "dmDDF::Result": DmDDFResult;
   readonly "dmDoubleLinkedList::List": Readonly<{ m_Head: DmSdkTypes["dmDoubleLinkedList::ListNode"]; m_Tail: DmSdkTypes["dmDoubleLinkedList::ListNode"] }>;
   readonly "dmDoubleLinkedList::ListNode": Readonly<{ m_Prev: DmPointer<"dmDoubleLinkedList::ListNode">; m_Next: DmPointer<"dmDoubleLinkedList::ListNode"> }>;
+  /**
+   * Engine exit code.
+   */
   readonly "dmExtension::AppExitCode": DmExtensionAppExitCode;
+  /**
+   * The extension app parameters
+   */
   readonly "dmExtension::AppParams": DmSdkTypes["ExtensionAppParams"];
+  /**
+   * Extra callback type for RegisterCallback function.
+   */
   readonly "dmExtension::CallbackType": DmExtensionCallbackType;
+  /**
+   * Extension event
+   */
   readonly "dmExtension::Event": DmSdkTypes["ExtensionEvent"];
+  /**
+   * Event id enumeration.
+   * EVENT_ID_ICONIFYAPP and EVENT_ID_DEICONIFYAPP only available on
+   */
   readonly "dmExtension::EventID": DmExtensionEventID;
+  /**
+   * Callback typedef for functions passed to RegisterCallback().
+   */
   readonly "dmExtension::FCallback": DmSdkTypes["FExtensionCallback"];
+  /**
+   * The global parameters avalable when registering and unregistering an extension
+   */
   readonly "dmExtension::Params": DmSdkTypes["ExtensionParams"];
+  /**
+   * Result enumeration.
+   */
   readonly "dmExtension::Result": DmExtensionResult;
+  /**
+   * Poll events
+   */
   readonly "dmFileDescriptor::PollEvent": DmFileDescriptorPollEvent;
   readonly "dmFileDescriptor::PollFD": Readonly<{ m_Fd: number; m_Events: number; m_REvents: number }>;
+  /**
+   * Poller
+   */
   readonly "dmFileDescriptor::Poller": Readonly<{ m_Pollfds: DmNativeType<"dmArray<PollFD>"> }>;
   readonly dmFixedMemAllocator: Readonly<{ m_Allocator: DmSdkTypes["dmAllocator"]; m_Memory: DmPointer<"uint8_t">; m_Used: number; m_Capacity: number }>;
   readonly "dmGameObject::CollectionHandle": DmNativeType<"dmGameObject::CollectionHandle">;
+  /**
+   * Component add to update function. Only components called with this function should be included in the update passes.
+   */
   readonly "dmGameObject::ComponentAddToUpdate": DmNativeCallback;
+  /**
+   * Parameters to ComponentAddToUpdate callback.
+   */
   readonly "dmGameObject::ComponentAddToUpdateParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t"> }>;
+  /**
+   * Component create function. Should allocate all necessary resources for the component.
+   * The game object instance is guaranteed to have its id, scene hierarchy and transform data updated when this is called.
+   */
   readonly "dmGameObject::ComponentCreate": DmNativeCallback;
+  /**
+   * Parameters to ComponentCreate callback.
+   */
   readonly "dmGameObject::ComponentCreateParams": Readonly<{ m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_Position: DmSdkTypes["dmVMath::Point3"]; m_Rotation: DmSdkTypes["dmVMath::Quat"]; m_Scale: DmSdkTypes["dmVMath::Vector3"]; m_PropertySet: DmSdkTypes["dmGameObject::PropertySet"]; m_Resource: DmPointer<"void">; m_World: DmPointer<"void">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t">; m_ComponentIndex: number }>;
+  /**
+   * Component world destroy function
+   */
   readonly "dmGameObject::ComponentDeleteWorld": DmNativeCallback;
+  /**
+   * Parameters to ComponentDeleteWorld callback.
+   */
   readonly "dmGameObject::ComponentDeleteWorldParams": Readonly<{ m_Context: DmPointer<"void">; m_World: DmPointer<"void"> }>;
+  /**
+   * Component destroy function. Should deallocate all necessary resources.
+   */
   readonly "dmGameObject::ComponentDestroy": DmNativeCallback;
+  /**
+   * Parameters to ComponentDestroy callback.
+   */
   readonly "dmGameObject::ComponentDestroyParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t"> }>;
+  /**
+   * Component finalize function. Should clean up as it is called when the component is disabled.
+   */
   readonly "dmGameObject::ComponentFinal": DmNativeCallback;
+  /**
+   * Parameters to ComponentFinal callback.
+   */
   readonly "dmGameObject::ComponentFinalParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t"> }>;
+  /**
+   * A simple way to get the component instance from the user_data (which was set during creation)
+   */
   readonly "dmGameObject::ComponentGet": DmNativeCallback;
+  /**
+   * Parameters to ComponentGet callback.
+   */
   readonly "dmGameObject::ComponentGetParams": Readonly<{ m_World: DmSdkTypes["dmGameObject::HComponentWorld"]; m_UserData: DmSdkTypes["dmGameObject::HComponentInternal"] }>;
+  /**
+   * Callback for retrieving a property value of the component.
+   */
   readonly "dmGameObject::ComponentGetProperty": DmNativeCallback;
+  /**
+   * Parameters to ComponentGetProperty callback.
+   */
   readonly "dmGameObject::ComponentGetPropertyParams": Readonly<{ m_Context: DmPointer<"void">; m_World: DmPointer<"void">; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_PropertyId: DmSdkTypes["dmhash_t"]; m_UserData: DmPointer<"uintptr_t">; m_Options: DmSdkTypes["dmGameObject::HPropertyOptions"] }>;
+  /**
+   * Component init function. Should set the components initial state as it is called when the component is enabled.
+   */
   readonly "dmGameObject::ComponentInit": DmNativeCallback;
+  /**
+   * Parameters to ComponentInit callback.
+   */
   readonly "dmGameObject::ComponentInitParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t"> }>;
+  /**
+   * Callback when iterating over the properties for a component.
+   * @remarks This function is only available/used in debug builds, when traversing the scene graph in order to export
+   * this data for external tools (e.g. external testing libraries like Poco)
+   */
   readonly "dmGameObject::ComponentIterProperties": DmNativeCallback;
+  /**
+   * Component world create function
+   */
   readonly "dmGameObject::ComponentNewWorld": DmNativeCallback;
+  /**
+   * Parameters to ComponentNewWorld callback.
+   */
   readonly "dmGameObject::ComponentNewWorldParams": Readonly<{ m_Context: DmPointer<"void">; m_ComponentIndex: number; m_MaxInstances: number; m_World: DmPointer<"void">; m_MaxComponentInstances: number }>;
+  /**
+   * Component on-input function. Called when input is sent to this component
+   */
   readonly "dmGameObject::ComponentOnInput": DmNativeCallback;
+  /**
+   * Parameters to ComponentOnInput callback.
+   */
   readonly "dmGameObject::ComponentOnInputParams": Readonly<{ m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_InputAction: DmReadonlyPointer<"dmGameObject::InputAction">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t"> }>;
+  /**
+   * Component on-message function. Called when message is sent to this component
+   */
   readonly "dmGameObject::ComponentOnMessage": DmNativeCallback;
+  /**
+   * Parameters to ComponentOnMessage callback.
+   */
   readonly "dmGameObject::ComponentOnMessageParams": Readonly<{ m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t">; m_Message: DmPointer<"dmMessage::Message"> }>;
+  /**
+   * Called when the resource the component is based on has been reloaded.
+   */
   readonly "dmGameObject::ComponentOnReload": DmNativeCallback;
+  /**
+   * Parameters to ComponentOnReload callback.
+   */
   readonly "dmGameObject::ComponentOnReloadParams": Readonly<{ m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_Resource: DmPointer<"void">; m_World: DmPointer<"void">; m_Context: DmPointer<"void">; m_UserData: DmPointer<"uintptr_t"> }>;
+  /**
+   * Set a property set for the component.
+   */
   readonly "dmGameObject::ComponentSetProperties": DmNativeCallback;
+  /**
+   * Parameters to ComponentSetProperties callback.
+   */
   readonly "dmGameObject::ComponentSetPropertiesParams": Readonly<{ m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_PropertySet: DmSdkTypes["dmGameObject::PropertySet"]; m_UserData: DmPointer<"uintptr_t"> }>;
+  /**
+   * Callback for setting a property value of the component.
+   */
   readonly "dmGameObject::ComponentSetProperty": DmNativeCallback;
+  /**
+   * Parameters to ComponentSetProperty callback.
+   */
   readonly "dmGameObject::ComponentSetPropertyParams": Readonly<{ m_Context: DmPointer<"void">; m_World: DmPointer<"void">; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_PropertyId: DmSdkTypes["dmhash_t"]; m_UserData: DmPointer<"uintptr_t">; m_Value: DmSdkTypes["dmGameObject::PropertyVar"]; m_Options: DmSdkTypes["dmGameObject::HPropertyOptions"] }>;
   readonly "dmGameObject::ComponentType": DmNativeType<"dmGameObject::ComponentType">;
+  /**
+   * Context used when registering a new component type
+   */
   readonly "dmGameObject::ComponentTypeCreateCtx": Readonly<{ m_Impl: DmPointer<"dmGameObject::ComponentTypeCreateCtxImpl">; m_Config: DmSdkTypes["dmConfigFile::HConfig"]; m_Factory: DmSdkTypes["dmResource::HFactory"]; m_Register: DmSdkTypes["dmGameObject::HRegister"]; m_Script: DmSdkTypes["dmScript::HContext"]; m_Contexts: DmNativeType<"dmHashTable64<void *>"> }>;
   readonly "dmGameObject::ComponentTypeCreateCtxImpl": DmNativeType<"dmGameObject::ComponentTypeCreateCtxImpl">;
   readonly "dmGameObject::ComponentTypeCreateFunction": DmNativeCallback;
   readonly "dmGameObject::ComponentTypeDescriptor": DmNativeType<"dmGameObject::ComponentTypeDescriptor">;
   readonly "dmGameObject::ComponentTypeDestroyFunction": DmNativeCallback;
+  /**
+   * Component post update function. The component state should never be modified in this function.
+   */
   readonly "dmGameObject::ComponentsPostUpdate": DmNativeCallback;
+  /**
+   * Parameters for ComponentsPostUpdate callback.
+   */
   readonly "dmGameObject::ComponentsPostUpdateParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void"> }>;
+  /**
+   * Component render function.
+   */
   readonly "dmGameObject::ComponentsRender": DmNativeCallback;
+  /**
+   * Parameters to ComponentsRender callback.
+   */
   readonly "dmGameObject::ComponentsRenderParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_World: DmPointer<"void">; m_Context: DmPointer<"void"> }>;
+  /**
+   * Component update function. Updates all component of this type for all game objects
+   */
   readonly "dmGameObject::ComponentsUpdate": DmNativeCallback;
+  /**
+   * Parameters to ComponentsUpdate callback.
+   */
   readonly "dmGameObject::ComponentsUpdateParams": Readonly<{ m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_UpdateContext: DmReadonlyPointer<"dmGameObject::UpdateContext">; m_World: DmPointer<"void">; m_Context: DmPointer<"void"> }>;
+  /**
+   * Parameters to ComponentsUpdate callback.
+   */
   readonly "dmGameObject::ComponentsUpdateResult": Readonly<{ m_TransformsUpdated: boolean }>;
+  /**
+   * Create result enum.
+   */
   readonly "dmGameObject::CreateResult": DmGameObjectCreateResult;
   readonly "dmGameObject::FIteratorChildren": DmNativeCallback;
   readonly "dmGameObject::FIteratorNext": DmNativeCallback;
@@ -14924,51 +15601,158 @@ export interface DmSdkTypes {
   readonly "dmGameObject::FIteratorPropertiesNext": DmNativeCallback;
   readonly "dmGameObject::FreeUserDataCallback": DmNativeCallback;
   readonly "dmGameObject::GetPropertyCallback": DmNativeCallback;
+  /**
+   * Gameobject collection handle
+   */
   readonly "dmGameObject::HCollection": DmPointer<"dmGameObject::CollectionHandle">;
   readonly "dmGameObject::HCollectionDesc": DmPointer<"void">;
+  /**
+   * Opaque handle to component instance
+   */
   readonly "dmGameObject::HComponent": DmPointer<"void">;
+  /**
+   * Opaque handle to internal representation of a component instance
+   */
   readonly "dmGameObject::HComponentInternal": bigint;
+  /**
+   * Component type handle. It holds the life time functions for a type.
+   */
   readonly "dmGameObject::HComponentType": DmPointer<"dmGameObject::ComponentType">;
+  /**
+   * Opaque handle to a component world
+   */
   readonly "dmGameObject::HComponentWorld": DmPointer<"void">;
+  /**
+   * Gameobject instance handle
+   */
   readonly "dmGameObject::HInstance": DmPointer<"dmGameObject::Instance">;
+  /**
+   * Gameobject properties handle
+   */
   readonly "dmGameObject::HProperties": DmPointer<"dmGameObject::Properties">;
+  /**
+   * Handle to a list of properties (gameobject_props.h)
+   */
   readonly "dmGameObject::HPropertyContainer": DmPointer<"dmGameObject::PropertyContainer">;
+  /**
+   * Opaque handle to a property container builder
+   */
   readonly "dmGameObject::HPropertyContainerBuilder": DmPointer<"dmGameObject::PropertyContainerBuilder">;
+  /**
+   * Handle to a list of property options
+   */
   readonly "dmGameObject::HPropertyOptions": DmPointer<"dmGameObject::PropertyOptions">;
+  /**
+   * Gameobject prototype handle
+   */
   readonly "dmGameObject::HPrototype": DmPointer<"dmGameObject::Prototype">;
+  /**
+   * Collection register.
+   */
   readonly "dmGameObject::HRegister": DmPointer<"dmGameObject::Register">;
+  /**
+   * Script handle
+   */
   readonly "dmGameObject::HScript": DmPointer<"dmGameObject::Script">;
+  /**
+   * Script instance handle
+   */
   readonly "dmGameObject::HScriptInstance": DmPointer<"dmGameObject::ScriptInstance">;
+  /**
+   * Container of input related information.
+   */
   readonly "dmGameObject::InputAction": Readonly<{ m_GamepadGuid: DmSdkTypes["dmHID::GamepadGuid"]; m_ActionId: DmSdkTypes["dmhash_t"]; m_Value: number; m_X: number; m_Y: number; m_DX: number; m_DY: number; m_ScreenX: number; m_ScreenY: number; m_ScreenDX: number; m_ScreenDY: number; m_AccX: number; m_AccY: number; m_AccZ: number; m_Count: number; m_GamepadIndex: number; m_UserID: number; m_IsGamepad: number; m_GamepadUnknown: number; m_GamepadDisconnected: number; m_GamepadConnected: number; m_HasGamepadPacket: number; m_HasText: number; m_Pressed: number; m_Released: number; m_Repeated: number; m_PositionSet: number; m_AccelerationSet: number; m_Consumed: number }>;
+  /**
+   * Input result enum
+   */
   readonly "dmGameObject::InputResult": DmGameObjectInputResult;
   readonly "dmGameObject::Instance": DmNativeType<"dmGameObject::Instance">;
+  /**
+   * Used for mapping instance ids from a collection definition to newly spawned instances
+   */
   readonly "dmGameObject::InstanceIdMap": DmNativeType<"dmHashTable<dmhash_t, dmhash_t>">;
+  /**
+   * Contains property containers for game objects to be spawned
+   */
   readonly "dmGameObject::InstancePropertyContainers": DmNativeType<"dmHashTable<dmhash_t, HPropertyContainer>">;
   readonly "dmGameObject::LuaScript": Readonly<{ m_LuaModule: DmPointer<"dmLuaDDF::LuaModule"> }>;
+  /**
+   * Playback type enum
+   */
   readonly "dmGameObject::Playback": DmGameObjectPlayback;
   readonly "dmGameObject::Properties": DmNativeType<"dmGameObject::Properties">;
   readonly "dmGameObject::PropertyContainer": DmNativeType<"dmGameObject::PropertyContainer">;
   readonly "dmGameObject::PropertyContainerBuilder": DmNativeType<"dmGameObject::PropertyContainerBuilder">;
+  /**
+   * PropertyContainerBuilderParams
+   * Helper struct to create a property container builder.
+   * It is required to fill out how many items of each type that is wanted.
+   */
   readonly "dmGameObject::PropertyContainerBuilderParams": Readonly<{ m_NumberCount: number; m_HashCount: number; m_URLStringCount: number; m_URLStringSize: number; m_URLCount: number; m_Vector3Count: number; m_Vector4Count: number; m_QuatCount: number; m_BoolCount: number; m_TextCount: number; m_TextSize: number }>;
+  /**
+   * Description of a property.
+   * If the property is externally mutable, m_ValuePtr points to the value and its length is m_ElementCount.
+   * m_Variant always reflects the value.
+   */
   readonly "dmGameObject::PropertyDesc": Readonly<{ m_ElementIds: DmSpan<DmSdkTypes["dmhash_t"]>; m_Variant: DmSdkTypes["dmGameObject::PropertyVar"]; m_ValuePtr: DmPointer<"float">; m_ReadOnly: number; m_ValueType: number; m_ArrayLength: number }>;
   readonly "dmGameObject::PropertyOptions": DmNativeType<"dmGameObject::PropertyOptions">;
+  /**
+   * Property result.
+   */
   readonly "dmGameObject::PropertyResult": DmGameObjectPropertyResult;
   readonly "dmGameObject::PropertySet": Readonly<{ m_GetPropertyCallback: DmSdkTypes["dmGameObject::GetPropertyCallback"]; m_FreeUserDataCallback: DmSdkTypes["dmGameObject::FreeUserDataCallback"]; m_UserData: bigint }>;
+  /**
+   * Property types.
+   */
   readonly "dmGameObject::PropertyType": DmGameObjectPropertyType;
+  /**
+   * Type of property value
+   */
   readonly "dmGameObject::PropertyValueType": DmGameObjectPropertyValueType;
+  /**
+   * Property variant that holds the data for a variable
+   */
   readonly "dmGameObject::PropertyVar": Readonly<{ m_Type: DmSdkTypes["dmGameObject::PropertyType"] }>;
   readonly "dmGameObject::Prototype": DmNativeType<"dmGameObject::Prototype">;
   readonly "dmGameObject::Register": DmNativeType<"dmGameObject::Register">;
+  /**
+   * Result enumeration.
+   */
   readonly "dmGameObject::Result": DmGameObjectResult;
+  /**
+   * Opaque struct that holds info about the current node
+   * @remarks The concept of a `scene node` only exists here, for the purposes of inspecting the scene graph for inspection and testing purposes only.
+   */
   readonly "dmGameObject::SceneNode": Readonly<{ m_Node: bigint; m_Type: DmSdkTypes["dmGameObject::SceneNodeType"]; m_Collection: DmSdkTypes["dmGameObject::HCollection"]; m_Instance: DmSdkTypes["dmGameObject::HInstance"]; m_ComponentType: DmPointer<"dmGameObject::ComponentType">; m_ComponentPrototype: DmPointer<"void">; m_ComponentWorld: DmPointer<"void">; m_Component: bigint }>;
+  /**
+   * Opaque struct that holds info about the current position when traversing the scene
+   */
   readonly "dmGameObject::SceneNodeIterator": Readonly<{ m_Node: DmSdkTypes["dmGameObject::SceneNode"]; m_Parent: DmSdkTypes["dmGameObject::SceneNode"]; m_NextChild: DmSdkTypes["dmGameObject::SceneNode"]; m_FnIterateNext: DmSdkTypes["dmGameObject::FIteratorNext"] }>;
+  /**
+   * Struct that holds info about the current position when traversing the scene
+   */
   readonly "dmGameObject::SceneNodeProperty": Readonly<{ m_NameHash: DmSdkTypes["dmhash_t"]; m_Type: DmSdkTypes["dmGameObject::SceneNodePropertyType"]; m_Value: DmNativeType<"union (unnamed union at upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1306:9)"> }>;
+  /**
+   * Holds the property
+   */
   readonly "dmGameObject::SceneNodePropertyIterator": Readonly<{ m_Property: DmSdkTypes["dmGameObject::SceneNodeProperty"]; m_Node: DmPointer<"dmGameObject::SceneNode">; m_Next: bigint; m_FnIterateNext: DmSdkTypes["dmGameObject::FIteratorPropertiesNext"] }>;
+  /**
+   * scene node property types
+   */
   readonly "dmGameObject::SceneNodePropertyType": DmGameObjectSceneNodePropertyType;
+  /**
+   * scene node types
+   */
   readonly "dmGameObject::SceneNodeType": DmGameObjectSceneNodeType;
   readonly "dmGameObject::Script": DmNativeType<"dmGameObject::Script">;
   readonly "dmGameObject::ScriptInstance": DmNativeType<"dmGameObject::ScriptInstance">;
+  /**
+   * Update context
+   */
   readonly "dmGameObject::UpdateContext": Readonly<{ m_TimeScale: number; m_DT: number; m_AccumFrameTime: number; m_FixedUpdateFrequency: number }>;
+  /**
+   * Update result enum.
+   */
   readonly "dmGameObject::UpdateResult": DmGameObjectUpdateResult;
   readonly "dmGameSystem::AnimationSetResource": Readonly<{ m_AnimationSet: DmPointer<"dmRigDDF::AnimationSet"> }>;
   readonly "dmGameSystem::BufferResource": Readonly<{ m_BufferDDF: DmPointer<"dmBufferDDF::BufferDesc">; m_Buffer: DmSdkTypes["dmBuffer::HBuffer"]; m_NameHash: DmSdkTypes["dmhash_t"]; m_ElementCount: number; m_Stride: number; m_Version: number }>;
@@ -14982,8 +15766,17 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::CollisionObjectResource": Readonly<{ m_DDF: DmPointer<"dmPhysicsDDF::CollisionObjectDesc">; m_ShapeTranslation: DmPointer<"dmVMath::Vector3">; m_ShapeRotation: DmPointer<"dmVMath::Quat">; m_ShapeTypes: DmPointer<"dmPhysicsDDF::CollisionShape::Type">; m_Mask: DmSpan<bigint>; m_Group: bigint; m_ShapeCount: number }>;
   readonly "dmGameSystem::CollisionObjectResourceBox2D": Readonly<{ m_BaseResource: DmSdkTypes["dmGameSystem::CollisionObjectResource"]; m_TileGridResource: DmPointer<"dmGameSystem::TileGridResource">; m_Shapes2D: DmPointer<"dmPhysics::HCollisionShape2D">; m_TileGridShapeCount: number; m_TileGrid: number }>;
   readonly "dmGameSystem::CollisionObjectResourceBullet3D": Readonly<{ m_BaseResource: DmSdkTypes["dmGameSystem::CollisionObjectResource"]; m_Shapes3D: DmPointer<"dmPhysics::HCollisionShape3D"> }>;
+  /**
+   * CompCollectionFactoryStatus
+   */
   readonly "dmGameSystem::CompCollectionFactoryStatus": DmGameSystemCompCollectionFactoryStatus;
+  /**
+   * CompFactoryStatus
+   */
   readonly "dmGameSystem::CompFactoryStatus": DmGameSystemCompFactoryStatus;
+  /**
+   * Used in GetMaterialConstant to resolve a render constant's value
+   */
   readonly "dmGameSystem::CompGetConstantCallback": DmNativeCallback;
   readonly "dmGameSystem::CompGuiNodeCloneFn": DmNativeCallback;
   readonly "dmGameSystem::CompGuiNodeContext": DmNativeType<"dmGameSystem::CompGuiNodeContext">;
@@ -14992,23 +15785,49 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::CompGuiNodeGetVerticesFn": DmNativeCallback;
   readonly "dmGameSystem::CompGuiNodeSetNodeDescFn": DmNativeCallback;
   readonly "dmGameSystem::CompGuiNodeType": DmNativeType<"dmGameSystem::CompGuiNodeType">;
+  /**
+   * Gui component node type create/destroy context
+   */
   readonly "dmGameSystem::CompGuiNodeTypeCtx": DmNativeType<"dmGameSystem::CompGuiNodeTypeCtx">;
   readonly "dmGameSystem::CompGuiNodeTypeDescriptor": Readonly<{ m_Next: DmPointer<"dmGameSystem::CompGuiNodeTypeDescriptor">; m_CreateFn: DmSdkTypes["dmGameSystem::GuiNodeTypeCreateFunction"]; m_DestroyFn: DmSdkTypes["dmGameSystem::GuiNodeTypeDestroyFunction"]; m_NodeType: DmPointer<"dmGameSystem::CompGuiNodeType">; m_Name: DmReadonlyPointer<"char">; m_NameHash: number }>;
   readonly "dmGameSystem::CompGuiNodeUpdateFn": DmNativeCallback;
+  /**
+   * GUI component property getter function
+   */
   readonly "dmGameSystem::CompGuiPropertyGetterFn": DmNativeCallback;
+  /**
+   * GUI component property setter function
+   */
   readonly "dmGameSystem::CompGuiPropertySetterFn": DmNativeCallback;
   readonly "dmGameSystem::CompRenderConstants": DmNativeType<"dmGameSystem::CompRenderConstants">;
+  /**
+   * Used in SetMaterialConstant to set a render constant's value
+   */
   readonly "dmGameSystem::CompSetConstantCallback": DmNativeCallback;
   readonly "dmGameSystem::ConvexShapeResourceBox2D": Readonly<{ m_Shape2D: DmSdkTypes["dmPhysics::HCollisionShape2D"] }>;
   readonly "dmGameSystem::ConvexShapeResourceBullet3D": Readonly<{ m_Shape3D: DmSdkTypes["dmPhysics::HCollisionShape3D"] }>;
   readonly "dmGameSystem::CustomNodeCtx": Readonly<{ m_NodeData: DmPointer<"void">; m_TypeContext: DmPointer<"void">; m_Scene: DmSdkTypes["dmGui::HScene"]; m_Node: DmSdkTypes["dmGui::HNode"]; m_Type: number }>;
+  /**
+   * This struct is an opaque handle managed by the engine. Use
+   * GetDDFData()  to access the underlying protobuf message for read-only
+   * inspection.
+   */
   readonly "dmGameSystem::DataResource": DmNativeType<"dmGameSystem::DataResource">;
+  /**
+   * Model animation callback function.
+   */
   readonly "dmGameSystem::FModelAnimationCallback": DmNativeCallback;
   readonly "dmGameSystem::FPrewarmTextCallback": DmNativeCallback;
   readonly "dmGameSystem::FactoryComponent": DmNativeType<"dmGameSystem::FactoryComponent">;
   readonly "dmGameSystem::FactoryResource": Readonly<{ m_Prototype: DmSdkTypes["dmGameObject::HPrototype"]; m_PrototypePath: DmReadonlyPointer<"char">; m_LoadDynamically: number; m_DynamicPrototype: number }>;
   readonly "dmGameSystem::FactoryWorld": DmNativeType<"dmGameSystem::FactoryWorld">;
+  /**
+   * Used to retrieve the information of a font.
+   */
   readonly "dmGameSystem::FontInfo": Readonly<{ m_Size: number; m_ShadowX: number; m_ShadowY: number; m_ShadowBlur: number; m_ShadowAlpha: number; m_Alpha: number; m_OutlineAlpha: number; m_OutlineWidth: number; m_OutputFormat: DmSdkTypes["dmRenderDDF::FontTextureFormat"]; m_RenderMode: DmSdkTypes["dmRenderDDF::FontRenderMode"] }>;
+  /**
+   * Handle to font resource
+   */
   readonly "dmGameSystem::FontResource": DmNativeType<"dmGameSystem::FontResource">;
   readonly "dmGameSystem::GuiNodeTypeCreateFunction": DmNativeCallback;
   readonly "dmGameSystem::GuiNodeTypeDestroyFunction": DmNativeCallback;
@@ -15019,6 +15838,9 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::HCollectionFactoryWorld": DmPointer<"dmGameSystem::CollectionFactoryWorld">;
   readonly "dmGameSystem::HCollectionProxyComponent": DmPointer<"dmGameSystem::CollectionProxyComponent">;
   readonly "dmGameSystem::HCollectionProxyWorld": DmPointer<"dmGameSystem::CollectionProxyWorld">;
+  /**
+   * Render constants handle
+   */
   readonly "dmGameSystem::HComponentRenderConstants": DmPointer<"dmGameSystem::CompRenderConstants">;
   readonly "dmGameSystem::HFactoryComponent": DmPointer<"dmGameSystem::FactoryComponent">;
   readonly "dmGameSystem::HFactoryResource": DmPointer<"dmGameSystem::FactoryResource">;
@@ -15026,6 +15848,9 @@ export interface DmSdkTypes {
   readonly "dmGameSystem::HModelComponent": DmPointer<"dmGameSystem::ModelComponent">;
   readonly "dmGameSystem::HModelWorld": DmPointer<"dmGameSystem::ModelWorld">;
   readonly "dmGameSystem::LabelResource": Readonly<{ m_DDF: DmPointer<"dmGameSystemDDF::LabelDesc">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Font: DmPointer<"dmGameSystem::FontResource"> }>;
+  /**
+   * This struct is an opaque handle managed by the engine.
+   */
   readonly "dmGameSystem::LightResource": DmNativeType<"dmGameSystem::LightResource">;
   readonly "dmGameSystem::MaterialInfo": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_Material: DmPointer<"dmGameSystem::MaterialResource">; m_Attributes: DmPointer<"dmGraphics::VertexAttribute">; m_AttributeCount: number; m_Textures: DmPointer<"dmGameSystem::MaterialTextureInfo">; m_TexturesCount: number; m_SortOrder: number }>;
   readonly "dmGameSystem::MaterialResource": Readonly<{ m_Material: DmSdkTypes["dmRender::HMaterial"]; m_Textures: DmSpan<DmPointer<"dmGameSystem::TextureResource">>; m_TextureResourcePaths: DmSpan<DmSdkTypes["dmhash_t"]>; m_SamplerNames: DmSpan<DmSdkTypes["dmhash_t"]>; m_NumTextures: number }>;
@@ -15065,48 +15890,167 @@ export interface DmSdkTypes {
   readonly "dmGameSystemDDF::TileGrid::BlendMode": DmGameSystemDDFTileGridBlendMode;
   readonly "dmGamesysDDF::CameraDesc": Readonly<{ m_AspectRatio: number; m_Fov: number; m_NearZ: number; m_FarZ: number; m_AutoAspectRatio: number; m_OrthographicProjection: number; m_OrthographicZoom: number; m_OrthographicMode: DmSdkTypes["dmGamesysDDF::OrthoZoomMode"] }>;
   readonly "dmGamesysDDF::OrthoZoomMode": DmGamesysDDFOrthoZoomMode;
+  /**
+   * Graphics adapter family.
+   * Identifies the type of graphics backend used by the rendering system
+   */
   readonly "dmGraphics::AdapterFamily": DmGraphicsAdapterFamily;
+  /**
+   * Defines how an attachment should be treated at the start and end of a render pass
+   */
   readonly "dmGraphics::AttachmentOp": DmGraphicsAttachmentOp;
+  /**
+   * Blend equation operations.
+   * Determines how source and destination colors are combined during blending
+   */
   readonly "dmGraphics::BlendEquation": DmGraphicsBlendEquation;
+  /**
+   * Blend factors for color blending.
+   * Defines how source and destination colors are combined
+   */
   readonly "dmGraphics::BlendFactor": DmGraphicsBlendFactor;
   readonly "dmGraphics::BufferAccess": DmGraphicsBufferAccess;
   readonly "dmGraphics::BufferType": DmGraphicsBufferType;
+  /**
+   * Buffer usage hints.
+   * Indicates how often the data in a buffer will be updated.
+   * Helps the driver optimize memory placement
+   */
   readonly "dmGraphics::BufferUsage": DmGraphicsBufferUsage;
+  /**
+   * Depth and alpha test comparison functions.
+   * Defines how incoming values are compared against stored ones
+   */
   readonly "dmGraphics::CompareFunc": DmGraphicsCompareFunc;
+  /**
+   * Graphics context creation parameters.
+   * Defines the configuration for creating a new graphics context.
+   * This structure is used when initializing the graphics system and
+   * specifies window association, job system context, texture filtering defaults,
+   * resolution, memory limits, and various debugging/validation options.
+   */
   readonly "dmGraphics::ContextParams": Readonly<{ m_Window: DmSdkTypes["HWindow"]; m_JobContext: DmSdkTypes["HJobContext"]; m_DefaultTextureMinFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_DefaultTextureMagFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_Width: number; m_Height: number; m_GraphicsMemorySize: number; m_SwapInterval: number; m_GraphicsApiVersionMajorHint: number; m_GraphicsApiVersionMinorHint: number; m_VerifyGraphicsCalls: number; m_PrintDeviceInfo: number; m_UseValidationLayers: number }>;
   readonly "dmGraphics::CoordinateSpace": DmGraphicsCoordinateSpace;
   readonly "dmGraphics::FaceType": DmGraphicsFaceType;
   readonly "dmGraphics::FaceWinding": DmGraphicsFaceWinding;
   readonly "dmGraphics::GraphicsContext": DmNativeType<"dmGraphics::GraphicsContext">;
+  /**
+   * Context handle
+   */
   readonly "dmGraphics::HContext": DmPointer<"dmGraphics::GraphicsContext">;
+  /**
+   * Index buffer handle
+   */
   readonly "dmGraphics::HIndexBuffer": bigint;
+  /**
+   * Program handle
+   */
   readonly "dmGraphics::HProgram": bigint;
+  /**
+   * Rendertarget handle
+   */
   readonly "dmGraphics::HRenderTarget": bigint;
+  /**
+   * Storage buffer handle
+   */
   readonly "dmGraphics::HStorageBuffer": bigint;
+  /**
+   * Texture handle
+   */
   readonly "dmGraphics::HTexture": bigint;
+  /**
+   * Uniform location handle
+   */
   readonly "dmGraphics::HUniformLocation": bigint;
+  /**
+   * Vertex buffer handle
+   */
   readonly "dmGraphics::HVertexBuffer": bigint;
+  /**
+   * Vertex declaration handle
+   */
   readonly "dmGraphics::HVertexDeclaration": DmPointer<"dmGraphics::VertexDeclaration">;
+  /**
+   * Vertex stream declaration handle
+   */
   readonly "dmGraphics::HVertexStreamDeclaration": DmPointer<"dmGraphics::VertexStreamDeclaration">;
+  /**
+   * Function's call result code
+   */
   readonly "dmGraphics::HandleResult": DmGraphicsHandleResult;
+  /**
+   * Index buffer element types.
+   * Defines the integer size used for vertex indices
+   */
   readonly "dmGraphics::IndexBufferFormat": DmGraphicsIndexBufferFormat;
   readonly "dmGraphics::PipelineState": Readonly<{ m_WriteColorMask: bigint; m_WriteDepth: bigint; m_PrimtiveType: bigint; m_DepthTestEnabled: bigint; m_DepthTestFunc: bigint; m_StencilEnabled: bigint; m_ScissorTestEnabled: bigint; m_StencilFrontOpFail: bigint; m_StencilFrontOpPass: bigint; m_StencilFrontOpDepthFail: bigint; m_StencilFrontTestFunc: bigint; m_StencilBackOpFail: bigint; m_StencilBackOpPass: bigint; m_StencilBackOpDepthFail: bigint; m_StencilBackTestFunc: bigint; m_StencilWriteMask: bigint; m_StencilCompareMask: bigint; m_StencilReference: bigint; m_BlendEnabled: bigint; m_BlendSrcFactor: bigint; m_BlendDstFactor: bigint; m_BlendSrcFactorAlpha: bigint; m_BlendDstFactorAlpha: bigint; m_BlendEquationColor: bigint; m_BlendEquationAlpha: bigint; m_CullFaceEnabled: bigint; m_CullFaceType: bigint; m_FaceWinding: bigint; m_PolygonOffsetFillEnabled: bigint }>;
+  /**
+   * Primitive drawing modes.
+   * Defines how vertex data is assembled into primitives
+   */
   readonly "dmGraphics::PrimitiveType": DmGraphicsPrimitiveType;
+  /**
+   * Attachment points for render targets
+   */
   readonly "dmGraphics::RenderTargetAttachment": DmGraphicsRenderTargetAttachment;
   readonly "dmGraphics::RenderTargetCreationParams": Readonly<{ m_ColorBufferCreationParams: DmSpan<DmSdkTypes["dmGraphics::TextureCreationParams"]>; m_DepthBufferCreationParams: DmSdkTypes["dmGraphics::TextureCreationParams"]; m_StencilBufferCreationParams: DmSdkTypes["dmGraphics::TextureCreationParams"]; m_ColorBufferParams: DmSpan<DmSdkTypes["dmGraphics::TextureParams"]>; m_DepthBufferParams: DmSdkTypes["dmGraphics::TextureParams"]; m_StencilBufferParams: DmSdkTypes["dmGraphics::TextureParams"]; m_SampleCount: number; m_ColorBufferLoadOps: DmSpan<DmSdkTypes["dmGraphics::AttachmentOp"]>; m_ColorBufferStoreOps: DmSpan<DmSdkTypes["dmGraphics::AttachmentOp"]>; m_ColorBufferClearValue: DmSpan<DmSpan<number>>; m_DepthTexture: number; m_StencilTexture: number }>;
+  /**
+   * Function called when a texture has been set asynchronously
+   */
   readonly "dmGraphics::SetTextureAsyncCallback": DmNativeCallback;
   readonly "dmGraphics::ShaderDesc": Readonly<{ m_Shaders: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:685:9)">; m_Reflection: DmSdkTypes["dmGraphics::ShaderDesc::ShaderReflection"]; m_HlslRootSignature: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:694:9)">; m_VertexProgram: DmReadonlyPointer<"char">; m_FragmentProgram: DmReadonlyPointer<"char">; m_ComputeProgram: DmReadonlyPointer<"char"> }>;
   readonly "dmGraphics::ShaderDesc::ShaderReflection": Readonly<{ m_UniformBuffers: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:566:13)">; m_StorageBuffers: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:574:13)">; m_Textures: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:582:13)">; m_Inputs: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:590:13)">; m_Outputs: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:598:13)">; m_Types: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/graphics/graphics_ddf.h:606:13)"> }>;
   readonly "dmGraphics::State": DmGraphicsState;
+  /**
+   * Stencil test actions.
+   * Defines what happens to a stencil buffer value depending on the outcome of the stencil/depth test.
+   */
   readonly "dmGraphics::StencilOp": DmGraphicsStencilOp;
+  /**
+   * Texture creation parameters.
+   * Defines how a texture is created, initialized, and used.
+   * This structure is typically passed when allocating GPU memory
+   * for a new texture. It controls dimensions, format, layering,
+   * mipmapping, and intended usage.
+   */
   readonly "dmGraphics::TextureCreationParams": Readonly<{ m_Type: DmSdkTypes["dmGraphics::TextureType"]; m_Width: number; m_Height: number; m_Depth: number; m_OriginalWidth: number; m_OriginalHeight: number; m_OriginalDepth: number; m_LayerCount: number; m_MipMapCount: number; m_UsageHintBits: number }>;
+  /**
+   * Texture filtering modes.
+   * Controls how texels are sampled when scaling or rotating textures
+   */
   readonly "dmGraphics::TextureFilter": DmGraphicsTextureFilter;
+  /**
+   * Pixel formats supported by textures.
+   * Includes uncompressed, compressed, and floating-point variants
+   */
   readonly "dmGraphics::TextureFormat": DmGraphicsTextureFormat;
   readonly "dmGraphics::TextureImage::TextureFormat": DmGraphicsTextureImageTextureFormat;
+  /**
+   * Texture update parameters.
+   * Defines a block of pixel data to be uploaded to a texture,
+   * along with filtering, wrapping, and sub-region update options.
+   * Typically used when calling texture upload/update functions
+   * after a texture object has been created with  TextureCreationParams
+   */
   readonly "dmGraphics::TextureParams": Readonly<{ m_Data: DmReadonlyPointer<"void">; m_DataSize: number; m_Format: DmSdkTypes["dmGraphics::TextureFormat"]; m_MinFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_MagFilter: DmSdkTypes["dmGraphics::TextureFilter"]; m_UWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_VWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_WWrap: DmSdkTypes["dmGraphics::TextureWrap"]; m_X: number; m_Y: number; m_Z: number; m_Slice: number; m_Width: number; m_Height: number; m_Depth: number; m_LayerCount: number; m_MipMap: number; m_SubUpdate: number }>;
+  /**
+   * Texture data upload status flags
+   */
   readonly "dmGraphics::TextureStatusFlags": DmGraphicsTextureStatusFlags;
+  /**
+   * Texture types
+   */
   readonly "dmGraphics::TextureType": DmGraphicsTextureType;
+  /**
+   * Texture addressing/wrapping modes.
+   * Controls behavior when texture coordinates fall outside the [0,1] range
+   */
   readonly "dmGraphics::TextureWrap": DmGraphicsTextureWrap;
+  /**
+   * Data type.
+   * Represents scalar, vector, matrix, image, or sampler types used
+   * for vertex attributes, uniforms, and shader interface definitions
+   */
   readonly "dmGraphics::Type": DmGraphicsType;
   readonly "dmGraphics::VertexAttribute": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_NameHash: bigint; m_SemanticType: DmSdkTypes["dmGraphics::VertexAttribute::SemanticType"]; m_ElementCount: number; m_Normalize: boolean; m_DataType: DmSdkTypes["dmGraphics::VertexAttribute::DataType"]; m_CoordinateSpace: DmSdkTypes["dmGraphics::CoordinateSpace"]; m_StepFunction: DmSdkTypes["dmGraphics::VertexStepFunction"]; m_VectorType: DmSdkTypes["dmGraphics::VertexAttribute::VectorType"]; m_Values: DmNativeType<"union (unnamed union at upstream/defold-sdk/include/graphics/graphics_ddf.h:165:9)">; m_ValuesOneOfIndex: number }>;
   readonly "dmGraphics::VertexAttribute::DataType": DmGraphicsVertexAttributeDataType;
@@ -15121,13 +16065,38 @@ export interface DmSdkTypes {
   readonly "dmGui::AdjustMode": DmGuiAdjustMode;
   readonly "dmGui::AdjustReference": DmGuiAdjustReference;
   readonly "dmGui::Context": DmNativeType<"dmGui::Context">;
+  /**
+   * Custom GUI node property value.
+   * String values returned from GetNodeCustomProperty() are owned by the GUI
+   * scene and must not be freed by the caller. String values passed to
+   * SetNodeCustomProperty() are copied.
+   */
   readonly "dmGui::CustomProperty": Readonly<{ m_Type: DmSdkTypes["dmGui::CustomPropertyType"]; m_Number: number; m_Boolean: boolean; m_Hash: DmSdkTypes["dmhash_t"]; m_String: DmReadonlyPointer<"char">; m_Vector3: DmSdkTypes["dmVMath::Vector3"]; m_Vector4: DmSdkTypes["dmVMath::Vector4"]; m_Quat: DmSdkTypes["dmVMath::Quat"] }>;
   readonly "dmGui::CustomPropertyType": DmGuiCustomPropertyType;
+  /**
+   * A handle to a gui context
+   */
   readonly "dmGui::HContext": DmPointer<"dmGui::Context">;
+  /**
+   * A handle to a gui node
+   */
   readonly "dmGui::HNode": number;
+  /**
+   * A handle to a gui scene
+   */
   readonly "dmGui::HScene": DmPointer<"dmGui::Scene">;
+  /**
+   * A handle to a gui script
+   */
   readonly "dmGui::HScript": DmPointer<"dmGui::Script">;
+  /**
+   * A handle to a texture source, which can be a pointer to a resource,
+   * a dmGraphics::HTexture or a dynamic texture created from a gui script.
+   */
   readonly "dmGui::HTextureSource": bigint;
+  /**
+   * This enum denotes what kind of texture type the m_Texture pointer is referencing.
+   */
   readonly "dmGui::NodeTextureType": DmGuiNodeTextureType;
   readonly "dmGui::NodeType": DmGuiNodeType;
   readonly "dmGui::Playback": DmGuiPlayback;
@@ -15149,62 +16118,175 @@ export interface DmSdkTypes {
   readonly "dmGuiDDF::SceneDesc::AdjustReference": DmGuiDDFSceneDescAdjustReference;
   readonly "dmHID::Context": DmNativeType<"dmHID::Context">;
   readonly "dmHID::Gamepad": DmNativeType<"dmHID::Gamepad">;
+  /**
+   * Parsed SDL-style gamepad guid.
+   * The struct matches SDL's 16-byte guid layout and can be converted back to
+   * the 32-character hexadecimal guid string with dmHID::FormatGamepadGuid().
+   */
   readonly "dmHID::GamepadGuid": Readonly<{ m_Bus: number; m_CRC16: number; m_Vendor: number; m_Product: number; m_Version: number; m_DriverSignature: number; m_DriverData: number }>;
+  /**
+   * Contains the current state of a gamepad
+   * @remarks implementation is internal, use the proper accessor functions
+   */
   readonly "dmHID::GamepadPacket": Readonly<{ m_Axis: DmSpan<number>; m_Buttons: DmSpan<number>; m_Hat: DmSpan<number>; m_GamepadDisconnected: number; m_GamepadConnected: number }>;
+  /**
+   * HID context handle
+   */
   readonly "dmHID::HContext": DmPointer<"dmHID::Context">;
+  /**
+   * gamepad context handle
+   */
   readonly "dmHID::HGamepad": DmPointer<"dmHID::Gamepad">;
+  /**
+   * keyboard context handle
+   */
   readonly "dmHID::HKeyboard": DmPointer<"dmHID::Keyboard">;
+  /**
+   * mouse context handle
+   */
   readonly "dmHID::HMouse": DmPointer<"dmHID::Mouse">;
+  /**
+   * touch device context handle
+   */
   readonly "dmHID::HTouchDevice": DmPointer<"dmHID::TouchDevice">;
+  /**
+   * keyboard key enumeration
+   */
   readonly "dmHID::Key": DmHIDKey;
   readonly "dmHID::Keyboard": DmNativeType<"dmHID::Keyboard">;
+  /**
+   * Contains the current state of a keyboard
+   * @remarks implementation is internal, use the proper accessor functions
+   */
   readonly "dmHID::KeyboardPacket": Readonly<{ m_Keys: DmSpan<number> }>;
   readonly "dmHID::Mouse": DmNativeType<"dmHID::Mouse">;
+  /**
+   * mouse button enumeration
+   */
   readonly "dmHID::MouseButton": DmHIDMouseButton;
+  /**
+   * Contains the current state of a mouse
+   * @remarks implementation is internal, use the proper accessor functions
+   */
   readonly "dmHID::MousePacket": Readonly<{ m_PositionX: number; m_PositionY: number; m_Wheel: number; m_Buttons: DmSpan<number> }>;
+  /**
+   * touch phase enumeration
+   * @remarks By convention the enumeration corresponds to the iOS values
+   */
   readonly "dmHID::Phase": DmHIDPhase;
+  /**
+   * Data for a single touch, e.g. finger
+   */
   readonly "dmHID::Touch": Readonly<{ m_TapCount: number; m_X: number; m_Y: number; m_ScreenX: number; m_ScreenY: number; m_DX: number; m_DY: number; m_ScreenDX: number; m_ScreenDY: number; m_Id: number; m_Phase: DmSdkTypes["dmHID::Phase"] }>;
   readonly "dmHID::TouchDevice": DmNativeType<"dmHID::TouchDevice">;
+  /**
+   * Specialized hash table with  uint16_t  as keys
+   */
   readonly "dmHashTable16::dmHashTable16": DmNativeType<"dmHashTable16::dmHashTable16">;
+  /**
+   * Specialized hash table with  uint32_t  as keys
+   */
   readonly "dmHashTable32::dmHashTable32": DmNativeType<"dmHashTable32::dmHashTable32">;
+  /**
+   * Specialized hash table with  uint64_t  as keys
+   */
   readonly "dmHashTable64::dmHashTable64": DmNativeType<"dmHashTable64::dmHashTable64">;
+  /**
+   * Hashtable with chaining for collision resolution, memcpy-copy semantics (POD types) and 32-bit indicies instead of pointers. (NUMA-friendly)
+   * @remarks The key type needs to support == and % operators
+   */
   readonly "dmHashTable::dmHashTable": DmNativeType<"dmHashTable::dmHashTable">;
   readonly "dmHashTable::dmHashTable::Entry": Readonly<{ m_Key: DmSdkTypes["dmHashTable::dmHashTable::key_t"]; m_Value: DmSdkTypes["dmHashTable::dmHashTable::value_t"]; m_Next: number }>;
+  /**
+   * Iterator to the key/value pairs of a hash table
+   */
   readonly "dmHashTable::dmHashTable::Iterator": Readonly<{ m_Table: DmReference<DmNativeType<"dmHashTable<KEY, T>">>; m_EntryPtr: DmPointer<"dmHashTable::dmHashTable::Entry">; m_Entry: number; m_BucketIndex: number }>;
   readonly "dmHashTable::dmHashTable::STATE_FLAGS": DmHashTableDmHashTableSTATEFLAGS;
   readonly "dmHashTable::dmHashTable::key_t": DmNativeType<"KEY">;
   readonly "dmHashTable::dmHashTable::value_t": DmNativeType<"T">;
+  /**
+   * Header parse result enumeration.
+   */
   readonly "dmHttpClient::ParseResult": DmHttpClientParseResult;
   readonly "dmImage::CompressionType": DmImageCompressionType;
   readonly "dmImage::HImage": DmPointer<"dmImage::Image">;
   readonly "dmImage::Image": DmNativeType<"dmImage::Image">;
+  /**
+   * result enumeration
+   */
   readonly "dmImage::Result": DmImageResult;
+  /**
+   * type enumeration
+   */
   readonly "dmImage::Type": DmImageType;
+  /**
+   * Frustum
+   * @remarks The plane normals point inwards
+   */
   readonly "dmIntersection::Frustum": Readonly<{ m_Planes: DmSpan<DmSdkTypes["dmIntersection::Plane"]>; m_NumPlanes: number }>;
+  /**
+   * Plane struct (currently an alias for dmVMath::Vector4)
+   */
   readonly "dmIntersection::Plane": DmSdkTypes["dmVMath::Vector4"];
+  /**
+   * Parameters for dmLogInitialize().
+   */
   readonly "dmLog::LogParams": DmSdkTypes["LogParams"];
   readonly "dmLuaDDF::LuaModule": Readonly<{ m_Source: DmSdkTypes["dmLuaDDF::LuaSource"]; m_Modules: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/lua_ddf.h:36:9)">; m_Resources: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/lua_ddf.h:43:9)">; m_Properties: DmSdkTypes["dmPropertiesDDF::PropertyDeclarations"]; m_PropertyResources: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/lua_ddf.h:51:9)"> }>;
   readonly "dmLuaDDF::LuaSource": Readonly<{ m_Script: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:33:9)">; m_Filename: DmReadonlyPointer<"char">; m_Bytecode: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:42:9)">; m_Delta: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:50:9)">; m_Bytecode32: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:58:9)">; m_Bytecode64: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/script/lua_source_ddf.h:66:9)"> }>;
+  /**
+   * Aligned memory allocation result
+   */
   readonly "dmMemory::Result": DmMemoryResult;
   readonly "dmMeshDDF::MeshDesc": Readonly<{ m_Material: DmReadonlyPointer<"char">; m_Vertices: DmReadonlyPointer<"char">; m_Textures: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/mesh_ddf.h:42:9)">; m_PrimitiveType: DmSdkTypes["dmMeshDDF::MeshDesc::PrimitiveType"]; m_PositionStream: DmReadonlyPointer<"char">; m_NormalStream: DmReadonlyPointer<"char"> }>;
   readonly "dmMeshDDF::MeshDesc::PrimitiveType": DmMeshDDFMeshDescPrimitiveType;
+  /**
+   * Socket handle
+   */
   readonly "dmMessage::HSocket": DmSdkTypes["dmhash_t"];
   readonly "dmMessage::Message": Readonly<{ m_Sender: DmSdkTypes["dmMessage::URL"]; m_Receiver: DmSdkTypes["dmMessage::URL"]; m_Id: DmSdkTypes["dmhash_t"]; m_UserData1: bigint; m_UserData2: bigint; m_Descriptor: bigint; m_DataSize: number; m_Next: DmPointer<"dmMessage::Message">; m_DestroyCallback: DmSdkTypes["dmMessage::MessageDestroyCallback"]; m_Data: DmSpan<number> }>;
   readonly "dmMessage::MessageDestroyCallback": DmNativeCallback;
+  /**
+   * Result enum
+   */
   readonly "dmMessage::Result": DmMessageResult;
+  /**
+   * Helper struct for parsing a string of the form "socket:path#fragment"
+   * @remarks The sizes do not include the null character. There is no null character since the dmMessage::ParseURL is non destructive.
+   */
   readonly "dmMessage::StringURL": Readonly<{ m_Socket: DmReadonlyPointer<"char">; m_SocketSize: number; m_Path: DmReadonlyPointer<"char">; m_PathSize: number; m_Fragment: DmReadonlyPointer<"char">; m_FragmentSize: number }>;
+  /**
+   * URL specifying a sender/receiver of messages
+   * @remarks Currently has a hard limit of 32 bytes
+   * This struct is a part of the save file APi (see script_table.cpp)
+   */
   readonly "dmMessage::URL": Readonly<{ m_Socket: DmSdkTypes["dmMessage::HSocket"]; _reserved: DmSdkTypes["dmhash_t"]; m_Path: DmSdkTypes["dmhash_t"]; m_Fragment: DmSdkTypes["dmhash_t"] }>;
   readonly "dmModelDDF::Model": DmNativeType<"dmModelDDF::Model">;
+  /**
+   * typedef     struct     Mutex  *     HMutex  ;
+   */
   readonly "dmMutex::HMutex": DmPointer<"dmMutex::Mutex">;
   readonly "dmMutex::Mutex": DmNativeType<"dmMutex::Mutex">;
   readonly "dmMutex::OptionalScopedMutexLock": Readonly<{ m_Mutex: DmSdkTypes["dmMutex::HMutex"] }>;
   readonly "dmMutex::ScopedLock": Readonly<{ m_Mutex: DmSdkTypes["dmMutex::HMutex"] }>;
+  /**
+   * Object pool data-structure with the following properties
+   * - Mapping from logical index to physical index
+   * - Logical index does not changes
+   * - Allocated objects are contiguously laid out in memory
+   * Loop of m_Objects [0..Size()-1] times to iterate all objects
+   * - Internal physical order is not preserved and a direct consequence of the
+   * contiguous property
+   */
   readonly "dmObjectPool::dmObjectPool": DmNativeType<"dmObjectPool::dmObjectPool">;
   readonly "dmObjectPool::dmObjectPool::Entry": Readonly<{ m_Physical: number; m_Next: number }>;
   readonly "dmParticle::HPrototype": DmPointer<"dmParticle::Prototype">;
   readonly "dmParticle::Prototype": DmNativeType<"dmParticle::Prototype">;
   readonly "dmPhysics::HCollisionShape2D": DmPointer<"void">;
   readonly "dmPhysics::HCollisionShape3D": DmPointer<"void">;
+  /**
+   * 2D Hull set handle
+   */
   readonly "dmPhysics::HHullSet2D": DmPointer<"void">;
   readonly "dmPhysicsDDF::CollisionObjectDesc": Readonly<{ m_CollisionShape: DmReadonlyPointer<"char">; m_Type: DmSdkTypes["dmPhysicsDDF::CollisionObjectType"]; m_Mass: number; m_Friction: number; m_Restitution: number; m_Group: DmReadonlyPointer<"char">; m_Mask: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gamesys/physics_ddf.h:151:9)">; m_EmbeddedCollisionShape: DmSdkTypes["dmPhysicsDDF::CollisionShape"]; m_LinearDamping: number; m_AngularDamping: number; m_LockedRotation: boolean; m_Bullet: boolean; m_EventCollision: boolean; m_EventContact: boolean; m_EventTrigger: boolean }>;
   readonly "dmPhysicsDDF::CollisionObjectType": DmPhysicsDDFCollisionObjectType;
@@ -15213,31 +16295,92 @@ export interface DmSdkTypes {
   readonly "dmPropertiesDDF::PropertyDeclarations": Readonly<{ m_NumberEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:53:9)">; m_HashEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:61:9)">; m_UrlEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:69:9)">; m_Vector3Entries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:77:9)">; m_Vector4Entries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:85:9)">; m_QuatEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:93:9)">; m_BoolEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:101:9)">; m_TextEntries: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:109:9)">; m_FloatValues: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:117:9)">; m_HashValues: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:125:9)">; m_StringValues: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/gameobject/properties_ddf.h:133:9)"> }>;
   readonly "dmRender::Constant": DmNativeType<"dmRender::Constant">;
   readonly "dmRender::FontMap": DmNativeType<"dmRender::FontMap">;
+  /**
+   * Frustum options used when setting up a draw call
+   */
   readonly "dmRender::FrustumOptions": Readonly<{ m_Matrix: DmSdkTypes["dmVMath::Matrix4"]; m_NumPlanes: DmSdkTypes["dmRender::FrustumPlanes"] }>;
+  /**
+   * Frustum planes to use in a frustum
+   */
   readonly "dmRender::FrustumPlanes": DmRenderFrustumPlanes;
+  /**
+   * Shader constant handle
+   */
   readonly "dmRender::HConstant": DmPointer<"dmRender::Constant">;
   readonly "dmRender::HFontMap": DmPointer<"dmRender::FontMap">;
+  /**
+   * Light prototype handle. Used to create light instances.
+   */
   readonly "dmRender::HLightPrototype": number;
+  /**
+   * Material instance handle
+   */
   readonly "dmRender::HMaterial": DmPointer<"dmRender::Material">;
+  /**
+   * Shader constant buffer handle. Holds name and values for a constant.
+   */
   readonly "dmRender::HNamedConstantBuffer": DmPointer<"dmRender::NamedConstantBuffer">;
+  /**
+   * The render context
+   */
   readonly "dmRender::HRenderContext": DmPointer<"dmRender::RenderContext">;
+  /**
+   * Render dispatch function handle.
+   */
   readonly "dmRender::HRenderListDispatch": number;
+  /**
+   * Sampler handle
+   */
   readonly "dmRender::HSampler": DmPointer<"dmRender::Sampler">;
   readonly "dmRender::IterateNamedConstantsFn": DmNativeCallback;
   readonly "dmRender::Material": DmNativeType<"dmRender::Material">;
   readonly "dmRender::NamedConstantBuffer": DmNativeType<"dmRender::NamedConstantBuffer">;
   readonly "dmRender::RenderContext": DmNativeType<"dmRender::RenderContext">;
+  /**
+   * Render dispatch function callback.
+   */
   readonly "dmRender::RenderListDispatchFn": DmNativeCallback;
+  /**
+   * Render dispatch function callback.
+   */
   readonly "dmRender::RenderListDispatchParams": Readonly<{ m_Context: DmSdkTypes["dmRender::HRenderContext"]; m_UserData: DmPointer<"void">; m_Operation: DmSdkTypes["dmRender::RenderListOperation"]; m_Buf: DmPointer<"dmRender::RenderListEntry">; m_Begin: DmPointer<"uint32_t">; m_End: DmPointer<"uint32_t"> }>;
+  /**
+   * Represents a renderable object (e.g. a single sprite)
+   * The renderer will (each frame) collect all entries with the current material tag, then batch these objects together.
+   * Batching is done based on the batch key and Z value (or order for GUI nodes)
+   * The caller will also register a callback function where the batched entries will be returned.
+   * Each callback then represents a draw call, and will register a RenderObject
+   */
   readonly "dmRender::RenderListEntry": Readonly<{ m_WorldPosition: DmSdkTypes["dmVMath::Point3"]; m_UserData: bigint; m_Order: number; m_BatchKey: number; m_TagListKey: number; m_FrustumHash: number; m_MinorOrder: number; m_MajorOrder: number; m_Dispatch: number; m_Visibility: number }>;
+  /**
+   * Render batch callback states
+   */
   readonly "dmRender::RenderListOperation": DmRenderRenderListOperation;
+  /**
+   * Render visibility function callback.
+   */
   readonly "dmRender::RenderListVisibilityFn": DmNativeCallback;
+  /**
+   * Visibility dispatch function callback.
+   */
   readonly "dmRender::RenderListVisibilityParams": Readonly<{ m_Frustum: DmReadonlyPointer<"dmIntersection::Frustum">; m_UserData: DmPointer<"void">; m_Entries: DmPointer<"dmRender::RenderListEntry">; m_NumEntries: number }>;
+  /**
+   * Render objects represent an actual draw call
+   */
   readonly "dmRender::RenderObject": Readonly<{ m_ConstantBuffer: DmSdkTypes["dmRender::HNamedConstantBuffer"]; m_WorldTransform: DmSdkTypes["dmVMath::Matrix4"]; m_TextureTransform: DmSdkTypes["dmVMath::Matrix4"]; m_IndexBuffer: DmSdkTypes["dmGraphics::HIndexBuffer"]; m_Material: DmSdkTypes["dmRender::HMaterial"]; m_Textures: DmSpan<DmSdkTypes["dmGraphics::HTexture"]>; m_PrimitiveType: DmSdkTypes["dmGraphics::PrimitiveType"]; m_IndexType: DmSdkTypes["dmGraphics::Type"]; m_SourceBlendFactor: DmSdkTypes["dmGraphics::BlendFactor"]; m_DestinationBlendFactor: DmSdkTypes["dmGraphics::BlendFactor"]; m_SourceBlendFactorAlpha: DmSdkTypes["dmGraphics::BlendFactor"]; m_DestinationBlendFactorAlpha: DmSdkTypes["dmGraphics::BlendFactor"]; m_BlendEquationColor: DmSdkTypes["dmGraphics::BlendEquation"]; m_BlendEquationAlpha: DmSdkTypes["dmGraphics::BlendEquation"]; m_FaceWinding: DmSdkTypes["dmGraphics::FaceWinding"]; m_StencilTestParams: DmSdkTypes["dmRender::StencilTestParams"]; m_VertexBufferOffsets: DmSpan<number>; m_VertexStart: number; m_VertexCount: number; m_InstanceCount: number; m_SetBlendFactors: number; m_SetStencilTest: number; m_SetFaceWinding: number }>;
+  /**
+   * Render order
+   */
   readonly "dmRender::RenderOrder": DmRenderRenderOrder;
   readonly "dmRender::Result": DmRenderResult;
   readonly "dmRender::Sampler": DmNativeType<"dmRender::Sampler">;
+  /**
+   * Struct holding stencil operation setup
+   */
   readonly "dmRender::StencilTestParams": Readonly<{ m_Front: DmNativeType<"(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:147:9)">; m_Back: DmNativeType<"(unnamed struct at upstream/defold/engine/render/src/dmsdk/render/render.h:155:9)">; m_Ref: number; m_RefMask: number; m_BufferMask: number; m_ColorBufferMask: number; m_ClearBuffer: number; m_SeparateFaceStates: number }>;
+  /**
+   * Visibility status
+   */
   readonly "dmRender::Visibility": DmRenderVisibility;
   readonly "dmRenderDDF::FontRenderMode": DmRenderDDFFontRenderMode;
   readonly "dmRenderDDF::FontTextureFormat": DmRenderDDFFontTextureFormat;
@@ -15248,15 +16391,43 @@ export interface DmSdkTypes {
   readonly "dmRenderDDF::MaterialDesc::Sampler": Readonly<{ m_Name: DmReadonlyPointer<"char">; m_WrapU: DmSdkTypes["dmRenderDDF::MaterialDesc::WrapMode"]; m_WrapV: DmSdkTypes["dmRenderDDF::MaterialDesc::WrapMode"]; m_FilterMin: DmSdkTypes["dmRenderDDF::MaterialDesc::FilterModeMin"]; m_FilterMag: DmSdkTypes["dmRenderDDF::MaterialDesc::FilterModeMag"]; m_MaxAnisotropy: number; m_NameIndirections: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/render/material_ddf.h:134:13)">; m_Texture: DmReadonlyPointer<"char">; m_NameHash: bigint; m_WrapW: DmSdkTypes["dmRenderDDF::MaterialDesc::WrapMode"] }>;
   readonly "dmRenderDDF::MaterialDesc::VertexSpace": DmRenderDDFMaterialDescVertexSpace;
   readonly "dmRenderDDF::MaterialDesc::WrapMode": DmRenderDDFMaterialDescWrapMode;
+  /**
+   * Decrypts a file
+   * @remarks Currently, the function requires the final resource to be the same length (or less)
+   */
   readonly "dmResource::FDecryptResource": DmNativeCallback;
+  /**
+   * Function called when a resource has been reloaded.
+   */
   readonly "dmResource::FReloadedCallback": DmSdkTypes["FResourceReloadedCallback"];
+  /**
+   * @deprecated Deprecated in favor of ResourceTypeSetCreateFn
+   */
   readonly "dmResource::FResourceCreate": DmNativeCallback;
+  /**
+   * @deprecated Deprecated in favor of ResourceTypeSetDestroyFn
+   */
   readonly "dmResource::FResourceDestroy": DmNativeCallback;
+  /**
+   * @deprecated Deprecated in favor of ResourceTypeSetPostCreateFn
+   */
   readonly "dmResource::FResourcePostCreate": DmNativeCallback;
+  /**
+   * @deprecated Deprecated in favor of ResourceTypeSetPreloadFn
+   */
   readonly "dmResource::FResourcePreload": DmNativeCallback;
+  /**
+   * @deprecated Deprecated in favor of ResourceTypeSetRecreateFn
+   */
   readonly "dmResource::FResourceRecreate": DmNativeCallback;
+  /**
+   * Holds information about a currently loaded resource.
+   */
   readonly "dmResource::HDescriptor": DmSdkTypes["HResourceDescriptor"];
   readonly "dmResource::HFactory": DmPointer<"ResourceFactory">;
+  /**
+   * Holds information about preloading resources
+   */
   readonly "dmResource::HPreloadHintInfo": DmSdkTypes["HResourcePreloadHintInfo"];
   readonly "dmResource::HResourceType": DmSdkTypes["HResourceType"];
   readonly "dmResource::ResourceCreateParams": DmSdkTypes["ResourceCreateParams"];
@@ -15266,6 +16437,9 @@ export interface DmSdkTypes {
   readonly "dmResource::ResourcePreloadParams": DmSdkTypes["ResourcePreloadParams"];
   readonly "dmResource::ResourceRecreateParams": DmSdkTypes["ResourceRecreateParams"];
   readonly "dmResource::ResourceReloadedParams": DmSdkTypes["ResourceReloadedParams"];
+  /**
+   * ResourceResult
+   */
   readonly "dmResource::Result": DmResourceResult;
   readonly "dmRig::BonePose": Readonly<{ m_Local: DmSdkTypes["dmTransform::Transform"]; m_World: DmSdkTypes["dmTransform::Transform"]; m_Final: DmSdkTypes["dmVMath::Matrix4"]; m_ParentIndex: number; m_Length: number }>;
   readonly "dmRig::HRigContext": DmPointer<"dmRig::RigContext">;
@@ -15293,53 +16467,185 @@ export interface DmSdkTypes {
   readonly "dmRigDDF::PrimitiveType": DmRigDDFPrimitiveType;
   readonly "dmRigDDF::RigScene": DmNativeType<"dmRigDDF::RigScene">;
   readonly "dmRigDDF::Skeleton": Readonly<{ m_Bones: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:301:9)">; m_Iks: DmNativeType<"(unnamed struct at upstream/defold-sdk/include/rig/rig_ddf.h:309:9)"> }>;
+  /**
+   * Result enumeration.
+   */
   readonly "dmSSLSocket::Result": DmSSLSocketResult;
   readonly "dmSSLSocket::SSLSocket": DmNativeType<"dmSSLSocket::SSLSocket">;
   readonly "dmSSLSocket::Socket": DmPointer<"dmSSLSocket::SSLSocket">;
   readonly "dmScript::Context": DmNativeType<"dmScript::Context">;
+  /**
+   * The script context
+   */
   readonly "dmScript::HContext": DmPointer<"dmScript::Context">;
+  /**
+   * Buffer ownership.
+   * - OWNER_C   - m_Buffer is owned by C side, should not be destroyed when GCed
+   * - OWNER_LUA - m_Buffer is owned by Lua side, will be destroyed when GCed
+   * - OWNER_RES - m_Buffer not used, has a reference to a buffer resource instead. m_BufferRes is owned by C side, will be released when GCed
+   */
   readonly "dmScript::LuaBufferOwnership": DmScriptLuaBufferOwnership;
+  /**
+   * callback info struct that will hold the relevant info needed to make a callback into Lua
+   */
   readonly "dmScript::LuaCallbackInfo": DmNativeType<"dmScript::LuaCallbackInfo">;
+  /**
+   * Holds info about the buffer and who owns it.
+   */
   readonly "dmScript::LuaHBuffer": Readonly<{ m_BufferResPathHash: DmSdkTypes["dmhash_t"]; m_BufferResVersion: number }>;
   readonly "dmScript::LuaStackCheck": Readonly<{ m_L: DmPointer<"lua_State">; m_Filename: DmReadonlyPointer<"char">; m_Linenumber: number; m_Top: number; m_Diff: number }>;
+  /**
+   * Network addresses were previously represented as an uint32_t, but in
+   * order to support IPv6 the internal representation was changed to a struct.
+   */
   readonly "dmSocket::Address": Readonly<{ m_family: DmSdkTypes["dmSocket::Domain"]; m_address: DmSpan<number> }>;
+  /**
+   * Domain type
+   */
   readonly "dmSocket::Domain": DmSocketDomain;
   readonly "dmSocket::Flags": DmSocketFlags;
+  /**
+   * Network protocol
+   */
   readonly "dmSocket::Protocol": DmSocketProtocol;
+  /**
+   * Socket result
+   */
   readonly "dmSocket::Result": DmSocketResult;
+  /**
+   * Selector
+   */
   readonly "dmSocket::Selector": Readonly<{ m_Poller: DmSdkTypes["dmFileDescriptor::Poller"] }>;
+  /**
+   * Selector kind
+   */
   readonly "dmSocket::SelectorKind": DmSocketSelectorKind;
+  /**
+   * Socket shutdown type
+   */
   readonly "dmSocket::ShutdownType": DmSocketShutdownType;
+  /**
+   * Socket type definition
+   * @remarks Use dmSocket::INVALID_SOCKET_HANDLE instead of zero for unset values. This is an exception
+   * from all other handles.
+   */
   readonly "dmSocket::Socket": number;
+  /**
+   * Socket type
+   */
   readonly "dmSocket::Type": DmSocketType;
   readonly "dmSound::Result": DmSoundResult;
   readonly "dmSpinlock::ScopedLock": Readonly<{ m_Spinlock: DmReference<DmSdkTypes["dmSpinlock::Spinlock"]> }>;
+  /**
+   * struct     Spinlock  ;
+   */
   readonly "dmSpinlock::Spinlock": DmNativeType<"dmSpinlock::Spinlock">;
   readonly "dmStructDDF::Value": Readonly<{ m_Kind: DmNativeType<"union (unnamed union at upstream/defold-sdk/include/ddf/ddf_struct.h:65:9)">; m_KindOneOfIndex: number }>;
+  /**
+   * Result code. Similar to standard posix result codes
+   */
   readonly "dmSys::Result": DmSysResult;
+  /**
+   * Status info for a file or directory
+   */
   readonly "dmSys::StatInfo": Readonly<{ m_Size: bigint; m_Mode: number; m_AccessTime: number; m_ModifiedTime: number }>;
   readonly "dmThread::Thread": bigint;
   readonly "dmThread::ThreadStart": DmNativeCallback;
   readonly "dmThread::TlsKey": bigint;
+  /**
+   * Transform with non-uniform (3-component) scale.
+   * Transform applied as:
+   * T(p) = translate(rotate(scale(p))) = p'
+   * The scale is non-rotated to avoid shearing in the transform.
+   * Two transforms are applied as:
+   * T1(T2(p)) = t1(r1(t2(r2(s1(s2(p)))))) = p'
+   * This means that the transform is not associative:
+   * T1(T2(p)) != (T1*T2)(P)
+   */
   readonly "dmTransform::Transform": DmNativeType<"dmTransform::Transform">;
+  /**
+   * URI parsing result parts
+   */
   readonly "dmURI::Parts": Readonly<{ m_Scheme: DmSpan<number>; m_Location: DmSpan<number>; m_Hostname: DmSpan<number>; m_Port: number; m_Path: DmSpan<number> }>;
+  /**
+   * URI parsing result
+   */
   readonly "dmURI::Result": DmURIResult;
+  /**
+   * A 3x3 matrix
+   * @remarks 16 byte aligned
+   * Implemented as 3 x Vector3
+   * Column major
+   * Currently scalar implementation is used on most platforms
+   */
   readonly "dmVMath::Matrix3": DmSdkTypes["Vectormath::Aos::Matrix3"];
+  /**
+   * A 4x4 matrix
+   * @remarks 16 byte aligned
+   * Implemented as 4 x Vector4
+   * Column major
+   * Currently scalar implementation is used on most platforms
+   */
   readonly "dmVMath::Matrix4": DmSdkTypes["Vectormath::Aos::Matrix4"];
+  /**
+   * A 3-tuple (with 4-th element always set to 1)
+   * @remarks 16 byte aligned
+   * Always size of 4 float32
+   * Currently scalar implementation is used on most platforms
+   */
   readonly "dmVMath::Point3": DmSdkTypes["Vectormath::Aos::Point3"];
+  /**
+   * A 4-tuple representing a rotation rotation. The  xyz  represents the axis, and the  w  represents the angle.
+   * @remarks 16 byte aligned
+   * Always size of 4 float32
+   * Currently scalar implementation is used on most platforms
+   */
   readonly "dmVMath::Quat": DmSdkTypes["Vectormath::Aos::Quat"];
+  /**
+   * A 3-tuple (with 4-th element always set to 0)
+   * @remarks 16 byte aligned
+   * Always size of 4 float32
+   * Currently scalar implementation is used on most platforms
+   */
   readonly "dmVMath::Vector3": DmSdkTypes["Vectormath::Aos::Vector3"];
+  /**
+   * A 4-tuple
+   * @remarks 16 byte aligned
+   * Always size of 4 float32
+   * Currently scalar implementation is used on most platforms
+   */
   readonly "dmVMath::Vector4": DmSdkTypes["Vectormath::Aos::Vector4"];
+  /**
+   * web server handle
+   */
   readonly "dmWebServer::HServer": DmPointer<"dmWebServer::Server">;
+  /**
+   * Web request handler callback
+   */
   readonly "dmWebServer::Handler": DmNativeCallback;
+  /**
+   * handler parameters
+   */
   readonly "dmWebServer::HandlerParams": Readonly<{ m_Userdata: DmPointer<"void">; m_Handler: DmSdkTypes["dmWebServer::Handler"] }>;
+  /**
+   * web server request
+   */
   readonly "dmWebServer::Request": Readonly<{ m_Method: DmReadonlyPointer<"char">; m_Resource: DmReadonlyPointer<"char">; m_ContentLength: number; m_Internal: DmPointer<"void"> }>;
+  /**
+   * result codes
+   */
   readonly "dmWebServer::Result": DmWebServerResult;
   readonly "dmWebServer::Server": DmNativeType<"dmWebServer::Server">;
   readonly dmWindow: DmNativeType<"dmWindow">;
+  /**
+   * typedef     uint64_t     dmhash_t
+   */
   readonly dmhash_t: bigint;
   readonly id: DmPointer<"void">;
   readonly int16_t: number;
+  /**
+   * 32 bit signed integer atomic
+   */
   readonly int32_atomic_t: number;
   readonly int32_t: number;
   readonly int64_t: bigint;
@@ -15365,29 +16671,76 @@ export interface DmSdkTypes {
 }
 
 export interface DmSdkVariables {
+  /**
+   * It defines the minimum size of the description blob being registered.
+   */
   readonly ConfigFileExtensionDescBufferSize: number;
+  /**
+   * Used when registering new extensions
+   */
   readonly ExtensionDescBufferSize: number;
   readonly PROFILER_MAX_NUM_PROPERTIES: number;
+  /**
+   * Index constant to mark a a property as invalid
+   */
   readonly PROFILE_PROPERTY_INVALID_IDX: number;
+  /**
+   * Resource type creator desc byte size declaration.
+   * The registered description data passeed to ResourceRegisterTypeCreatorDesc must be of at least this size.
+   */
   readonly ResourceTypeCreatorDescBufferSize: number;
+  /**
+   * Store pointers as offset from base address. Needed when serializing entire messages (copy). Value (1 &lt;&lt; 0)
+   */
   readonly "dmDDF::OPTION_OFFSET_POINTERS": number;
+  /**
+   * Value for an invalid instance index, this must be the same as defined in gamesys_ddf.proto for Create#index.
+   */
   readonly "dmGameObject::INVALID_INSTANCE_POOL_INDEX": number;
   readonly "dmGameObject::s_ComponentTypeDescBufferSize": number;
+  /**
+   * The edge value of an sdf glyph bitmap
+   */
   readonly "dmGameSystem::SDF_EDGE_VALUE": number;
   readonly "dmGameSystem::s_CompGuiNodeTypeDescBufferSize": number;
+  /**
+   * Invalid program handle constant.
+   * Used to represent an uninitialized or invalid program handle.
+   * Can be used to check if program creation or loading failed.
+   */
   readonly "dmGraphics::INVALID_PROGRAM_HANDLE": DmSdkTypes["dmGraphics::HProgram"];
+  /**
+   * Invalid stream offset
+   */
   readonly "dmGraphics::INVALID_STREAM_OFFSET": number;
+  /**
+   * Invalid uniform location constant.
+   * Used to represent an uninitialized or invalid uniform location.
+   * Can be used to check if uniform location lookup failed.
+   */
   readonly "dmGraphics::INVALID_UNIFORM_LOCATION": DmSdkTypes["dmGraphics::HUniformLocation"];
+  /**
+   * Max buffer color attachments
+   */
   readonly "dmGraphics::MAX_BUFFER_COLOR_ATTACHMENTS": number;
+  /**
+   * Invalid node handle
+   */
   readonly "dmGui::INVALID_HANDLE": DmSdkTypes["dmGui::HNode"];
   readonly "dmHID::INVALID_GAMEPAD_HANDLE": DmSdkTypes["dmHID::HGamepad"];
   readonly "dmHID::INVALID_KEYBOARD_HANDLE": DmSdkTypes["dmHID::HKeyboard"];
   readonly "dmHID::INVALID_MOUSE_HANDLE": DmSdkTypes["dmHID::HMouse"];
   readonly "dmHID::INVALID_TOUCH_DEVICE_HANDLE": DmSdkTypes["dmHID::HTouchDevice"];
+  /**
+   * max number of characters
+   */
   readonly "dmHID::MAX_CHAR_COUNT": number;
   readonly "dmHID::MAX_GAMEPAD_AXIS_COUNT": number;
   readonly "dmHID::MAX_GAMEPAD_BUTTON_COUNT": number;
   readonly "dmHID::MAX_GAMEPAD_COUNT": number;
+  /**
+   * max number of characters for a guid
+   */
   readonly "dmHID::MAX_GAMEPAD_GUID_LENGTH": number;
   readonly "dmHID::MAX_GAMEPAD_HAT_COUNT": number;
   readonly "dmHID::MAX_GAMEPAD_NAME_LENGTH": number;
@@ -15397,12 +16750,24 @@ export interface DmSdkVariables {
   readonly "dmHID::MAX_TOUCH_DEVICE_COUNT": number;
   readonly "dmHashTable::dmHashTable::INVALID_INDEX": number;
   readonly "dmHashTable::dmHashTable::MAX_SIZE": number;
+  /**
+   * The maximum number of textures the render object can hold (16)
+   */
   readonly "dmRender::RenderObject::MAX_TEXTURE_COUNT": number;
   readonly "dmRender::RenderObject::MAX_VERTEX_BUFFER_COUNT": number;
   readonly "dmResource::s_ResourceTypeCreatorDescBufferSize": number;
   readonly "dmRig::INVALID_BONE_INDEX": number;
+  /**
+   * SSLSocket socket handle
+   */
   readonly "dmSSLSocket::INVALID_SOCKET_HANDLE": DmSdkTypes["dmSSLSocket::Socket"];
+  /**
+   * Invalid socket handle
+   */
   readonly "dmSocket::INVALID_SOCKET_HANDLE": DmSdkTypes["dmSocket::Socket"];
+  /**
+   * Socket default timeout value
+   */
   readonly "dmSocket::SOCKET_TIMEOUT": number;
   readonly "dmTrigLookup::COS_TABLE": DmReadonlyPointer<"float">;
   readonly "dmTrigLookup::COS_TABLE_SIZE": number;

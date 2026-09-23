@@ -114,6 +114,25 @@ call-thread and target-feature tokens until target evidence resolves them.
 These counts are the data-driven work queue for generic emitters; they are not
 per-symbol hand-written wrapper lists.
 
+# Documentation projection
+
+The SDK generators also project Defold's reference prose into the generated
+TypeScript surface. Script annotations contribute function descriptions,
+parameters, returns, and two source-declared deprecations. dmSDK reference JSON
+contributes declaration descriptions, parameters, returns, notes, and fourteen
+source-declared deprecations. Deprecation sentences are recognized
+structurally and emitted as TSDoc `@deprecated` tags, so TypeScript editors can
+present the upstream replacement guidance without a handwritten symbol list.
+
+Documentation-only fields deliberately do not enter the runtime script or
+dmSDK IR. The enriched in-memory model emits TypeScript/TSDoc, while the
+serialized runtime IR omits notes and derived deprecation tags. This keeps a
+prose-only upstream change from invalidating ABI classifications, bridge
+descriptors, packaged-engine probes, or runtime evidence. The frozen
+source-pipeline SDK fixture still hashes the generated TypeScript files, so a
+documentation projection change remains deterministic and reviewable without
+being mistaken for an executable ABI change.
+
 # Generator contract
 
 The central script and dmSDK registries own the generators, pinned inputs,

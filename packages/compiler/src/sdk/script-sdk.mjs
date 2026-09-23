@@ -153,6 +153,15 @@ function cleanDocumentation(lines) {
   return trimmed.join("\n").replaceAll("*/", "* /");
 }
 
+function deprecationNotice(...values) {
+  for (const value of values.flat(Infinity)) {
+    if (typeof value !== "string") continue;
+    const line = value.split(/\r?\n/u).map((item) => item.trim()).find((item) => /\bdeprecated\b/iu.test(item));
+    if (line) return line.replace(/^\[[^\]]+\]\s*/u, "");
+  }
+  return undefined;
+}
+
 function documentation(value, indent = "") {
   if (!value) return [];
   return [
@@ -288,6 +297,8 @@ function parseArchive(lifecycleNames) {
         const parts = fn[1].split(/[.:]/);
         const member = parts.pop();
         const modulePath = parts.length ? parts : ["builtins"];
+        const description = cleanDocumentation(docs);
+        const deprecated = deprecationNotice(description);
         if (!parts.length) {
           // A namespace-less declaration. Defold documents three different
           // things this way and only one of them is callable API, so classify
@@ -313,7 +324,8 @@ function parseArchive(lifecycleNames) {
           generics: pending.filter((item) => item.kind === "generic").map((item) => item.body),
           source,
           line: lineIndex + 1,
-          description: cleanDocumentation(docs),
+          description,
+          ...(deprecated ? { deprecated } : {}),
           disposition: "generated-lua-bridge"
         });
         pending = [];
@@ -588,6 +600,7 @@ function renderNodeInterface(node, renderType, indent = "  ") {
   }
   for (const fn of node.functions.sort((a, b) => a.jsName.localeCompare(b.jsName))) {
     const tags = [fn.description];
+    if (fn.deprecated) tags.push(`@deprecated ${fn.deprecated}`);
     for (const [index, param] of fn.parameters.entries()) if (param.description) tags.push(`@param ${parameterName(param.rawName, index)} ${param.description}`);
     if (fn.returnDescriptions.some(Boolean)) tags.push(`@returns ${fn.returnDescriptions.filter(Boolean).join("; ")}`);
     lines.push(...documentation(tags.filter(Boolean).join("\n\n"), indent));
@@ -896,7 +909,9 @@ const ir = {
   unresolvedTypes,
   runtimeImplementedCount: model.functions.filter(({ runtimeStatus }) => runtimeStatus.startsWith("implemented-")).length,
   runtimeUnimplementedCount: model.functions.filter(({ runtimeStatus }) => runtimeStatus.startsWith("requires-")).length,
-  functions: model.functions.map(({ stableId: _stableId, ...fn }) => fn),
+  // Documentation-only tags drive the generated TypeScript surface, but stay
+  // out of the runtime IR so comment changes cannot invalidate bridge evidence.
+  functions: model.functions.map(({ stableId: _stableId, deprecated: _deprecated, ...fn }) => fn),
   types: [...model.classes.map((item) => ({ ...item, kind: "class", disposition: "generated-type" })), ...model.aliases.map((item) => ({ ...item, kind: "alias", disposition: "generated-type" })), ...model.enums.map((item) => ({ ...item, kind: "enum", disposition: "generated-type" }))]
 };
 await output(irPath, `${JSON.stringify(ir, null, 2)}\n`);

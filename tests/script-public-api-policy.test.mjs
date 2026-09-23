@@ -39,4 +39,8 @@ test("generated SDK exposes defold while preserving the raw Lua route identity",
   const hash = JSON.parse(irText).functions.find(({ id }) => id === "script:hash");
   assert.deepEqual(hash.modulePath, ["builtins"]);
   assert.equal(hash.rawName, "hash");
+
+  assert.match(types, /@deprecated This function is deprecated\. Use `go\.get\("#label", "text"\)` instead\./);
+  assert.match(types, /@deprecated This function is deprecated\. Use `go\.set\("#label", "text", value\)` instead\./);
+  assert.equal(types.match(/@deprecated\b/g)?.length, 2);
 });

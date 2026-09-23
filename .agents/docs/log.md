@@ -1853,3 +1853,32 @@ generated `defold_hermes` and optional `defold_hermes_typed_native` installation
 trees. Their target-dependent presence had made the authored-game evidence vary
 with local build state. Bundle artifacts remain measured exactly; only the
 source census boundary was corrected.
+
+## 2026-09-22 - Defold deprecations reach generated TypeScript hovers
+
+The script and dmSDK SDK generators now derive TSDoc `@deprecated` tags from
+Defold's pinned annotation/reference sources instead of maintaining a symbol
+allowlist. The current source set yields two script deprecations and fourteen
+dmSDK deprecations, including the exact replacement guidance for
+`label.get_text`, `label.set_text`, and
+`dmScript::CheckBufferNoError`. dmSDK record, enum, alias, and variable
+descriptions also reach their generated TypeScript declarations.
+
+The generators use an enriched in-memory documentation model, then remove
+documentation-only notes and derived deprecation tags from the serialized
+runtime IR. Re-running the complete script runtime pipeline therefore produced
+byte-identical runtime descriptors and retained the existing packaged-engine
+probe marker; only generated TypeScript and the independently captured
+source-pipeline SDK manifest changed. Focused source/IR/type tests and both SDK
+`--check` commands pass. This is deterministic generation and TypeScript
+surface evidence, not a live VS Code hover observation; the desktop remained
+locked during this wave.
+
+An independent hosted review initially reported two P0s, two P1s, two P2s,
+and one P3. Reproduction rejected six claims: notes are distinct JSON entries;
+the split helper cannot return embedded newlines; comment terminators are
+already neutralized; current script markers are prose rather than bracketed
+tags; and script aliases, classes, enums, and fields already emit docs. One P2
+was valid: non-deprecation dmSDK notes were captured but omitted from output.
+They now emit as TSDoc `@remarks`. Exact current-source census assertions prove
+all fourteen dmSDK and both script deprecations are present.

@@ -20447,6 +20447,8 @@ export interface LabelApi {
    *
    * [Open in Browser](https://defold.com/ref/label-lua#label.get_text:url)
    *
+   * @deprecated This function is deprecated. Use `go.get("#label", "text")` instead.
+   *
    * @param url the label to get the text from
    *
    * @returns text the label text
@@ -20471,6 +20473,8 @@ export interface LabelApi {
    * ```
    *
    * [Open in Browser](https://defold.com/ref/label-lua#label.set_text:url-text)
+   *
+   * @deprecated This function is deprecated. Use `go.set("#label", "text", value)` instead.
    *
    * @param url the label that should have a constant set
    *

@@ -77,4 +77,13 @@ test("generated dmSDK resolves every Clang declaration", async () => {
   assert.match(types, /export const DmGraphicsVertexStepFunction = \{/);
   assert.match(types, /readonly "dmGraphics::VertexStepFunction": DmGraphicsVertexStepFunction;/);
   assert.match(types, /readonly VkImage: bigint;/);
+
+  const checkBuffer = types.slice(
+    types.indexOf('readonly "dmScript::CheckBufferNoError"'),
+    types.indexOf('readonly "dmScript::CheckBufferNoError"') + 600,
+  );
+  assert.match(checkBuffer, /@remarks Returns 0 on error\. Does not invoke lua_error\./);
+  assert.match(checkBuffer, /The dmBuffer::IsBufferValid is already called on the returned buffer/);
+  assert.match(checkBuffer, /@deprecated deprecated\. Prefer ToBuffer\(\) instead\./);
+  assert.equal(types.match(/@deprecated\b/g)?.length, 14);
 });
