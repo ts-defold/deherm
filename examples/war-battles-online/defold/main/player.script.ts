@@ -29,6 +29,7 @@ const WEAPON_3 = hashLiteral("#weapon3");
 const WEAPON_4 = hashLiteral("#weapon4");
 const WEAPON_5 = hashLiteral("#weapon5");
 const WEAPON_6 = hashLiteral("#weapon6");
+const RESTART = hashLiteral("#restart");
 
 /**
  * The camera follows a reported position rather than sampling this object.
@@ -222,6 +223,13 @@ export default defineComponent({
   },
 
   onInput(self: PlayerSelf, actionId: DefoldHash, action: OnInputAction): boolean {
+    if (actionId === RESTART) {
+      if (action.pressed) {
+        engage(self);
+        msg.post(ARENA, "restart");
+      }
+      return true;
+    }
     // Any input at all takes the match off the scripted demonstration.
     if (actionId === FIRE) {
       // Pressing fire during the demonstration starts the match rather than

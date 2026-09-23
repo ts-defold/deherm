@@ -75,6 +75,19 @@ export class ArenaMatch {
     else this.battle.setControls(this.controls);
   }
 
+  /** Starts a fresh offline round. The authoritative server owns online restarts. */
+  restart(): boolean {
+    if (this.mode !== "offline") return false;
+    this.controls.moveX = 0;
+    this.controls.moveY = 0;
+    this.controls.fire = false;
+    this.controls.boost = false;
+    this.controls.weapon = 0;
+    this.accumulator = 0;
+    this.battle.restart();
+    return true;
+  }
+
   /** Advances by `dt` seconds of wall clock, in whole 60 Hz ticks. */
   advance(dt: number, maximumSteps = 5): number {
     if (!this.engaged) return 0;

@@ -27,13 +27,13 @@
     ]
   },
   "platform": "wasm-web",
-  "bundleFingerprint": "1295fb69e459971a1297e6e868afb8fdae53cfb249258870ef4157b4c2529750",
-  "bundleSha256": "d273437192190b7e458bff398a35e0662d07045440360bf094e154b9d740f276",
+  "bundleFingerprint": "cc048e6691d9d087cf034e694fb470ca9bbfde1a90cd9ede6a0c8d3297a0f67e",
+  "bundleSha256": "6f024d0f88621cc6217c97f67ceffafadfa41c9d9c077690469eaee4f55264e6",
   "state": {
     "documentReady": "complete",
     "engineStarted": true,
     "hostRuntime": "browser",
-    "componentsRegistered": 5,
+    "componentsRegistered": 8,
     "scriptBridgeInstalled": true,
     "scriptBridgeTarget": "html5-browser-host",
     "modules": [
@@ -42,7 +42,7 @@
       "ExampleMath",
       "Timer"
     ],
-    "bundleFingerprint": "1295fb69e459971a1297e6e868afb8fdae53cfb249258870ef4157b4c2529750",
+    "bundleFingerprint": "cc048e6691d9d087cf034e694fb470ca9bbfde1a90cd9ede6a0c8d3297a0f67e",
     "canvas": {
       "width": 756,
       "height": 425
@@ -50,8 +50,10 @@
   },
   "requiredEngineMarkers": [
     "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
-    "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
     "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'"
+  ],
+  "requiredEngineMarkerPatterns": [
+    "^INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from [1-9][0-9]* generated Lua symbols$"
   ],
   "requiredGameMarkers": [
     "war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
@@ -63,9 +65,12 @@
     "war-battles:rocket-hit",
     "war-battles:score:100",
     "war-battles:rocket-explosion-done",
-    "war-battles:player-moved:1592.0:1072.0"
+    "war-battles:player-moved:1592.0:1072.0",
+    "war-battles:arena-init:players=8:online=0",
+    "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
   ],
   "observedGameMarkers": [
+    "war-battles:arena-init:players=8:online=0",
     "war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
     "war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
     "war-battles:ui-init",
@@ -75,9 +80,10 @@
     "war-battles:rocket-hit",
     "war-battles:score:100",
     "war-battles:rocket-explosion-done",
-    "war-battles:player-moved:1592.0:1072.0"
+    "war-battles:player-moved:1592.0:1072.0",
+    "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
   ],
-  "cameraSampleCount": 12,
+  "cameraSampleCount": 11,
   "cameraClampStates": [
     "none",
     "x",

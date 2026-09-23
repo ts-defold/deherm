@@ -3,6 +3,7 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 action="${1:-build}"
+shift || true
 log_file="$repo_root/build/extender-local.log"
 extender_pid=""
 
@@ -36,4 +37,4 @@ if ! curl --silent --fail --max-time 2 http://localhost:9010/actuator/health >/d
   exit 1
 fi
 
-DEFOLD_HERMES_BUILD_SERVER=http://localhost:9010 "$repo_root/scripts/bob.sh" "$action"
+DEFOLD_HERMES_BUILD_SERVER=http://localhost:9010 "$repo_root/scripts/bob.sh" "$action" "$@"

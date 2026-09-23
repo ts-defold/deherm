@@ -288,6 +288,14 @@ mechanically covered through the public package paths described below.
 
 Public ledger: [#99 Ship playable War Battles across native, Static Hermes, and browser](https://github.com/ts-defold/deherm/issues/99).
 
+Current evidence (2026-09-22): tutorial-derived art, animation, input, GUI,
+generated audio resources, collision/score flow, restart, bots, Dynamic Hermes,
+reachable typed-native Static Hermes, and browser-host WebGL 2 are implemented
+and observed. Checked native and browser evidence is current, and Chrome's
+playability gate observes fire, audio-call, and round-two restart markers. The
+remaining work in this tranche is installed-TUI HMR proof and the multiplayer
+expansion; literal VS Code visual observation remains a tooling-tranche debt.
+
 1. Make the tutorial-faithful game playable with real tutorial art, correctly
    sliced/anchored animation, tint/material effects, input, GUI, audio,
    collisions, scoring, restart, and bots—all in public-package TypeScript.

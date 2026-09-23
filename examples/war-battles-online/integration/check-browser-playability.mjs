@@ -104,7 +104,22 @@ async function run() {
     await key(client, { type: "keyDown", key: " ", code: "Space", virtualKeyCode: 32 });
     await new Promise((resolveDelay) => setTimeout(resolveDelay, 250));
     await key(client, { type: "keyUp", key: " ", code: "Space", virtualKeyCode: 32 });
-    await new Promise((resolveDelay) => setTimeout(resolveDelay, 750));
+    await waitFor(
+      () => client.transcript.includes("war-battles:sfx:fire"),
+      { timeoutMs: 3_000, intervalMs: 50, what: "the local fire event to play its generated sound" }
+    );
+
+    await key(client, { type: "keyDown", key: "r", code: "KeyR", virtualKeyCode: 82 });
+    await key(client, { type: "keyUp", key: "r", code: "KeyR", virtualKeyCode: 82 });
+    await waitFor(
+      () => client.transcript.includes("war-battles:arena-restart:round=2"),
+      { timeoutMs: 3_000, intervalMs: 50, what: "the public restart control to start round two" }
+    );
+    await waitFor(
+      () => client.transcript.includes("war-battles:sfx:round"),
+      { timeoutMs: 3_000, intervalMs: 50, what: "the round restart cue to play" }
+    );
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, 500));
 
     const graphics = await evaluate(client, `(() => {
       const canvas = document.querySelector("canvas");
@@ -196,7 +211,9 @@ async function run() {
         bytes: screenshotBytes.byteLength,
         sha256: createHash("sha256").update(screenshotBytes).digest("hex")
       },
-      arenaMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-engaged:"))
+      arenaMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-engaged:")),
+      restartMarker: client.transcript.find((line) => line.startsWith("war-battles:arena-restart:")),
+      soundMarkers: client.transcript.filter((line) => line.startsWith("war-battles:sfx:"))
     };
     console.log(`war-battles-browser-playability:ok:${JSON.stringify(report)}`);
     return report;

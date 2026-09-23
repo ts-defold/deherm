@@ -8,6 +8,8 @@
     ".": "./core/index.ts"
   },
   "scripts": {
+    "sound": "node tools/generate-sound.mjs",
+    "sound:check": "node tools/generate-sound.mjs --check",
     "art": "node tools/generate-art.mjs",
     "art:check": "node tools/generate-art.mjs --check",
     "tilemap": "node tools/generate-arena-tilemap.mjs",
@@ -15,7 +17,7 @@
     "sync": "node integration/sync-defold-sources.mjs",
     "sync:check": "node integration/sync-defold-sources.mjs --check",
     "generate": "deherm generate --project defold && pnpm sync && node integration/generate-capability-snapshot.mjs",
-    "verify:generated": "deherm verify-generated --project defold && pnpm sync:check && pnpm art:check && pnpm tilemap:check && node integration/generate-capability-snapshot.mjs --check",
+    "verify:generated": "deherm verify-generated --project defold && pnpm sync:check && pnpm art:check && pnpm sound:check && pnpm tilemap:check && node integration/generate-capability-snapshot.mjs --check",
     "typecheck": "tsc -p tsconfig.json --noEmit && deherm typecheck --project defold",
     "test": "node --test test/core.test.mjs test/integration.test.mjs test/packaged-runtime-evidence.test.mjs",
     "check": "pnpm verify:generated && pnpm typecheck && pnpm test",

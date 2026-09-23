@@ -66,3 +66,7 @@ key_trigger {
   input: KEY_6
   action: "weapon6"
 }
+key_trigger {
+  input: KEY_R
+  action: "restart"
+}

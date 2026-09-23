@@ -63,7 +63,8 @@ function statusLine(self: UiSelf): string {
   return `HP ${bar(self.view.health, 200)} ${self.view.health}` +
     `   AR ${self.view.armor}` +
     `   ${weapon.name.toUpperCase()} ${ammo}` +
-    `   BOOST ${bar(self.view.boostTicks, 90)}${overdrive}`;
+    `   BOOST ${bar(self.view.boostTicks, 90)}${overdrive}` +
+    `   ROUND ${match?.mode === "offline" ? match.battle.round : 1}`;
 }
 
 function leaderboard(self: UiSelf): string {
@@ -118,7 +119,7 @@ export default defineComponent({
     if (match === undefined || !match.engaged) return;
     if (!self.engaged) {
       self.engaged = true;
-      gui.setText(self.hint, "ARROWS/WASD DRIVE   SPACE FIRE   SHIFT BOOST   1-6 WEAPON");
+      gui.setText(self.hint, "ARROWS/WASD DRIVE   SPACE FIRE   SHIFT BOOST   1-6 WEAPON   R RESTART");
     }
     gui.setText(self.status, statusLine(self));
     if (self.countdown > 0) {

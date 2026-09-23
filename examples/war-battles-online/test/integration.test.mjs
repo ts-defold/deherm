@@ -181,33 +181,13 @@ test("checked Defold capability snapshot is fresh against both generated reports
   assert.match(result, /fresh/);
 });
 
-// The Ultimate Edition rebuilt the authored Defold project, so the recorded
-// packaged-engine observation no longer describes the tree that produced it.
-// Re-recording is a real engine run, not a file edit: it needs Bob, a local
-// Extender and a custom arm64-macOS engine, none of which this test can stand
-// in for. The gate itself is unchanged and still says so; this is the one place
-// that names the debt instead of letting a red suite hide it.
-//
-//   pnpm bob:local:bundle && pnpm runtime:packaged:record
-//
-// See defold/PLAYABLE-BLOCKERS.md, "Evidence superseded by the Ultimate Edition".
-test("packaged runtime evidence remains bound to current extension and project sources", {
-  skip: "packaged-runtime evidence is knowingly stale; re-record with pnpm runtime:packaged:record",
-}, () => {
+test("packaged runtime evidence remains bound to current extension and project sources", () => {
   const result = execFileSync(
     process.execPath,
     [fromExample("integration/check-packaged-runtime.mjs"), "--check-sources"],
     { cwd: repositoryRoot, encoding: "utf8" },
   );
   assert.match(result, /war-battles-packaged-runtime-sources:fresh/);
-});
-
-test("the packaged runtime gate reports its evidence as stale rather than passing quietly", () => {
-  assert.throws(() => execFileSync(
-    process.execPath,
-    [fromExample("integration/check-packaged-runtime.mjs"), "--check-sources"],
-    { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe" },
-  ), /Packaged runtime source evidence is stale/);
 });
 
 test("Defold-local deterministic sources are fresh copies of the canonical core", () => {
@@ -221,7 +201,7 @@ test("Defold-local deterministic sources are fresh copies of the canonical core"
 
 test("the built project is the arena, and the mockup stays out of the build", async () => {
   const [collection, playerObject, rocketObject, tankObject, arenaObject, levelObject, scene,
-    playerSource, rocketSource, arenaSource, uiSource, blockers] =
+    playerSource, rocketSource, arenaSource, uiSource, inputBinding, blockers] =
     await Promise.all([
       readFile(fromExample("defold/main/main.collection"), "utf8"),
       readFile(fromExample("defold/main/player.go"), "utf8"),
@@ -234,6 +214,7 @@ test("the built project is the arena, and the mockup stays out of the build", as
       readFile(fromExample("defold/main/rocket.script.ts"), "utf8"),
       readFile(fromExample("defold/main/arena.script.ts"), "utf8"),
       readFile(fromExample("defold/main/ui.gui.ts"), "utf8"),
+      readFile(fromExample("defold/input/game.input_binding"), "utf8"),
       readFile(fromExample("defold/PLAYABLE-BLOCKERS.md"), "utf8"),
     ]);
 
@@ -262,6 +243,14 @@ test("the built project is the arena, and the mockup stays out of the build", as
     assert.match(arenaObject, new RegExp(`id: "${factoryId}"`), `arena.go is missing ${factoryId}`);
     assert.match(arenaSource, new RegExp(`"#${factoryId}"`), `arena.script.ts never uses ${factoryId}`);
   }
+  for (const soundId of ["sfx_fire", "sfx_hit", "sfx_explosion", "sfx_pickup", "sfx_round"]) {
+    assert.match(arenaObject, new RegExp(`id: "${soundId}"`), `arena.go is missing ${soundId}`);
+    assert.match(arenaSource, new RegExp(`"#${soundId}"`), `arena.script.ts never plays ${soundId}`);
+  }
+  assert.match(inputBinding, /input: KEY_R[\s\S]*action: "restart"/);
+  assert.match(playerSource, /msg\.post\(ARENA, "restart"\)/);
+  assert.match(arenaSource, /war-battles:arena-restart:round=/);
+  assert.match(arenaSource, /sound\.play\(url\)/);
 
   assert.match(scene, /script: "\/main\/ui\.gui_script"/);
   assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 4);
@@ -319,5 +308,20 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
     "pickup-machinegun", "pickup-railgun", "pickup-scatter", "pickup-mortar", "pickup-ricochet",
   ]) {
     assert.match(atlas, new RegExp(`id: "${animation}"`), `arena-sprites.atlas is missing ${animation}`);
+  }
+});
+
+test("the generated 8-bit sound cues are fresh and valid PCM WAV resources", async () => {
+  const result = execFileSync(
+    process.execPath,
+    [fromExample("tools/generate-sound.mjs"), "--check"],
+    { cwd: repositoryRoot, encoding: "utf8" },
+  );
+  assert.match(result, /war-battles-sound:fresh:5/);
+  for (const cue of ["fire", "hit", "explosion", "pickup", "round"]) {
+    const bytes = await readFile(fromExample(`defold/assets/derived/audio/${cue}.wav`));
+    assert.equal(bytes.subarray(0, 4).toString("ascii"), "RIFF");
+    assert.equal(bytes.subarray(8, 12).toString("ascii"), "WAVE");
+    assert.ok(bytes.length > 1_000, `${cue}.wav is unexpectedly empty`);
   }
 });

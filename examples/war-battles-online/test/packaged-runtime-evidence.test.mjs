@@ -6,8 +6,10 @@ import {
   buildEvidenceDocument,
   canonicalizeRuntimeTranscript,
   firstRejectedDiagnostic,
+  observedRequiredMarkers,
   REQUIRED_MARKERS,
   REQUIRED_SHUTDOWN_MARKERS,
+  RUNTIME_PROFILE_MARKER_PREFIX,
   runPackagedRuntimeEvidence,
   transcriptEvidence,
 } from "../integration/packaged-runtime-evidence.mjs";
@@ -36,6 +38,7 @@ function engineDouble({
 const http = require("node:http");
 const markers = ${JSON.stringify(markers)};
 const shutdownMarkers = ${JSON.stringify(shutdownMarkers)};
+const runtimeProfileMarkerPrefix = ${JSON.stringify("INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from ")};
 const server = http.createServer((request, response) => {
   if (request.url === "/post/@system/exit" && request.method === "POST") {
     request.resume();
@@ -56,7 +59,10 @@ server.listen(0, "127.0.0.1", () => {
   }
   let index = 0;
   const timer = setInterval(() => {
-    if (index < markers.length) process.stdout.write(markers[index++] + "\\n");
+    if (index < markers.length) {
+      const marker = markers[index++];
+      process.stdout.write((marker === runtimeProfileMarkerPrefix ? marker + "315 generated Lua symbols" : marker) + "\\n");
+    }
     else { clearInterval(timer); ${suffix} }
   }, 5);
 });
@@ -76,12 +82,29 @@ const driveDouble = (options, overrides = {}) => runPackagedRuntimeEvidence({
 
 test("packaged runtime gate observes every marker, settles, and exits gracefully", async () => {
   const result = await driveDouble();
-  assert.deepEqual(result.markers, [...REQUIRED_MARKERS]);
+  const expected = [...REQUIRED_MARKERS];
+  expected[expected.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] += "315 generated Lua symbols";
+  assert.deepEqual(result.markers, expected);
   assert.deepEqual(result.shutdownMarkers, [...REQUIRED_SHUTDOWN_MARKERS]);
   assert.equal(result.termination.method, "system-exit");
   assert.equal(result.termination.exitCode, 0);
   assert.equal(result.termination.signal, null);
   assert.ok(Number.isSafeInteger(result.termination.port) && result.termination.port > 0);
+});
+
+test("runtime profile evidence keeps the final positive symbol count without pinning it", () => {
+  const transcript = [
+    `${RUNTIME_PROFILE_MARKER_PREFIX}253 generated Lua symbols`,
+    `${RUNTIME_PROFILE_MARKER_PREFIX}315 generated Lua symbols`,
+  ].join("\n");
+  assert.equal(
+    observedRequiredMarkers(transcript, [RUNTIME_PROFILE_MARKER_PREFIX])[0],
+    `${RUNTIME_PROFILE_MARKER_PREFIX}315 generated Lua symbols`,
+  );
+  assert.equal(
+    observedRequiredMarkers(`${RUNTIME_PROFILE_MARKER_PREFIX}0 generated Lua symbols`, [RUNTIME_PROFILE_MARKER_PREFIX])[0],
+    null,
+  );
 });
 
 test("packaged runtime gate fails closed on known diagnostics", async () => {

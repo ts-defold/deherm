@@ -1938,3 +1938,33 @@ policy identity repair. These are generation, type-check, compile/link fixture,
 and package-boundary results. They do not replace the separate real-engine
 evidence already recorded for core routes, nor the still-pending literal VS Code
 visual observation while the desktop is locked.
+
+## 2026-09-22 - War Battles audio, restart, and clean packaged evidence
+
+War Battles now owns five deterministically generated PCM WAV cues for fire,
+hit, explosion, pickup, and round start. The Defold arena embeds those sound
+components and the TypeScript component triggers them from observed match
+events. `R` is a generated input binding that restarts the offline match through
+`ArenaMatch.restart()`, clears presentation cursors and effects, advances the
+round counter, and updates the HUD. Generated-audio freshness, RIFF/WAVE headers,
+resource wiring, and restart wiring are asserted by the example integration
+suite; those checks prove deterministic inputs and code shape, not audible
+speaker output.
+
+A fresh `wasm-web` Bob build ran in real Chrome with WebGL 2 / GLSL ES 3.0. The
+playability gate delivered keyboard fire and restart events, observed the fire
+and round sound-call markers, observed round two, and captured the composed game
+frame at `build/evidence/war-battles-html5.png`. The inspected frame shows the
+arena, tutorial-derived tank and terrain art, HUD, `ROUND 2`, and the restart
+hint. This is browser-host input, engine, render, and `sound.play` call evidence;
+it is not proof that a physical audio device emitted sound.
+
+The native build exposed a stale-archive defect in the Bob wrapper seam:
+`bob-local.sh` discarded the documented additional Bob arguments, so callers
+could not insert Bob's `clean` command. The wrapper now forwards them. A clean
+`clean resolve build bundle` rebuilt the archive, after which the packaged
+arm64-macOS engine detected 315 generated Lua symbols, loaded generation one
+through Dynamic Hermes with the generated typed-native transport reachable,
+ran the tutorial collision/score sequence and eight-player arena engagement,
+then exited cleanly through `@system/exit`. Both native and browser evidence
+files are hash-bound to the resulting artifacts and current source inputs.

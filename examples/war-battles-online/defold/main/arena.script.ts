@@ -4,6 +4,7 @@ import {
   go,
   hashLiteral,
   property,
+  sound,
   sys,
   vmath,
   type DefoldHash,
@@ -14,6 +15,7 @@ import {
   BrowserWebTransportClient,
   EVENT_EXPLOSION,
   EVENT_FIRE,
+  EVENT_HIT,
   EVENT_KILL,
   EVENT_PICKUP_TAKEN,
   MAX_PICKUPS,
@@ -49,6 +51,19 @@ declare const __defoldHostV1: {
  */
 
 const ENGAGE = hashLiteral("#engage");
+const RESTART = hashLiteral("#restart");
+
+const SFX_FIRE = "#sfx_fire";
+const SFX_HIT = "#sfx_hit";
+const SFX_EXPLOSION = "#sfx_explosion";
+const SFX_PICKUP = "#sfx_pickup";
+const SFX_ROUND = "#sfx_round";
+
+const SFX_FIRE_BIT = 1 << 0;
+const SFX_HIT_BIT = 1 << 1;
+const SFX_EXPLOSION_BIT = 1 << 2;
+const SFX_PICKUP_BIT = 1 << 3;
+const SFX_ROUND_BIT = 1 << 4;
 
 const EXPLOSION_TICKS = 34;
 const SPARK_TICKS = 14;
@@ -79,6 +94,19 @@ interface ArenaSelf {
   effectIds: DefoldHash[];
   effectTicks: number[];
   online: boolean;
+  sfxMask: number;
+}
+
+function playSfx(
+  self: ArenaSelf,
+  bit: number,
+  url: typeof SFX_FIRE | typeof SFX_HIT | typeof SFX_EXPLOSION | typeof SFX_PICKUP | typeof SFX_ROUND,
+  name: string,
+): void {
+  sound.play(url);
+  if ((self.sfxMask & bit) !== 0) return;
+  self.sfxMask |= bit;
+  __defoldHostV1.log("info", `war-battles:sfx:${name}`);
 }
 
 function spawnTankParts(self: ArenaSelf): void {
@@ -170,6 +198,7 @@ function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): void 
 function drainEvents(self: ArenaSelf): void {
   const world = self.match.world;
   if (world === undefined) return;
+  const localPlayerId = self.match.localSlot + 1;
   const oldest = world.events.oldest();
   if (self.eventCursor < oldest) self.eventCursor = oldest;
   while (self.eventCursor < world.events.sequence) {
@@ -180,10 +209,19 @@ function drainEvents(self: ArenaSelf): void {
       spawnEffect(self, true, self.event.x, self.event.y);
     } else if (kind === EVENT_KILL) {
       spawnEffect(self, true, self.event.x, self.event.y);
+      if (self.event.a === localPlayerId || self.event.b === localPlayerId) {
+        playSfx(self, SFX_EXPLOSION_BIT, SFX_EXPLOSION, "explosion");
+      }
+    } else if (kind === EVENT_HIT && self.event.a === localPlayerId) {
+      playSfx(self, SFX_HIT_BIT, SFX_HIT, "hit");
     } else if (kind === EVENT_FIRE && self.event.b === WEAPON_MORTAR) {
       spawnEffect(self, false, self.event.x, self.event.y);
+      if (self.event.a === localPlayerId) playSfx(self, SFX_FIRE_BIT, SFX_FIRE, "fire");
+    } else if (kind === EVENT_FIRE && self.event.a === localPlayerId) {
+      playSfx(self, SFX_FIRE_BIT, SFX_FIRE, "fire");
     } else if (kind === EVENT_PICKUP_TAKEN) {
       spawnEffect(self, false, self.event.x, self.event.y);
+      if (self.event.a === localPlayerId) playSfx(self, SFX_PICKUP_BIT, SFX_PICKUP, "pickup");
     }
   }
 }
@@ -213,6 +251,22 @@ function engage(self: ArenaSelf): void {
     `war-battles:arena-engaged:players=${self.players}:skill=${Math.trunc(self.botSkill)}` +
     `:seed=${world === undefined ? 0 : world.mapSeed}:mode=${self.match.mode}`,
   );
+}
+
+function restart(self: ArenaSelf): void {
+  if (!self.match.restart()) {
+    __defoldHostV1.log("info", "war-battles:arena-restart-denied:online");
+    return;
+  }
+  self.eventCursor = 0;
+  self.spawnedProjectile.fill(0);
+  self.spawnedPickup.fill(0);
+  for (const id of self.effectIds) go.delete(id);
+  self.effectIds.length = 0;
+  self.effectTicks.length = 0;
+  syncPickups(self);
+  playSfx(self, SFX_ROUND_BIT, SFX_ROUND, "round");
+  __defoldHostV1.log("info", `war-battles:arena-restart:round=${self.match.battle.round}`);
 }
 
 /**
@@ -265,6 +319,7 @@ export default defineComponent({
     self.visibleProjectiles = 0;
     self.effectIds = [];
     self.effectTicks = [];
+    self.sfxMask = 0;
     const players = Math.max(2, Math.min(32, Math.trunc(self.players)));
     self.players = players;
     self.match = startArena({
@@ -278,6 +333,7 @@ export default defineComponent({
 
   onMessage(self: ArenaSelf, messageId: DefoldHash): void {
     if (messageId === ENGAGE) engage(self);
+    else if (messageId === RESTART) restart(self);
   },
 
   update(self: ArenaSelf, dt: number): void {

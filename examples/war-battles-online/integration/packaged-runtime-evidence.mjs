@@ -19,9 +19,14 @@ export { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic };
 // The same tutorial loop the browser gate requires, spelled in engine-log form.
 // Keeping the two lists the same behaviour is what makes the native and browser
 // projections comparable instead of merely adjacent.
+export const RUNTIME_PROFILE_MARKER_PREFIX =
+  "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from ";
 export const REQUIRED_MARKERS = Object.freeze([
   "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
-  "INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from 253 generated Lua symbols",
+  // Extensions can add registrations between the early engine probe and the
+  // final attached runtime. The profile identity is authoritative; the count
+  // is observed data and must be a positive integer rather than a stale pin.
+  RUNTIME_PROFILE_MARKER_PREFIX,
   "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
   "INFO:DEFOLD_HERMES: war-battles:camera-init:zoom=2.00:view=640x360:cameras=1",
   "INFO:DEFOLD_HERMES: war-battles:camera-bounds:x=[8.0,1288.0]:y=[-172.0,908.0]",
@@ -50,8 +55,16 @@ export const REQUIRED_SHUTDOWN_MARKERS = Object.freeze([
 ]);
 
 export function observedRequiredMarkers(transcript, requiredMarkers = REQUIRED_MARKERS) {
-  const lines = transcript.replaceAll("\r", "").split("\n");
-  return requiredMarkers.map((marker) => lines.find((line) => line === marker) ?? null);
+  const lines = transcript.replaceAll("\r", "").split("\n").map((line) => line.trimEnd());
+  return requiredMarkers.map((marker) => {
+    if (marker !== RUNTIME_PROFILE_MARKER_PREFIX) return lines.find((line) => line === marker) ?? null;
+    for (let index = lines.length - 1; index >= 0; index -= 1) {
+      const line = lines[index];
+      if (!line.startsWith(marker)) continue;
+      if (/^[1-9][0-9]* generated Lua symbols$/u.test(line.slice(marker.length))) return line;
+    }
+    return null;
+  });
 }
 
 async function waitForExitAfterSignal(child, method, graceMs) {

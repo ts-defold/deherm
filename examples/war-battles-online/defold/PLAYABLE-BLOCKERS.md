@@ -5,18 +5,20 @@ components. Gameplay runs as Defold game objects with sprite, factory and
 collision-object components; the GUI is the HUD. The 32-tank presentation mockup
 is retained, unbuilt, under [`reference/`](./reference/README.md).
 
-## Evidence superseded by the Ultimate Edition
+## Current native and browser evidence
 
-**Read this first.** The two packaged-engine evidence documents -
+The two checked evidence documents -
 [`../evidence/packaged-runtime-arm64-macos.json`](../evidence/packaged-runtime-arm64-macos.json)
 and [`../evidence/browser-runtime-wasm-web.json`](../evidence/browser-runtime-wasm-web.json)
-- were recorded against the tutorial-scope scene. Rebuilding that scene into the
-arena changed the authored project tree they are hash-bound to, so both are now
-**stale and must be re-recorded**. Neither gate was weakened: they still refuse.
+- are current for the arena project. They were re-recorded from clean Bob builds
+on 2026-09-22. The native projection loaded the bundle through Dynamic Hermes,
+made the generated Static Hermes transport reachable, detected 315 generated
+Lua symbols, ran the tutorial collision/score sequence, engaged the eight-player
+offline arena, and exited through `@system/exit` with code 0. The browser
+projection loaded the same bundle fingerprint through the browser host and ran
+the same game-owned marker sequence.
 
-Re-recording is a real engine run, not a file edit. It needs Bob, a running local
-Extender (`pnpm extender:status`) and a rebuilt custom engine, and for the
-browser a fresh `wasm-web` bundle:
+The reproducible commands are:
 
 ```sh
 # native
@@ -28,10 +30,10 @@ DEFOLD_HERMES_PROJECT=examples/war-battles-online/defold pnpm bob:web:bundle
 pnpm --filter @deherm/example-war-battles-online runtime:browser:record
 ```
 
-`test/integration.test.mjs` carries a skipped test naming this debt and a
-companion test asserting that `check-packaged-runtime.mjs --check-sources`
-actually reports the staleness rather than passing quietly. Delete the skip when
-the evidence is re-recorded.
+The separate browser playability gate sends real Chrome keyboard events. It
+observes movement, firing, a generated sound cue, and an `R` restart that advances
+the round to two. It also requires a live WebGL 2 context and analyzes a composed
+browser screenshot rather than the cleared default framebuffer.
 
 ### What changed in the marker contract, deliberately
 
@@ -53,7 +55,7 @@ the gate as `EXPECTED_COMPONENT_COUNT` and asserted a second time in
 `test/integration.test.mjs` against the generated component manifest, so the
 number inside the engine and the number on disk cannot drift apart.
 
-## Observed packaged-engine run (tutorial-scope scene, superseded)
+## Observed packaged-engine run
 
 A custom arm64-macOS engine built through the pinned local Extender was launched
 from `build/default` on 2026-09-18. Defold 1.14.0 loaded the archive, created
@@ -88,17 +90,15 @@ That sequence is the whole tutorial loop:
 * `go.set_position` advanced the player 179.9 px over the one-second scripted
   move, so the frame loop, not just `init`, drives engine state.
 
-Not observed in engine output, and therefore not claimed:
+Not observed by the native transcript, and therefore not claimed by that
+projection:
 
-* pixel output. No screenshot or frame capture was taken. The tilemap, atlases,
-  fonts, sprites, and GUI scene all compiled and loaded without a resource or
-  component diagnostic, but "it renders correctly" is unverified.
-* keyboard input. `on_input` is wired to arrows, WASD, space, shift and `1`-`6`,
-  and the same `dispatchInput` path is exercised by the retained reference
-  component, but no key event was injected into this port by any gate. A human
-  has driven it in a browser; that is a report, not evidence this repository
-  holds.
-* everything the arena does. The run above predates it entirely.
+* pixel output. Browser/WebGL pixel evidence is held by the companion browser
+  playability projection, not inferred from this native transcript;
+* keyboard input. The browser playability gate owns the keyboard claim;
+* every arena branch, bot decision, weapon, or multiplayer transport. Dedicated
+  deterministic tests own the 32-player simulation claim, and no real QUIC
+  session has been observed yet.
 
 ## Provider defects fixed to reach this point
 
@@ -139,11 +139,10 @@ against this build: `pnpm runtime:packaged`, `runtime:packaged:record`,
 `runtime:packaged:check`, and `runtime:packaged --check-sources` all pass, and
 the process still terminates on SIGTERM with no rejected diagnostic.
 
-`../evidence/bundle-size.json` is stale, but for reasons outside this port: the
-measured entry only moved from `main/battle.gui.ts` to `reference/battle.gui.ts`,
-while the recorded source byte and file counts changed with an unrelated
-in-flight SDK regeneration. Re-record it with `pnpm bundle:size:update` once that
-lands.
+`../evidence/bundle-size.json` is current for the authored source census and
+compiled JavaScript bundle. Generated extension trees and target selector state
+remain outside the authored-source count so switching targets does not corrupt
+the measurement.
 
 ## Online boundary
 
