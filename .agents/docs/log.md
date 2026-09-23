@@ -1890,3 +1890,16 @@ dmSDK generators now emit separate 452-byte and 31,615-byte documentation
 augmentations. Policy carries those source-derived facts, SDK manifest entries
 name them as inputs, and the installed compiler joins them by exact declaration
 identity before rendering. Runtime IR and its descriptor ABI remain unchanged.
+
+## 2026-09-22 - Policy identity follows the documentation realizer
+
+The repository-wide check detected that the documentation-realizer change had
+been committed after its policy root was last derived. The policy's semantic
+subtree references were already current, but the root still named the preceding
+generator digest. Running the owning policy generator with pruning replaced the
+single obsolete root with the root derived from the exact current compiler and
+materializer sources, and updated the revision index and review manifest. No
+runtime IR, SDK recipe, Defold revision, subtree object, or realizer capability
+changed. `pnpm check:api-policy` and the repository-wide generated-state check
+are the authority for this repair; it is policy-store consistency evidence, not
+new engine-runtime evidence.
