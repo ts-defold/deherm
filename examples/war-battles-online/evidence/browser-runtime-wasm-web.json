@@ -27,8 +27,8 @@
     ]
   },
   "platform": "wasm-web",
-  "bundleFingerprint": "c5b9d794bd4b7cd2dfaea739a74722d0e00b3acbf1c882e12bb2627fda460cc6",
-  "bundleSha256": "653524a91165dcd2f0d3cee3d254508613d9ff17a8ad1498693ace6eaccd7511",
+  "bundleFingerprint": "759a81dff4c24e79b17e09b9e524e90675fd2107c19ef5976275f0b34fc3fd7d",
+  "bundleSha256": "90f8e23f3614bc649a78dc9e7e598ae89f7011eedc624fdaa7e1cf8216348a16",
   "state": {
     "documentReady": "complete",
     "engineStarted": true,
@@ -42,7 +42,7 @@
       "ExampleMath",
       "Timer"
     ],
-    "bundleFingerprint": "c5b9d794bd4b7cd2dfaea739a74722d0e00b3acbf1c882e12bb2627fda460cc6",
+    "bundleFingerprint": "759a81dff4c24e79b17e09b9e524e90675fd2107c19ef5976275f0b34fc3fd7d",
     "canvas": {
       "width": 756,
       "height": 425
@@ -95,7 +95,7 @@
     "minY": -47.1,
     "maxY": 783.1
   },
-  "cameraSampleCount": 12,
+  "cameraSampleCount": 11,
   "cameraClampStates": [
     "none",
     "x",

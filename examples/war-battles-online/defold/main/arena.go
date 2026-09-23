@@ -93,6 +93,24 @@ embedded_components {
   }
 }
 embedded_components {
+  id: "muzzlefactory"
+  type: "factory"
+  data: "prototype: \"/main/arena-muzzle.go\"\n"
+  "load_dynamically: false\n"
+  ""
+  position {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  }
+  rotation {
+    x: 0.0
+    y: 0.0
+    z: 0.0
+    w: 1.0
+  }
+}
+embedded_components {
   id: "sfx_fire"
   type: "sound"
   data: "sound: \"/assets/derived/audio/fire.wav\"\n"

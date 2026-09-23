@@ -460,9 +460,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "c5b9d794bd4b7cd2dfaea739a74722d0e00b3acbf1c882e12bb2627fda460cc6",
+        "fingerprint": "759a81dff4c24e79b17e09b9e524e90675fd2107c19ef5976275f0b34fc3fd7d",
         "outputs": {
-          "deherm/app.dehermc": "653524a91165dcd2f0d3cee3d254508613d9ff17a8ad1498693ace6eaccd7511"
+          "deherm/app.dehermc": "90f8e23f3614bc649a78dc9e7e598ae89f7011eedc624fdaa7e1cf8216348a16"
         },
         "build": {
           "entryPoint": "main/arena.script.ts",
@@ -483,12 +483,12 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "17a4d5c70f88702191d6b3855e7b0a756d17e5c5c7ec21ff4d19a23878279885",
+          "digest": "4ffbb323c7d5343804a9f98ad4229fca8203e9a625073e732d096178ac2e2fb0",
           "fileCount": 68,
           "files": {
             ".deherm/generated/components/registry.ts": "442a3864f95018529f415bf4c125a33c4450308ac6b2797be8ad86f1f95b77e9",
             ".deherm/generated/dmsdk-call-symbol-index.json": "5b42fdf93957d7f5448f21e7f3b8cb6e5335dc6431d84136a0dad3d9d91f2b88",
-            ".deherm/generated/resource-symbols.json": "5d789b8914a7aa6e6ee3f81e381fa981ada46f11a43fc9cca8a24c9d14ea6944",
+            ".deherm/generated/resource-symbols.json": "7c641bfb9abce1b806a6b110478c65156fec475a28f4ae170a29fbeadc58bd76",
             ".deherm/generated/script-route-symbol-index.json": "b01d3f6d7f2d50b0bdab68adeff9bbe30db4de91e8785ba0af30dc9bcd2d502c",
             ".deherm/sdk/address.ts": "32420294482945e853794417e35e5614224af893df0338901259e63b62176649",
             ".deherm/sdk/component.ts": "64b6d6b295d2843f5c86147df0a52f68b802c20a6a993ab2b30290d3add0f614",
@@ -527,7 +527,7 @@
             ".deherm/sdk/hmr-state.ts": "6f8978f80140dfddd64a43713e07517647e54f799e90f1cce89686678502f47a",
             ".deherm/sdk/index.ts": "c9d99790bd21a591bb03190ca79e2055443202e4e4005e6e80f60a7f609c10f8",
             ".deherm/sdk/runtime.ts": "84a733642d38d5887bc16b1f472c5f1834ba8dc69928e8eace97cebe6ecf8988",
-            "main/arena.script.ts": "cb810e1919198e0e065a9420c5b06a2ed6c2128ccde1c18a03917730b0e6dd2a",
+            "main/arena.script.ts": "7b4e12e4231a79db53db6cd169a47a851daef552e6b2fd9c4e432a1d778213d9",
             "main/camera.script.ts": "8a55ec7a49e9f8bca0e7ae30071efdee8271699735e6a156b76dc95f069a1a58",
             "main/pickup.script.ts": "868d3376041849b24e4308519e51b5dcac8527585d4e7541e768edf8b22591a9",
             "main/player.script.ts": "d15a74cb995a762a51e7a1fc8651c9bab952bb160c62596cde0222a78692e389",

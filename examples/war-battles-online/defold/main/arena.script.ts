@@ -67,6 +67,7 @@ const SFX_ROUND_BIT = 1 << 4;
 
 const EXPLOSION_TICKS = 34;
 const SPARK_TICKS = 14;
+const MUZZLE_TICKS = 10;
 const MAX_EFFECTS = 24;
 
 /** Part discriminator understood by `tank.script.ts`. */
@@ -212,6 +213,20 @@ function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): void 
   self.effectTicks.push(big ? EXPLOSION_TICKS : SPARK_TICKS);
 }
 
+function spawnMuzzle(self: ArenaSelf, x: number, y: number, directionX: number, directionY: number): void {
+  // Muzzle prototypes are sprite-only: the director's bounded effect pool is
+  // the sole owner and retires them after the atlas animation has played.
+  if (self.effectIds.length >= MAX_EFFECTS) return;
+  const id = factory.create(
+    "#muzzlefactory",
+    vmath.vector3(pixelX(x), pixelY(y), 0.55),
+    vmath.quatRotationZ(Math.atan2(directionY, directionX)),
+  ) as DefoldHash | undefined;
+  if (id === undefined) return;
+  self.effectIds.push(id);
+  self.effectTicks.push(MUZZLE_TICKS);
+}
+
 function drainEvents(self: ArenaSelf): void {
   const world = self.match.world;
   if (world === undefined) return;
@@ -232,10 +247,17 @@ function drainEvents(self: ArenaSelf): void {
     } else if (kind === EVENT_HIT && self.event.a === localPlayerId) {
       playSfx(self, SFX_HIT_BIT, SFX_HIT, "hit");
     } else if (kind === EVENT_FIRE && self.event.b === WEAPON_MORTAR) {
+      const shooter = self.event.a - 1;
+      spawnMuzzle(self, self.event.x, self.event.y, world.playerTurretX[shooter]!, world.playerTurretY[shooter]!);
       spawnEffect(self, false, self.event.x, self.event.y);
       if (self.event.a === localPlayerId) playSfx(self, SFX_FIRE_BIT, SFX_FIRE, "fire");
     } else if (kind === EVENT_FIRE && self.event.a === localPlayerId) {
+      const shooter = self.event.a - 1;
+      spawnMuzzle(self, self.event.x, self.event.y, world.playerTurretX[shooter]!, world.playerTurretY[shooter]!);
       playSfx(self, SFX_FIRE_BIT, SFX_FIRE, "fire");
+    } else if (kind === EVENT_FIRE) {
+      const shooter = self.event.a - 1;
+      spawnMuzzle(self, self.event.x, self.event.y, world.playerTurretX[shooter]!, world.playerTurretY[shooter]!);
     } else if (kind === EVENT_PICKUP_TAKEN) {
       spawnEffect(self, false, self.event.x, self.event.y);
       if (self.event.a === localPlayerId) playSfx(self, SFX_PICKUP_BIT, SFX_PICKUP, "pickup");

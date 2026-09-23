@@ -185,6 +185,22 @@ versions, and explicitly excludes WAN, ingress, native Defold, impairment,
 load, persistent-stream runtime, and allocation claims. Those remain separate
 gates rather than implied by loopback transport success.
 
+## Bounded combat-feedback tranche
+
+The arena now renders a one-shot sprite-only `muzzle` prototype at the
+authoritative muzzle position for every observed `EVENT_FIRE`, including remote
+players and mortar shots, while the bounded presentation-event and effect pools
+retain capacity. The existing director-owned effect pool is the sole owner of
+the created object: it records the returned id and deletes it after the fixed
+animation lifetime, so no component callback can race a second deletion. The
+source-level integration gate checks the factory/prototype and event wiring,
+while native and browser runtime gates prove the updated game tree still loads,
+runs, and tears down, and the focused project typecheck checks the remaining
+generated contexts.
+This closes a concrete product gap in issue #99's real-art and animation
+acceptance without changing the core binding generator or introducing a
+game-specific input route.
+
 # Stage 3: over-the-top game expansion
 
 Use data-driven definitions for content so new items do not require new bridge

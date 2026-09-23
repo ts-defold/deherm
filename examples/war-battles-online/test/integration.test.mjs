@@ -241,7 +241,7 @@ test("the built project is the arena, and the mockup stays out of the build", as
 
   // Every object the arena creates is created through the director's own
   // relative factory URLs.
-  for (const factoryId of ["tankfactory", "pickupfactory", "shotfactory", "boomfactory", "sparkfactory"]) {
+  for (const factoryId of ["tankfactory", "pickupfactory", "shotfactory", "boomfactory", "sparkfactory", "muzzlefactory"]) {
     assert.match(arenaObject, new RegExp(`id: "${factoryId}"`), `arena.go is missing ${factoryId}`);
     assert.match(arenaSource, new RegExp(`"#${factoryId}"`), `arena.script.ts never uses ${factoryId}`);
   }
@@ -253,6 +253,12 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(playerSource, /msg\.post\(ARENA, "restart"\)/);
   assert.match(arenaSource, /war-battles:arena-restart:round=/);
   assert.match(arenaSource, /sound\.play\(url\)/);
+  assert.match(arenaSource, /spawnMuzzle\(self/);
+  const muzzleObject = await readFile(fromExample("defold/main/arena-muzzle.go"), "utf8");
+  assert.match(muzzleObject, /type: "sprite"/);
+  assert.match(muzzleObject, /tile_set: \\"\/main\/arena-sprites\.atlas\\"/);
+  assert.match(muzzleObject, /default_animation: \\"muzzle\\"/);
+  assert.doesNotMatch(muzzleObject, /component:/);
   // Camera clamps must use the effective auto-fit zoom. The HTML5 canvas is
   // responsive, so fixed-mode reference dimensions place the first spawn
   // partly outside the viewport even though the map bounds are correct.
@@ -311,6 +317,7 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
     "tank-red-hull", "tank-green-hull", "tank-sand-hull",
     "proj-cannon", "proj-machinegun", "proj-railgun", "proj-scatter", "proj-mortar", "proj-ricochet",
     "explosion-big", "explosion-small",
+    "muzzle",
     "pickup-health", "pickup-armor", "pickup-overdrive",
     "pickup-machinegun", "pickup-railgun", "pickup-scatter", "pickup-mortar", "pickup-ricochet",
   ]) {
