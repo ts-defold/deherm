@@ -201,6 +201,22 @@ This closes a concrete product gap in issue #99's real-art and animation
 acceptance without changing the core binding generator or introducing a
 game-specific input route.
 
+## Bounded camera impact tranche
+
+The arena now reduces authoritative `EVENT_HIT`, `EVENT_EXPLOSION`, and
+`EVENT_KILL` records to at most one reusable `camera_impact` message per update,
+keeping the strongest impact when several records arrive together. The camera
+accepts only nearby impacts, applies a fixed 180 ms deterministic envelope, and
+clamps the shaken view against the same world rectangle as the follow view. The
+phase is an incrementing scalar rather than a random source, so the same event
+stream produces the same shake without a new bridge, queue, or per-frame
+presentation allocation in the TypeScript state.
+
+The integration gate proves the bounded aggregation, message route, decay, and
+post-shake clamp structurally. Existing native and browser runtime gates prove
+the updated project still loads, renders, and tears down; they do not claim a
+specific combat event was visually observed during their fixed runtime window.
+
 # Stage 3: over-the-top game expansion
 
 Use data-driven definitions for content so new items do not require new bridge

@@ -3,6 +3,7 @@ import {
   factory,
   go,
   hashLiteral,
+  msg,
   property,
   sound,
   sys,
@@ -52,6 +53,8 @@ declare const __defoldHostV1: {
 
 const ENGAGE = hashLiteral("#engage");
 const RESTART = hashLiteral("#restart");
+const CAMERA = "/camera#follow";
+const CAMERA_IMPACT = "camera_impact";
 
 const SFX_FIRE = "#sfx_fire";
 const SFX_HIT = "#sfx_hit";
@@ -69,6 +72,17 @@ const EXPLOSION_TICKS = 34;
 const SPARK_TICKS = 14;
 const MUZZLE_TICKS = 10;
 const MAX_EFFECTS = 24;
+const CAMERA_IMPACT_HIT = 3;
+const CAMERA_IMPACT_EXPLOSION = 8;
+const CAMERA_IMPACT_KILL = 12;
+
+interface CameraImpactMessage {
+  [key: string]: unknown;
+  [key: symbol]: unknown;
+  x: number;
+  y: number;
+  strength: number;
+}
 
 /** Part discriminator understood by `tank.script.ts`. */
 const PART_HULL = 0;
@@ -94,6 +108,8 @@ interface ArenaSelf {
   visibleProjectiles: number;
   effectIds: DefoldHash[];
   effectTicks: number[];
+  /** One reusable message; drainEvents sends at most one impact per update. */
+  impact: CameraImpactMessage;
   online: boolean;
   sfxMask: number;
 }
@@ -227,9 +243,20 @@ function spawnMuzzle(self: ArenaSelf, x: number, y: number, directionX: number, 
   self.effectTicks.push(MUZZLE_TICKS);
 }
 
+function requestCameraImpact(self: ArenaSelf, strength: number, x: number, y: number): void {
+  // Multiple authoritative events can arrive in one update (a kill writes an
+  // explosion immediately after it). Keep one strongest message instead of
+  // allocating or queueing a message for every event.
+  if (strength <= self.impact.strength) return;
+  self.impact.x = x;
+  self.impact.y = y;
+  self.impact.strength = strength;
+}
+
 function drainEvents(self: ArenaSelf): void {
   const world = self.match.world;
   if (world === undefined) return;
+  self.impact.strength = 0;
   const localPlayerId = self.match.localSlot + 1;
   const oldest = world.events.oldest();
   if (self.eventCursor < oldest) self.eventCursor = oldest;
@@ -238,13 +265,16 @@ function drainEvents(self: ArenaSelf): void {
     self.eventCursor += 1;
     const kind = self.event.kind;
     if (kind === EVENT_EXPLOSION) {
+      requestCameraImpact(self, CAMERA_IMPACT_EXPLOSION, self.event.x, self.event.y);
       spawnEffect(self, true, self.event.x, self.event.y);
     } else if (kind === EVENT_KILL) {
+      requestCameraImpact(self, CAMERA_IMPACT_KILL, self.event.x, self.event.y);
       spawnEffect(self, true, self.event.x, self.event.y);
       if (self.event.a === localPlayerId || self.event.b === localPlayerId) {
         playSfx(self, SFX_EXPLOSION_BIT, SFX_EXPLOSION, "explosion");
       }
     } else if (kind === EVENT_HIT && self.event.a === localPlayerId) {
+      requestCameraImpact(self, CAMERA_IMPACT_HIT, self.event.x, self.event.y);
       playSfx(self, SFX_HIT_BIT, SFX_HIT, "hit");
     } else if (kind === EVENT_FIRE && self.event.b === WEAPON_MORTAR) {
       const shooter = self.event.a - 1;
@@ -263,6 +293,7 @@ function drainEvents(self: ArenaSelf): void {
       if (self.event.a === localPlayerId) playSfx(self, SFX_PICKUP_BIT, SFX_PICKUP, "pickup");
     }
   }
+  if (self.impact.strength > 0) msg.post(CAMERA, CAMERA_IMPACT, self.impact);
 }
 
 function ageEffects(self: ArenaSelf): void {
@@ -376,6 +407,7 @@ export default defineComponent({
     self.visibleProjectiles = 0;
     self.effectIds = [];
     self.effectTicks = [];
+    self.impact = { x: 0, y: 0, strength: 0 };
     self.sfxMask = 0;
     const players = Math.max(2, Math.min(32, Math.trunc(self.players)));
     self.players = players;

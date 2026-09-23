@@ -23,10 +23,20 @@ declare const __defoldHostV1: {
  * `msg.post(String, String, Table)` shape.
  */
 const PLAYER_AT = hashLiteral("#player_at");
+const CAMERA_IMPACT = hashLiteral("#camera_impact");
+const SHAKE_DURATION = 0.18;
+const SHAKE_RADIUS = 360;
+const MAX_SHAKE_PIXELS = 14;
 
 interface PlayerAt {
   readonly x: number;
   readonly y: number;
+}
+
+interface CameraImpact {
+  readonly x: number;
+  readonly y: number;
+  readonly strength: number;
 }
 
 interface CameraSelf {
@@ -66,6 +76,11 @@ interface CameraSelf {
   clampedX: boolean;
   clampedY: boolean;
   traceElapsed: number;
+  /** Fixed-lifetime deterministic camera impulse, in world pixels. */
+  shakeRemaining: number;
+  shakeElapsed: number;
+  shakeAmplitude: number;
+  shakePhase: number;
 }
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -98,12 +113,26 @@ function resolveBounds(self: CameraSelf): void {
 
 /** Write the smoothed view position, snapped to whole world pixels. */
 function commit(self: CameraSelf): void {
-  const x = clamp(self.viewX, self.minX, self.maxX);
-  const y = clamp(self.viewY, self.minY, self.maxY);
-  self.clampedX = x !== self.viewX;
-  self.clampedY = y !== self.viewY;
-  self.viewX = x;
-  self.viewY = y;
+  const baseX = clamp(self.viewX, self.minX, self.maxX);
+  const baseY = clamp(self.viewY, self.minY, self.maxY);
+  let shakeX = 0;
+  let shakeY = 0;
+  if (self.shakeRemaining > 0 && self.shakeAmplitude > 0) {
+    const envelope = (self.shakeRemaining / SHAKE_DURATION) ** 2;
+    const phase = self.shakePhase + self.shakeElapsed * 61;
+    shakeX = Math.sin(phase * 1.7) * self.shakeAmplitude * envelope;
+    shakeY = Math.cos(phase * 2.3) * self.shakeAmplitude * envelope;
+  }
+  // Clamp after applying the impulse so shake never reveals outside the map.
+  const x = clamp(baseX + shakeX, self.minX, self.maxX);
+  const y = clamp(baseY + shakeY, self.minY, self.maxY);
+  self.clampedX = baseX !== self.viewX || x !== baseX + shakeX;
+  self.clampedY = baseY !== self.viewY || y !== baseY + shakeY;
+  // Keep the smoothed follow state free of the transient impulse. Otherwise
+  // the next frame would chase the shaken position and the envelope would
+  // become a second, unbounded follow offset.
+  self.viewX = baseX;
+  self.viewY = baseY;
   // The reference scale is a whole-pixel integer zoom, so the view origin is
   // snapped to whole world pixels; a fractional origin would shimmer the
   // tilemap at the authored scale.
@@ -166,13 +195,35 @@ export default defineComponent({
     self.clampedX = false;
     self.clampedY = false;
     self.traceElapsed = 0;
+    self.shakeRemaining = 0;
+    self.shakeElapsed = 0;
+    self.shakeAmplitude = 0;
+    self.shakePhase = 0;
     commit(self);
   },
 
-  onMessage(self: CameraSelf, messageId: DefoldHash, message: PlayerAt): void {
-    if (messageId !== PLAYER_AT) return;
-    self.targetX = message.x;
-    self.targetY = message.y;
+  onMessage(self: CameraSelf, messageId: DefoldHash, message: PlayerAt | CameraImpact): void {
+    if (messageId === PLAYER_AT) {
+      self.targetX = message.x;
+      self.targetY = message.y;
+      return;
+    }
+    if (messageId !== CAMERA_IMPACT) return;
+    const impact = message as CameraImpact;
+    const dx = impact.x - self.viewX;
+    const dy = impact.y - self.viewY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    if (distance >= SHAKE_RADIUS) return;
+    const proximity = 1 - distance / SHAKE_RADIUS;
+    const amplitude = Math.min(MAX_SHAKE_PIXELS, Math.max(0, impact.strength) * proximity);
+    if (amplitude <= 0) return;
+    self.shakeAmplitude = Math.max(self.shakeAmplitude, amplitude);
+    self.shakeRemaining = Math.max(self.shakeRemaining, SHAKE_DURATION);
+    self.shakeElapsed = 0;
+    // The phase is an incrementing deterministic sequence, not a random
+    // source, so replayed event streams produce identical camera motion.
+    self.shakePhase += 1.61803398875;
+    if (self.shakePhase > 1000) self.shakePhase -= 1000;
   },
 
   update(self: CameraSelf, dt: number): void {
@@ -196,6 +247,16 @@ export default defineComponent({
     const leadBlend = 1 - Math.exp(-self.lookAheadRate * dt);
     self.leadX += (desiredLeadX - self.leadX) * leadBlend;
     self.leadY += (desiredLeadY - self.leadY) * leadBlend;
+
+    if (self.shakeRemaining > 0) {
+      self.shakeElapsed += dt;
+      self.shakeRemaining -= dt;
+      if (self.shakeRemaining <= 0) {
+        self.shakeRemaining = 0;
+        self.shakeElapsed = 0;
+        self.shakeAmplitude = 0;
+      }
+    }
 
     const followBlend = 1 - Math.exp(-self.followRate * dt);
     self.viewX += (self.targetX + self.leadX - self.viewX) * followBlend;

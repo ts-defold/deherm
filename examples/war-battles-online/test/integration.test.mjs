@@ -254,6 +254,9 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(arenaSource, /war-battles:arena-restart:round=/);
   assert.match(arenaSource, /sound\.play\(url\)/);
   assert.match(arenaSource, /spawnMuzzle\(self/);
+  assert.match(arenaSource, /msg\.post\(CAMERA, CAMERA_IMPACT, self\.impact\)/);
+  assert.match(arenaSource, /self\.impact\.strength = 0/);
+  assert.equal((arenaSource.match(/msg\.post\(CAMERA, CAMERA_IMPACT/g) ?? []).length, 1);
   const muzzleObject = await readFile(fromExample("defold/main/arena-muzzle.go"), "utf8");
   assert.match(muzzleObject, /type: "sprite"/);
   assert.match(muzzleObject, /tile_set: \\"\/main\/arena-sprites\.atlas\\"/);
@@ -264,6 +267,10 @@ test("the built project is the arena, and the mockup stays out of the build", as
   // partly outside the viewport even though the map bounds are correct.
   assert.match(cameraSource, /getOrthographicAutoZoom/);
   assert.match(cameraObject, /orthographic_mode: ORTHO_MODE_AUTO_FIT/);
+  assert.match(cameraSource, /SHAKE_DURATION = 0\.18/);
+  assert.match(cameraSource, /messageId !== CAMERA_IMPACT/);
+  assert.match(cameraSource, /self\.shakeRemaining -= dt/);
+  assert.match(cameraSource, /Clamp after applying the impulse/);
 
   assert.match(scene, /script: "\/main\/ui\.gui_script"/);
   assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 4);
