@@ -21,6 +21,7 @@ import {
   WORLD_PIXEL_ORIGIN_Y,
   type PlayControls,
 } from "./generated-war-battles/index";
+import { hmrPersistentState } from "@deherm/project";
 
 export const MAX_VISIBLE_PROJECTILES = 64;
 export const DEFAULT_ROSTER = 8;
@@ -111,15 +112,15 @@ export class ArenaMatch {
   }
 }
 
-let current: ArenaMatch | undefined;
+const persistent = hmrPersistentState("war-battles/arena-match", () => ({ current: undefined as ArenaMatch | undefined }));
 
 export function arenaMatch(): ArenaMatch | undefined {
-  return current;
+  return persistent.value.current;
 }
 
 export function startArena(options: ArenaOptions): ArenaMatch {
-  current = new ArenaMatch(options);
-  return current;
+  persistent.value.current = new ArenaMatch(options);
+  return persistent.value.current;
 }
 
 /** Simulation units to Defold world pixels, and back. */

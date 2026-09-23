@@ -269,7 +269,7 @@ stateDiagram-v2
   Retired --> [*]: drain roots and arena
 ```
 
-The transaction is:
+The general application transaction is:
 
 1. Build a candidate Hermes runtime in an inactive runtime slot.
 2. Evaluate the complete bundle and validate exported lifecycle/component tables.
@@ -292,6 +292,31 @@ Dynamic source or matched bytecode Hermes is the native development lane.
 Static Hermes is still the native release/AOT lane, but an AOT binary cannot be
 replaced by resource reload. HTML5 uses the host browser JavaScript engine and a
 unique generation factory; it does not embed Hermes in Wasm by default.
+
+Component-only native bundles now take a compatible fast path after the same
+disposable candidate validation. The active Hermes realm clears its registration
+globals, evaluates the candidate bundle, requires a new component registry and
+64-hex build fingerprint, and validates every live component id, schema
+fingerprint, context, and definition before replacing any definition. It then
+swaps only the method-table objects. The existing `self` objects, handle slots,
+generations, properties, and other authored state stay in the active realm. A
+schema or context change restores the prior globals and definitions and leaves
+the last-good generation callable. Each committed slot becomes reload-pending;
+its next real proxy lifecycle dispatch consumes exactly one authored `onReload`
+inside that proxy's already-active Defold instance context. An explicit Defold
+proxy `on_reload` consumes the same pending callback. An accepted generation
+therefore never needs a second `init`, and the extension never bulk-calls hooks
+without the owning script instance. A bulk runtime shutdown has no owning proxy
+context; if it reaches a still-pending slot, the runtime drops that obsolete
+reload callback and calls `final` exactly once instead of executing `onReload`
+under the bootstrap context.
+
+This fast path is intentionally limited to compiler-generated component bundles,
+whose top level is registration-only. The transaction restores déherm's three
+registration globals and every live definition on failure; it cannot roll back
+arbitrary external side effects performed by hand-written top-level JavaScript.
+Application bundles still use the fresh-realm transaction above. Static Hermes
+units remain installed in the active runtime and are not resource-reloaded.
 
 ## Two native transports and one browser transport
 
@@ -658,19 +683,75 @@ one reload signal, and one matching runtime activation for each edit, continuous
 heap/component/Lua-registry telemetry, and no runtime error. The exact
 fingerprints were `5de1ceb3...` -> `6334816a...` -> `5de1ceb3...`.
 
-That run also made the remaining state boundary visible rather than closing it:
-the native candidate transaction constructs a fresh Hermes component `self` and
-runs `init` when a live Lua proxy first dispatches into the new runtime. War
-Battles therefore restarted its match and spawned another presentation set;
-observed component counts rose from 51 to 95 to 127. This is not claimed as a
-leak-free/state-preserving HMR result. Explicit component capture/restore or a
-bounded teardown/migration contract is still required before that claim;
-[issue #120](https://github.com/ts-defold/deherm/issues/120) tracks that exact
-measured boundary and soak gate.
+That run also made the former state boundary visible: the fresh-realm candidate
+constructed a new Hermes component `self` and ran `init` when a live Lua proxy
+first dispatched into it. War Battles restarted its match and spawned another
+presentation set; observed component counts rose from 51 to 95 to 127.
+
+The native runtime now has a same-realm component-only transaction that removes
+that mechanism. Its standalone Dynamic Hermes executable preserves authored
+`self` state, uses the replacement lifecycle table without a second `init`,
+dispatches exactly one `onReload`, rejects schema/context drift without changing
+the active behavior, and completes 1,000 alternating cycles (500 accepted, 500
+rejected) with live component/callback counts fixed at their baseline and then
+returned to zero. The same executable passes ASan and UBSan.
+
+The first public packed-package soak preserved runtime id `1`, arena instance
+`0:1`, and all 19 persistent identities, but its live component set climbed
+from 51 to 222 while the simulation population fell. Independent review traced
+that measured regression to a re-evaluated module-local arena singleton:
+preserving component `self` did not preserve mutable module state, so newly
+bound rocket and pickup definitions could no longer find the match and never
+reached their deletion checks. That run is retained as negative evidence, not
+described as harmless transient churn.
+
+The revision-neutral `hmrPersistentState` cell below now retains the arena
+singleton explicitly. A fresh six-edit soak through the packed npm package,
+local Extender, Bob, and custom Defold engine kept runtime id `1`, arena
+instance `0:1`, and all 19 persistent identities while gameplay advanced to
+tick 918. Live component counts were `51, 49, 41, 42, 44, 33, 35`; transient
+populations were `32, 30, 22, 23, 25, 14, 16`. Exact identity comparison
+observed 56 transient detaches after the first accepted generation, with at
+least five in every later transition. The current evidence at
+`examples/war-battles-online/evidence/installed-hmr-soak-native.json` is bound
+to packed-package tree digest `409b55cd...` and rejects the historical monotonic
+accumulation trace.
+
+Each edit window and a post-process-close whole-session sweep fail closed on
+error-level JSON events, rejected activations, non-JSON stdout, or stderr, so
+startup, inter-edit, and shutdown diagnostics cannot hide behind a successful
+fingerprint acknowledgement.
+On POSIX the driver probes and reaps the owned process group even after its CLI
+leader exits, escalating from `SIGTERM` to `SIGKILL` on group liveness. Windows
+uses `taskkill /T`, escalating to `/F`; failure to address the original tree is
+an error even when the CLI leader has already exited, because leader exit is
+not descendant-exit evidence. Process cleanup failure cannot skip restoration
+of the temporary source edit. These paths are covered by platform-neutral unit
+tests while live Windows cleanup remains host-parity evidence. The standalone
+1,000-cycle sanitizer run and installed War Battles
+soak remain separately named evidence rather than being promoted into one
+another. This closes the measured state-preservation boundary in
+[issue #120](https://github.com/ts-defold/deherm/issues/120).
 The Rezi console exists and has deterministic renderer fixtures, but still
 needs PTY/performance/platform evidence. Its focus, layer, pointer, selection,
 and keymap behavior is covered by deterministic renderer and lifecycle tests
 only; no run against a real PTY has been recorded, so mouse reporting, OSC 52
-acceptance, and divider dragging are unobserved on an actual terminal. The native swap and init-throw
-rejection recovery are proven for one sample bundle, not yet for the whole API
-or War Battles.
+acceptance, and divider dragging are unobserved on an actual terminal. The
+native swap, init-throw rejection recovery, and installed War Battles
+state-preservation loop are proven for persistent identity and observed
+transient detach; they do not by themselves prove every generated API route.
+
+## Same-realm persistent module state
+
+Revision-neutral projects may opt into `hmrPersistentState(key, create)` from
+`@deherm/project`. It stores one caller-keyed mutable cell on the realm-owned
+`globalThis.__dehermHmrPersistentStateV1` registry. Re-evaluating a compatible
+bundle therefore reuses the cell without retaining a module namespace or
+running its factory again; keys are explicit and independent, and an empty key
+fails closed. This is deliberately a small state primitive, not an automatic
+module cache or a promise to migrate arbitrary class instances.
+
+War Battles' arena-match singleton uses the cell so newly evaluated component
+definitions close over the same current match. The installed soak proves the
+engine-side transient lifecycle separately through exact disappearing instance
+identities; persistent arena identity alone is not promoted to that evidence.

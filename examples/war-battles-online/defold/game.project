@@ -23,6 +23,9 @@ shared_state = 1
 [tilemap]
 max_tile_count = 16384
 
+[sprite]
+max_count = 1024
+
 [library]
 include_dirs = defold_hermes
 

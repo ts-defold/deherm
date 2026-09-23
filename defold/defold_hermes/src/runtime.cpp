@@ -36,6 +36,7 @@
 #include <stdexcept>
 #include <system_error>
 #include <utility>
+#include <vector>
 
 #include <hermes/hermes.h>
 #include <jsi/jsi.h>
@@ -225,6 +226,133 @@ class Runtime::Impl {
     captureEntrypoints();
   }
 
+  void reloadComponentBundle(const std::string& source, const std::string& sourceUrl) {
+    if (!componentOnly()) {
+      throw std::runtime_error(
+          "Same-realm component HMR requires a loaded component-only bundle");
+    }
+
+    // Keep the registration surface alive until every live slot has passed
+    // validation.  In particular, never let a candidate inherit the previous
+    // registry or fingerprint: doing so could acknowledge a bundle that did
+    // not actually register its own definitions.
+    auto global = runtime_->global();
+    jsi::Value previousApplication = global.getProperty(*runtime_, "__defoldAppV1");
+    jsi::Value previousComponents = global.getProperty(*runtime_, "__defoldComponentsV1");
+    jsi::Value previousFingerprint = global.getProperty(
+        *runtime_, "__DEFOLD_HERMES_BUILD_FINGERPRINT__");
+    // jsi::Object is a movable handle, not a copyable value. Retain cloned
+    // Value handles for rollback, and stage replacement Object handles before
+    // touching any live slot so validation and allocation complete first.
+    std::vector<std::pair<uint32_t, jsi::Value>> previousDefinitions;
+    std::vector<std::pair<uint32_t, jsi::Object>> candidateDefinitions;
+    previousDefinitions.reserve(liveComponents_);
+    candidateDefinitions.reserve(liveComponents_);
+
+    const auto restore = [&]() {
+      global.setProperty(*runtime_, "__defoldAppV1", std::move(previousApplication));
+      global.setProperty(*runtime_, "__defoldComponentsV1", std::move(previousComponents));
+      global.setProperty(
+          *runtime_, "__DEFOLD_HERMES_BUILD_FINGERPRINT__", std::move(previousFingerprint));
+      for (auto& previous : previousDefinitions) {
+        ComponentSlot& slot = componentSlots_[previous.first];
+        if (slot.live && previous.second.isObject())
+          slot.definition.emplace(previous.second.getObject(*runtime_));
+      }
+    };
+
+    try {
+      global.setProperty(*runtime_, "__defoldAppV1", jsi::Value::undefined());
+      global.setProperty(*runtime_, "__defoldComponentsV1", jsi::Value::undefined());
+      global.setProperty(
+          *runtime_, "__DEFOLD_HERMES_BUILD_FINGERPRINT__", jsi::Value::undefined());
+      runtime_->evaluateJavaScript(
+          std::make_shared<jsi::StringBuffer>(source), sourceUrl);
+
+      const auto application = global.getProperty(*runtime_, "__defoldAppV1");
+      if (!application.isUndefined() && !application.isNull()) {
+        throw jsi::JSError(
+            *runtime_, "Component-only HMR candidate registered an application lifecycle");
+      }
+      const auto registeredValue = global.getProperty(*runtime_, "__defoldComponentsV1");
+      if (!registeredValue.isObject()) {
+        throw jsi::JSError(
+            *runtime_, "Component-only HMR candidate registered no component registry");
+      }
+      const std::string candidateFingerprint = bundleFingerprint();
+      if (candidateFingerprint.empty()) {
+        throw jsi::JSError(*runtime_, "Component-only HMR candidate carries no build fingerprint");
+      }
+
+      const auto registered = registeredValue.asObject(*runtime_);
+      const auto contextName = [](ComponentContext context) {
+        return context == ComponentContext::kGameObject ? "game-object" :
+            context == ComponentContext::kGuiScene ? "gui-scene" :
+            "render-instance+graphics";
+      };
+      for (uint32_t index = 0; index < componentSlots_.size(); ++index) {
+        ComponentSlot& slot = componentSlots_[index];
+        if (!slot.live) continue;
+        if (!slot.definition || !slot.self) {
+          throw std::runtime_error("Live component slot has no retained same-realm state");
+        }
+        previousDefinitions.emplace_back(
+            index, jsi::Value(*runtime_, *slot.definition));
+        const auto entryValue = registered.getProperty(*runtime_, slot.componentId.c_str());
+        if (!entryValue.isObject()) {
+          throw jsi::JSError(
+              *runtime_, std::string("Component disappeared during same-realm HMR: ") +
+              slot.componentId);
+        }
+        const auto entry = entryValue.asObject(*runtime_);
+        const auto schema = entry.getProperty(*runtime_, "schemaFingerprint");
+        if (!schema.isString() ||
+            schema.getString(*runtime_).utf8(*runtime_) != slot.schemaFingerprint) {
+          throw jsi::JSError(
+              *runtime_, std::string("Component schema fingerprint changed; a property-schema "
+              "change needs a project build: ") + slot.componentId);
+        }
+        const auto context = entry.getProperty(*runtime_, "contextKind");
+        if (!context.isString() ||
+            context.getString(*runtime_).utf8(*runtime_) != contextName(slot.context)) {
+          throw jsi::JSError(
+              *runtime_, std::string("Component context does not match its existing attachment: ") +
+              slot.componentId);
+        }
+        const auto definition = entry.getProperty(*runtime_, "definition");
+        if (!definition.isObject() ||
+            definition.asObject(*runtime_).isFunction(*runtime_)) {
+          throw jsi::JSError(
+              *runtime_, std::string("Reloaded component definition is invalid: ") +
+              slot.componentId);
+        }
+        candidateDefinitions.emplace_back(
+            index, definition.getObject(*runtime_));
+      }
+
+      // All compatibility checks and handle allocations happen before
+      // replacing any slot. The self object is intentionally untouched; only
+      // its definition (the method table) is rebound in this realm. Lifecycle
+      // dispatch remains the responsibility of the native Lua proxy.
+      for (auto& candidate : candidateDefinitions) {
+        componentSlots_[candidate.first].definition = std::move(candidate.second);
+      }
+      // Defold reloads the shared .dehermc resource, not every unchanged Lua
+      // proxy resource, so no proxy on_reload callback is guaranteed here.
+      // Defer exactly one authored onReload until each proxy next dispatches
+      // with its own active Defold instance/context.
+      for (const auto& candidate : candidateDefinitions) {
+        componentSlots_[candidate.first].reloadPending = true;
+        componentSlots_[candidate.first].reloadCallbackDelivered = false;
+      }
+    } catch (...) {
+      restore();
+      throw;
+    }
+  }
+
+  bool componentOnly() const noexcept { return loaded_ && !app_; }
+
   void captureEntrypoints() {
     auto application = runtime_->global().getProperty(*runtime_, "__defoldAppV1");
     auto components = runtime_->global().getProperty(*runtime_, "__defoldComponentsV1");
@@ -355,6 +483,20 @@ class Runtime::Impl {
     ComponentSlot& slot = resolve(handle);
     if (!lifecycle || argumentCount > 4 || (argumentCount && !arguments))
       throw std::invalid_argument("Component dispatch arguments are invalid");
+    if (slot.reloadPending) {
+      // Clear before invoking authored code: a throwing onReload is reported
+      // once instead of poisoning every subsequent engine frame. A direct
+      // onReload lifecycle dispatch consumes the same pending callback instead
+      // of leaving it armed for the next update.
+      slot.reloadPending = false;
+      slot.reloadCallbackDelivered = true;
+      // Finalization may be a bulk runtime teardown under the bootstrap
+      // context rather than the component proxy's owning instance. A pending
+      // reload has no useful lifecycle after final, so consume and drop it.
+      if (std::strcmp(lifecycle, "onReload") != 0 &&
+          std::strcmp(lifecycle, "final") != 0)
+        dispatchComponent(handle, "onReload", nullptr, 0);
+    }
     auto hookValue = slot.definition->getProperty(*runtime_, lifecycle);
     if (hookValue.isUndefined() || hookValue.isNull()) return false;
     if (!hookValue.isObject() || !hookValue.asObject(*runtime_).isFunction(*runtime_))
@@ -381,14 +523,27 @@ class Runtime::Impl {
     auto definition = entryValue.asObject(*runtime_).getProperty(*runtime_, "definition");
     if (!definition.isObject()) throw jsi::JSError(*runtime_, "Reloaded component definition is invalid");
     slot.definition.emplace(definition.asObject(*runtime_));
-    dispatchComponent(handle, "onReload", nullptr, 0);
+    const bool callbackAlreadyDelivered = slot.reloadCallbackDelivered;
+    slot.reloadPending = false;
+    slot.reloadCallbackDelivered = false;
+    // A Defold proxy may report on_reload after the first normal lifecycle
+    // dispatch already consumed the deferred callback. Keep that engine event
+    // idempotent for the accepted bundle while preserving explicit reloads
+    // when no callback has been delivered yet.
+    if (!callbackAlreadyDelivered) {
+      // Mark before invoking authored code so a throwing callback is not
+      // retried by a duplicate engine notification for this generation.
+      slot.reloadCallbackDelivered = true;
+      dispatchComponent(handle, "onReload", nullptr, 0);
+    }
   }
 
   void detachComponent(ComponentHandle handle) {
     if (handle.slot >= componentSlots_.size()) return;
     ComponentSlot& slot = componentSlots_[handle.slot];
     if (!slot.live || slot.generation != handle.generation) return;
-    slot.definition.reset(); slot.self.reset(); slot.componentId.clear(); slot.schemaFingerprint.clear(); slot.live = false;
+    slot.definition.reset(); slot.self.reset(); slot.componentId.clear(); slot.schemaFingerprint.clear();
+    slot.reloadPending = false; slot.reloadCallbackDelivered = false; slot.live = false;
 #if DEHERM_HERMES_DEBUGGER
     for (uint8_t index = 0; index < slot.propertyCount; ++index)
       slot.propertyNames[index].clear();
@@ -584,6 +739,8 @@ class Runtime::Impl {
     std::string schemaFingerprint;
     ComponentContext context = ComponentContext::kGameObject;
     uint32_t generation = 1;
+    bool reloadPending = false;
+    bool reloadCallbackDelivered = false;
     bool live = false;
 #if DEHERM_HERMES_DEBUGGER
     std::array<std::string, kSnapshotPropertyCapacity> propertyNames{};
@@ -1012,6 +1169,12 @@ void Runtime::loadStatic(
   impl_->loadStatic(unitCreators, unitCount, sourceUrl);
   impl_->pumpInspector();
 }
+void Runtime::reloadComponentBundle(const std::string& source, const std::string& sourceUrl) {
+  impl_->pumpInspector();
+  impl_->reloadComponentBundle(source, sourceUrl);
+  impl_->pumpInspector();
+}
+bool Runtime::componentOnly() const noexcept { return impl_->componentOnly(); }
 void Runtime::init() { impl_->pumpInspector(); impl_->init(); impl_->pumpInspector(); }
 void Runtime::update(double dt) { impl_->pumpInspector(); impl_->update(dt); impl_->pumpInspector(); }
 void Runtime::onMessage(const std::string& message) { impl_->pumpInspector(); impl_->onMessage(message); impl_->pumpInspector(); }

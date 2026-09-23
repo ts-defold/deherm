@@ -1,5 +1,75 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Component-only native HMR keeps the live realm and authored state
+
+Native component-only reloads now validate a complete candidate in a disposable
+Hermes runtime and then commit compatible definitions into the already-active
+realm. The commit clears and re-establishes the registration surface, validates
+every live component id, schema fingerprint, context, and definition before any
+slot changes, and swaps only definition objects. Existing `self` objects,
+component handle generations, properties, and authored match state stay live.
+Schema or context drift restores the prior registration globals and definitions.
+The shared `.dehermc` resource does not cause Defold to reload every unchanged
+Lua proxy resource, so commit marks each live slot reload-pending. The next real
+proxy lifecycle dispatch consumes exactly one authored `onReload` inside that
+proxy's active Defold instance context; an explicit proxy `on_reload` consumes
+the same pending callback. Accepted generations receive no second `init`, and
+the extension does not bulk-call hooks without the owning script instance. If
+runtime finalization reaches a still-pending slot before another proxy
+lifecycle, it consumes the pending bit without calling `onReload` under the
+bootstrap context and still runs `final` exactly once.
+
+The focused Dynamic Hermes executable passed a 1,000-cycle alternating soak:
+500 compatible definition reloads and 500 rejected schema-drift candidates,
+with one component and zero callback roots throughout, followed by zero live
+component/callback roots after finalization. A separately configured Debug build
+of the same target passed under ASan and UBSan. The public packed-package path
+then completed three independent six-edit War Battles soaks against the custom
+Defold engine. The recorded run revalidates from
+`examples/war-battles-online/evidence/installed-hmr-soak-native.json`: Hermes
+runtime id `1`, arena instance `0:1`, and all 19 persistent component identities
+remain exact while gameplay continues advancing through every edit. Transient
+combat
+objects legitimately raise the sampled component high-water mark from 51 to
+222, but no persistent identity duplicates, callback-root growth, Lua-registry
+growth, or runtime replacement occurs. The evidence also records a deterministic
+SHA-256 of the packed npm package tree while normalizing the temporary install
+path and loopback inspector endpoint, so replay is bound to package content
+without treating host-local paths as product identity. The installed driver
+records error-level JSON events, rejected activations, and any non-JSON stdout
+protocol violation in the exact edit window; an activation cannot be reported
+healthy while one of those diagnostics is present. It also owns a POSIX
+process group, waits for graceful shutdown, escalates the owned tree only on a
+deadline, and all repeated runs leave no CLI or engine process alive.
+
+The same live run exposed two independent defects rather than hiding them. War
+Battles retained `undefined` when `factory.create` exhausted Defold's game-object
+buffer; authored TypeScript now refuses that absent id before `go.delete`. The
+stricter per-edit error gate then exposed Defold's default 128-sprite capacity as
+smaller than the simulation's authored 512-projectile bound. The example now
+declares 1,024 sprite slots, and the fresh six-edit soak completes without those
+factory errors. The
+generated value-family dispatcher also treated every non-specialized shape as
+invalid. A reviewed `unhandledShapePolicy` now lets partial specializations such
+as `go.delete(Hash)` yield documented non-owned shapes to the universal generated
+route, while source-contradicting partial shapes such as the misleading
+two-number `vmath.euler_to_quat` declaration still fail closed. Native exact
+tests execute both the specialized hash and universal string-address delete
+forms. Compiler-generated component bundles remain registration-only at top
+level; arbitrary external side effects from hand-written top-level JavaScript
+are outside the rollback contract.
+
+The integration review found and closed three smaller evidence gaps. A direct
+`onReload` lifecycle dispatch now consumes the same pending bit as the deferred
+path, so the following update cannot invoke it twice; the 1,000-cycle Release
+and ASan/UBSan harnesses include that assertion. Installed HMR evidence now
+requires the activation event and component snapshot to name the same runtime.
+Windows cleanup uses `taskkill /T` (and `/F` only after the deadline) so the CLI,
+Bob, and engine descendants share the process-tree guarantee already provided
+by POSIX process groups. The full 926-route script clean room regenerated 100
+artifacts byte-identically, and the 237-test binding runtime/codegen matrix plus
+the complete War Battles package check pass against the rebuilt extension.
+
 ## 2026-09-23 - Fresh HTML5 replay keeps restart input observable
 
 Both GitHub workflows for `79318020993fd1c1e1ba6802e85ab522cdabad5d`
@@ -2043,3 +2113,37 @@ through Dynamic Hermes with the generated typed-native transport reachable,
 ran the tutorial collision/score sequence and eight-player arena engagement,
 then exited cleanly through `@system/exit`. Both native and browser evidence
 files are hash-bound to the resulting artifacts and current source inputs.
+
+## 2026-09-23 - Installed HMR preserves module state and drains transients
+
+Adversarial review rejected the earlier interpretation of the installed HMR
+soak. Although runtime id `1`, arena instance `0:1`, and all 19 persistent
+component identities survived, live component instances rose monotonically
+from 51 to 222 while world entities declined. Reproduction confirmed that the
+same-realm bundle transaction re-evaluated `arena-match.ts`: replacement
+component definitions closed over a fresh undefined module singleton, so
+rockets and pickups returned before their stale-object deletion checks.
+
+The revision-neutral SDK now exports `hmrPersistentState(key, create)`, an
+explicit keyed cell held by the active realm. The project materializer ships
+the helper without Defold-version facts, and War Battles uses it for the arena
+singleton. The installed validator now records exact transient identities and
+requires a detach after the first accepted generation; it also rejects errors,
+activation rejection, protocol violations, and stderr across the whole session.
+POSIX cleanup probes the owned process group even after its leader exits, and
+the component runtime de-duplicates a late proxy `on_reload` after a lifecycle
+dispatch already delivered the callback. Follow-up audit tightened that claim:
+duplicate explicit proxy notifications are also once-per-generation; the final
+health sweep runs after process exit and stream closure; Windows fails closed
+if `taskkill /T` cannot address the original tree; and source restoration runs
+even when process cleanup fails.
+
+Focused generator, package-boundary, TypeScript, and HMR tests passed 60 cases,
+and the native 1,000-cycle HMR harness passed under ASan and
+UBSan. The fresh six-edit installed-package run used the local Extender, Bob,
+and custom Defold engine. Gameplay reached tick 918; component counts were
+`51, 49, 41, 42, 44, 33, 35`; transient populations were
+`32, 30, 22, 23, 25, 14, 16`; exact identities proved 56 detaches after the
+first accepted generation. This is installed native HMR evidence for the
+packed package and current arm64-macOS engine, not Windows cleanup or browser
+HMR evidence.

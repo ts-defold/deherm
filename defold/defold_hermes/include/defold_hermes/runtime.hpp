@@ -94,6 +94,20 @@ class Runtime {
       const StaticUnitCreator* unitCreators,
       size_t unitCount,
       const std::string& sourceUrl);
+  /**
+   * Evaluate a component-only development bundle in this runtime and rebind
+   * its live component definitions without recreating their self objects.
+   * This swaps definitions only; the next native component-proxy lifecycle
+   * dispatch consumes the single pending `onReload` callback in the correct
+   * Defold instance context. If Defold subsequently reports the proxy's
+   * explicit reload event for that same generation, it is idempotent and does
+   * not invoke the authored callback a second time.
+   * The operation is same-realm only: application bundles are rejected, and
+   * an incompatible component registry leaves the current generation active.
+   */
+  void reloadComponentBundle(const std::string& source, const std::string& sourceUrl);
+  /** Whether this runtime currently owns a registry-only (no application) bundle. */
+  bool componentOnly() const noexcept;
   void init();
   void update(double dt);
   void onMessage(const std::string& message);

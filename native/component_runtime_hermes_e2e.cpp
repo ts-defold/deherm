@@ -116,6 +116,41 @@ std::string Read(const char* path) {
   return output.str();
 }
 
+std::string ReplaceAll(std::string source, const std::string& search,
+    const std::string& replacement) {
+  if (search.empty()) Fail("component HMR replacement search text is empty");
+  size_t offset = 0;
+  size_t replacements = 0;
+  while ((offset = source.find(search, offset)) != std::string::npos) {
+    source.replace(offset, search.size(), replacement);
+    offset += replacement.size();
+    ++replacements;
+  }
+  if (replacements == 0) Fail("component HMR fixture replacement did not match");
+  return source;
+}
+
+std::string ReplaceBundleFingerprint(
+    std::string source, const std::string& fingerprint) {
+  if (fingerprint.size() != 64) Fail("component HMR test fingerprint must be 64 hex characters");
+  const std::string marker = "__DEFOLD_HERMES_BUILD_FINGERPRINT__ = \"";
+  const size_t start = source.find(marker);
+  if (start == std::string::npos) Fail("component HMR bundle fingerprint marker is missing");
+  const size_t valueStart = start + marker.size();
+  if (valueStart + 64 >= source.size() || source[valueStart + 64] != '"')
+    Fail("component HMR bundle fingerprint value is malformed");
+  source.replace(valueStart, 64, fingerprint);
+  return source;
+}
+
+uint32_t CountTranscript(const std::vector<std::string>& transcript,
+    const std::string& marker, size_t start = 0) {
+  uint32_t count = 0;
+  for (size_t index = start; index < transcript.size(); ++index)
+    if (transcript[index].find(marker) != std::string::npos) ++count;
+  return count;
+}
+
 void Run(lua_State* state, const std::string& source) {
   if (luaL_loadbuffer(state, source.data(), source.size(), "component-runtime-e2e.lua") != 0 ||
       lua_pcall(state, 0, 0, 0) != 0) {
@@ -256,6 +291,159 @@ int main(int argc, char** argv) {
     Fail("Runtime-generation rebind did not initialize replacement state and dispatch reload");
 
   replacement.finalize();
+
+  // Same-realm component-only HMR is deliberately exercised separately from
+  // the generation-rebind path above.  The Lua proxy and its handle are not
+  // recreated: Runtime swaps only the definition object, so authored `self`
+  // state and the lifecycle ownership remain in place.
+  defold_hermes::Runtime hmrRuntime(host);
+  hmrRuntime.load(componentSource, "deherm://compiler-generated-components-hmr.js");
+  if (!hmrRuntime.componentOnly()) Fail("component-only fixture was not identified as such");
+  const auto hmrHandle = hmrRuntime.attachComponent(
+      argv[2], argv[3], defold_hermes::Runtime::ComponentContext::kGameObject);
+  defold_hermes::Runtime::ComponentValue speed{};
+  speed.kind = defold_hermes::Runtime::ComponentValueKind::kNumber;
+  speed.number = 120;
+  hmrRuntime.setComponentProperty(hmrHandle, "speed", speed);
+  // Lifecycle dispatch returns false for non-input events; only exceptions
+  // indicate a failed component hook here.
+  hmrRuntime.dispatchComponent(hmrHandle, "init", nullptr, 0);
+  defold_hermes::Runtime::ComponentArgument initialDt{};
+  initialDt.value.kind = defold_hermes::Runtime::ComponentValueKind::kNumber;
+  initialDt.value.number = 0.25;
+  hmrRuntime.dispatchComponent(hmrHandle, "update", &initialDt, 1);
+  const size_t hmrStart = host.transcript.size();
+  const uint32_t baselineComponents = hmrRuntime.liveComponents();
+  const uint32_t baselineCallbacks = hmrRuntime.liveCallbacks();
+  const std::string activeHmrFingerprint(64, 'a');
+  const std::string rejectedHmrFingerprint(64, 'b');
+  const std::string hmrCandidate = ReplaceBundleFingerprint(
+      ReplaceAll(
+          ReplaceAll(
+              ReplaceAll(
+                  ReplaceAll(componentSource, "game:init:", "component-hmr:init:"),
+                  "game:update:", "component-hmr:update:"),
+              "game:reload:", "component-hmr:reload:"),
+          "game:final:true", "component-hmr:final:true"),
+      activeHmrFingerprint);
+  hmrRuntime.reloadComponentBundle(
+      hmrCandidate, "deherm://compiler-generated-components-hmr-compatible.js");
+  if (hmrRuntime.bundleFingerprint() != activeHmrFingerprint)
+    Fail("compatible component-only HMR did not commit the candidate fingerprint");
+  if (hmrRuntime.liveComponents() != baselineComponents ||
+      hmrRuntime.liveCallbacks() != baselineCallbacks)
+    Fail("compatible component-only HMR changed live component or callback roots");
+  if (CountTranscript(host.transcript, "component-hmr:init:", hmrStart) != 0)
+    Fail("compatible component-only HMR called init a second time");
+  if (CountTranscript(host.transcript, "component-hmr:reload:", hmrStart) != 0)
+    Fail("compatible component-only HMR ran onReload outside a proxy lifecycle context");
+  defold_hermes::Runtime::ComponentArgument hmrDt{};
+  hmrDt.value.kind = defold_hermes::Runtime::ComponentValueKind::kNumber;
+  hmrDt.value.number = 0.5;
+  hmrRuntime.dispatchComponent(hmrHandle, "update", &hmrDt, 1);
+  if (CountTranscript(host.transcript, "component-hmr:reload:", hmrStart) != 1)
+    Fail("compatible component-only HMR did not call the new onReload exactly once");
+  if (CountTranscript(host.transcript, "component-hmr:update:0.75", hmrStart) != 1)
+    Fail("compatible component-only HMR did not preserve authored self state");
+
+  // Defold may deliver the proxy's on_reload notification after the first
+  // normal lifecycle dispatch already consumed the deferred callback. The
+  // runtime must treat that notification as an acknowledgement, not as a
+  // second authored onReload invocation.
+  const size_t deferredProxyReloadStart = host.transcript.size();
+  hmrRuntime.reloadComponent(hmrHandle);
+  if (CountTranscript(host.transcript, "component-hmr:reload:", deferredProxyReloadStart) != 0)
+    Fail("proxy on_reload duplicated an onReload already delivered by lifecycle dispatch");
+
+  // The explicit proxy on_reload path and the deferred next-lifecycle path
+  // share one pending bit. A proxy reload with no prior lifecycle delivery
+  // must invoke onReload once, and the following update cannot dispatch it a
+  // second time.
+  const size_t directReloadStart = host.transcript.size();
+  hmrRuntime.reloadComponentBundle(
+      hmrCandidate, "deherm://compiler-generated-components-hmr-explicit-reload.js");
+  hmrRuntime.reloadComponent(hmrHandle);
+  if (CountTranscript(host.transcript, "component-hmr:reload:", directReloadStart) != 1)
+    Fail("explicit onReload did not consume the pending component reload exactly once");
+  hmrRuntime.dispatchComponent(hmrHandle, "update", &hmrDt, 1);
+  if (CountTranscript(host.transcript, "component-hmr:reload:", directReloadStart) != 1)
+    Fail("explicit onReload remained pending and ran again on update");
+  hmrRuntime.reloadComponent(hmrHandle);
+  if (CountTranscript(host.transcript, "component-hmr:reload:", directReloadStart) != 1)
+    Fail("duplicate proxy on_reload invoked authored onReload twice for one generation");
+
+  // A schema or context drift is a project-build boundary.  The candidate is
+  // rejected before any retained definition is replaced, and the old
+  // definition remains callable after each rejection.
+  const std::string schemaDrift = ReplaceBundleFingerprint(
+      ReplaceAll(hmrCandidate, argv[3], "deherm-schema-drift"), rejectedHmrFingerprint);
+  const std::string contextDrift = ReplaceBundleFingerprint(
+      ReplaceAll(hmrCandidate, "\"game-object\"", "\"gui-scene\""), rejectedHmrFingerprint);
+  const std::string evaluationFailure = ReplaceBundleFingerprint(
+      hmrCandidate, rejectedHmrFingerprint) +
+      "\nthrow new Error('component-hmr-evaluation-failure');\n";
+  for (const auto& drift : {schemaDrift, contextDrift, evaluationFailure}) {
+    bool rejected = false;
+    try {
+      hmrRuntime.reloadComponentBundle(drift, "deherm://compiler-generated-components-hmr-drift.js");
+    } catch (const std::exception&) {
+      rejected = true;
+    }
+    if (!rejected) Fail("incompatible component-only HMR candidate was accepted");
+    if (hmrRuntime.bundleFingerprint() != activeHmrFingerprint)
+      Fail("rejected component-only HMR changed the active fingerprint");
+    if (hmrRuntime.liveComponents() != baselineComponents ||
+        hmrRuntime.liveCallbacks() != baselineCallbacks)
+      Fail("rejected component-only HMR changed live counters");
+    const size_t beforeUpdate = host.transcript.size();
+    hmrRuntime.dispatchComponent(hmrHandle, "update", &hmrDt, 1);
+    if (CountTranscript(host.transcript, "component-hmr:update:", beforeUpdate) != 1)
+      Fail("rejected component-only HMR altered the active lifecycle definition");
+  }
+
+  // Keep the soak bounded in terms of the counters the native runtime owns:
+  // one live component handle, no callbacks, and no growing attachment set.
+  // Accepted and rejected candidates deliberately alternate so rollback is
+  // tested just as often as the successful path.
+  const uint32_t soakCycles = 1000;
+  uint32_t accepted = 0;
+  uint32_t rejected = 0;
+  for (uint32_t cycle = 0; cycle < soakCycles; ++cycle) {
+    if ((cycle & 1u) == 0) {
+      hmrRuntime.reloadComponentBundle(
+          hmrCandidate, "deherm://compiler-generated-components-hmr-soak-accepted.js");
+      hmrRuntime.dispatchComponent(hmrHandle, "update", &hmrDt, 1);
+      ++accepted;
+    } else {
+      try {
+        hmrRuntime.reloadComponentBundle(
+            schemaDrift, "deherm://compiler-generated-components-hmr-soak-rejected.js");
+      } catch (const std::exception&) {
+        ++rejected;
+      }
+    }
+    if (hmrRuntime.liveComponents() != baselineComponents ||
+        hmrRuntime.liveCallbacks() != baselineCallbacks)
+      Fail("component-only HMR soak exceeded its live counter baseline");
+  }
+  if (accepted != soakCycles / 2 || rejected != soakCycles / 2)
+    Fail("component-only HMR soak did not exercise equal accepted and rejected cycles");
+  // A shutdown immediately after a compatible reload has no owning Lua proxy
+  // context in which to run onReload. Finalization must consume the pending
+  // bit without invoking that hook under the runtime's bootstrap context.
+  hmrRuntime.reloadComponentBundle(
+      hmrCandidate, "deherm://compiler-generated-components-hmr-finalize-pending.js");
+  const uint32_t reloadBeforeFinal = CountTranscript(
+      host.transcript, "component-hmr:reload:", hmrStart);
+  const uint32_t finalBefore = CountTranscript(host.transcript, "component-hmr:final:", hmrStart);
+  hmrRuntime.finalize();
+  if (hmrRuntime.liveComponents() != 0 || hmrRuntime.liveCallbacks() != 0)
+    Fail("component-only HMR finalization did not return component/callback counts to baseline");
+  if (CountTranscript(host.transcript, "component-hmr:reload:", hmrStart) != reloadBeforeFinal)
+    Fail("component-only HMR finalization invoked pending onReload without its owning proxy context");
+  if (CountTranscript(host.transcript, "component-hmr:final:", hmrStart) != finalBefore + 1)
+    Fail("component-only HMR finalization called final more than once");
+
   luaRuntime.shutdown();
   defold_hermes::game_object::uninstallCurrentInstanceApi();
   defold_hermes::game_object::uninstallTerminalApi();
@@ -266,6 +454,9 @@ int main(int argc, char** argv) {
   std::puts("component-runtime-hermes-e2e:properties-lifecycle-message-input-reload-detach:ok");
   std::puts("component-runtime-hermes-e2e:bounded-recursive-event-codec:ok");
   std::puts("component-runtime-hermes-e2e:runtime-generation-rebind:ok");
+  std::puts("component-runtime-hermes-e2e:component-only-hmr-state-and-lifecycle:ok");
+  std::puts("component-runtime-hermes-e2e:component-only-hmr-schema-context-rollback:ok");
+  std::puts("component-runtime-hermes-e2e:component-only-hmr-soak:cycles=1000:accepted=500:rejected=500:bounded:ok");
   std::puts("component-runtime-hermes-e2e:fingerprint-and-heap-telemetry:ok");
   std::puts("component-runtime-hermes-e2e:packaged-defold-engine:unverified");
   return 0;

@@ -1262,9 +1262,14 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
     if (scalarOwner) throw new Error(`${entry.id}: stable ID collides with scalar binding ${scalarOwner}`);
     if (stableIds.has(id)) throw new Error(`Stable ID collision: ${entry.id} and ${stableIds.get(id)}`);
     stableIds.set(id, entry.id);
+    const unhandledShapePolicy = entry.unhandledShapePolicy ?? "error";
+    if (unhandledShapePolicy !== "error" && unhandledShapePolicy !== "universal-fallback") {
+      throw new Error(`${entry.id}: unknown unhandled-shape policy ${unhandledShapePolicy}`);
+    }
     const binding = {
       ...entry,
       implementedCallShapes,
+      unhandledShapePolicy,
       stableId: id,
       rawName: fn.rawName,
       jsName: fn.jsName,
@@ -1288,6 +1293,11 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
   });
 
   const shapes = bindings.flatMap(({ implementedCallShapes }) => implementedCallShapes);
+  // Partial specialization is not enough to infer fallback safety: some
+  // documented shapes contradict the pinned implementation. Only an explicit
+  // reviewed policy may yield to the universal generated route.
+  const bindingAllowsUniversalFallback = bindings.map(({ unhandledShapePolicy }) =>
+    unhandledShapePolicy === "universal-fallback");
   const bindingShapeOffsets = [0];
   for (const binding of bindings) bindingShapeOffsets.push(bindingShapeOffsets.at(-1) + binding.implementedCallShapes.length);
   const shapeArgumentOffsets = [0];
@@ -1362,7 +1372,9 @@ export function generate(irText, scalarDispatchText, patternsText, inputs) {
       "enum class Codec : uint8_t { kNil, kBoolean, kNumber, kString, kHash, kUrl, kVector3, kVector4, kQuaternion, kMatrix4, kTable, kNode, kAddressArray };")
     .replace(
       "constexpr uint16_t kBindingShapeOffsets[] =",
-      `constexpr StructuredLuaOperation kStructuredLuaOperations[] = {\n${structuredLuaOperations}\n};\nconstexpr uint16_t kBindingShapeOffsets[] =`)
+      `constexpr StructuredLuaOperation kStructuredLuaOperations[] = {\n${structuredLuaOperations}\n};\n` +
+      `constexpr bool kBindingAllowsUniversalFallback[] = { ${bindingAllowsUniversalFallback.join(", ")} };\n` +
+      "constexpr uint16_t kBindingShapeOffsets[] =")
     .replace(
       `bool matches(Codec codec, const ScriptValue& value) noexcept {
   if (codec == Codec::kNumber) return value.tag == ScriptValueTag::kNumber;
@@ -1424,6 +1436,7 @@ DispatchStatus complete(bool ok) noexcept { return ok ? DispatchStatus::kSuccess
     .replace(
       `if (!validateShape(binding, *frame)) { fail(error, errorCapacity, "Defold value arguments do not match a generated call shape"); return DispatchStatus::kError; }`,
       `if (!validateShape(binding, *frame)) {
+    if (kBindingAllowsUniversalFallback[binding]) return DispatchStatus::kMissing;
     if (error && errorCapacity) std::snprintf(
         error,
         errorCapacity,

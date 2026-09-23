@@ -16,6 +16,8 @@ test("Defold value and handle bindings are deterministic structured descriptors"
   });
   const report = JSON.parse(await readFile(new URL(
     "packages/bindings/generated/defold-script-value-bindings.json", root), "utf8"));
+  const nativeSource = await readFile(new URL(
+    "defold/defold_hermes/src/generated_script_value_bindings.cpp", root), "utf8");
   assert.equal(report.bindingCount, 78);
   assert.equal(report.callShapeCount, 236);
   const familyBindings = report.bindings.filter(({ generatedFamily }) => generatedFamily === "gui-node-setters");
@@ -89,6 +91,13 @@ test("Defold value and handle bindings are deterministic structured descriptors"
   assert.equal(familyBindings.every(({ operation }) => operation.template === "gui-node-setter"), true);
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:vmath.euler_to_quat").implementedCallShapes,
     [["Vector3"], ["Number", "Number", "Number"]]);
+  assert.match(nativeSource, /constexpr bool kBindingAllowsUniversalFallback\[\]/);
+  assert.match(nativeSource,
+    /if \(kBindingAllowsUniversalFallback\[binding\]\) return DispatchStatus::kMissing;/);
+  assert.equal(report.bindings.find(({ id }) => id === "script:go.delete").unhandledShapePolicy,
+    "universal-fallback");
+  assert.equal(report.bindings.find(({ id }) => id === "script:vmath.euler_to_quat").unhandledShapePolicy,
+    "error");
   assert.deepEqual(report.bindings.find(({ id }) => id === "script:vmath.length_sqr").implementedCallShapes,
     [["Vector3"], ["Vector4"], ["Quaternion"]]);
   assert.equal(vmathFamily.every(({ operation }) =>

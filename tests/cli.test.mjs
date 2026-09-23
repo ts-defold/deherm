@@ -1042,7 +1042,13 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.ok(!contextManifest.contexts.shared.namespaces.includes("gui"));
   assert.ok(contextManifest.contexts.render.namespaces.includes("render"));
   assert.ok(!contextManifest.contexts["game-object"].namespaces.includes("render"));
-  assert.match(await readFile(path.join(output.root, "sdk", "contexts", "game-object.ts"), "utf8"), /projectExtensions = \{/);
+  const hmrStateExport = /export \* from "\.\.\/hmr-state\.js";/;
+  assert.match(await readFile(path.join(output.root, "sdk", "index.ts"), "utf8"), /export \* from "\.\/hmr-state\.js";/);
+  for (const context of ["shared", "game-object", "gui", "render"]) {
+    const contextSdk = await readFile(path.join(output.root, "sdk", "contexts", `${context}.ts`), "utf8");
+    assert.match(contextSdk, hmrStateExport, `${context} context SDK must expose hmrPersistentState`);
+    assert.match(contextSdk, /projectExtensions = \{/);
+  }
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "extensions.json"), "utf8")), {
     recommendations: ["samchon.ttsc", "ts-defold.deherm"]
   });

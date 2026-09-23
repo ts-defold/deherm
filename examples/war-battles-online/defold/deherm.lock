@@ -327,12 +327,12 @@
   },
   "generation": {
     "schemaVersion": 1,
-    "projectGeneratorSha256": "9e923c2fd0664f4ec505761bf4776e3fb3130506fd1f6e4a770c942b023e3f7f",
+    "projectGeneratorSha256": "a19226d96e4fa0c66dee3fa43a731d9b4273678be8aa9c33934d3d002789e9dd",
     "nativeExtensionGeneratorSha256": "7c85459ce52d51aaf1e2d184615be90af562b8916699327c9968ae1c214073a1",
     "nativeExtensionClang": {
       "required": false
     },
-    "cacheKey": "42bdbdc39284bdde5d5e47fa354e3e2674566ca8e866f032d2497a8c58dc533f"
+    "cacheKey": "53e5e92098ccec7c5604be1664edd3eabe81be9ec186e96cd7d7f5010621b349"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -342,10 +342,9 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 8497051,
-      "modifiedMs": 1790108229495
-    },
-    "via": "deherm-lock"
+      "size": 8545903,
+      "modifiedMs": 1790154907735
+    }
   },
   "defoldSurface": {
     "layer": "user-cache"
@@ -354,7 +353,7 @@
     "schemaVersion": 1,
     "engineRoot": "096b3aea590ed5841e6eff8bacecb7a1e9bc717503fb910e16a26bfc67c7a2ff",
     "nativeRoot": "0499f56f899a668241f171e213759fcdd4c92a6f6a08c8d50a946672766eb363",
-    "root": "42e39aff66829e06788ae22d744e34c90dea7eba72f458a3ebd7b13876297cc4"
+    "root": "a09609be6d0070b67e3f1fb66252c42e0abb6c5a9ccbceb7e93cf652ae7ada20"
   },
   "inputs": {
     "valueLayoutsSha256": "53276a2451fc181fb983ee0bf7ad56ab24aab7c6f043e29f28eeda64704ef188",
@@ -380,11 +379,11 @@
   "generatedOutputs": {
     "output": {
       "script-contexts.json": "de6c9c72202b702272e57a0fffa869c9d63fa491d7db281ac419b2e821f0fc05",
-      "generated/native-extensions/index.json": "beba154ee68b00b34b156c9f87936de77e9010dd45a206c7402026368f5fb148",
-      "sdk/contexts/shared.ts": "f9fbf6bad84413a3fc4da22499b431e8a1a23e787ef6082e8935a2c3ad651784",
-      "sdk/contexts/game-object.ts": "f78f5740bb6eb06bf903f8de41a5ff30206b2b5eeb841c12568aa6ac00cd6ed7",
-      "sdk/contexts/gui.ts": "cf03743da2030749d238eefa30eab9cd6819a5cbcc28720cd017e52749b53026",
-      "sdk/contexts/render.ts": "e30bdffd3fe0499c1f05bc75952dc189df8164ca80dbd50cb90e31dd86377d29"
+      "generated/native-extensions/index.json": "dfcd50d9bd05afecd83d467677085e922696fc2aaa4ea78f429799263851430a",
+      "sdk/contexts/shared.ts": "9530ce2c75345eeb75a45baca57180cd9ab7a043373b7cff866bfb595c36ac94",
+      "sdk/contexts/game-object.ts": "ae25e99a99a7798fee5d93252f3ca3cdb0043addbc105e55b04b609ccecfe340",
+      "sdk/contexts/gui.ts": "ee394ccf53c2fce1f7dbda9588f066ba8e87ff84ee4514aa9dc5769f34adad5e",
+      "sdk/contexts/render.ts": "21ebb5c3cc90a0e9bd86247a8f05d6f26961b6e8d429a3ce9b7586d75520f3b8"
     },
     "project": {
       "tsconfig.deherm.base.json": "0c877d4615c6356293850c647d0f603d348803b80030dace8bf8f887c7c26b36",
@@ -397,13 +396,13 @@
       "tsconfig.deherm.json": "0666a9440af963a2797ddb9ecea8cebd95783bfe0ce2f6a6b8c614b25ce4c6ba"
     }
   },
-  "generatedSdkSha256": "78939734388d62c3bd193ab9517e435cb82da6465228f040d8f8272706bb5f31",
+  "generatedSdkSha256": "bfac0cc5208bd2f118438a42863d82e3dc65bba75f7134e6dff74b47920954fe",
   "nativeExtensions": {
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/42bdbdc39284bdde5d5e47fa354e3e2674566ca8e866f032d2497a8c58dc533f",
-    "treeSha256": "8e43c0d7966fce58ad6fae13beca4982c73442e991012f2d4b91542d8995034b"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/53e5e92098ccec7c5604be1664edd3eabe81be9ec186e96cd7d7f5010621b349",
+    "treeSha256": "24b620378a3c8351441dbdd2bcd977818896f00722c54db2f25d1e8837bc367a"
   },
   "engineProfiles": {
     "source": "defold-default",
@@ -460,12 +459,12 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "be4d20399b4388c064bbd5acbb7d223058d5b826b6945cbc8c0f32f551e6f6bc",
+        "fingerprint": "2f2b696f76c4f9440f9205494b187a941907895a8a20834ab7fc0145897f2f9c",
         "outputs": {
-          "deherm/app.dehermc": "fc1d5f8092224f6beb40504f5908d404029222b390abc92003ae279b02fe9193"
+          "deherm/app.dehermc": "75b9100fe3720c7d5083b6b61858e7b78848d1070661b662aa255c2672cef0e6"
         },
         "build": {
-          "entryPoint": "main/player.script.ts",
+          "entryPoint": "main/arena.script.ts",
           "preludeEntries": [
             ".deherm/generated/components/registry.ts"
           ],
@@ -483,19 +482,19 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "f5da818280e42624c5ea6733b792e18870e5d6521b39f96b5b61bca0cf59f4b8",
-          "fileCount": 67,
+          "digest": "46105ae8698e132ca0fc6678c7b313e577051907f666f216dd3cfe7d494ee574",
+          "fileCount": 68,
           "files": {
-            ".deherm/generated/components/registry.ts": "242e47ddc478fc63b95af757e52f370d4302c83ead219ff0690f298b2c640e79",
+            ".deherm/generated/components/registry.ts": "442a3864f95018529f415bf4c125a33c4450308ac6b2797be8ad86f1f95b77e9",
             ".deherm/generated/dmsdk-call-symbol-index.json": "5b42fdf93957d7f5448f21e7f3b8cb6e5335dc6431d84136a0dad3d9d91f2b88",
             ".deherm/generated/resource-symbols.json": "b946f766131017abd847f771d84419804685a3148d65bbb40009646d52c83ee6",
             ".deherm/generated/script-route-symbol-index.json": "8e4defeb6df30557f79c3724394e7cea7bbec9d5132854c73d98377ce6553dc8",
             ".deherm/sdk/address.ts": "32420294482945e853794417e35e5614224af893df0338901259e63b62176649",
             ".deherm/sdk/component.ts": "64b6d6b295d2843f5c86147df0a52f68b802c20a6a993ab2b30290d3add0f614",
-            ".deherm/sdk/contexts/game-object.ts": "f78f5740bb6eb06bf903f8de41a5ff30206b2b5eeb841c12568aa6ac00cd6ed7",
-            ".deherm/sdk/contexts/gui.ts": "cf03743da2030749d238eefa30eab9cd6819a5cbcc28720cd017e52749b53026",
-            ".deherm/sdk/contexts/render.ts": "e30bdffd3fe0499c1f05bc75952dc189df8164ca80dbd50cb90e31dd86377d29",
-            ".deherm/sdk/contexts/shared.ts": "f9fbf6bad84413a3fc4da22499b431e8a1a23e787ef6082e8935a2c3ad651784",
+            ".deherm/sdk/contexts/game-object.ts": "ae25e99a99a7798fee5d93252f3ca3cdb0043addbc105e55b04b609ccecfe340",
+            ".deherm/sdk/contexts/gui.ts": "ee394ccf53c2fce1f7dbda9588f066ba8e87ff84ee4514aa9dc5769f34adad5e",
+            ".deherm/sdk/contexts/render.ts": "21ebb5c3cc90a0e9bd86247a8f05d6f26961b6e8d429a3ce9b7586d75520f3b8",
+            ".deherm/sdk/contexts/shared.ts": "9530ce2c75345eeb75a45baca57180cd9ab7a043373b7cff866bfb595c36ac94",
             ".deherm/sdk/generated/dmsdk/borrowed-handle.ts": "999407d1e6aab4ff466af2a41908b358f6f3f0a29f636ba7a2a2c3b952958533",
             ".deherm/sdk/generated/dmsdk/browser-arena.ts": "79c095743aa2c800a1244d85f09d98cbcecd729c5137f3d1f97f13389368ea04",
             ".deherm/sdk/generated/dmsdk/cstring-value.ts": "4077730cac0790dc8f995ae0b211caa4290f0cd8b2f2959255fcd00d0e06b456",
@@ -524,9 +523,10 @@
             ".deherm/sdk/generated/script/url-target-support.ts": "adcb06373ce840e950f532a49e49eacda85a567998aa96a8dfbdd2c32f1f4a1b",
             ".deherm/sdk/generated/script/value-tail-target-support.ts": "b53f885a0948fbef97230b46571f4e5a9a61f65905dab8ec2abbf44d1533b192",
             ".deherm/sdk/generated/script/value-target-support.ts": "814dfc5607f9473fed1797f4a10ee46a393f996d18253cee1c222ffcf9782bca",
-            ".deherm/sdk/index.ts": "a59c900d88f8a36ade31b2cf1b8bf5f7b3731634da105d51475ef9525f785eda",
+            ".deherm/sdk/hmr-state.ts": "6f8978f80140dfddd64a43713e07517647e54f799e90f1cce89686678502f47a",
+            ".deherm/sdk/index.ts": "c9d99790bd21a591bb03190ca79e2055443202e4e4005e6e80f60a7f609c10f8",
             ".deherm/sdk/runtime.ts": "84a733642d38d5887bc16b1f472c5f1834ba8dc69928e8eace97cebe6ecf8988",
-            "main/arena.script.ts": "f45c08e91b51b13e8e3c641dc42dc1193f0861b9869b3feaf0b105098fac0853",
+            "main/arena.script.ts": "ddedb363c5d96065c4dea0cec9283cb808c7730b7a7f444820f012f5c97236da",
             "main/camera.script.ts": "4595017829c5b33c03a04f8936610aec7fcbf2e35e270e23274fae3fa50f6a5a",
             "main/pickup.script.ts": "868d3376041849b24e4308519e51b5dcac8527585d4e7541e768edf8b22591a9",
             "main/player.script.ts": "d15a74cb995a762a51e7a1fc8651c9bab952bb160c62596cde0222a78692e389",
@@ -534,7 +534,7 @@
             "main/tank.script.ts": "862d3f96f580bf74f8111c4ec8c2130f7a41c46e5a39224a5618022698e43295",
             "main/ui.gui.ts": "fc2628f1859217c5e6b55cdd8105c216528793ef4bb9668c02e81dfbf057fd37",
             "reference/battle.gui.ts": "712eb7b8775a9a5f9447a64b954181dd70f4a0313a2e25e7abf7e10f8d7405f8",
-            "src/arena-match.ts": "9541836c85034756dc5ac8f79d634da4dca3ec7b656a47b90b91c40904dff715",
+            "src/arena-match.ts": "e419fd6873108f04cae0dfe04c8916aef383254af9427e6478b3725d66942a69",
             "src/capability-snapshot.ts": "1cc3bcb6342ff5dbbe53769645d426bb24e0f99eec5067a3995762e091625bf7",
             "src/generated-war-battles/arena.ts": "de4e50ba1a518e18e3bbc0eaec74807af77b59aaac69a0b6abc611b0cd6b9813",
             "src/generated-war-battles/bots.ts": "48ab38f42117527a33a3f8edc1bf032fcb5d2d2b0d5c378729d919a222e3582e",

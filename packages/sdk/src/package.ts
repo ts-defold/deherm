@@ -23,6 +23,7 @@ export {
   type DefoldSocketAddress,
   type DefoldUrl
 } from "./address";
+export { hmrPersistentState, type HmrPersistentCell } from "./hmr-state";
 
 export interface DefoldApiV1 {
   readonly version: 1;

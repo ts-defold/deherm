@@ -139,6 +139,21 @@ This exact runner does not instrument allocations, execute Defold
 implementation semantics, or prove every dynamic/overload alternative.
 Non-emitted Static rows remain applicability, not debt.
 
+A route whose optimized value-family specialization intentionally covers only
+some documented shapes carries an explicit reviewed `unhandledShapePolicy`.
+`universal-fallback` makes an unowned shape return `kMissing`, after which the
+generated universal route performs its normal exact validation and call;
+`error` retains the fail-closed specialization behavior. This is declared in
+the generator input rather than inferred from a failed dispatch. Native exact
+tests prove both the specialized hash and universal string-address forms of
+`go.delete`, while the pinned-source-contradicting two-number
+`vmath.euler_to_quat` shape remains `error` and rejected. Universal fallback is
+a bounded transport, not a second semantic oracle: the generated operation
+still bounds arity, scratch, recursion, and results, while the pinned Defold Lua
+function retains its own source-level coercion/rejection semantics. The native
+test therefore also proves that a boolean reaches that source boundary and is
+rejected without being counted as an executed delete.
+
 The remaining eleven script routes now have their own generated exact-call
 report and C verification header. The emitter exact-set joins the accounting
 rows to the component compiler capability and to both timer schemas; either

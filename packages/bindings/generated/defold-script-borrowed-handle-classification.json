@@ -6,7 +6,7 @@
   "allocationClaim": "After fixed-capacity bridge registries and Lua stack/registry storage are prewarmed, the generated lookup and dispatch glue can avoid C++ heap allocation on handle-consuming calls. This does not claim that Lua, Defold, Box2D, Bullet, GUI, graphics, resource, or user callbacks are allocation-free; handle capture, object creation, table growth, and engine operations may allocate.",
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "scriptApiAccountingSha256": "c34b328420d22167c2324184f84c35601a5e408539fbfd7be29020f3b28317fe",
+    "scriptApiAccountingSha256": "31f2ddc7d74c651e892c0792968cfb0e9be583db8fea7ed83293ed1ebd59f23e",
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "classificationOverrideSha256": "a7db98deb62c0146509858c81b28c09d1cd496d4e1ee6cb833f763e57388d61d",
     "defoldSources": [
@@ -101,7 +101,7 @@
         "sha256": "545d2af669cc9b3952384f30a67ea1b444921267c4a9ab3372a151d3a269106e"
       }
     ],
-    "aggregateInputSha256": "14c1a88b8ba3241c8edc974df0f5b6f8e808e397953f6c3417c1523b7715d7b0"
+    "aggregateInputSha256": "f3cf7f480c03a60dc0587f1e67e17e144559a8a0bf9150fea33c4b761d7444f6"
   },
   "routeCount": 437,
   "operationClassCounts": {

@@ -101,11 +101,19 @@ Both authoring forms retain the same semantic requirements:
 
 The class adapter anchors its instance on the runtime-owned component state as
 a non-enumerable private field. Re-evaluated definitions capture the new
-prototype methods while retaining that object and its fields. A fresh Hermes
-runtime has no retained object: the native rebind path dispatches `init` before
-`onReload`, creating and initializing the new class instance before reload code
-runs. The manifest records `authoringStyle` and, for class components, the
-source class name; this metadata does not create a second ABI.
+prototype methods while retaining that object and its fields. Compatible
+component-only HMR keeps the active Hermes realm, swaps only validated
+definitions, and consumes exactly one deferred `onReload` inside the owning
+proxy context without a second `init`. If the normal lifecycle consumes that
+deferred callback before Defold delivers the proxy's `on_reload` event, the
+runtime treats the later proxy event as an idempotent acknowledgement; an
+explicit proxy reload still invokes `onReload` once when no callback was
+delivered for the active generation, and duplicate explicit notifications for
+that generation remain acknowledgements rather than invoking it again. A full application-bundle replacement
+still uses a fresh runtime and therefore has no retained class object; that is
+an explicit wider transaction boundary, not the component-only fast path. The
+manifest records `authoringStyle` and, for class components, the source class
+name; this metadata does not create a second ABI.
 
 # Generated artifacts
 
@@ -142,9 +150,12 @@ associate the two resources, but the build does not depend on it.
 
 # Runtime model
 
-This section is the required model, not current runtime evidence. The generated
-capability gate presently reports zero executable component-proxy methods and
-fails all six Lua entry points closed until the model below exists.
+This section defines the runtime model. The generated capability gate now finds
+all six Lua entry points installed and executable in the native Lua and Dynamic
+Hermes harnesses (`attachComponent`, lifecycle, message, input, reload, and
+detach). Packaged-engine status remains a separate evidence field; Static
+Hermes component C-ABI projection remains fail-closed rather than inheriting
+Dynamic Hermes evidence.
 
 Instance identity is a 64-bit logical value represented as index plus
 generation. Dense SoA storage tracks the native/Lua instance reference,

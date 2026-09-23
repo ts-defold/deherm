@@ -158,7 +158,9 @@ int MockFactoryCreate(lua_State* state) {
 
 int MockGoDelete(lua_State* state) {
   if (!HasExpectedLuaInstance(state)) return luaL_error(state, "wrong captured go instance");
-  if (lua_gettop(state) == 1 && !lua_isuserdata(state, 1)) return luaL_error(state, "delete hash differs");
+  if (lua_gettop(state) == 1 && !lua_isuserdata(state, 1) && !lua_isstring(state, 1)) {
+    return luaL_error(state, "delete address differs");
+  }
   ++gDeleteCalls;
   return 0;
 }
@@ -1173,7 +1175,23 @@ int main() {
 
   Expect(AdapterDispatch(adapter, value::BindingId::GoDelete, &created, 1, nullptr), adapter.lastError());
   Expect(AdapterDispatch(adapter, value::BindingId::GoDelete, nullptr, 0, nullptr), adapter.lastError());
-  Expect(gDeleteCalls == 2, "go.delete generated overloads did not both execute");
+  const char deleteAddressBytes[] = "/fallback-target";
+  ScriptValue deleteAddress = String(deleteAddressBytes, sizeof(deleteAddressBytes) - 1);
+  char partialShapeError[256]{};
+  uint32_t partialShapeResultCount = UINT32_MAX;
+  Expect(Dispatch(value::BindingId::GoDelete, &deleteAddress, 1, nullptr,
+      &partialShapeResultCount, partialShapeError, sizeof(partialShapeError)) ==
+      value::DispatchStatus::kMissing,
+      "partial go.delete specialization rejected a documented fallback shape");
+  Expect(partialShapeResultCount == 0 && partialShapeError[0] == '\0',
+      "partial go.delete specialization exposed a false validation failure");
+  Expect(AdapterDispatch(adapter, value::BindingId::GoDelete, &deleteAddress, 1, nullptr),
+      adapter.lastError());
+  Expect(gDeleteCalls == 3, "go.delete specialized and universal shapes did not execute");
+  ScriptValue invalidDeleteAddress = Boolean(true);
+  Expect(!AdapterDispatch(adapter, value::BindingId::GoDelete, &invalidDeleteAddress, 1, nullptr),
+      "go.delete universal fallback silently accepted a value rejected by the Defold source contract");
+  Expect(gDeleteCalls == 3, "go.delete counted a source-rejected universal value as executed");
 
   lua_pushlightuserdata(lua, gExpectedLuaInstance);
   Expect(adapter.captureGuiInstance(-1), adapter.lastError());

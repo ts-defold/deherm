@@ -96,13 +96,26 @@ below without changing its completion rule.
    hash literals, the `defold` namespace, function/class component adapters,
    context-specific projects, generated properties and documentation, and
    local/dependency `.script_api` plus C/C++ schemas all pass their common
-   generation and test-twin gates. Next record the actual VS Code visual
-   observation. Native activation itself is already
-   proven, while cross-realm component state migration remains the distinct
-   measured HMR boundary tracked by
-   [issue #120](https://github.com/ts-defold/deherm/issues/120). After that,
+   generation and test-twin gates. The installed packed-package path has now
+   completed three independent six-edit native War Battles HMR soaks while
+   preserving runtime id `1`, arena instance `0:1`, all 19 persistent component
+   identities, and advancing gameplay through every edit; the persisted record
+   revalidates offline and is keyed to the deterministic packed-package tree
+   digest rather than a temporary install path. Next record the actual VS Code
+   visual observation, then
    continue native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
+   The component-only native runtime now preserves the active Hermes realm and
+   `self` objects across compatible definition reloads; its ASan/UBSan-backed
+   1,000-cycle native harness rejects schema/context drift and keeps all live
+   counters bounded. The installed source-edit gate for
+   [issue #120](https://github.com/ts-defold/deherm/issues/120) is complete. Its
+   stronger review exposed and fixed a module-singleton regression: the public
+   `hmrPersistentState` cell now retains explicitly keyed module state, and a
+   fresh installed six-edit soak observed 50 transient detaches after the first
+   accepted generation while runtime id `1`, arena instance `0:1`, and all 19
+   persistent identities remained stable. The remaining tooling observation is
+   literal VS Code presentation.
 
 Every route remains public when Defold exposes it. Verification status controls
 the evidence label, never whether the generator ships the route; a missing
@@ -296,9 +309,10 @@ playability gate observes fire, audio-call, and round-two restart markers. The
 native source identity normalizes only the target-transient `.defignore` entry
 that the package owns to keep typed-native code out of a Wasm upload; every
 user-authored ignore rule remains hashed, while target selection cannot
-invalidate otherwise identical native evidence. The
-remaining work in this tranche is installed-TUI HMR proof and the multiplayer
-expansion; literal VS Code visual observation remains a tooling-tranche debt.
+invalidate otherwise identical native evidence. Installed-TUI HMR proof is
+complete through the packed-package path. The remaining work in this tranche
+is the multiplayer expansion;
+literal VS Code visual observation remains a tooling-tranche debt.
 
 1. Make the tutorial-faithful game playable with real tutorial art, correctly
    sliced/anchored animation, tint/material effects, input, GUI, audio,

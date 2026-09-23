@@ -16,6 +16,7 @@ export {
   type DefoldSocketAddress,
   type DefoldUrl
 } from "./address";
+export { hmrPersistentState, type HmrPersistentCell } from "./hmr-state";
 export type { DefoldModuleMap, ExampleMathSpec, Vec3 } from "./generated/modules";
 export { DEFOLD_HERMES_ABI_VERSION } from "./generated/modules";
 export { DefoldModules, type DefoldModuleRegistry } from "./registry";

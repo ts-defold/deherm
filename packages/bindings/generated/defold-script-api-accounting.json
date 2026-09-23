@@ -9,11 +9,11 @@
     "bindingPatternsSha256": "9788b0873228cf8b9145aace14c3437d8b5fe69b7478da536743f0759c1a073e",
     "bindingDescriptorsSha256": "9b249c9e9616ce25bc8a0f3ae3b6204a4c74a0c17890501ce5c5ce95e92afd71",
     "scalarDispatchSha256": "ec01d55f6d135721399bb37c65e89aa5b388c9f9c4a0401b387c4818f73c267b",
-    "valueBindingsSha256": "969027da2d8c8db9e963538978a9a0ce05239eef6beb8f4f3c7d9e1ebbda6a95",
+    "valueBindingsSha256": "805dbd25cbf2fc9472f207f9244e4996296a99418411e0880dca1640e596b176",
     "fixedTupleBindingsSha256": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "urlBindingsSha256": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "valueTailBindingsSha256": "ae7374fcde25ccbf0cc6358a8b726064176a1c09276b294b66da7daacbb28f93",
-    "overloadDispatchSha256": "973475e6b77b9829e84c58cc783b76f43ba57eadc9feeee61fdd02de04c49b5d",
+    "valueTailBindingsSha256": "91ab45725003e790882597ec7a1387d3d5ff2365b8e987232da509656ac39e7b",
+    "overloadDispatchSha256": "829f556760905005f05f0757eaa244d86c6e6af047d50ece033662344fe48d39",
     "universalValuePolicySha256": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
     "universalValueSelectionSha256": "514cd2cb3926a1a0107fa3f90968ab834383ca3257b6b17b159465a95f2acaf0",
     "valueDefinitions": [
@@ -27,7 +27,7 @@
       },
       {
         "definitionPath": "packages/bindings/overrides/script-go-current-instance-bindings.json",
-        "definitionSha256": "6023e6763a28d44cf372a06b6ecdafb2164f07bfe2364a8c58a86eb2da59300c"
+        "definitionSha256": "1e9db06a319f27dde6f9ca484c466cf649da12677fafb15305a41855dbf64d3f"
       },
       {
         "definitionPath": "packages/bindings/overrides/script-msg-structured-bindings.json",
@@ -76,7 +76,7 @@
         "sourceSha256": "4a46bc80c0a35a59ddf7ea990cd7dcdf5b6eff86e03e6096739eb76f078064e4"
       }
     ],
-    "aggregateInputSha256": "24fcee9078b38eee5fd5aa1b03c28dd01eb7670baa95ea826fcdc25f44506e6a"
+    "aggregateInputSha256": "5847b13231c17a55cb9e679bd0be148c808ef85ac06fe4ddd740d5b26be580ef"
   },
   "functionCount": 926,
   "categoryCounts": {

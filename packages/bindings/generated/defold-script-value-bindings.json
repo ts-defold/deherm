@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "inputSha256": "202627764bc6fae82b250d5266a455d463d55dd0adbe247bb9685822d01a1d04",
+  "inputSha256": "0f059bad1c614a14c1d0ecc1f8783c2a879e0ce47f2461bd1c6aa5ae086d28ec",
   "sourceEvidence": [
     {
       "path": "upstream/defold/engine/script/src/script_vmath.cpp",
@@ -926,6 +926,7 @@
           "Vector3"
         ]
       ],
+      "unhandledShapePolicy": "error",
       "stableId": 96184340,
       "rawName": "factory.create",
       "jsName": "create",
@@ -990,6 +991,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 344287147,
       "rawName": "gui.set_enabled",
       "jsName": "setEnabled",
@@ -1054,6 +1056,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 344438576,
       "rawName": "gui.set_clipping_inverted",
       "jsName": "setClippingInverted",
@@ -1104,6 +1107,7 @@
         ]
       ],
       "resultCodec": "Node",
+      "unhandledShapePolicy": "error",
       "stableId": 509983822,
       "rawName": "gui.get_node",
       "jsName": "getNode",
@@ -1176,6 +1180,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 510669267,
       "rawName": "gui.set_id",
       "jsName": "setId",
@@ -1240,6 +1245,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 599811265,
       "rawName": "gui.set_inner_radius",
       "jsName": "setInnerRadius",
@@ -1303,6 +1309,7 @@
           "tolerance": 0.000001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 603084884,
       "rawName": "vmath.quat_rotation_y",
       "jsName": "quatRotationY",
@@ -1370,6 +1377,7 @@
         ]
       ],
       "resultCodec": "None",
+      "unhandledShapePolicy": "error",
       "stableId": 608141138,
       "rawName": "go.set_position",
       "jsName": "setPosition",
@@ -1433,6 +1441,7 @@
           "tolerance": 0.000001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 619862503,
       "rawName": "vmath.quat_rotation_x",
       "jsName": "quatRotationX",
@@ -1505,6 +1514,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 634729758,
       "rawName": "gui.set_particlefx",
       "jsName": "setParticlefx",
@@ -1544,6 +1554,7 @@
           "Number"
         ]
       ],
+      "unhandledShapePolicy": "error",
       "stableId": 653417741,
       "rawName": "vmath.quat_rotation_z",
       "jsName": "quatRotationZ",
@@ -1616,6 +1627,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 681356529,
       "rawName": "gui.set_color",
       "jsName": "setColor",
@@ -1688,6 +1700,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 852399392,
       "rawName": "gui.set_outline",
       "jsName": "setOutline",
@@ -1782,6 +1795,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 889923285,
       "rawName": "vmath.matrix4_translation",
       "jsName": "matrix4Translation",
@@ -1872,6 +1886,7 @@
           "tolerance": 0.00001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1058276904,
       "rawName": "vmath.matrix4_perspective",
       "jsName": "matrix4Perspective",
@@ -2010,6 +2025,7 @@
         ]
       ],
       "resultCodec": "None",
+      "unhandledShapePolicy": "error",
       "stableId": 1111726479,
       "rawName": "msg.post",
       "jsName": "post",
@@ -2109,6 +2125,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1292408212,
       "rawName": "vmath.ortho_inv",
       "jsName": "orthoInv",
@@ -2205,6 +2222,7 @@
           "tolerance": 0.000001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1329930197,
       "rawName": "vmath.euler_to_quat",
       "jsName": "eulerToQuat",
@@ -2277,6 +2295,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1335131087,
       "rawName": "gui.set_size",
       "jsName": "setSize",
@@ -2341,6 +2360,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1425442548,
       "rawName": "gui.set_leading",
       "jsName": "setLeading",
@@ -2421,6 +2441,7 @@
           "tolerance": 0.000001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1458980654,
       "rawName": "vmath.quat_from_to",
       "jsName": "quatFromTo",
@@ -2493,6 +2514,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1474440329,
       "rawName": "gui.set_position",
       "jsName": "setPosition",
@@ -2549,6 +2571,7 @@
         ]
       ],
       "resultCodec": "None",
+      "unhandledShapePolicy": "error",
       "stableId": 1480837389,
       "rawName": "gui.set_text",
       "jsName": "setText",
@@ -2621,6 +2644,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1482532654,
       "rawName": "gui.set_shadow",
       "jsName": "setShadow",
@@ -2693,6 +2717,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1539901009,
       "rawName": "gui.set_texture",
       "jsName": "setTexture",
@@ -2757,6 +2782,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1648551722,
       "rawName": "gui.set_clipping_mode",
       "jsName": "setClippingMode",
@@ -2821,6 +2847,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1712128015,
       "rawName": "gui.set_outer_bounds",
       "jsName": "setOuterBounds",
@@ -2910,6 +2937,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1732915491,
       "rawName": "vmath.matrix4_axis_angle",
       "jsName": "matrix4AxisAngle",
@@ -2974,6 +3002,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1740794531,
       "rawName": "gui.set_tracking",
       "jsName": "setTracking",
@@ -3038,6 +3067,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1874419309,
       "rawName": "gui.set_blend_mode",
       "jsName": "setBlendMode",
@@ -3102,6 +3132,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 1932260719,
       "rawName": "gui.set_fill_angle",
       "jsName": "setFillAngle",
@@ -3166,6 +3197,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2042797604,
       "rawName": "gui.set_yanchor",
       "jsName": "setYanchor",
@@ -3233,6 +3265,7 @@
         ]
       ],
       "resultCodec": "None",
+      "unhandledShapePolicy": "error",
       "stableId": 2093413559,
       "rawName": "go.set_rotation",
       "jsName": "setRotation",
@@ -3297,6 +3330,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2104597123,
       "rawName": "gui.set_size_mode",
       "jsName": "setSizeMode",
@@ -3361,6 +3395,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2124339589,
       "rawName": "gui.set_adjust_mode",
       "jsName": "setAdjustMode",
@@ -3467,6 +3502,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2149531511,
       "rawName": "vmath.matrix4_look_at",
       "jsName": "matrix4LookAt",
@@ -3531,6 +3567,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2274625155,
       "rawName": "gui.set_flipbook_playback_rate",
       "jsName": "setFlipbookPlaybackRate",
@@ -3588,6 +3625,7 @@
           "Quaternion"
         ]
       ],
+      "unhandledShapePolicy": "error",
       "stableId": 2370510694,
       "rawName": "vmath.length",
       "jsName": "length",
@@ -3706,6 +3744,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2501238546,
       "rawName": "vmath.matrix4_compose",
       "jsName": "matrix4Compose",
@@ -3785,6 +3824,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2509648852,
       "rawName": "vmath.matrix4_rotation_y",
       "jsName": "matrix4RotationY",
@@ -3864,6 +3904,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2526426471,
       "rawName": "vmath.matrix4_rotation_x",
       "jsName": "matrix4RotationX",
@@ -3943,6 +3984,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2559981709,
       "rawName": "vmath.matrix4_rotation_z",
       "jsName": "matrix4RotationZ",
@@ -4018,6 +4060,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2686972787,
       "rawName": "vmath.project",
       "jsName": "project",
@@ -4082,6 +4125,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2749898006,
       "rawName": "gui.set_alpha",
       "jsName": "setAlpha",
@@ -4138,6 +4182,7 @@
           "Number"
         ]
       ],
+      "unhandledShapePolicy": "error",
       "stableId": 2756728049,
       "rawName": "vmath.quat",
       "jsName": "quat",
@@ -4202,6 +4247,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2765276089,
       "rawName": "gui.set_clipping_visible",
       "jsName": "setClippingVisible",
@@ -4296,6 +4342,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2797369728,
       "rawName": "vmath.matrix4_orthographic",
       "jsName": "matrix4Orthographic",
@@ -4360,6 +4407,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2837486932,
       "rawName": "gui.set_screen_position",
       "jsName": "setScreenPosition",
@@ -4402,6 +4450,7 @@
           "String"
         ]
       ],
+      "unhandledShapePolicy": "error",
       "stableId": 2845099200,
       "rawName": "hash",
       "jsName": "hash",
@@ -4478,6 +4527,7 @@
           "Hash"
         ]
       ],
+      "unhandledShapePolicy": "universal-fallback",
       "resultCodec": "None",
       "stableId": 2920192283,
       "rawName": "go.delete",
@@ -4543,6 +4593,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2930785382,
       "rawName": "gui.set_inherit_alpha",
       "jsName": "setInheritAlpha",
@@ -4633,6 +4684,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2962238768,
       "rawName": "vmath.quat_basis",
       "jsName": "quatBasis",
@@ -4710,6 +4762,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2981849211,
       "rawName": "vmath.length_sqr",
       "jsName": "lengthSqr",
@@ -4774,6 +4827,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 2994148867,
       "rawName": "gui.set_xanchor",
       "jsName": "setXanchor",
@@ -4853,6 +4907,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3022880242,
       "rawName": "vmath.cross",
       "jsName": "cross",
@@ -4940,6 +4995,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3063853257,
       "rawName": "vmath.matrix4_quat",
       "jsName": "matrix4Quat",
@@ -5004,6 +5060,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3158379927,
       "rawName": "gui.set_flipbook_cursor",
       "jsName": "setFlipbookCursor",
@@ -5068,6 +5125,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3222725677,
       "rawName": "gui.set_perimeter_vertices",
       "jsName": "setPerimeterVertices",
@@ -5155,6 +5213,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3312627817,
       "rawName": "vmath.quat_matrix4",
       "jsName": "quatMatrix4",
@@ -5227,6 +5286,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3446342703,
       "rawName": "gui.set_font",
       "jsName": "setFont",
@@ -5287,6 +5347,7 @@
           "Number"
         ]
       ],
+      "unhandledShapePolicy": "error",
       "stableId": 3491633886,
       "rawName": "vmath.vector3",
       "jsName": "vector3",
@@ -5386,6 +5447,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3499206161,
       "rawName": "vmath.inv",
       "jsName": "inv",
@@ -5443,6 +5505,7 @@
           "Quaternion"
         ]
       ],
+      "unhandledShapePolicy": "error",
       "stableId": 3582341977,
       "rawName": "vmath.normalize",
       "jsName": "normalize",
@@ -5523,6 +5586,7 @@
           "tolerance": 0.000001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3691011585,
       "rawName": "vmath.rotate",
       "jsName": "rotate",
@@ -5587,6 +5651,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3757373152,
       "rawName": "gui.set_visible",
       "jsName": "setVisible",
@@ -5659,6 +5724,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3759172468,
       "rawName": "gui.set_rotation",
       "jsName": "setRotation",
@@ -5723,6 +5789,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3771988895,
       "rawName": "gui.set_slice9",
       "jsName": "setSlice9",
@@ -5779,6 +5846,7 @@
         ]
       ],
       "resultCodec": "Vector3",
+      "unhandledShapePolicy": "error",
       "stableId": 3918772974,
       "rawName": "go.get_position",
       "jsName": "getPosition",
@@ -5851,6 +5919,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3920485847,
       "rawName": "gui.set_euler",
       "jsName": "setEuler",
@@ -5923,6 +5992,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3923373356,
       "rawName": "gui.set_scale",
       "jsName": "setScale",
@@ -5995,6 +6065,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3974957251,
       "rawName": "gui.set_layer",
       "jsName": "setLayer",
@@ -6075,6 +6146,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3975981566,
       "rawName": "gui.set_parent",
       "jsName": "setParent",
@@ -6139,6 +6211,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 3991574614,
       "rawName": "gui.set_pivot",
       "jsName": "setPivot",
@@ -6203,6 +6276,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 4102050116,
       "rawName": "gui.set_line_break",
       "jsName": "setLineBreak",
@@ -6275,6 +6349,7 @@
         "gui.PIVOT": "Number",
         "gui.SIZE_MODE": "Number"
       },
+      "unhandledShapePolicy": "error",
       "stableId": 4118133459,
       "rawName": "gui.set_material",
       "jsName": "setMaterial",
@@ -6348,6 +6423,7 @@
           "tolerance": 0.000001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 4121318819,
       "rawName": "vmath.quat_axis_angle",
       "jsName": "quatAxisAngle",
@@ -6419,6 +6495,7 @@
           "tolerance": 0
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 4233115420,
       "rawName": "vmath.conj",
       "jsName": "conj",
@@ -6515,6 +6592,7 @@
           "tolerance": 0.00001
         }
       },
+      "unhandledShapePolicy": "error",
       "stableId": 4245225016,
       "rawName": "vmath.matrix4_frustum",
       "jsName": "matrix4Frustum",

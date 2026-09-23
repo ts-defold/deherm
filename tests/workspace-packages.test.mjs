@@ -84,6 +84,7 @@ test("the public package ships directory boundaries instead of enumerated genera
     "packages/polyfills/",
     "packages/sdk/src/address.ts",
     "packages/sdk/src/component.ts",
+    "packages/sdk/src/hmr-state.ts",
     "packages/sdk/src/package.ts",
     "packages/static-hermes/src/globals.d.ts",
     "packages/static-hermes/src/typed-app.ts",

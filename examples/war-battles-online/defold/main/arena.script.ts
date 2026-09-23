@@ -97,6 +97,20 @@ interface ArenaSelf {
   sfxMask: number;
 }
 
+function logHmrState(self: ArenaSelf, edit: string): void {
+  const world = self.match.world;
+  let entities = 0;
+  if (world !== undefined) {
+    for (const active of world.playerActive) entities += active;
+    for (const active of world.projectileActive) entities += active;
+    for (const active of world.pickupActive) entities += active;
+  }
+  __defoldHostV1.log(
+    "info",
+    `war-battles:hmr-reload:edit=${edit}:tick=${self.match.ticksStepped}:entities=${entities}:elapsed=${self.elapsed.toFixed(3)}`,
+  );
+}
+
 function playSfx(
   self: ArenaSelf,
   bit: number,
@@ -187,10 +201,13 @@ function syncProjectiles(self: ArenaSelf): void {
 
 function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): void {
   if (self.effectIds.length >= MAX_EFFECTS) return;
+  // A dynamic factory can fail when the Defold gameobject buffer is full.
+  // Do not retain an absent id: go.delete only accepts a real address.
   const id = factory.create(
     big ? "#boomfactory" : "#sparkfactory",
     vmath.vector3(pixelX(x), pixelY(y), big ? 0.6 : 0.5),
-  );
+  ) as DefoldHash | undefined;
+  if (id === undefined) return;
   self.effectIds.push(id);
   self.effectTicks.push(big ? EXPLOSION_TICKS : SPARK_TICKS);
 }
@@ -329,11 +346,18 @@ export default defineComponent({
     });
     self.online = connectOnline(self);
     __defoldHostV1.log("info", `war-battles:arena-init:players=${players}:online=${self.online ? 1 : 0}`);
+    logHmrState(self, "initial");
   },
 
   onMessage(self: ArenaSelf, messageId: DefoldHash): void {
     if (messageId === ENGAGE) engage(self);
     else if (messageId === RESTART) restart(self);
+  },
+
+  // This small marker is intentionally observable from the native dev session:
+  // it proves that the live match kept advancing between compatible reloads.
+  onReload(self: ArenaSelf): void {
+    logHmrState(self, "baseline");
   },
 
   update(self: ArenaSelf, dt: number): void {

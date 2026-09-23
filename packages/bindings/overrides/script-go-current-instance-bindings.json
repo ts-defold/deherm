@@ -60,6 +60,7 @@
       },
       "callShapes": [[], ["String"], ["Hash"], ["Url"], ["AddressArray"], ["String", "Boolean"], ["Hash", "Boolean"], ["Url", "Boolean"], ["AddressArray", "Boolean"]],
       "implementedCallShapes": [[], ["Hash"]],
+      "unhandledShapePolicy": "universal-fallback",
       "resultCodec": "None"
     }
   ]

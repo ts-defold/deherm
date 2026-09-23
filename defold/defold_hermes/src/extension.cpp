@@ -382,7 +382,10 @@ bool ActivateBundle(bool initial) {
       }
       defold_hermes::game_object::Scope scope(context);
       if (!scope.entered()) throw std::runtime_error("Game-object context stack is exhausted during reload");
-      candidate->init();
+      // Component-only candidates are validated here but committed below by
+      // rebinding their definitions into the active realm. They have no
+      // application lifecycle and must not enter the fresh-runtime init path.
+      if (!candidate->componentOnly()) candidate->init();
     }
   } catch (const std::exception& error) {
     // A jsi::JSError retains values owned by its Hermes runtime. Keep the
@@ -409,6 +412,59 @@ bool ActivateBundle(bool initial) {
         candidateRuntimeId,
         initial ? "true" : "false");
     return false;
+  }
+
+  // The candidate above is still evaluated in a disposable realm so the
+  // normal bundle validation (including static units, registration, and
+  // fingerprint capture) remains intact. For a registry-only generation,
+  // commit its definitions into the already-live realm instead of swapping
+  // runtimes. The candidate is never exposed to component slots and is then
+  // discarded without init/final; the Lua proxy owns the subsequent
+  // dispatchReload/onReload call.
+  if (!initial && previousRuntime && previousRuntime->componentOnly() &&
+      candidate && candidate->componentOnly()) {
+    std::string rebindDiagnostic;
+    bool rebindRejected = false;
+    try {
+      gInspector.bindRuntime(previousRuntime);
+      inspectorMovedToCandidate = false;
+      previousRuntime->reloadComponentBundle(
+          std::string(bundle.data, bundle.size),
+          std::string("deherm://") + gBundlePath);
+    } catch (const std::exception& error) {
+      rebindRejected = true;
+      rebindDiagnostic = error.what();
+    }
+    if (rebindRejected) {
+      // The active runtime's transaction restores its previous registration
+      // surface before reporting the error. Keep that runtime and its slots
+      // installed; only the disposable candidate is released here.
+      candidate.reset();
+      gRejectedBundleGeneration = bundle.generation;
+      gPendingRejectedBundleGeneration = bundle.generation;
+      dmLogError(
+          "TypeScript bundle generation %llu was rejected: %s",
+          static_cast<unsigned long long>(bundle.generation),
+          rebindDiagnostic.c_str());
+      dmLogInfo(
+          "DEHERM_EVENT bundle-rejected fingerprint=%s resource_generation=%llu runtime_id=%u initial=false",
+          candidateFingerprint.empty() ? "unavailable" : candidateFingerprint.c_str(),
+          static_cast<unsigned long long>(bundle.generation), candidateRuntimeId);
+      return false;
+    }
+    candidate.reset();
+    gBundleGeneration = bundle.generation;
+    gRejectedBundleGeneration = 0;
+    gPendingRejectedBundleGeneration = 0;
+    dmLogInfo(
+        "Activated TypeScript component bundle generation %llu from '%s' (same-realm HMR; %u live components)",
+        static_cast<unsigned long long>(bundle.generation), gBundlePath.c_str(),
+        previousRuntime->liveComponents());
+    dmLogInfo(
+        "DEHERM_EVENT bundle-activated fingerprint=%s resource_generation=%llu runtime_id=%u initial=false",
+        previousRuntime->bundleFingerprint().c_str(),
+        static_cast<unsigned long long>(bundle.generation), previousRuntime->identity());
+    return true;
   }
 
   if (gRuntime && gApplicationInitialized) {

@@ -4,7 +4,7 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "evidenceBoundary": "Compiler intrinsics are verified by exact generated Lua declarations. Lua, Dynamic Hermes/JSI, and browser/Wasm execute the generated timer lifecycle scenario with exact call and ownership assertions. Static Hermes separately verifies sound-typed symbol selection, ordered ABI values/results, and callback-handle field transport; it does not claim callback ownership. Defold remains the semantic authority behind the bridge.",
   "inputs": {
-    "accountingSha256": "03ddb73d204468a724f1e524a5261e15126c3b6d291d3125857053d22bd86d15",
+    "accountingSha256": "13b07686e0cd657eab8de7a0a8c774f38a1c45d38ae89c5d5d55245207209df9",
     "moduleSchemaSha256": "f3d6492da495392d5149ca3b6429cf3f59ebbc01f4cbe80464ef7b4289c1d912",
     "luaSchemaSha256": "89bf097676883d82dfc90cd21c0b520f9bb5b9c68721e1ac804510e80b1abe44"
   },
@@ -314,5 +314,5 @@
       "secondHandle": 2
     }
   ],
-  "reportSha256": "4febbb8704339fefd023bba08424880ccb18bc93b2ab2173c90e0184487b4c42"
+  "reportSha256": "ee51ec3db805d2a70e63150f1fce2cf3fa45b7bd0fcba7a170cdc81aa3a6f908"
 }
