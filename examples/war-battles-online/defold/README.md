@@ -18,7 +18,7 @@ collision-object components; the HUD is a GUI scene. No Lua is authored here.
 | `main/rocket.go` | `/main/rocket.script`, sprite, kinematic collision, group `rockets`, mask `tanks` |
 | `main/tank.go` | sprite, kinematic collision, group `tanks`, mask `rockets` |
 | `main/ui.gui` | score, status, leaderboard and hint text driven by `/main/ui.gui_script` |
-| `input/game.input_binding` | arrows and WASD, space, shift, and `1`-`6` |
+| `input/game.input_binding` | arrows/WASD, space, shift, `1`-`6` weapons, `7`-`0` chassis |
 
 The authored sources are `main/arena.script.ts`, `main/player.script.ts`,
 `main/tank.script.ts`, `main/rocket.script.ts`, `main/pickup.script.ts`,
@@ -35,6 +35,7 @@ Controls:
 | Space | Fire |
 | Shift | Boost — a limited, recharging burst of speed |
 | `1`–`6` | Cannon, autocannon, railgun, scatter, mortar, ricochet |
+| `7`–`0` | Purchase/select scout, assault, bulwark, artillery chassis |
 
 The turret is a separate object from the hull and slews at its own rate. With a
 keyboard there is no second stick, so the turret tracks the closest enemy the
@@ -109,7 +110,7 @@ the player an inset copy of that rectangle and the camera the rectangle itself.
 The arena is **point-symmetric and not destructible**. Symmetric because neither
 half of a deathmatch may be the bad half. Not destructible because the grid is
 derived from a four-byte `mapSeed` rather than stored: a joining client rebuilds
-it exactly, and the authoritative snapshot stays a fixed 17,560 bytes with no
+it exactly, and the authoritative snapshot stays a fixed 17,624 bytes with no
 terrain delta codec. Breakable cover would put 10,800 mutable cells on the wire
 or force an encoder this slice does not have — and Quake's arenas are not
 destructible either; cover you learned stays where you learned it.

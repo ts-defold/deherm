@@ -19,6 +19,7 @@ import {
 import {
   CONTROL_BUY_UPGRADE,
   CONTROL_SET_WEAPON,
+  CONTROL_SET_CHASSIS,
   INPUT_PACKET_BYTES,
   CONTROL_SUICIDE,
   MESSAGE_CONTROL,
@@ -565,6 +566,8 @@ export class ServerSession implements TransportReceiver {
       this.server.world.applyUpgrade(playerId, this.control.argument);
     } else if (this.control.action === CONTROL_SET_WEAPON) {
       if (isWeaponId(this.control.argument)) this.server.world.playerWeaponRequest[this.slot] = this.control.argument;
+    } else if (this.control.action === CONTROL_SET_CHASSIS) {
+      this.server.world.selectChassis(playerId, this.control.argument);
     } else if (this.control.action === CONTROL_SUICIDE) {
       this.server.world.playerHealth[this.slot] = 0;
     }

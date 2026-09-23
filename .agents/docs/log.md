@@ -1,5 +1,23 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Bounded Stage-3 War Battles chassis tranche
+
+The War Battles canonical simulation now has four fixed-capacity chassis rows:
+scout, assault, bulwark, and artillery. Each row materially changes
+health/armour, acceleration/top speed, drag and facing handling, knockback
+response, weapon-slot mask, role, and unlock cost. `BattleWorld.playerChassis`
+is authoritative and is restored in the versioned 90-byte player snapshot
+record. A new reliable `CONTROL_SET_CHASSIS` action spends credits through the
+same server-owned purchase path as existing upgrades; bots use deterministic
+roster variety and the same selection function. The generated Defold mirror,
+HUD, local 7–0 selection controls, and generated role-marked hull art consume
+the canonical rows. Focused core tests pass 55/55; TypeScript/Defold context,
+generated-source, and generated-art checks pass. Snapshot bandwidth evidence
+changed with the additive chassis bytes: normal deltas are 1,838–2,998 bytes
+(p50 2,333) on the 200-frame 32-player trace. This is a bounded chassis
+vertical slice, not completion evidence for the remaining Stage-3 weapons,
+hazards, objectives, or accessibility work.
+
 ## 2026-09-23 - Deterministic 32-player War Battles impairment/load evidence
 
 The War Battles example now owns a bounded authoritative load harness over the
@@ -2444,3 +2462,34 @@ with a nonzero base tick. Client decode and restore failures now invalidate the
 baseline, report only the first root error, drop dependent deltas, and accept
 frames again only after a valid keyframe. Focused regressions cover both codec
 header rejection and recovery after decode/restore failure.
+
+## 2026-09-23 - War Battles chassis vertical slice
+
+War Battles now projects four data-driven chassis through the authoritative
+simulation, reliable control lane, rollback/resume snapshot, bots, Defold
+adapter, HUD, generated art and packaged bundle. Each row defines bounded
+health/armour, movement and handling, knockback response, weapon compatibility,
+role and unlock cost. A per-player four-bit unlock mask makes the cost one-time;
+switching an unlocked chassis neither charges again nor refills armour. Invalid
+chassis controls fail closed, incompatible weapon requests are rejected, and
+bots exclude weapon pads their current chassis cannot use.
+
+The art owner now emits all four chassis for blue, red, green and sand teams.
+Remote and local presentations retain the chassis across respawn and show the
+appropriate wreck while dead. Generated atlas/source mirrors, component
+proxies and the déherm bundle were rebuilt through their owners.
+
+Evidence is split by boundary. The deterministic core suite passes 57/57,
+including unlock, weapon-mask, movement, rollback/resume and invalid-control
+cases. The complete example gate passes 114/114. The owned 32-player soak,
+impaired authoritative-load, real QUIC/WebTransport loopback, bundle-size and
+packaged arm64-macOS Defold records were regenerated from the final sources.
+The packaged engine loaded bundle generation 1, executed the tutorial
+collision/score chain, engaged the eight-player arena and exited gracefully.
+The same fingerprint was then bundled by pinned Bob/local Extender for
+`wasm-web` and exercised in real Chrome with the browser host, WebGL canvas,
+all eight components, the same tutorial/arena marker chain and no page errors.
+The 200-frame deterministic snapshot trace now measures 1,918–3,160-byte
+normal deltas with a 2,433-byte median and ten 17,640-byte recovery keyframes.
+These are local deterministic/runtime observations; they do not claim WAN
+latency, production ingress, or a human visual-quality judgment.

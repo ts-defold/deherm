@@ -9,7 +9,7 @@ import {
 } from "@deherm/project";
 
 import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
-import type { PlayerTransform } from "../src/generated-war-battles/index";
+import { chassisById, type PlayerTransform } from "../src/generated-war-battles/index";
 
 /**
  * One visible part of one tank: a hull or a turret.
@@ -46,6 +46,12 @@ const WRECK_ANIMATIONS: readonly DefoldHash[] = [
   hashLiteral("#tank-green-wreck"),
   hashLiteral("#tank-sand-wreck"),
 ];
+const CHASSIS_ANIMATIONS: readonly (readonly DefoldHash[])[] = [
+  [hashLiteral("#chassis-blue-scout"), hashLiteral("#chassis-blue-assault"), hashLiteral("#chassis-blue-bulwark"), hashLiteral("#chassis-blue-artillery")],
+  [hashLiteral("#chassis-red-scout"), hashLiteral("#chassis-red-assault"), hashLiteral("#chassis-red-bulwark"), hashLiteral("#chassis-red-artillery")],
+  [hashLiteral("#chassis-green-scout"), hashLiteral("#chassis-green-assault"), hashLiteral("#chassis-green-bulwark"), hashLiteral("#chassis-green-artillery")],
+  [hashLiteral("#chassis-sand-scout"), hashLiteral("#chassis-sand-assault"), hashLiteral("#chassis-sand-bulwark"), hashLiteral("#chassis-sand-artillery")],
+];
 
 interface TankSelf {
   /** Editor property: the simulation slot this part belongs to. */
@@ -55,6 +61,7 @@ interface TankSelf {
   colour: number;
   turret: boolean;
   wrecked: boolean;
+  chassis: number;
   z: number;
   transform: PlayerTransform;
 }
@@ -74,6 +81,11 @@ function play(animation: DefoldHash): void {
   msg.post("#sprite", "play_animation", { id: animation });
 }
 
+function chassisAnimation(colour: number, chassis: number): DefoldHash {
+  const definition = chassisById(chassis);
+  return CHASSIS_ANIMATIONS[colour]![definition.id - 1]!;
+}
+
 export default defineComponent({
   properties: {
     slot: property.number(0),
@@ -83,6 +95,10 @@ export default defineComponent({
   init(self: TankSelf): void {
     self.turret = Math.trunc(self.part) === PART_TURRET;
     self.wrecked = false;
+    // The first authoritative update selects the real chassis. Keeping an
+    // invalid sentinel here also makes a respawn and a chassis change follow
+    // the same deterministic selection path.
+    self.chassis = 0;
     self.z = go.getPosition().z;
     self.transform = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
     const match = arenaMatch();
@@ -101,6 +117,12 @@ export default defineComponent({
       go.delete();
       return;
     }
+    const colour = tankColour(slot, world.playerTeam[slot]!, match === undefined ? -1 : match.localSlot);
+    const colourChanged = colour !== self.colour;
+    self.colour = colour;
+    const chassis = world.playerChassis[slot]!;
+    const chassisChanged = chassis !== self.chassis;
+    self.chassis = chassis;
     const dead = world.playerHealth[slot]! <= 0;
     if (dead !== self.wrecked) {
       self.wrecked = dead;
@@ -109,8 +131,12 @@ export default defineComponent({
         // rather than deleted: the slot respawns and wants it back.
         if (dead) go.setPosition(vmath.vector3(-10_000, -10_000, self.z));
       } else {
-        play(dead ? WRECK_ANIMATIONS[self.colour]! : HULL_ANIMATIONS[self.colour]!);
+        play(dead ? WRECK_ANIMATIONS[self.colour]! : chassisAnimation(self.colour, chassis));
       }
+    } else if (self.turret) {
+      if (!dead && colourChanged) play(TURRET_ANIMATIONS[self.colour]!);
+    } else if (colourChanged || (!dead && chassisChanged)) {
+      play(dead ? WRECK_ANIMATIONS[self.colour]! : chassisAnimation(self.colour, chassis));
     }
     if (dead && self.turret) return;
 

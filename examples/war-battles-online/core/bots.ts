@@ -26,6 +26,9 @@ import {
   PICKUP_HEALTH,
   PICKUP_OVERDRIVE,
   SPAWN_WEAPON,
+  CHASSIS_COUNT,
+  canUseWeapon,
+  chassisById,
   WEAPON_COUNT,
   pickupByKind,
   weaponById,
@@ -209,6 +212,13 @@ export class BotController {
   }
 
   private decide(world: BattleWorld, slot: number, skill: BotDifficulty, tick: number): void {
+    // Chassis purchases use the same authoritative credit path as a human
+    // control message. The hash keeps the upgrade cadence deterministic while
+    // the fixed roster assignment still gives a match four roles immediately.
+    const nextChassis = (world.playerChassis[slot]! % CHASSIS_COUNT) + 1;
+    if (world.playerCredits[slot]! >= chassisById(nextChassis).unlockCost && (hash(tick, slot * 17 + 9) & 0xff) < 4) {
+      world.selectChassis(slot + 1, nextChassis);
+    }
     const enemy = nearestEnemy(world, slot);
     this.goalTarget[slot] = enemy;
     const vitality = world.playerHealth[slot]! + world.playerArmor[slot]!;
@@ -247,6 +257,7 @@ export class BotController {
       const definition = pickupByKind(kind);
       let weight = 0;
       if (definition.weapon !== 0) {
+        if (!canUseWeapon(world.playerChassis[slot]!, definition.weapon)) continue;
         const candidate = weaponById(definition.weapon);
         if (!wantWeapon) continue;
         if (candidate.botPreference <= currentPreference && world.ammo(slot + 1, definition.weapon) > 0) continue;
@@ -332,6 +343,7 @@ export class BotController {
     let bestPreference = weaponById(SPAWN_WEAPON).botPreference;
     for (let weaponId = 1; weaponId <= WEAPON_COUNT; weaponId += 1) {
       const definition = weaponById(weaponId);
+      if (!canUseWeapon(world.playerChassis[slot]!, weaponId)) continue;
       if (definition.maximumAmmo > 0 && world.playerAmmo[slot * WEAPON_COUNT + weaponId - 1] === 0) continue;
       if (definition.botPreference <= bestPreference) continue;
       best = weaponId;

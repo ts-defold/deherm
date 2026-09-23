@@ -35,6 +35,7 @@ pnpm play                         # the built arm64-macOS engine
 | Space | Fire |
 | Shift | Boost — a limited, recharging burst |
 | `1`–`6` | Cannon, autocannon, railgun, scatter, mortar, ricochet |
+| `7`–`0` | Purchase/select scout, assault, bulwark, artillery chassis |
 
 The scene opens on the tutorial's scripted demonstration, which is what the
 packaged runtime gates observe; **any key starts the match immediately**, and it
@@ -57,6 +58,13 @@ its own top speed — which is what makes splash knockback and rocket-jumping re
 rather than cancelled on the next tick. The hull chases the direction of travel
 and the turret chases the aim, at different rates, so a tank visibly drifts
 through a turn while still shooting where you are pointing.
+
+**Four chassis, four roles.** Scout is fast and light, assault is a balanced
+linebreaker, bulwark trades speed for armour and knockback resistance, and
+artillery is a slow siege platform with long-range slots. Their rows are
+authoritative content: the HUD names the active role, bots receive deterministic
+role variety, and `7`–`0` spends credits once to unlock a chassis through the
+same reliable path online and offline; later switches are free.
 
 **Six weapons, six ways to fight.** Every tank spawns with the cannon and
 unlimited ammunition for it; the other five are picked up.
@@ -83,9 +91,9 @@ guarantees at least eight tiles of corridor between any two blocks. Every open
 cell is reachable — the test suite floods the map to prove it. Cover is
 **not destructible**, on purpose: the grid is derived from a four-byte seed
 rather than stored, so a joining client rebuilds it exactly and the raw world
-state stays a fixed 17,560 bytes. Network snapshots use a 17,576-byte keyframe
+state stays a fixed 17,624 bytes. Network snapshots use a 17,640-byte keyframe
 only for join/recovery and a bounded changed-byte delta thereafter; a 32-player
-bot trace measured 2,015–3,262-byte normal deltas (p50 2,398) over 200 frames,
+bot trace measured 1,918–3,160-byte normal deltas (p50 2,433) over 200 frames,
 versus the former fixed 17,568-byte message. The codec sends a keyframe at least
 every 20 snapshots.
 
@@ -146,11 +154,12 @@ snaps to the truth. Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 3, the
-tick input packet is still exactly 32 bytes (version 1 reserved byte 15 and
-wrote zero; it is now the weapon request, so every other offset is unchanged),
-and the session, control and snapshot lanes now carry a typed four-byte envelope
-whose kind fixes the lane it is allowed on. Full table in
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 4,
+which adds authoritative chassis state to snapshots and the reliable control
+lane. The tick input packet is still exactly 32 bytes (version 1 reserved byte
+15 and wrote zero; it is now the weapon request, so every other offset is
+unchanged), and the session, control and snapshot lanes now carry a typed
+four-byte envelope whose kind fixes the lane it is allowed on. Full table in
 [`server/README.md`](./server/README.md).
 
 **What is and is not proven.** The two-client match, the prediction agreeing with
@@ -166,8 +175,8 @@ does not claim a persistent-stream open count. This is browser loopback
 evidence, not WAN/ingress, native Defold, load, loss, or allocation evidence.
 
 The compact snapshot unit test independently proves the codec against a full
-32-player world: the former 17,568-byte frame is now a 17,576-byte keyframe,
-while the measured 20 Hz bot trace uses 2,015–3,262-byte deltas (p50 2,398).
+32-player world: the former 17,568-byte frame is now a 17,640-byte keyframe,
+while the measured 20 Hz bot trace uses 1,918–3,160-byte deltas (p50 2,433).
 The test also proves keyframe reconstruction, exact-base enforcement, sorted
 run bounds, and rejection of a delta without its baseline. This is protocol and
 in-process evidence; it is not a WAN compression, packet-loss, or allocation

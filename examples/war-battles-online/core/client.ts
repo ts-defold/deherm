@@ -25,6 +25,7 @@ import { clamp, createDirection, normalizeInto, type Direction } from "./fixed.t
 import { assistedAim, type PlayControls } from "./playable.ts";
 import {
   CONTROL_BYTES,
+  CONTROL_SET_CHASSIS,
   HELLO_BYTES,
   INPUT_PACKET_BYTES,
   MESSAGE_PONG,
@@ -290,6 +291,11 @@ export class BattleClient implements TransportReceiver {
   sendControl(action: number, argument: number): void {
     writeControl(this.controlBuffer, { action, argument });
     void this.send(TRANSPORT_CHANNEL_CONTROL, this.controlBuffer);
+  }
+
+  /** Purchases/switches the local player's chassis on the reliable control lane. */
+  sendChassis(chassisId: number): void {
+    this.sendControl(CONTROL_SET_CHASSIS, chassisId);
   }
 
   ping(clientTime: number): void {

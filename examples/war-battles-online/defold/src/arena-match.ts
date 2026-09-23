@@ -99,6 +99,15 @@ export class ArenaMatch {
     else this.battle.setControls(this.controls);
   }
 
+  /** Reliable online control or deterministic offline purchase for a chassis. */
+  selectChassis(chassisId: number): boolean {
+    if (this.mode === "online") {
+      this.client?.sendChassis(chassisId);
+      return true;
+    }
+    return this.battle.selectChassis(chassisId);
+  }
+
   /** Starts a fresh offline round. The authoritative server owns online restarts. */
   restart(): boolean {
     if (this.mode !== "offline") return false;

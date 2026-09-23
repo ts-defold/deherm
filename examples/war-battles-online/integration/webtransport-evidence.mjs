@@ -9,6 +9,9 @@ import { assertProjectionEnvelope, projectionEnvelope } from "./projections.mjs"
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 
+export const WEBTRANSPORT_OWNER =
+  "examples/war-battles-online/integration/check-real-webtransport.mjs";
+
 // Keep the input roots explicit, but hash the complete core tree mechanically.
 // A future imported core module therefore invalidates evidence without someone
 // having to remember to add another filename to a hand-maintained allowlist.
@@ -95,6 +98,8 @@ function assertSourceInventory(document, sourceInputs) {
 export function assertWebTransportEvidence(document, { sourceInputs } = {}) {
   assert.equal(document?.schemaVersion, 2, "WebTransport evidence schemaVersion must be 2");
   assert.equal(document?.kind, "war-battles.real-webtransport-loopback");
+  assert.equal(document?.owner, WEBTRANSPORT_OWNER);
+  assert.equal(document?.generator, WEBTRANSPORT_OWNER);
   assertProjectionEnvelope("browser-webtransport-loopback", document);
   if (sourceInputs !== undefined) assertSourceInventory(document, sourceInputs);
 

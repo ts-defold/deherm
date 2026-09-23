@@ -338,6 +338,19 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
   ]) {
     assert.match(atlas, new RegExp(`id: "${animation}"`), `arena-sprites.atlas is missing ${animation}`);
   }
+  const chassisTeams = ["blue", "red", "green", "sand"];
+  const chassisKinds = ["scout", "assault", "bulwark", "artillery"];
+  for (const team of chassisTeams) {
+    for (const kind of chassisKinds) {
+      assert.match(atlas, new RegExp(`id: "chassis-${team}-${kind}"`),
+        `arena-sprites.atlas is missing ${team} ${kind} chassis art`);
+    }
+  }
+  const chassisSprites = manifest.sprites.filter(({ role }) => role.startsWith("chassis."));
+  assert.equal(chassisSprites.length, chassisTeams.length * chassisKinds.length * 2,
+    "every team/chassis animation must retain two generated frames");
+  assert.equal(new Set(chassisSprites.map(({ role }) => role)).size, chassisTeams.length * chassisKinds.length,
+    "chassis manifest roles must cover each team/chassis pair");
 });
 
 test("the generated 8-bit sound cues are fresh and valid PCM WAV resources", async () => {

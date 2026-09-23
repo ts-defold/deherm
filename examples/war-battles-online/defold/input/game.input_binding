@@ -67,6 +67,22 @@ key_trigger {
   action: "weapon6"
 }
 key_trigger {
+  input: KEY_7
+  action: "chassis1"
+}
+key_trigger {
+  input: KEY_8
+  action: "chassis2"
+}
+key_trigger {
+  input: KEY_9
+  action: "chassis3"
+}
+key_trigger {
+  input: KEY_0
+  action: "chassis4"
+}
+key_trigger {
   input: KEY_R
   action: "restart"
 }

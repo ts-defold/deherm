@@ -3,14 +3,15 @@ import { INPUT_BUTTON_MASK, MAX_PLAYERS, SNAPSHOT_BYTES, TICK_RATE } from "./con
 import { WEAPON_COUNT } from "./content";
 
 /**
- * Version 3 adds the compact keyframe/delta snapshot framing to the reliable
+ * Version 4 adds authoritative chassis state to the compact snapshot framing and
+ * reliable control lane.
  * session/control envelope below. Version 2 added the weapon-request byte to
  * the tick input packet; the packet is still exactly 32 bytes because version 1
  * left byte 15 reserved and zero. The snapshot wire change is intentionally a
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 3;
+export const PROTOCOL_VERSION = 4;
 export const INPUT_PACKET_BYTES = 32;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
@@ -167,6 +168,7 @@ export const REJECT_MAXIMUM_BYTES = REJECT_HEADER_BYTES + 96;
 export const CONTROL_BUY_UPGRADE = 1;
 export const CONTROL_SET_WEAPON = 2;
 export const CONTROL_SUICIDE = 3;
+export const CONTROL_SET_CHASSIS = 4;
 
 export const REJECT_VERSION = 1;
 export const REJECT_FULL = 2;

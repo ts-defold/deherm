@@ -8,6 +8,9 @@ const integrationRoot = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const exampleRoot = resolve(integrationRoot, "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 
+export const AUTHORITATIVE_LOAD_OWNER =
+  "examples/war-battles-online/integration/check-authoritative-load.mjs";
+
 export const AUTHORITATIVE_LOAD_SOURCE_PATHS = Object.freeze([
   "examples/war-battles-online/core",
   "examples/war-battles-online/integration/authoritative-load-harness.ts",
@@ -62,6 +65,8 @@ export function digestAuthoritativeLoadSourceInputs(sourceInputs) {
 export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {}) {
   assert.equal(document?.schemaVersion, 1);
   assert.equal(document?.kind, "war-battles.authoritative-32-player-load");
+  assert.equal(document?.owner, AUTHORITATIVE_LOAD_OWNER);
+  assert.equal(document?.generator, AUTHORITATIVE_LOAD_OWNER);
   if (sourceInputs !== undefined) {
     assert.deepEqual(document.sourceInputs, sourceInputs, "authoritative load evidence source inventory is stale");
     assert.equal(document.sourceKey, digestAuthoritativeLoadSourceInputs(sourceInputs), "authoritative load source key is stale");

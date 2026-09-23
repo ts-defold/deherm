@@ -1,20 +1,22 @@
 {
   "schemaVersion": 1,
+  "owner": "examples/war-battles-online/headless/measure-bundles.mjs",
+  "generator": "examples/war-battles-online/headless/measure-bundles.mjs",
   "observedOn": "2026-09-22",
   "esbuildVersion": "0.25.10",
   "scope": "JavaScript bundle evidence only; not a Defold package or Hermes bytecode measurement",
-  "sourceFileCount": 506,
-  "sourceBytes": 2001173,
+  "sourceFileCount": 540,
+  "sourceBytes": 2074541,
   "artifacts": {
     "headlessNodeBundle": {
-      "bytes": 49656,
-      "gzipBytes": 14065,
-      "sha256": "bc04ac2e17cb861e697cfb053f3ee6932ae8f7317dc800591502492f129270e5"
+      "bytes": 52904,
+      "gzipBytes": 14946,
+      "sha256": "d9abe5bb17475fb1411742ab3a57ebf8c11b354dcfa560a1b2128020abc35c91"
     },
     "defoldGuiDiagnosticBundle": {
-      "bytes": 51973,
-      "gzipBytes": 15158,
-      "sha256": "c7244f3be0584b7ed0955264a529f1c78063bcd8c5b0e764af12f80912db5cf7"
+      "bytes": 55260,
+      "gzipBytes": 16025,
+      "sha256": "0825f8c59a442a4bf146270d6aef22627215dfd258800230e8fe806711700115"
     }
   }
 }

@@ -99,6 +99,182 @@ animations {
   playback: PLAYBACK_NONE
 }
 animations {
+  id: "chassis-blue-scout"
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-scout-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-assault"
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-assault-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-bulwark"
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-bulwark-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-blue-artillery"
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-blue-artillery-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-scout"
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-scout-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-assault"
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-assault-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-bulwark"
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-bulwark-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-red-artillery"
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-red-artillery-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-scout"
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-scout-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-assault"
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-assault-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-bulwark"
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-bulwark-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-green-artillery"
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-green-artillery-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-scout"
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-scout-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-assault"
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-assault-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-bulwark"
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-bulwark-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
+  id: "chassis-sand-artillery"
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-1.png"
+  }
+  images {
+    image: "/assets/derived/arena/chassis-sand-artillery-2.png"
+  }
+  playback: PLAYBACK_LOOP_FORWARD
+  fps: 10
+}
+animations {
   id: "proj-cannon"
   images {
     image: "/assets/derived/arena/proj-cannon.png"

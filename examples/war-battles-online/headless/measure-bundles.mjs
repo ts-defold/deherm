@@ -24,6 +24,8 @@ for (const path of sourceFiles) sourceBytes += (await readFile(path)).byteLength
 
 const report = {
   schemaVersion: 1,
+  owner: "examples/war-battles-online/headless/measure-bundles.mjs",
+  generator: "examples/war-battles-online/headless/measure-bundles.mjs",
   observedOn: "2026-09-22",
   esbuildVersion,
   scope: "JavaScript bundle evidence only; not a Defold package or Hermes bytecode measurement",

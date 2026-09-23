@@ -153,6 +153,10 @@ export class PlayableBattle {
     return this.world.applyUpgrade(LOCAL_PLAYER_ID, upgradeId);
   }
 
+  selectChassis(chassisId: number): boolean {
+    return this.world.selectChassis(LOCAL_PLAYER_ID, chassisId);
+  }
+
   /** Highest frag count in the match. */
   leaderScore(): number {
     let best = 0;

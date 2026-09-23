@@ -1,6 +1,8 @@
 {
   "schemaVersion": 2,
-  "observedOn": "2026-09-19",
+  "owner": "examples/war-battles-online/headless/record-soak.mjs",
+  "generator": "examples/war-battles-online/headless/record-soak.mjs",
+  "kind": "war-battles.headless-soak",
   "scope": "In-process deterministic simulation; no network, engine, renderer, or VM allocation profiling",
   "fixture": "Recorded match: the real BotController drives all 32 tanks, and the replay is the input stream it produced",
   "players": 32,
@@ -11,12 +13,69 @@
   "seed": 12648430,
   "matchId": 77,
   "mapSeed": 12648430,
-  "stateHash": 1767261748,
-  "replayBodyHash": 1630769351,
-  "alivePlayers": 29,
-  "totalKills": 1402,
+  "stateHash": 2563301512,
+  "replayBodyHash": 1058935495,
+  "alivePlayers": 32,
+  "totalKills": 28,
   "rollbackCount": 1,
   "rollbackMatchesUninterrupted": true,
-  "wallClockObservationMs": 2506.0,
-  "note": "Wall-clock duration is one local observation and is not asserted by tests; deterministic hashes and counts are asserted."
+  "sourceInputs": [
+    {
+      "path": "examples/war-battles-online/core",
+      "kind": "tree",
+      "fileCount": 16,
+      "bytes": 241303,
+      "sha256": "a5520a0a48cfd442b6b422600fe5ecea3a15c3a3acf89e8337d308df4f2d24f5"
+    },
+    {
+      "path": "examples/war-battles-online/headless/fixture.ts",
+      "kind": "file",
+      "bytes": 1357,
+      "sha256": "798d589aed1505df19cbf2127a8c0ea957cd68b9b7d696b8f343c036c6497b93"
+    },
+    {
+      "path": "examples/war-battles-online/headless/match.ts",
+      "kind": "file",
+      "bytes": 3231,
+      "sha256": "e60b9de53713fb2f11ebe033191e586619c836d30972342347edf29a3bc6b1a9"
+    },
+    {
+      "path": "examples/war-battles-online/headless/replay.ts",
+      "kind": "file",
+      "bytes": 5328,
+      "sha256": "aa2168159a4e6d37d8a32b85a581c4d734be7e2b6971e172a8fdadb6c0a8e68a"
+    },
+    {
+      "path": "examples/war-battles-online/headless/record-soak.mjs",
+      "kind": "file",
+      "bytes": 1703,
+      "sha256": "5e8ce1200f89c3927a41d416fe921c2488d90735f04cf3a39b1f3700ebeb9445"
+    },
+    {
+      "path": "examples/war-battles-online/headless/soak-evidence.mjs",
+      "kind": "file",
+      "bytes": 6351,
+      "sha256": "c4f7e5f5b6fe1b4b53765674c6441ec0db0ec59e256270389d241215a4dd7afc"
+    },
+    {
+      "path": "examples/war-battles-online/package.json",
+      "kind": "file",
+      "bytes": 4097,
+      "sha256": "be068f587b08f7f589983d08205db35347a091ebeebcb3645f3781215583a016"
+    },
+    {
+      "path": "package.json",
+      "kind": "file",
+      "bytes": 43106,
+      "sha256": "2aae366b9d68a40b84b79852a390a7826d872812e6ab713798a2513cede954a0"
+    },
+    {
+      "path": "pnpm-lock.yaml",
+      "kind": "file",
+      "bytes": 78862,
+      "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
+    }
+  ],
+  "sourceKey": "522b718ba86edf211e702b34d492caa3eaa2132e2c226d49d9d7f1b25d124f1f",
+  "evidenceBoundary": "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence."
 }

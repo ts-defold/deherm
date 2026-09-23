@@ -9,7 +9,7 @@ import {
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
 } from "./constants";
-import { WEAPON_COUNT } from "./content";
+import { CHASSIS_COUNT, CHASSIS_UNLOCK_MASK, WEAPON_COUNT, chassisUnlockBit } from "./content";
 import {
   ENVELOPE_MAGIC,
   MESSAGE_SNAPSHOT,
@@ -22,7 +22,7 @@ import {
 import type { BattleWorld } from "./world";
 
 const SNAPSHOT_MAGIC = 0x57425331;
-const SNAPSHOT_VERSION = 2;
+const SNAPSHOT_VERSION = 3;
 
 export interface SnapshotFrameScratch {
   readonly baseline: Uint8Array;
@@ -256,8 +256,10 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
     view.setUint8(cursor + 73, world.playerWeaponRequest[slot]!);
     view.setUint8(cursor + 74, world.playerBotSkill[slot]!);
     view.setUint8(cursor + 75, world.playerBoostTicks[slot]!);
+    view.setUint8(cursor + 76, world.playerChassis[slot]!);
+    view.setUint8(cursor + 77, world.playerChassisUnlocks[slot]!);
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
-      view.setUint16(cursor + 76 + weapon * 2, world.playerAmmo[slot * WEAPON_COUNT + weapon]!, true);
+      view.setUint16(cursor + 78 + weapon * 2, world.playerAmmo[slot * WEAPON_COUNT + weapon]!, true);
     }
     cursor += PLAYER_SNAPSHOT_BYTES;
   }
@@ -344,8 +346,17 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     world.playerWeaponRequest[slot] = view.getUint8(cursor + 73);
     world.playerBotSkill[slot] = view.getUint8(cursor + 74);
     world.playerBoostTicks[slot] = view.getUint8(cursor + 75);
+    const chassis = view.getUint8(cursor + 76);
+    const chassisUnlocks = view.getUint8(cursor + 77);
+    if (world.playerActive[slot] !== 0 && (chassis < 1 || chassis > CHASSIS_COUNT)) throw new Error("snapshot chassis id is invalid");
+    if ((chassisUnlocks & ~CHASSIS_UNLOCK_MASK) !== 0) throw new Error("snapshot chassis unlock mask is invalid");
+    if (world.playerActive[slot] !== 0 && (chassisUnlocks & chassisUnlockBit(chassis)) === 0) {
+      throw new Error("snapshot active chassis is not unlocked");
+    }
+    world.playerChassis[slot] = chassis;
+    world.playerChassisUnlocks[slot] = chassisUnlocks;
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
-      world.playerAmmo[slot * WEAPON_COUNT + weapon] = view.getUint16(cursor + 76 + weapon * 2, true);
+      world.playerAmmo[slot * WEAPON_COUNT + weapon] = view.getUint16(cursor + 78 + weapon * 2, true);
     }
     cursor += PLAYER_SNAPSHOT_BYTES;
   }

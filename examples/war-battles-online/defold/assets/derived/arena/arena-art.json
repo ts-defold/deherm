@@ -2336,6 +2336,582 @@
       "sha256": "63bb9523e7761ee7eede72a2e081dada4e20fa14df7628b50728794636ee8589"
     },
     {
+      "file": "chassis-blue-scout-1.png",
+      "role": "chassis.blue.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "c463ed31e574544803046f5be6067a561974dd5e29001952660132e7c0a68f8b"
+    },
+    {
+      "file": "chassis-blue-scout-2.png",
+      "role": "chassis.blue.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "0dfbc21f810da0b106a369a89e6be729f8ba2e02c8001ed1b2fd112da69220f5"
+    },
+    {
+      "file": "chassis-blue-assault-1.png",
+      "role": "chassis.blue.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "2dbf6337b658a88e3bd54143d9612cdd6dfc79b9f23be47bb9914b07ba16bead"
+    },
+    {
+      "file": "chassis-blue-assault-2.png",
+      "role": "chassis.blue.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "df4180d7c978fd86b9b7694b4296038b9c913f0f74e9576e7ca58f8279a9cad9"
+    },
+    {
+      "file": "chassis-blue-bulwark-1.png",
+      "role": "chassis.blue.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "9df703dc364a3dc62cd14fbbf9ddf69eef6742324ccd5cb8520c2c45e2c60d54"
+    },
+    {
+      "file": "chassis-blue-bulwark-2.png",
+      "role": "chassis.blue.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "5d00f20ae3fb2b30b4eb4d76da37a5b867cff95e47d724cb5a2802283b47990a"
+    },
+    {
+      "file": "chassis-blue-artillery-1.png",
+      "role": "chassis.blue.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "e7208eddb7f917b23fb974862aade4ea1ff71c9d7b56184d3c2fd7bea11485b6"
+    },
+    {
+      "file": "chassis-blue-artillery-2.png",
+      "role": "chassis.blue.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "9a49435a1d11f6c0bc86cf8c9f8c7fd62ba289ba23ccabf6bf473ec8b91f0028"
+    },
+    {
+      "file": "chassis-red-scout-1.png",
+      "role": "chassis.red.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "5e9871446f7916dfc188f318e9ad6fda211cc4f8fe34d869d1cb6752afd8fc3b"
+    },
+    {
+      "file": "chassis-red-scout-2.png",
+      "role": "chassis.red.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "14f2ceaefea08d7eaf6f6fe10e746401a8db9297f534014916e0d0f01c5aad88"
+    },
+    {
+      "file": "chassis-red-assault-1.png",
+      "role": "chassis.red.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "fe3186bc455d92421f740169180a95bf992a5b44c58d3d685f36b130890889aa"
+    },
+    {
+      "file": "chassis-red-assault-2.png",
+      "role": "chassis.red.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "8562aa15ff58178dffb7fcbb7682fc603f4fb8146ae89828ded1079b9efc97da"
+    },
+    {
+      "file": "chassis-red-bulwark-1.png",
+      "role": "chassis.red.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "6823da8324fb623b1b6a28c1d8f34274a558e6066195bd0a8a23adfc72ba2a3a"
+    },
+    {
+      "file": "chassis-red-bulwark-2.png",
+      "role": "chassis.red.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "39d1a32ae34ee024112ffe9fab79e765d16fcad218f3d491ceb067cd5e4dee35"
+    },
+    {
+      "file": "chassis-red-artillery-1.png",
+      "role": "chassis.red.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "fc71a729012d1c2eb17a116e43a1f239aa33663684419d7b428e818fb0325749"
+    },
+    {
+      "file": "chassis-red-artillery-2.png",
+      "role": "chassis.red.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "08849b1d8dba5dad488a8b4b51b82374686c4bc0ee80124aaeb627bb5d20279b"
+    },
+    {
+      "file": "chassis-green-scout-1.png",
+      "role": "chassis.green.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "3f3c11cef47a84fefceb3139729387b44ad4ba4cb03a6b77a04753d51c8355c1"
+    },
+    {
+      "file": "chassis-green-scout-2.png",
+      "role": "chassis.green.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "43f7a22b91a3409ecf7e072c7bb3798018a553e0c443d6fcb9490c6a168fd9d1"
+    },
+    {
+      "file": "chassis-green-assault-1.png",
+      "role": "chassis.green.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "9a36c926261f9c4274296b7a3c4cae8ec5c3351fb9904ac37ca3f4219814be7d"
+    },
+    {
+      "file": "chassis-green-assault-2.png",
+      "role": "chassis.green.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "43a103bd06dec34c0b8f430f31c692ac299629cd11f0477b058eab09ce211e67"
+    },
+    {
+      "file": "chassis-green-bulwark-1.png",
+      "role": "chassis.green.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "440550cab97eb68e61ddc57e1c297902db55a437c9546331d2858a532125d641"
+    },
+    {
+      "file": "chassis-green-bulwark-2.png",
+      "role": "chassis.green.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "9b73c23d6d30bd728a3a91ebc63af60cf8243257da6363accb6173c24e3d0d73"
+    },
+    {
+      "file": "chassis-green-artillery-1.png",
+      "role": "chassis.green.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "73abf24eb6b628b9fa21b8784610dcf0dd06591b4266052bbf94280334b43aa4"
+    },
+    {
+      "file": "chassis-green-artillery-2.png",
+      "role": "chassis.green.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "53090e524ab9e638415dd9e95b7e12689feb0bd4317269aae0f8b4875d1d72ed"
+    },
+    {
+      "file": "chassis-sand-scout-1.png",
+      "role": "chassis.sand.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "e6829fa407275e64da8a853bcd0f63230f326ee4b4e5c43a6dc56c5094d1b882"
+    },
+    {
+      "file": "chassis-sand-scout-2.png",
+      "role": "chassis.sand.scout",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "913f7eea61fb1c4861a29dc313ebd88327f15dcd105d85a3abbe5d75d194ffbd"
+    },
+    {
+      "file": "chassis-sand-assault-1.png",
+      "role": "chassis.sand.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "43e934d01df8c40da1f3e99b13b2794346d04e58fc75fd28a4dc7628e6fa179f"
+    },
+    {
+      "file": "chassis-sand-assault-2.png",
+      "role": "chassis.sand.assault",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "77e43bfe7c4b7098331b115d622dfec75f23aa8b0b8a7e6705558f3f3bb3edd8"
+    },
+    {
+      "file": "chassis-sand-bulwark-1.png",
+      "role": "chassis.sand.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "52de6ec71d08a3707a43597054b668c64cd8abd9d29603da4c0f5d12144ba6fd"
+    },
+    {
+      "file": "chassis-sand-bulwark-2.png",
+      "role": "chassis.sand.bulwark",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "d0c8bb76f72a1151bcbda07689399c55c31c7190af4133289e8c6d9b8c1f649f"
+    },
+    {
+      "file": "chassis-sand-artillery-1.png",
+      "role": "chassis.sand.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "ad0fe548449613e89f22f4db728cd0924444bf5faf2bcf9a1a6bba782a4df0c6"
+    },
+    {
+      "file": "chassis-sand-artillery-2.png",
+      "role": "chassis.sand.artillery",
+      "size": [
+        32,
+        32
+      ],
+      "outline": "#2c2839",
+      "rotationAnchored": true,
+      "opaqueBbox": [
+        0,
+        5,
+        30,
+        26
+      ],
+      "verticalCentreOffset": 0,
+      "sha256": "e8656d0ab519026b9eac90b001294e67d6e807423de788489520421be91ee0f9"
+    },
+    {
       "file": "proj-cannon.png",
       "role": "projectile",
       "size": [
@@ -3275,7 +3851,7 @@
   "atlas": {
     "file": "/main/arena-sprites.atlas",
     "extrudeBorders": 2,
-    "sha256": "38d83bc84697632c4b8b0a9c001a7e7a879b194ec29b7798c85468d31293fcf6",
+    "sha256": "702b20af021c1249e015ce9e4d62517e52f73d5b08579f480aee4013d3f3f961",
     "animations": [
       {
         "id": "tank-blue-hull",
@@ -3375,6 +3951,150 @@
         "fps": null,
         "frames": [
           "tank-sand-wreck.png"
+        ]
+      },
+      {
+        "id": "chassis-blue-scout",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-blue-scout-1.png",
+          "chassis-blue-scout-2.png"
+        ]
+      },
+      {
+        "id": "chassis-blue-assault",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-blue-assault-1.png",
+          "chassis-blue-assault-2.png"
+        ]
+      },
+      {
+        "id": "chassis-blue-bulwark",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-blue-bulwark-1.png",
+          "chassis-blue-bulwark-2.png"
+        ]
+      },
+      {
+        "id": "chassis-blue-artillery",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-blue-artillery-1.png",
+          "chassis-blue-artillery-2.png"
+        ]
+      },
+      {
+        "id": "chassis-red-scout",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-red-scout-1.png",
+          "chassis-red-scout-2.png"
+        ]
+      },
+      {
+        "id": "chassis-red-assault",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-red-assault-1.png",
+          "chassis-red-assault-2.png"
+        ]
+      },
+      {
+        "id": "chassis-red-bulwark",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-red-bulwark-1.png",
+          "chassis-red-bulwark-2.png"
+        ]
+      },
+      {
+        "id": "chassis-red-artillery",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-red-artillery-1.png",
+          "chassis-red-artillery-2.png"
+        ]
+      },
+      {
+        "id": "chassis-green-scout",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-green-scout-1.png",
+          "chassis-green-scout-2.png"
+        ]
+      },
+      {
+        "id": "chassis-green-assault",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-green-assault-1.png",
+          "chassis-green-assault-2.png"
+        ]
+      },
+      {
+        "id": "chassis-green-bulwark",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-green-bulwark-1.png",
+          "chassis-green-bulwark-2.png"
+        ]
+      },
+      {
+        "id": "chassis-green-artillery",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-green-artillery-1.png",
+          "chassis-green-artillery-2.png"
+        ]
+      },
+      {
+        "id": "chassis-sand-scout",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-sand-scout-1.png",
+          "chassis-sand-scout-2.png"
+        ]
+      },
+      {
+        "id": "chassis-sand-assault",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-sand-assault-1.png",
+          "chassis-sand-assault-2.png"
+        ]
+      },
+      {
+        "id": "chassis-sand-bulwark",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-sand-bulwark-1.png",
+          "chassis-sand-bulwark-2.png"
+        ]
+      },
+      {
+        "id": "chassis-sand-artillery",
+        "playback": "PLAYBACK_LOOP_FORWARD",
+        "fps": 10,
+        "frames": [
+          "chassis-sand-artillery-1.png",
+          "chassis-sand-artillery-2.png"
         ]
       },
       {
@@ -3952,6 +4672,646 @@
     },
     {
       "label": "tank-sand-wreck: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-scout-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-scout-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-scout-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-scout-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-scout-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-scout-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-scout-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-scout-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-assault-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-assault-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-assault-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-assault-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-assault-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-assault-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-assault-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-assault-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-bulwark-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-bulwark-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-bulwark-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-bulwark-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-bulwark-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-bulwark-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-bulwark-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-bulwark-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-artillery-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-artillery-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-artillery-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-artillery-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-artillery-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-blue-artillery-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-blue-artillery-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-blue-artillery-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-scout-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-scout-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-scout-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-scout-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-scout-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-scout-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-scout-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-scout-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-assault-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-assault-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-assault-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-assault-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-assault-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-assault-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-assault-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-assault-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-bulwark-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-bulwark-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-bulwark-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-bulwark-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-bulwark-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-bulwark-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-bulwark-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-bulwark-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-artillery-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-artillery-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-artillery-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-artillery-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-artillery-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-red-artillery-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-red-artillery-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-red-artillery-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-scout-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-scout-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-scout-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-scout-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-scout-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-scout-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-scout-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-scout-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-assault-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-assault-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-assault-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-assault-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-assault-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-assault-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-assault-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-assault-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-bulwark-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-bulwark-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-bulwark-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-bulwark-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-bulwark-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-bulwark-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-bulwark-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-bulwark-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-artillery-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-artillery-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-artillery-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-artillery-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-artillery-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-green-artillery-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-green-artillery-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-green-artillery-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-scout-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-scout-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-scout-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-scout-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-scout-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-scout-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-scout-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-scout-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-assault-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-assault-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-assault-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-assault-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-assault-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-assault-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-assault-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-assault-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-bulwark-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-bulwark-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-bulwark-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-bulwark-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-bulwark-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-bulwark-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-bulwark-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-bulwark-2: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-artillery-1: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-artillery-1: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-artillery-1: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-artillery-1: vertically centred for rotation (dy=0)",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-artillery-2: decodes at 32x32",
+      "ok": true,
+      "detail": "32x32"
+    },
+    {
+      "label": "chassis-sand-artillery-2: not fully transparent",
+      "ok": true,
+      "detail": null
+    },
+    {
+      "label": "chassis-sand-artillery-2: opaque bbox within bounds",
+      "ok": true,
+      "detail": "[0,5,30,26]"
+    },
+    {
+      "label": "chassis-sand-artillery-2: vertically centred for rotation (dy=0)",
       "ok": true,
       "detail": null
     },

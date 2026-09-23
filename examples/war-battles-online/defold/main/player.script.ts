@@ -12,6 +12,7 @@ import {
 } from "@deherm/project";
 
 import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
+import { chassisById } from "../src/generated-war-battles/index";
 
 declare const __defoldHostV1: {
   log(level: "info", message: string): void;
@@ -29,6 +30,10 @@ const WEAPON_3 = hashLiteral("#weapon3");
 const WEAPON_4 = hashLiteral("#weapon4");
 const WEAPON_5 = hashLiteral("#weapon5");
 const WEAPON_6 = hashLiteral("#weapon6");
+const CHASSIS_1 = hashLiteral("#chassis1");
+const CHASSIS_2 = hashLiteral("#chassis2");
+const CHASSIS_3 = hashLiteral("#chassis3");
+const CHASSIS_4 = hashLiteral("#chassis4");
 const RESTART = hashLiteral("#restart");
 
 /**
@@ -46,6 +51,13 @@ const ARENA = "/arena#arena";
  * needed. (The tutorial's infantry art faced screen-down and did need one.)
  */
 const ART_FACING_OFFSET = 0;
+const CHASSIS_ANIMATIONS: readonly DefoldHash[] = [
+  hashLiteral("#chassis-blue-scout"),
+  hashLiteral("#chassis-blue-assault"),
+  hashLiteral("#chassis-blue-bulwark"),
+  hashLiteral("#chassis-blue-artillery"),
+];
+const WRECK_ANIMATION = hashLiteral("#tank-blue-wreck");
 const SPEED = 180;
 
 interface PlayerSelf {
@@ -76,6 +88,8 @@ interface PlayerSelf {
   boosting: boolean;
   weapon: number;
   z: number;
+  chassis: number;
+  wrecked: boolean;
 }
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -156,6 +170,8 @@ export default defineComponent({
     msg.post(".", "acquire_input_focus");
     const position = go.getPosition();
     self.z = position.z;
+    self.chassis = 0;
+    self.wrecked = false;
     __defoldHostV1.log("info", `war-battles:player-init:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
   },
 
@@ -179,6 +195,20 @@ export default defineComponent({
       const world = match?.world;
       const slot = match === undefined ? -1 : match.localSlot;
       if (world === undefined || slot < 0) return;
+      const chassis = world.playerChassis[slot]!;
+      const chassisChanged = chassis !== self.chassis;
+      if (chassisChanged) {
+        self.chassis = chassis;
+      }
+      const dead = world.playerHealth[slot]! <= 0;
+      if (dead !== self.wrecked) {
+        self.wrecked = dead;
+        msg.post("#sprite", "play_animation", {
+          id: dead ? WRECK_ANIMATION : CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]!,
+        });
+      } else if (!dead && chassisChanged) {
+        msg.post("#sprite", "play_animation", { id: CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]! });
+      }
       const x = pixelX(world.playerX[slot]!);
       const y = pixelY(world.playerY[slot]!);
       go.setPosition(vmath.vector3(x, y, self.z));
@@ -254,6 +284,12 @@ export default defineComponent({
               : actionId === WEAPON_6 ? 6 : 0;
     if (weapon !== 0) {
       if (action.pressed) self.weapon = weapon;
+      engage(self);
+      return true;
+    }
+    const chassis = actionId === CHASSIS_1 ? 1 : actionId === CHASSIS_2 ? 2 : actionId === CHASSIS_3 ? 3 : actionId === CHASSIS_4 ? 4 : 0;
+    if (chassis !== 0) {
+      if (action.pressed) arenaMatch()?.selectChassis(chassis);
       engage(self);
       return true;
     }

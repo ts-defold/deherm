@@ -460,12 +460,12 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "3734cb543e23cd0ae5a815fce7b97a6bf6099f6fcd3eb541891678cad19de8a7",
+        "fingerprint": "a0d41e4e5986bc1114576c2e2f2d6500ff9b7e2ffb01f9dba7619c176821b749",
         "outputs": {
-          "deherm/app.dehermc": "3b4d344f074d338325dad08c0321859e73d2756819cdd8de3f403ffb6a469974"
+          "deherm/app.dehermc": "d8bafa57f214b3596e708f0417d2178810f263760c0c76f0a8691c3bb033aaaf"
         },
         "build": {
-          "entryPoint": "main/arena.script.ts",
+          "entryPoint": "main/player.script.ts",
           "preludeEntries": [
             ".deherm/generated/components/registry.ts"
           ],
@@ -483,12 +483,12 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "6ad000e1afea3a85428cee6d4ee8b3dddfd94d5016cb163dfef69b7c18cb0937",
+          "digest": "f8982200bc16f700fd82cbc020304d2438269461f4d9d399413b3adeda33d1c9",
           "fileCount": 68,
           "files": {
             ".deherm/generated/components/registry.ts": "442a3864f95018529f415bf4c125a33c4450308ac6b2797be8ad86f1f95b77e9",
             ".deherm/generated/dmsdk-call-symbol-index.json": "5b42fdf93957d7f5448f21e7f3b8cb6e5335dc6431d84136a0dad3d9d91f2b88",
-            ".deherm/generated/resource-symbols.json": "40f7abb4c2a3011f73dd228b08e6f163519afc79a91686a0c01414f3638f69a3",
+            ".deherm/generated/resource-symbols.json": "aa235d4f33e140f3f0351c2b1b3407f00d5afe2259a3c57e117f7c7982688e53",
             ".deherm/generated/script-route-symbol-index.json": "b01d3f6d7f2d50b0bdab68adeff9bbe30db4de91e8785ba0af30dc9bcd2d502c",
             ".deherm/sdk/address.ts": "32420294482945e853794417e35e5614224af893df0338901259e63b62176649",
             ".deherm/sdk/component.ts": "64b6d6b295d2843f5c86147df0a52f68b802c20a6a993ab2b30290d3add0f614",
@@ -530,28 +530,28 @@
             "main/arena.script.ts": "80ee7560177779bb93340b18f6aed52915707a573bb89d99420936b821e05cad",
             "main/camera.script.ts": "3344ed6f0ef3e9cd894cc2ba8c2371dcc0041f66e225c680497f0307b76ae1ef",
             "main/pickup.script.ts": "868d3376041849b24e4308519e51b5dcac8527585d4e7541e768edf8b22591a9",
-            "main/player.script.ts": "d15a74cb995a762a51e7a1fc8651c9bab952bb160c62596cde0222a78692e389",
+            "main/player.script.ts": "179e85a54445681402743268a6dedc35bab17faef175216a799558a3ca2f2ade",
             "main/rocket.script.ts": "08c1620a9e9fb9258404c5f78d44ac899bc233a794b0c24a95559a3018cedffd",
-            "main/tank.script.ts": "461f5bc82bcd61ffabca9557a719d0ae879e2a9aa3572b97dd8c837cb63b83bf",
-            "main/ui.gui.ts": "244a3927d64171f6d1d370ac1c43532d7b6d467d95ef6852a56d40e306446d4f",
+            "main/tank.script.ts": "cbd61b622a3a78010eb9a6e4a42a9aa924ab54c9040897a7e97388a7e90ced52",
+            "main/ui.gui.ts": "feb8cf222c75fa3517679f1b039e2c5c43a07f8fb87f68a1cb8399c8e73e2c82",
             "reference/battle.gui.ts": "712eb7b8775a9a5f9447a64b954181dd70f4a0313a2e25e7abf7e10f8d7405f8",
-            "src/arena-match.ts": "d0326d976fb3ad436f6d4b62138aa0a59e1e7b71d5e47e7dc90f56f9ce3ddc53",
+            "src/arena-match.ts": "129e768aa176101f781096b63a028d8817a41b571c27a566528996d11f3efa26",
             "src/capability-snapshot.ts": "1cc3bcb6342ff5dbbe53769645d426bb24e0f99eec5067a3995762e091625bf7",
-            "src/generated-war-battles/arena.ts": "de4e50ba1a518e18e3bbc0eaec74807af77b59aaac69a0b6abc611b0cd6b9813",
-            "src/generated-war-battles/bots.ts": "48ab38f42117527a33a3f8edc1bf032fcb5d2d2b0d5c378729d919a222e3582e",
+            "src/generated-war-battles/arena.ts": "dcc1562de5d74981bd3c0af301f6149fd6b64df9ef4a76761d84bcbb00dfff50",
+            "src/generated-war-battles/bots.ts": "7edfe5fbcbdd82db72634518dccdbeb136b6fcf718eaca21401e8343e0e83a05",
             "src/generated-war-battles/browser-webtransport.ts": "da48e41682d5fe39a25f867615b6da47b35f36a0461ead33c2fd2b72f76376ee",
-            "src/generated-war-battles/client.ts": "c7c2427574cf47d8b307a203cd42b9ac271cf8bc74f30fc99be5110de96477e9",
-            "src/generated-war-battles/constants.ts": "b401e6b1b8122dd30d6403c57aa7aace94779857dcbe263e71b339defd415b60",
-            "src/generated-war-battles/content.ts": "b80a9516bfd89c233fa1abed06ab7e2aaaad9b181fc21a8ef961ce808d283ce7",
+            "src/generated-war-battles/client.ts": "e49b937bceb72d2353df129bd456a669ecbba312a4ee17264ed090d827a51f52",
+            "src/generated-war-battles/constants.ts": "6abed0dfba11153951c54479ec62b4963424c2de119bc3f39362cc79f9519464",
+            "src/generated-war-battles/content.ts": "77db138863f033ab5556679dd2099f50a3a5e79581531696a5fe5976567c8cce",
             "src/generated-war-battles/events.ts": "88440289a11aa91f5df65e0d9234a2974a3c38d51c315d8132ce041091a3ca9e",
             "src/generated-war-battles/fixed.ts": "2dbc995b0230edd9893945cec02c695884e67253c79e978bf5fcaf371161f8f1",
             "src/generated-war-battles/index.ts": "f6ef8fcc54bdc261cb2babfbeebc4debc4c3aef3534628032d69db44dae87924",
-            "src/generated-war-battles/playable.ts": "5583a28d77c792d2aeffa91750409e831cb475d9ba819b33df1421c971857337",
-            "src/generated-war-battles/protocol.ts": "ec090d8136e55f7e169af9d6cbdc8442fc066e82c9f427af6ead2a5363b63671",
-            "src/generated-war-battles/snapshot.ts": "6181a85b9a50304fb5b6f0a439fd852b468e5dfe0f7759f38f3e7861af6eb26a",
+            "src/generated-war-battles/playable.ts": "6b9bfe13a811e05d5a6fb39a881fd251be28c146b96b71ac92170d949de52449",
+            "src/generated-war-battles/protocol.ts": "94df2feaf501dc9ca9f4933e7f38881b5c27dd3e939b685bd925cb795eb7cdef",
+            "src/generated-war-battles/snapshot.ts": "e6c500a7926ad3c5390caea7cb76545020f8b81919e501c7a49a74bfbd8fab01",
             "src/generated-war-battles/transport-selection.ts": "90aa92aafba681502f3f744daefaef3ff4951a8318093c88380f6a356a10482f",
             "src/generated-war-battles/transport.ts": "146850ba5ff99abf86854caaac5de72702d1764ed4c435fc986c46bfa4f190eb",
-            "src/generated-war-battles/world.ts": "e3d0396cdcf5ab968576c384c0ea5127ade96c654723f6bf8df4581004ad0ec1",
+            "src/generated-war-battles/world.ts": "bbdfdce650a9f15e56e7e676bd7a06fdb031c43abae07e76251a79f9e6769bf9",
             "tsconfig.deherm.base.json": "0c877d4615c6356293850c647d0f603d348803b80030dace8bf8f887c7c26b36",
             "tsconfig.deherm.bundle.json": "128eac3168a6ca0f2a3cd676e795d9f83ad8486f0cc7eb873d443cac52bada4f"
           }

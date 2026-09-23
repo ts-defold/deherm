@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { runAuthoritativeLoadHarness } from "./authoritative-load-harness.ts";
 import {
   assertAuthoritativeLoadEvidence,
+  AUTHORITATIVE_LOAD_OWNER,
   buildAuthoritativeLoadSourceInputs,
   digestAuthoritativeLoadSourceInputs,
 } from "./authoritative-load-evidence.mjs";
@@ -19,6 +20,8 @@ const evidencePath = resolve(exampleRoot, "evidence/authoritative-load-32.json")
 const sourceInputs = await buildAuthoritativeLoadSourceInputs();
 const generated = {
   ...await runAuthoritativeLoadHarness(),
+  owner: AUTHORITATIVE_LOAD_OWNER,
+  generator: AUTHORITATIVE_LOAD_OWNER,
   sourceInputs,
   sourceKey: digestAuthoritativeLoadSourceInputs(sourceInputs),
 };

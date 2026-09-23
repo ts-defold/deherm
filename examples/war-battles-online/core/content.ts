@@ -19,6 +19,37 @@ export const UPGRADE_DAMAGE = 1;
 export const UPGRADE_MOBILITY = 2;
 export const UPGRADE_ARMOR = 3;
 
+// Chassis are content, not branching simulation code. The mask is the set of
+// weapon slots the chassis can carry; bit zero is unused because weapon ids are
+// one-based on the wire. Values are fixed-point simulation units so a client
+// and server resolve the same handling without floats in the hot path.
+export const CHASSIS_SCOUT = 1;
+export const CHASSIS_ASSAULT = 2;
+export const CHASSIS_BULWARK = 3;
+export const CHASSIS_ARTILLERY = 4;
+export const CHASSIS_COUNT = 4;
+export const CHASSIS_UNLOCK_MASK = (1 << CHASSIS_COUNT) - 1;
+
+export interface ChassisDefinition {
+  readonly id: number;
+  readonly name: string;
+  readonly role: string;
+  /** Existing atlas/tutorial art id used by the Defold presentation. */
+  readonly sprite: string;
+  readonly maxHealth: number;
+  readonly baseArmor: number;
+  readonly acceleration: number;
+  readonly maxSpeed: number;
+  readonly dragShift: number;
+  readonly wallBounce: number;
+  readonly hullSlew: number;
+  readonly turretSlew: number;
+  /** 256 is neutral; smaller values resist knockback. */
+  readonly knockbackFactor: number;
+  readonly weaponMask: number;
+  readonly unlockCost: number;
+}
+
 export interface WeaponDefinition {
   readonly id: number;
   readonly name: string;
@@ -197,6 +228,25 @@ export const WEAPONS: readonly (WeaponDefinition | undefined)[] = Object.freeze(
   }),
 ]);
 
+const chassis = (definition: ChassisDefinition): ChassisDefinition => Object.freeze(definition);
+const weaponMask = (...ids: number[]): number => ids.reduce((mask, id) => mask | (1 << id), 0);
+
+export const CHASSIS: readonly (ChassisDefinition | undefined)[] = Object.freeze([
+  undefined,
+  chassis({ id: CHASSIS_SCOUT, name: "scout", role: "interceptor", sprite: "scout", maxHealth: 120, baseArmor: 5,
+    acceleration: 8 * 256, maxSpeed: 112 * 256, dragShift: 4, wallBounce: 112, hullSlew: 58, turretSlew: 36,
+    knockbackFactor: 180, weaponMask: weaponMask(WEAPON_CANNON, WEAPON_AUTOCANNON, WEAPON_RICOCHET), unlockCost: 0 }),
+  chassis({ id: CHASSIS_ASSAULT, name: "assault", role: "linebreaker", sprite: "assault", maxHealth: 170, baseArmor: 20,
+    acceleration: 6 * 256, maxSpeed: 88 * 256, dragShift: 5, wallBounce: 96, hullSlew: 44, turretSlew: 26,
+    knockbackFactor: 128, weaponMask: weaponMask(WEAPON_CANNON, WEAPON_AUTOCANNON, WEAPON_SCATTER), unlockCost: 150 }),
+  chassis({ id: CHASSIS_BULWARK, name: "bulwark", role: "anchor", sprite: "bulwark", maxHealth: 240, baseArmor: 55,
+    acceleration: 4 * 256, maxSpeed: 66 * 256, dragShift: 6, wallBounce: 76, hullSlew: 30, turretSlew: 20,
+    knockbackFactor: 72, weaponMask: weaponMask(WEAPON_CANNON, WEAPON_MORTAR, WEAPON_RAILGUN), unlockCost: 300 }),
+  chassis({ id: CHASSIS_ARTILLERY, name: "artillery", role: "siege", sprite: "artillery", maxHealth: 190, baseArmor: 30,
+    acceleration: 5 * 256, maxSpeed: 74 * 256, dragShift: 6, wallBounce: 84, hullSlew: 28, turretSlew: 18,
+    knockbackFactor: 96, weaponMask: weaponMask(WEAPON_CANNON, WEAPON_RAILGUN, WEAPON_MORTAR, WEAPON_RICOCHET), unlockCost: 225 }),
+]);
+
 export const PICKUP_HEALTH = 10;
 export const PICKUP_ARMOR = 11;
 export const PICKUP_OVERDRIVE = 12;
@@ -232,6 +282,21 @@ export function weaponById(id: number): WeaponDefinition {
   const definition = WEAPONS[id];
   if (definition === undefined) throw new RangeError(`unknown weapon id ${id}`);
   return definition;
+}
+
+export function chassisById(id: number): ChassisDefinition {
+  const definition = CHASSIS[id];
+  if (definition === undefined) throw new RangeError(`unknown chassis id ${id}`);
+  return definition;
+}
+
+export function chassisUnlockBit(id: number): number {
+  chassisById(id);
+  return 1 << (id - 1);
+}
+
+export function canUseWeapon(chassisId: number, weaponId: number): boolean {
+  return (chassisById(chassisId).weaponMask & (1 << weaponId)) !== 0;
 }
 
 export function pickupByKind(kind: number): PickupDefinition {

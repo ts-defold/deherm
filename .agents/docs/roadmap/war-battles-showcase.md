@@ -298,8 +298,8 @@ being presented as current. This is deterministic transport/simulation load
 evidence only; it excludes WAN behavior, native Defold networking, browser
 WebTransport, allocation benchmarking, sanitizer results, and visual proof.
 
-The focused 32-player codec test measured 2,015–3,262-byte normal deltas (p50
-2,398) across a 200-frame veteran-bot trace, compared with the former fixed
+The focused 32-player codec test measured 1,918–3,160-byte normal deltas (p50
+2,433) across a 200-frame veteran-bot trace, compared with the former fixed
 17,568-byte message. The test proves keyframe reconstruction, exact-base
 enforcement and malformed-run rejection. The codec loops use direct indexed
 copies, so they create no typed-array views or heap objects after setup; the
@@ -324,6 +324,27 @@ code. The target showcase includes:
   text, spectating, scoreboards, and accessibility controls;
 * React/hooks-driven Defold GUI once that renderer passes its own runtime and
   memory gates.
+
+## Bounded Stage-3 chassis tranche
+
+The first Stage-3 vertical slice is now implemented in the canonical
+`examples/war-battles-online/core` source and mirrored into Defold. Four fixed
+capacity chassis rows (scout, assault, bulwark, artillery) carry distinct
+health/armour, acceleration/top speed, handling, knockback response, weapon
+slot masks, roles, unlock costs, and presentation sprite ids. The authoritative
+`BattleWorld` stores the selected chassis and a bounded unlock mask per slot;
+reliable `CONTROL_SET_CHASSIS` spends credits once, then switches among unlocked
+rows without charging again or refilling armour. Both fields are included in
+the versioned compact snapshot so rollback, delta recovery, and resume restore
+the same state. Bots start with deterministic role variety, filter weapon pads
+by their slot mask, and may purchase the next row through the same world path.
+The Defold adapter exposes the selection path on keys 7–0, renders generated
+role-marked hulls, and shows chassis/role plus chassis-scaled health in the HUD.
+Focused core tests cover stat distinction, one-time selection cost, weapon-mask
+rejection, snapshot rollback/resume, fail-closed control input, and existing
+32-player convergence. This tranche does
+not claim the complete Stage-3 weapon families, destructible spaces, or final
+renderer/accessibility work listed above.
 
 # Verification
 

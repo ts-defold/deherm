@@ -14,6 +14,7 @@ import {
   DenoWebTransportServer,
   CELL_FLOOR,
   CONTROL_BUY_UPGRADE,
+  CONTROL_SET_CHASSIS,
   EVENT_KILL,
   EVENT_PICKUP_TAKEN,
   HELLO_BYTES,
@@ -60,7 +61,14 @@ import {
   writeSnapshotKeyframe,
   writeWelcome,
 } from "../core/index.ts";
-import { UPGRADE_MOBILITY } from "../core/content.ts";
+import {
+  CHASSIS_ARTILLERY,
+  CHASSIS_BULWARK,
+  CHASSIS_SCOUT,
+  chassisById,
+  chassisUnlockBit,
+  UPGRADE_MOBILITY,
+} from "../core/content.ts";
 
 function command(playerId, tick, overrides = {}) {
   return {
@@ -226,12 +234,12 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   }
   lengths.sort((left, right) => left - right);
   assert.equal(lengths.length, 200);
-  assert.equal(lengths[0], 2_015);
+  assert.equal(lengths[0], 1_918);
   assert.equal(lengths.at(-1), SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_398);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_433);
   assert.equal(lengths.filter((length) => length === SNAPSHOT_MESSAGE_BYTES).length, 10);
   const normal = lengths.filter((length) => length !== SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(normal.at(-1), 3_262);
+  assert.equal(normal.at(-1), 3_160);
 });
 
 test("a replaced in-flight snapshot forces a recovery keyframe", async () => {
@@ -674,6 +682,52 @@ test("fixed stores retain identity through a sustained 32-player run", () => {
   assert.equal(world.playerX.byteLength, MAX_PLAYERS * Int32Array.BYTES_PER_ELEMENT);
 });
 
+test("data-driven chassis stats, weapon slots, purchase selection and snapshots agree", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1);
+  world.addPlayer(2);
+  assert.notEqual(world.playerChassis[0], world.playerChassis[1], "roster bootstrap should expose distinct roles");
+  assert.ok(chassisById(CHASSIS_BULWARK).maxHealth > chassisById(CHASSIS_SCOUT).maxHealth);
+  assert.ok(chassisById(CHASSIS_SCOUT).maxSpeed > chassisById(CHASSIS_BULWARK).maxSpeed);
+  assert.ok(chassisById(CHASSIS_SCOUT).knockbackFactor > chassisById(CHASSIS_BULWARK).knockbackFactor);
+  assert.notEqual(chassisById(CHASSIS_SCOUT).weaponMask, chassisById(CHASSIS_ARTILLERY).weaponMask);
+
+  world.grantCredits(1, chassisById(CHASSIS_BULWARK).unlockCost);
+  assert.equal(world.playerChassisUnlocks[0], chassisUnlockBit(CHASSIS_SCOUT));
+  assert.equal(world.selectChassis(1, CHASSIS_BULWARK), true);
+  assert.equal(world.playerChassis[0], CHASSIS_BULWARK);
+  assert.equal(world.playerCredits[0], 0);
+  assert.notEqual(world.playerChassisUnlocks[0] & chassisUnlockBit(CHASSIS_BULWARK), 0);
+  world.playerArmor[0] = 3;
+  assert.equal(world.selectChassis(1, CHASSIS_SCOUT), true);
+  assert.equal(world.selectChassis(1, CHASSIS_BULWARK), true, "an unlocked chassis can be selected again");
+  assert.equal(world.playerCredits[0], 0, "an unlocked chassis is never charged twice");
+  assert.equal(world.playerArmor[0], 3, "switching chassis cannot mint armor");
+  const snapshot = new Uint8Array(SNAPSHOT_BYTES);
+  world.writeSnapshot(snapshot);
+  world.setChassis(1, CHASSIS_SCOUT);
+  world.restoreSnapshot(snapshot);
+  assert.equal(world.playerChassis[0], CHASSIS_BULWARK, "rollback must restore the selected chassis");
+  assert.notEqual(world.playerChassisUnlocks[0] & chassisUnlockBit(CHASSIS_BULWARK), 0, "rollback must restore unlocks");
+});
+
+test("chassis weapon masks and handling affect authoritative simulation", () => {
+  const scout = new BattleWorld(77);
+  const bulwark = new BattleWorld(77);
+  scout.addPlayer(1);
+  bulwark.addPlayer(1);
+  scout.setChassis(1, CHASSIS_SCOUT);
+  bulwark.setChassis(1, CHASSIS_BULWARK);
+
+  scout.grantAmmo(1, WEAPON_MORTAR, 4);
+  scout.submitInput(command(1, 1, { weaponRequest: WEAPON_MORTAR, moveX: 127, moveY: 0 }));
+  bulwark.submitInput(command(1, 1, { moveX: 127, moveY: 0 }));
+  scout.step();
+  bulwark.step();
+  assert.notEqual(scout.playerWeapon[0], WEAPON_MORTAR, "a weapon outside the chassis mask is rejected");
+  assert.ok(Math.abs(scout.playerVelocityX[0]) > Math.abs(bulwark.playerVelocityX[0]), "the scout accelerates faster under identical input");
+});
+
 // --- bots -------------------------------------------------------------------
 
 test("bots fight, score, stay out of cover and pick their arena up", () => {
@@ -836,10 +890,13 @@ test("a welcomed player resumes its slot and the new stream starts from a keyfra
   const tokenBeforeDisconnect = first.resumeToken.slice();
   server.world.playerScore[playerId - 1] = 7;
   server.world.playerCredits[playerId - 1] = 425;
+  assert.equal(server.world.selectChassis(playerId, CHASSIS_BULWARK), true);
   const stateBeforeDisconnect = [
     server.world.playerScore[playerId - 1],
     server.world.playerCredits[playerId - 1],
     server.world.playerHealth[playerId - 1],
+    server.world.playerChassis[playerId - 1],
+    server.world.playerChassisUnlocks[playerId - 1],
   ];
   // Establish and consume the old session's baseline, then disconnect after
   // welcome. The world remains authoritative while the bot fills the slot.
@@ -868,6 +925,8 @@ test("a welcomed player resumes its slot and the new stream starts from a keyfra
     server.world.playerScore[playerId - 1],
     server.world.playerCredits[playerId - 1],
     server.world.playerHealth[playerId - 1],
+    server.world.playerChassis[playerId - 1],
+    server.world.playerChassisUnlocks[playerId - 1],
   ], stateBeforeDisconnect, "resume must not reset authoritative player state");
 
   server.step();
@@ -1333,7 +1392,26 @@ test("a control message buys an upgrade through the reliable lane", async () => 
   client.sendControl(CONTROL_BUY_UPGRADE, UPGRADE_DAMAGE);
   await settle();
   assert.equal(server.world.playerDamageLevel[client.playerId - 1], before + 1);
+  const chassisCredits = server.world.playerCredits[client.playerId - 1];
+  client.sendControl(CONTROL_SET_CHASSIS, CHASSIS_BULWARK);
+  await settle();
+  assert.equal(server.world.playerChassis[client.playerId - 1], CHASSIS_BULWARK);
+  assert.ok(server.world.playerCredits[client.playerId - 1] < chassisCredits);
   assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("an invalid chassis control fails closed", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 1, onError: (error) => errors.push(error) });
+  const client = join(server, "invalid-chassis", errors);
+  await settle();
+  assert.equal(client.state, "ready");
+  client.sendControl(CONTROL_SET_CHASSIS, 255);
+  await settle();
+  assert.equal(client.state, "closed");
+  assert.equal(errors.length, 1);
+  assert.match(String(errors[0]), /unknown chassis id 255/);
   server.close();
 });
 

@@ -973,6 +973,29 @@ function tankHull(team, frame) {
   return canvas;
 }
 
+/**
+ * Chassis silhouettes reuse the generated team hull and add a small role marker
+ * in the same sampled metal palette. Keeping the team as an input is
+ * important: a chassis swap must not erase the team colour of the tank.
+ */
+function chassisHull(team, kind, frame) {
+  const canvas = tankHull(team, frame);
+  if (kind === "scout") {
+    canvas.rect(25, 11, 4, 2, C.skyBlue);
+    canvas.rect(25, 19, 4, 2, C.seaBlue);
+  } else if (kind === "assault") {
+    canvas.rect(4, 10, 4, 2, C.metalHi);
+    canvas.rect(4, 20, 4, 2, C.metalHi);
+  } else if (kind === "bulwark") {
+    canvas.rect(27, 11, 3, 10, C.metalLight);
+    canvas.rect(26, 13, 2, 6, C.metalHi);
+  } else {
+    canvas.rect(6, 11, 2, 10, C.deepBlue);
+    canvas.rect(23, 11, 2, 10, C.deepBlue);
+  }
+  return canvas;
+}
+
 function tankTurret(team) {
   const ramp = TEAMS[team];
   const canvas = new Canvas(TANK, TANK);
@@ -1640,6 +1663,12 @@ function buildSprites() {
     add(`tank-${team}-turret`, tankTurret(team), { anchored: true, role: `tank.${team}.turret` });
     add(`tank-${team}-wreck`, tankWreck(team), { anchored: true, role: `tank.${team}.wreck` });
   }
+  for (const team of TEAM_ORDER) {
+    for (const kind of ["scout", "assault", "bulwark", "artillery"]) {
+      add(`chassis-${team}-${kind}-1`, chassisHull(team, kind, 0), { anchored: true, role: `chassis.${team}.${kind}` });
+      add(`chassis-${team}-${kind}-2`, chassisHull(team, kind, 1), { anchored: true, role: `chassis.${team}.${kind}` });
+    }
+  }
 
   add("proj-cannon", projCannon(), { anchored: true, role: "projectile" });
   add("proj-machinegun", projMachinegun(), { anchored: true, role: "projectile", outlineColor: null });
@@ -1694,6 +1723,11 @@ function buildAnimations() {
   }
   for (const team of TEAM_ORDER) still(`tank-${team}-turret`, `tank-${team}-turret`);
   for (const team of TEAM_ORDER) still(`tank-${team}-wreck`, `tank-${team}-wreck`);
+  for (const team of TEAM_ORDER) {
+    for (const kind of ["scout", "assault", "bulwark", "artillery"]) {
+      loop(`chassis-${team}-${kind}`, [`chassis-${team}-${kind}-1`, `chassis-${team}-${kind}-2`], 10);
+    }
+  }
 
   for (const id of ["proj-cannon", "proj-machinegun", "proj-railgun", "proj-scatter", "proj-mortar"]) {
     still(id, id);

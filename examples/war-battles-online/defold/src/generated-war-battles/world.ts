@@ -2,14 +2,12 @@
 import {
   BASE_HEALTH,
   DIRECTION_SCALE,
-  HULL_SLEW,
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
   INPUT_HISTORY_TICKS,
   INPUT_HOLD_TICKS,
   KNOCKBACK_PER_DAMAGE,
   MAX_ARMOR,
-  MAX_HEALTH,
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
@@ -19,18 +17,12 @@ import {
   RESPAWN_TICKS,
   SNAPSHOT_BYTES,
   SPAWN_PROTECT_TICKS,
-  TANK_ACCELERATION,
   TANK_BOOST_CAPACITY,
   TANK_BOOST_DENOMINATOR,
   TANK_BOOST_NUMERATOR,
   TANK_BOOST_REFILL_TICKS,
-  TANK_DRAG_SHIFT,
   TANK_MAX_IMPULSE_SPEED,
-  TANK_MAX_SPEED,
-  TANK_SPEED_PER_MOBILITY,
-  TANK_WALL_BOUNCE,
   TILE_UNITS,
-  TURRET_SLEW,
   VELOCITY_SCALE,
   WORLD_MAX_X,
   WORLD_MAX_Y,
@@ -45,6 +37,10 @@ import {
 } from "./arena";
 import {
   SPAWN_WEAPON,
+  CHASSIS_COUNT,
+  canUseWeapon,
+  chassisById,
+  chassisUnlockBit,
   UPGRADE_ARMOR,
   UPGRADE_DAMAGE,
   UPGRADE_MOBILITY,
@@ -101,6 +97,8 @@ export interface PlayerView {
   mobilityLevel: number;
   armorLevel: number;
   botSkill: number;
+  chassisId: number;
+  chassisUnlocks: number;
 }
 
 export interface ProjectileView {
@@ -156,6 +154,8 @@ export class BattleWorld {
   readonly playerGeneration = new Uint16Array(MAX_PLAYERS);
   readonly playerTeam = new Uint8Array(MAX_PLAYERS);
   readonly playerWeapon = new Uint8Array(MAX_PLAYERS);
+  readonly playerChassis = new Uint8Array(MAX_PLAYERS);
+  readonly playerChassisUnlocks = new Uint8Array(MAX_PLAYERS);
   readonly playerDamageLevel = new Uint8Array(MAX_PLAYERS);
   readonly playerMobilityLevel = new Uint8Array(MAX_PLAYERS);
   readonly playerArmorLevel = new Uint8Array(MAX_PLAYERS);
@@ -262,6 +262,9 @@ export class BattleWorld {
     this.playerMobilityLevel[slot] = 0;
     this.playerArmorLevel[slot] = 0;
     this.playerBotSkill[slot] = 0;
+    const chassisId = defaultChassisForSlot(slot);
+    this.playerChassis[slot] = chassisId;
+    this.playerChassisUnlocks[slot] = chassisUnlockBit(1) | chassisUnlockBit(chassisId);
     this.playerLastInputTick[slot] = -1;
     this.spawn(slot, x, y);
     return entityId(ENTITY_KIND_PLAYER, slot, generation);
@@ -334,6 +337,34 @@ export class BattleWorld {
     }
   }
 
+  /** Administrative assignment used for deterministic roster/bootstrap setup. */
+  setChassis(playerId: number, chassisId: number): void {
+    const slot = activePlayerSlot(this, playerId);
+    chassisById(chassisId);
+    this.playerChassis[slot] = chassisId;
+    this.playerChassisUnlocks[slot] = this.playerChassisUnlocks[slot]! | chassisUnlockBit(chassisId);
+    const definition = chassisById(chassisId);
+    if (this.playerHealth[slot]! > definition.maxHealth) this.playerHealth[slot] = definition.maxHealth;
+    if (!canUseWeapon(chassisId, this.playerWeapon[slot]!)) this.playerWeapon[slot] = SPAWN_WEAPON;
+  }
+
+  /** Reliable control/purchase path for a player-selected chassis. */
+  selectChassis(playerId: number, chassisId: number): boolean {
+    const slot = activePlayerSlot(this, playerId);
+    const definition = chassisById(chassisId);
+    if (this.playerChassis[slot] === chassisId) return true;
+    const unlockBit = chassisUnlockBit(chassisId);
+    if ((this.playerChassisUnlocks[slot]! & unlockBit) === 0) {
+      if (this.playerCredits[slot]! < definition.unlockCost) return false;
+      this.playerCredits[slot] = this.playerCredits[slot]! - definition.unlockCost;
+      this.playerChassisUnlocks[slot] = this.playerChassisUnlocks[slot]! | unlockBit;
+    }
+    this.playerChassis[slot] = chassisId;
+    this.playerHealth[slot] = Math.min(definition.maxHealth, this.playerHealth[slot]!);
+    if (!canUseWeapon(chassisId, this.playerWeapon[slot]!)) this.playerWeapon[slot] = SPAWN_WEAPON;
+    return true;
+  }
+
   grantAmmo(playerId: number, weaponId: number, rounds: number): void {
     const slot = activePlayerSlot(this, playerId);
     this.addAmmo(slot, weaponId, rounds);
@@ -367,7 +398,7 @@ export class BattleWorld {
     else if (upgradeId === UPGRADE_MOBILITY) this.playerMobilityLevel[slot] = current + 1;
     else {
       this.playerArmorLevel[slot] = current + 1;
-      this.playerHealth[slot] = Math.min(MAX_HEALTH, this.playerHealth[slot]! + 25);
+      this.playerHealth[slot] = Math.min(chassisById(this.playerChassis[slot]!).maxHealth, this.playerHealth[slot]! + 25);
     }
     return true;
   }
@@ -406,6 +437,8 @@ export class BattleWorld {
     output.mobilityLevel = this.playerMobilityLevel[slot]!;
     output.armorLevel = this.playerArmorLevel[slot]!;
     output.botSkill = this.playerBotSkill[slot]!;
+    output.chassisId = this.playerChassis[slot]!;
+    output.chassisUnlocks = this.playerChassisUnlocks[slot]!;
     return active;
   }
 
@@ -499,8 +532,9 @@ export class BattleWorld {
     this.playerTurretY[slot] = facing * DIRECTION_SCALE;
     this.playerAimX[slot] = 0;
     this.playerAimY[slot] = facing * DIRECTION_SCALE;
-    this.playerHealth[slot] = BASE_HEALTH + this.playerArmorLevel[slot]! * 25;
-    this.playerArmor[slot] = 0;
+    const chassis = chassisById(this.playerChassis[slot]!);
+    this.playerHealth[slot] = Math.min(chassis.maxHealth, BASE_HEALTH + this.playerArmorLevel[slot]! * 25);
+    this.playerArmor[slot] = chassis.baseArmor;
     this.playerWeapon[slot] = SPAWN_WEAPON;
     this.playerCooldown[slot] = 0;
     this.playerRespawnTicks[slot] = 0;
@@ -599,7 +633,7 @@ export class BattleWorld {
     const requested = this.playerWeaponRequest[slot]!;
     if (requested === 0) return;
     this.playerWeaponRequest[slot] = 0;
-    if (!isWeaponId(requested) || requested === this.playerWeapon[slot]) return;
+    if (!isWeaponId(requested) || !canUseWeapon(this.playerChassis[slot]!, requested) || requested === this.playerWeapon[slot]) return;
     const definition = weaponById(requested);
     if (definition.maximumAmmo > 0 && this.ammoOf(slot, requested) === 0) return;
     this.playerWeapon[slot] = requested;
@@ -610,7 +644,8 @@ export class BattleWorld {
     const boosting = this.playerBoostTicks[slot] !== 0;
     const moveX = this.playerLastMoveX[slot]!;
     const moveY = this.playerLastMoveY[slot]!;
-    let maximum = TANK_MAX_SPEED + this.playerMobilityLevel[slot]! * TANK_SPEED_PER_MOBILITY;
+    const chassis = chassisById(this.playerChassis[slot]!);
+    let maximum = chassis.maxSpeed + this.playerMobilityLevel[slot]! * 8 * VELOCITY_SCALE;
     if (boosting) maximum = Math.trunc((maximum * TANK_BOOST_NUMERATOR) / TANK_BOOST_DENOMINATOR);
     if (moveX !== 0 || moveY !== 0) {
       normalizeInto(moveX, moveY, this.scratchDirection);
@@ -621,7 +656,7 @@ export class BattleWorld {
         (this.playerVelocityX[slot]! * this.scratchDirection.x + this.playerVelocityY[slot]! * this.scratchDirection.y)
         / DIRECTION_SCALE);
       if (along < maximum) {
-        let thrust = TANK_ACCELERATION;
+        let thrust = chassis.acceleration;
         if (boosting) thrust = Math.trunc((thrust * TANK_BOOST_NUMERATOR) / TANK_BOOST_DENOMINATOR);
         if (along > 0) thrust = Math.trunc((thrust * (maximum - along)) / maximum) + 1;
         this.playerVelocityX[slot] = this.playerVelocityX[slot]! + Math.trunc((this.scratchDirection.x * thrust) / DIRECTION_SCALE);
@@ -629,8 +664,8 @@ export class BattleWorld {
       }
     }
 
-    this.playerVelocityX[slot] = this.playerVelocityX[slot]! - (this.playerVelocityX[slot]! >> TANK_DRAG_SHIFT);
-    this.playerVelocityY[slot] = this.playerVelocityY[slot]! - (this.playerVelocityY[slot]! >> TANK_DRAG_SHIFT);
+    this.playerVelocityX[slot] = this.playerVelocityX[slot]! - (this.playerVelocityX[slot]! >> chassis.dragShift);
+    this.playerVelocityY[slot] = this.playerVelocityY[slot]! - (this.playerVelocityY[slot]! >> chassis.dragShift);
     const speed = length(this.playerVelocityX[slot]!, this.playerVelocityY[slot]!);
     if (speed > TANK_MAX_IMPULSE_SPEED) {
       this.playerVelocityX[slot] = Math.trunc((this.playerVelocityX[slot]! * TANK_MAX_IMPULSE_SPEED) / speed);
@@ -647,13 +682,13 @@ export class BattleWorld {
     this.map.resolveCircle(x, this.playerY[slot]!, PLAYER_RADIUS, this.resolution);
     if (this.resolution.hitX || this.resolution.hitY) {
       x = this.resolution.x;
-      this.playerVelocityX[slot] = Math.trunc((this.playerVelocityX[slot]! * -TANK_WALL_BOUNCE) / DIRECTION_SCALE);
+      this.playerVelocityX[slot] = Math.trunc((this.playerVelocityX[slot]! * -chassis.wallBounce) / DIRECTION_SCALE);
     }
     let y = clampY(this.playerY[slot]! + stepY);
     this.map.resolveCircle(x, y, PLAYER_RADIUS, this.resolution);
     if (this.resolution.hitX || this.resolution.hitY) {
       y = this.resolution.y;
-      this.playerVelocityY[slot] = Math.trunc((this.playerVelocityY[slot]! * -TANK_WALL_BOUNCE) / DIRECTION_SCALE);
+      this.playerVelocityY[slot] = Math.trunc((this.playerVelocityY[slot]! * -chassis.wallBounce) / DIRECTION_SCALE);
     }
     this.playerX[slot] = clampX(x);
     this.playerY[slot] = clampY(y);
@@ -665,11 +700,11 @@ export class BattleWorld {
     // shooting where the player is pointing.
     if (normalizeInto(this.playerVelocityX[slot]!, this.playerVelocityY[slot]!, this.scratchDirection)
       && length(this.playerVelocityX[slot]!, this.playerVelocityY[slot]!) > VELOCITY_SCALE * 4) {
-      slewInto(this.playerHullX[slot]!, this.playerHullY[slot]!, this.scratchDirection.x, this.scratchDirection.y, HULL_SLEW, this.scratchDirection);
+      slewInto(this.playerHullX[slot]!, this.playerHullY[slot]!, this.scratchDirection.x, this.scratchDirection.y, chassisById(this.playerChassis[slot]!).hullSlew, this.scratchDirection);
       this.playerHullX[slot] = this.scratchDirection.x;
       this.playerHullY[slot] = this.scratchDirection.y;
     }
-    slewInto(this.playerTurretX[slot]!, this.playerTurretY[slot]!, this.playerAimX[slot]!, this.playerAimY[slot]!, TURRET_SLEW, this.scratchDirection);
+    slewInto(this.playerTurretX[slot]!, this.playerTurretY[slot]!, this.playerAimX[slot]!, this.playerAimY[slot]!, chassisById(this.playerChassis[slot]!).turretSlew, this.scratchDirection);
     this.playerTurretX[slot] = this.scratchDirection.x;
     this.playerTurretY[slot] = this.scratchDirection.y;
   }
@@ -865,8 +900,9 @@ export class BattleWorld {
   ): void {
     const applied = this.applyDamage(target, damage, attackerSlot, x, y);
     if (applied <= 0) return;
-    this.playerVelocityX[target] = this.playerVelocityX[target]! + Math.trunc((directionX * applied * KNOCKBACK_PER_DAMAGE) / DIRECTION_SCALE);
-    this.playerVelocityY[target] = this.playerVelocityY[target]! + Math.trunc((directionY * applied * KNOCKBACK_PER_DAMAGE) / DIRECTION_SCALE);
+    const knockback = Math.trunc((KNOCKBACK_PER_DAMAGE * chassisById(this.playerChassis[target]!).knockbackFactor) / DIRECTION_SCALE);
+    this.playerVelocityX[target] = this.playerVelocityX[target]! + Math.trunc((directionX * applied * knockback) / DIRECTION_SCALE);
+    this.playerVelocityY[target] = this.playerVelocityY[target]! + Math.trunc((directionY * applied * knockback) / DIRECTION_SCALE);
     this.events.push(EVENT_HIT, attackerSlot + 1, weaponId, x, y, this.tick);
   }
 
@@ -920,7 +956,7 @@ export class BattleWorld {
         if (splash <= 0) continue;
         const applied = this.applyDamage(target, splash, ownerSlot, this.playerX[target]!, this.playerY[target]!);
         if (applied <= 0 || distance === 0) continue;
-        const knock = applied * KNOCKBACK_PER_DAMAGE * 2;
+        const knock = applied * Math.trunc((KNOCKBACK_PER_DAMAGE * chassisById(this.playerChassis[target]!).knockbackFactor) / DIRECTION_SCALE) * 2;
         this.playerVelocityX[target] = this.playerVelocityX[target]! + Math.trunc((dx * knock) / distance);
         this.playerVelocityY[target] = this.playerVelocityY[target]! + Math.trunc((dy * knock) / distance);
       }
@@ -968,6 +1004,7 @@ export class BattleWorld {
     const definition = pickupByKind(this.pickupKind[index]!);
     if (definition.weapon !== 0) {
       const weapon = weaponById(definition.weapon);
+      if (!canUseWeapon(this.playerChassis[slot]!, weapon.id)) return false;
       const held = this.ammoOf(slot, weapon.id);
       if (held >= weapon.maximumAmmo) return false;
       this.addAmmo(slot, weapon.id, weapon.pickupAmmo);
@@ -981,7 +1018,7 @@ export class BattleWorld {
       return true;
     }
     if (definition.health > 0) {
-      const maximum = MAX_HEALTH;
+      const maximum = chassisById(this.playerChassis[slot]!).maxHealth;
       if (this.playerHealth[slot]! >= maximum) return false;
       this.playerHealth[slot] = Math.min(maximum, this.playerHealth[slot]! + definition.health);
       return true;
@@ -1045,7 +1082,12 @@ export function createPlayerView(): PlayerView {
     health: 0, armor: 0, score: 0, deaths: 0, credits: 0, weaponId: 0, ammo: 0,
     cooldown: 0, respawnTicks: 0, spawnProtectTicks: 0, overdriveTicks: 0,
     boostTicks: 0, damageLevel: 0, mobilityLevel: 0, armorLevel: 0, botSkill: 0,
+    chassisId: 1, chassisUnlocks: chassisUnlockBit(1),
   };
+}
+
+function defaultChassisForSlot(slot: number): number {
+  return (slot % CHASSIS_COUNT) + 1;
 }
 
 export function createProjectileView(): ProjectileView {

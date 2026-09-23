@@ -483,7 +483,7 @@
     "maxSnapshotsIgnored": 0
   },
   "convergence": {
-    "authoritativeHash": 1374732178,
+    "authoritativeHash": 1046632383,
     "allClientsConverged": true,
     "uniquePlayerIds": 32,
     "finalTick": 600
@@ -494,13 +494,15 @@
     "clients": [],
     "protocolErrors": 0
   },
+  "owner": "examples/war-battles-online/integration/check-authoritative-load.mjs",
+  "generator": "examples/war-battles-online/integration/check-authoritative-load.mjs",
   "sourceInputs": [
     {
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 16,
-      "bytes": 233109,
-      "sha256": "a3db5119f486fb214f09d3b59bbe36ebd477429cdafb5ef9378968dfd8995df4"
+      "bytes": 241303,
+      "sha256": "a5520a0a48cfd442b6b422600fe5ecea3a15c3a3acf89e8337d308df4f2d24f5"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
@@ -511,20 +513,20 @@
     {
       "path": "examples/war-battles-online/integration/authoritative-load-evidence.mjs",
       "kind": "file",
-      "bytes": 4688,
-      "sha256": "c6500be38ab4cb7676021a28d2b3f45beb3e1f3173d2e2f334f4f1f97cbb41b5"
+      "bytes": 4925,
+      "sha256": "22306a6d30b841a3d266d157d83d967dd85467196dfcbabfe693fe33674d0c20"
     },
     {
       "path": "examples/war-battles-online/integration/check-authoritative-load.mjs",
       "kind": "file",
-      "bytes": 1898,
-      "sha256": "deccbe427ca52ad47ed69306c2b9f90b95166d377fd98adebe58cab7fa927ff0"
+      "bytes": 2000,
+      "sha256": "f4f5862b1885eeb6ff51a63c3541313df7caafffaeb1093c1b5130cb2a8a17e3"
     },
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 3890,
-      "sha256": "0676b4179932f5209eb539ec1283064a4cac7438957c985d3f48e593e0dbd3bc"
+      "bytes": 4097,
+      "sha256": "be068f587b08f7f589983d08205db35347a091ebeebcb3645f3781215583a016"
     },
     {
       "path": "package.json",
@@ -539,5 +541,5 @@
       "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
     }
   ],
-  "sourceKey": "03542ebeb0976e1838e331a1949829c8741621cc89b9b0f73b197a3237f07daa"
+  "sourceKey": "1209d9ab31c7ed1217beef43d6e7fb07ee3624d20c86c652321e78468cd4c952"
 }

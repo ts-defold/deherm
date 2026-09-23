@@ -28,6 +28,7 @@ import {
   assertWebTransportEvidence,
   buildWebTransportSourceInputs,
   digestWebTransportSourceInputs,
+  WEBTRANSPORT_OWNER,
 } from "./webtransport-evidence.mjs";
 import { projectionEnvelope } from "./projections.mjs";
 
@@ -267,6 +268,8 @@ async function run() {
 
     const evidence = {
       schemaVersion: 2,
+      owner: WEBTRANSPORT_OWNER,
+      generator: WEBTRANSPORT_OWNER,
       kind: "war-battles.real-webtransport-loopback",
       projection: projectionEnvelope("browser-webtransport-loopback"),
       transport: observed.transport,
