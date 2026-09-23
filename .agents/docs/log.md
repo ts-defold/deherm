@@ -1,5 +1,16 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Published policy object reads tolerate transient host failures
+
+Hosted policy run `35889801941` published and resolved its manifest, then the
+clean npm consumer received a single HTTP 503 while fetching an immutable
+content-addressed object. Policy resolution now retries only network failures
+and HTTP 408, 425, 429, and 5xx responses with bounded linear backoff. Permanent
+4xx path/content failures still fail immediately, and hashes remain mandatory
+after a successful response. Focused tests prove transient recovery and
+single-attempt 404 behavior; the next hosted policy run owns public-site
+evidence for the fix.
+
 ## 2026-09-23 - Workflow artifact transport moved off the Node 20 runtime
 
 Every GitHub Actions workflow now uses the official Node 24 artifact-action

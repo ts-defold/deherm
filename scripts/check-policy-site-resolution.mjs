@@ -85,18 +85,57 @@ function expand(template, values) {
   });
 }
 
+const delay = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+function transientHttpStatus(status) {
+  return status === 408 || status === 425 || status === 429 || status >= 500;
+}
+
+/**
+ * Read one immutable policy-site object, retrying only transport failures and
+ * HTTP statuses which can be transient. A 4xx content/path failure still fails
+ * immediately; retrying it would hide a broken published graph for minutes.
+ */
+export async function fetchPolicyText({
+  url,
+  label,
+  fetchImpl = fetch,
+  maxAttempts = 5,
+  retryDelayMs = 1_000,
+  sleep = delay
+}) {
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    let response;
+    try {
+      response = await fetchImpl(url, { cache: "no-store" });
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      if (attempt < maxAttempts) await sleep(retryDelayMs * attempt);
+      continue;
+    }
+    if (response.ok) return response.text();
+    lastError = new Error(`${label}: HTTP ${response.status}`);
+    if (!transientHttpStatus(response.status)) throw lastError;
+    await response.body?.cancel?.().catch(() => {});
+    if (attempt < maxAttempts) await sleep(retryDelayMs * attempt);
+  }
+  throw lastError ?? new Error(`${label}: request failed`);
+}
+
 /**
  * The whole consumer path, written the way a consumer would have to write it:
  * the base and the three path templates come from the index, and every fetched
  * body is verified against the hash in its own path before it is parsed.
  */
-export async function resolvePolicy({ index, fetchImpl = fetch }) {
+export async function resolvePolicy({ index, fetchImpl = fetch, retry = {} }) {
   const base = `${index.base.url.replace(/\/$/, "")}${index.base.pathPrefix ? `/${index.base.pathPrefix}` : ""}`;
-  const get = async (relative) => {
-    const response = await fetchImpl(`${base}/${relative}`);
-    if (!response.ok) throw new Error(`${relative}: HTTP ${response.status}`);
-    return response.text();
-  };
+  const get = (relative) => fetchPolicyText({
+    url: `${base}/${relative}`,
+    label: relative,
+    fetchImpl,
+    ...retry
+  });
   const trace = [];
   const results = [];
   for (const asserted of index.entries) {

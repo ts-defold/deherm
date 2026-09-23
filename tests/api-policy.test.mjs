@@ -33,7 +33,7 @@ import {
 import { buildToolchainPins, parseSdkPins } from "../packages/compiler/src/defold-toolchain-pins.mjs";
 import { isRevisionOutput, REVISION_OUTPUT_ROOTS } from "../packages/compiler/src/revision-output-layout.mjs";
 import { manifestUrl, missingPublishedEntries } from "../scripts/check-published-policy.mjs";
-import { validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
+import { fetchPolicyText, validateRebuiltHandshake } from "../scripts/check-policy-site-resolution.mjs";
 import {
   buildShippedIndex,
   canonicalizePolicyText,
@@ -153,6 +153,40 @@ test("all workflow artifact actions use their Node 24-compatible official majors
   assert.ok(downloadRefs.length > 0, "workflows must retain artifact downloads");
   assert.ok(uploadRefs.every((ref) => ref === node24ArtifactActions.upload), `unexpected upload refs: ${uploadRefs.join(", ")}`);
   assert.ok(downloadRefs.every((ref) => ref === node24ArtifactActions.download), `unexpected download refs: ${downloadRefs.join(", ")}`);
+});
+
+test("published immutable policy objects retry transient transport failures only", async () => {
+  const sleeps = [];
+  let attempts = 0;
+  const text = await fetchPolicyText({
+    url: "https://example.test/policies/v1/object/abc.json",
+    label: "v1/object/abc.json",
+    maxAttempts: 4,
+    retryDelayMs: 10,
+    sleep: async (milliseconds) => sleeps.push(milliseconds),
+    fetchImpl: async () => {
+      attempts += 1;
+      if (attempts === 1) return { ok: false, status: 503 };
+      if (attempts === 2) throw new Error("socket reset");
+      return { ok: true, status: 200, text: async () => "policy-body" };
+    }
+  });
+  assert.equal(text, "policy-body");
+  assert.equal(attempts, 3);
+  assert.deepEqual(sleeps, [10, 20]);
+
+  let missingAttempts = 0;
+  await assert.rejects(fetchPolicyText({
+    url: "https://example.test/policies/v1/object/missing.json",
+    label: "v1/object/missing.json",
+    maxAttempts: 5,
+    sleep: async () => assert.fail("a permanent 404 must not sleep or retry"),
+    fetchImpl: async () => {
+      missingAttempts += 1;
+      return { ok: false, status: 404 };
+    }
+  }), /v1\/object\/missing\.json: HTTP 404/u);
+  assert.equal(missingAttempts, 1);
 });
 
 test("published smoke waits for the exact derived entries at the configured site", () => {
