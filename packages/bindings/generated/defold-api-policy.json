@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:f112a3022d7386c02e1e949c2314fa931edc67ee9b16a754dbaccd5a70e1e9a8",
+  "generator": "sha256:9345e81cabbbe6d0aa2d54958e35491a14c4ca01cee61610cd72bdc3ef7b4756",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "3be468ead4b68cb2c6128ad7f1ad26eee4a1d5dc5514a112a9fff8fc003718f2",
+  "policyRoot": "f86074d4a18c87a132a38e3fe7db096be98e7d69479c753e1a23136775562ea4",
   "layoutVersion": "v1",
   "counts": {
-    "subtrees": 190,
+    "subtrees": 192,
     "namespaces": 52,
-    "objectBytes": 24331991,
+    "objectBytes": 24359189,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,8 +54,8 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "f42907a6339989bce74536ca55eb2bcd69afd44f89309519dd16e232731d1ba3",
-      "bytes": 66255
+      "hash": "2f15b83fb375044a9790d7e7e6b6cefd6292ee992aac0801bec5a3f7e2408aae",
+      "bytes": 66839
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
       "hash": "c49f8925fd12eecb4bac25470324756255921bc977ba37cca289750d67378608",
@@ -68,6 +68,10 @@
     "@compiler:document:defold-dmsdk-scalar-thunks.json": {
       "hash": "07b8b9b411a1ccba0582b49e8d2b91aba9abb4bb6e2385d0aaf1ae028a195df8",
       "bytes": 80506
+    },
+    "@compiler:document:defold-dmsdk-sdk-documentation.json": {
+      "hash": "18164c195eb5dcbb87226ecec1c557cd00d5e7bfe77719f2fcfb0f724aedfef0",
+      "bytes": 26072
     },
     "@compiler:document:defold-dmsdk-universal-bindings.json": {
       "hash": "5e902bc3f83d3bcc5a900f002df05e118387b21ec2798b4be47f32206cb84a99",
@@ -108,6 +112,10 @@
     "@compiler:document:defold-script-scalar-dispatch.json": {
       "hash": "fdc8c7f0105dc33999ab338c73e05c52bd144c62d0cb3f20b045be6df2fa42f2",
       "bytes": 50250
+    },
+    "@compiler:document:defold-script-sdk-documentation.json": {
+      "hash": "17387775f0ccd35b0a4c82fa53b22705dd85b14cbee684411b07c23cb75813df",
+      "bytes": 542
     },
     "@compiler:document:defold-script-universal-value-bindings.json": {
       "hash": "d977f34d5fa87cf45e5ae7c2f523ad0eb57e147b846719a3d055f451fc64dd2b",

@@ -43,7 +43,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 17);
+  assert.equal(first.descriptor.documents.length, 19);
   for (const name of [
     "defold-script-binding-patterns.json",
     "defold-dmsdk-binding-patterns.json",
@@ -52,8 +52,16 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.ok(first.descriptor.documents.includes(name), `materialized conformance input is missing ${name}`);
   }
   assert.equal(Object.keys(first.descriptor.sdk).length, 28);
-
   const compiler = policy.objects.get("@compiler");
+  assert.deepEqual(
+    compiler.value.sdk.entries["script/types.ts"].inputs,
+    ["defold-script-api-ir.json", "defold-script-sdk-documentation.json", "defold-script-handle-lowering.json"]
+  );
+  assert.deepEqual(
+    compiler.value.sdk.entries["dmsdk/types.ts"].inputs,
+    ["defold-sdk-ir.json", "defold-dmsdk-sdk-documentation.json"]
+  );
+
   assert.ok(policy.policy.realizer.requiredCapabilities.includes(BINDING_LOWERING_RECIPE_CAPABILITY),
     "policy root must advertise the package lowering-recipe interpreter it requires");
   assert.ok(Buffer.byteLength(JSON.stringify(compiler.value)) < 5_000_000,
@@ -93,7 +101,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
     bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_830_751, snapshots: 105_573 },
+  assert.deepEqual(bytesByMode, { rendered: 3_870_554, snapshots: 105_573 },
     "the local-emitter versus compatibility-snapshot migration debt changed");
 
   const expectedOutputs = await discoverCompilerSurfaceOutputs();
@@ -176,6 +184,24 @@ test("policy materialization fails closed when the dmSDK catalog exceeds the pac
 test("package-owned SDK and revision-output recipes fail closed on manifest drift", async () => {
   const policy = await currentResolvedPolicy();
   const compiler = policy.objects.get("@compiler");
+
+  const scriptDocumentationKey = compiler.value.documents.entries["defold-script-sdk-documentation.json"].object;
+  const scriptDocumentationObject = policy.objects.get(scriptDocumentationKey);
+  const badDocumentationValue = structuredClone(scriptDocumentationObject.value);
+  badDocumentationValue.value.functions[0].parameters = [];
+  const badDocumentation = {
+    ...policy,
+    objects: new Map(policy.objects).set(scriptDocumentationKey, {
+      ...scriptDocumentationObject,
+      value: badDocumentationValue
+    })
+  };
+  await assert.rejects(
+    materializePolicySurface(badDocumentation, {
+      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-sdk-documentation-drift-test-"))
+    }),
+    /invalid SDK documentation fields/u
+  );
 
   const badSdkValue = structuredClone(compiler.value);
   badSdkValue.sdk.entries["dmsdk/named-scalar.ts"].recipeInput.emittedCount = 1;

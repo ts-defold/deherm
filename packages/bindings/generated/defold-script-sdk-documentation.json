@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.script-sdk-documentation",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "functions": [
+    {
+      "id": "script:label.get_text",
+      "deprecated": "This function is deprecated. Use `go.get(\"#label\", \"text\")` instead."
+    },
+    {
+      "id": "script:label.set_text",
+      "deprecated": "This function is deprecated. Use `go.set(\"#label\", \"text\", value)` instead."
+    }
+  ]
+}

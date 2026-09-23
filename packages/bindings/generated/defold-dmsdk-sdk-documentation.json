@@ -1,0 +1,808 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-sdk-documentation",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "declarations": [
+    {
+      "id": "dmsdk:EnsureSize@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:528:69",
+      "notes": [
+        "May grow but not shrink capacity"
+      ]
+    },
+    {
+      "id": "dmsdk:ExtensionAppParamsGetContext@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:238:749",
+      "notes": [
+        "Deprecated. Use [ref:ContextRegistryGetByHash] on [ref:HContextRegistry] instead."
+      ],
+      "deprecated": "Deprecated. Use [ref:ContextRegistryGetByHash] on [ref:HContextRegistry] instead."
+    },
+    {
+      "id": "dmsdk:ExtensionAppParamsGetContextByName@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:228:748",
+      "notes": [
+        "Deprecated. Use [ref:ContextRegistryGet] on [ref:HContextRegistry] instead."
+      ],
+      "deprecated": "Deprecated. Use [ref:ContextRegistryGet] on [ref:HContextRegistry] instead."
+    },
+    {
+      "id": "dmsdk:ExtensionAppParamsSetContext@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:218:747",
+      "notes": [
+        "Deprecated. Use [ref:ContextRegistrySet] on [ref:HContextRegistry] instead."
+      ],
+      "deprecated": "Deprecated. Use [ref:ContextRegistrySet] on [ref:HContextRegistry] instead."
+    },
+    {
+      "id": "dmsdk:ExtensionParamsGetContext@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:276:753",
+      "notes": [
+        "Deprecated. Use [ref:ContextRegistryGetByHash] on [ref:HContextRegistry] instead."
+      ],
+      "deprecated": "Deprecated. Use [ref:ContextRegistryGetByHash] on [ref:HContextRegistry] instead."
+    },
+    {
+      "id": "dmsdk:ExtensionParamsGetContextByName@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:266:752",
+      "notes": [
+        "Deprecated. Use [ref:ContextRegistryGet] on [ref:HContextRegistry] instead."
+      ],
+      "deprecated": "Deprecated. Use [ref:ContextRegistryGet] on [ref:HContextRegistry] instead."
+    },
+    {
+      "id": "dmsdk:ExtensionParamsSetContext@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:256:751",
+      "notes": [
+        "Deprecated. Use [ref:ContextRegistrySet] on [ref:HContextRegistry] instead."
+      ],
+      "deprecated": "Deprecated. Use [ref:ContextRegistrySet] on [ref:HContextRegistry] instead."
+    },
+    {
+      "id": "dmsdk:ExtensionRegisteriOSUIApplicationDelegate@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:433:764",
+      "notes": [
+        "Note that the delegate needs to be registered before the UIApplicationMain in order to\nhandle any earlier callbacks.\n\nThis function is only available on iOS. [icon:ios]"
+      ]
+    },
+    {
+      "id": "dmsdk:FExtensionAppInitialize@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:290:754",
+      "notes": [
+        "There is no guarantuee of initialization order. If an extension requires another extension to be initialized,\n      that should be handled in [ref:FExtensionInitialize]."
+      ]
+    },
+    {
+      "id": "dmsdk:FExtensionFinalize@upstream/defold/engine/extension/src/dmsdk/extension/extension.h:318:757",
+      "notes": [
+        "All extensions will be called with `FExtensionFinalize` before moving on to the next step, the [ref:FExtensionAppFinalize]"
+      ]
+    },
+    {
+      "id": "dmsdk:FJobCallback@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:136:368",
+      "notes": [
+        "This call occurs on the game main thread"
+      ]
+    },
+    {
+      "id": "dmsdk:FJobProcess@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:122:367",
+      "notes": [
+        "This call may occur on a separate thread"
+      ]
+    },
+    {
+      "id": "dmsdk:FResourcePostCreate@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:511:1927",
+      "notes": [
+        "returning RESOURCE_CREATE_RESULT_PENDING will result in a repeated callback the following update."
+      ]
+    },
+    {
+      "id": "dmsdk:FResourceRecreate@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:530:1929",
+      "notes": [
+        "Beware that any \"in flight\" resource pointers to the actual resource must remain valid after this call."
+      ]
+    },
+    {
+      "id": "dmsdk:FResourceTypeRegister@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:468:1923",
+      "notes": [
+        "The type is already cerate, and name and name hash properties are valid to get using the RsourceTypeGetName()/RsourceTypeGetNameHash() functions"
+      ]
+    },
+    {
+      "id": "dmsdk:FontCollectionAddFont@upstream/defold/engine/font/src/dmsdk/font/fontcollection.h:58:825",
+      "notes": [
+        "No ownership transfer occurrs. HFont must be alive during the lifetime of the font collection"
+      ]
+    },
+    {
+      "id": "dmsdk:FontGetPathHash@upstream/defold/engine/font/src/dmsdk/font/font.h:182:809",
+      "notes": [
+        "We use a 32bit hash to make it easier to pair with a glyph index into a 64-bit key"
+      ]
+    },
+    {
+      "id": "dmsdk:FontGlyph@upstream/defold/engine/font/src/dmsdk/font/font.h:115:801",
+      "notes": [
+        "The baseline of a glyph bitmap is calculated: `base = glyph.bitmap.height - glyph.ascent`"
+      ]
+    },
+    {
+      "id": "dmsdk:HConfigFile@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:0:114",
+      "notes": [
+        "Properties can be overridden on command line or via the config file extension system. (See [ref:DM_DECLARE_CONFIGFILE_EXTENSION])"
+      ]
+    },
+    {
+      "id": "dmsdk:Job@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:148:369",
+      "notes": [
+        "This call may occur on a separate thread"
+      ]
+    },
+    {
+      "id": "dmsdk:JobSystemCancelJob@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:234:377",
+      "notes": [
+        "Cancelled jobs will be flushed at the next JobSystemUpdate()"
+      ]
+    },
+    {
+      "id": "dmsdk:JobSystemCreateJob@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:194:374",
+      "notes": [
+        "Parent job will only run after all children has finished"
+      ]
+    },
+    {
+      "id": "dmsdk:JobSystemPushJob@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:213:376",
+      "notes": [
+        "A parent job needs to be pushed after its children"
+      ]
+    },
+    {
+      "id": "dmsdk:JobSystemSetParent@upstream/defold/engine/dlib/src/dmsdk/dlib/jobsystem.h:204:375",
+      "notes": [
+        "Parent job will only run after all children has finished"
+      ]
+    },
+    {
+      "id": "dmsdk:ProfileFrameBegin@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:356:533",
+      "notes": [
+        "NULL is returned if profiling is disabled"
+      ]
+    },
+    {
+      "id": "dmsdk:ResourceCreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:338:1908",
+      "notes": [
+        "The input data pointer is not stored",
+        "The reference count is 1, so make sure it's destruction is handled"
+      ]
+    },
+    {
+      "id": "dmsdk:ResourceDescriptorGetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:423:1917",
+      "notes": [
+        "only used when recreating a resource"
+      ]
+    },
+    {
+      "id": "dmsdk:ResourceDescriptorSetPrevResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:415:1916",
+      "notes": [
+        "only used when recreating a resource"
+      ]
+    },
+    {
+      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1895",
+      "notes": [
+        "if successful, it increments the ref count by one"
+      ]
+    },
+    {
+      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1897",
+      "notes": [
+        "this currently doesn't load a resource",
+        "if successful, it increments the ref count by one"
+      ]
+    },
+    {
+      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1896",
+      "notes": [
+        "if successful, it increments the ref count by one"
+      ]
+    },
+    {
+      "id": "dmsdk:ResourceRelease@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:285:1903",
+      "notes": [
+        "Decreases ref count by 1. If it reaches 0, the resource destroy function is called."
+      ]
+    },
+    {
+      "id": "dmsdk:dmArray::dmArray::EnsureSize@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:292:36",
+      "notes": [
+        "May grow but not shrink capacity"
+      ]
+    },
+    {
+      "id": "dmsdk:dmAtomicGet32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:144:85",
+      "notes": [
+        "Retrieves the current value by adding 0"
+      ]
+    },
+    {
+      "id": "dmsdk:dmConfigFile::HConfig@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile_gen.hpp:50:125",
+      "notes": [
+        "Properties can be overridden on command line or via the config file extension system. (See [ref:DM_DECLARE_CONFIGFILE_EXTENSION])"
+      ]
+    },
+    {
+      "id": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
+      "notes": [
+        "Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len",
+        "An empty input (src_len = 0) decodes into zero bytes: the function returns true with *dst_len = 0"
+      ]
+    },
+    {
+      "id": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
+      "notes": [
+        "Call this function with *dst_len = 0 to obtain the required buffer size in *dst_len",
+        "An empty input (src_len = 0) still requires one byte for the terminating null, and encodes into *dst_len = 0"
+      ]
+    },
+    {
+      "id": "dmsdk:dmEngine::GetWebServer@upstream/defold/engine/engine/src/dmsdk/engine/extension.hpp:92:723",
+      "notes": [
+        "Only valid in debug builds"
+      ]
+    },
+    {
+      "id": "dmsdk:dmExtension::RegisteriOSUIApplicationDelegate@upstream/defold/engine/extension/src/dmsdk/extension/extension_gen.hpp:304:795",
+      "notes": [
+        "Note that the delegate needs to be registered before the UIApplicationMain in order to\nhandle any earlier callbacks.\n\nThis function is only available on iOS. [icon:ios]"
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameObject::ComponentIterProperties@upstream/defold/engine/gameobject/src/dmsdk/gameobject/component.h:536:906",
+      "notes": [
+        "This function is only available/used in debug builds, when traversing the scene graph in order to export\nthis data for external tools (e.g. external testing libraries like Poco)"
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameObject::New@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:582:1003",
+      "notes": [
+        "Calling this function during update is not permitted. Use #Spawn instead for deferred creation"
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameObject::SceneNode@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:0:1062",
+      "notes": [
+        "The concept of a `scene node` only exists here, for the purposes of inspecting the scene graph for inspection and testing purposes only."
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameObject::SceneNode@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1160:1066",
+      "notes": [
+        "The concept of a `scene node` only exists here, for the purposes of inspecting the scene graph for inspection and testing purposes only."
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameObject::TraverseGetRoot@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1225:1068",
+      "notes": [
+        "The dmGameObject::HRegister is obtained from the `dmEngine::GetGameObjectRegister(dmExtension::AppParams)`",
+        "Traversing the scene like this is not efficient. These functions are here for inspection and testing purposes only."
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameObject::TraverseIterateProperties@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1362:1077",
+      "notes": [
+        "Getting the properties like this is not efficient. These functions are here for inspection and testing purposes only.",
+        "Reverse hashes via `dmHashReverseSafe64()` isn't available in release builds."
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameSystem::HashRenderConstants@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:139:1207",
+      "notes": [
+        "Also updates the internal state of the constants container. After a call to this function, the `AreRenderConstantsUpdated` will always return false."
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameSystem::ResFontAddFontByPath@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:173:1251",
+      "notes": [
+        "Loads the resource if not already loaded"
+      ]
+    },
+    {
+      "id": "dmsdk:dmGameSystem::ResFontAddFontByPathHash@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:183:1252",
+      "notes": [
+        "the ttf resource must already be loaded"
+      ]
+    },
+    {
+      "id": "dmsdk:dmGraphics::NewIndexBuffer@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1053:1386",
+      "notes": [
+        "The caller need to track if the indices are 16 or 32 bit."
+      ]
+    },
+    {
+      "id": "dmsdk:dmGui::SetNodeId@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:252:1555",
+      "notes": [
+        "The id must be unique"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHID::GamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:498:1609",
+      "notes": [
+        "implementation is internal, use the proper accessor functions"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHID::KeyboardPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:475:1607",
+      "notes": [
+        "implementation is internal, use the proper accessor functions"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHID::MousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:485:1608",
+      "notes": [
+        "implementation is internal, use the proper accessor functions"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHID::Phase@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:160:1604",
+      "notes": [
+        "By convention the enumeration corresponds to the iOS values"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashReverseSafe32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:134:218",
+      "notes": [
+        "Do not store this pointer"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashReverseSafe32Alloc@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:352:243",
+      "notes": [
+        "This function is thread safe",
+        "The pointer is valid during the scope of the allocator"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashReverseSafe64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:109:216",
+      "notes": [
+        "Do not store this pointer"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashReverseSafe64Alloc@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:327:242",
+      "notes": [
+        "This function is thread safe",
+        "The pointer is valid during the scope of the allocator"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashTable::dmHashTable::Erase@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:384:269",
+      "notes": [
+        "Only valid if key exists in table"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashTable::dmHashTable::dmHashTable<KEY, T>@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:102:255",
+      "notes": [
+        "The key type needs to support == and % operators"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashTable::dmHashTable::dmHashTable<KEY, T>@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:549:278",
+      "notes": [
+        "The key type needs to support == and % operators"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashTable::dmHashTable::dmHashTable<KEY, T>@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:88:254",
+      "notes": [
+        "The key type needs to support == and % operators"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashTable::dmHashTable::~dmHashTable<KEY, T>@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:137:257",
+      "notes": [
+        "The key type needs to support == and % operators"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashTable::dmHashTable@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:45:245",
+      "notes": [
+        "The key type needs to support == and % operators"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHashTable@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:45:244",
+      "notes": [
+        "The key type needs to support == and % operators"
+      ]
+    },
+    {
+      "id": "dmsdk:dmHttpClient::ParseHeader@upstream/defold/engine/dlib/src/dmsdk/dlib/http_client.h:62:337",
+      "notes": [
+        "This function is destructive to the input data."
+      ]
+    },
+    {
+      "id": "dmsdk:dmIntersection::Frustum@upstream/defold/engine/dlib/src/dmsdk/dlib/intersection.h:54:353",
+      "notes": [
+        "The plane normals point inwards"
+      ]
+    },
+    {
+      "id": "dmsdk:dmLogRegisterListener@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:282:388",
+      "notes": [
+        "Any calls to dmLogInfo et al from within the calllback will be ignored"
+      ]
+    },
+    {
+      "id": "dmsdk:dmMessage::Post@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:253:425",
+      "notes": [
+        "Message data is copied by value"
+      ]
+    },
+    {
+      "id": "dmsdk:dmMessage::PostDDF@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:283:426",
+      "notes": [
+        "Message data is copied by value"
+      ]
+    },
+    {
+      "id": "dmsdk:dmMessage::StringURL@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:99:410",
+      "notes": [
+        "The sizes do not include the null character. There is no null character since the dmMessage::ParseURL is non destructive."
+      ]
+    },
+    {
+      "id": "dmsdk:dmMessage::URL@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:73:408",
+      "notes": [
+        "Currently has a hard limit of 32 bytes",
+        "This struct is a part of the save file APi (see script_table.cpp)"
+      ]
+    },
+    {
+      "id": "dmsdk:dmObjectPool::dmObjectPool::GetRawObjects@upstream/defold/engine/dlib/src/dmsdk/dlib/object_pool.h:189:453",
+      "notes": [
+        "The order of objects in this array may change if Alloc() or Free() has been called"
+      ]
+    },
+    {
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855",
+      "notes": [
+        "This give access to the internal memory of the constant"
+      ]
+    },
+    {
+      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
+      "notes": [
+        "This give access to the internal memory of the constant"
+      ]
+    },
+    {
+      "id": "dmsdk:dmRender::RenderListAlloc@upstream/defold/engine/render/src/dmsdk/render/render.h:429:1833",
+      "notes": [
+        "Do not store a pointer into this array, as they're reused next frame"
+      ]
+    },
+    {
+      "id": "dmsdk:dmResource::CreateResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:104:1965",
+      "notes": [
+        "The input data pointer is not stored",
+        "The reference count is 1, so make sure it's destruction is handled"
+      ]
+    },
+    {
+      "id": "dmsdk:dmResource::FDecryptResource@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:162:1971",
+      "notes": [
+        "Currently, the function requires the final resource to be the same length (or less)"
+      ]
+    },
+    {
+      "id": "dmsdk:dmResource::FResourceCreate@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:244:1981",
+      "notes": [
+        "Deprecated in favor of ResourceTypeSetCreateFn"
+      ],
+      "deprecated": "Deprecated in favor of ResourceTypeSetCreateFn"
+    },
+    {
+      "id": "dmsdk:dmResource::FResourceDestroy@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:256:1983",
+      "notes": [
+        "Deprecated in favor of ResourceTypeSetDestroyFn"
+      ],
+      "deprecated": "Deprecated in favor of ResourceTypeSetDestroyFn"
+    },
+    {
+      "id": "dmsdk:dmResource::FResourcePostCreate@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:250:1982",
+      "notes": [
+        "Deprecated in favor of ResourceTypeSetPostCreateFn"
+      ],
+      "deprecated": "Deprecated in favor of ResourceTypeSetPostCreateFn"
+    },
+    {
+      "id": "dmsdk:dmResource::FResourcePreload@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:238:1980",
+      "notes": [
+        "Deprecated in favor of ResourceTypeSetPreloadFn"
+      ],
+      "deprecated": "Deprecated in favor of ResourceTypeSetPreloadFn"
+    },
+    {
+      "id": "dmsdk:dmResource::FResourceRecreate@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:262:1984",
+      "notes": [
+        "Deprecated in favor of ResourceTypeSetRecreateFn"
+      ],
+      "deprecated": "Deprecated in favor of ResourceTypeSetRecreateFn"
+    },
+    {
+      "id": "dmsdk:dmResource::RegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:268:1985",
+      "notes": [
+        "Deprecated in favor of ResourceRegisterTypeCreatorDesc"
+      ],
+      "deprecated": "Deprecated in favor of ResourceRegisterTypeCreatorDesc"
+    },
+    {
+      "id": "dmsdk:dmResource::Release@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:192:2007",
+      "notes": [
+        "Decreases ref count by 1. If it reaches 0, the resource destroy function is called."
+      ]
+    },
+    {
+      "id": "dmsdk:dmResource::SetupType@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:302:1988",
+      "notes": [
+        "C++ Helper function. Deprecated in favor of ResourceRegisterTypeCreatorDesc et al"
+      ],
+      "deprecated": "C++ Helper function. Deprecated in favor of ResourceRegisterTypeCreatorDesc et al"
+    },
+    {
+      "id": "dmsdk:dmScript::CheckBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:214:1320",
+      "notes": [
+        "The dmBuffer::IsBufferValid is already called on the returned buffer"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::CheckBufferNoError@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:227:1321",
+      "notes": [
+        "Returns 0 on error. Does not invoke lua_error.",
+        "deprecated. Prefer ToBuffer() instead.",
+        "The dmBuffer::IsBufferValid is already called on the returned buffer"
+      ],
+      "deprecated": "deprecated. Prefer ToBuffer() instead."
+    },
+    {
+      "id": "dmsdk:dmScript::CheckBufferUnpack@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:253:1323",
+      "notes": [
+        "The dmBuffer::IsBufferValid is already called on the returned buffer"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::CheckBufferUnpackNoError@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:267:1324",
+      "notes": [
+        "The dmBuffer::IsBufferValid is already called on the returned buffer"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::CheckCollection@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:92:1310",
+      "notes": [
+        "Works from both a .script/.gui_script"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::CheckMatrix4@upstream/defold/engine/script/src/dmsdk/script/script.h:417:2104",
+      "notes": [
+        "throws a luaL_error if it's not the correct type"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::CheckQuat@upstream/defold/engine/script/src/dmsdk/script/script.h:379:2100",
+      "notes": [
+        "throws a luaL_error if it's not the correct type"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::CheckVector3@upstream/defold/engine/script/src/dmsdk/script/script.h:305:2092",
+      "notes": [
+        "throws a luaL_error if it's not the correct type"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::CheckVector4@upstream/defold/engine/script/src/dmsdk/script/script.h:342:2096",
+      "notes": [
+        "throws a luaL_error if it's not the correct type"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::GetComponentFromLua@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:106:1311",
+      "notes": [
+        "The object referenced by the url must be in the same collection as the caller."
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2117",
+      "notes": [
+        "Throws Lua error if it fails to parser the json"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2118",
+      "notes": [
+        "Throws Lua error if it fails to parser the json"
+      ]
+    },
+    {
+      "id": "dmsdk:dmScript::ToBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:239:1322",
+      "notes": [
+        "Returns 0 on error. Does not invoke lua_error.",
+        "The dmBuffer::IsBufferValid is already called on the returned buffer"
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::New@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:229:552",
+      "notes": [
+        "SIGPIPE is disabled on applicable platforms. This has the implication\nthat Receive can return zero bytes when the connection is closed by remote peer."
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::Receive@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:356:565",
+      "notes": [
+        "For dmSocket::Recv() and dmSocket::Send() function ETIMEDOUT is translated to EWOULDBLOCK\non win32 for compatibility with BSD sockets."
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::Send@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:344:564",
+      "notes": [
+        "For dmSocket::Recv() and dmSocket::Send() function ETIMEDOUT is translated to EWOULDBLOCK\non win32 for compatibility with BSD sockets."
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::SetQuickAck@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:310:561",
+      "notes": [
+        "This is a no op on platforms that doesn't support it"
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::SetReceiveTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:332:563",
+      "notes": [
+        "Timeout resolution might be in milliseconds, e.g. windows. Use values\n      larger than or equal to 1000"
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::SetSendTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:321:562",
+      "notes": [
+        "Timeout resolution might be in milliseconds, e.g. windows. Use values\n      larger than or equal to 1000."
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::Socket@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:44:542",
+      "notes": [
+        "Use dmSocket::INVALID_SOCKET_HANDLE instead of zero for unset values. This is an exception\nfrom all other handles."
+      ]
+    },
+    {
+      "id": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
+      "notes": [
+        "This operation is atomic"
+      ]
+    },
+    {
+      "id": "dmsdk:dmThread::New@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:92:605",
+      "notes": [
+        "thread name currently not supported on win32"
+      ]
+    },
+    {
+      "id": "dmsdk:dmThread::SetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:157:613",
+      "notes": [
+        "The thread argument is unused on Darwin (uses current thread)"
+      ]
+    },
+    {
+      "id": "dmsdk:dmURI::Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:105:656",
+      "notes": [
+        "The output will never be larger than the input."
+      ]
+    },
+    {
+      "id": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
+      "notes": [
+        "If dst=0 the bytes_written will return the number of required bytes (including null character)"
+      ]
+    },
+    {
+      "id": "dmsdk:dmURI::Parse@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:85:654",
+      "notes": [
+        "This is a simplified URI parser and does not conform to rfc2396.\n      Missing features are: parameters, query, fragment part of URI and support for escaped sequences",
+        "For http m_Port is set to 80 if not specified in uri."
+      ]
+    },
+    {
+      "id": "dmsdk:dmUtf8::ToUtf8@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:69:659",
+      "notes": [
+        "Buffer must be of at least 4 characters. The string is *not* NULL-terminated"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Lerp@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:338:689",
+      "notes": [
+        "Does not clamp t to between 0 and 1"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Lerp@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:354:690",
+      "notes": [
+        "Does not clamp t to between 0 and 1"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Lerp@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:357:691",
+      "notes": [
+        "Does not clamp t to between 0 and 1"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Matrix3@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:100:673",
+      "notes": [
+        "16 byte aligned",
+        "Implemented as 3 x Vector3",
+        "Column major",
+        "Currently scalar implementation is used on most platforms"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Matrix4@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:111:674",
+      "notes": [
+        "16 byte aligned",
+        "Implemented as 4 x Vector4",
+        "Column major",
+        "Currently scalar implementation is used on most platforms"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Point3@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:45:669",
+      "notes": [
+        "16 byte aligned",
+        "Always size of 4 float32",
+        "Currently scalar implementation is used on most platforms"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Quat@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:89:672",
+      "notes": [
+        "16 byte aligned",
+        "Always size of 4 float32",
+        "Currently scalar implementation is used on most platforms"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Slerp@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:368:692",
+      "notes": [
+        "Does not clamp t to between 0 and 1",
+        "Unpredicatable results if a and b point in opposite direction"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Slerp@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:379:693",
+      "notes": [
+        "Does not clamp t to between 0 and 1",
+        "Unpredicatable results if a and b point in opposite direction"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Slerp@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:390:694",
+      "notes": [
+        "Does not clamp t to between 0 and 1",
+        "Unpredicatable results if a and b point in opposite direction"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Vector3@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:60:670",
+      "notes": [
+        "16 byte aligned",
+        "Always size of 4 float32",
+        "Currently scalar implementation is used on most platforms"
+      ]
+    },
+    {
+      "id": "dmsdk:dmVMath::Vector4@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:75:671",
+      "notes": [
+        "16 byte aligned",
+        "Always size of 4 float32",
+        "Currently scalar implementation is used on most platforms"
+      ]
+    },
+    {
+      "id": "dmsdk:dmWebServer::SetStatusCode@upstream/defold/engine/dlib/src/dmsdk/dlib/webserver.h:135:717",
+      "notes": [
+        "Only valid to invoke before #Send is invoked"
+      ]
+    }
+  ]
+}

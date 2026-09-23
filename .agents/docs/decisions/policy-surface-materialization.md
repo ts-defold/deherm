@@ -137,7 +137,9 @@ the document is a minimal policy input.
 | `defold-binding-lowering-recipe-facts.json` | 2,560,034 | normalized source-derived lowering selections | package emitter rebuilds the plan byte-for-byte |
 | `defold-dmsdk-universal-bindings.json` | 2,985,651 | copied recipe catalog | normalize catalog facts and emit locally |
 | `defold-sdk-ir.json` | 2,706,350 | source-derived dmSDK semantics | retain as policy facts or normalize without loss |
+| `defold-dmsdk-sdk-documentation.json` | 31,615 | source-derived dmSDK notes and deprecations | retain as policy facts; documentation must not enter runtime ABI identity |
 | `defold-script-api-ir.json` | 1,350,464 | source-derived script semantics | retain as policy facts or normalize without loss |
+| `defold-script-sdk-documentation.json` | 452 | source-derived script deprecations | retain as policy facts; documentation must not enter runtime ABI identity |
 | `defold-script-route-availability-profiles.json` | 1,221,105 | copied derived profile product | rebuild from profile facts |
 | `defold-script-handle-lowering.json` | 773,592 | emitter consumes only `handleKinds` | retain the 12,350-byte fact slice; rebuild the rest |
 | `defold-script-api-accounting.json` | 742,371 | copied evidence report | keep in evidence/reporting, not realization input |
@@ -158,8 +160,13 @@ the sentinel key covers the package emitter bytes, source input hashes, and
 source input paths, so an unchanged policy/compiler pair writes nothing while
 an emitter or input-identity change gets a different key.
 
-The existing sixteen SDK renderers consume the two primary IR documents, the
-handle-lowering report, and the script/dmSDK universal recipe catalogs. Six
+The existing sixteen SDK renderers consume the two primary IR documents, two
+small documentation augmentations, the handle-lowering report, and the
+script/dmSDK universal recipe catalogs. The documentation augmentations are
+keyed by the same declaration IDs as the runtime IR and carry only fields that
+affect generated TSDoc. Keeping them separate prevents an upstream prose change
+from invalidating bridge descriptors or runtime evidence while still making a
+policy-only client reproduce the exact SDK bytes and manifest digest. Six
 support emitters now live in `packages/compiler/src/sdk/support-sdk.mjs`:
 script handle-lowering types, script universal-value metadata, dmSDK universal
 metadata, the dmSDK browser arena, script browser-target support, and dmSDK

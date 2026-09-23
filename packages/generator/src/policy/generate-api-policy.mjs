@@ -80,7 +80,9 @@ const generatedDir = path.join(root, "packages", "bindings", "generated");
 export const compilerSurfaceDocuments = Object.freeze({
   "defold-value-layouts.json": "defold-value-layouts.json",
   "defold-script-api-ir.json": "defold-script-api-ir.json",
+  "defold-script-sdk-documentation.json": "defold-script-sdk-documentation.json",
   "defold-sdk-ir.json": "defold-sdk-ir.json",
+  "defold-dmsdk-sdk-documentation.json": "defold-dmsdk-sdk-documentation.json",
   "defold-script-scalar-dispatch.json": "defold-script-scalar-dispatch.json",
   "defold-script-binding-patterns.json": "defold-script-binding-patterns.json",
   "defold-dmsdk-binding-patterns.json": "defold-dmsdk-binding-patterns.json",
@@ -138,12 +140,16 @@ const locallyRenderedSdkRecipes = Object.freeze({
 });
 
 const locallyRenderedSdkInputs = Object.freeze({
-  "script/types.ts": Object.freeze(["defold-script-api-ir.json", "defold-script-handle-lowering.json"]),
+  "script/types.ts": Object.freeze([
+    "defold-script-api-ir.json",
+    "defold-script-sdk-documentation.json",
+    "defold-script-handle-lowering.json"
+  ]),
   "script/modules.ts": Object.freeze(["defold-script-api-ir.json"]),
   "script/runtime.ts": Object.freeze([]),
   "script/index.ts": Object.freeze(["defold-script-api-ir.json"]),
-  "dmsdk/types.ts": Object.freeze(["defold-sdk-ir.json"]),
-  "dmsdk/runtime.ts": Object.freeze(["defold-sdk-ir.json"]),
+  "dmsdk/types.ts": Object.freeze(["defold-sdk-ir.json", "defold-dmsdk-sdk-documentation.json"]),
+  "dmsdk/runtime.ts": Object.freeze(["defold-sdk-ir.json", "defold-dmsdk-sdk-documentation.json"]),
   "dmsdk/index.ts": Object.freeze([]),
   "script/handle-lowering.ts": Object.freeze(["defold-script-handle-lowering.json"]),
   "script/universal-value-bindings.ts": Object.freeze(["defold-script-universal-value-bindings.json"]),

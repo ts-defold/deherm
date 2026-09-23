@@ -1882,3 +1882,11 @@ tags; and script aliases, classes, enums, and fields already emit docs. One P2
 was valid: non-deprecation dmSDK notes were captured but omitted from output.
 They now emit as TSDoc `@remarks`. Exact current-source census assertions prove
 all fourteen dmSDK and both script deprecations are present.
+
+The first published clean-client reconstruction correctly caught an omitted
+recipe dependency: the manifest expected the enriched TypeScript bytes, but
+the materializer had only the documentation-neutral runtime IR. Script and
+dmSDK generators now emit separate 452-byte and 31,615-byte documentation
+augmentations. Policy carries those source-derived facts, SDK manifest entries
+name them as inputs, and the installed compiler joins them by exact declaration
+identity before rendering. Runtime IR and its descriptor ABI remain unchanged.
