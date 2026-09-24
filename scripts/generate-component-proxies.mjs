@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 
 import {
   discoverComponentSources,
-  generateComponentProxies
+  generateComponentProxies,
+  loadComponentProxyPolicy
 } from "./lib/component-proxy-generator.mjs";
 
 function parseArguments(argv) {
@@ -31,7 +32,8 @@ export async function main(argv = process.argv.slice(2)) {
     projectRoot,
     sourceFiles,
     outputRoot: options.outputRoot ? path.resolve(options.outputRoot) : projectRoot,
-    check: options.check
+    check: options.check,
+    componentPolicy: await loadComponentProxyPolicy(path.join(projectRoot, ".deherm", "ir", "defold-component-proxy-contract.json"))
   });
   const mode = options.check ? "fresh" : "generated";
   console.log(`Component proxies ${mode}: ${result.manifest.components.length} component(s)`);

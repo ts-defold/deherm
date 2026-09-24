@@ -147,6 +147,7 @@ the document is a minimal policy input.
 | `defold-dmsdk-scalar-thunks.json` | 80,331 | copied recipe catalog | normalize and emit locally |
 | `defold-script-scalar-dispatch.json` | 50,068 | copied dispatch product | rebuild from route facts |
 | `defold-value-layouts.json` | 8,074 | ABI/layout facts | retain as policy facts |
+| `defold-component-proxy-contract.json` | 3,288 | lifecycle, proxy suffix, property, and resource facts | retain as policy facts; package owns only lowering recipes |
 
 The lowering-plan cut replaces a 10,507,488-byte authenticated copy of the
 derived aggregate with the 2,560,034-byte recipe-fact object above, a reduction
@@ -235,7 +236,7 @@ no Defold checkout. The same test requires all 118 revision outputs (1,723,658
 bytes) to match the source pipeline byte for byte: 12 package-rendered files
 (5,372 bytes) and 106 authenticated snapshots (1,718,286 bytes).
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 67,114
+The `<5 MB` compiler-object budget is enforced; the current manifest is 67,380
 bytes. This is a structural transfer boundary, not yet a total-size victory.
 The 12 SDK support-source objects and 106 revision-output objects must still be
 replaced by compiler-owned emitters over compact semantic facts. Those changes
@@ -246,7 +247,7 @@ This proves policy-only realization for the pinned Defold revision and, through
 the independent Defold 1.13.1 derivation described in
 `revision-parametric-derivation.md`, for a second historical revision using the
 same package/compiler implementation. The historical policy reconstructed all
-28 SDK files and 118 revision outputs byte-for-byte and reconstructed its 19
-semantic IR documents equivalently. Routine revision changes therefore stay on
+28 SDK files and 118 revision outputs byte-for-byte and reconstructed its 20
+non-sentinel semantic IR documents equivalently. Routine revision changes therefore stay on
 the policy side of the boundary; an actually new recipe capability remains the
 explicit condition that can require a package upgrade.

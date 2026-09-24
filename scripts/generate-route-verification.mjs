@@ -55,7 +55,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { componentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
+import { createComponentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -118,12 +118,16 @@ export function runtimeEvidenceMatchesPlan(report, plan, defoldRevision) {
 
 async function main() {
   const check = process.argv.includes("--check");
-  const [ir, report, plan, registration] = await Promise.all([
+  const [ir, report, plan, registration, componentPolicy] = await Promise.all([
     read("defold-script-api-ir.json"),
     read("defold-headless-conformance-report.json"),
     read("defold-headless-conformance-plan.json"),
-    read("defold-lua-registration-surface.json")
+    read("defold-lua-registration-surface.json"),
+    read("defold-component-proxy-contract.json")
   ]);
+  assert.equal(componentPolicy.defoldRevision, ir.defoldRevision,
+    "component proxy policy and script API IR revisions differ");
+  const componentProxyConstants = createComponentProxyConstants(componentPolicy);
   const runtimeEvidenceCurrent = runtimeEvidenceMatchesPlan(report, plan, ir.defoldRevision);
   // Never promote a runtime observation across the plan/input boundary that
   // produced it. A generator correction may invalidate only the exercise

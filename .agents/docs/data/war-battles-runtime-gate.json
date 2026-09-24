@@ -19,13 +19,13 @@
       "sha256": "805dbd25cbf2fc9472f207f9244e4996296a99418411e0880dca1640e596b176"
     },
     "tests/fixtures/war-battles/.deherm/generated/components/manifest.json": {
-      "sha256": "4b4b7a84d0544f5aece58983e5e907494f89599b1dd511b24f8450e3e4ecb64c"
+      "sha256": "328a26c65307a603a189c4cf815995474ae858a16b91b9ffd78b9002d05aedd0"
     },
     "tests/fixtures/war-battles/src/scripts/player.script.ts": {
       "sha256": "80d1a964d82a9cbbcd13c2764125be3a21d5620c7bb1a2f8c6da1732681aa143"
     },
     "tests/fixtures/war-battles/src/scripts/rocket.script": {
-      "sha256": "f24c1e48e6d5a3ec8aefbfca8bc615d1587c7a14fa20c0b88f372202db8fd135"
+      "sha256": "a38a81f964bb09ed02a4e2a98ba2005615d60c6a88f92b6fb80f0768d1607ce6"
     },
     "tests/fixtures/war-battles/src/scripts/rocket.script.ts": {
       "sha256": "74db92633f82dddc2b299b8a5712c3a379bbd10c6f62290b4cb26c28b1eccd56"

@@ -6,11 +6,19 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  componentProxyConstants,
-  compileComponentSources,
+  compileComponentSources as compileComponentSourcesWithPolicy,
+  createComponentProxyConstants,
   discoverComponentSources,
-  generateComponentProxies
+  generateComponentProxies as generateComponentProxiesWithPolicy
 } from "../scripts/lib/component-proxy-generator.mjs";
+
+const componentPolicy = JSON.parse(await readFile(
+  path.resolve("packages/bindings/generated/defold-component-proxy-contract.json"),
+  "utf8"
+));
+const componentProxyConstants = createComponentProxyConstants(componentPolicy);
+const compileComponentSources = (options) => compileComponentSourcesWithPolicy({ ...options, componentPolicy });
+const generateComponentProxies = (options) => generateComponentProxiesWithPolicy({ ...options, componentPolicy });
 
 const fixtureRoot = path.resolve("tests/fixtures/component-proxy");
 const fixtureSource = path.join(fixtureRoot, "player.script.ts");
@@ -200,7 +208,7 @@ test("GUI and render lifecycle contracts match pinned Defold function tables", a
   const extract = (source, name) => {
     const body = source.match(new RegExp(`(?:const|static const) char\\* ${name}\\[[^\\]]*\\]\\s*=\\s*\\{([\\s\\S]*?)\\};`))?.[1];
     assert.ok(body, name);
-    return [...body.matchAll(/"([a-z_]+)"/g)].map(([, value]) => ({ on_message: "onMessage", on_input: "onInput", on_reload: "onReload" })[value] ?? value);
+    return [...body.matchAll(/"([a-z_]+)"/g)].map(([, value]) => value);
   };
   const [guiSource,renderSource]=await Promise.all([
     readFile(path.resolve("upstream/defold/engine/gui/src/gui.cpp"),"utf8"),
@@ -208,8 +216,72 @@ test("GUI and render lifecycle contracts match pinned Defold function tables", a
   ]);
   const gui=componentProxyConstants.sourceKinds.find(({suffix})=>suffix===".gui.ts");
   const render=componentProxyConstants.sourceKinds.find(({suffix})=>suffix===".render.ts");
-  assert.deepEqual(extract(guiSource,"SCRIPT_FUNCTION_NAMES"),gui.lifecycle.supported);
-  assert.deepEqual(extract(renderSource,"RENDER_SCRIPT_FUNCTION_NAMES"),render.lifecycle.supported);
+  assert.deepEqual(extract(guiSource,"SCRIPT_FUNCTION_NAMES"),gui.lifecycle.engineCallbacks);
+  assert.deepEqual(extract(renderSource,"RENDER_SCRIPT_FUNCTION_NAMES"),render.lifecycle.engineCallbacks);
+});
+
+test("source-derived script callbacks lower late and fixed update without moving existing ABI slots", async () => {
+  const projectRoot = await temporaryProject();
+  const source = await componentSource(projectRoot, "timing.script.ts", `
+import { defineComponent } from "@ts-defold/deherm/component";
+export default defineComponent({
+  lateUpdate(_self: unknown, _dt: number): void {},
+  fixedUpdate(_self: unknown, _dt: number): void {},
+});
+`);
+  const result = await generateComponentProxies({ projectRoot, sourceFiles: [source] });
+  const proxy = await readFile(path.join(projectRoot, "timing.script"), "utf8");
+  assert.match(proxy, /function late_update\(self, dt\)[\s\S]*?"lateUpdate", dt\)/);
+  assert.match(proxy, /function fixed_update\(self, dt\)[\s\S]*?"fixedUpdate", dt\)/);
+  assert.equal(result.specializations.lifecycleSlots.final, 2);
+  assert.equal(result.specializations.lifecycleSlots.onReload, 5);
+  assert.equal(result.specializations.lifecycleSlots.lateUpdate, 6);
+  assert.equal(result.specializations.lifecycleSlots.fixedUpdate, 7);
+});
+
+test("a future Defold callback is reported as unsupported instead of disappearing", () => {
+  const futurePolicy = structuredClone(componentPolicy);
+  futurePolicy.contexts.find(({ proxyKind }) => proxyKind === "script").callbacks.push("future_tick");
+  const constants = createComponentProxyConstants(futurePolicy);
+  const script = constants.sourceKinds.find(({ suffix }) => suffix === ".script.ts");
+  assert.deepEqual(script.lifecycle.unsupported, ["future_tick"]);
+  assert.ok(script.lifecycle.engineCallbacks.includes("future_tick"));
+});
+
+test("historical and current Defold resource property tokens select the same stable codec", () => {
+  for (const resourceToken of ["resource", "resource_data"]) {
+    const revisionPolicy = structuredClone(componentPolicy);
+    revisionPolicy.property.valueTypes = revisionPolicy.property.valueTypes
+      .filter((name) => name !== "resource" && name !== "resource_data");
+    revisionPolicy.property.valueTypes.push(resourceToken);
+    const constants = createComponentProxyConstants(revisionPolicy);
+    assert.deepEqual(constants.unsupportedPropertyTypes, []);
+    assert.equal(constants.propertyCodecs.resource.codecId, 9);
+  }
+});
+
+test("a policy-added resource constructor is usable through the stable generic resource recipe", async () => {
+  const futurePolicy = structuredClone(componentPolicy);
+  futurePolicy.property.resourceConstructors.push({
+    authoringName: "mesh",
+    engineName: "mesh",
+    route: "resource.mesh",
+    source: "synthetic-future-revision:1"
+  });
+  const projectRoot = await temporaryProject();
+  const source = await componentSource(projectRoot, "mesh.script.ts", `
+import { defineComponent, property } from "@ts-defold/deherm/component";
+export default defineComponent({
+  properties: { model: property.resource("mesh", "/assets/tank.mesh") },
+});
+`);
+  const [component] = await compileComponentSourcesWithPolicy({
+    projectRoot,
+    sourceFiles: [source],
+    componentPolicy: futurePolicy
+  });
+  assert.equal(component.properties[0].resourceKind, "mesh");
+  assert.equal(component.properties[0].luaDefault, 'resource.mesh("/assets/tank.mesh")');
 });
 
 test("render components reject lifecycle hooks Defold never calls", async (t) => {

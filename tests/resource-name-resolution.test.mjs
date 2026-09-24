@@ -21,6 +21,8 @@ const schema = JSON.parse(await readFile(
   path.join(root, "packages/bindings/generated/defold-resource-declaration-schema.json"), "utf8"));
 const classification = JSON.parse(await readFile(
   path.join(root, "packages/bindings/generated/defold-script-resource-namespaces.json"), "utf8"));
+const componentPolicy = JSON.parse(await readFile(
+  path.join(root, "packages/bindings/generated/defold-component-proxy-contract.json"), "utf8"));
 
 function namespacesFor(extension) {
   return schema.resources.find((resource) => resource.extension === extension)?.namespaces.map(({ id }) => id) ?? [];
@@ -129,6 +131,7 @@ test("component bindings retain every same-extension resource for route projecti
   const table = buildResourceSymbolTable({
     schema,
     classification: { routes: [], runtimeExtensibleNamespaces: [] },
+    componentPolicy,
     resources,
     componentSources: ["main/player.script.ts"]
   });
@@ -364,7 +367,7 @@ test("project message evidence includes ordinary imported TypeScript modules", a
     export function announce(): void { msg.post("#hud", "helper-ready"); }
   `);
   try {
-    const table = await buildProjectResourceSymbols(fixture, { pinned: { schema, classification } });
+    const table = await buildProjectResourceSymbols(fixture, { pinned: { schema, classification, componentPolicy } });
     const message = table.projectMessages.names.find(({ name }) => name === "helper-ready");
     assert.equal(message?.senderEvidence[0]?.source, "main/message-helper.ts");
     assert.equal(table.componentCount, 5);
@@ -384,7 +387,7 @@ test("declared names no component source mentions are reported for review", asyn
 });
 
 test("the ttsc host resolves literal names and stays silent for dynamic ones", async (t) => {
-  await writeProjectResourceSymbols(fixture, path.join(fixture, ".deherm"), { pinned: { schema, classification } });
+  await writeProjectResourceSymbols(fixture, path.join(fixture, ".deherm"), { pinned: { schema, classification, componentPolicy } });
   t.after(() => rm(path.join(fixture, ".deherm"), { recursive: true, force: true }));
 
   compileFixture("tsconfig.json");

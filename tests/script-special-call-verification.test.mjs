@@ -21,7 +21,8 @@ const [accounting, moduleSchema, luaSchema] = await Promise.all([
   json("packages/bindings/modules.json"),
   json("packages/bindings/lua-compat.json")
 ]);
-const report = generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema });
+const componentPolicy = await json("packages/bindings/generated/defold-component-proxy-contract.json");
+const report = generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema, componentPolicy });
 
 test("special-call report is a total inventory partition of compiler and module routes", () => {
   const compilerIds = accounting.rows
@@ -56,7 +57,7 @@ test("every compiler-intrinsic vector emits its exact Lua declaration", async ()
       ""
     ].join("\n"));
     await mkdir(path.join(projectRoot, "node_modules", "@ts-defold"), { recursive: true });
-    await generateComponentProxies({ projectRoot });
+    await generateComponentProxies({ projectRoot, componentPolicy });
     const proxy = await readFile(path.join(projectRoot, "vectors.script"), "utf8");
     for (const vector of report.compilerIntrinsics) {
       assert.match(proxy, new RegExp(vector.expectedLua.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), vector.id);
@@ -82,7 +83,7 @@ test("the same timer rows select the Lua, JSI, Static Hermes, and browser call p
     assert.match(staticHermes, new RegExp(`function ${vector.cSymbol}\\(`), vector.id);
     assert.match(browser, new RegExp(`_${vector.cSymbol}\\(`), vector.id);
   }
-  const header = renderScriptSpecialCallVerificationHeader({ accounting, moduleSchema, luaSchema });
+  const header = renderScriptSpecialCallVerificationHeader({ accounting, moduleSchema, luaSchema, componentPolicy });
   assert.match(header, /DEHERM_VERIFY_TIMER_DELAY_CALLBACK_RUNTIME UINT32_C\(2166572391\)/);
   assert.match(header, /DEHERM_VERIFY_TIMER_DELAY_C_ABI_ARITY UINT32_C\(6\)/);
 });
@@ -91,7 +92,7 @@ test("module and Lua schemas cannot drift independently", () => {
   const drifted = structuredClone(luaSchema);
   drifted.modules[0].functions[0].parameters.reverse();
   assert.throws(
-    () => generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema: drifted }),
+    () => generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema: drifted, componentPolicy }),
     /module and Lua parameter schemas differ/
   );
 });

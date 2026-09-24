@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 import { stableBindingId } from "./lib/binding-identity.mjs";
 import { generateScriptBindingDescriptors } from "./generate-script-binding-descriptors.mjs";
 import { generateScriptUrlAddressClassification } from "./generate-script-url-address-classification.mjs";
-import { componentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
+import { createComponentProxyConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
 import {
   selectUniversalRoutes,
   universalTargetSupport
@@ -28,6 +28,7 @@ const inputUrls = {
   url: new URL("packages/bindings/generated/defold-script-url-address-classification.json", root),
   valueTail: new URL("packages/bindings/generated/defold-script-value-tail-bindings.json", root),
   overload: new URL("packages/bindings/generated/defold-script-overload-dispatch.json", root),
+  componentPolicy: new URL("packages/bindings/generated/defold-component-proxy-contract.json", root),
   universalPolicy: new URL("packages/bindings/overrides/script-universal-value-bindings.json", root)
 };
 const valueDefinitionUrls = [
@@ -40,11 +41,6 @@ const valueDefinitionUrls = [
 ];
 const urlOverrideUrl = new URL("packages/bindings/overrides/script-url-address-classification.json", root);
 const outputUrl = new URL("packages/bindings/generated/defold-script-api-accounting.json", root);
-const componentPropertyCompilerIds = new Set([
-  "script:go.property",
-  ...Object.values(componentProxyConstants.resourceKinds).map((kind) => `script:resource.${kind}`)
-]);
-
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -295,6 +291,12 @@ export function generateScriptApiAccounting(inputs) {
   const valueTail = parse(inputs.valueTailText, "value-tail binding report");
   const overload = parse(inputs.overloadText, "overload-dispatch report");
   const universalPolicy = parse(inputs.universalPolicyText, "universal-value fallback policy");
+  const componentPolicy = parse(inputs.componentPolicyText, "component proxy policy");
+  const componentProxyConstants = createComponentProxyConstants(componentPolicy);
+  const componentPropertyCompilerIds = new Set([
+    componentPolicy.property.route.startsWith("script:") ? componentPolicy.property.route : `script:${componentPolicy.property.route}`,
+    ...Object.values(componentProxyConstants.resourceKinds).map((kind) => `script:resource.${kind}`)
+  ]);
 
   expectSameRevision({
     label: "script API accounting",
@@ -307,7 +309,8 @@ export function generateScriptApiAccounting(inputs) {
       { path: "packages/bindings/generated/defold-script-value-bindings.json", revision: value.defoldRevision },
       { path: "packages/bindings/generated/defold-script-url-address-classification.json", revision: url.defoldRevision },
       { path: "packages/bindings/generated/defold-script-value-tail-bindings.json", revision: valueTail.defoldRevision },
-      { path: "packages/bindings/generated/defold-script-overload-dispatch.json", revision: overload.defoldRevision }
+      { path: "packages/bindings/generated/defold-script-overload-dispatch.json", revision: overload.defoldRevision },
+      { path: "packages/bindings/generated/defold-component-proxy-contract.json", revision: componentPolicy.defoldRevision }
     ]
   });
   assert(ir.counts?.functions === ir.functions.length, "script IR function count is stale");
@@ -642,6 +645,7 @@ export function generateScriptApiAccounting(inputs) {
     valueTailBindingsSha256: sha256(inputs.valueTailText),
     overloadDispatchSha256: sha256(inputs.overloadText),
     universalValuePolicySha256: sha256(inputs.universalPolicyText),
+    componentProxyPolicySha256: sha256(inputs.componentPolicyText),
     universalValueSelectionSha256: sha256(JSON.stringify(universal.selected))
   };
   const aggregateInputSha256 = sha256([
@@ -709,6 +713,7 @@ async function loadInputs() {
     valueTailText: texts.valueTail,
     overloadText: texts.overload,
     universalPolicyText: texts.universalPolicy,
+    componentPolicyText: texts.componentPolicy,
     urlOverrideText,
     urlSourceTexts,
     valueDefinitions

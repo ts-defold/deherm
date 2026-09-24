@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.policy.component-proxy-contract",
+  "generator": "scripts/generate-component-proxy-contract.mjs",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "contexts": [
+    {
+      "contextKind": "game-object",
+      "supportsProperties": true,
+      "proxyKind": "script",
+      "proxySuffix": ".script",
+      "callbacks": [
+        "init",
+        "final",
+        "update",
+        "late_update",
+        "fixed_update",
+        "on_message",
+        "on_input",
+        "on_reload"
+      ],
+      "evidence": {
+        "lifecycle": "engine/gameobject/src/gameobject/gameobject_script.cpp:SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      }
+    },
+    {
+      "contextKind": "gui-scene",
+      "supportsProperties": false,
+      "proxyKind": "gui_script",
+      "proxySuffix": ".gui_script",
+      "callbacks": [
+        "init",
+        "final",
+        "update",
+        "on_message",
+        "on_input",
+        "on_reload"
+      ],
+      "evidence": {
+        "lifecycle": "engine/gui/src/gui.cpp:SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      }
+    },
+    {
+      "contextKind": "render-instance+graphics",
+      "supportsProperties": false,
+      "proxyKind": "render_script",
+      "proxySuffix": ".render_script",
+      "callbacks": [
+        "init",
+        "update",
+        "on_message",
+        "on_reload"
+      ],
+      "evidence": {
+        "lifecycle": "engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      }
+    }
+  ],
+  "property": {
+    "route": "go.property",
+    "valueTypes": [
+      "number",
+      "hash",
+      "string",
+      "url",
+      "vector3",
+      "vector4",
+      "quaternion",
+      "resource_data",
+      "boolean"
+    ],
+    "source": "doc/go.lua:817",
+    "resourceConstructors": [
+      {
+        "authoringName": "atlas",
+        "engineName": "atlas",
+        "route": "resource.atlas",
+        "source": "doc/resource.lua:46"
+      },
+      {
+        "authoringName": "buffer",
+        "engineName": "buffer",
+        "route": "resource.buffer",
+        "source": "doc/resource.lua:69"
+      },
+      {
+        "authoringName": "font",
+        "engineName": "font",
+        "route": "resource.font",
+        "source": "doc/resource.lua:492"
+      },
+      {
+        "authoringName": "material",
+        "engineName": "material",
+        "route": "resource.material",
+        "source": "doc/resource.lua:682"
+      },
+      {
+        "authoringName": "renderTarget",
+        "engineName": "render_target",
+        "route": "resource.render_target",
+        "source": "doc/resource.lua:714"
+      },
+      {
+        "authoringName": "texture",
+        "engineName": "texture",
+        "route": "resource.texture",
+        "source": "doc/resource.lua:1040"
+      },
+      {
+        "authoringName": "tileSource",
+        "engineName": "tile_source",
+        "route": "resource.tile_source",
+        "source": "doc/resource.lua:1063"
+      }
+    ]
+  }
+}

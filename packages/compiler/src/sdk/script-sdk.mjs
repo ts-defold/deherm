@@ -11,7 +11,7 @@ import {
   publicScriptModulePath,
   rawScriptRootName
 } from "../script-public-api-policy.mjs";
-import { componentProxyConstants } from "../component-proxy-contract.mjs";
+import { componentLifecycleRecipes } from "../component-proxy-contract.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../../..");
 const archivePath = path.join(root, "upstream", "ref-doc.zip");
@@ -982,9 +982,7 @@ for (const row of model.globals) {
 // not support is a real gap in what a TypeScript author can write, and naming it
 // here is what keeps it from being invisible. It is reported, not fatal: Defold
 // adding a callback must not stop a revision from being derived.
-const supportedLifecycle = new Set(componentProxyConstants.sourceKinds.flatMap(
-  (kind) => kind.lifecycle.supported.map((name) => name.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`))
-));
+const supportedLifecycle = new Set(Object.values(componentLifecycleRecipes).map(({ engineName }) => engineName));
 const unsupportedLifecycle = [...lifecycle.byProxyKind].flatMap(([proxyKind, names]) =>
   names.filter((name) => !supportedLifecycle.has(name)).map((name) => `${proxyKind}.${name}`));
 const semanticOverrides = await loadScriptSemanticOverrides(pathToFileURL(`${root}${path.sep}`));

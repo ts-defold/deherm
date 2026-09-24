@@ -4,7 +4,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { componentProxyConstants } from "./lib/component-proxy-generator.mjs";
+import { componentProxyInvariantConstants } from "../packages/compiler/src/component-proxy-contract.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const inputs = {
@@ -60,7 +60,7 @@ ${rows}
 
 async function build() {
   const text = Object.fromEntries(await Promise.all(Object.entries(inputs).map(async ([key, path]) => [key, await readFile(resolve(root, path), "utf8")])));
-  const capability = componentProxyConstants.proxyRuntimeCapability;
+  const capability = componentProxyInvariantConstants.proxyRuntimeCapability;
   const requiredMethods = capability?.requiredMethods;
   const luaModule = capability?.luaModule;
   assert.match(luaModule, /^_[a-z][a-z0-9_]*_$/, "component runtime Lua module must use a private reserved-style identifier");

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { componentProxyConstants } from "./component-proxy-contract.mjs";
+import { createComponentProxyConstants } from "./component-proxy-contract.mjs";
 
 function compareCodeUnits(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
@@ -58,7 +58,8 @@ function parameterShape(parameter, scenario) {
   });
 }
 
-function derivePropertyVectors(rows) {
+function derivePropertyVectors(rows, componentPolicy) {
+  const componentProxyConstants = createComponentProxyConstants(componentPolicy);
   const reverseResourceKinds = new Map(Object.entries(componentProxyConstants.resourceKinds)
     .map(([authoringKind, luaKind]) => [luaKind, authoringKind]));
   const goRows = rows.filter(({ rawName }) => rawName === "go.property");
@@ -169,11 +170,11 @@ function deriveTimerVectors(rows, moduleSchema, luaSchema) {
     }));
 }
 
-export function generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema }) {
+export function generateScriptSpecialCallVerification({ accounting, moduleSchema, luaSchema, componentPolicy }) {
   assert(accounting?.schemaVersion === 1, "script accounting schemaVersion must be 1");
   const compilerRows = accounting.rows.filter(({ category }) => category === "component-property-compiler");
   const separateRows = accounting.rows.filter(({ category }) => category === "separate-module");
-  const compilerIntrinsics = derivePropertyVectors(compilerRows);
+  const compilerIntrinsics = derivePropertyVectors(compilerRows, componentPolicy);
   const separateModules = deriveTimerVectors(separateRows, moduleSchema, luaSchema);
   assert(compilerIntrinsics.length === compilerRows.length, "compiler verification vector count drifted");
   assert(separateModules.length === separateRows.length, "separate-module verification vector count drifted");
@@ -186,7 +187,8 @@ export function generateScriptSpecialCallVerification({ accounting, moduleSchema
     inputs: {
       accountingSha256: sha256(canonicalJson(accounting)),
       moduleSchemaSha256: sha256(canonicalJson(moduleSchema)),
-      luaSchemaSha256: sha256(canonicalJson(luaSchema))
+      luaSchemaSha256: sha256(canonicalJson(luaSchema)),
+      componentPolicySha256: sha256(canonicalJson(componentPolicy))
     },
     counts: {
       componentPropertyCompiler: compilerIntrinsics.length,

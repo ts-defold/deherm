@@ -7,10 +7,9 @@
 
 import { computeLineStarts, createScanner, LanguageVariant, SyntaxKind } from "typescript/unstable/ast";
 
-import { componentProxyConstants } from "./component-proxy-contract.mjs";
+import { createComponentProxyConstants } from "./component-proxy-contract.mjs";
 import { messagesAt, parseProtobufText, stringField } from "./protobuf-text.mjs";
 
-const { sourceKinds } = componentProxyConstants;
 const messageScanLimits = Object.freeze({ maxSourceBytes: 2 * 1024 * 1024, maxTokens: 250_000 });
 const messageApiModules = new Set(["@deherm/project", "@ts-defold/deherm"]);
 const expressionEndingTokens = new Set([
@@ -66,7 +65,7 @@ function schemaExtension(schema, value) {
 }
 
 /** Proxy resource path a component source compiles to. */
-export function componentProxyPath(relativeSource) {
+export function componentProxyPath(relativeSource, sourceKinds) {
   const kind = [...sourceKinds]
     .sort((left, right) => right.suffix.length - left.suffix.length)
     .find(({ suffix }) => relativeSource.endsWith(suffix));
@@ -726,7 +725,8 @@ export function unreferencedDeclarations(declarations, literals) {
     compare(left.name, right.name));
 }
 
-export function buildResourceSymbolTable({ schema, classification, resources, componentSources, sourceTexts = new Map() }) {
+export function buildResourceSymbolTable({ schema, classification, resources, componentSources, sourceTexts = new Map(), componentPolicy }) {
+  const { sourceKinds } = createComponentProxyConstants(componentPolicy);
   const byPath = new Map(resources.map((resource) => [resource.path, resource]));
   const namespaceKinds = {};
   for (const resource of schema.resources) {
@@ -776,7 +776,7 @@ export function buildResourceSymbolTable({ schema, classification, resources, co
   const components = {};
   const attachmentConflicts = [];
   for (const relativeSource of [...componentSources].sort(compare)) {
-    const proxy = componentProxyPath(relativeSource);
+    const proxy = componentProxyPath(relativeSource, sourceKinds);
     if (!proxy) continue;
     const references = [];
     for (const resource of resources) {

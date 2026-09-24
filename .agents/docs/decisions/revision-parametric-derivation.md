@@ -204,16 +204,17 @@ read; the third is a real re-review.
 Deriving Defold 1.13.1 (`574678c7`) from the current `dev` pin (`7f0f554f`) is
 the acceptance test for this decision. It now passes with the unchanged package
 and compiler code. The derivation hydrated the exact historical SDK, ran all 19
-dmSDK and 31 script generator steps, rebuilt the canonical lowering plan and its
+dmSDK and 32 script generator steps, rebuilt the canonical lowering plan and its
 typed-native/recording consumers, and emitted a 19.50 MB content-addressed policy
-with 56 namespaces and 197 subtrees. The historical surface contains 1,336
+with 56 namespaces and 198 subtrees. The historical surface contains 1,336
 dmSDK universal recipes with zero omissions; source drift withdrew specialized
 lanes locally while preserving their universal fallback.
 
-Policy-only materialization of that historical policy then wrote 20 semantic
-documents, all 28 SDK files, and all 118 revision outputs without a Defold tree
+Policy-only materialization of that historical policy then wrote 21 documents
+(20 non-sentinel semantic documents plus the local cache sentinel), all 28 SDK
+files, and all 118 revision outputs without a Defold tree
 or source archive. A second pass wrote nothing. The 28 SDK files and 118 outputs
-matched the historical source-pipeline tree byte for byte; the 19 non-sentinel
+matched the historical source-pipeline tree byte for byte; the 20 non-sentinel
 IR documents were semantically identical after canonical JSON parsing. This is
 the decisive two-revision proof: both the current revision and 1.13.1 are
 derived and realized by one package/compiler implementation.

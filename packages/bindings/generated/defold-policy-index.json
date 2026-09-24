@@ -21,8 +21,8 @@
   "entries": [
     {
       "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-      "policyRoot": "f4d8b1f6e865a4c606180df4869453afaab00d009f23e137a3b75b69f6bd453f",
-      "generator": "sha256:72c6d9863d3fb6378b379d978b91e8ff8a058cae051a16dbe144dfb35b003e9d",
+      "policyRoot": "cdb466dcb5662b4e1f4949989babf4ffcc4aff87e4e0d0c1eaf5fa3bd2d3835c",
+      "generator": "sha256:b8d29478d864ac1efc6e94c4098e79178c3890e9bdc9266961d1d7b17be2449b",
       "realizer": {
         "minimumPackageVersion": "0.0.0",
         "requiredCapabilities": [
@@ -31,6 +31,7 @@
           "output.dmsdk-universal-jsi-header.render.v1",
           "output.stable-template.render.v1",
           "policy.compiler-document.binding-lowering-plan.v1",
+          "policy.compiler-document.component-proxy-contract.v1",
           "policy.compiler-document.copy-json.v1",
           "policy.compiler-document.defold-value-layouts.v1",
           "policy.compiler-document.dmsdk-universal.v1",

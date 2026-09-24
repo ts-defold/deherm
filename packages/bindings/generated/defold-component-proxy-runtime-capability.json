@@ -89,11 +89,11 @@
   "provenance": {
     "proxyGenerator": {
       "path": "packages/compiler/src/component-proxy-generator.mjs",
-      "sha256": "f1a25714aef9c7999661f26107371ada2950d13c8eca484f96ed42feba239c7f"
+      "sha256": "d1d7c003f37388ef2beb119cc8ab86e0c78b61b189f1647f7b02a751297cb14c"
     },
     "componentBundler": {
       "path": "scripts/build-component-registry.mjs",
-      "sha256": "8fda97f10690485ba26c6ef011fc709a28b1e4c8b291c03617b6003eee605f65"
+      "sha256": "be31be5e079601718edd05188d31461041112420214f11eb5a1d2b273fd61251"
     },
     "runtimeHeader": {
       "path": "defold/defold_hermes/include/defold_hermes/runtime.hpp",
@@ -129,7 +129,7 @@
     },
     "componentSdk": {
       "path": "packages/sdk/src/component.ts",
-      "sha256": "64b6d6b295d2843f5c86147df0a52f68b802c20a6a993ab2b30290d3add0f614"
+      "sha256": "e7d11b15d946a6f122925a62ae3dd77307939595d2f140f9815ae4f2ee11650e"
     },
     "nativeLuaHarness": {
       "path": "tests/native/component_proxy_lua_gate/component_proxy_lua_gate_test.cpp",

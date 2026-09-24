@@ -7,12 +7,11 @@ import {
   readResource,
   resourcePath
 } from "../../compiler/src/resource-symbol-table.mjs";
+import { createComponentProxyConstants } from "../../compiler/src/component-proxy-contract.mjs";
 import { buildScriptRouteSymbolIndex } from "../../compiler/src/script-route-symbol-index.mjs";
 import { buildDmSdkCallSymbolIndex } from "../../compiler/src/dmsdk-call-symbol-index.mjs";
-import { componentProxyConstants } from "../../compiler/src/component-proxy-contract.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
-const { sourceKinds } = componentProxyConstants;
 const ignoredDirectories = new Set([".deherm", ".git", ".internal", "build", "dist", "node_modules", "upstream"]);
 
 function portable(value) {
@@ -28,16 +27,18 @@ const generatedBindings = path.join(packageRoot, "packages", "bindings", "genera
 /** Pinned inputs the symbol table is derived from. */
 export async function loadResourceClassification({
   schemaPath = path.join(generatedBindings, "defold-resource-declaration-schema.json"),
-  classificationPath = path.join(generatedBindings, "defold-script-resource-namespaces.json")
+  classificationPath = path.join(generatedBindings, "defold-script-resource-namespaces.json"),
+  componentPolicyPath = path.join(generatedBindings, "defold-component-proxy-contract.json")
 } = {}) {
-  const [schema, classification] = await Promise.all([
+  const [schema, classification, componentPolicy] = await Promise.all([
     readFile(schemaPath, "utf8"),
-    readFile(classificationPath, "utf8")
+    readFile(classificationPath, "utf8"),
+    readFile(componentPolicyPath, "utf8")
   ]);
-  return { schema: JSON.parse(schema), classification: JSON.parse(classification) };
+  return { schema: JSON.parse(schema), classification: JSON.parse(classification), componentPolicy: JSON.parse(componentPolicy) };
 }
 
-async function walkProject(projectRoot) {
+async function walkProject(projectRoot, sourceKinds) {
   const resources = [];
   const componentSources = [];
   const typeScriptSources = [];
@@ -82,9 +83,10 @@ async function walkProject(projectRoot) {
  * checks that would have come from the missing declarations.
  */
 export async function buildProjectResourceSymbols(projectRoot, options = {}) {
-  const { schema, classification } = options.pinned ?? await loadResourceClassification();
+  const { schema, classification, componentPolicy } = options.pinned ?? await loadResourceClassification();
+  const { sourceKinds } = createComponentProxyConstants(componentPolicy);
   const extensions = schemaExtensions(schema);
-  const { resources, componentSources, typeScriptSources } = await walkProject(projectRoot);
+  const { resources, componentSources, typeScriptSources } = await walkProject(projectRoot, sourceKinds);
   const diagnostics = [];
   const parsed = [];
   for (const { relative, absolute } of resources) {
@@ -111,7 +113,7 @@ export async function buildProjectResourceSymbols(projectRoot, options = {}) {
       diagnostics.push({ severity: "warning", path: relative, message: `unreadable TypeScript source: ${error.message}` });
     }
   }
-  const table = buildResourceSymbolTable({ schema, classification, resources: parsed, componentSources, sourceTexts });
+  const table = buildResourceSymbolTable({ schema, classification, resources: parsed, componentSources, sourceTexts, componentPolicy });
   return {
     ...table,
     projectFile: "game.project",
@@ -127,7 +129,8 @@ export async function writeProjectResourceSymbols(projectRoot, outputRoot, optio
   const directory = path.join(outputRoot, "generated");
   const pinned = options.pinned ?? await loadResourceClassification({
     schemaPath: path.join(outputRoot, "ir", "defold-resource-declaration-schema.json"),
-    classificationPath: path.join(outputRoot, "ir", "defold-script-resource-namespaces.json")
+    classificationPath: path.join(outputRoot, "ir", "defold-script-resource-namespaces.json"),
+    componentPolicyPath: path.join(outputRoot, "ir", "defold-component-proxy-contract.json")
   });
   const table = await buildProjectResourceSymbols(projectRoot, {
     ...options,

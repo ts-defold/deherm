@@ -197,7 +197,7 @@ async function validatePinnedGroundTruth(repositoryRoot, evidencePaths) {
   const head = headOutput.trim();
   assert(head === lock.DEFOLD_REV,
     `Defold evidence checkout ${head} does not match pinned revision ${lock.DEFOLD_REV}`);
-  const relativeEvidence = evidencePaths
+  const relativeEvidence = [...new Set([...evidencePaths, ...scriptPinnedInputs])]
     .filter((entry) => entry.startsWith("upstream/defold/"))
     .map((entry) => entry.slice("upstream/defold/".length));
   if (relativeEvidence.length) {
@@ -238,7 +238,7 @@ export async function discoverGeneratedScriptArtifacts(repositoryRoot = defaultR
     // source tree rather than an enumerable input list, so this clean room
     // cannot regenerate it and must not claim to own it.
     if (file === "defold-script-resource-namespaces.json") continue;
-    if (/^(?:defold-script-|defold-static-hermes-|defold-typed-native-|defold-value-layouts|war-battles-script-)/.test(file)) {
+    if (/^(?:defold-script-|defold-component-proxy-contract|defold-static-hermes-|defold-typed-native-|defold-value-layouts|war-battles-script-)/.test(file)) {
       candidates.add(`packages/bindings/generated/${file}`);
     }
   }
@@ -471,7 +471,7 @@ export async function runScriptCleanRoomRegeneration(options = {}) {
   try {
     const evidencePaths = await sourceEvidencePaths(repositoryRoot);
     const pinnedGroundTruth = await validatePinnedGroundTruth(repositoryRoot, evidencePaths);
-    const cleanInputs = [...scriptGeneratorSources, ...scriptPinnedInputs, ...evidencePaths];
+    const cleanInputs = [...new Set([...scriptGeneratorSources, ...scriptPinnedInputs, ...evidencePaths])];
     for (const relativePath of cleanInputs) await copyRelative(repositoryRoot, cleanRoot, relativePath);
     const locked = parseYaml(await readFile(path.join(repositoryRoot, "pnpm-lock.yaml"), "utf8"));
     const installedFflate = JSON.parse(await readFile(path.join(repositoryRoot, "node_modules/fflate/package.json"), "utf8"));

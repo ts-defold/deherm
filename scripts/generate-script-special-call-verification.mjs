@@ -17,12 +17,13 @@ async function json(relative) {
 }
 
 export async function generate() {
-  const [accounting, moduleSchema, luaSchema] = await Promise.all([
+  const [accounting, moduleSchema, luaSchema, componentPolicy] = await Promise.all([
     json("packages/bindings/generated/defold-script-api-accounting.json"),
     json("packages/bindings/modules.json"),
-    json("packages/bindings/lua-compat.json")
+    json("packages/bindings/lua-compat.json"),
+    json("packages/bindings/generated/defold-component-proxy-contract.json")
   ]);
-  const inputs = { accounting, moduleSchema, luaSchema };
+  const inputs = { accounting, moduleSchema, luaSchema, componentPolicy };
   return {
     report: renderScriptSpecialCallVerification(inputs),
     header: renderScriptSpecialCallVerificationHeader(inputs)

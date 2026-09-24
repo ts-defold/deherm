@@ -21,7 +21,9 @@
     "final": 2,
     "onMessage": 3,
     "onInput": 4,
-    "onReload": 5
+    "onReload": 5,
+    "lateUpdate": 6,
+    "fixedUpdate": 7
   },
   "propertyCodecs": {
     "1": "number",
@@ -37,7 +39,7 @@
   "components": [
     {
       "componentId": "deherm.component/v1/bf9d9d8ca59e486805b929b32e188c5c6c8b4fafded4442d26e6ad27f931304b",
-      "schemaFingerprint": "d051907021d6cd5a982ebc0dc68440cfa1dc9082cc690a102112822c384d393e",
+      "schemaFingerprint": "555d1fd009f25da7089768cc0f5fc80dee11d65da5bf59c9e05a1cc8a03c01f6",
       "nativeSymbol": "deherm_component_bf9d9d8ca59e486805b929b32e188c5c",
       "proxyKind": "script",
       "contextKind": "game-object",
@@ -48,7 +50,9 @@
         "final",
         "onMessage",
         "onInput",
-        "onReload"
+        "onReload",
+        "lateUpdate",
+        "fixedUpdate"
       ],
       "teardownPolicy": "final-callback-detach",
       "reloadPolicy": "preserve-instance-state",
@@ -112,7 +116,7 @@
     },
     {
       "componentId": "deherm.component/v1/bba628a1ee23634d353872b113e5c7bf3b52e4de28e2b105a34011aa682b07f1",
-      "schemaFingerprint": "8fb3ace48da667a2119093091a9c1f950d6eeb49f44435418c216b8215bac256",
+      "schemaFingerprint": "1583bb2136f1ee655aaab10e901ec72b5d1814f67d3939c20308b56096cbab6c",
       "nativeSymbol": "deherm_component_bba628a1ee23634d353872b113e5c7bf",
       "proxyKind": "render_script",
       "contextKind": "render-instance+graphics",

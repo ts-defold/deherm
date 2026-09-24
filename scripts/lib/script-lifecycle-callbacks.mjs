@@ -34,7 +34,7 @@ import path from "node:path";
 /**
  * Where each script type's callback table lives, and what it is called.
  *
- * `proxyKind` matches `componentProxyConstants.sourceKinds[].proxyKind`, so the
+ * `proxyKind` matches the source-derived component proxy policy, so the
  * two surfaces can be compared without a second mapping.
  */
 export const LIFECYCLE_TABLES = Object.freeze([

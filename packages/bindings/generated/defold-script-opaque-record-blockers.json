@@ -8,7 +8,7 @@
   "coverageClaim": "No bounded generator is safe. render.draw borrows predicate and constant-buffer userdata while allocating/transferring frustum command data into the render command queue; render.dispatch_compute borrows a constant buffer and requires an active render-script command context. Neither ownership/lifetime contract exists in ScriptCallFrame.",
   "inputEvidence": {
     "scriptIrSha256": "1e7e05b70976fb689b8416ecff7b5911122de0691d7f76a6a7455e20e3630049",
-    "tableRecordFrontierSha256": "ad99eac7d868e4998a06436ab6d5eb4048e30a77c17138a581080b9249f2ae50",
+    "tableRecordFrontierSha256": "29d5bc2fcba31073e728b840fe727fd117a9d4bfbc25f50e6a224c4375f574a7",
     "reviewedPolicySha256": "41fc8215d17522077009c253ff8d2d5eee487fa7e52c752a0241fdfd107536a4",
     "defoldSources": [
       {

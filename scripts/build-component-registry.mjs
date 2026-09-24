@@ -10,7 +10,7 @@ import { lstat, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises"
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { generateComponentProxies } from "./lib/component-proxy-generator.mjs";
+import { generateComponentProxies, loadComponentProxyPolicy } from "./lib/component-proxy-generator.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -92,7 +92,10 @@ export async function buildComponentRegistry(argv = []) {
   const generated = await generateComponentProxies({
     projectRoot: options.projectRoot,
     outputRoot: options.projectRoot,
-    check: options.check === true
+    check: options.check === true,
+    componentPolicy: options.componentPolicy ?? await loadComponentProxyPolicy(path.join(
+      options.projectRoot, ".deherm", "ir", "defold-component-proxy-contract.json"
+    ))
   });
   const registryPath = path.join(options.projectRoot, ".deherm", "generated", "components", "registry.ts");
   const manifestPath = path.join(options.projectRoot, ".deherm", "generated", "components", "manifest.json");

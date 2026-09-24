@@ -218,7 +218,11 @@ async function scaffoldProject(options) {
     force: true,
     surfaceRepositoryRoot: generated.surfaceRepositoryRoot
   });
-  const components = await generateComponentProxies({ projectRoot: scaffold.projectRoot, outputRoot: scaffold.projectRoot });
+  const components = await generateComponentProxies({
+    projectRoot: scaffold.projectRoot,
+    outputRoot: scaffold.projectRoot,
+    componentPolicy: generated.componentPolicy
+  });
   await writeProjectResourceSymbols(scaffold.projectRoot, generated.root);
   await writeProjectRouteSymbolIndex(generated.root);
   await writeProjectDmSdkCallSymbolIndex(generated.root);
@@ -583,7 +587,11 @@ export async function run(argv = process.argv.slice(2)) {
     await installNativeExtension(inventory.projectRoot, {
       surfaceRepositoryRoot: generated.surfaceRepositoryRoot
     });
-    await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot });
+    await generateComponentProxies({
+      projectRoot: inventory.projectRoot,
+      outputRoot: inventory.projectRoot,
+      componentPolicy: generated.componentPolicy
+    });
     const snapshot = await runDevSession(options);
     if (options.once && options.json) console.log(JSON.stringify({ schemaVersion: 1, snapshot }, null, 2));
     return snapshot.phase === "failed" ? 1 : 0;
@@ -764,7 +772,11 @@ export async function run(argv = process.argv.slice(2)) {
       force: options.force,
       surfaceRepositoryRoot: output.surfaceRepositoryRoot
     });
-    const components = await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot });
+    const components = await generateComponentProxies({
+      projectRoot: inventory.projectRoot,
+      outputRoot: inventory.projectRoot,
+      componentPolicy: output.componentPolicy
+    });
     const componentCount = components.manifest.components.length;
     const resourceSymbols = await writeProjectResourceSymbols(inventory.projectRoot, output.root);
     // The checker resolves Defold reachability against this index. Development
@@ -797,7 +809,13 @@ export async function run(argv = process.argv.slice(2)) {
   }
   if (options.command === "verify-generated") {
     const result = await verifyGeneratedProject(inventory.projectRoot, options.outDir);
-    const components = await generateComponentProxies({ projectRoot: inventory.projectRoot, outputRoot: inventory.projectRoot, check: true });
+    const componentPolicy = JSON.parse(await readFile(path.join(result.root, "ir", "defold-component-proxy-contract.json"), "utf8"));
+    const components = await generateComponentProxies({
+      projectRoot: inventory.projectRoot,
+      outputRoot: inventory.projectRoot,
+      check: true,
+      componentPolicy
+    });
     const componentCount = components.manifest.components.length;
     if (options.json) console.log(JSON.stringify({ ...result, componentCount }, null, 2));
     else {

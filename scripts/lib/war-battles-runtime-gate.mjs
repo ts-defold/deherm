@@ -124,7 +124,11 @@ export async function buildWarBattlesRuntimeGate(repositoryRoot) {
   try {
     await generateComponentProxies({
       projectRoot: fixtureProjectRoot,
-      outputRoot: componentOutputRoot
+      outputRoot: componentOutputRoot,
+      componentPolicy: JSON.parse(await readFile(
+        path.join(root, "packages/bindings/generated/defold-component-proxy-contract.json"),
+        "utf8"
+      ))
     });
     componentManifestText = await readFile(
       path.join(componentOutputRoot, ".deherm/generated/components/manifest.json"),

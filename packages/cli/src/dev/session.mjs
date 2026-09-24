@@ -1,9 +1,9 @@
 import { createWriteStream } from "node:fs";
-import { access, mkdir, readdir, rm } from "node:fs/promises";
+import { access, mkdir, readFile, readdir, rm } from "node:fs/promises";
 import path from "node:path";
 
 import {
-  componentProxyConstants,
+  componentAuthoringConventions,
   generateComponentProxies
 } from "../../../compiler/src/component-proxy-generator.mjs";
 import { recordBundleBuild } from "../build-artifacts.mjs";
@@ -35,7 +35,7 @@ async function exists(file) {
   }
 }
 
-const componentSourceSuffixes = componentProxyConstants.sourceKinds.map(({ suffix }) => suffix);
+const componentSourceSuffixes = componentAuthoringConventions.map(({ suffix }) => suffix);
 const ignoredEntryDirectories = new Set([
   ".deherm",
   ".git",
@@ -305,6 +305,10 @@ export async function runDevSession(options = {}) {
   const services = options.services ?? {};
   const projectRoot = path.resolve(options.project ?? process.cwd());
   const generatedRoot = path.resolve(options.generatedRoot ?? path.join(projectRoot, options.outDir ?? ".deherm"));
+  const componentPolicy = JSON.parse(await readFile(
+    path.join(generatedRoot, "ir", "defold-component-proxy-contract.json"),
+    "utf8"
+  ));
   const entryPoint = await resolveEntry(projectRoot, options.entry);
   const outputFile = path.resolve(options.outputFile ?? path.join(projectRoot, ".deherm", "dev", "app.dehermc"));
   const sessionLogFile = path.resolve(options.sessionLog ?? path.join(projectRoot, ".deherm", "dev", "session.log"));
@@ -433,7 +437,7 @@ export async function runDevSession(options = {}) {
     },
     beforeRebuild: options.components === false ? undefined : async (changedSources) => {
       if (generatedComponents && !changedSources.some(isComponentSource)) return;
-      const components = await generateComponentProxies({ projectRoot, outputRoot: projectRoot });
+      const components = await generateComponentProxies({ projectRoot, outputRoot: projectRoot, componentPolicy });
       generatedProxyPaths.clear();
       for (const component of components.manifest.components) generatedProxyPaths.add(component.proxy);
       emit({

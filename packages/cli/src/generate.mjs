@@ -1128,7 +1128,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const sdkSourceRoot = surface.sdkRoot;
   const repositorySourceRoot = surface.repositoryRoot;
   const {
-    valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath,
+    valueLayoutsPath, componentContractPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath,
     scriptProbesPath, scriptAccountingPath, scriptUniversalPath,
     scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath,
     resourceSchemaPath, resourceNamespacesPath, toolchainPath
@@ -1142,8 +1142,9 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const toolchainSourcePromise = surface.toolchain
     ? Promise.resolve(Buffer.from(`${JSON.stringify(surface.toolchain, null, 2)}\n`))
     : readFile(toolchainPath);
-  const [valueLayoutsSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptPatternsSource, dmsdkPatternsSource, scriptProbesSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, loweringPlanRecipeEmitterSource, dmsdkThunksSource, dmsdkUniversalSource, resourceSchemaSource, resourceNamespacesSource, toolchainSource, packageSource] = await Promise.all([
+  const [valueLayoutsSource, componentContractSource, scriptSource, dmsdkSource, scriptDispatchSource, scriptPatternsSource, dmsdkPatternsSource, scriptProbesSource, scriptAccountingSource, scriptUniversalSource, scriptProfilesSource, loweringPlanSource, loweringPlanSentinelSource, loweringPlanGeneratorSource, loweringPlanRecipeEmitterSource, dmsdkThunksSource, dmsdkUniversalSource, resourceSchemaSource, resourceNamespacesSource, toolchainSource, packageSource] = await Promise.all([
     readFile(valueLayoutsPath),
+    readFile(componentContractPath),
     readFile(scriptIrPath),
     readFile(dmsdkIrPath),
     readFile(scriptDispatchPath),
@@ -1165,6 +1166,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     readFile(path.join(packageRoot, "package.json"), "utf8")
   ]);
   const valueLayouts = JSON.parse(valueLayoutsSource);
+  const componentContract = JSON.parse(componentContractSource);
   const scriptIr = JSON.parse(scriptSource);
   const dmsdkIr = JSON.parse(dmsdkSource);
   const scriptDispatch = JSON.parse(scriptDispatchSource);
@@ -1179,7 +1181,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   const dmsdkThunks = JSON.parse(dmsdkThunksSource);
   const dmsdkUniversal = JSON.parse(dmsdkUniversalSource);
   const toolchainPolicy = JSON.parse(toolchainSource);
-  const revisions = new Set([valueLayouts, scriptIr, dmsdkIr, scriptDispatch, scriptPatterns, dmsdkPatterns, scriptProbes, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
+  const revisions = new Set([valueLayouts, componentContract, scriptIr, dmsdkIr, scriptDispatch, scriptPatterns, dmsdkPatterns, scriptProbes, scriptAccounting, scriptUniversal, scriptProfiles, loweringPlan, dmsdkThunks, dmsdkUniversal].map(({ defoldRevision }) => defoldRevision));
   if (revisions.size !== 1) {
     throw new Error(`Packaged API inputs disagree: ${[...revisions].join(", ")}`);
   }
@@ -1239,6 +1241,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     // host on which the generated project will run conformance/development.
     platform: hostDefoldPlatform(),
     valueLayouts,
+    componentContract,
     valueTypes: createDefoldValueTypeCatalog(valueLayouts),
     scriptIr,
     dmsdkIr,
@@ -1254,6 +1257,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
     artifacts: surface.artifacts ?? null,
     inputs: {
       valueLayoutsSha256: sha256(valueLayoutsSource),
+      componentContractSha256: sha256(componentContractSource),
       scriptIrSha256: sha256(scriptSource),
       dmsdkIrSha256: sha256(dmsdkSource),
       scriptDispatchSha256: sha256(scriptDispatchSource),
@@ -1273,7 +1277,7 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
       sdkSourceSha256,
       repositorySourceSha256
     },
-    paths: { valueLayoutsPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath, scriptProbesPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath, resourceSchemaPath, resourceNamespacesPath, toolchainPath }
+    paths: { valueLayoutsPath, componentContractPath, scriptIrPath, dmsdkIrPath, scriptDispatchPath, scriptPatternsPath, dmsdkPatternsPath, scriptProbesPath, scriptAccountingPath, scriptUniversalPath, scriptProfilesPath, loweringPlanPath, loweringPlanSentinelPath, dmsdkThunksPath, dmsdkUniversalPath, resourceSchemaPath, resourceNamespacesPath, toolchainPath }
   };
 }
 
@@ -1563,6 +1567,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
           defoldResolution: defoldResolutionRecord(revisionResolution),
           defoldSurfaceLayer: core.surfaceLayer,
           surfaceRepositoryRoot: core.repositorySourceRoot,
+          componentPolicy: core.componentContract,
           generationMerkle: { engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
           revisionDiagnostics: revisionResolution.diagnostics ?? [],
           moduleCount: bindingIr.modules.length,
@@ -1592,6 +1597,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const irRoot = path.join(root, "ir");
   await mkdir(irRoot, { recursive: true });
   await cp(core.paths.valueLayoutsPath, path.join(irRoot, "defold-value-layouts.json"));
+  await cp(core.paths.componentContractPath, path.join(irRoot, "defold-component-proxy-contract.json"));
   await cp(core.paths.scriptIrPath, path.join(irRoot, "script-api.json"));
   await cp(core.paths.dmsdkIrPath, path.join(irRoot, "dmsdk.json"));
   await cp(core.paths.scriptDispatchPath, path.join(irRoot, "script-scalar-dispatch.json"));
@@ -1844,6 +1850,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     defoldResolution: defoldResolutionRecord(revisionResolution),
     defoldSurfaceLayer: core.surfaceLayer,
     surfaceRepositoryRoot: core.repositorySourceRoot,
+    componentPolicy: core.componentContract,
     generationMerkle: { engineRoot: merkle.engineRoot, nativeRoot: merkle.nativeRoot, root: merkle.root },
     revisionDiagnostics: revisionResolution.diagnostics ?? [],
     moduleCount: modules.length,

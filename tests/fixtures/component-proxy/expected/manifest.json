@@ -31,9 +31,15 @@
         "final",
         "onMessage",
         "onInput",
-        "onReload"
+        "onReload",
+        "lateUpdate",
+        "fixedUpdate"
       ],
-      "teardownPolicy": "final-callback-detach"
+      "teardownPolicy": "final-callback-detach",
+      "lifecycleEvidence": {
+        "lifecycle": "engine/gameobject/src/gameobject/gameobject_script.cpp:SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      }
     },
     {
       "authoredSuffix": ".gui.ts",
@@ -45,14 +51,17 @@
       "legacy": false,
       "supportedLifecycles": [
         "init",
-        "final",
         "update",
+        "final",
         "onMessage",
         "onInput",
         "onReload"
       ],
       "teardownPolicy": "final-callback-detach",
-      "lifecycleEvidence": "upstream/defold/engine/gui/src/gui.cpp:SCRIPT_FUNCTION_NAMES"
+      "lifecycleEvidence": {
+        "lifecycle": "engine/gui/src/gui.cpp:SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      }
     },
     {
       "authoredSuffix": ".render.ts",
@@ -69,7 +78,10 @@
         "onReload"
       ],
       "teardownPolicy": "provider-required-unimplemented-no-final-callback",
-      "lifecycleEvidence": "upstream/defold/engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES"
+      "lifecycleEvidence": {
+        "lifecycle": "engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      }
     },
     {
       "authoredSuffix": ".gui_script.ts",
@@ -81,14 +93,17 @@
       "legacy": true,
       "supportedLifecycles": [
         "init",
-        "final",
         "update",
+        "final",
         "onMessage",
         "onInput",
         "onReload"
       ],
       "teardownPolicy": "final-callback-detach",
-      "lifecycleEvidence": "upstream/defold/engine/gui/src/gui.cpp:SCRIPT_FUNCTION_NAMES"
+      "lifecycleEvidence": {
+        "lifecycle": "engine/gui/src/gui.cpp:SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      }
     }
   ],
   "components": [
@@ -106,14 +121,20 @@
         "final",
         "onMessage",
         "onInput",
-        "onReload"
+        "onReload",
+        "lateUpdate",
+        "fixedUpdate"
       ],
       "teardownPolicy": "final-callback-detach",
+      "lifecycleEvidence": {
+        "lifecycle": "engine/gameobject/src/gameobject/gameobject_script.cpp:SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      },
       "proxyKind": "script",
       "contextKind": "game-object",
       "authoringStyle": "object",
       "sourceSha256": "c5bfaf7b53440054264c93d212626548a67c9ec2c5054f46be5a9be0087eb00d",
-      "schemaFingerprint": "d051907021d6cd5a982ebc0dc68440cfa1dc9082cc690a102112822c384d393e",
+      "schemaFingerprint": "555d1fd009f25da7089768cc0f5fc80dee11d65da5bf59c9e05a1cc8a03c01f6",
       "reloadPolicy": "preserve-instance-state",
       "lifecycleMask": 63,
       "lifecycles": {
@@ -122,7 +143,9 @@
         "final": true,
         "onMessage": true,
         "onInput": true,
-        "onReload": true
+        "onReload": true,
+        "lateUpdate": false,
+        "fixedUpdate": false
       },
       "properties": [
         {
@@ -223,12 +246,15 @@
         "onReload"
       ],
       "teardownPolicy": "provider-required-unimplemented-no-final-callback",
-      "lifecycleEvidence": "upstream/defold/engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES",
+      "lifecycleEvidence": {
+        "lifecycle": "engine/render/src/render/render_script.cpp:RENDER_SCRIPT_FUNCTION_NAMES",
+        "resource": "com.dynamo.cr/com.dynamo.cr.bob/src/com/dynamo/bob/pipeline/ScriptBuilders.java:@BuilderParams"
+      },
       "proxyKind": "render_script",
       "contextKind": "render-instance+graphics",
       "authoringStyle": "object",
       "sourceSha256": "d0341f4f60079963b3c46874e9de951c8788c9fb7d8c95486b20d54251e711c3",
-      "schemaFingerprint": "8fb3ace48da667a2119093091a9c1f950d6eeb49f44435418c216b8215bac256",
+      "schemaFingerprint": "1583bb2136f1ee655aaab10e901ec72b5d1814f67d3939c20308b56096cbab6c",
       "reloadPolicy": "preserve-instance-state",
       "lifecycleMask": 43,
       "lifecycles": {
@@ -237,7 +263,9 @@
         "final": false,
         "onMessage": true,
         "onInput": false,
-        "onReload": true
+        "onReload": true,
+        "lateUpdate": false,
+        "fixedUpdate": false
       },
       "properties": [],
       "native": {

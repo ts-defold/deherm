@@ -33,6 +33,7 @@ import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 // incomplete and is not used.
 export const surfaceIrFiles = Object.freeze({
   valueLayoutsPath: "defold-value-layouts.json",
+  componentContractPath: "defold-component-proxy-contract.json",
   scriptIrPath: "defold-script-api-ir.json",
   scriptConstantLoweringPath: "defold-script-constant-lowering.json",
   dmsdkIrPath: "defold-sdk-ir.json",

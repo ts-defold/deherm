@@ -52,6 +52,7 @@ const DOCUMENT_RECIPE = "policy.compiler-document.copy-json.v1";
 const DOCUMENT_RECIPES = new Set([
   DOCUMENT_RECIPE,
   BINDING_LOWERING_RECIPE_CAPABILITY,
+  "policy.compiler-document.component-proxy-contract.v1",
   "policy.compiler-document.defold-value-layouts.v1",
   "policy.compiler-document.dmsdk-universal.v1"
 ]);

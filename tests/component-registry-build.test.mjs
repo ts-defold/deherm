@@ -8,6 +8,9 @@ import vm from "node:vm";
 
 import { buildComponentRegistry } from "../scripts/build-component-registry.mjs";
 
+const componentPolicy = JSON.parse(await readFile(
+  path.resolve("packages/bindings/generated/defold-component-proxy-contract.json"), "utf8"));
+
 async function source(root, relative, context) {
   const file = path.join(root, relative);
   await mkdir(path.dirname(file), { recursive: true });
@@ -32,7 +35,7 @@ test("compiler emits, type-checks, bundles, caches, and verifies the complete co
   await source(projectRoot, "ui/hud.gui.ts", "gui-scene");
   await source(projectRoot, "render/main.render.ts", "render-instance+graphics");
 
-  const first = await buildComponentRegistry({ projectRoot, outputRoot });
+  const first = await buildComponentRegistry({ projectRoot, outputRoot, componentPolicy });
   assert.equal(first.cacheHit, false);
   assert.equal(first.manifest.components.length, 3);
   const registryPath = path.join(projectRoot, ".deherm/generated/components/registry.ts");
@@ -48,13 +51,13 @@ test("compiler emits, type-checks, bundles, caches, and verifies the complete co
   const bundlePath = path.join(outputRoot, "components.js");
   const sentinelPath = path.join(outputRoot, "component-bundle.sentinel.json");
   const before = { bundle: (await stat(bundlePath)).mtimeMs, sentinel: (await stat(sentinelPath)).mtimeMs };
-  const second = await buildComponentRegistry({ projectRoot, outputRoot });
+  const second = await buildComponentRegistry({ projectRoot, outputRoot, componentPolicy });
   assert.equal(second.cacheHit, true);
   assert.deepEqual(
     { bundle: (await stat(bundlePath)).mtimeMs, sentinel: (await stat(sentinelPath)).mtimeMs },
     before
   );
-  await buildComponentRegistry({ projectRoot, outputRoot, check: true });
+  await buildComponentRegistry({ projectRoot, outputRoot, check: true, componentPolicy });
 
   const context = { globalThis: null };
   context.globalThis = context;
@@ -68,7 +71,7 @@ test("compiler emits, type-checks, bundles, caches, and verifies the complete co
 
   await writeFile(bundlePath, `${await readFile(bundlePath, "utf8")}\n// tampered\n`);
   await assert.rejects(
-    buildComponentRegistry({ projectRoot, outputRoot, check: true }),
+    buildComponentRegistry({ projectRoot, outputRoot, check: true, componentPolicy }),
     /stale/
   );
 });

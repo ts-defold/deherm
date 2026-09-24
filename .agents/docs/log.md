@@ -1,9 +1,36 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - Component proxy facts crossed the policy boundary
+
+`defold-component-proxy-contract.json` is now generated from each Defold
+revision's lifecycle tables, Bob script resource extensions, `go.property`
+signature, and documented resource constructors. The compiler package owns
+only stable authoring and lowering recipes. Existing lifecycle ABI slots remain
+0-5; source-derived `late_update` and `fixed_update` append at 6 and 7. The
+generic `property.resource(kind, path)` recipe lets a policy add another
+resource constructor without requiring a package release, while unknown
+callbacks and value types remain visible as unsupported policy facts.
+
+The first historical run exposed a genuine token-coupling bug: Defold 1.13.1
+describes the seven property-only resource constructors as returning
+`hash`/`resource`, while the current revision uses `resource_data`. Derivation
+now classifies the source documentation contract rather than either revision's
+return spelling. An adversarial consumption check also found the stable
+realizer's diagnostic alias set only recognized the current spelling; it now
+maps both `resource` and `resource_data` to resource codec 9, with a direct
+test covering both policy forms. A fresh network-backed Defold 1.13.1 run completed all 51
+registered binding generators with zero refusals. Policy-only materialization
+from that historical result wrote 21 documents, 28 SDK files, and 118 revision
+outputs; all SDK/output bytes matched its source pipeline, and a second pass
+wrote zero files. The current script clean room reproduced 102 generated
+artifacts byte-for-byte, and the package inventory still contains no revision
+policy/output. These are generation, realization, idempotence, and packaging
+claims respectively; they are not packaged-engine runtime evidence.
+
 ## 2026-09-24 - Cross-revision policy derivation covers both binding surfaces
 
 The historical Defold 1.13.1 control now exercises the complete registered
-binding pipeline: all 31 script generators and all 19 dmSDK generators ran with
+binding pipeline: all 32 script generators and all 19 dmSDK generators ran with
 the current package/compiler and zero refused. The ratchet is derived from the
 two ownership registries, so adding a generator cannot leave the historical
 proof silently scoped to the old list. Production and clean-room checks no

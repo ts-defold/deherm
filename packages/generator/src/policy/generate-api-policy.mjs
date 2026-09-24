@@ -82,6 +82,7 @@ export const compilerSurfaceDocuments = Object.freeze({
   "defold-script-api-ir.json": "defold-script-api-ir.json",
   "defold-script-constant-lowering.json": "defold-script-constant-lowering.json",
   "defold-script-sdk-documentation.json": "defold-script-sdk-documentation.json",
+  "defold-component-proxy-contract.json": "defold-component-proxy-contract.json",
   "defold-sdk-ir.json": "defold-sdk-ir.json",
   "defold-dmsdk-sdk-documentation.json": "defold-dmsdk-sdk-documentation.json",
   "defold-script-scalar-dispatch.json": "defold-script-scalar-dispatch.json",
@@ -165,6 +166,7 @@ const locallyRenderedSdkInputs = Object.freeze({
 
 const compilerDocumentRecipes = Object.freeze({
   "defold-value-layouts.json": "policy.compiler-document.defold-value-layouts.v1",
+  "defold-component-proxy-contract.json": "policy.compiler-document.component-proxy-contract.v1",
   "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1",
   [BINDING_LOWERING_RECIPE_NAME]: BINDING_LOWERING_RECIPE_CAPABILITY
 });

@@ -56,12 +56,27 @@ JavaScript catalog only as a regeneration/test fixture; npm packaging explicitly
 excludes it. Repository-only policy derivation code is also excluded from the
 consumer package.
 
+Component proxy realization now follows the same boundary. The repository
+derives `defold-component-proxy-contract.json` from each revision's lifecycle
+tables, Bob script-resource suffixes, `go.property` signature, and documented
+resource constructors. The package retains stable lifecycle slots, property
+codecs, TypeScript authoring suffixes, and Lua lowering recipes. Existing ABI
+slots never move when Defold reorders a callback table; `late_update` and
+`fixed_update` therefore append at slots 6 and 7. A policy-added resource
+constructor can use the package's generic `property.resource(kind, path)`
+recipe without an npm release, while the familiar named helpers remain
+convenience APIs. Unknown callbacks and value types stay present in the policy
+as unsupported capabilities instead of disappearing.
+
 ## Remaining migration frontier
 
 The same rule must be applied to:
 
 1. Native extension sources: ship only invariant skeleton/runtime/emitters; materialize revision-generated descriptors and adapters from policy.
-2. Component contracts: keep proxy mechanics in npm and move lifecycle, property, and resource vocabulary into policy.
+2. Component authoring declarations: generate policy-specific ergonomic named
+   helpers and callback declarations; correctness no longer depends on the
+   fixed resource-helper list because the generic resource recipe is
+   revision-parametric.
 3. Script type and context vocabulary, handle classifications, route semantics, dynamic-route evidence, dmSDK specializations, and platform/toolchain vocabulary.
 4. Generated SDK and Static Hermes files: package copies may be fixtures for the pinned revision, never authority for an arbitrary revision.
 

@@ -45,6 +45,7 @@ export const POLICY_REALIZER_CAPABILITY_REGISTRY = Object.freeze({
   "policy.compiler-surface.references.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.copy-json.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.binding-lowering-plan.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
+  "policy.compiler-document.component-proxy-contract.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.defold-value-layouts.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "policy.compiler-document.dmsdk-universal.v1": Object.freeze({ introducedInVersion: "0.0.0" }),
   "sdk.compatibility-source.copy.v1": Object.freeze({ introducedInVersion: "0.0.0" }),

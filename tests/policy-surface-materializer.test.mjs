@@ -43,7 +43,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 20);
+  assert.equal(first.descriptor.documents.length, 21);
   for (const name of [
     "defold-script-binding-patterns.json",
     "defold-dmsdk-binding-patterns.json",

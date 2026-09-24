@@ -815,7 +815,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(ir.modules[0].members[1].jsName, "focusTarget");
 
   const output = await writeGeneratedProject(inventory);
-  await generateComponentProxies({ projectRoot: project, outputRoot: project });
+  await generateComponentProxies({ projectRoot: project, outputRoot: project, componentPolicy: output.componentPolicy });
   await writeProjectResourceSymbols(project, output.root);
   await writeProjectRouteSymbolIndex(output.root);
   await writeProjectDmSdkCallSymbolIndex(output.root);

@@ -26,30 +26,18 @@ import {
   isStringLiteral
 } from "typescript/unstable/ast/is";
 
-import { componentProxyConstants } from "./component-proxy-contract.mjs";
+import {
+  componentAuthoringConventions,
+  componentProxyInvariantConstants,
+  createComponentProxyConstants
+} from "./component-proxy-contract.mjs";
 
 const {
   componentIdNamespace: COMPONENT_ID_NAMESPACE,
   generatedMarker: GENERATED_MARKER,
   generator: GENERATOR,
-  lifecycleSlots,
-  proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY,
-  sourceKinds: componentSourceKinds,
-  resourceKinds
-} = componentProxyConstants;
-
-const propertyCodecs = Object.freeze({
-  number: { codecId: 1 },
-  boolean: { codecId: 2 },
-  string: { codecId: 3 },
-  hash: { codecId: 4 },
-  url: { codecId: 5 },
-  vector3: { codecId: 6 },
-  vector4: { codecId: 7 },
-  quaternion: { codecId: 8 }
-});
-
-const rootMemberNames = new Set(["properties", ...Object.keys(lifecycleSlots)]);
+  proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY
+} = componentProxyInvariantConstants;
 const ignoredDirectories = new Set([
   ".deherm",
   ".git",
@@ -67,7 +55,7 @@ function compareCodeUnits(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
-function canonicalRelativePath(projectRoot, file) {
+function canonicalRelativePath(projectRoot, file, componentSourceKinds = componentAuthoringConventions) {
   const relative = path.relative(projectRoot, file).split(path.sep).join("/");
   if (!relative || relative === ".." || relative.startsWith("../") || path.isAbsolute(relative)) {
     throw new Error(`${file}: component source must be inside project root ${projectRoot}`);
@@ -81,14 +69,14 @@ function canonicalRelativePath(projectRoot, file) {
   return relative;
 }
 
-function componentSourceKind(relativeSource) {
+function componentSourceKind(relativeSource, componentSourceKinds) {
   const kind = [...componentSourceKinds].sort((left, right) => right.suffix.length - left.suffix.length)
     .find(({ suffix }) => relativeSource.endsWith(suffix));
   if (!kind) throw new Error(`${relativeSource}: unsupported component source suffix`);
   return kind;
 }
 
-function proxyRelativePath(relativeSource, sourceKind = componentSourceKind(relativeSource)) {
+function proxyRelativePath(relativeSource, sourceKind) {
   return `${relativeSource.slice(0, -sourceKind.suffix.length)}${sourceKind.proxySuffix}`;
 }
 
@@ -201,7 +189,8 @@ function zeroOrOneArgument(args, context) {
   if (args.length > 1) throw new Error(`${context}: expected zero or one argument, received ${args.length}`);
 }
 
-function parseProperty(member, sourceFile, name, slot) {
+function parseProperty(member, sourceFile, name, slot, constants) {
+  const { propertyCodecs, resourceKinds } = constants;
   if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) || name.startsWith("__deherm_")) {
     throw new Error(`property ${JSON.stringify(name)}: name must be a Lua-safe identifier and may not use the __deherm_ prefix`);
   }
@@ -248,22 +237,31 @@ function parseProperty(member, sourceFile, name, slot) {
     };
   }
 
-  const resourceKind = resourceKinds[call.kind];
+  let resourceAuthoringKind = call.kind;
+  let resourceArguments = call.arguments;
+  if (call.kind === "resource") {
+    if (call.arguments.length < 1 || call.arguments.length > 2) {
+      throw new Error(`${context}: expected a policy resource kind and optional path`);
+    }
+    resourceAuthoringKind = stringLiteral(call.arguments[0], sourceFile, `${context} kind`);
+    resourceArguments = call.arguments.slice(1);
+  }
+  const resourceKind = resourceKinds[resourceAuthoringKind];
   if (resourceKind) {
-    zeroOrOneArgument(call.arguments, context);
-    const value = call.arguments.length ? stringLiteral(call.arguments[0], sourceFile, context) : null;
+    zeroOrOneArgument(resourceArguments, context);
+    const value = resourceArguments.length ? stringLiteral(resourceArguments[0], sourceFile, context) : null;
     return {
       name,
       slot,
       kind: "resource",
       resourceKind,
-      codecId: 9,
+      codecId: propertyCodecs.resource.codecId,
       default: value,
       luaDefault: `resource.${resourceKind}(${value === null ? "" : luaString(value)})`
     };
   }
 
-  throw new Error(`${context}: unsupported property kind; supported kinds are number, boolean, string, hash, url, vector3, vector4, quaternion, ${Object.keys(resourceKinds).join(", ")}`);
+  throw new Error(`${context}: unsupported property kind; supported kinds are number, boolean, string, hash, url, vector3, vector4, quaternion, resource(<policy kind>), ${Object.keys(resourceKinds).join(", ")}`);
 }
 
 function validateLifecycle(member, sourceFile, name) {
@@ -287,7 +285,7 @@ function hasModifier(node, kind) {
   return Boolean(node.modifiers?.some((modifier) => modifier.kind === kind));
 }
 
-function parseClassDefinition(sourceFile, relativeSource, sourceKind, argument) {
+function parseClassDefinition(sourceFile, relativeSource, sourceKind, argument, lifecycleSlots) {
   argument = unwrapExpression(argument);
   if (!isIdentifier(argument)) {
     throw new Error(`${relativeSource}: component argument must name a class declared in the same file`);
@@ -360,8 +358,10 @@ function diagnosticText(message) {
   return parts.join(" ");
 }
 
-function parseSourceFile(sourceFile, relativeSource, sourceText) {
-  const sourceKind = componentSourceKind(relativeSource);
+function parseSourceFile(sourceFile, relativeSource, sourceText, constants) {
+  const { lifecycleSlots, sourceKinds: componentSourceKinds } = constants;
+  const rootMemberNames = new Set(["properties", ...Object.keys(lifecycleSlots)]);
+  const sourceKind = componentSourceKind(relativeSource, componentSourceKinds);
   const exports = sourceFile.statements.filter(isExportAssignment).filter((statement) => !statement.isExportEquals);
   if (exports.length !== 1) throw new Error(`${relativeSource}: expected exactly one export default defineComponent(...) or component(...)`);
 
@@ -386,7 +386,7 @@ function parseSourceFile(sourceFile, relativeSource, sourceText) {
     };
     authoring.propertiesMember = authoring.members.get("properties");
   } else {
-    authoring = parseClassDefinition(sourceFile, relativeSource, sourceKind, exported.arguments[0]);
+    authoring = parseClassDefinition(sourceFile, relativeSource, sourceKind, exported.arguments[0], lifecycleSlots);
   }
 
   const { members, propertiesMember } = authoring;
@@ -408,7 +408,7 @@ function parseSourceFile(sourceFile, relativeSource, sourceText) {
     const value = unwrapExpression(propertiesMember.initializer);
     if (!isObjectLiteralExpression(value)) throw new Error(`${relativeSource}: properties must be an object literal`);
     const propertyMembers = objectMembers(value, sourceFile, `${relativeSource}: properties`);
-    properties = [...propertyMembers.entries()].map(([name, member], slot) => parseProperty(member, sourceFile, name, slot));
+    properties = [...propertyMembers.entries()].map(([name, member], slot) => parseProperty(member, sourceFile, name, slot, constants));
   }
 
   const propertyNames = new Set();
@@ -508,6 +508,24 @@ function renderLua(component) {
     lines.push(
       "function update(self, dt)",
       `    ${luaModule}.dispatchLifecycle(self, COMPONENT_ID, "update", dt)`,
+      "end",
+      ""
+    );
+  }
+
+  if (component.lifecycles.lateUpdate) {
+    lines.push(
+      "function late_update(self, dt)",
+      `    ${luaModule}.dispatchLifecycle(self, COMPONENT_ID, "lateUpdate", dt)`,
+      "end",
+      ""
+    );
+  }
+
+  if (component.lifecycles.fixedUpdate) {
+    lines.push(
+      "function fixed_update(self, dt)",
+      `    ${luaModule}.dispatchLifecycle(self, COMPONENT_ID, "fixedUpdate", dt)`,
       "end",
       ""
     );
@@ -620,7 +638,12 @@ function renderRegistry(components) {
   ].join("\n")}`;
 }
 
-function outputsFor(components, outputRoot) {
+function outputsFor(components, outputRoot, constants) {
+  const {
+    lifecycleSlots,
+    propertyCodecs,
+    sourceKinds: componentSourceKinds
+  } = constants;
   const manifest = {
     schemaVersion: 1,
     generator: GENERATOR,
@@ -645,17 +668,7 @@ function outputsFor(components, outputRoot) {
     generator: GENERATOR,
     proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY,
     lifecycleSlots,
-    propertyCodecs: {
-      1: "number",
-      2: "boolean",
-      3: "string",
-      4: "hash",
-      5: "url",
-      6: "vector3",
-      7: "vector4",
-      8: "quaternion",
-      9: "resource"
-    },
+    propertyCodecs: Object.fromEntries(Object.entries(propertyCodecs).map(([name, { codecId }]) => [codecId, name])),
     components: components.map((component) => ({
       componentId: component.componentId,
       schemaFingerprint: component.schemaFingerprint,
@@ -772,7 +785,7 @@ async function stageWrites(writes) {
   }
 }
 
-export async function discoverComponentSources(projectRoot) {
+export async function discoverComponentSources(projectRoot, componentSourceKinds = componentAuthoringConventions) {
   const root = path.resolve(projectRoot);
   const found = [];
   async function visit(directory) {
@@ -792,10 +805,16 @@ export async function discoverComponentSources(projectRoot) {
   return found;
 }
 
-export async function compileComponentSources({ projectRoot, sourceFiles }) {
+export async function loadComponentProxyPolicy(file) {
+  return JSON.parse(await readFile(file, "utf8"));
+}
+
+export async function compileComponentSources({ projectRoot, sourceFiles, componentPolicy }) {
+  const constants = createComponentProxyConstants(componentPolicy);
+  const componentSourceKinds = constants.sourceKinds;
   const root = path.resolve(projectRoot);
   const files = sourceFiles.map((file) => path.resolve(file));
-  const records = files.map((file) => ({ file, relative: canonicalRelativePath(root, file) }));
+  const records = files.map((file) => ({ file, relative: canonicalRelativePath(root, file, componentSourceKinds) }));
   records.sort((left, right) => compareCodeUnits(left.relative, right.relative));
 
   await Promise.all(records.map(async (record) => {
@@ -828,7 +847,7 @@ export async function compileComponentSources({ projectRoot, sourceFiles }) {
         if (sourceTextAfterParse !== record.sourceText) {
           throw new Error(`${record.relative}: source changed while component generation was running; retry generation`);
         }
-        const component = parseSourceFile(sourceFile, record.relative, record.sourceText);
+        const component = parseSourceFile(sourceFile, record.relative, record.sourceText, constants);
         const collision = ids.get(component.componentId);
         if (collision && collision !== record.relative) {
           throw new Error(`component ID collision: ${collision} and ${record.relative} both map to ${component.componentId}`);
@@ -855,22 +874,24 @@ export async function compileComponentSources({ projectRoot, sourceFiles }) {
   }
 }
 
-export async function generateComponentProxies({ projectRoot, sourceFiles, outputRoot = projectRoot, check = false }) {
+export async function generateComponentProxies({ projectRoot, sourceFiles, outputRoot = projectRoot, check = false, componentPolicy }) {
+  const constants = createComponentProxyConstants(componentPolicy);
+  const componentSourceKinds = constants.sourceKinds;
   const root = path.resolve(projectRoot);
   const output = path.resolve(outputRoot);
-  const files = await discoverComponentSources(root);
+  const files = await discoverComponentSources(root, componentSourceKinds);
   if (sourceFiles?.length) {
     const inventory = new Set(files.map((file) => path.resolve(file)));
     for (const requested of sourceFiles) {
       const absolute = path.resolve(requested);
-      canonicalRelativePath(root, absolute);
+      canonicalRelativePath(root, absolute, componentSourceKinds);
       if (!inventory.has(absolute)) {
         throw new Error(`${absolute}: explicit component input is not a regular discovered project source`);
       }
     }
   }
-  const components = await compileComponentSources({ projectRoot: root, sourceFiles: files });
-  const generated = outputsFor(components, output);
+  const components = await compileComponentSources({ projectRoot: root, sourceFiles: files, componentPolicy });
+  const generated = outputsFor(components, output, constants);
   const prior = await previousManifest(output);
 
   const currentOwners = new Map(generated.outputs
@@ -924,4 +945,8 @@ export async function generateComponentProxies({ projectRoot, sourceFiles, outpu
   return { ...generated, stale, defoldResourceStale };
 }
 
-export { componentProxyConstants };
+export {
+  componentAuthoringConventions,
+  componentProxyInvariantConstants,
+  createComponentProxyConstants
+};

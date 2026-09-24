@@ -53,6 +53,7 @@ async function inputs() {
     valueTailText: await text("packages/bindings/generated/defold-script-value-tail-bindings.json"),
     overloadText: await text("packages/bindings/generated/defold-script-overload-dispatch.json"),
     universalPolicyText: await text("packages/bindings/overrides/script-universal-value-bindings.json"),
+    componentPolicyText: await text("packages/bindings/generated/defold-component-proxy-contract.json"),
     urlOverrideText,
     urlSourceTexts,
     valueDefinitions

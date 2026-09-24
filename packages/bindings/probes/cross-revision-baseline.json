@@ -4,7 +4,7 @@
   "controlRevision": "574678c7d44be490d874fbed2d0ae6211feec4d9",
   "controlVersion": "1.13.1",
   "controlRationale": "A stable release that differs from the pinned dev revision along the axes that matter: no bullet3d backend at all, zero ---@alias declarations against the pinned revision's 98, callbacks annotated in the older `function(...)` spelling, and the editor and Lua standard-library surfaces the pinned revision omits.",
-  "totalSteps": 50,
+  "totalSteps": 51,
   "refusingSteps": 0,
   "refusalsByCause": {},
   "steps": []

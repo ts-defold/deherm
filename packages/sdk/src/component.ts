@@ -32,6 +32,8 @@ export interface ComponentDefinition {
   readonly properties?: PropertyMap;
   init?(self: any): void;
   update?(self: any, dt: number): void;
+  lateUpdate?(self: any, dt: number): void;
+  fixedUpdate?(self: any, dt: number): void;
   final?(self: any): void;
   onMessage?(self: any, messageId: DefoldHash, message: any, sender: DefoldUrl): void;
   onInput?(self: any, actionId: DefoldHash, action: any): boolean;
@@ -54,6 +56,8 @@ export class ScriptComponent<Properties extends PropertyMap = PropertyMap> {
 export interface ScriptComponent<Properties extends PropertyMap = PropertyMap> {
   init?(): void;
   update?(dt: number): void;
+  lateUpdate?(dt: number): void;
+  fixedUpdate?(dt: number): void;
   final?(): void;
   onMessage?(messageId: DefoldHash, message: unknown, sender: DefoldUrl): void;
   onInput?(actionId: DefoldHash, action: unknown): boolean;
@@ -121,6 +125,14 @@ export const property = Object.freeze({
   quaternion(_x: number, _y: number, _z: number, _w: number): PropertyDescriptor<ComponentQuaternion, "quaternion"> {
     return descriptor();
   },
+  /**
+   * Revision-parametric resource property. Use this when a selected Defold
+   * policy exposes a resource constructor newer than the convenience methods
+   * below; the component compiler validates `kind` against that policy.
+   */
+  resource<const Kind extends string>(_kind: Kind, _path?: string): PropertyDescriptor<DefoldResource<Kind>, "resource"> {
+    return descriptor();
+  },
   atlas(_path?: string): PropertyDescriptor<DefoldResource<"atlas">, "atlas"> {
     return descriptor();
   },
@@ -155,6 +167,8 @@ const classInstanceSlot = "__deherm_component_class_instance_v1";
 interface InternalClassInstance {
   init?: () => void;
   update?: (dt: number) => void;
+  lateUpdate?: (dt: number) => void;
+  fixedUpdate?: (dt: number) => void;
   final?: () => void;
   onMessage?: (messageId: DefoldHash, message: unknown, sender: DefoldUrl) => void;
   onInput?: (actionId: DefoldHash, action: unknown) => boolean;
@@ -215,6 +229,20 @@ export function component<
   if (typeof update === "function") {
     definition.update = function classUpdate(self, dt): void {
       update.call(ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames), dt);
+    };
+  }
+
+  const lateUpdate = prototype.lateUpdate;
+  if (typeof lateUpdate === "function") {
+    definition.lateUpdate = function classLateUpdate(self, dt): void {
+      lateUpdate.call(ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames), dt);
+    };
+  }
+
+  const fixedUpdate = prototype.fixedUpdate;
+  if (typeof fixedUpdate === "function") {
+    definition.fixedUpdate = function classFixedUpdate(self, dt): void {
+      fixedUpdate.call(ensureClassInstance(InternalType, self as InternalComponentSelf, propertyNames), dt);
     };
   }
 
