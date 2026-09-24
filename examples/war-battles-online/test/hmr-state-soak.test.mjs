@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -22,6 +25,7 @@ import {
   ownedPosixGroupAlive,
   parseCliEventLine,
   parseReloadMarker,
+  restoreHarnessOwnedGeneratedFile,
   runtimeErrorFromEvents,
   snapshotFromState,
   stopOwnedProcessTree,
@@ -290,6 +294,20 @@ test("installed HMR cleanup restores source state even when process cleanup fail
     /tree cleanup failed/,
   );
   assert.equal(restored, true);
+});
+
+test("installed HMR restores or removes its generated lock state", async (context) => {
+  const root = await mkdtemp(join(tmpdir(), "deherm-hmr-lock-"));
+  context.after(() => rm(root, { recursive: true, force: true }));
+  const lock = join(root, "deherm.lock");
+  await writeFile(lock, "before\n");
+  await writeFile(lock, "temporary-hmr-build\n");
+  await restoreHarnessOwnedGeneratedFile(lock, "before\n");
+  assert.equal(await readFile(lock, "utf8"), "before\n");
+
+  await writeFile(lock, "created-by-hmr\n");
+  await restoreHarnessOwnedGeneratedFile(lock, undefined);
+  await assert.rejects(() => readFile(lock, "utf8"), { code: "ENOENT" });
 });
 
 test("installed package tree identity is deterministic and excludes dependency links", async () => {

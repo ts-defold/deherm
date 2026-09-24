@@ -2,7 +2,7 @@
 
 import { execFile as execFileCallback, spawn } from "node:child_process";
 import { createHash } from "node:crypto";
-import { access, mkdtemp, readFile, readdir, rm, symlink, writeFile } from "node:fs/promises";
+import { access, mkdtemp, readFile, readdir, rm, symlink, unlink, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import path from "node:path";
 import { tmpdir } from "node:os";
@@ -116,6 +116,25 @@ export async function cleanupOwnedHmrRun({ stopOwnedTree, childClosed, restoreOw
   if (failures.length === 1) throw failures[0];
   if (failures.length > 1)
     throw new AggregateError(failures, "installed HMR cleanup and source restoration both failed");
+}
+
+export async function restoreHarnessOwnedGeneratedFile(file, original) {
+  if (original === undefined) {
+    try {
+      await unlink(file);
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+    }
+    return;
+  }
+  await writeFile(file, original);
+}
+
+async function readOptionalFile(file) {
+  return readFile(file).catch((error) => {
+    if (error?.code === "ENOENT") return undefined;
+    throw error;
+  });
 }
 
 export async function installedPackageTreeSha256(packageRoot) {
@@ -324,7 +343,15 @@ export function snapshotFromState(state, gameplay = {}) {
 export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, installedPackageRoot }) {
   const projectRoot = path.join(exampleRoot, "defold");
   const sourceFile = path.join(projectRoot, "main/arena.script.ts");
+  const lockFile = path.join(projectRoot, "deherm.lock");
   const originalSource = await readFile(sourceFile, "utf8");
+  const originalLock = await readOptionalFile(lockFile);
+  const applicationArtifacts = [
+    path.join(projectRoot, "deherm/app.dehermc"),
+    path.join(projectRoot, "deherm/app.dehermc.hbc"),
+    path.join(projectRoot, "deherm/app.dehermc.map"),
+  ];
+  const originalApplicationArtifacts = await Promise.all(applicationArtifacts.map(readOptionalFile));
   if (!originalSource.includes('logHmrState(self, "baseline")'))
     throw new Error("arena.script.ts is missing the production HMR marker");
   let packageBoundary;
@@ -436,10 +463,35 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
   let closed = false;
 
   const restoreOwnedFiles = async () => {
-    const current = await readFile(sourceFile, "utf8");
-    if (current === lastWrittenSource) await writeFile(sourceFile, originalSource);
-    else if (current !== originalSource) throw new Error("arena.script.ts changed externally; left it untouched");
-    if (packageBoundary.stage) await rm(packageBoundary.stage, { recursive: true, force: true });
+    const failures = [];
+    try {
+      const current = await readFile(sourceFile, "utf8");
+      if (current === lastWrittenSource) await writeFile(sourceFile, originalSource);
+      else if (current !== originalSource) throw new Error("arena.script.ts changed externally; left it untouched");
+    } catch (error) {
+      failures.push(error);
+    }
+    try {
+      // The installed CLI owns this generated lock for the lifetime of the
+      // isolated HMR run. Restore the consumer's pre-run state after the owned
+      // process tree has closed so temporary entry points and source digests
+      // cannot poison a later build.
+      await restoreHarnessOwnedGeneratedFile(lockFile, originalLock);
+      await Promise.all(
+        applicationArtifacts.map((file, index) =>
+          restoreHarnessOwnedGeneratedFile(file, originalApplicationArtifacts[index]),
+        ),
+      );
+    } catch (error) {
+      failures.push(error);
+    }
+    try {
+      if (packageBoundary.stage) await rm(packageBoundary.stage, { recursive: true, force: true });
+    } catch (error) {
+      failures.push(error);
+    }
+    if (failures.length === 1) throw failures[0];
+    if (failures.length > 1) throw new AggregateError(failures, "installed HMR file restoration failed");
   };
   const cleanupOwnedRun = async () => {
     await cleanupOwnedHmrRun({ stopOwnedTree, childClosed, restoreOwnedFiles });

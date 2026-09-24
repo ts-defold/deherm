@@ -739,8 +739,15 @@ leader exits, escalating from `SIGTERM` to `SIGKILL` on group liveness. Windows
 uses `taskkill /T`, escalating to `/F`; failure to address the original tree is
 an error even when the CLI leader has already exited, because leader exit is
 not descendant-exit evidence. Process cleanup failure cannot skip restoration
-of the temporary source edit. These paths are covered by platform-neutral unit
-tests while live Windows cleanup remains host-parity evidence. The standalone
+of the temporary source edit. The installed CLI also rewrites the generated
+`deherm.lock` and application bundle artifacts for the harness-only
+`arena.script.ts` entry and each temporary source fingerprint. The harness now
+snapshots those files before launch and restores their exact pre-run state only
+after the owned process tree closes; if one did not exist before the run, the
+harness removes the file it created. This keeps a successful or failed HMR
+proof from changing the consumer project's next build. These paths are covered
+by platform-neutral unit tests while live
+Windows cleanup remains host-parity evidence. The standalone
 1,000-cycle sanitizer run and installed War Battles
 soak remain separately named evidence rather than being promoted into one
 another. This closes the measured state-preservation boundary in

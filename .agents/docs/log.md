@@ -3159,3 +3159,24 @@ emitted seven telemetry samples, and peaked at 56 components. This is native
 macOS packed-package HMR and telemetry evidence. Non-reloadable Defold resource
 changes remain rebuild-and-restart behavior, and the hosted production Extender
 remains incompatible with this pinned dev SDK.
+
+## 2026-09-24 - Installed HMR proof leaves the project unchanged
+
+A fresh rerun reproduced the repaired six-cycle transaction through the packed
+npm package and pinned local Extender: 40 entities survived, the baseline held
+51 components, seven runtime telemetry samples arrived, and transient gameplay
+peaked at 56 components. Running the command inside the restricted network
+sandbox instead failed before engine launch with the surfaced policy-fetch
+error; that is environment evidence, not a runtime activation failure.
+
+The successful proof exposed a separate harness side effect. The installed CLI
+correctly regenerated `defold/deherm.lock` for its harness-only
+`main/arena.script.ts` entry and temporary edit fingerprint, but cleanup only
+restored the authored TypeScript source. The same run also replaced the
+application bytecode and its sidecars, leaving the restored lock inconsistent
+with the next build. The driver now treats the generated lock and application
+artifacts as part of its owned transaction: it snapshots the exact pre-run
+bytes, waits for the complete CLI/Bob/engine process tree to close, then
+restores each file or removes it when the pre-run state was absent. A focused
+filesystem test covers both cases. Runtime behavior and cleanup evidence remain
+separate.
