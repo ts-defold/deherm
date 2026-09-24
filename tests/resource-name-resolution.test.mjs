@@ -202,6 +202,12 @@ test("project message projection is deterministic, route-scoped, and ignores unr
   assert.deepEqual(first.routes, {
     "MsgApi.post": { parameter: 1, role: "message-id", names: "projectMessages.names" }
   });
+  assert.deepEqual(first.receiver, {
+    role: "message-id",
+    names: "projectMessages.names",
+    evidence: "receiverEvidence",
+    prefix: "#"
+  });
   assert.deepEqual(first.names.map(({ name }) => name), ["zeta"]);
   assert.deepEqual(first.names[0].senderEvidence.map(({ source }) => source), ["main/z.script.ts"]);
   assert.deepEqual(first.names[0].receiverEvidence, []);

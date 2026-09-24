@@ -699,6 +699,12 @@ export function buildProjectMessages(sourceTexts) {
     routes: {
       "MsgApi.post": { parameter: 1, role: "message-id", names: "projectMessages.names" }
     },
+    receiver: {
+      role: "message-id",
+      names: "projectMessages.names",
+      evidence: "receiverEvidence",
+      prefix: "#"
+    },
     names: merged,
     skippedSources
   };

@@ -27,6 +27,10 @@ import {
   assertWebTransportEvidence,
   buildWebTransportSourceInputs,
 } from "./webtransport-evidence.mjs";
+import {
+  buildWarBattlesStaticHermesProjection,
+  assertWarBattlesStaticHermesProjection,
+} from "../../../scripts/generate-war-battles-static-hermes-projection.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
@@ -87,6 +91,19 @@ export async function checkProjectionEvidence() {
     });
   } catch (error) {
     failures.push(`browser-webtransport-loopback evidence is stale or malformed: ${error.message}`);
+  }
+  try {
+    const staticDeclaration = WAR_BATTLES_PROJECTIONS["native-arm64-macos-static-hermes-reachable"];
+    const staticEvidencePath = resolve(exampleRoot, staticDeclaration.evidence);
+    const staticEvidenceText = await readFile(staticEvidencePath, "utf8");
+    const staticEvidence = JSON.parse(staticEvidenceText);
+    assertWarBattlesStaticHermesProjection(staticEvidence);
+    const regenerated = await buildWarBattlesStaticHermesProjection();
+    if (staticEvidenceText !== `${JSON.stringify(regenerated, null, 2)}\n`) {
+      throw new Error("checked-in generated evidence differs from current release reachability and adapter inputs");
+    }
+  } catch (error) {
+    failures.push(`native-arm64-macos-static-hermes-reachable evidence is stale or malformed: ${error.message}`);
   }
   if (failures.length) {
     throw new Error(`War Battles projection evidence is incomplete:\n  - ${failures.join("\n  - ")}`);

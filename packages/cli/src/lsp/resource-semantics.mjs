@@ -470,7 +470,8 @@ function routeCatalog(table, tokens) {
     const moduleName = moduleIndex >= 0 ? tokens[moduleIndex].value : null;
     const canonicalModule = generatedSdkModules.has(moduleName);
     let cursor = index + 1;
-    if (tokens[cursor]?.value === "type") cursor += 1;
+    const typeOnlyImport = tokens[cursor]?.value === "type";
+    if (typeOnlyImport) cursor += 1;
     if (tokens[cursor]?.kind === "identifier") {
       // Neither public package defines a default SDK namespace. A default
       // import with a Defold-shaped local name must therefore shadow it.
@@ -485,17 +486,18 @@ function routeCatalog(table, tokens) {
       if (close !== undefined && close < statementEnd) {
         for (const [start, end] of topLevelSegments(tokens, cursor + 1, close)) {
           let position = start;
-          if (tokens[position]?.value === "type") position += 1;
+          const typeOnlySpecifier = tokens[position]?.value === "type";
+          if (typeOnlySpecifier) position += 1;
           const imported = tokens[position];
           if (imported?.kind !== "identifier") continue;
           const local = tokens[position + 1]?.value === "as" && tokens[position + 2]?.kind === "identifier"
             ? tokens[position + 2].value
             : imported.value;
           let binding = BLOCKED_BINDING;
-          if (canonicalModule && knownNamespaces.has(imported.value)) {
-            binding = { kind: "sdk-module", namespace: imported.value };
-          } else if (canonicalModule && knownWrappers.has(imported.value)) {
-            binding = { kind: "sdk-wrapper", wrapper: imported.value };
+          if (canonicalModule && !typeOnlyImport && !typeOnlySpecifier && knownNamespaces.has(imported.value)) {
+            binding = { kind: "sdk-module", namespace: imported.value, imported: true };
+          } else if (canonicalModule && !typeOnlyImport && !typeOnlySpecifier && knownWrappers.has(imported.value)) {
+            binding = { kind: "sdk-wrapper", wrapper: imported.value, imported: true };
           }
           if (knownNamespaces.has(local) || knownWrappers.has(local) || binding !== BLOCKED_BINDING) {
             scopes.bind(scopes.root, local, binding);
@@ -698,7 +700,19 @@ function directLiteralFromRange(tokens, range, literalIndex, resolve) {
   return null;
 }
 
-function semanticContextAt(table, text, position) {
+function receiverEvidenceAt(table, relativeDocument, text, literal, position) {
+  if (!relativeDocument || !literal) return false;
+  const line = position.line + 1;
+  // `sourceLocation` records the opening quote as a one-based column, and the
+  // scanner token start is the same opening quote in a zero-based offset.
+  const lineStart = text.lastIndexOf("\n", literal.start - 1) + 1;
+  const column = literal.start - lineStart + 1;
+  return (table.projectMessages?.names ?? []).some((entry) =>
+    (entry.receiverEvidence ?? []).some((site) =>
+      site.source === relativeDocument && site.line === line && site.column === column));
+}
+
+function semanticContextAt(table, text, position, relativeDocument = null) {
   const offset = positionOffset(text, position);
   const tokens = scanTokens(text);
   const literalIndex = tokens.findIndex((token) => token.kind === "string" && offset > token.start && offset <= token.end);
@@ -744,6 +758,23 @@ function semanticContextAt(table, text, position) {
         ? staticStringFromRange(tokens, ranges[parameter.addressParameter], resolve)
         : null
     };
+  }
+  // Receiver message ids are a separate generated projection. They are not
+  // ordinary Defold resource declarations and do not occur as a callable API
+  // argument, so join only the canonical hashLiteral wrapper and the exact
+  // evidence coordinate produced by the bounded project-message scanner.
+  const receiver = table.projectMessages?.receiver;
+  const receiverBinding = receiver?.names === "projectMessages.names"
+    ? resolve("hashLiteral", literalIndex)
+    : null;
+  const literal = tokens[literalIndex];
+  if (receiverBinding?.kind === "sdk-wrapper" && receiverBinding.wrapper === "hashLiteral" &&
+      receiverBinding.imported === true &&
+      tokens[literalIndex - 1]?.value === "(" && tokens[literalIndex - 2]?.kind === "identifier" &&
+      tokens[literalIndex - 2]?.value === "hashLiteral" &&
+      tokens[literalIndex + 1]?.value === ")" &&
+      receiverEvidenceAt(table, relativeDocument, text, literal, position)) {
+    return { kind: "project-message", routeKey: "projectMessages.receiver", argumentIndex: 0, descriptor: receiver };
   }
   return null;
 }
@@ -799,18 +830,21 @@ function resourceSymbolsForContext(table, projectRoot, relativeDocument, context
 function projectMessageSymbols(table, projectRoot, descriptor) {
   const symbols = new Map();
   for (const entry of table.projectMessages?.names ?? []) {
+    const candidateEvidence = descriptor?.evidence ? entry[descriptor.evidence] ?? [] : null;
+    if (candidateEvidence && candidateEvidence.length === 0) continue;
     const evidence = [...(entry.receiverEvidence ?? []), ...(entry.senderEvidence ?? [])];
     const receiverCount = entry.receiverEvidence?.length ?? 0;
     const senderCount = entry.senderEvidence?.length ?? 0;
+    const name = `${descriptor?.prefix ?? ""}${entry.name}`;
     const documentation = `Project message identifier from static TypeScript evidence (${receiverCount} receiver${receiverCount === 1 ? "" : "s"}, ${senderCount} sender${senderCount === 1 ? "" : "s"}).`;
     if (!evidence.length) {
-      addSymbol(symbols, { insertText: entry.name, label: entry.name, detail: descriptor.role, documentation, kind: 18, location: null });
+      addSymbol(symbols, { insertText: name, label: name, detail: descriptor.role, documentation, kind: 18, location: null });
       continue;
     }
     for (const site of evidence) {
       addSymbol(symbols, {
-        insertText: entry.name,
-        label: entry.name,
+        insertText: name,
+        label: name,
         detail: descriptor.role,
         documentation,
         kind: 18,
@@ -822,7 +856,7 @@ function projectMessageSymbols(table, projectRoot, descriptor) {
 }
 
 function symbolsAt(table, projectRoot, relativeDocument, text, position) {
-  const context = semanticContextAt(table, text, position);
+  const context = semanticContextAt(table, text, position, relativeDocument);
   const symbols = context?.kind === "resource"
     ? resourceSymbolsForContext(table, projectRoot, relativeDocument, context)
     : context?.kind === "project-message"

@@ -129,6 +129,29 @@ export const WAR_BATTLES_PROJECTIONS = Object.freeze({
       "the gameplay markers themselves, which the `native-arm64-macos` projection owns",
     ],
   }),
+  "native-arm64-macos-static-hermes-reachable": declare({
+    id: "native-arm64-macos-static-hermes-reachable",
+    title: "Reachable-only Static Hermes War Battles adapter projection",
+    runtime: "hermes",
+    transport: ["typed-native"],
+    reachableSet: "reachable",
+    profile: "release",
+    stage: "generated-adapter-evidence",
+    evidence: "evidence/static-hermes-reachable-arm64-macos.json",
+    producer: "node scripts/generate-war-battles-static-hermes-projection.mjs",
+    observed: [
+      "Release TypeScript reachability is dynamic-access-free and selects a named reachable route set for the War Battles project.",
+      "The canonical lowering plan selects the Static Hermes C ABI for the retained routes and preserves any blocked reachable routes as explicit blockers.",
+      "The packaged typed-native census provides adapter evidence for the subset of retained routes that the real Dynamic Hermes game crossed over the generated typed-native adapter."
+    ],
+    excluded: [
+      "full Static Hermes gameplay: no packaged War Battles application has executed entirely as a Static Hermes application",
+      "Static Hermes compilation and linkage: those remain separate shermes and Extender build gates",
+      "Defold implementation semantics, visual correctness, allocation, and performance",
+      "routes blocked by the canonical lowering plan, which remain listed rather than silently falling back",
+      "the complete generated script or dmSDK surface"
+    ]
+  }),
   "browser-webtransport-loopback": declare({
     id: "browser-webtransport-loopback",
     title: "Production browser client and Deno server exchanging War Battles protocol traffic over loopback HTTP/3/WebTransport",

@@ -37,10 +37,10 @@
   "playerId": 1,
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
-  "observedSnapshotsApplied": 4,
-  "observedInputsSent": 14,
-  "lastServerTick": 45,
-  "lastLocalTick": 49,
+  "observedSnapshotsApplied": 3,
+  "observedInputsSent": 9,
+  "lastServerTick": 90,
+  "lastLocalTick": 93,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -85,8 +85,8 @@
     {
       "path": "examples/war-battles-online/integration/projections.mjs",
       "kind": "file",
-      "bytes": 11002,
-      "sha256": "7398c64c7292c7e2e635b285b90f2d5967c5b2e2d53a5cdf2e696100bdc2a9cc"
+      "bytes": 12498,
+      "sha256": "85cf1d332ef07fda562a62255db70e55ccb9ad214e3c66b0be88b279b33ab4da"
     },
     {
       "path": "examples/war-battles-online/integration/webtransport-evidence.mjs",
@@ -109,8 +109,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 43570,
-      "sha256": "500089741a64c128fe60097e152facca7d9cfa49b696260263407793d299f7ba"
+      "bytes": 44024,
+      "sha256": "50f917a658d5c1de61d738fd4915be7bcdd6cfa73b2721fa183b5dd5bdf44fa5"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -125,6 +125,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "a38385756a59545a4c26270e4db8f74defaecf1597813a85fa169bb10376533b",
+  "sourceKey": "d2481d216e8bcae77ac4456bb9b6bfab6fd9d520c5328b99806f6811107b6c5a",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence."
 }

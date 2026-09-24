@@ -56,6 +56,12 @@ The protocol observation returned all of the following:
   line 6. The project currently has no authored `.render.ts` component, so this
   is a route/context projection check, not a claim of a shipped War Battles
   render source file.
+* Receiver-side project message literals now use the generated
+  `projectMessages.receiver` projection: a canonical
+  `hashLiteral("#add_score")` at an evidence coordinate offers only receiver-
+  evidenced message ids, with hover and definition retaining the bounded
+  sender/receiver evidence locations. An arbitrary `hashLiteral(...)` outside
+  that coordinate remains empty.
 * `textDocument/diagnostic` returned `-32601 Method not found`. This is the
   intended ownership boundary: the deherm server advertises completion, hover,
   and definition only; ordinary TypeScript diagnostics remain VS Code's
@@ -66,7 +72,8 @@ Focused verification passed:
 ```text
 /tmp/deherm-installed/node_modules/@ts-defold/deherm/bin/deherm.mjs typecheck --project examples/war-battles-online/defold
 # ok TypeScript contexts: shared, game-object, GUI, render
-pnpm test:lsp       # 11 passed
+pnpm test:lsp       # 12 passed
+pnpm test:resource-names # 22 passed
 pnpm test:vscode    # 15 passed
 pnpm package:vscode # VSIX emitted, client-only manifest
 git diff --check
@@ -78,3 +85,9 @@ macOS desktop was locked, and native-app UI automation reported that it could
 not unlock the display. No visual claim is made here; the literal VS Code visual
 observation remains open until an unlocked Extension Host session can be
 observed.
+
+The receiver projection is intentionally narrower than sender projection: it
+requires the generated static-evidence source, one-based line/column join, and
+the canonical SDK `hashLiteral` wrapper. Missing, stale, dynamic, shadowed, or
+unrelated receiver code therefore fails closed and does not create a diagnostic
+or a broad project-wide message list.

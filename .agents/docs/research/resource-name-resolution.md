@@ -155,6 +155,10 @@ context:
   game-object component and bound resource;
 * `component-address` offers only the current game object's `#components` and
   its collection's `/instances` and `/instance#component` addresses.
+* `projectMessages.receiver` offers only `#`-prefixed message ids whose generated static
+  evidence identifies the current canonical `hashLiteral(...)` token as an
+  `onMessage` comparison. Sender and receiver evidence locations remain the
+  only navigation targets; an arbitrary hash literal is not promoted.
 
 A string must be the entire argument expression, or the sole argument of an
 exact `address(...)`/`hashLiteral(...)` wrapper. A nested helper call, suffix,
@@ -205,6 +209,7 @@ must never reject a build or produce an unknown-message diagnostic.
 | Project symbol table | `tests/fixtures/resource-names` built through `buildProjectResourceSymbols` plus the multi-material unit fixture | Declarations with source lines, game-object bindings, collection instances, all five component attachments, and deterministic same-extension resource lists |
 | Project message evidence | Focused scanner and project-table tests | Deterministic sender/receiver separation, canonical-package import gating, exact authored locations, lexical-shadow and regex rejection, no mixing with resource declarations, and dynamic-expression silence |
 | Language service route join | `tests/language-server.test.mjs` over generated-table-shaped fixtures | Exact call/argument filtering across all three scopes, namespace-only dynamic fallback, project-message opt-in, CRLF/UTF-16 safety, and completion/hover/definition parity |
+| Receiver message route join | `tests/language-server.test.mjs` plus `projectMessages.receiver` metadata | Canonical `hashLiteral(...)` receiver evidence gets bounded completion/hover/definition; unrelated literals stay empty |
 | Actual ttsc host | Pinned `ttsc` compiles the fixture projects through the package plugin descriptor | A GUI node/layer/font/layout typo, a sprite animation typo, a `#component` typo, and a `/instance` typo each produce a diagnostic naming the namespace, the declaring resource, and the candidates |
 | Fail-open | The same host compiles a component whose names are computed, templated, read from state, or context-relative | No diagnostic; removing the symbol table restores the previous behavior exactly |
 
@@ -237,6 +242,12 @@ must never reject a build or produce an unknown-message diagnostic.
   inferred; those forms receive no route-specific claim. Slash classification
   follows expression-ending token state, and ambiguous post-block slashes fail
   closed as opaque regex text.
+* Receiver message navigation joins generated one-based source coordinates to
+  the current LSP token. If the generated table is stale or the source moves,
+  the join fails closed until generation refreshes it.
+* Receiver lookup also requires a real value import of `hashLiteral` from a
+  canonical generated SDK module. Ambient-looking names, missing imports, and
+  `import type` declarations do not authenticate runtime wrapper semantics.
 
 # Focused verification
 

@@ -93,7 +93,9 @@ below without changing its completion rule.
    with zero omissions. Generated route/argument metadata now also drives
    scoped completion, hover, and definition for attached resources,
    addressed-component resources, component addresses, and separately derived
-   project message ids; real War Battles queries prove the joins. Public
+   project message ids; real War Battles queries prove the joins. Receiver-side
+   `hashLiteral(...)` message ids now join only generated `onMessage` evidence
+   coordinates, while unrelated or stale literals fail closed. Public
    TypeScript ergonomics and extension ingestion are now complete: contextual
    hash literals, the `defold` namespace, function/class component adapters,
    context-specific projects, generated properties and documentation, and
@@ -318,6 +320,16 @@ invalidate otherwise identical native evidence. Installed-TUI HMR proof is
 complete through the packed-package path. The remaining work in this tranche
 is the multiplayer expansion;
 literal VS Code visual observation remains a tooling-tranche debt.
+
+The next Static Hermes seam is now recorded separately as the generated
+`native-arm64-macos-static-hermes-reachable` projection. The release usage
+manifest is dynamic-access-free and currently selects 17 of the 27 reachable
+War Battles routes for the sound typed-native lane; 10 reachable routes remain
+blocked with machine-readable lowering reasons. The packaged Dynamic Hermes
+typed-native census observes 14 of those selected routes. This is the strongest
+current product projection, but it is not Static Hermes gameplay evidence:
+full application execution, compilation/linkage, and Defold semantics remain
+separate gates.
 
 1. Make the tutorial-faithful game playable with real tutorial art, correctly
    sliced/anchored animation, tint/material effects, input, GUI, audio,

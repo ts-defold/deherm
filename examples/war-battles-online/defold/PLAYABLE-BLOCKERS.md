@@ -7,6 +7,24 @@ is retained, unbuilt, under [`reference/`](./reference/README.md).
 
 ## Current native and browser evidence
 
+### Reachable-only Static Hermes projection
+
+The project now records a separate generated Static Hermes projection at
+[`../evidence/static-hermes-reachable-arm64-macos.json`](../evidence/static-hermes-reachable-arm64-macos.json).
+Run `node bin/deherm.mjs typecheck --project examples/war-battles-online/defold
+--release` before generating it; the generator then reads the release usage
+manifest, canonical lowering plan, and typed-native adapter census. The current
+record has 27 reachable routes, 17 selected for Static Hermes, and 10 retained
+as explicit blockers. Fourteen selected routes were observed crossing the
+typed-native adapter in the packaged Dynamic Hermes run.
+
+This is an honest product projection, not a gameplay claim: no packaged War
+Battles application has executed entirely as Static Hermes yet. The record
+keeps compilation, linkage, engine semantics, visual behavior, and the three
+selected routes not exercised by the bounded gameplay transcript out of the
+claim. `pnpm check:war-battles-projections` regenerates the record in memory and
+fails if the checked-in evidence or any named blocker drifts.
+
 The two checked evidence documents -
 [`../evidence/packaged-runtime-arm64-macos.json`](../evidence/packaged-runtime-arm64-macos.json)
 and [`../evidence/browser-runtime-wasm-web.json`](../evidence/browser-runtime-wasm-web.json)

@@ -294,9 +294,9 @@ node scripts/assemble-typed-native-extension.mjs \
   --project examples/war-battles-online/defold --target <platform> --reconcile
 ```
 
-## The three projections
+## The five projections
 
-This port runs in three projections of the same IR, and each carries its own
+This port has five named projections of the same IR, and each carries its own
 evidence because each is a first-class artifact rather than a variant of
 another. The set is declared in
 [`../integration/projections.mjs`](../integration/projections.mjs) and checked
@@ -308,9 +308,20 @@ projection has no evidence.
 | `native-arm64-macos` | `hermes` | `jsi` + `typed-native` | engine-detected | `pnpm --filter @deherm/example-war-battles-online runtime:packaged` |
 | `browser-wasm-web` | `browser` | `direct-memory` | browser | `pnpm test:html5:war-battles` |
 | `native-arm64-macos-typed-native-transport` | `hermes` | `typed-native` + `jsi` | `DEHERM_PROFILE` | `node integration/check-typed-native-transport.mjs --run <slot>` |
+| `native-arm64-macos-static-hermes-reachable` | `hermes` | `typed-native` | release reachable subset | `node scripts/generate-war-battles-static-hermes-projection.mjs` |
+| `browser-webtransport-loopback` | `browser` + `deno` | `webtransport-h3` | loopback P-256 pinned | `pnpm --filter @deherm/example-war-battles-online runtime:webtransport` |
 
 None of them claims visual correctness: every one reads markers, engine state,
 or a transport census, and nothing here can inspect a window or a canvas.
+
+The fourth row is intentionally narrower than packaged gameplay. It is the
+strongest current Static Hermes product projection: release typecheck proves a
+dynamic-access-free reachable set, the canonical lowering plan selects the
+sound typed-native subset and preserves blocked routes, and the packaged
+typed-native census shows which of that subset crossed the generated adapter
+in a real Dynamic Hermes run. It does not claim that the full game has run as a
+Static Hermes application; compilation, linkage, and gameplay remain separate
+gates.
 
 ## Graceful shutdown and component teardown
 

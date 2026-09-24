@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { PassThrough } from "node:stream";
@@ -9,6 +9,7 @@ import { pathToFileURL } from "node:url";
 import { applyContentChanges, runLanguageServer } from "../packages/cli/src/lsp/server.mjs";
 import { createContentLengthJsonTransport } from "../packages/cli/src/protocol/content-length-json.mjs";
 import { createResourceSemanticIndex, semanticContextAt } from "../packages/cli/src/lsp/resource-semantics.mjs";
+import { buildProjectMessages } from "../packages/compiler/src/resource-symbol-table.mjs";
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-lsp-"));
@@ -479,13 +480,14 @@ test("dynamic addressed resources fail open to the route namespace and recognize
   assert.equal(await index.definition(uri, receiver, messagePosition), null);
 });
 
-test("optional project-message evidence serves only msg.post message ids", async () => {
+test("project-message evidence scopes sender and receiver message ids", async () => {
   const root = await fixture();
   const table = symbols({
     projectMessages: {
       schemaVersion: 1,
       evidenceBoundary: "static-project-typescript-evidence",
       routes: { "MsgApi.post": { parameter: 1, role: "message-id", names: "projectMessages.names" } },
+      receiver: { role: "message-id", names: "projectMessages.names", evidence: "receiverEvidence", prefix: "#" },
       names: [{
         name: "add_score",
         senderEvidence: [{ kind: "msg-post-literal", source: "main/player.script.ts", line: 12, column: 25 }],
@@ -514,6 +516,79 @@ test("optional project-message evidence serves only msg.post message ids", async
     [pathToFileURL(path.join(root, "main", "hud.gui.ts")).href, { line: 14, character: 30 }],
     [pathToFileURL(path.join(root, "main", "player.script.ts")).href, { line: 11, character: 24 }]
   ]);
+
+  const receiverUri = pathToFileURL(path.join(root, "main", "hud.gui.ts")).href;
+  const receiverText = [
+    'import { hashLiteral } from "@deherm/project";',
+    'export default defineComponent({ onMessage(messageId) {',
+    '  if (messageId === hashLiteral("#add_score")) return;',
+    '});'
+  ].join("\n");
+  table.projectMessages.names[0].receiverEvidence = [{
+    kind: "on-message-hash-comparison",
+    source: "main/hud.gui.ts",
+    line: 3,
+    column: 33,
+    constant: "ADD_SCORE"
+  }];
+  await writeFile(path.join(root, ".deherm", "generated", "resource-symbols.json"), `${JSON.stringify(table)}\n`);
+  index.invalidate();
+  const receiverPosition = positionOf(receiverText, "#add_score", 0, 3);
+  const receiverCompletion = await index.complete(receiverUri, receiverText, receiverPosition);
+  assert.deepEqual(receiverCompletion.map(({ label }) => label), ["#add_score"]);
+  const receiverHover = await index.hover(receiverUri, receiverText, receiverPosition);
+  assert.match(receiverHover.contents.value, /static TypeScript evidence/u);
+  const receiverDefinition = await index.definition(receiverUri, receiverText, receiverPosition);
+  assert.deepEqual(receiverDefinition.map(({ uri: definitionUri, range }) => [definitionUri, range.start]), [
+    [pathToFileURL(path.join(root, "main", "hud.gui.ts")).href, { line: 2, character: 32 }],
+    [pathToFileURL(path.join(root, "main", "player.script.ts")).href, { line: 11, character: 24 }]
+  ]);
+
+  const unrelatedReceiver = 'import { hashLiteral } from "@deherm/project"; hashLiteral("#add_score");';
+  const unrelatedPosition = positionOf(unrelatedReceiver, "#add_score", 0, 3);
+  assert.deepEqual(await index.complete(receiverUri, unrelatedReceiver, unrelatedPosition), []);
+  assert.equal(await index.hover(receiverUri, unrelatedReceiver, unrelatedPosition), null);
+  assert.equal(await index.definition(receiverUri, unrelatedReceiver, unrelatedPosition), null);
+
+  const staleReceiver = receiverText.replace(
+    'hashLiteral("#add_score")',
+    'hashLiteral("#add_score", messageId)'
+  );
+  const stalePosition = positionOf(staleReceiver, "#add_score", 0, 3);
+  assert.deepEqual(await index.complete(receiverUri, staleReceiver, stalePosition), []);
+  assert.equal(await index.hover(receiverUri, staleReceiver, stalePosition), null);
+  assert.equal(await index.definition(receiverUri, staleReceiver, stalePosition), null);
+
+  const missingImport = receiverText.replace(
+    'import { hashLiteral } from "@deherm/project";',
+    ' '.repeat('import { hashLiteral } from "@deherm/project";'.length)
+  );
+  const missingImportPosition = positionOf(missingImport, "#add_score", 0, 3);
+  assert.deepEqual(await index.complete(receiverUri, missingImport, missingImportPosition), []);
+
+  const typeOnlyImport = receiverText.replace(
+    'import { hashLiteral }',
+    'import type { hashLiteral }'
+  );
+  const typeOnlyPosition = positionOf(typeOnlyImport, "#add_score", 0, 3);
+  assert.deepEqual(await index.complete(receiverUri, typeOnlyImport, typeOnlyPosition), []);
+});
+
+test("real generated receiver evidence resolves authored Defold hash literals", async () => {
+  const root = await fixture();
+  const realSourcePath = path.resolve("examples/war-battles-online/defold/main/ui.gui.ts");
+  const text = await readFile(realSourcePath, "utf8");
+  const table = symbols({ projectMessages: buildProjectMessages(new Map([["main/ui.gui.ts", text]])) });
+  await writeFile(path.join(root, "main", "ui.gui.ts"), text);
+  await writeFile(path.join(root, ".deherm", "generated", "resource-symbols.json"), `${JSON.stringify(table)}\n`);
+  const index = createResourceSemanticIndex(root);
+  const uri = pathToFileURL(path.join(root, "main", "ui.gui.ts")).href;
+  const position = positionOf(text, "#add_score", 0, 3);
+  assert.deepEqual((await index.complete(uri, text, position)).map(({ label }) => label), ["#add_score"]);
+  assert.match((await index.hover(uri, text, position)).contents.value, /1 receiver/u);
+  const definitions = await index.definition(uri, text, position);
+  assert.equal(definitions.length, 1);
+  assert.deepEqual(definitions[0].range.start, { line: 21, character: 30 });
 });
 
 test("missing generated semantics is an actionable request error, not a server crash", async () => {

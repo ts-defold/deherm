@@ -59,7 +59,7 @@ projection carries its own evidence**. See
 [`../decisions/release-reachability-and-native-lowering.md`](../decisions/release-reachability-and-native-lowering.md).
 
 War Battles is the first product example to exist in more than one at once, and
-its three runtime records are declared as a set in
+its five projection records are declared as a set in
 `examples/war-battles-online/integration/projections.mjs`. Each declaration
 names the four parameters, what its evidence observed, and what it explicitly
 does not claim; each evidence document embeds that declaration verbatim, and
@@ -72,11 +72,21 @@ rather than a silence.
 | `native-arm64-macos` | `hermes` | `jsi` + `typed-native` | complete | engine-detected | `evidence/packaged-runtime-arm64-macos.json` |
 | `browser-wasm-web` | `browser` | `direct-memory` | complete | browser | `evidence/browser-runtime-wasm-web.json` |
 | `native-arm64-macos-typed-native-transport` | `hermes` | `typed-native` + `jsi` | complete | `DEHERM_PROFILE` | `evidence/packaged-typed-native-transport-arm64-macos.json` |
+| `native-arm64-macos-static-hermes-reachable` | `hermes` | `typed-native` | reachable | `release` | `evidence/static-hermes-reachable-arm64-macos.json` |
+| `browser-webtransport-loopback` | `browser` + `deno` | `webtransport-h3` | complete | `loopback-p256-pinned` | `evidence/webtransport-quic-loopback.json` |
 
 The first two observe the same tutorial loop reaching the engine; the third
 observes how each call got there. They are deliberately not merged: a route
 that ran is not a route whose transport anyone looked at, and the third
 projection's engine is the instrumented one, which is not what ships.
+The fourth is deliberately narrower: release reachability and the canonical
+plan select 17 of the project's 27 routes for Static Hermes, while ten remain
+explicitly blocked. Fourteen selected routes are observed in the packaged
+Dynamic Hermes adapter census. It is a generated adapter projection, not a
+claim that the full War Battles application has executed as Static Hermes;
+compilation, linkage, and gameplay semantics remain separate gates. The fifth
+record owns the independent browser-to-server HTTP/3/WebTransport loopback
+claim rather than promoting it into either gameplay record.
 
 # Reading the matrix
 
