@@ -8,7 +8,7 @@ import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, generatedProjectCacheMatches, installNativeExtension, shouldResolvePublishedPolicy, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, generatedProjectCacheMatches, installNativeExtension, shouldResolvePublishedPolicy, typecheckGeneratedProject as typecheckGeneratedProjectCore, verifyGeneratedProject as verifyGeneratedProjectCore, writeGeneratedProject as writeGeneratedProjectCore } from "../packages/cli/src/generate.mjs";
 import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
 import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } from "../packages/cli/src/native-extension-api.mjs";
 import { writeProjectDmSdkCallSymbolIndex, writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../packages/cli/src/resource-symbols.mjs";
@@ -29,6 +29,9 @@ const bundledDefoldRevision = JSON.parse(
   await readFile(path.resolve("packages/bindings/generated/defold-script-api-ir.json"), "utf8")).defoldRevision;
 const defoldValueLayouts = JSON.parse(
   await readFile(path.resolve("packages/bindings/generated/defold-value-layouts.json"), "utf8"));
+const engineProfileSelection = JSON.parse(
+  await readFile(path.resolve("packages/bindings/generated/defold-script-route-availability-profiles.json"), "utf8"))
+  .engineProfileSelection;
 const buildProjectBindingIr = (inventory) => compileProjectBindingIr(inventory, defoldValueLayouts);
 const generateExtensionTypes = (inventory) => renderExtensionTypes(inventory, defoldValueLayouts);
 
@@ -89,6 +92,43 @@ async function fixture() {
   });
   await writeFile(path.join(root, ".internal", "lib", "math.zip"), archive);
   return root;
+}
+
+// Generation tests must not accidentally consume an unrelated revision surface
+// from the developer's home cache. Keep the production boundary fail-closed,
+// while making the test fixture resolve the authenticated checkout surface.
+function testSurfaceOptions(projectRoot, options = {}) {
+  return {
+    ...options,
+    env: {
+      ...process.env,
+      ...(options.env ?? {}),
+      DEHERM_CACHE_HOME: options.env?.DEHERM_CACHE_HOME ?? path.join(projectRoot, ".deherm-test-surface-cache")
+    }
+  };
+}
+
+async function writeGeneratedProject(inventory, outputDirectory = ".deherm", options = {}) {
+  return writeGeneratedProjectCore(inventory, outputDirectory, testSurfaceOptions(inventory.projectRoot, options));
+}
+
+async function verifyGeneratedProject(projectRoot, outputDirectory = ".deherm") {
+  return verifyGeneratedProjectCore(projectRoot, outputDirectory, testSurfaceOptions(projectRoot));
+}
+
+async function typecheckGeneratedProject(projectRoot, options = {}) {
+  return typecheckGeneratedProjectCore(projectRoot, {
+    ...options,
+    env: testSurfaceOptions(projectRoot, options).env
+  });
+}
+
+function testCliOptions(projectRoot) {
+  return {
+    cwd: process.cwd(),
+    encoding: "utf8",
+    env: { ...process.env, ...testSurfaceOptions(projectRoot).env }
+  };
 }
 
 test("managed native extension install is content-keyed and replaces through a staged tree", async () => {
@@ -433,7 +473,7 @@ test("project discovery resolves nearest and bounded descendant projects determi
 
 test("project inspection finds local and resolved dependency extensions", async () => {
   const project = await fixture();
-  const inventory = await inspectDefoldProject({ project });
+  const inventory = await inspectDefoldProject({ project, engineProfileSelection });
   assert.deepEqual(inventory.summary, {
     localExtensions: 1,
     dependencyExtensions: 1,
@@ -944,8 +984,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(verified.checkedFiles, 30);
   assert.equal(verified.planSha256, loweringPlan.planSha256);
   const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
-    cwd: process.cwd(),
-    encoding: "utf8"
+    ...testCliOptions(project)
   });
   assert.equal(verifiedCli.status, 0, `${verifiedCli.stdout}\n${verifiedCli.stderr}`);
   assert.equal(JSON.parse(verifiedCli.stdout).planSha256, loweringPlan.planSha256);
@@ -977,8 +1016,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(generatedDiagnostic.buildArtifacts.ok, false);
   assert.equal(generatedDiagnostic.buildArtifacts.entries[0].status, "transform-disabled");
   const generatedDiagnosticCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
-    cwd: process.cwd(),
-    encoding: "utf8"
+    ...testCliOptions(project)
   });
   assert.equal(generatedDiagnosticCli.status, 1, `${generatedDiagnosticCli.stdout}\n${generatedDiagnosticCli.stderr}`);
   assert.equal(JSON.parse(generatedDiagnosticCli.stdout).buildArtifacts.entries[0].status, "transform-disabled");
@@ -1312,8 +1350,7 @@ test("suffix projects type-check legal APIs and reject APIs from other Defold co
   const legal = compile("--build", path.join(project, "tsconfig.deherm.json"), "--force");
   assert.equal(legal.status, 0, `${legal.stdout}\n${legal.stderr}`);
   const cliTypecheck = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
-    cwd: process.cwd(),
-    encoding: "utf8"
+    ...testCliOptions(project)
   });
   assert.equal(cliTypecheck.status, 0, `${cliTypecheck.stdout}\n${cliTypecheck.stderr}`);
   assert.equal(JSON.parse(cliTypecheck.stdout).passed, true);
@@ -1356,8 +1393,7 @@ test("suffix projects type-check legal APIs and reject APIs from other Defold co
     const original = await readFile(target, "utf8");
     await writeFile(target, invalidSource);
     const rejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
-      cwd: process.cwd(),
-      encoding: "utf8"
+      ...testCliOptions(project)
     });
     assert.equal(rejected.status, 1, `${name} unexpectedly crossed the authored context boundary`);
     const diagnostic = JSON.parse(rejected.stdout);
@@ -1369,8 +1405,7 @@ test("suffix projects type-check legal APIs and reject APIs from other Defold co
   await writeFile(path.join(sourceRoot, "barrel.ts"), 'export { gui } from "@ts-defold/deherm";\n');
   await writeFile(path.join(sourceRoot, "shared.ts"), 'import { gui } from "./barrel.js"; void gui;\n');
   const reexportRejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
-    cwd: process.cwd(),
-    encoding: "utf8"
+    ...testCliOptions(project)
   });
   assert.equal(reexportRejected.status, 1, "shared barrel unexpectedly re-exported the package-root SDK");
   assert.match(JSON.parse(reexportRejected.stdout).stderr, /barrel\.ts:1:.*bypasses the context-filtered/);
@@ -1380,8 +1415,7 @@ test("suffix projects type-check legal APIs and reject APIs from other Defold co
   const outsideGui = path.join(componentRoot, "menu.gui.ts");
   await writeFile(outsideGui, 'import { render } from "@deherm/project"; void render;\n');
   const outsideRejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project, "--json"], {
-    cwd: process.cwd(),
-    encoding: "utf8"
+    ...testCliOptions(project)
   });
   assert.equal(outsideRejected.status, 1, "GUI resource outside src unexpectedly used render APIs");
   assert.match(JSON.parse(outsideRejected.stdout).stdout, /no exported member 'render'/i);
@@ -1390,8 +1424,7 @@ test("suffix projects type-check legal APIs and reject APIs from other Defold co
   const contextEntry = path.join(project, ".deherm", "sdk", "contexts", "gui.ts");
   await writeFile(contextEntry, `${await readFile(contextEntry, "utf8")} `);
   const staleRejected = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "typecheck", "--project", project], {
-    cwd: process.cwd(),
-    encoding: "utf8"
+    ...testCliOptions(project)
   });
   assert.equal(staleRejected.status, 1);
   assert.match(staleRejected.stderr, /does not match generated output sentinel/);
@@ -1463,7 +1496,7 @@ platforms:
       libs: [physics_2d_defold]
 `);
 
-  const inventory = await inspectDefoldProject({ project });
+  const inventory = await inspectDefoldProject({ project, engineProfileSelection });
   assert.equal(inventory.engineProfiles.source, "app-manifest");
   assert.equal(inventory.engineProfiles.manifest, "game.appmanifest");
   assert.match(inventory.engineProfiles.manifestSha256, /^[a-f0-9]{64}$/);
@@ -1477,6 +1510,19 @@ platforms:
   const output = await writeGeneratedProject(inventory);
   const manifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
   assert.deepEqual(manifest.engineProfiles.platforms, inventory.engineProfiles.platforms);
+  await verifyGeneratedProject(project);
+
+  await writeFile(path.join(project, "game.appmanifest"), `
+platforms:
+  arm64-ios:
+    context:
+      excludeLibs: [physics, LinearMath, BulletDynamics, BulletCollision]
+      libs: [physics_2d_defold]
+`);
+  await assert.rejects(
+    verifyGeneratedProject(project),
+    /engine-profile authority differs from the current project/
+  );
 });
 
 test("project inspection rejects contradictory app-manifest physics selections", async () => {
@@ -1489,7 +1535,7 @@ platforms:
       excludeLibs: []
       libs: [physics_2d_defold, physics_2d, script_box2d]
 `);
-  await assert.rejects(inspectDefoldProject({ project }), /both legacy Box2D and Box2D v3/);
+  await assert.rejects(inspectDefoldProject({ project, engineProfileSelection }), /both legacy Box2D and Box2D v3/);
 });
 
 test("a uniform app manifest becomes the project default API profile", async () => {
@@ -1502,7 +1548,7 @@ platforms:
       excludeLibs: [physics, LinearMath, BulletDynamics, BulletCollision, script_box2d_defold]
       libs: [physics_2d, box2d, script_box2d]
 `);
-  const inventory = await inspectDefoldProject({ project });
+  const inventory = await inspectDefoldProject({ project, engineProfileSelection });
   assert.equal(inventory.engineProfiles.platforms["arm64-ios"], "v3-no-bullet");
   assert.equal(inventory.engineProfiles.defaultProfileId, "v3-no-bullet");
 });
@@ -1518,7 +1564,7 @@ platforms:
       excludeLibs: []
       libs: []
 `);
-  let inventory = await inspectDefoldProject({ project });
+  let inventory = await inspectDefoldProject({ project, engineProfileSelection });
   assert.equal(inventory.engineProfiles.platforms["arm64-ios"], "legacy-no-bullet");
 
   await writeFile(path.join(project, "game.appmanifest"), `
@@ -1528,7 +1574,7 @@ platforms:
       excludeLibs: [script_box2d_defold]
       libs: []
 `);
-  await assert.rejects(inspectDefoldProject({ project }), /without selecting Box2D v3/);
+  await assert.rejects(inspectDefoldProject({ project, engineProfileSelection }), /without selecting Box2D v3/);
 });
 
 test("project inspection rejects app manifests outside the project", async () => {
@@ -1548,8 +1594,20 @@ test("project profile resolution agrees with all six pinned Defold app-manifest 
     "exclude_physics.appmanifest": "no-physics"
   };
   for (const [manifest, expected] of Object.entries(fixtures)) {
-    const resolved = await resolveEngineProfiles(root, { native_extension: { app_manifest: manifest } });
+    const resolved = await resolveEngineProfiles(root, { native_extension: { app_manifest: manifest } }, engineProfileSelection);
     assert.ok(Object.keys(resolved.platforms).length > 0, `${manifest} has no resolved platforms`);
     assert.deepEqual(new Set(Object.values(resolved.platforms)), new Set([expected]), manifest);
   }
+});
+
+test("project profile resolution follows renamed policy profile IDs", async () => {
+  const root = path.resolve("upstream/defold/editor/test/resources/test_project/app_manifest");
+  const renamed = structuredClone(engineProfileSelection);
+  renamed.defaultProfileId = "default-legacy-bullet-renamed";
+  renamed.profiles = Object.fromEntries(Object.entries(renamed.profiles).map(([id, profile]) => [
+    `${id}-renamed`, profile
+  ]));
+  const resolved = await resolveEngineProfiles(root, { native_extension: { app_manifest: "default.appmanifest" } }, renamed);
+  assert.equal(resolved.defaultProfileId, "default-legacy-bullet-renamed");
+  assert.deepEqual(new Set(Object.values(resolved.platforms)), new Set(["default-legacy-bullet-renamed"]));
 });

@@ -55,13 +55,13 @@ function parseArguments(argv) {
   return options;
 }
 
-export function resolveReleaseSelection(engineProfiles, options = {}) {
+export function resolveReleaseSelection(engineProfiles, options = {}, policyDefaultProfileId = null) {
   const platformProfile = options.platform ? engineProfiles?.platforms?.[options.platform] : null;
   if (options.platform && !platformProfile) {
     throw new Error(`Generated project has no API profile for platform '${options.platform}'`);
   }
   return {
-    profile: options.profile ?? platformProfile ?? engineProfiles?.defaultProfileId ?? "default-legacy-bullet",
+    profile: options.profile ?? platformProfile ?? engineProfiles?.defaultProfileId ?? policyDefaultProfileId,
     target: options.target ?? (options.platform?.endsWith("-web") ? "browserWasmHost" : "dynamicHermesJsi")
   };
 }
@@ -269,7 +269,14 @@ export async function generateReleaseBuild(argv = []) {
     projectManifestSource = await readFile(resolve(options.project, ".deherm/manifest.json"));
     engineProfiles = JSON.parse(projectManifestSource).engineProfiles;
   }
-  const selection = resolveReleaseSelection(engineProfiles, options);
+  const policyProfilesPath = resolve(repositoryRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json");
+  const policyProfileCatalog = await readJson(policyProfilesPath);
+  const selection = resolveReleaseSelection(
+    engineProfiles,
+    options,
+    policyProfileCatalog.engineProfileSelection?.defaultProfileId
+  );
+  if (!selection.profile) throw new Error("Defold policy has no default engine profile");
   options.target = selection.target;
   options.profile = selection.profile;
   const paths = {
@@ -277,7 +284,7 @@ export async function generateReleaseBuild(argv = []) {
     plan: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
     planSentinel: resolve(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.sentinel.json"),
     scriptProjection: resolve(repositoryRoot, "packages/bindings/generated/defold-script-projection-ir.json"),
-    profiles: resolve(repositoryRoot, "packages/bindings/generated/defold-script-route-availability-profiles.json"),
+    profiles: policyProfilesPath,
     bindingsGenerator: resolve(repositoryRoot, "scripts/generate-bindings.mjs"),
     emissionGenerator: resolve(repositoryRoot, "scripts/generate-binding-emission-plan.mjs"),
     canonicalFamilyGenerator: resolve(repositoryRoot, "scripts/generate-canonical-family-sources.mjs"),

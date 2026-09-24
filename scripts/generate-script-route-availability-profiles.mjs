@@ -82,15 +82,23 @@ function manifestListValues(text, field) {
   return [...new Set(values)].sort(compareText);
 }
 
-function featuresFromManifest(text) {
+function featuresFromManifest(text, engineProfileSelection) {
   const excludedLibraries = manifestListValues(text, "excludeLibs");
   const linkedLibraries = manifestListValues(text, "libs");
   const excluded = new Set(excludedLibraries);
   const linked = new Set(linkedLibraries);
-  const noPhysics = linked.has("physics_null");
-  const noBox2d = noPhysics || (excluded.has("script_box2d") && excluded.has("script_box2d_defold"));
-  const v3 = !noBox2d && linked.has("script_box2d") && excluded.has("script_box2d_defold");
-  const bullet = !noPhysics && !excluded.has("BulletDynamics") && !excluded.has("BulletCollision");
+  const axes = engineProfileSelection.axes;
+  const nullPhysicsLibraries = axes.nullPhysics?.libraries ?? [];
+  const legacyScriptLibrary = axes.box2d?.legacyScriptLibrary;
+  const v3ScriptLibrary = axes.box2d?.v3ScriptLibrary;
+  const bulletDisableLibraries = axes.bullet3d?.disableWhenExcluded ?? [];
+  assert(nullPhysicsLibraries.length > 0 && typeof legacyScriptLibrary === "string" &&
+    typeof v3ScriptLibrary === "string" && bulletDisableLibraries.length > 0,
+  "engineProfileSelection axes do not describe manifest feature derivation");
+  const noPhysics = nullPhysicsLibraries.some((library) => linked.has(library));
+  const noBox2d = noPhysics || (excluded.has(v3ScriptLibrary) && excluded.has(legacyScriptLibrary));
+  const v3 = !noBox2d && linked.has(v3ScriptLibrary) && excluded.has(legacyScriptLibrary);
+  const bullet = !noPhysics && !bulletDisableLibraries.some((library) => excluded.has(library));
   return {
     features: ["core", ...(!noBox2d ? [v3 ? "box2d-v3" : "box2d-v2"] : []), ...(bullet ? ["bullet3d"] : [])],
     excludedLibraries,
@@ -184,6 +192,14 @@ async function generate(options) {
     derived: defoldRevision,
     detail: "the reviewed route availability profiles"
   });
+  const engineProfileSelection = policy.engineProfileSelection;
+  assert(engineProfileSelection?.schemaVersion === 1 &&
+    typeof engineProfileSelection.defaultProfileId === "string" &&
+    engineProfileSelection.axes && typeof engineProfileSelection.axes === "object" &&
+    engineProfileSelection.profiles && typeof engineProfileSelection.profiles === "object",
+  "engineProfileSelection is missing or invalid");
+  assert(engineProfileSelection.profiles[engineProfileSelection.defaultProfileId],
+    "engineProfileSelection.defaultProfileId is not declared in profiles");
   assert(Array.isArray(scriptIr.functions), "script API IR has no functions");
   const documentedNames = new Set(scriptIr.functions.map(({ rawName }) => rawName));
   const scriptRowsByRawName = new Map(scriptIr.functions.map((row) => [row.rawName, scriptRouteRow(row)]));
@@ -204,7 +220,7 @@ async function generate(options) {
   const manifestTexts = await validateEvidence(manifestEntries, "app manifest");
   const manifestAudit = [];
   for (const manifest of manifestEntries) {
-    const parsed = featuresFromManifest(manifestTexts.get(manifest.path));
+    const parsed = featuresFromManifest(manifestTexts.get(manifest.path), engineProfileSelection);
     assert(JSON.stringify(parsed.features) === JSON.stringify(manifest.features),
       `${manifest.id}: parsed manifest features ${parsed.features.join(",")} differ from policy ${manifest.features.join(",")}`);
     manifestAudit.push({ id: manifest.id, ...parsed });
@@ -429,6 +445,7 @@ async function generate(options) {
   const report = {
     schemaVersion: 1,
     defoldRevision,
+    engineProfileSelection,
     catalogSha256,
     inputEvidence: {
       policy: options.policy,

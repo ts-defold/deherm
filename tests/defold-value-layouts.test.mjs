@@ -21,6 +21,10 @@ function policy() {
       node: "retained-engine-handle",
       "future-only": "retained-engine-handle"
     },
+    recordingShapes: {
+      node: "handle",
+      "future-only": "handle"
+    },
     opaqueReasons: {
       "retained-engine-handle": "Engine-owned handle."
     }
@@ -43,6 +47,7 @@ test("revision-specific value names use a visible conservative universal fallbac
       classification: "generated",
       proof: "source-derived-name; specialized-layout-unproven",
       fallbackTransport: "script-universal-value",
+      recordingShape: "userdata",
       alert: "specialized-layout-unproven"
     });
   }

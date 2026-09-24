@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "Fixed-layout Defold script value types derived from the pinned dmSDK headers, reviewed opaque classifications, and generated conservative opaque fallbacks for revision-specific names. Conservative entries remain usable through the universal value transport but are excluded from transparent typed-native lowering until specialized layout evidence exists. Layout only; this is not compile, link, runtime, or conformance evidence.",
-  "policySha256": "cd6f271e34db062c46d40686fea1ae2009ce8ba9bcaf8487c1f89ea6f05a2848",
+  "policySha256": "b5ece02fda14244e1749e5e5745039a0b8c1d9c28406e8f06b503181f59059ba",
   "sourceSha256": {
     "hash": {
       "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
@@ -49,7 +49,8 @@
         "file": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
         "declaration": "dmhash_t"
       },
-      "typescriptType": "DefoldHash"
+      "typescriptType": "DefoldHash",
+      "recordingShape": "hash"
     },
     "matrix4": {
       "transport": "float-arena",
@@ -68,7 +69,8 @@
         "line": 102,
         "declaration": "Matrix4"
       },
-      "typescriptType": "Matrix4"
+      "typescriptType": "Matrix4",
+      "recordingShape": "matrix4"
     },
     "quaternion": {
       "transport": "float-lanes",
@@ -83,7 +85,8 @@
         "line": 77,
         "declaration": "Quat"
       },
-      "typescriptType": "Quaternion"
+      "typescriptType": "Quaternion",
+      "recordingShape": "quaternion"
     },
     "url": {
       "transport": "u64-lane-quad",
@@ -116,7 +119,8 @@
         "declaration": "URL",
         "line": 72
       },
-      "typescriptType": "DefoldUrl"
+      "typescriptType": "DefoldUrl",
+      "recordingShape": "url"
     },
     "vector3": {
       "transport": "float-lanes",
@@ -131,7 +135,8 @@
         "line": 47,
         "declaration": "Vector3"
       },
-      "typescriptType": "Vector3"
+      "typescriptType": "Vector3",
+      "recordingShape": "vector3"
     },
     "vector4": {
       "transport": "float-lanes",
@@ -146,7 +151,8 @@
         "line": 62,
         "declaration": "Vector4"
       },
-      "typescriptType": "Vector4"
+      "typescriptType": "Vector4",
+      "recordingShape": "vector4"
     }
   },
   "opaque": {
@@ -155,91 +161,104 @@
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "handle"
     },
     "buffer_stream": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "handle"
     },
     "constant_buffer": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "handle"
     },
     "go.EASING": {
       "reason": "enum-token-domain",
       "note": "The value is an engine-defined constant domain, not a value record. It needs an explicit enum lowering before a typed unit may carry it.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "number"
     },
     "gui.EASING": {
       "reason": "enum-token-domain",
       "note": "The value is an engine-defined constant domain, not a value record. It needs an explicit enum lowering before a typed unit may carry it.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "number"
     },
     "gui.PROP": {
       "reason": "enum-token-domain",
       "note": "The value is an engine-defined constant domain, not a value record. It needs an explicit enum lowering before a typed unit may carry it.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "number"
     },
     "node": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "handle"
     },
     "render_predicate": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "userdata"
     },
     "render_target": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "handle"
     },
     "resource_data": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "userdata"
     },
     "texture": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "handle"
     },
     "timer_handle": {
       "reason": "retained-engine-handle",
       "note": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "number"
     },
     "vector": {
       "reason": "variable-length-value",
       "note": "The value carries a runtime-determined element count, so it has no fixed-capacity typed record.",
       "classification": "reviewed",
       "proof": "reviewed-semantic-classification",
-      "fallbackTransport": "script-universal-value"
+      "fallbackTransport": "script-universal-value",
+      "recordingShape": "userdata"
     }
   }
 }

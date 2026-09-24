@@ -46,6 +46,7 @@ flowchart LR
     SIR[Script API IR] --> PLAN[Deterministic plan]
     DIR[dmSDK IR] --> PLAN
     CLASS[Binding classifications] --> PLAN
+    POLICY[Hash-bound context and target vocabulary] --> PLAN
     EVIDENCE[Existing scoped evidence] --> PLAN
     PLAN --> TS[Generated TypeScript fixture]
     PLAN --> RUN[Generated generic runtime driver]
@@ -115,6 +116,19 @@ and stable-ID collisions.
 | `runtime.mjs` | Generic safe-case runner driven by case metadata and a target adapter |
 | `observations.example.json` | Empty, plan-bound observation envelope |
 | `tsconfig.json` | Strict no-emit compiler configuration for the generated fixture |
+
+The plan's context and target gates come from the semantic-policy
+`conformanceVocabulary`, not from module-name or platform-name heuristics in
+the CLI. The lowering-plan generator carries the normalized rows and exact
+generated target census with both the semantic-policy and target-conditional
+input hashes, plus a vocabulary digest; conformance refuses a plan whose rows
+or target/group mapping are not hash-bound. Context rows may name a future
+module explicitly, while target rows use exact target IDs or the authenticated
+target-conditionals group from that same plan (so a target rename does not
+silently change availability). A declaration
+with no matching row receives the conservative `generic` context, and a
+platform-gated declaration with no availability row is blocked with an
+explicit reason.
 
 The current full plan selects 926 script functions and 2,140 dmSDK
 declarations: 3,066 cases. The test suite compiles that generated file against

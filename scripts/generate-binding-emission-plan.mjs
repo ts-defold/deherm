@@ -23,7 +23,7 @@ function parseArguments(argv) {
     usage: null,
     output: resolve(repositoryRoot, "build/profiles/release/defold-binding-emission-plan.json"),
     target: "dynamicHermesJsi",
-    profile: "default-legacy-bullet",
+    profile: null,
     check: false
   };
   for (let index = 0; index < argv.length; index += 1) {
@@ -132,7 +132,7 @@ function internSelected(sourceValues, indices) {
 
 export function generateBindingEmissionPlan(plan, scriptProjection, profileCatalog, usage, options = {}) {
   const target = options.target ?? "dynamicHermesJsi";
-  const profileId = options.profile ?? "default-legacy-bullet";
+  const profileId = options.profile ?? profileCatalog.engineProfileSelection?.defaultProfileId;
   validatePlanIdentity(plan);
   if (plan.inputCanonicalHashes?.scriptProjection !== sha256(JSON.stringify(scriptProjection))) {
     throw new Error("Script projection does not match the lowering plan authority");
@@ -141,6 +141,9 @@ export function generateBindingEmissionPlan(plan, scriptProjection, profileCatal
     throw new Error("Lowering plan, script projection, and profile catalog revisions differ");
   }
   validateProfileAuthority(scriptProjection, profileCatalog);
+  if (typeof profileId !== "string" || !profileId) {
+    throw new Error("Defold profile catalog has no policy-selected default profile");
+  }
   if (!plan.targetOrder.includes(target)) throw new Error(`Unknown lowering target '${target}'`);
   if (!plan.targetCapabilities[target].runtime) throw new Error(`Target '${target}' is not a runtime emission target`);
   if (!profileCatalog.profiles[profileId]) throw new Error(`Unknown Defold runtime profile '${profileId}'`);

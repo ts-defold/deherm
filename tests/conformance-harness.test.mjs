@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cp, mkdtemp, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -86,7 +87,8 @@ test("conformance inputs load from a generated project's policy-backed IR", asyn
     "defold-dmsdk-binding-patterns.json": "dmsdk-binding-patterns.json",
     "defold-script-scalar-dispatch.json": "script-scalar-dispatch.json",
     "defold-script-real-engine-probes.json": "script-real-engine-probes.json",
-    "defold-dmsdk-scalar-thunks.json": "dmsdk-scalar-thunks.json"
+    "defold-dmsdk-scalar-thunks.json": "dmsdk-scalar-thunks.json",
+    "defold-binding-lowering-plan.json": "binding-lowering-plan.json"
   };
   await Promise.all(Object.entries(files).map(([source, destination]) =>
     cp(path.join(generated, source), path.join(irRoot, destination))));
@@ -211,4 +213,90 @@ test("CLI generates sharded plans and writes honest reports", async () => {
     "--strict"
   ], { cwd: process.cwd(), encoding: "utf8" });
   assert.equal(strict.status, 1);
+});
+
+test("conformance context and target availability follow authenticated policy rows", async () => {
+  const inputs = await loadConformanceInputs();
+  const future = structuredClone(inputs);
+  future.bindingPlan.conformanceVocabulary.contextRows.push({
+    id: "script.future-module-example",
+    surface: "script",
+    match: { moduleRoots: ["future"] },
+    contexts: ["future-context"],
+    evidence: "synthetic-forward-compatible-vocabulary-fixture"
+  });
+  {
+    const { digest: _digest, sources: _sources, ...unsigned } = future.bindingPlan.conformanceVocabulary;
+    future.bindingPlan.conformanceVocabulary.digest = createHash("sha256").update(JSON.stringify(unsigned)).digest("hex");
+    const { planSha256: _planSha256, ...planBody } = future.bindingPlan;
+    future.bindingPlan.planSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
+  }
+  const source = future.scriptIr.functions.find(({ id }) => id === "script:timer.delay");
+  future.scriptIr.functions = [{
+    ...source,
+    id: "script:future.schedule",
+    rawName: "future.schedule",
+    modulePath: ["future"],
+    member: "schedule",
+    jsName: "schedule"
+  }];
+  const futurePlan = buildConformancePlan(future, {
+    surface: "script",
+    target: "js-web",
+    contexts: ["future-context"],
+    shard: "0/1"
+  });
+  assert.deepEqual(futurePlan.cases[0].requiredContexts, ["future-context"]);
+  assert.equal(futurePlan.cases[0].execution.policy, "safe");
+
+  const fallback = structuredClone(future);
+  fallback.scriptIr.functions[0].modulePath = ["unlisted-future"];
+  const fallbackPlan = buildConformancePlan(fallback, {
+    surface: "script",
+    target: "js-web",
+    contexts: ["generic"],
+    shard: "0/1"
+  });
+  assert.deepEqual(fallbackPlan.cases[0].requiredContexts, ["generic"]);
+  const conservativeTargetPlan = buildConformancePlan(inputs, { surface: "dmsdk", target: "arm64-osx", shard: "0/1" });
+  const unlistedPlatformCase = conservativeTargetPlan.cases.find((item) =>
+    item.families.includes("platform-gated") && item.execution.reason?.includes("no authenticated target-availability row"));
+  assert.ok(unlistedPlatformCase, "unlisted platform-gated APIs must use the conservative target fallback");
+
+  const renamed = structuredClone(inputs);
+  const iosTarget = renamed.bindingPlan.conformanceVocabulary.targets.find(({ target }) => target === "arm64-ios");
+  iosTarget.target = "future-ios-name";
+  {
+    const { digest: _digest, sources: _sources, ...unsigned } = renamed.bindingPlan.conformanceVocabulary;
+    renamed.bindingPlan.conformanceVocabulary.digest = createHash("sha256").update(JSON.stringify(unsigned)).digest("hex");
+    const { planSha256: _planSha256, ...planBody } = renamed.bindingPlan;
+    renamed.bindingPlan.planSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
+  }
+  const ios = renamed.dmsdkIr.declarations.find(({ name }) => name === "dmGraphics::GetNativeiOSUIWindow");
+  renamed.dmsdkIr.declarations = [ios];
+  const renamedPlan = buildConformancePlan(renamed, {
+    surface: "dmsdk",
+    target: "future-ios-name",
+    contexts: ["*"],
+    shard: "0/1"
+  });
+  assert.equal(renamedPlan.cases[0].execution.policy, "safe");
+
+  const tampered = structuredClone(inputs);
+  tampered.bindingPlan.conformanceVocabulary.contextRows = [];
+  {
+    const { planSha256: _planSha256, ...planBody } = tampered.bindingPlan;
+    tampered.bindingPlan.planSha256 = createHash("sha256").update(JSON.stringify(planBody)).digest("hex");
+  }
+  assert.throws(() => buildConformancePlan(tampered), /conformance vocabulary digest/);
+
+  const forgedTargetGroup = structuredClone(inputs);
+  const linux = forgedTargetGroup.bindingPlan.conformanceVocabulary.targets
+    .find(({ target }) => target === "x86_64-linux");
+  linux.group = "ios";
+  {
+    const { digest: _digest, sources: _sources, ...unsigned } = forgedTargetGroup.bindingPlan.conformanceVocabulary;
+    forgedTargetGroup.bindingPlan.conformanceVocabulary.digest = createHash("sha256").update(JSON.stringify(unsigned)).digest("hex");
+  }
+  assert.throws(() => buildConformancePlan(forgedTargetGroup), /lowering plan internal digest/u);
 });

@@ -25,6 +25,7 @@ const relativePaths = Object.freeze({
   projection: "packages/bindings/generated/defold-script-projection-ir.json",
   universal: "packages/bindings/generated/defold-script-universal-value-bindings.json",
   handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
+  valueLayouts: "packages/bindings/generated/defold-value-layouts.json",
   tableRecords: "packages/bindings/generated/defold-script-table-record-bindings.json",
   valueBindings: "packages/bindings/generated/defold-script-value-bindings.json",
   overloadDispatch: "packages/bindings/generated/defold-script-overload-dispatch.json",
@@ -67,13 +68,14 @@ function parseArguments(argv) {
 
 async function readInputs(sourceRoot) {
   const read = async (key) => readFile(path.join(sourceRoot, relativePaths[key]), "utf8");
-  const [projectionText, universalText, handleLoweringText, tableRecordsText, valueBindingsText, overloadDispatchText, loweringPlanText] = await Promise.all([
-    read("projection"), read("universal"), read("handleLowering"), read("tableRecords"), read("valueBindings"), read("overloadDispatch"), read("loweringPlan")
+  const [projectionText, universalText, handleLoweringText, valueLayoutsText, tableRecordsText, valueBindingsText, overloadDispatchText, loweringPlanText] = await Promise.all([
+    read("projection"), read("universal"), read("handleLowering"), read("valueLayouts"), read("tableRecords"), read("valueBindings"), read("overloadDispatch"), read("loweringPlan")
   ]);
   return {
     projection: JSON.parse(projectionText),
     universal: JSON.parse(universalText),
     handleLowering: JSON.parse(handleLoweringText),
+    valueLayouts: JSON.parse(valueLayoutsText),
     tableRecords: JSON.parse(tableRecordsText),
     valueBindings: JSON.parse(valueBindingsText),
     overloadDispatch: JSON.parse(overloadDispatchText),
@@ -82,6 +84,7 @@ async function readInputs(sourceRoot) {
       projection: sha256(projectionText),
       universal: sha256(universalText),
       handleLowering: sha256(handleLoweringText),
+      valueLayouts: sha256(valueLayoutsText),
       tableRecords: sha256(tableRecordsText),
       valueBindings: sha256(valueBindingsText),
       overloadDispatch: sha256(overloadDispatchText),
@@ -2973,7 +2976,7 @@ export function generateRecordingEngine(inputs) {
     ...model,
     artifacts: Object.fromEntries(Object.entries(relativePaths)
       .filter(([key]) => key !== "projection" && key !== "universal" &&
-        key !== "handleLowering" && key !== "tableRecords" && key !== "valueBindings" &&
+        key !== "handleLowering" && key !== "valueLayouts" && key !== "tableRecords" && key !== "valueBindings" &&
         key !== "overloadDispatch" && key !== "loweringPlan")
       .map(([key, value]) => [key, value])),
     artifactHashes: {

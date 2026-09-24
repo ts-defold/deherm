@@ -2,15 +2,15 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:b8d29478d864ac1efc6e94c4098e79178c3890e9bdc9266961d1d7b17be2449b",
+  "generator": "sha256:1f8e342edff6013edde33a4de8718aa185a28945ed862c463484f88926ef3cf1",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "cdb466dcb5662b4e1f4949989babf4ffcc4aff87e4e0d0c1eaf5fa3bd2d3835c",
+  "policyRoot": "9bdb93d38e59a76a5b0e529e0828841bf40ab8c60c43291a06f1492839732ec1",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 194,
     "namespaces": 52,
-    "objectBytes": 25065988,
+    "objectBytes": 25078691,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -54,16 +54,16 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "d3e16ad70782757da2a3250ce7c858233d81aa550df1b26700ec05e851afd82a",
+      "hash": "90ffad8b4cfa32d13930dba7587d3b478ddb67cb3e2750d01dc807734c8fbdda",
       "bytes": 67380
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
-      "hash": "2232e81226327b81cc1e010e36e6eabf70e8f6f34c1e82791d677043dc3fe581",
-      "bytes": 2678622
+      "hash": "d3ab57ef2a08b921e8947174f1cbce7127c2d49bfaa177cd7f04e15d6005a9c5",
+      "bytes": 2689701
     },
     "@compiler:document:defold-component-proxy-contract.json": {
-      "hash": "3f0f750fc97ebfe009b07f8c9830dfe0d84421805954b4d7b39f3f8f74947e71",
-      "bytes": 2506
+      "hash": "f49909436bec664ca2f96d2cf24221cd8b44f5ad361b51b58ab0378bf6a64dff",
+      "bytes": 2701
     },
     "@compiler:document:defold-dmsdk-binding-patterns.json": {
       "hash": "44402523e06aa9afd60364c4949c247b1778ababd98dda7dba287a947e564019",
@@ -86,7 +86,7 @@
       "bytes": 13974
     },
     "@compiler:document:defold-script-api-accounting.json": {
-      "hash": "293942507f44745c3891e542435bd27b073cd4823d9dc9e8523cae765f5fa315",
+      "hash": "38e4b361dfb55605cbf3551276663223c819def74e94fef02d9fb73c62a1cc3e",
       "bytes": 767030
     },
     "@compiler:document:defold-script-api-ir.json": {
@@ -102,7 +102,7 @@
       "bytes": 415014
     },
     "@compiler:document:defold-script-handle-lowering.json": {
-      "hash": "4d740d53bb2e80a2c7c4d02d578ba0a763dba75acc92c4f9866866e65c682f48",
+      "hash": "61a5477f3ea7506ab08600376f1a8eb77762a2eee85cc1aa0f6943efedff640f",
       "bytes": 820132
     },
     "@compiler:document:defold-script-real-engine-probes.json": {
@@ -114,8 +114,8 @@
       "bytes": 84816
     },
     "@compiler:document:defold-script-route-availability-profiles.json": {
-      "hash": "85034cce1798647c178c4b75cde074fca6146b8b9a66a024805f05a9c80cfe1b",
-      "bytes": 1221310
+      "hash": "cb5312f05643c39adb9db2d1c33387d18a8cd9607fd524e32dfc18637170a37c",
+      "bytes": 1222237
     },
     "@compiler:document:defold-script-scalar-dispatch.json": {
       "hash": "fdc8c7f0105dc33999ab338c73e05c52bd144c62d0cb3f20b045be6df2fa42f2",
@@ -126,7 +126,7 @@
       "bytes": 542
     },
     "@compiler:document:defold-script-universal-value-bindings.json": {
-      "hash": "a4227754a800743e594bd25d17f72d29e998a942ac090e7c3c653dfae7a35151",
+      "hash": "aaab80fe0a351fa5bb19b8d96ad89f55edb8f762195d3248b47cddceccb42994",
       "bytes": 645339
     },
     "@compiler:document:defold-sdk-ir.json": {
@@ -134,8 +134,8 @@
       "bytes": 2830427
     },
     "@compiler:document:defold-value-layouts.json": {
-      "hash": "9423a09d6ab1caf30e5c154dba0c821b22423449f31a72a22c72d472f63a0877",
-      "bytes": 8237
+      "hash": "9313ad0cfa87a9659c0abc690f0d06d179ddf4570abea034b16fa1fab86414d5",
+      "bytes": 8739
     },
     "@compiler:output:defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h": {
       "hash": "892dba3d7ec43e89346d3ae51d8adae8ab83263697d5c9120e406fa92969e317",

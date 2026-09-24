@@ -14,7 +14,6 @@ const projectDiscoveryIgnoredDirectories = new Set([
   "upstream"
 ]);
 const textDecoder = new TextDecoder();
-const defaultEngineProfileId = "default-legacy-bullet";
 export const NATIVE_EXTENSION_BINDING_SCHEMA = "defold-hermes.bindings.json";
 export const PUBLIC_EXTENSION_ZIP_LIMITS = Object.freeze({
   archiveBytes: 64 * 1024 * 1024,
@@ -237,31 +236,68 @@ function includesAny(values, names) {
   return names.some((name) => values.has(name));
 }
 
-function inferPlatformEngineProfile(platform, context = {}) {
+function assertEngineProfileSelection(selection) {
+  if (!selection || typeof selection !== "object" || Array.isArray(selection) || selection.schemaVersion !== 1 ||
+      typeof selection.defaultProfileId !== "string" || !selection.defaultProfileId ||
+      !selection.axes || typeof selection.axes !== "object" || Array.isArray(selection.axes) ||
+      !selection.profiles || typeof selection.profiles !== "object" || Array.isArray(selection.profiles)) {
+    throw new Error("Defold policy has no valid engine-profile selection contract");
+  }
+  const box2d = selection.axes.box2d;
+  const bullet3d = selection.axes.bullet3d;
+  const nullPhysics = selection.axes.nullPhysics;
+  if (!box2d || !bullet3d || !nullPhysics ||
+      !Array.isArray(box2d.legacyLibraries) || !Array.isArray(box2d.v3Libraries) ||
+      typeof box2d.legacyScriptLibrary !== "string" || typeof box2d.v3ScriptLibrary !== "string" ||
+      typeof box2d.extensionSymbol !== "string" || !Array.isArray(bullet3d.libraries) ||
+      !Array.isArray(bullet3d.disableWhenExcluded) || typeof bullet3d.extensionSymbol !== "string" ||
+      !Array.isArray(nullPhysics.libraries) || !selection.profiles[selection.defaultProfileId]) {
+    throw new Error("Defold policy has an incomplete engine-profile selection contract");
+  }
+  const validBox2d = new Set(["legacy", "v3", "disabled"]);
+  const validBullet = new Set(["enabled", "disabled"]);
+  for (const [profileId, profile] of Object.entries(selection.profiles)) {
+    if (!profile || !validBox2d.has(profile.box2d) || !validBullet.has(profile.bullet3d)) {
+      throw new Error(`Defold policy engine profile '${profileId}' has invalid classifier states`);
+    }
+  }
+  return selection;
+}
+
+function profileForStates(selection, box2d, bullet3d) {
+  const matches = Object.entries(selection.profiles)
+    .filter(([, profile]) => profile.box2d === box2d && profile.bullet3d === bullet3d)
+    .map(([profileId]) => profileId);
+  if (matches.length !== 1) {
+    throw new Error(`Defold policy engine-profile classifier has ${matches.length} matches for box2d=${box2d}, bullet3d=${bullet3d}`);
+  }
+  return matches[0];
+}
+
+function inferPlatformEngineProfile(platform, context = {}, selection) {
+  assertEngineProfileSelection(selection);
   const libs = stringSet(context.libs);
   const excludes = stringSet(context.excludeLibs);
   const excludedSymbols = new Set(Array.isArray(context.excludeSymbols) ? context.excludeSymbols.map(String) : []);
-  const v2Libraries = ["box2d_defold", "script_box2d_defold", "physics_2d_defold"];
-  const v3Libraries = ["box2d", "script_box2d", "physics_2d"];
-  const bulletLibraries = ["BulletDynamics", "BulletCollision", "LinearMath", "physics_3d"];
-  const includeV2 = includesAny(libs, v2Libraries);
-  const includeV3 = includesAny(libs, v3Libraries);
-  const includeBullet = includesAny(libs, bulletLibraries);
-  const nullPhysics = libs.has("physics_null");
+  const { box2d, bullet3d, nullPhysics } = selection.axes;
+  const includeV2 = includesAny(libs, box2d.legacyLibraries);
+  const includeV3 = includesAny(libs, box2d.v3Libraries);
+  const includeBullet = includesAny(libs, bullet3d.libraries);
+  const nullPhysicsSelected = includesAny(libs, nullPhysics.libraries);
 
   if (includeV2 && includeV3) {
     throw new Error(`${platform}: app manifest includes both legacy Box2D and Box2D v3 libraries`);
   }
-  if (nullPhysics && (includeV2 || includeV3 || includeBullet)) {
-    throw new Error(`${platform}: app manifest includes physics_null together with concrete physics libraries`);
+  if (nullPhysicsSelected && (includeV2 || includeV3 || includeBullet)) {
+    throw new Error(`${platform}: app manifest includes null physics together with concrete physics libraries`);
   }
 
-  const excludesV2Script = excludes.has("script_box2d_defold");
-  const excludesV3Script = excludes.has("script_box2d");
+  const excludesV2Script = excludes.has(box2d.legacyScriptLibrary);
+  const excludesV3Script = excludes.has(box2d.v3ScriptLibrary);
   const excludesBothBox2dScripts = excludesV2Script && excludesV3Script;
-  const box2dDisabled = nullPhysics || excludesBothBox2dScripts || excludedSymbols.has("ScriptBox2DExt");
-  const bulletLibrariesDisabled = excludes.has("BulletDynamics") && excludes.has("BulletCollision");
-  const bulletDisabled = nullPhysics || bulletLibrariesDisabled || excludedSymbols.has("ScriptBullet3DExt");
+  const box2dDisabled = nullPhysicsSelected || excludesBothBox2dScripts || excludedSymbols.has(box2d.extensionSymbol);
+  const bulletLibrariesDisabled = bullet3d.disableWhenExcluded.every((name) => excludes.has(name));
+  const bulletDisabled = nullPhysicsSelected || bulletLibrariesDisabled || excludedSymbols.has(bullet3d.extensionSymbol);
 
   if (excludesBothBox2dScripts && (includeV2 || includeV3)) {
     throw new Error(`${platform}: app manifest both disables and includes Box2D`);
@@ -270,7 +306,7 @@ function inferPlatformEngineProfile(platform, context = {}) {
     throw new Error(`${platform}: app manifest both disables and includes Bullet physics`);
   }
   if (includeV3 && !excludesV2Script) {
-    throw new Error(`${platform}: Box2D v3 is linked without excluding the legacy script_box2d_defold library`);
+    throw new Error(`${platform}: Box2D v3 is linked without excluding the legacy script library`);
   }
   if (includeV2 && excludesV2Script && !box2dDisabled) {
     throw new Error(`${platform}: legacy Box2D is linked while its script library is excluded`);
@@ -282,11 +318,9 @@ function inferPlatformEngineProfile(platform, context = {}) {
     throw new Error(`${platform}: legacy Box2D script library is excluded without selecting Box2D v3`);
   }
 
-  if (box2dDisabled && bulletDisabled) return "no-physics";
-  if (box2dDisabled) return "bullet-only";
-  const box2d = includeV3 ? "v3" : "legacy";
-  if (box2d === "v3") return bulletDisabled ? "v3-no-bullet" : "v3-bullet";
-  return bulletDisabled ? "legacy-no-bullet" : defaultEngineProfileId;
+  const box2dState = box2dDisabled ? "disabled" : includeV3 ? "v3" : "legacy";
+  const bulletState = bulletDisabled ? "disabled" : "enabled";
+  return profileForStates(selection, box2dState, bulletState);
 }
 
 function projectRelativeResourcePath(projectRoot, configuredPath) {
@@ -299,14 +333,15 @@ function projectRelativeResourcePath(projectRoot, configuredPath) {
   return { absolute, relative: portable(relative) };
 }
 
-export async function resolveEngineProfiles(projectRoot, properties) {
+export async function resolveEngineProfiles(projectRoot, properties, profileSelection = null) {
+  const selection = profileSelection ? assertEngineProfileSelection(profileSelection) : null;
   const configuredPath = properties.native_extension?.app_manifest?.trim();
   if (!configuredPath) {
     return {
-      source: "defold-default",
+      source: selection ? "defold-default" : "policy-required",
       manifest: null,
       manifestSha256: null,
-      defaultProfileId: defaultEngineProfileId,
+      defaultProfileId: selection?.defaultProfileId ?? null,
       platforms: {}
     };
   }
@@ -334,14 +369,23 @@ export async function resolveEngineProfiles(projectRoot, properties) {
     if (!context || typeof context !== "object" || Array.isArray(context)) {
       throw new Error(`${resolved.relative}: ${platform}.context must be an object`);
     }
-    platforms[platform] = inferPlatformEngineProfile(platform, context);
+    platforms[platform] = selection ? inferPlatformEngineProfile(platform, context, selection) : null;
+  }
+  if (!selection) {
+    return {
+      source: "policy-required",
+      manifest: resolved.relative,
+      manifestSha256: sha256(source),
+      defaultProfileId: null,
+      platforms
+    };
   }
   const selectedProfiles = new Set(Object.values(platforms));
   return {
     source: "app-manifest",
     manifest: resolved.relative,
     manifestSha256: sha256(source),
-    defaultProfileId: selectedProfiles.size === 1 ? [...selectedProfiles][0] : defaultEngineProfileId,
+    defaultProfileId: selectedProfiles.size === 1 ? [...selectedProfiles][0] : selection.defaultProfileId,
     platforms
   };
 }
@@ -673,7 +717,7 @@ async function dependencyExtensions(projectRoot, diagnostics) {
 export async function inspectDefoldProject(options = {}) {
   const projectRoot = await findProjectRoot(options.cwd, options.project, { select: options.selectProject });
   const properties = parseGameProject(await readFile(path.join(projectRoot, "game.project"), "utf8"));
-  const engineProfiles = await resolveEngineProfiles(projectRoot, properties);
+  const engineProfiles = await resolveEngineProfiles(projectRoot, properties, options.engineProfileSelection);
   const diagnostics = [];
   if (options.requireDehermRuntime === true) appendDehermRuntimeDiagnostics(properties, diagnostics);
   const manifestPaths = await walk(projectRoot, (file) => path.basename(file) === "ext.manifest", false, diagnostics);

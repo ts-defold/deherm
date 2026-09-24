@@ -61,12 +61,6 @@ const propertyCodecs = Object.freeze({
   resource: Object.freeze({ codecId: 9 })
 });
 
-// Defold 1.13.x called the resource-valued go.property union member
-// `resource`; newer revisions call the same semantic value `resource_data`.
-// Both select the stable resource codec. This is intentionally an alias set,
-// not a claim that either spelling exists in every revision.
-const resourcePropertyTypeAliases = Object.freeze(new Set(["resource", "resource_data"]));
-
 function invariant(condition, message) {
   if (!condition) throw new Error(`Invalid Defold component policy: ${message}`);
 }
@@ -127,10 +121,27 @@ export function createComponentProxyConstants(policy) {
   invariant(unusedContexts.length === 0, `contexts require an unsupported authoring recipe: ${unusedContexts.join(", ")}`);
 
   const declaredPropertyTypes = uniqueStrings(policy.property.valueTypes, "property.valueTypes");
-  const supportedValueTypes = Object.keys(propertyCodecs).filter((name) => name !== "resource");
-  const unsupportedPropertyTypes = declaredPropertyTypes.filter((name) =>
-    !supportedValueTypes.includes(name) && !resourcePropertyTypeAliases.has(name)
-  );
+  const explicitPropertyTypeCodecs = policy.property.valueTypeCodecs;
+  invariant(explicitPropertyTypeCodecs === undefined ||
+    (explicitPropertyTypeCodecs && typeof explicitPropertyTypeCodecs === "object"),
+  "property.valueTypeCodecs must be an object");
+  const propertyTypeCodecs = Object.fromEntries(declaredPropertyTypes.map((name) => {
+    // v1 documents predate the explicit source-token -> stable-codec table.
+    // Their only non-core codec was a resource token, whose historical
+    // spellings contain "resource". Keep that bounded compatibility decoder;
+    // never treat an arbitrary new v1 token as a resource ABI.
+    const legacyCodec = Object.hasOwn(propertyCodecs, name)
+      ? name
+      : /resource/iu.test(name) ? "resource" : null;
+    const codec = explicitPropertyTypeCodecs?.[name] ??
+      (explicitPropertyTypeCodecs === undefined ? legacyCodec : null);
+    return [name, Object.hasOwn(propertyCodecs, codec) ? codec : null];
+  }));
+  const stalePropertyTypeCodecs = Object.keys(explicitPropertyTypeCodecs ?? {})
+    .filter((name) => !declaredPropertyTypes.includes(name));
+  invariant(stalePropertyTypeCodecs.length === 0,
+    `property.valueTypeCodecs names absent value types: ${stalePropertyTypeCodecs.join(", ")}`);
+  const unsupportedPropertyTypes = declaredPropertyTypes.filter((name) => propertyTypeCodecs[name] === null);
   const resources = policy.property.resourceConstructors;
   invariant(Array.isArray(resources), "property.resourceConstructors must be an array");
   const resourceKinds = {};
@@ -151,6 +162,7 @@ export function createComponentProxyConstants(policy) {
     lifecycleSlots,
     lifecycleRecipes: componentLifecycleRecipes,
     propertyCodecs,
+    propertyTypeCodecs: Object.freeze(propertyTypeCodecs),
     proxyRuntimeCapability: PROXY_RUNTIME_CAPABILITY,
     sourceKinds: Object.freeze(sourceKinds),
     resourceKinds: Object.freeze(resourceKinds),

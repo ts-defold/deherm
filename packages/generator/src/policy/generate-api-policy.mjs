@@ -165,8 +165,8 @@ const locallyRenderedSdkInputs = Object.freeze({
 });
 
 const compilerDocumentRecipes = Object.freeze({
-  "defold-value-layouts.json": "policy.compiler-document.defold-value-layouts.v1",
-  "defold-component-proxy-contract.json": "policy.compiler-document.component-proxy-contract.v1",
+  "defold-value-layouts.json": "policy.compiler-document.defold-value-layouts.v2",
+  "defold-component-proxy-contract.json": "policy.compiler-document.component-proxy-contract.v2",
   "defold-dmsdk-universal-bindings.json": "policy.compiler-document.dmsdk-universal.v1",
   [BINDING_LOWERING_RECIPE_NAME]: BINDING_LOWERING_RECIPE_CAPABILITY
 });

@@ -59,6 +59,27 @@
     "timer_handle": "retained-engine-handle",
     "vector": "variable-length-value"
   },
+  "recordingShapes": {
+    "buffer_data": "handle",
+    "buffer_stream": "handle",
+    "constant_buffer": "handle",
+    "go.EASING": "number",
+    "gui.EASING": "number",
+    "gui.PROP": "number",
+    "hash": "hash",
+    "matrix4": "matrix4",
+    "node": "handle",
+    "quaternion": "quaternion",
+    "render_predicate": "userdata",
+    "render_target": "handle",
+    "resource_data": "userdata",
+    "texture": "handle",
+    "timer_handle": "number",
+    "url": "url",
+    "vector": "userdata",
+    "vector3": "vector3",
+    "vector4": "vector4"
+  },
   "opaqueReasons": {
     "retained-engine-handle": "The engine owns the value behind a Lua userdata or engine handle table. It has no pinned public byte layout, so a sound typed unit cannot copy it; it needs the retained-handle transport.",
     "enum-token-domain": "The value is an engine-defined constant domain, not a value record. It needs an explicit enum lowering before a typed unit may carry it.",

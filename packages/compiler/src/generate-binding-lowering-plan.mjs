@@ -36,6 +36,7 @@ export const inputPaths = Object.freeze({
   dmsdkArenaSpanBlockers: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
   dmsdkCStringValue: "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
   dmsdkBorrowedHandle: "packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json",
+  dmsdkTargetConditionals: "packages/bindings/generated/defold-dmsdk-target-conditionals.json",
   semanticPolicies: "packages/bindings/overrides/binding-semantic-policies.json",
   typescriptSdk: "packages/bindings/targets/typescript-sdk.json",
   dynamicHermesJsi: "packages/bindings/targets/dynamic-hermes-jsi.json",
@@ -741,6 +742,92 @@ function selectorMatches(unit, selector) {
   return true;
 }
 
+/**
+ * Carry the reviewed conformance vocabulary through the canonical plan.  The
+ * conformance CLI is deliberately not allowed to grow a second source of
+ * context or platform knowledge: these rows are the policy input, and the
+ * plan's semantic-policy hash authenticates the copy consumed by the CLI.
+ */
+export function deriveConformanceVocabulary(policies, targetConditionals) {
+  const vocabulary = policies?.conformanceVocabulary;
+  if (!vocabulary || vocabulary.schemaVersion !== 1 || !vocabulary.fallback ||
+      !Array.isArray(vocabulary.contextRows) || !Array.isArray(vocabulary.targetRows)) {
+    throw new Error("Semantic policy has no valid conformance vocabulary");
+  }
+  if (typeof vocabulary.fallback.context !== "string" || vocabulary.fallback.context.length === 0 ||
+      typeof vocabulary.fallback.targetReason !== "string" || vocabulary.fallback.targetReason.length === 0) {
+    throw new Error("Conformance vocabulary fallback is incomplete");
+  }
+  const normalizeRows = (rows, kind) => rows.map((row, index) => {
+    if (!row || typeof row !== "object" || Array.isArray(row) || typeof row.id !== "string" ||
+        !["script", "dmsdk"].includes(row.surface) || !row.match || typeof row.match !== "object" ||
+        !Array.isArray(row.contexts ?? row.targetIds ?? row.targetGroups)) {
+      throw new Error(`Conformance ${kind} row ${index} is malformed`);
+    }
+    const match = row.match;
+    const moduleRoots = match.moduleRoots ?? [];
+    const namePrefixes = match.namePrefixes ?? [];
+    if (!Array.isArray(moduleRoots) || !Array.isArray(namePrefixes) ||
+        (moduleRoots.length === 0 && namePrefixes.length === 0) ||
+        moduleRoots.some((value) => typeof value !== "string" || value.length === 0) ||
+        namePrefixes.some((value) => typeof value !== "string" || value.length === 0)) {
+      throw new Error(`Conformance ${kind} row ${row.id} has an invalid matcher`);
+    }
+    const contexts = row.contexts ? [...new Set(row.contexts)].sort(compareCodeUnits) : undefined;
+    const targetIds = row.targetIds ? [...new Set(row.targetIds)].sort(compareCodeUnits) : undefined;
+    const targetGroups = row.targetGroups ? [...new Set(row.targetGroups)].sort(compareCodeUnits) : undefined;
+    if (kind === "context" && (!contexts?.length || targetIds || targetGroups)) {
+      throw new Error(`Conformance context row ${row.id} has invalid result fields`);
+    }
+    if (kind === "target" && (!targetIds?.length && !targetGroups?.length || contexts)) {
+      throw new Error(`Conformance target row ${row.id} has invalid result fields`);
+    }
+    if (typeof row.evidence !== "string" || row.evidence.length === 0) {
+      throw new Error(`Conformance ${kind} row ${row.id} has no evidence label`);
+    }
+    return {
+      id: row.id,
+      surface: row.surface,
+      match: {
+        ...(moduleRoots.length ? { moduleRoots: [...new Set(moduleRoots)].sort(compareCodeUnits) } : {}),
+        ...(namePrefixes.length ? { namePrefixes: [...new Set(namePrefixes)].sort(compareCodeUnits) } : {})
+      },
+      ...(contexts ? { contexts } : {}),
+      ...(targetIds ? { targetIds } : {}),
+      ...(targetGroups ? { targetGroups } : {}),
+      evidence: row.evidence
+    };
+  }).sort((left, right) => compareCodeUnits(left.id, right.id));
+  const contextRows = normalizeRows(vocabulary.contextRows, "context");
+  const targetRows = normalizeRows(vocabulary.targetRows, "target");
+  if (new Set([...contextRows, ...targetRows].map(({ id }) => id)).size !== contextRows.length + targetRows.length) {
+    throw new Error("Conformance vocabulary row IDs must be unique");
+  }
+  if (targetConditionals?.schemaVersion !== 1 || !Array.isArray(targetConditionals.targets)) {
+    throw new Error("dmSDK target conditionals have no generated target census");
+  }
+  const targets = targetConditionals.targets.map((row, index) => {
+    if (!row || typeof row.target !== "string" || row.target.length === 0 ||
+        typeof row.group !== "string" || row.group.length === 0) {
+      throw new Error(`dmSDK target conditional row ${index} is malformed`);
+    }
+    return { target: row.target, group: row.group };
+  }).sort((left, right) => compareCodeUnits(left.target, right.target));
+  if (new Set(targets.map(({ target }) => target)).size !== targets.length) {
+    throw new Error("dmSDK target conditional target IDs must be unique");
+  }
+  return {
+    schemaVersion: 1,
+    fallback: {
+      context: vocabulary.fallback.context,
+      targetReason: vocabulary.fallback.targetReason
+    },
+    contextRows,
+    targetRows,
+    targets
+  };
+}
+
 function applySemanticPolicies(units, policies) {
   if (policies.schemaVersion !== 1 || !Array.isArray(policies.rules)) throw new Error("Invalid semantic policy catalog");
   const resolutions = new Map();
@@ -1124,6 +1211,8 @@ export function generateBindingLoweringPlan(inputs) {
     throw new Error("Unified lowering plan contains duplicate units");
   }
   const { resolutions, ruleMatches } = applySemanticPolicies(units, semanticPolicies);
+  const conformanceVocabulary = deriveConformanceVocabulary(semanticPolicies, parsed.dmsdkTargetConditionals);
+  const conformanceVocabularyDigest = sha256(JSON.stringify(conformanceVocabulary));
   const implementationLanes = implementationLaneIndex(
     units, parsed, scriptProjection.defoldRevision);
   const { defoldValueLayouts } = parsed;
@@ -1156,6 +1245,14 @@ export function generateBindingLoweringPlan(inputs) {
     inputCanonicalHashes: Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, sha256(JSON.stringify(JSON.parse(content)))])),
     targetOrder,
     targetCapabilities: Object.fromEntries(targets.map((target) => [target.target, target])),
+    conformanceVocabulary: {
+      ...conformanceVocabulary,
+      digest: conformanceVocabularyDigest,
+      sources: [
+        { input: "semanticPolicies", sha256: sha256(inputs.semanticPolicies) },
+        { input: "dmsdkTargetConditionals", sha256: sha256(inputs.dmsdkTargetConditionals) }
+      ]
+    },
     runtimes: runtimeCoverage(units, targets),
     semanticPolicyMatches: ruleMatches,
     coverage: {

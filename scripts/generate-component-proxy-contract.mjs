@@ -26,6 +26,20 @@ const contextKinds = Object.freeze({
   render_script: Object.freeze({ contextKind: "render-instance+graphics", supportsProperties: false })
 });
 
+// These are compiler codec capabilities, not Defold spellings. The emitted
+// policy maps each revision's source token onto one of them so the installed
+// compiler never needs an alias list such as `resource`/`resource_data`.
+const propertyCodecBySemanticName = Object.freeze({
+  number: "number",
+  boolean: "boolean",
+  string: "string",
+  hash: "hash",
+  url: "url",
+  vector3: "vector3",
+  vector4: "vector4",
+  quaternion: "quaternion"
+});
+
 function camel(value) {
   return value.replace(/_([a-z0-9])/gu, (_whole, character) => character.toUpperCase());
 }
@@ -85,6 +99,14 @@ export async function buildComponentProxyPolicy(options = {}) {
     }))
     .sort((left, right) => left.engineName < right.engineName ? -1 : left.engineName > right.engineName ? 1 : 0);
   assert(resourceConstructors.length > 0, "no resource constructors restricted to go.property were derived");
+  const resourceReturnTypes = new Set(scriptIr.functions
+    .filter((fn) => resourceConstructors.some(({ route }) => route === fn.rawName))
+    .flatMap((fn) => fn.returns ?? []));
+  const valueTypeCodecs = Object.fromEntries(valueTypes.map((name) => {
+    const codec = propertyCodecBySemanticName[name] ??
+      (resourceReturnTypes.has(name) || /resource/iu.test(name) ? "resource" : "unsupported");
+    return [name, codec];
+  }));
 
   return {
     schemaVersion: 1,
@@ -95,6 +117,7 @@ export async function buildComponentProxyPolicy(options = {}) {
     property: {
       route: property[0].rawName,
       valueTypes,
+      valueTypeCodecs,
       source: `${property[0].source}:${property[0].line}`,
       resourceConstructors
     }

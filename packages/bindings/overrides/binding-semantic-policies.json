@@ -1,6 +1,33 @@
 {
   "schemaVersion": 1,
   "scope": "Algebraic semantic-token resolutions shared by all lowering backends. Rules select value/effect/context shapes; route IDs are forbidden.",
+  "conformanceVocabulary": {
+    "schemaVersion": 1,
+    "scope": "Authenticated context and target-availability vocabulary for the generated conformance plan. Rows select declaration shapes, never inferred platform-name substrings.",
+    "fallback": {
+      "context": "generic",
+      "targetReason": "platform-gated API has no authenticated target-availability row"
+    },
+    "contextRows": [
+      { "id": "script.gui-scene", "surface": "script", "match": { "moduleRoots": ["gui"] }, "contexts": ["gui-scene"], "evidence": "reviewed-script-context-row" },
+      { "id": "script.render-script", "surface": "script", "match": { "moduleRoots": ["render", "graphics", "material", "font", "compute"] }, "contexts": ["render-script"], "evidence": "reviewed-script-context-row" },
+      { "id": "script.game-object", "surface": "script", "match": { "moduleRoots": ["go", "sprite", "tilemap", "label", "model", "particlefx", "factory", "collectionfactory", "collectionproxy", "camera", "physics", "b2d", "bullet3d"] }, "contexts": ["game-object"], "evidence": "reviewed-script-context-row" },
+      { "id": "script.browser", "surface": "script", "match": { "moduleRoots": ["html5"] }, "contexts": ["browser"], "evidence": "reviewed-script-context-row" },
+      { "id": "script.window", "surface": "script", "match": { "moduleRoots": ["window"] }, "contexts": ["window"], "evidence": "reviewed-script-context-row" },
+      { "id": "script.network", "surface": "script", "match": { "moduleRoots": ["http", "socket"] }, "contexts": ["network"], "evidence": "reviewed-script-context-row" },
+      { "id": "dmsdk.input-system", "surface": "dmsdk", "match": { "namePrefixes": ["dmHID"] }, "contexts": ["input-system"], "evidence": "reviewed-dmsdk-context-row" },
+      { "id": "dmsdk.engine-instance", "surface": "dmsdk", "match": { "namePrefixes": ["dmGui", "dmGameObject", "dmScript", "dmMessage", "dmResource"] }, "contexts": ["engine-instance"], "evidence": "reviewed-dmsdk-context-row" },
+      { "id": "dmsdk.render-thread", "surface": "dmsdk", "match": { "namePrefixes": ["dmGraphics", "dmRender", "dmModel", "dmRig", "dmParticle"] }, "contexts": ["render-thread"], "evidence": "reviewed-dmsdk-context-row" },
+      { "id": "dmsdk.extension-lifecycle", "surface": "dmsdk", "match": { "namePrefixes": ["dmExtension"] }, "contexts": ["extension-lifecycle"], "evidence": "reviewed-dmsdk-context-row" },
+      { "id": "dmsdk.network", "surface": "dmsdk", "match": { "namePrefixes": ["dmHttp", "dmSocket", "dmConnectionPool"] }, "contexts": ["network"], "evidence": "reviewed-dmsdk-context-row" }
+    ],
+    "targetRows": [
+      { "id": "script.html5-browser", "surface": "script", "match": { "moduleRoots": ["html5"] }, "targetIds": ["js-web"], "evidence": "reviewed-script-target-row" },
+      { "id": "dmsdk.ios", "surface": "dmsdk", "match": { "namePrefixes": ["ExtensionRegisteriOS", "ExtensionUnregisteriOS", "dmExtension::RegisteriOS", "dmExtension::UnregisteriOS", "dmGraphics::GetNativeiOS"] }, "targetGroups": ["ios"], "evidence": "defold-dmsdk-target-conditionals" },
+      { "id": "dmsdk.android", "surface": "dmsdk", "match": { "namePrefixes": ["dmGraphics::GetNativeAndroid"] }, "targetGroups": ["android"], "evidence": "defold-dmsdk-target-conditionals" },
+      { "id": "dmsdk.web", "surface": "dmsdk", "match": { "namePrefixes": ["dmGraphics::WebGPU"] }, "targetGroups": ["web"], "evidence": "defold-dmsdk-target-conditionals" }
+    ]
+  },
   "selectorLanguage": {
     "fields": ["surface", "valueKindsAll", "valueKindsAny", "contexts", "semanticTokensAll", "semanticTokensAny", "linkage", "availabilityKinds"],
     "identitySelectors": "forbidden",

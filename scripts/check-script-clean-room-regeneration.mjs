@@ -450,7 +450,7 @@ async function validateRouteProvenance(cleanRoot) {
     typedNativeFunctionRouteCount,
     typedNativeConstantRouteCount,
     projectedRouteCount: projection.routeCount,
-    defaultProfileRouteCount: profiles.profiles["default-legacy-bullet"].availableRouteCount,
+    defaultProfileRouteCount: profiles.profiles[profiles.engineProfileSelection.defaultProfileId].availableRouteCount,
     defoldRevision: ir.defoldRevision
   };
 }

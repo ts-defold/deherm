@@ -26,6 +26,7 @@ import { homedir } from "node:os";
 import path from "node:path";
 
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
+import { DEFOLD_REVISION_TOKEN, sealObject } from "../../compiler/src/api-policy.mjs";
 
 // Every file a surface layer must provide, by the key the generator uses for it.
 // `ir` files are the version-specific binding IR; `sdk` is the generated
@@ -55,6 +56,11 @@ export const surfaceIrFiles = Object.freeze({
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function safeRelativePath(value) {
+  return typeof value === "string" && value.length > 0 && !path.isAbsolute(value) &&
+    value.split(/[\\/]/u).every((segment) => segment.length > 0 && segment !== "." && segment !== "..");
 }
 
 function canonical(value) {
@@ -188,10 +194,91 @@ async function layerProvides(candidate, revision) {
     } catch (error) {
       return { ok: false, missing: ["surface.json"], error: error?.code === "ENOENT" ? undefined : error.message };
     }
-    if (descriptor.kind !== "deherm.materialized-defold-surface" || descriptor.defoldRevision !== revision) {
+    if (descriptor.schemaVersion !== 2 || descriptor.kind !== "deherm.materialized-defold-surface" || descriptor.defoldRevision !== revision) {
       return { ok: false, missing: [], revision: descriptor.defoldRevision, error: "invalid surface descriptor" };
     }
+    if (!/^[0-9a-f]{64}$/u.test(descriptor.policyRoot ?? "") ||
+        !/^[0-9a-f]{64}$/u.test(descriptor.compilerObjectSha256 ?? "")) {
+      return { ok: false, missing: [], error: "surface descriptor has no authenticated policy identity" };
+    }
+    try {
+      const policyBytes = await readFile(path.join(candidate.root, "policy-root.json"));
+      if (sha256(policyBytes) !== descriptor.policyRoot) {
+        return { ok: false, missing: [], error: "surface policy root digest mismatch" };
+      }
+      const policy = JSON.parse(policyBytes);
+      if (policy.subtrees?.["@compiler"] !== descriptor.compilerObjectSha256) {
+        return { ok: false, missing: [], error: "surface compiler object is not authenticated by its policy root" };
+      }
+      const compilerBytes = await readFile(path.join(candidate.root, "compiler-object.json"));
+      if (sha256(compilerBytes) !== descriptor.compilerObjectSha256) {
+        return { ok: false, missing: [], error: "surface compiler object digest mismatch" };
+      }
+      descriptor._authenticatedPolicy = policy;
+      descriptor._authenticatedCompiler = JSON.parse(compilerBytes);
+    } catch (error) {
+      return { ok: false, missing: ["policy-root.json", "compiler-object.json"], error: error.message };
+    }
+    if (!descriptor.ir || typeof descriptor.ir !== "object" || Array.isArray(descriptor.ir)) {
+      return { ok: false, missing: [], error: "surface descriptor has no authenticated IR inventory" };
+    }
+    for (const [relative, record] of Object.entries(descriptor.ir)) {
+      if (!safeRelativePath(relative)) {
+        return { ok: false, missing: [], error: `surface IR record has an unsafe path: ${relative}` };
+      }
+      if (!/^[0-9a-f]{64}$/u.test(record?.sha256 ?? "")) {
+        return { ok: false, missing: [], error: `surface IR record ${relative} has no digest` };
+      }
+      try {
+        const bytes = await readFile(path.join(candidate.irRoot, relative));
+        if (sha256(bytes) !== record.sha256) {
+          return { ok: false, missing: [], error: `surface IR digest mismatch for ${relative}` };
+        }
+        const compilerEntry = descriptor._authenticatedCompiler.documents?.entries?.[relative];
+        if (compilerEntry) {
+          const namespace = compilerEntry.object;
+          const expectedObjectSha256 = descriptor._authenticatedPolicy.subtrees?.[namespace];
+          if (!/^[0-9a-f]{64}$/u.test(expectedObjectSha256 ?? "")) {
+            return { ok: false, missing: [], error: `surface policy does not authenticate ${relative}` };
+          }
+          const value = JSON.parse(bytes.toString("utf8").split(revision).join(DEFOLD_REVISION_TOKEN));
+          const actualObjectSha256 = sealObject({
+            schemaVersion: 1,
+            kind: "deherm.policy.compiler-document",
+            namespace,
+            name: relative,
+            value
+          }).hash;
+          if (actualObjectSha256 !== expectedObjectSha256) {
+            return { ok: false, missing: [], error: `surface IR is not authenticated by policy for ${relative}` };
+          }
+        }
+      } catch (error) {
+        return { ok: false, missing: [relative], error: error.message };
+      }
+    }
+    delete descriptor._authenticatedPolicy;
+    delete descriptor._authenticatedCompiler;
+    for (const relative of Object.values(surfaceIrFiles)) {
+      if (relative === surfaceIrFiles.toolchainPath) continue;
+      if (!descriptor.ir[relative]) {
+        return { ok: false, missing: [], error: `surface descriptor does not authenticate ${relative}` };
+      }
+    }
+    try {
+      const profiles = JSON.parse(await readFile(path.join(candidate.irRoot, surfaceIrFiles.scriptProfilesPath), "utf8"));
+      const selection = profiles.engineProfileSelection;
+      if (selection?.schemaVersion !== 1 || typeof selection.defaultProfileId !== "string" ||
+          !selection.profiles?.[selection.defaultProfileId]) {
+        return { ok: false, missing: [], error: "surface policy predates the engine-profile selection contract and must be refreshed" };
+      }
+    } catch (error) {
+      return { ok: false, missing: [surfaceIrFiles.scriptProfilesPath], error: error.message };
+    }
     for (const relative of Object.keys(descriptor.sdk ?? {})) {
+      if (!safeRelativePath(relative)) {
+        return { ok: false, missing: [], error: `surface SDK record has an unsafe path: ${relative}` };
+      }
       try {
         const information = await stat(path.join(candidate.sdkRoot, "generated", relative));
         if (!information.isFile()) missing.push(`sdk/generated/${relative}`);
@@ -200,6 +287,9 @@ async function layerProvides(candidate, revision) {
       }
     }
     for (const relative of Object.keys(descriptor.outputs ?? {})) {
+      if (!safeRelativePath(relative)) {
+        return { ok: false, missing: [], error: `surface output record has an unsafe path: ${relative}` };
+      }
       try {
         const information = await stat(path.join(candidate.repositoryRoot, relative));
         if (!information.isFile()) missing.push(`repository/${relative}`);

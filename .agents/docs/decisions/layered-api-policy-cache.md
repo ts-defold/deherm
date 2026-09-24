@@ -536,7 +536,13 @@ surface, because that is exactly the defect: signatures that compile and are
 wrong.
 
 Descriptor-backed cache layers also authenticate and return their toolchain and
-artifact siblings. The toolchain digest gates the Defold target matrix; the
+artifact siblings. Surface descriptor schema 2 records the content-addressed
+policy root, the `@compiler` object it authenticates, and the SHA-256 of every
+realized IR document. The resolver verifies the stored policy root, the exact
+content-addressed compiler manifest, and each copied semantic document rebuilt
+as its policy object—not merely the mutable descriptor's digest—before using a
+shared user or project cache. A modified route-profile, lowering-plan, or other
+policy-derived document is a cache miss, never authority. The toolchain digest gates the Defold target matrix; the
 artifact digest gates the per-target GitHub release mapping. `deherm create`,
 `deherm generate`, and `deherm dev` require that published artifact mapping.
 Online runs refresh the deliberately replaceable mapping before selecting the
@@ -631,8 +637,9 @@ complete the layered cache:
 * Public headers and native sources are currently named in the project Merkle
   tree but not content-digested. Same-path byte edits must move `nativeRoot`
   before extension caching is sound.
-* The 10.21 MB canonical lowering plan and 15 TypeScript compatibility sources
-  remain referenced derived objects. Compiler-owned recipe emitters must replace
+* The canonical lowering plan is now reconstructed locally from authenticated
+  recipe facts, but 12 SDK support sources and 106 revision outputs remain
+  referenced compatibility objects. Compiler-owned recipe emitters must replace
   them before the policy is a compact result rather than a correctness-first
   transition artifact. Track the ownership/size migration in
   [#93](https://github.com/ts-defold/deherm/issues/93).

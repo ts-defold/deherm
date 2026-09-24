@@ -1,6 +1,35 @@
 {
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "engineProfileSelection": {
+    "schemaVersion": 1,
+    "defaultProfileId": "default-legacy-bullet",
+    "axes": {
+      "box2d": {
+        "legacyLibraries": ["box2d_defold", "script_box2d_defold", "physics_2d_defold"],
+        "v3Libraries": ["box2d", "script_box2d", "physics_2d"],
+        "legacyScriptLibrary": "script_box2d_defold",
+        "v3ScriptLibrary": "script_box2d",
+        "extensionSymbol": "ScriptBox2DExt"
+      },
+      "bullet3d": {
+        "libraries": ["BulletDynamics", "BulletCollision", "LinearMath", "physics_3d"],
+        "disableWhenExcluded": ["BulletDynamics", "BulletCollision"],
+        "extensionSymbol": "ScriptBullet3DExt"
+      },
+      "nullPhysics": {
+        "libraries": ["physics_null"]
+      }
+    },
+    "profiles": {
+      "default-legacy-bullet": {"box2d": "legacy", "bullet3d": "enabled"},
+      "v3-bullet": {"box2d": "v3", "bullet3d": "enabled"},
+      "legacy-no-bullet": {"box2d": "legacy", "bullet3d": "disabled"},
+      "v3-no-bullet": {"box2d": "v3", "bullet3d": "disabled"},
+      "bullet-only": {"box2d": "disabled", "bullet3d": "enabled"},
+      "no-physics": {"box2d": "disabled", "bullet3d": "disabled"}
+    }
+  },
   "expectedFeatureCounts": {
     "core": 9,
     "box2d-v2": 124,

@@ -72,6 +72,17 @@
       "resource_data",
       "boolean"
     ],
+    "valueTypeCodecs": {
+      "number": "number",
+      "hash": "hash",
+      "string": "string",
+      "url": "url",
+      "vector3": "vector3",
+      "vector4": "vector4",
+      "quaternion": "quaternion",
+      "resource_data": "resource",
+      "boolean": "boolean"
+    },
     "source": "doc/go.lua:817",
     "resourceConstructors": [
       {

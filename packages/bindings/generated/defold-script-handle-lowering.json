@@ -30,9 +30,9 @@
     },
     "hashes": {
       "policy": "68239dfe605ef568c51fd53898744eeadefb6a525fc9a366968f46e806d40546",
-      "projection": "db36c6dec4ba3a921b4d14a2bcead1dcc395150c47d268ab5ed16501ee5c533e",
-      "classification": "008b67d6600cb7b3c1324930c65570d8854f71bf27fcfd201ccc3f04b6692fe4",
-      "availability": "ac01e6b180b6d7965b82899b2de091757d52c263f7b625041e4cd1fd86bb9b5c"
+      "projection": "08ab33d3b4c79299398281dc3846f4bd6fd9d8f37380894dd5d3dda379bbe8a8",
+      "classification": "1bf739a109b793badbbe22f54f31753808ac54aba180412cc31c6b2251f3da20",
+      "availability": "ebc682852bade96acd13e123ed5849ed06f02c54c3a13348875f9bf3e1db13c2"
     },
     "availabilityCatalogSha256": "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"
   },

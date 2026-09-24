@@ -68,6 +68,14 @@ recipe without an npm release, while the familiar named helpers remain
 convenience APIs. Unknown callbacks and value types stay present in the policy
 as unsupported capabilities instead of disappearing.
 
+Engine-profile selection follows the same rule. The authenticated route-profile
+document carries a declarative classifier contract containing the revision's
+library/symbol spellings, profile IDs, and default profile. The packed CLI owns
+only the generic conflict checking and state-to-profile matching algorithm; it
+does not embed a Defold physics vocabulary or a default profile ID. A renamed
+profile or library spelling is therefore a policy update, while a genuinely
+new runtime capability still requires a new realizer construct.
+
 ## Remaining migration frontier
 
 The same rule must be applied to:

@@ -248,16 +248,45 @@ test("a future Defold callback is reported as unsupported instead of disappearin
   assert.ok(script.lifecycle.engineCallbacks.includes("future_tick"));
 });
 
-test("historical and current Defold resource property tokens select the same stable codec", () => {
-  for (const resourceToken of ["resource", "resource_data"]) {
+test("policy-defined resource property tokens select the same stable codec without package aliases", () => {
+  for (const resourceToken of ["resource", "resource_data", "future_asset_reference"]) {
     const revisionPolicy = structuredClone(componentPolicy);
     revisionPolicy.property.valueTypes = revisionPolicy.property.valueTypes
       .filter((name) => name !== "resource" && name !== "resource_data");
+    delete revisionPolicy.property.valueTypeCodecs.resource;
+    delete revisionPolicy.property.valueTypeCodecs.resource_data;
     revisionPolicy.property.valueTypes.push(resourceToken);
+    revisionPolicy.property.valueTypeCodecs[resourceToken] = "resource";
     const constants = createComponentProxyConstants(revisionPolicy);
     assert.deepEqual(constants.unsupportedPropertyTypes, []);
+    assert.equal(constants.propertyTypeCodecs[resourceToken], "resource");
     assert.equal(constants.propertyCodecs.resource.codecId, 9);
   }
+});
+
+test("legacy component policy infers unknown property tokens as resource without a spelling allowlist", () => {
+  const legacyPolicy = structuredClone(componentPolicy);
+  delete legacyPolicy.property.valueTypeCodecs;
+  legacyPolicy.property.valueTypes = legacyPolicy.property.valueTypes
+    .filter((name) => name !== "resource_data");
+  legacyPolicy.property.valueTypes.push("historical_resource_reference");
+  const constants = createComponentProxyConstants(legacyPolicy);
+  assert.equal(constants.propertyTypeCodecs.historical_resource_reference, "resource");
+  assert.deepEqual(constants.unsupportedPropertyTypes, []);
+
+  legacyPolicy.property.valueTypes.push("future_tensor");
+  const guarded = createComponentProxyConstants(legacyPolicy);
+  assert.equal(guarded.propertyTypeCodecs.future_tensor, null);
+  assert.deepEqual(guarded.unsupportedPropertyTypes, ["future_tensor"]);
+});
+
+test("a genuinely new property ABI shape remains visible as an unsupported policy capability", () => {
+  const futurePolicy = structuredClone(componentPolicy);
+  futurePolicy.property.valueTypes.push("future_tensor");
+  futurePolicy.property.valueTypeCodecs.future_tensor = "future-tensor";
+  const constants = createComponentProxyConstants(futurePolicy);
+  assert.deepEqual(constants.unsupportedPropertyTypes, ["future_tensor"]);
+  assert.equal(constants.propertyTypeCodecs.future_tensor, null);
 });
 
 test("a policy-added resource constructor is usable through the stable generic resource recipe", async () => {

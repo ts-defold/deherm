@@ -26,7 +26,7 @@ import {
   generateScriptUniversalValue,
   generateScriptValueTargetSupport
 } from "./sdk/support-sdk.mjs";
-import { DEFOLD_REVISION_TOKEN, restoreDefoldRevision } from "./api-policy.mjs";
+import { DEFOLD_REVISION_TOKEN, restoreDefoldRevision, sealObject } from "./api-policy.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
 import { assertDmSdkUniversalStaticFrameCapacity } from "./dmsdk-universal-static-frame.mjs";
 import { isRevisionOutput } from "./revision-output-layout.mjs";
@@ -53,7 +53,9 @@ const DOCUMENT_RECIPES = new Set([
   DOCUMENT_RECIPE,
   BINDING_LOWERING_RECIPE_CAPABILITY,
   "policy.compiler-document.component-proxy-contract.v1",
+  "policy.compiler-document.component-proxy-contract.v2",
   "policy.compiler-document.defold-value-layouts.v1",
+  "policy.compiler-document.defold-value-layouts.v2",
   "policy.compiler-document.dmsdk-universal.v1"
 ]);
 const OUTPUT_RECIPE = "output.compatibility-source.copy.v1";
@@ -456,6 +458,21 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   for (const [relative, value] of Object.entries(documents).sort(([left], [right]) => left.localeCompare(right))) {
     if (await writeStable(path.join(outputRoot, "ir", relative), json(value), outputBoundary)) writes.push(`ir/${relative}`);
   }
+  const sealedPolicyRoot = sealObject(resolvedPolicy.policy);
+  const declaredPolicyRoot = resolvedPolicy?.entry?.policyRoot ?? resolvedPolicy?.policy?.rootHash ?? null;
+  if (sealedPolicyRoot.hash !== declaredPolicyRoot) {
+    throw new Error("Materialized policy root does not match its content-addressed index entry");
+  }
+  if (await writeStable(path.join(outputRoot, "policy-root.json"), sealedPolicyRoot.bytes, outputBoundary)) {
+    writes.push("policy-root.json");
+  }
+  const sealedCompilerObject = sealObject(compilerObject(resolvedPolicy));
+  if (sealedCompilerObject.hash !== resolvedPolicy.policy.subtrees?.["@compiler"]) {
+    throw new Error("Compiler surface does not match the object authenticated by the policy root");
+  }
+  if (await writeStable(path.join(outputRoot, "compiler-object.json"), sealedCompilerObject.bytes, outputBoundary)) {
+    writes.push("compiler-object.json");
+  }
   const toolchainSource = json(toolchain);
   if (await writeStable(path.join(outputRoot, "ir", "defold-toolchain.json"), toolchainSource, outputBoundary)) {
     writes.push("ir/defold-toolchain.json");
@@ -491,11 +508,14 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
   }
 
   const descriptor = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     kind: "deherm.materialized-defold-surface",
     defoldRevision: revision,
-    policyRoot: resolvedPolicy?.entry?.policyRoot ?? resolvedPolicy?.policy?.rootHash ?? null,
+    policyRoot: declaredPolicyRoot,
+    compilerObjectSha256: resolvedPolicy.policy.subtrees?.["@compiler"] ?? null,
     documents: Object.keys(documents).sort(),
+    ir: Object.fromEntries(Object.entries(documents).sort(([left], [right]) => left.localeCompare(right))
+      .map(([name, value]) => [name, { sha256: sha256(json(value)) }])),
     toolchainSha256: sha256(toolchainSource),
     artifactsSha256: artifactsSource ? sha256(artifactsSource) : null,
     sdk: Object.fromEntries(Object.entries(sdk).sort(([left], [right]) => left.localeCompare(right)).map(([name, value]) => [name, {

@@ -102,14 +102,17 @@ receive revision modules through their generated `@deherm/project` surface.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now a **67,114-byte manifest**, not a
-21 MB container. It references 19 independently content-addressed semantic
+The authenticated `@compiler` subtree is now a **67,380-byte manifest**, not a
+21 MB container. It references 20 independently content-addressed semantic
 documents, a 28-entry SDK manifest, and a 118-entry revision-output manifest.
 Of those outputs, 12 are package-rendered and 106 remain compatibility sources.
 This keeps each object shareable and makes the remaining migration
 debt enumerable; it does not pretend the referenced bytes have disappeared.
-The current complete object store is 32,019,304 bytes until the lowering-plan,
-support-source, and revision-output emitters replace those objects.
+The current reachable object graph is 25,078,691 bytes across 194 subtrees.
+The 17,792,680-byte canonical lowering plan is already rebuilt locally from a
+2,689,701-byte authenticated recipe-facts document. Twelve SDK support sources
+and 106 revision-output compatibility sources remain to be replaced by compact
+facts plus package emitters.
 
 `packages/compiler/src/policy-surface-materializer.mjs` owns the public
 realization contract. It restores the selected revision, resolves and validates

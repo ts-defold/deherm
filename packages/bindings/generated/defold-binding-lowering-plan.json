@@ -12,22 +12,22 @@
     "conformance": "not-claimed"
   },
   "inputHashes": {
-    "scriptProjection": "db36c6dec4ba3a921b4d14a2bcead1dcc395150c47d268ab5ed16501ee5c533e",
+    "scriptProjection": "08ab33d3b4c79299398281dc3846f4bd6fd9d8f37380894dd5d3dda379bbe8a8",
     "scriptScalarDispatch": "ec01d55f6d135721399bb37c65e89aa5b388c9f9c4a0401b387c4818f73c267b",
     "scriptValueBindings": "805dbd25cbf2fc9472f207f9244e4996296a99418411e0880dca1640e596b176",
     "scriptFixedTuples": "c50f26549b3da248786c32c442ab87ae6845816b794c9e343f42bd920c30f889",
     "scriptDynamicValues": "30d50c846e5e5c532dfcf95ca63529a4990e8486a0dbaac895b6d01009abaa46",
     "scriptValueTail": "91ab45725003e790882597ec7a1387d3d5ff2365b8e987232da509656ac39e7b",
     "scriptOverloadDispatch": "829f556760905005f05f0757eaa244d86c6e6af047d50ece033662344fe48d39",
-    "scriptTableRecords": "29d5bc2fcba31073e728b840fe727fd117a9d4bfbc25f50e6a224c4375f574a7",
+    "scriptTableRecords": "ef7e3061aaa1ff03e37f121290993bb7114b351dd98be15a7c4a53b5dbf24f94",
     "scriptCallbackLifecycle": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "scriptCopiedValueBlockers": "e4cc52f4f1c3a3850a341381f125e808e0ef19164463413f19bd937fd69c1c3a",
-    "scriptOpaqueRecordBlockers": "588962c43a9d5d32ab7729de2d51d0e5fdb0bf8f08bd6c961e4052b4f5fb46e7",
+    "scriptCopiedValueBlockers": "6fed803c5feb2632d6500e80bbe73c363763f50ad11a689965d4feeaec0ed84c",
+    "scriptOpaqueRecordBlockers": "20bf633db974c3142bd7c233786fe942e2cf5a3629573ec768b21ed4fff08c2c",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "1e2a8fdd04ec72643cd63f66df19dab4f5c5ec242f2a74abdcb6a3b2628cd08c",
-    "scriptUniversalValue": "0c7a110558e6068a875896e7f56cbe6b352701d3bd44a099795eab90592ac90f",
+    "scriptHandleLowering": "375f4a93fbad06da7a873fccf468bdbb880e3973ee13a77d2e924bb6e4764043",
+    "scriptUniversalValue": "a335c0cff8f6f96aefbc889168e03ec4126c461c00c165cfbe84aa2843621b5c",
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
-    "defoldValueLayouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
+    "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "dmsdkProjection": "159ebfcb0aafabfa5dca7a88c6ad894e4eb60ab58fe408c16b39b99216ff1c09",
     "dmsdkUniversal": "0c44cb8eff9d4908b9e0dbe44011688abedf77b6bedef34cb69dd48b535cd529",
     "dmsdkScalarThunks": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
@@ -41,7 +41,8 @@
     "dmsdkArenaSpanBlockers": "6f93462a4e5218e7eb5e934d7d7ba1f3402ebb90c2b468822fb6cae56e356bfd",
     "dmsdkCStringValue": "78e6bf8b77b95e0635a00ec95912641c2979ecda148aab2b1bbd4fc824b0e2ac",
     "dmsdkBorrowedHandle": "56b17cccc5c361c7d84c5e75947d323e5364f96380373f14b58b31d152cc9b21",
-    "semanticPolicies": "cf28bf3e4ff1eaba22661cbf01f0e74620013a25b920ff092f1297227aaf6ec2",
+    "dmsdkTargetConditionals": "cc01a8a5e6b0e85af728d55a00cd80801177d3e8eb54f1308de9279a01ed60d9",
+    "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
     "dynamicHermesJsi": "32be0b54b6bda4396d9c3bacfffa05292de96977cca1e8b17266622906751ee3",
     "staticHermesCAbi": "c048ff037ee95327a37719e96a9debf4559f353afef82bb23435640e086a0de5",
@@ -49,22 +50,22 @@
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
   "inputCanonicalHashes": {
-    "scriptProjection": "06cfa81df3dac3891bdae5ddd327b1141ee6fd1504bb2b24d3acf7056f15023b",
+    "scriptProjection": "25f96ee076e6ed5eb68c789446b85d1e4feb0219976a56a8d16f6677b12adba3",
     "scriptScalarDispatch": "0c2ec5b561bfb41c071ca9f00cd999310eb1b48f4f444714fea5ed888c6b8859",
     "scriptValueBindings": "b68e9401191f71813ff2762ea30b09083ce955718e4d4981b182b8b291a58aff",
     "scriptFixedTuples": "985cc2541d2fd278c59bfc0f0aa5f0083b5a94073ff3a7b6f83cd315ecdf9628",
     "scriptDynamicValues": "b987ff960b43ae0fc45d3a6d7002e2b54eca98fc26c35a421d8e7fcc74416326",
     "scriptValueTail": "f264fcc8ad4d4d85e88aa7b98d1a4e2bf740594c157abcd63d3f04b08ea3cf8c",
     "scriptOverloadDispatch": "b01f1e833d473aaa0fa22522bc8dd9b5990bc31c2a5f056551eb6fa503f2091f",
-    "scriptTableRecords": "431e4b041209842fee79c12d32d0b75b090d3ff6acef27da711955c00aa684e8",
+    "scriptTableRecords": "6cbd9cbf3e7483493fe6b42eddf6732766a8429f5479b42c5b85bcf19afba2b0",
     "scriptCallbackLifecycle": "ae1ea85b129434f31fd28655f78177ead8eab7d8d2e4ea39d19fc8f915b9c1df",
-    "scriptCopiedValueBlockers": "132077057fd9b2d12ff4faf01b4b613584bcc6bc81bc310246324e967d929392",
-    "scriptOpaqueRecordBlockers": "2d9db4476b176cfb52a67d69e259d9c88e18b9fcbb1fe734ce4e13a8a3360499",
+    "scriptCopiedValueBlockers": "48c80d03e07fb68111022f36088881ffadac3ec3de2996cf2347a9c81e635033",
+    "scriptOpaqueRecordBlockers": "fa62ed7a9c7e69b1fcf4002075311717aebe51ba3e9c8fde5c4ecea8871d55bd",
     "scriptUrlAddress": "0c30abae7994fb4f4ba13e53958732c2f5ec4814e3669afeabe379d6180f258f",
-    "scriptHandleLowering": "7cea4b87fb6f79765c4736533f5f655c05512f732d31503e1517c9010ddddf9d",
-    "scriptUniversalValue": "4f32759b4a398ce58ccdcd808ef7fc2766db4ab27e5488f8039064bd4bafa487",
+    "scriptHandleLowering": "47cdeccde0435cdc0b735313c55cc9762f248cfd2d053a6eebff32c1aa061d9a",
+    "scriptUniversalValue": "28bafa01bbfade3c7fbfb88412973091fc961549dec9529432a36bf998945328",
     "scriptConstantLowering": "cf923dc81d26c2d45a21fe9b3691c65d69950adda5fbcb68bbae0331704f4154",
-    "defoldValueLayouts": "e7dfbb78eec1c3fbd432080161989576915d554668f0d8b009fe420167325d29",
+    "defoldValueLayouts": "eac699e8e10722490bda1981edfa002e4b5fe9ac8b1eb1a12898abc5689708ca",
     "dmsdkProjection": "f9468a2b4adcf4e9a3cd9766973bbab03dda471a1a1f7cff7011bc5f1653d542",
     "dmsdkUniversal": "9a64d6a9f57c7230d14dd1bde5e3deb737ccf26929d47477e656e5a6ee738cf5",
     "dmsdkScalarThunks": "80dcddd4811260d4fede04879b1189cef8c4fdaed0f59128e08421a7f46f5d5d",
@@ -78,7 +79,8 @@
     "dmsdkArenaSpanBlockers": "2c6da6e4e4e4b804d5768c49ef773234b7ab3628d3b9c03a90e6bfc0369d192a",
     "dmsdkCStringValue": "348a66e705d267356507f67d7a7ffcc8bad224429f9339a465e5b1b85cc3064b",
     "dmsdkBorrowedHandle": "f7b3aa78059956b0f352f3059f33466ef17c33460410e4e7caf612bd72800404",
-    "semanticPolicies": "47af97340ecb38ea3744ae2595d41d5b73a1d02986e26a5fa04bdf493b753ae5",
+    "dmsdkTargetConditionals": "21156a0f0366b332ba7d5256302decc7ea7cf627a4626c237adb8055a05e4f22",
+    "semanticPolicies": "3336271187d4bf1b9d3c0c45efe68a9c9c3710d71fef1a09c5f37973fd52e0f8",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
     "dynamicHermesJsi": "2888cfa7afbc9caf7bfdc3de1771a5dd7639ff3b16a14dfe09adf44b604c7b1a",
     "staticHermesCAbi": "1e8803d1a6534d5597edda334d055ec08a4f1fe861c843da8e1634a5bcf7212d",
@@ -224,6 +226,304 @@
         "callback"
       ]
     }
+  },
+  "conformanceVocabulary": {
+    "schemaVersion": 1,
+    "fallback": {
+      "context": "generic",
+      "targetReason": "platform-gated API has no authenticated target-availability row"
+    },
+    "contextRows": [
+      {
+        "id": "dmsdk.engine-instance",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "dmGameObject",
+            "dmGui",
+            "dmMessage",
+            "dmResource",
+            "dmScript"
+          ]
+        },
+        "contexts": [
+          "engine-instance"
+        ],
+        "evidence": "reviewed-dmsdk-context-row"
+      },
+      {
+        "id": "dmsdk.extension-lifecycle",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "dmExtension"
+          ]
+        },
+        "contexts": [
+          "extension-lifecycle"
+        ],
+        "evidence": "reviewed-dmsdk-context-row"
+      },
+      {
+        "id": "dmsdk.input-system",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "dmHID"
+          ]
+        },
+        "contexts": [
+          "input-system"
+        ],
+        "evidence": "reviewed-dmsdk-context-row"
+      },
+      {
+        "id": "dmsdk.network",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "dmConnectionPool",
+            "dmHttp",
+            "dmSocket"
+          ]
+        },
+        "contexts": [
+          "network"
+        ],
+        "evidence": "reviewed-dmsdk-context-row"
+      },
+      {
+        "id": "dmsdk.render-thread",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "dmGraphics",
+            "dmModel",
+            "dmParticle",
+            "dmRender",
+            "dmRig"
+          ]
+        },
+        "contexts": [
+          "render-thread"
+        ],
+        "evidence": "reviewed-dmsdk-context-row"
+      },
+      {
+        "id": "script.browser",
+        "surface": "script",
+        "match": {
+          "moduleRoots": [
+            "html5"
+          ]
+        },
+        "contexts": [
+          "browser"
+        ],
+        "evidence": "reviewed-script-context-row"
+      },
+      {
+        "id": "script.game-object",
+        "surface": "script",
+        "match": {
+          "moduleRoots": [
+            "b2d",
+            "bullet3d",
+            "camera",
+            "collectionfactory",
+            "collectionproxy",
+            "factory",
+            "go",
+            "label",
+            "model",
+            "particlefx",
+            "physics",
+            "sprite",
+            "tilemap"
+          ]
+        },
+        "contexts": [
+          "game-object"
+        ],
+        "evidence": "reviewed-script-context-row"
+      },
+      {
+        "id": "script.gui-scene",
+        "surface": "script",
+        "match": {
+          "moduleRoots": [
+            "gui"
+          ]
+        },
+        "contexts": [
+          "gui-scene"
+        ],
+        "evidence": "reviewed-script-context-row"
+      },
+      {
+        "id": "script.network",
+        "surface": "script",
+        "match": {
+          "moduleRoots": [
+            "http",
+            "socket"
+          ]
+        },
+        "contexts": [
+          "network"
+        ],
+        "evidence": "reviewed-script-context-row"
+      },
+      {
+        "id": "script.render-script",
+        "surface": "script",
+        "match": {
+          "moduleRoots": [
+            "compute",
+            "font",
+            "graphics",
+            "material",
+            "render"
+          ]
+        },
+        "contexts": [
+          "render-script"
+        ],
+        "evidence": "reviewed-script-context-row"
+      },
+      {
+        "id": "script.window",
+        "surface": "script",
+        "match": {
+          "moduleRoots": [
+            "window"
+          ]
+        },
+        "contexts": [
+          "window"
+        ],
+        "evidence": "reviewed-script-context-row"
+      }
+    ],
+    "targetRows": [
+      {
+        "id": "dmsdk.android",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "dmGraphics::GetNativeAndroid"
+          ]
+        },
+        "targetGroups": [
+          "android"
+        ],
+        "evidence": "defold-dmsdk-target-conditionals"
+      },
+      {
+        "id": "dmsdk.ios",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "ExtensionRegisteriOS",
+            "ExtensionUnregisteriOS",
+            "dmExtension::RegisteriOS",
+            "dmExtension::UnregisteriOS",
+            "dmGraphics::GetNativeiOS"
+          ]
+        },
+        "targetGroups": [
+          "ios"
+        ],
+        "evidence": "defold-dmsdk-target-conditionals"
+      },
+      {
+        "id": "dmsdk.web",
+        "surface": "dmsdk",
+        "match": {
+          "namePrefixes": [
+            "dmGraphics::WebGPU"
+          ]
+        },
+        "targetGroups": [
+          "web"
+        ],
+        "evidence": "defold-dmsdk-target-conditionals"
+      },
+      {
+        "id": "script.html5-browser",
+        "surface": "script",
+        "match": {
+          "moduleRoots": [
+            "html5"
+          ]
+        },
+        "targetIds": [
+          "js-web"
+        ],
+        "evidence": "reviewed-script-target-row"
+      }
+    ],
+    "targets": [
+      {
+        "target": "arm64-android",
+        "group": "android"
+      },
+      {
+        "target": "arm64-ios",
+        "group": "ios"
+      },
+      {
+        "target": "arm64-linux",
+        "group": "linux"
+      },
+      {
+        "target": "arm64-osx",
+        "group": "osx"
+      },
+      {
+        "target": "arm64_sim-ios",
+        "group": "ios"
+      },
+      {
+        "target": "armv7-android",
+        "group": "android"
+      },
+      {
+        "target": "wasm-web",
+        "group": "web"
+      },
+      {
+        "target": "wasm_pthread-web",
+        "group": "web"
+      },
+      {
+        "target": "x86_64-android",
+        "group": "android"
+      },
+      {
+        "target": "x86_64-linux",
+        "group": "linux"
+      },
+      {
+        "target": "x86_64-osx",
+        "group": "osx"
+      },
+      {
+        "target": "x86_64-win32",
+        "group": "win32"
+      }
+    ],
+    "digest": "e88f254dc6a6f3cecbce9106030c54aeb8157b427ec54888f167d5179624c932",
+    "sources": [
+      {
+        "input": "semanticPolicies",
+        "sha256": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6"
+      },
+      {
+        "input": "dmsdkTargetConditionals",
+        "sha256": "cc01a8a5e6b0e85af728d55a00cd80801177d3e8eb54f1308de9279a01ed60d9"
+      }
+    ]
   },
   "runtimes": {
     "browser": {
@@ -516933,5 +517233,5 @@
       }
     }
   ],
-  "planSha256": "57f5010378d76190eb23f43e98db80c3500ee4f81ce0b1ff8b79d66c5eb98008"
+  "planSha256": "1f77343a737e6b378d8b9634307cb47e54b9bfdffda45c8810911feb7e816d6b"
 }

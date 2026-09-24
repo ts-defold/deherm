@@ -177,6 +177,25 @@ const transportBuilders = Object.freeze({
   "u64-lane-quad": (sources, entry) => structLayout(sources, entry.source, entry.declaration, entry.transport)
 });
 
+const recordingShapes = Object.freeze(new Set([
+  "number", "hash", "url", "handle", "userdata",
+  "vector3", "vector4", "quaternion", "matrix4"
+]));
+
+function recordingShape(policy, name, classification) {
+  const shape = policy.recordingShapes?.[name];
+  if (shape !== undefined) {
+    assert(recordingShapes.has(shape), `${name}: unsupported recording shape ${shape}`);
+    return shape;
+  }
+  assert(classification === "generated",
+    `${name}: reviewed Defold value policy has no recording shape`);
+  // An unseen Defold value is still carried by the universal Lua-value lane.
+  // Recording it as opaque userdata is conservative and keeps the route in the
+  // generated census; a later reviewed policy may select a narrower shape.
+  return "userdata";
+}
+
 export function generateDefoldValueLayouts({ projection, policy, sources, sourcePaths }) {
   assert(policy.schemaVersion === 1, "Unsupported Defold value layout policy schema");
   const names = [...collectDefoldValueNames(projection.rows.map((row) => row.signature))].sort(compare);
@@ -194,6 +213,7 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
     assert(typeof entry.typescriptType === "string" && /^[A-Za-z_$][A-Za-z0-9_$]*$/.test(entry.typescriptType),
       `${name}: transparent policy must declare a TypeScript type identifier`);
     layout.typescriptType = entry.typescriptType;
+    layout.recordingShape = recordingShape(policy, name, "reviewed");
     layout.evidence = { ...layout.evidence, file: sourcePaths[layout.evidence.file] ?? layout.evidence.file };
     transparent[name] = layout;
   }
@@ -207,7 +227,8 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
       note: policy.opaqueReasons[reason],
       classification: "reviewed",
       proof: "reviewed-semantic-classification",
-      fallbackTransport: "script-universal-value"
+      fallbackTransport: "script-universal-value",
+      recordingShape: recordingShape(policy, name, "reviewed")
     };
   }
   for (const name of unclassified) {
@@ -217,6 +238,7 @@ export function generateDefoldValueLayouts({ projection, policy, sources, source
       classification: "generated",
       proof: "source-derived-name; specialized-layout-unproven",
       fallbackTransport: "script-universal-value",
+      recordingShape: recordingShape(policy, name, "generated"),
       alert: "specialized-layout-unproven"
     };
   }

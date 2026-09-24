@@ -30,20 +30,21 @@ the source-derived Lua registration surface and the resource declaration schema
 toolchain pins from `build_tools/sdk.py`.
 
 For the pinned revision `7f0f554f41f9dce1e0ddff99bf08200657d1ee05` the policy is
-**202 subtrees - 52 namespaces plus content-addressed shared, toolchain,
-compiler-document, SDK-source, and revision-output objects - in 32,019,304
+**194 subtrees - 52 namespaces plus content-addressed shared, toolchain,
+compiler-document, SDK-source, and revision-output objects - in 25,078,691
 bytes**, under policy root
-`0a4d01692191125173e56af85557b7cd9c10c22cd793e0ee8ec60f5618f59314`.
+`9bdb93d38e59a76a5b0e529e0828841bf40ab8c60c43291a06f1492839732ec1`.
 
-`@compiler` is now a 64,150-byte versioned manifest. Its 17 semantic documents,
-28 SDK entries, and 114 revision outputs are separate content-addressed objects,
+`@compiler` is now a 67,380-byte versioned manifest. Its 20 semantic documents,
+28 SDK entries, and 118 revision outputs are separate content-addressed objects,
 so they can be shared and the manifest can eventually drive lazy fetching. The
-installed compiler locally renders thirteen script/dmSDK TypeScript files and
-checks their hashes; 15 SDK files and 114 revision outputs remain visibly
-tagged authenticated compatibility sources. This split fixes the ownership and
-object-size boundary, but not total transfer cost: the 10.21 MB lowering plan
-and compatibility outputs must still move behind package emitters once their
-normalized recipe facts can reproduce them.
+installed compiler locally renders sixteen SDK files and twelve revision
+outputs and checks their hashes; 12 SDK files and 106 revision outputs remain
+visibly tagged authenticated compatibility sources. The 17,792,680-byte
+lowering plan is already reconstructed from 2,689,701 bytes of authenticated
+recipe facts. This split fixes the ownership and object-size boundary, but not
+total transfer cost: the remaining compatibility sources and redundant
+semantic IR must continue moving behind compact facts and package emitters.
 
 The intended policy/package dependency points in one direction. Policy objects carry all
 Defold-defined vocabulary and the exact recipe data selected from it. The npm

@@ -44,6 +44,9 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
   assert.equal(first.descriptor.documents.length, 21);
+  assert.equal(first.descriptor.schemaVersion, 2);
+  assert.match(first.descriptor.policyRoot, /^[0-9a-f]{64}$/u);
+  assert.match(first.descriptor.compilerObjectSha256, /^[0-9a-f]{64}$/u);
   for (const name of [
     "defold-script-binding-patterns.json",
     "defold-dmsdk-binding-patterns.json",
@@ -163,6 +166,41 @@ test("authenticated policy materializes the complete generated SDK without a Def
   });
   assert.ok(refused.blocker, "a descriptor-backed surface without an authenticated toolchain digest must be refused");
   assert.match(refused.searched[0].reason, /no authenticated toolchain digest/u);
+
+  await materializePolicySurface(policy, { outputRoot });
+  const profilesPath = path.join(outputRoot, "ir", "defold-script-route-availability-profiles.json");
+  const profiles = JSON.parse(await readFile(profilesPath, "utf8"));
+  delete profiles.engineProfileSelection;
+  await writeFile(profilesPath, `${JSON.stringify(profiles, null, 2)}\n`);
+  const refusedTamperedIr = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refusedTamperedIr.blocker, "a modified policy-derived IR document must be refused");
+  assert.match(refusedTamperedIr.searched[0].reason, /IR digest mismatch/u);
+
+  await materializePolicySurface(policy, { outputRoot });
+  const selfConsistentProfiles = JSON.parse(await readFile(profilesPath, "utf8"));
+  selfConsistentProfiles.engineProfileSelection.defaultProfileId = "no-physics";
+  const selfConsistentBytes = `${JSON.stringify(selfConsistentProfiles, null, 2)}\n`;
+  await writeFile(profilesPath, selfConsistentBytes);
+  const selfConsistentDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  selfConsistentDescriptor.ir["defold-script-route-availability-profiles.json"].sha256 = sha256(selfConsistentBytes);
+  await writeFile(descriptorPath, `${JSON.stringify(selfConsistentDescriptor, null, 2)}\n`);
+  const refusedSelfConsistentTamper = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refusedSelfConsistentTamper.blocker, "descriptor hashes cannot bless modified policy-derived IR");
+  assert.match(refusedSelfConsistentTamper.searched[0].reason, /not authenticated by policy/u);
+
+  await materializePolicySurface(policy, { outputRoot });
+  const unsafeDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  unsafeDescriptor.ir["../outside.json"] = { sha256: "0".repeat(64) };
+  await writeFile(descriptorPath, `${JSON.stringify(unsafeDescriptor, null, 2)}\n`);
+  const refusedUnsafePath = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refusedUnsafePath.blocker, "descriptor paths may not escape the materialized surface");
+  assert.match(refusedUnsafePath.searched[0].reason, /unsafe path/u);
 });
 
 test("policy materialization fails closed when the dmSDK catalog exceeds the package frame", async () => {

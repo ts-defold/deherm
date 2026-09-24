@@ -118,7 +118,8 @@ const inputFiles = Object.freeze({
   dmsdkPatterns: "defold-dmsdk-binding-patterns.json",
   scriptDispatch: "defold-script-scalar-dispatch.json",
   scriptProbes: "defold-script-real-engine-probes.json",
-  dmsdkThunks: "defold-dmsdk-scalar-thunks.json"
+  dmsdkThunks: "defold-dmsdk-scalar-thunks.json",
+  bindingPlan: "defold-binding-lowering-plan.json"
 });
 
 const projectInputFiles = Object.freeze({
@@ -128,7 +129,8 @@ const projectInputFiles = Object.freeze({
   dmsdkPatterns: "dmsdk-binding-patterns.json",
   scriptDispatch: "script-scalar-dispatch.json",
   scriptProbes: "script-real-engine-probes.json",
-  dmsdkThunks: "dmsdk-scalar-thunks.json"
+  dmsdkThunks: "dmsdk-scalar-thunks.json",
+  bindingPlan: "binding-lowering-plan.json"
 });
 
 function invariant(condition, message) {
@@ -185,25 +187,55 @@ export function parseShard(value = "0/1") {
   return { index, count };
 }
 
-function scriptContexts(item) {
-  const root = item.modulePath[0] ?? "builtins";
-  if (root === "gui") return ["gui-scene"];
-  if (["render", "graphics", "material", "font", "compute"].includes(root)) return ["render-script"];
-  if (["go", "sprite", "tilemap", "label", "model", "particlefx", "factory", "collectionfactory", "collectionproxy", "camera", "physics", "b2d", "bullet3d"].includes(root)) return ["game-object"];
-  if (root === "html5") return ["browser"];
-  if (root === "window") return ["window"];
-  if (["http", "socket"].includes(root)) return ["network"];
-  return ["engine"];
+function conformanceVocabulary(inputs) {
+  const { planSha256, ...planBody } = inputs.bindingPlan ?? {};
+  invariant(typeof planSha256 === "string" && planSha256 === sha256(JSON.stringify(planBody)),
+    "binding-lowering plan internal digest is invalid");
+  const vocabulary = inputs.bindingPlan?.conformanceVocabulary;
+  invariant(vocabulary?.schemaVersion === 1, "binding-lowering plan has no conformance vocabulary");
+  const expectedSources = ["semanticPolicies", "dmsdkTargetConditionals"];
+  invariant(Array.isArray(vocabulary.sources) && vocabulary.sources.length === expectedSources.length &&
+    expectedSources.every((input) => vocabulary.sources.some((source) => source.input === input &&
+      source.sha256 === inputs.bindingPlan.inputHashes?.[input])),
+  "conformance vocabulary is not authenticated by its lowering-plan input hashes");
+  invariant(Array.isArray(vocabulary.contextRows) && Array.isArray(vocabulary.targetRows) && Array.isArray(vocabulary.targets),
+    "binding-lowering plan conformance vocabulary is malformed");
+  const { digest, sources: _sources, ...unsigned } = vocabulary;
+  invariant(typeof digest === "string" && digest === sha256(JSON.stringify(unsigned)),
+    "conformance vocabulary digest does not match its authenticated rows");
+  return vocabulary;
 }
 
-function dmsdkContexts(item) {
-  const name = item.name;
-  if (/dmHID/.test(name)) return ["input-system"];
-  if (/dmGui|dmGameObject|dmScript|dmMessage|dmResource/.test(name)) return ["engine-instance"];
-  if (/dmGraphics|dmRender|dmModel|dmRig|dmParticle/.test(name)) return ["render-thread"];
-  if (/dmExtension/.test(name)) return ["extension-lifecycle"];
-  if (/dmHttp|dmSocket|dmConnectionPool/.test(name)) return ["network"];
-  return ["native-host"];
+function targetCatalog(vocabulary) {
+  const rows = vocabulary.targets;
+  invariant(Array.isArray(rows), "target-availability vocabulary has no generated target census");
+  const byTarget = new Map();
+  for (const row of rows) {
+    invariant(typeof row.target === "string" && typeof row.group === "string",
+      "generated target census contains a malformed target row");
+    invariant(!byTarget.has(row.target), `generated target census repeats ${row.target}`);
+    byTarget.set(row.target, row.group);
+  }
+  return byTarget;
+}
+
+function policyRowMatches(row, surface, item) {
+  if (row.surface !== surface) return false;
+  const root = item.modulePath?.[0] ?? "builtins";
+  const name = surface === "script" ? item.rawName ?? item.name : item.name;
+  const roots = row.match?.moduleRoots ?? [];
+  const prefixes = row.match?.namePrefixes ?? [];
+  return roots.includes(root) || prefixes.some((prefix) => name.startsWith(prefix));
+}
+
+function matchingPolicyRow(rows, surface, item) {
+  const matches = rows.filter((row) => policyRowMatches(row, surface, item));
+  return matches.length === 1 ? matches[0] : undefined;
+}
+
+function requiredContexts(surface, item, vocabulary) {
+  const row = matchingPolicyRow(vocabulary.contextRows, surface, item);
+  return row?.contexts ?? [vocabulary.fallback.context];
 }
 
 function behavioralPolicy(name) {
@@ -218,16 +250,17 @@ function behavioralPolicy(name) {
   return { policy: "safe" };
 }
 
-function targetBlock(surface, item, families, target) {
-  if (surface === "script" && item.modulePath[0] === "html5" && target !== "js-web") {
-    return `html5 script API requires target js-web, selected ${target}`;
+function targetBlock(surface, item, families, target, vocabulary, targets) {
+  const row = matchingPolicyRow(vocabulary.targetRows, surface, item);
+  const group = targets.get(target);
+  const available = row && ((row.targetIds ?? []).includes(target) || (group && (row.targetGroups ?? []).includes(group)));
+  if (row && available) return undefined;
+  if (row) {
+    const required = row.targetIds?.length ? `target ${row.targetIds.join(", ")}` : `target group ${row.targetGroups.join(", ")}`;
+    return `${row.id} requires ${required}; selected ${target}`;
   }
   if (!families.includes("platform-gated")) return undefined;
-  const lower = item.name.toLowerCase();
-  if (lower.includes("ios") && !target.includes("ios")) return `iOS-only API does not match target ${target}`;
-  if (lower.includes("android") && !target.includes("android")) return `Android-only API does not match target ${target}`;
-  if ((lower.includes("html5") || lower.includes("web")) && target !== "js-web") return `web-only API does not match target ${target}`;
-  return `platform-gated API requires target-specific availability evidence for ${target}`;
+  return `${vocabulary.fallback.targetReason}; selected ${target}`;
 }
 
 function applySelectionPolicy(basePolicy, requiredContexts, selectedContexts, targetReason) {
@@ -277,11 +310,11 @@ function skipped(reason, evidence) {
   return result;
 }
 
-function scriptCase(item, pattern, dispatch, probes, selection) {
+function scriptCase(item, pattern, dispatch, probes, selection, vocabulary, targets) {
   const families = pattern ? [pattern.loweringFamily, ...(pattern.traits ?? [])] : [];
-  const requiredContexts = scriptContexts(item);
+  const requiredContextsForCase = requiredContexts("script", item, vocabulary);
   const basePolicy = behavioralPolicy(item.rawName);
-  const policy = applySelectionPolicy(basePolicy, requiredContexts, selection.contexts, targetBlock("script", item, families, selection.target));
+  const policy = applySelectionPolicy(basePolicy, requiredContextsForCase, selection.contexts, targetBlock("script", item, families, selection.target, vocabulary, targets));
   const specialized = item.runtimeStatus === "implemented-generated-lua-bridge";
   const scalarDispatch = Boolean(dispatch);
   const implemented = specialized || scalarDispatch;
@@ -290,7 +323,7 @@ function scriptCase(item, pattern, dispatch, probes, selection) {
     ? "generated_scalar_lua_descriptors.cpp + script_scalar_lua_adapter.cpp"
     : "generated_lua_bridge.cpp + native/lua_hermes_e2e.cpp";
   return {
-    ...commonCase({ item, surface: "script", ...selection, families, requiredContexts, policy }),
+    ...commonCase({ item, surface: "script", ...selection, families, requiredContexts: requiredContextsForCase, policy }),
     typeAccess: scriptTypeAccess(item),
     invocation: { kind: "script", modulePath: item.modulePath.join("."), member: item.member },
     stages: {
@@ -319,11 +352,11 @@ function scriptCase(item, pattern, dispatch, probes, selection) {
   };
 }
 
-function dmsdkCase(item, pattern, thunk, selection) {
+function dmsdkCase(item, pattern, thunk, selection, vocabulary, targets) {
   const families = pattern?.families ?? item.abiStrategies ?? [];
-  const requiredContexts = dmsdkContexts(item);
+  const requiredContextsForCase = requiredContexts("dmsdk", item, vocabulary);
   const basePolicy = callableKinds.has(item.kind) ? behavioralPolicy(item.name) : { policy: "not-applicable", reason: "type metadata is not executable" };
-  const policy = applySelectionPolicy(basePolicy, requiredContexts, selection.contexts, targetBlock("dmsdk", item, families, selection.target));
+  const policy = applySelectionPolicy(basePolicy, requiredContextsForCase, selection.contexts, targetBlock("dmsdk", item, families, selection.target, vocabulary, targets));
   const emitted = thunk?.emitted === true;
   const hostLinked = emitted && thunk.stages?.linked?.status?.includes("covered");
   const hostConformant = emitted && thunk.stages?.conformant?.status?.includes("covered");
@@ -334,7 +367,7 @@ function dmsdkCase(item, pattern, thunk, selection) {
       ? "type"
       : item.kind === "variable" ? "variable" : "metadata";
   return {
-    ...commonCase({ item, surface: "dmsdk", ...selection, families, requiredContexts, policy }),
+    ...commonCase({ item, surface: "dmsdk", ...selection, families, requiredContexts: requiredContextsForCase, policy }),
     typeAccess: { kind: accessKind, key: accessKind === "metadata" ? item.id : item.name, declarationId: item.id },
     invocation: callableKinds.has(item.kind) ? { kind: "dmsdk", symbol: item.name } : undefined,
     stages: {
@@ -384,6 +417,8 @@ export function buildConformancePlan(inputs, options = {}) {
   const shard = typeof options.shard === "string" ? parseShard(options.shard) : options.shard ?? { index: 0, count: 1 };
   const surfaces = options.surface && options.surface !== "all" ? [options.surface] : ["script", "dmsdk"];
   invariant(surfaces.every((value) => value === "script" || value === "dmsdk"), "--surface must be script, dmsdk, or all");
+  const vocabulary = conformanceVocabulary(inputs);
+  const targets = targetCatalog(vocabulary);
   const revisions = new Set([inputs.scriptIr.defoldRevision, inputs.dmsdkIr.defoldRevision].filter(Boolean));
   invariant(revisions.size === 1, "script and dmSDK IR must have the same Defold revision");
 
@@ -407,10 +442,18 @@ export function buildConformancePlan(inputs, options = {}) {
       scriptPatterns.get(item.id),
       scriptDispatch.get(item.id),
       scriptProbes.get(item.id),
-      selection)));
+      selection,
+      vocabulary,
+      targets)));
   }
   if (surfaces.includes("dmsdk")) {
-    allCases.push(...inputs.dmsdkIr.declarations.map((item) => dmsdkCase(item, dmsdkPatterns.get(item.id), dmsdkThunks.get(item.id), selection)));
+    allCases.push(...inputs.dmsdkIr.declarations.map((item) => dmsdkCase(
+      item,
+      dmsdkPatterns.get(item.id),
+      dmsdkThunks.get(item.id),
+      selection,
+      vocabulary,
+      targets)));
   }
   const ids = new Set();
   const stableIds = new Map();

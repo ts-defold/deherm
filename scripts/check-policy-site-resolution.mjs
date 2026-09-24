@@ -286,12 +286,17 @@ async function main() {
       lines.push(`  gui: ${gui.script.functions.length} declared routes, ` +
         `${Object.values(gui.registration).reduce((total, target) => total + target.routes.length, 0)} registered route records`);
 
+      const defaultProfileId = subtrees["@compiler:document:defold-script-route-availability-profiles.json"]
+        ?.value?.engineProfileSelection?.defaultProfileId;
+      if (typeof defaultProfileId !== "string" || !defaultProfileId) {
+        throw new Error("policy profile subtree has no default engine profile");
+      }
       const handshake = validateRebuiltHandshake({
         profiles: subtrees["@profiles"],
         revision,
-        profileId: "default-legacy-bullet"
+        profileId: defaultProfileId
       });
-      lines.push(`  rebuilt runtime handshake for default-legacy-bullet matches its policy profile ` +
+      lines.push(`  rebuilt runtime handshake for ${defaultProfileId} matches its policy profile ` +
         `(catalogSha256 ${handshake.catalogSha256.slice(0, 12)})`);
     }
 

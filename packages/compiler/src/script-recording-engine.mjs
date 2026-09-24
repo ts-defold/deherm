@@ -70,35 +70,6 @@ function seedStableId(revision, name, used) {
   return candidate;
 }
 
-/**
- * Structural alias policy from projected `defold-value` names onto the generated
- * handle-kind ledger. These are value-shape rules, not route allowlists: an
- * unknown name produces a machine-readable blocker instead of a silent guess.
- */
-const defoldValueHandleAliases = Object.freeze({
-  node: "gui-node",
-  buffer_data: "buffer-data",
-  buffer_stream: "buffer-stream",
-  texture: "graphics-texture",
-  render_target: "graphics-render-target",
-  constant_buffer: "render-constant-buffer"
-});
-
-/** Projected `defold-value` names that are plain numeric engine constants. */
-const defoldValueNumericNames = Object.freeze([
-  "go.EASING",
-  "gui.EASING",
-  "gui.PROP",
-  "timer_handle"
-]);
-
-/** Projected `defold-value` names carried as unbranded retained Lua userdata. */
-const defoldValueUserdataNames = Object.freeze([
-  "render_predicate",
-  "resource_data",
-  "vector"
-]);
-
 function assert(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -169,6 +140,26 @@ function handleKindLedger(handleLowering) {
     for (const rawType of kind.rawTypes ?? []) byRawType.set(rawType, kind.numericId);
   }
   return { byRawType, byId };
+}
+
+const legacyTransparentRecordingShapes = Object.freeze({
+  DefoldHash: "hash",
+  DefoldUrl: "url",
+  Vector3: "vector3",
+  Vector4: "vector4",
+  Quaternion: "quaternion",
+  Matrix4: "matrix4"
+});
+
+function recordingShapeForValue(name, entry, ledger) {
+  if (typeof entry?.recordingShape === "string") return entry.recordingShape;
+  if (ledger.byRawType.has(name)) return "handle";
+  if (typeof entry?.typescriptType === "string" && legacyTransparentRecordingShapes[entry.typescriptType]) {
+    return legacyTransparentRecordingShapes[entry.typescriptType];
+  }
+  if (entry?.reason === "enum-token-domain") return "number";
+  if (entry?.classification === "reviewed" || entry?.classification === "generated") return "userdata";
+  return undefined;
 }
 
 /**
@@ -308,7 +299,7 @@ function collectHandleNeeds(shapes, index, into, seen = new Set()) {
 }
 
 export function buildRecordingEngineModel(inputs) {
-  const { projection, universal, handleLowering, tableRecords, valueBindings, overloadDispatch, loweringPlan, inputHashes } = inputs;
+  const { projection, universal, handleLowering, valueLayouts, tableRecords, valueBindings, overloadDispatch, loweringPlan, inputHashes } = inputs;
 
   assert(loweringPlan.schemaVersion === 2, "recording engine requires canonical lowering plan schema v2");
   assert(projection.defoldRevision === universal.defoldRevision,
@@ -322,7 +313,8 @@ export function buildRecordingEngineModel(inputs) {
   const planInputDrift = Object.entries({
     projection: "scriptProjection",
     universal: "scriptUniversalValue",
-    handleLowering: "scriptHandleLowering"
+    handleLowering: "scriptHandleLowering",
+    valueLayouts: "defoldValueLayouts"
   })
     .filter(([local, planKey]) => inputHashes[local] !== loweringPlan.inputHashes[planKey])
     .map(([local, planKey]) => ({
@@ -334,6 +326,12 @@ export function buildRecordingEngineModel(inputs) {
 
   const semanticNames = ["", ...(handleLowering.handleKinds ?? []).map((kind) => kind.id)];
   const ledger = handleKindLedger(handleLowering);
+  assert(valueLayouts?.schemaVersion === 1 && valueLayouts.defoldRevision === projection.defoldRevision,
+    "recording engine requires revision-matched Defold value semantics");
+  const valueSemantics = new Map([
+    ...Object.entries(valueLayouts.transparent ?? {}),
+    ...Object.entries(valueLayouts.opaque ?? {})
+  ].map(([name, entry]) => [name, recordingShapeForValue(name, entry, ledger)]));
   const text = new TextTable();
   const shapes = new ShapeTable(text);
 
@@ -420,26 +418,21 @@ export function buildRecordingEngineModel(inputs) {
         return node(SHAPE.handle, numeric);
       }
       case "defold-value": {
-        if (value.name === "vector3") return node(SHAPE.vector3);
-        if (value.name === "vector4") return node(SHAPE.vector4);
-        if (value.name === "quaternion") return node(SHAPE.quaternion);
-        if (value.name === "matrix4") return node(SHAPE.matrix4);
-        if (value.name === "hash") return node(SHAPE.hash);
-        if (value.name === "url") return node(SHAPE.url);
-        if (defoldValueNumericNames.includes(value.name)) return node(SHAPE.number);
-        if (defoldValueUserdataNames.includes(value.name)) return node(SHAPE.userdata);
-        const alias = defoldValueHandleAliases[value.name];
-        if (alias) {
-          const numeric = ledger.byId.get(alias);
+        const semantic = valueSemantics.get(value.name);
+        if (["number", "hash", "url", "userdata", "vector3", "vector4", "quaternion", "matrix4"].includes(semantic)) {
+          return node(SHAPE[semantic]);
+        }
+        if (semantic === "handle") {
+          const numeric = ledger.byRawType.get(value.name);
           if (numeric === undefined) {
-            recordBlocker(routeId, "unknown-handle-alias", `${value.name} -> ${alias}`);
+            recordBlocker(routeId, "unknown-handle-alias", value.name);
             return node(SHAPE.unsupported);
           }
           return numeric === ledger.byId.get("gui-node")
             ? node(SHAPE.guiNode, numeric)
             : node(SHAPE.handle, numeric);
         }
-        recordBlocker(routeId, "unsupported-defold-value", value.name);
+        recordBlocker(routeId, "unsupported-defold-value", `${value.name}:${semantic ?? "unclassified"}`);
         return node(SHAPE.unsupported);
       }
       case "record-ref":
@@ -920,6 +913,7 @@ export function buildRecordingEngineModel(inputs) {
       projection: inputHashes.projection,
       universal: inputHashes.universal,
       handleLowering: inputHashes.handleLowering,
+      valueLayouts: inputHashes.valueLayouts,
       contracts: fallbackContracts
     })),
     planFallback: canonicalPlanMatchesRevision ? null : {

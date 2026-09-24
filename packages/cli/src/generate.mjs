@@ -24,6 +24,7 @@ import {
   defoldResolutionRecord,
   resolveDefoldRevision
 } from "./defold-revision.mjs";
+import { parseGameProject, resolveEngineProfiles } from "./project.mjs";
 import {
   assertResolvedDefoldSurface,
   buildGenerationMerkle,
@@ -1311,6 +1312,13 @@ function validateEngineProfiles(engineProfiles, catalog) {
   if (!engineProfiles || typeof engineProfiles !== "object") {
     throw new Error("Project inventory has no Defold engine profile resolution");
   }
+  if (typeof engineProfiles.defaultProfileId !== "string" || !engineProfiles.defaultProfileId) {
+    throw new Error("Project engine-profile resolution requires an authenticated Defold policy");
+  }
+  const selection = catalog?.engineProfileSelection;
+  if (!selection || typeof selection.defaultProfileId !== "string" || !selection.profiles?.[selection.defaultProfileId]) {
+    throw new Error("Defold policy has no authenticated engine-profile selection contract");
+  }
   const known = new Set(Object.keys(catalog.profiles ?? {}));
   const selected = new Set([
     engineProfiles.defaultProfileId,
@@ -1513,6 +1521,11 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     requirePublishedArtifacts: options.requirePublishedArtifacts
   });
   const toolchain = core.toolchain;
+  inventory.engineProfiles = await resolveEngineProfiles(
+    inventory.projectRoot,
+    parseGameProject(await readFile(path.join(inventory.projectRoot, "game.project"), "utf8")),
+    core.scriptProfiles.engineProfileSelection
+  );
   const engineProfiles = validateEngineProfiles(inventory.engineProfiles, core.scriptProfiles);
   const nativeExtensionClang = resolveNativeExtensionClang({ inventory, clang: options.clang });
   const portableInventory = { ...inventory, projectRoot: "." };
@@ -1882,7 +1895,7 @@ async function readExistingBuildArtifacts(resolvedProjectRoot) {
   }
 }
 
-export async function verifyGeneratedProject(projectRoot, outputDirectory = ".deherm") {
+export async function verifyGeneratedProject(projectRoot, outputDirectory = ".deherm", options = {}) {
   if (typeof outputDirectory !== "string" || !outputDirectory || path.isAbsolute(outputDirectory)) {
     throw new Error("Generated output must be a relative subdirectory of the Defold project");
   }
@@ -1905,7 +1918,10 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   ]);
   const manifest = JSON.parse(manifestBytes.toString("utf8"));
   const lock = JSON.parse(lockBytes.toString("utf8"));
-  const core = await coreSdkForRevision(manifest.defoldRevision, { projectRoot });
+  const core = await coreSdkForRevision(manifest.defoldRevision, {
+    projectRoot,
+    env: options.env
+  });
   if (JSON.stringify(manifest.inputs) !== JSON.stringify(core.inputs)) {
     throw new Error("Generated manifest inputs do not match this installed deherm package");
   }
@@ -1918,9 +1934,14 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   if (JSON.stringify(manifest.artifacts ?? null) !== JSON.stringify(core.artifacts ?? null)) {
     throw new Error("Generated manifest names a different Defold artifact release mapping");
   }
-  const expectedEngineProfiles = validateEngineProfiles(manifest.engineProfiles, core.scriptProfiles);
+  const currentEngineProfiles = await resolveEngineProfiles(
+    resolvedProjectRoot,
+    parseGameProject(await readFile(path.join(resolvedProjectRoot, "game.project"), "utf8")),
+    core.scriptProfiles.engineProfileSelection
+  );
+  const expectedEngineProfiles = validateEngineProfiles(currentEngineProfiles, core.scriptProfiles);
   if (JSON.stringify(manifest.engineProfiles) !== JSON.stringify(expectedEngineProfiles)) {
-    throw new Error("Generated manifest engine-profile authority differs from the installed Defold catalog");
+    throw new Error("Generated manifest engine-profile authority differs from the current project and installed Defold catalog");
   }
   const inventorySource = await readConfinedFile(resolvedOutputRoot, "extensions.json", "Generated extension inventory");
   const inventory = JSON.parse(inventorySource.toString("utf8"));
@@ -2190,7 +2211,7 @@ export async function typecheckGeneratedProject(projectRoot, options = {}) {
       throw new Error(`Generated TypeScript solution is missing at ${required}; run 'deherm generate' first`);
     }
   }
-  await verifyGeneratedProject(root);
+  await verifyGeneratedProject(root, ".deherm", { env: options.env });
   const typescriptPackage = require.resolve("typescript/package.json");
   const contextCompiler = path.join(path.dirname(typescriptPackage), "bin", "tsc");
   const compiler = contextCompiler;

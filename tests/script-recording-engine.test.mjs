@@ -7,7 +7,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { generatedScriptArtifacts } from "../scripts/lib/script-generator-pipeline.mjs";
-import { buildRecordingEngineModel } from "../packages/compiler/src/script-recording-engine.mjs";
+import { buildRecordingEngineModel, shapeCodes } from "../packages/compiler/src/script-recording-engine.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const reportPath = path.join(root, "packages/bindings/generated/defold-script-recording-engine.json");
@@ -25,6 +25,7 @@ test("a lowering plan from another revision becomes an explicit recording fallba
     projection: "packages/bindings/generated/defold-script-projection-ir.json",
     universal: "packages/bindings/generated/defold-script-universal-value-bindings.json",
     handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
+    valueLayouts: "packages/bindings/generated/defold-value-layouts.json",
     loweringPlan: "packages/bindings/generated/defold-binding-lowering-plan.json"
   };
   const texts = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([key, relative]) => [
@@ -45,6 +46,58 @@ test("a lowering plan from another revision becomes an explicit recording fallba
   assert.equal(report.planFallback.routeCount, inputs.universal.bindings.length);
   assert.ok(report.routes.every(({ loweringPlanEvidence }) =>
     loweringPlanEvidence === "projection-derived-unverified-fallback"));
+});
+
+test("recording value semantics come from revision policy rather than package aliases", async () => {
+  const paths = {
+    projection: "packages/bindings/generated/defold-script-projection-ir.json",
+    universal: "packages/bindings/generated/defold-script-universal-value-bindings.json",
+    handleLowering: "packages/bindings/generated/defold-script-handle-lowering.json",
+    valueLayouts: "packages/bindings/generated/defold-value-layouts.json",
+    tableRecords: "packages/bindings/generated/defold-script-table-record-bindings.json",
+    valueBindings: "packages/bindings/generated/defold-script-value-bindings.json",
+    overloadDispatch: "packages/bindings/generated/defold-script-overload-dispatch.json",
+    loweringPlan: "packages/bindings/generated/defold-binding-lowering-plan.json"
+  };
+  const texts = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([key, relative]) => [
+    key,
+    await readFile(path.join(root, relative), "utf8")
+  ])));
+  const inputs = Object.fromEntries(Object.entries(texts).map(([key, text]) => [key, JSON.parse(text)]));
+  inputs.inputHashes = Object.fromEntries(Object.entries(texts).map(([key, text]) => [
+    key,
+    createHash("sha256").update(text).digest("hex")
+  ]));
+
+  const routeId = "script:b2d.body.get_force";
+  const legacyInputs = structuredClone(inputs);
+  for (const entry of Object.values(legacyInputs.valueLayouts.transparent)) delete entry.recordingShape;
+  for (const entry of Object.values(legacyInputs.valueLayouts.opaque)) delete entry.recordingShape;
+  const legacyReport = buildRecordingEngineModel(legacyInputs);
+  const legacyRoute = legacyReport.routes.find(({ id }) => id === routeId);
+  assert.equal(legacyReport.shapes[legacyRoute.resultShapes[0]].code, shapeCodes.vector3,
+    "v1 layout policies remain consumable through structural inference");
+
+  const route = inputs.projection.rows.find(({ id }) => id === routeId);
+  assert.ok(route);
+  route.signature.returns[0].value.name = "future_position_vector";
+  inputs.valueLayouts.opaque.future_position_vector = {
+    ...inputs.valueLayouts.opaque.vector,
+    recordingShape: "vector3"
+  };
+  inputs.inputHashes.projection = "synthetic-future-projection";
+  inputs.inputHashes.valueLayouts = "synthetic-future-value-layouts";
+
+  const report = buildRecordingEngineModel(inputs);
+  const generated = report.routes.find(({ id }) => id === routeId);
+  assert.ok(generated);
+  assert.equal(report.shapes[generated.resultShapes[0]].code, shapeCodes.vector3);
+  assert.equal(report.blockers.some(({ route: id }) => id === routeId), false);
+
+  inputs.valueLayouts.opaque.future_position_vector.recordingShape = "future-abi-shape";
+  const unsupported = buildRecordingEngineModel(inputs);
+  assert.ok(unsupported.blockers.some(({ route: id, code, detail }) =>
+    id === routeId && code === "unsupported-defold-value" && detail === "future_position_vector:future-abi-shape"));
 });
 
 test("the recording engine is generated from the same IR as the bindings, and is deterministic", async () => {
@@ -128,8 +181,8 @@ test("the recording engine is generated from the same IR as the bindings, and is
     }
   });
   assert.deepEqual(report.summary.targetApplicability["static-hermes"], {
-    status: { exercise: 325 + constantCount, blocked: 588, omit: 2 },
-    lanes: { "static-hermes-typed-native": 325 + constantCount, "not-emitted": 590 }
+    status: { exercise: 376 + constantCount, blocked: 537, omit: 2 },
+    lanes: { "static-hermes-typed-native": 376 + constantCount, "not-emitted": 539 }
   });
   assert.deepEqual(report.summary.targetApplicability["lua-stack"], {
     status: { exercise: 911 + constantCount, blocked: 2, omit: 2 },
