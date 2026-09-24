@@ -49,9 +49,16 @@ It prints its listening address, the certificate digest and the roster, then one
 line per session join and leave.
 
 `GET /healthz` is a liveness check and `GET /readyz` is a readiness check. Both
-return JSON with the certificate digest and a snapshot of authoritative server
-stats; `/readyz` returns HTTP 503 during shutdown. Keep this control port
-private — gameplay remains HTTP/3/WebTransport over UDP.
+return JSON with the certificate digest, the `websocket-tcp` fallback label and
+a snapshot of authoritative server stats; `/readyz` returns HTTP 503 during
+shutdown or while durable session persistence is unhealthy. New QUIC and
+WebSocket admissions are rejected in that state; existing sessions are allowed
+to finish. `GET /ws` is a WebSocket upgrade on this same TCP listener. It uses
+the reliable protocol envelope and routes tick inputs through the explicit
+reliable input-fallback channel; it is never labelled WebTransport or QUIC.
+Keep this control port private and configure `war_battles.server_websocket`
+when needed. The primary gameplay transport remains HTTP/3/WebTransport over
+UDP.
 
 ## 3. Point the game at it
 
@@ -101,11 +108,11 @@ welcome, authoritative snapshots, and sent input datagrams. It does not replace
 the two-client gate: together they prove packaged-engine integration and real
 multi-session admission, respectively.
 
-**Native Defold is offline only.** A native engine has no WebTransport client
-extension; `arena.script.ts` detects the missing `WebTransport` global, logs
-`war-battles:arena-online-unavailable:no-webtransport` and plays the same match
-against bots. Generating that extension through the normal binding pipeline is
-item 3 in the README's list of next gates.
+HTML5 prefers browser WebTransport/HTTP3 and now falls back explicitly to
+WebSocket/TCP; both paths are exercised against the Bob-produced game. Native
+Defold remains offline until a native WebTransport or WebSocket adapter is
+provided, and then plays the same match against bots without mislabelling that
+path as networked.
 
 ## What is proven, and what is not
 
@@ -135,14 +142,15 @@ whose kind fixes the lane it is allowed on:
 
 | Kind | Lane | Direction | Bytes |
 | --- | --- | --- | --- |
-| `hello` | session | client → server | 40 |
-| `welcome` | session | server → client | 37 |
+| `hello` | session | client → server | 68 |
+| `welcome` | session | server → client | 61 |
 | `reject` | session | server → client | ≤ 102 |
 | `ping` / `pong` | session | both | 12 |
 | `control` | control | client → server | 8 |
 | `snapshot` | snapshot | server → client | 17,768 keyframe; compact delta after join |
 
-`PROTOCOL_VERSION` is 5: the snapshot now carries the authoritative chassis and
+`PROTOCOL_VERSION` is 6: the hello/welcome frames carry 40-byte authenticated
+resume credentials, and the snapshot carries the authoritative chassis and
 weapon-branch state, and the reliable control lane carries chassis and branch
 selection. The
 input packet is still exactly 32 bytes:
@@ -167,7 +175,8 @@ tick. A client that cannot decode or restore a frame latches its baseline as
 unavailable, reports only the first root error, drops dependent deltas, and
 recovers only from a valid keyframe.
 
-After a welcome, each session receives a rotating 16-byte resume credential.
+After a welcome, each session receives a rotating 40-byte HMAC-SHA-256 resume
+credential. The protocol version is bumped when this layout changes.
 Closing an authenticated connection releases the transport but reserves its
 slot for a bounded tick-based grace window; the world state is not reset, and
 the existing bot takeover policy advances that slot while it is absent. A
@@ -175,21 +184,26 @@ current token restores the same player id and state, rotates the token, and
 starts a fresh snapshot baseline whose first frame is a keyframe. A non-zero
 resume attempt never falls through to an anonymous slot: unknown, stale,
 active-session, and foreign-match tokens return `REJECT_BAD_RESUME`. Anonymous
-joins can use only never-authenticated or expired reservations. The example
-credential is deterministic and process-local rather than cryptographic; a
-deployment must replace issuance and verification with its authenticated token
-service. Credentials are staged for the welcome and committed only after a
+joins can use only never-authenticated or expired reservations. Credentials
+are staged for the welcome and committed only after a
 `sent` disposition, so a failed welcome retains the previous token and releases
 the slot for retry without extending that token's original grace deadline.
 A terminal snapshot-send disposition closes the server session and releases
 its claimed slot instead of leaving a disconnected human owner behind.
 
-The 37-byte welcome ends with one `snapshotIntervalTicks` cadence byte. Readers
-still accept the legacy 36-byte form and use the default three-tick cadence.
+The version-6 welcome is 61 bytes and ends with one
+`snapshotIntervalTicks` cadence byte. Older welcome layouts fail closed.
 
-The resume token is a **placeholder**: a keyed hash of the match, the slot and a
-process-lifetime salt, with no signature. It exists so the reconnect path has a
-real implementation to exercise. Anyone who sees a token can reuse it. A
-deployment must replace `MatchServer.issueResumeToken` with a token minted and
-verified by whatever authenticates the player; the method says so at its
-definition rather than leaving it to be discovered.
+`core/session-auth.ts` owns the fixed-size HMAC credential and bounded key
+rotation. `core/session-persistence.ts` owns the versioned/checksummed fixed
+capacity ledger. The Deno host restores and checkpoints that ledger only at
+startup, admission/disconnect, and shutdown; no persistence occurs per tick.
+Set `WAR_BATTLES_RESUME_KEY` (64 hex characters) and
+`WAR_BATTLES_SESSION_STATE` or pass `--resume-key`, `--resume-key-file`, and
+`--session-state` as appropriate for
+restart-resumable deployments. If no key is configured, the server uses an
+unpredictable local-development key, so restart resume requires explicit key
+configuration. Malformed keys and corrupt state fail closed. A failed
+checkpoint also fails closed for new admissions until a later checkpoint write
+recovers; the serialized writer remains retryable and keeps ledger revisions
+dirty until a write succeeds.

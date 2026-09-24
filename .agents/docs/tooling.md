@@ -229,6 +229,20 @@ pnpm exec deherm verify-bundle --recompute           # also re-bundle and name t
 pnpm exec deherm verify-bundle --allow-unbound       # report, do not fail, an artifact with no binding
 ```
 
+`--no-ttsc` is a diagnostic escape hatch, not a packaging mode. It deliberately
+keeps source-level calls such as `hashLiteral("#fire")` in the JavaScript so a
+browser or engine session can be inspected, but that bundle must never cross
+the Bob seam. `verify-bundle` marks a recorded bundle built with transforms
+disabled as an error even with `--allow-unbound`; `verify-generated` applies the
+same gate, and `scripts/bob.sh` runs `verify-bundle` before Bob. The normal
+development path is `deherm dev --once`, which rebuilds with transforms
+enabled.
+
+This guard was added after a real failure: a War Battles diagnostic bundle
+retained the runtime `hashLiteral` call and reached the packaged Wasm output.
+The retained runtime call, rather than the browser host, was the cause; a
+diagnostic build is still useful for inspection, but it is not valid Bob input.
+
 The default check is a hash comparison over the recorded inputs, not a
 recompile, so it is cheap enough for a pre-Bob step and for every rebuild.
 `scripts/bob.sh` runs it before invoking Bob; `DEFOLD_HERMES_SKIP_BUNDLE_CHECK=1`

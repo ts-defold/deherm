@@ -416,6 +416,16 @@ that provably disagrees with it. `--recompute` bundles the current sources into
 a scratch directory to name the exact fingerprint they produce, and clears the
 failure when that is the artifact already on disk.
 
+The transform setting is part of this seam as well. `deherm dev --no-ttsc` is
+diagnostic-only: it allows a runtime session to inspect untransformed source,
+but a recorded bundle with `ttsc: false` is rejected by `verify-bundle`,
+`verify-generated`, and the Bob wrapper even when an unbound artifact is being
+reported rather than gated. This closes a failure observed in the real Wasm
+path: a diagnostic bundle retained the runtime `hashLiteral` call and reached
+packaging. The browser host could inspect that bundle, but it was not a valid
+packaged program. The default diagnostic inspection remains reportable; only
+the packaging boundary fails closed.
+
 Both workflows keep working unchanged. A committed bundle is committed together
 with its binding; a build machine that runs déherm rewrites the binding before
 Bob reads it. The same record shape covers generated extension C - the

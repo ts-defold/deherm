@@ -16,6 +16,8 @@ import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import { PUBLIC_EXTENSION_ZIP_LIMITS, discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
 import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
+import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
+import { recordBundleBuild } from "../packages/cli/src/build-artifacts.mjs";
 
 // Every fixture states the Defold revision it targets. Generation resolves the
 // revision from the project rather than assuming the packaged one, so a fixture
@@ -945,6 +947,39 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   });
   assert.equal(verifiedCli.status, 0, `${verifiedCli.stdout}\n${verifiedCli.stderr}`);
   assert.equal(JSON.parse(verifiedCli.stdout).planSha256, loweringPlan.planSha256);
+
+  // Generated state can be perfectly current while a diagnostic `--no-ttsc`
+  // bundle is still the file Bob would archive. Inspection remains available,
+  // but verify-generated must carry the same pre-Bob transform gate as
+  // verify-bundle.
+  const gameProjectPath = path.join(project, "game.project");
+  await writeFile(gameProjectPath, `${await readFile(gameProjectPath, "utf8")}app = /deherm/app.dehermc\n`);
+  await mkdir(path.join(project, "src"), { recursive: true });
+  await writeFile(path.join(project, "src", "main.ts"), "export const fixtureDiagnostic = true;\n");
+  const diagnosticCompiler = await createIncrementalCompiler({
+    entryPoint: path.join(project, "src", "main.ts"),
+    outputFile: path.join(project, ".deherm", "dev", "app.dehermc"),
+    mirrors: [path.join(project, "deherm", "app.dehermc")],
+    resourcePath: "/deherm/app.dehermc",
+    useTtsc: false,
+    sourcemap: false,
+    captureDiagnostics: false
+  });
+  try {
+    const diagnosticBuild = await diagnosticCompiler.rebuild([]);
+    await recordBundleBuild({ projectRoot: project, build: diagnosticBuild });
+  } finally {
+    await diagnosticCompiler.dispose();
+  }
+  const generatedDiagnostic = await verifyGeneratedProject(project);
+  assert.equal(generatedDiagnostic.buildArtifacts.ok, false);
+  assert.equal(generatedDiagnostic.buildArtifacts.entries[0].status, "transform-disabled");
+  const generatedDiagnosticCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
+    cwd: process.cwd(),
+    encoding: "utf8"
+  });
+  assert.equal(generatedDiagnosticCli.status, 1, `${generatedDiagnosticCli.stdout}\n${generatedDiagnosticCli.stderr}`);
+  assert.equal(JSON.parse(generatedDiagnosticCli.stdout).buildArtifacts.entries[0].status, "transform-disabled");
 
   const cameraGlue = path.join(cameraNativeRoot, "camera_glue.cpp");
   await writeFile(cameraGlue, `${await readFile(cameraGlue, "utf8")} `);

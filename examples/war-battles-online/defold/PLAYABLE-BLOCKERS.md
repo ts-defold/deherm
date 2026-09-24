@@ -158,16 +158,15 @@ does not prove:
   session with a typed reject; a session's forged packet for another player's
   slot being rejected without moving that tank; an upgrade bought over the
   reliable control lane.
-* **Not proven anywhere:** a real QUIC session. No gate in this repository has
-  opened one. `server/deno-main.ts` and the certificate procedure are written and
-  typechecked; Deno is not installed in the environment that wrote them.
-* **Native Defold has no WebTransport client.** `arena.script.ts` detects the
-  missing global, logs `war-battles:arena-online-unavailable:no-webtransport`
-  and plays offline. Generating that extension through the normal binding
-  pipeline remains the blocker it always was.
-* The resume token issued by `MatchServer` is a keyed hash, not a signed
-  credential. It proves the reconnect *path*, not the reconnect *security*, and
-  says so at its definition.
+* **Browser transport is proven on both lanes:** the owner gates open a real
+  QUIC/WebTransport session and a forced WebSocket/TCP fallback from the
+  Bob-produced HTML5 game, then require authoritative snapshots and
+  server-accepted input. Native Defold still needs a native transport adapter
+  and otherwise plays offline.
+* Resume tokens are fixed 40-byte HMAC-SHA-256 credentials with bounded,
+  persisted generation state. The Docker restart gate proves that the same
+  player resumes after the server container restarts; it is not a claim of
+  matchmaking, account identity, abuse prevention, or cross-region failover.
 
 ## Route shapes this port deliberately does not use
 

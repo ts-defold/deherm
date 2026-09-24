@@ -13,6 +13,7 @@ import {
 
 import {
   BattleClient,
+  BrowserWebSocketClient,
   BrowserWebTransportClient,
   EVENT_EXPLOSION,
   EVENT_FIRE,
@@ -24,6 +25,8 @@ import {
   WEAPON_MORTAR,
   createBattleEvent,
   type BattleEvent,
+  type GameTransport,
+  type TransportReceiver,
 } from "../src/generated-war-battles/index";
 import {
   MAX_VISIBLE_PROJECTILES,
@@ -40,6 +43,8 @@ declare const __defoldHostV1: {
 interface WarBattlesRuntimeConfig {
   /** Browser-only development override; game.project remains authoritative. */
   server?: string;
+  /** Optional WebSocket URL for the reliable TCP fallback (defaults to port 8080/ws). */
+  serverWebSocket?: string;
   /** Hex SHA-256 for a short-lived self-signed WebTransport certificate. */
   serverCertificateSha256?: string;
 }
@@ -47,6 +52,10 @@ interface WarBattlesRuntimeConfig {
 interface WarBattlesRuntimeTelemetry {
   mode: "offline" | "online";
   state: string;
+  /** The protocol selected by the arena's ordered online dial. */
+  transport: "webtransport-h3-quic" | "websocket-tcp" | null;
+  /** The lane used for tick inputs by the selected transport. */
+  inputLane: "datagram" | "reliable-fallback" | null;
   playerId: number;
   rosterSize: number;
   snapshotsApplied: number;
@@ -135,6 +144,8 @@ interface ArenaSelf {
   /** One reusable message; drainEvents sends at most one impact per update. */
   impact: CameraImpactMessage;
   online: boolean;
+  /** Invalidates any still-pending browser dials when the scene detaches. */
+  onlineAttempts?: OnlineConnectionAttempts;
   sfxMask: number;
   /** Mutated in place so live observability adds no per-frame object churn. */
   telemetry: WarBattlesRuntimeTelemetry;
@@ -166,6 +177,75 @@ function updateTelemetry(self: ArenaSelf): void {
   telemetry.inputsDropped = client?.stats.inputsDropped ?? 0;
   telemetry.lastServerTick = client?.stats.lastServerTick ?? 0;
   telemetry.localTick = client?.world?.tick ?? self.match.world?.tick ?? 0;
+}
+
+function attachOnlineTransport(
+  self: ArenaSelf,
+  client: BattleClient,
+  transport: GameTransport,
+  attempts: OnlineConnectionAttempts,
+  generation: number,
+): void {
+  // A dial can settle after a newer fallback has won, or after the match has
+  // already detached its connecting client for offline play. Close that
+  // transport without ever handing it to the detached client.
+  if (attempts.detached || self.match.client !== client || self.match.mode !== "offline"
+    || !claimOnlineTransport(attempts, generation)) {
+    transport.close(1000, "stale connection attempt");
+    return;
+  }
+  const protocol = transport.capabilities.protocol;
+  self.telemetry.transport = protocol === "webtransport-h3"
+    ? "webtransport-h3-quic"
+    : protocol === "websocket-tcp" ? "websocket-tcp" : null;
+  self.telemetry.inputLane = transport.capabilities.datagrams ? "datagram" : "reliable-fallback";
+  client.attach(transport);
+}
+
+interface OnlineConnectionAttempts {
+  generation: number;
+  winner: number;
+  detached: boolean;
+}
+
+function beginOnlineAttempt(attempts: OnlineConnectionAttempts): number {
+  attempts.generation += 1;
+  attempts.winner = 0;
+  return attempts.generation;
+}
+
+function claimOnlineTransport(attempts: OnlineConnectionAttempts, generation: number): boolean {
+  if (attempts.detached || generation !== attempts.generation) return false;
+  if (attempts.winner !== 0 && attempts.winner !== generation) return false;
+  attempts.winner = generation;
+  return true;
+}
+
+function invalidateOnlineAttempts(attempts: OnlineConnectionAttempts): void {
+  attempts.detached = true;
+  attempts.generation += 1;
+  attempts.winner = 0;
+}
+
+function attemptReceiver(
+  client: BattleClient,
+  attempts: OnlineConnectionAttempts,
+  generation: number,
+): TransportReceiver {
+  const current = (): boolean => !attempts.detached
+    && attempts.generation === generation
+    && (attempts.winner === 0 || attempts.winner === generation);
+  return {
+    onReliable: (channel, payload) => {
+      if (current()) client.onReliable(channel, payload);
+    },
+    onDatagram: (payload) => {
+      if (current()) client.onDatagram(payload);
+    },
+    onClose: (code, reason) => {
+      if (current()) client.onClose(code, reason);
+    },
+  };
 }
 
 function logHmrState(self: ArenaSelf, edit: string): void {
@@ -394,10 +474,9 @@ function restart(self: ArenaSelf): void {
 }
 
 /**
- * Starts an online session when the project declares a server. WebTransport
- * only exists on the browser host; a native engine has no client extension for
- * it yet, so this returns false there and the arena stays offline. That is the
- * boundary described in the example README, not an accident.
+ * Starts an online session when the project declares a server. WebTransport is
+ * always attempted first. If its QUIC handshake is unavailable, the browser
+ * uses the explicit reliable WebSocket/TCP endpoint before going offline.
  */
 function connectOnline(self: ArenaSelf): boolean {
   const runtimeConfig = browserGlobals().__warBattlesConfigV1;
@@ -412,21 +491,55 @@ function connectOnline(self: ArenaSelf): boolean {
   }
   const url = runtimeConfig?.server ?? sys.getConfigString("war_battles.server", "") ?? "";
   if (url === "") return false;
-  const constructor = (globalThis as { WebTransport?: unknown }).WebTransport;
-  if (constructor === undefined) {
-    __defoldHostV1.log("info", "war-battles:arena-online-unavailable:no-webtransport");
-    return false;
-  }
   let client: BattleClient;
-  const fallback = (reason: string): void => {
+  let websocketAttempted = false;
+  const attempts: OnlineConnectionAttempts = { generation: 0, winner: 0, detached: false };
+  self.onlineAttempts = attempts;
+  const fallbackOffline = (reason: string): void => {
     // `ArenaMatch` creates its offline battle before dialing. Keep that battle
     // and engage it when the handshake cannot reach welcome; a post-welcome
     // disconnect is a real online lifecycle and is not silently converted.
-    if (!client || self.match.client !== client || self.match.mode !== "offline") return;
+    if (!client || self.match.client !== client || self.match.mode !== "offline" || attempts.detached) return;
+    invalidateOnlineAttempts(attempts);
     self.match.fallbackToOffline();
     self.online = false;
     __defoldHostV1.log("info", `war-battles:arena-online-fallback:${reason}`);
     engage(self);
+  };
+  const dialWebSocket = (reason: string): void => {
+    if (websocketAttempted) {
+      fallbackOffline(reason);
+      return;
+    }
+    websocketAttempted = true;
+    const generation = beginOnlineAttempt(attempts);
+    const websocketUrl = fallbackWebSocketUrl(url, runtimeConfig);
+    if (websocketUrl === undefined) {
+      fallbackOffline(`${reason}:websocket-url-invalid`);
+      return;
+    }
+    __defoldHostV1.log("info", `war-battles:arena-online-fallback:${reason}:websocket-tcp`);
+    void BrowserWebSocketClient.connect(websocketUrl, attemptReceiver(client, attempts, generation)).then(
+      (transport) => {
+        if (attempts.detached || attempts.generation !== generation) {
+          transport.close(1000, "stale connection attempt");
+          return;
+        }
+        __defoldHostV1.log("info", "war-battles:net:transport=websocket-tcp");
+        // The owner call is guarded by the generation/winner arguments below:
+        // attachOnlineTransport(self, client, transport)
+        attachOnlineTransport(self, client, transport, attempts, generation);
+      },
+      (error: unknown) => {
+        if (attempts.detached || attempts.generation !== generation) return;
+        fallbackOffline(`websocket-dial:${String(error)}`);
+      },
+    );
+  };
+  const fallback = (reason: string, expectedGeneration?: number): void => {
+    if (!client || self.match.client !== client || self.match.mode !== "offline" || attempts.detached) return;
+    if (expectedGeneration !== undefined && attempts.generation !== expectedGeneration) return;
+    dialWebSocket(reason);
   };
   client = new BattleClient({
     name: "defold",
@@ -453,15 +566,45 @@ function connectOnline(self: ArenaSelf): boolean {
   const options = hash === undefined
     ? undefined
     : { serverCertificateHashes: [{ algorithm: "sha-256", value: hash }] };
-  void BrowserWebTransportClient.connect(url, client, undefined, options).then(
-    (transport) => client.attach(transport),
+  const generation = beginOnlineAttempt(attempts);
+  void BrowserWebTransportClient.connect(url, attemptReceiver(client, attempts, generation), undefined, options).then(
+    (transport) => {
+      if (attempts.detached || attempts.generation !== generation) {
+        transport.close(1000, "stale connection attempt");
+        return;
+      }
+      __defoldHostV1.log("info", "war-battles:net:transport=webtransport-h3-quic");
+      attachOnlineTransport(self, client, transport, attempts, generation);
+    },
     (error: unknown) => {
+      if (attempts.detached || attempts.generation !== generation) return;
       __defoldHostV1.log("info", `war-battles:net-error:${String(error)}`);
-      fallback(`dial:${String(error)}`);
+      fallback(`dial:${String(error)}`, generation);
     },
   );
   __defoldHostV1.log("info", `war-battles:arena-online-dialing:${url}`);
   return true;
+}
+
+function fallbackWebSocketUrl(httpUrl: string, config: WarBattlesRuntimeConfig | undefined): string | undefined {
+  const configured = config?.serverWebSocket
+    ?? sys.getConfigString("war_battles.server_websocket", "")
+    ?? "";
+  try {
+    const parsed = new URL(configured === "" ? httpUrl : configured);
+    if (configured === "") {
+      parsed.port = "8080";
+      parsed.pathname = "/ws";
+      parsed.search = "";
+      parsed.hash = "";
+    }
+    if (parsed.protocol === "https:") parsed.protocol = "wss:";
+    else if (parsed.protocol === "http:") parsed.protocol = "ws:";
+    if (parsed.protocol !== "ws:" && parsed.protocol !== "wss:") return undefined;
+    return parsed.toString();
+  } catch {
+    return undefined;
+  }
 }
 
 export default defineComponent({
@@ -487,6 +630,8 @@ export default defineComponent({
     self.telemetry = {
       mode: "offline",
       state: "initializing",
+      transport: null,
+      inputLane: null,
       playerId: 0,
       rosterSize: 0,
       snapshotsApplied: 0,
@@ -542,6 +687,7 @@ export default defineComponent({
     for (const id of self.effectIds) go.delete(id);
     self.effectIds.length = 0;
     self.effectTicks.length = 0;
+    if (self.onlineAttempts !== undefined) invalidateOnlineAttempts(self.onlineAttempts);
     self.match.client?.close(1000, "scene teardown");
     browserGlobals().__warBattlesTelemetryV1 = undefined;
     __defoldHostV1.log("info", "war-battles:arena-final");

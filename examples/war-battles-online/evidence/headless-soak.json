@@ -14,7 +14,7 @@
   "matchId": 77,
   "mapSeed": 12648430,
   "stateHash": 2340706098,
-  "replayBodyHash": 154245043,
+  "replayBodyHash": 1319485626,
   "alivePlayers": 32,
   "totalKills": 14,
   "rollbackCount": 1,
@@ -23,9 +23,9 @@
     {
       "path": "examples/war-battles-online/core",
       "kind": "tree",
-      "fileCount": 16,
-      "bytes": 255353,
-      "sha256": "89cc92296270bbf6bff575e66769c5d61e3d8d9bc55bb310ab8e71ee56ef10e9"
+      "fileCount": 20,
+      "bytes": 291545,
+      "sha256": "ba6a5bfeb66375e28a3e2e3228464783977b2e1fe7b850ad3645975cdf0187f9"
     },
     {
       "path": "examples/war-battles-online/headless/fixture.ts",
@@ -60,14 +60,14 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 4097,
-      "sha256": "be068f587b08f7f589983d08205db35347a091ebeebcb3645f3781215583a016"
+      "bytes": 6047,
+      "sha256": "1bb9135f8c589f34a31765396e8320d891f659a41bc8aca9e5dcad6a8c14c017"
     },
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 43106,
-      "sha256": "2aae366b9d68a40b84b79852a390a7826d872812e6ab713798a2513cede954a0"
+      "bytes": 43570,
+      "sha256": "500089741a64c128fe60097e152facca7d9cfa49b696260263407793d299f7ba"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -76,6 +76,6 @@
       "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
     }
   ],
-  "sourceKey": "6e7f19b4659c4b9c081091d24faab4560eb84700be53282dd9fb3d5570c02cf9",
+  "sourceKey": "92d92e1eeb2dbaf01611147de78dddbf000673aaac06e358e263179bbb3c98de",
   "evidenceBoundary": "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence."
 }

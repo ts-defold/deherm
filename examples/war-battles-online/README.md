@@ -158,9 +158,9 @@ snaps to the truth. Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 5,
-which adds authoritative chassis and weapon-branch state to snapshots and the
-reliable control lane. The tick input packet is still exactly 32 bytes (version 1 reserved byte
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 6,
+which adds 40-byte authenticated resume credentials alongside the authoritative
+chassis and weapon-branch state. The tick input packet is still exactly 32 bytes (version 1 reserved byte
 15 and wrote zero; it is now the weapon request, so every other offset is
 unchanged), and the session, control and snapshot lanes now carry a typed
 four-byte envelope whose kind fixes the lane it is allowed on. Full table in
@@ -177,6 +177,21 @@ tick inputs through QUIC datagrams, and observes a MatchServer marker proving
 that at least three inputs were accepted server-side. The gate intentionally
 does not claim a persistent-stream open count. This is browser loopback
 evidence, not WAN/ingress, native Defold, load, loss, or allocation evidence.
+
+The packaged boundary has its own fallback gate:
+`pnpm runtime:browser:online:fallback`. It loads the actual Bob-produced
+Defold/Wasm bundle, makes only the configured WebTransport/QUIC endpoint
+unavailable, keeps the Deno TCP control listener alive, and requires the game
+component to report `transport=websocket-tcp`,
+`inputLane=reliable-fallback`, an authoritative welcome, snapshots, and
+server-accepted inputs. Both owner runs query the Deno `/readyz` control
+endpoint and require `stats.inputsAccepted >= 3` plus the exact
+`war-battles-server:stats:inputs-accepted:count=3` milestone; client
+`inputsSent` telemetry alone is not server-acceptance evidence. The normal
+`pnpm runtime:browser:online` run reports
+`transport=webtransport-h3-quic` and `inputLane=datagram`; these are mutually
+exclusive packaged observations, not labels copied from a standalone adapter
+harness.
 
 The compact snapshot unit test independently proves the codec against a full
 32-player world: the former 17,640-byte frame is now a 17,768-byte keyframe,
@@ -210,6 +225,13 @@ it with `pnpm runtime:webtransport --
 --record-evidence`; the gate owns and removes its certificate, server, browser
 profile, and static host.
 
+The packaged online owner (`integration/check-packaged-online.mjs`) is the
+source of truth for those two transport observations. Its `--fallback` mode
+uses the same shipped bundle and browser host; the focused
+`test/packaged-online-fallback.test.mjs` test keeps that ownership boundary
+explicit. This proof does not promote TCP to QUIC, claim native Defold
+networking, WAN behavior, or offline failover after a welcomed session.
+
 The packaged native and HTML5 evidence documents are current for this tree.
 [`evidence/packaged-runtime-arm64-macos.json`](./evidence/packaged-runtime-arm64-macos.json)
 records the custom-engine run through the tutorial collision/score chain and
@@ -242,6 +264,8 @@ manifest so the two cannot drift.
 | `pnpm serve` | The Deno HTTP/3 match server |
 | `pnpm dev` | Compiler, watcher and hot-reload control plane |
 | `pnpm runtime:packaged`, `pnpm runtime:browser` | The two packaged runtime gates |
+| `pnpm runtime:browser:online`, `pnpm runtime:browser:online:fallback` | Packaged online WebTransport/QUIC and forced WebSocket/TCP fallback gates |
+| `pnpm test:websocket`, `pnpm runtime:websocket` | Deterministic and real-browser WebSocket/TCP fallback gates |
 | `pnpm runtime:projections` | The projection-set gate |
 | `pnpm bundle:size`, `pnpm bundle:size:update` | Bundle measurement |
 
@@ -266,16 +290,22 @@ runtime. It deliberately describes semantics instead of naming a vendor:
 - reconnect/session resume lives above the connection. A new connection presents
   its current resume token, then the server either restores the player slot and
   sends a fresh full snapshot or refuses the resume. A transport connection
-  itself is never assumed resumable. This example's token is deterministic and
-  in-process only; deployment authentication must replace it with a signed or
-  otherwise authenticated credential service.
+  itself is never assumed resumable. Version 6 carries a 40-byte HMAC resume
+  credential; the Deno host accepts an explicit 32-byte secret and persists a
+  fixed-capacity generation ledger at lifecycle checkpoints.
 
-The browser adapter places each reliable protocol message on an independent
-unidirectional stream. That avoids cross-lane ordered head-of-line blocking and
-lets a caller abort an obsolete reliable input fallback. Its stream receive path
-buffers arbitrary read fragmentation and validates a fixed length prefix before
-delivery. Transport receive allocations and browser/runtime queues are outside
-the simulation allocation boundary.
+The WebTransport browser adapter places each reliable protocol message on an
+independent unidirectional stream. That avoids cross-lane ordered head-of-line
+blocking and lets a caller abort an obsolete reliable input fallback. Its stream
+receive path buffers arbitrary read fragmentation and validates a fixed length
+prefix before delivery. When WebTransport is unavailable, the browser adapter
+connects to the Deno health/control listener's `/ws` endpoint. WebSocket is
+reliable ordered TCP only (`websocket-tcp`): it advertises no datagrams, so
+`sendTickInput` uses the explicit reliable `input-fallback` channel. Arena
+selection always tries WebTransport first and only then this fallback. Set
+`war_battles.server_websocket` (or the browser config override) when the health
+port is not the default `8080`. Transport receive allocations and
+browser/runtime queues are outside the simulation allocation boundary.
 
 Deployments must terminate HTTP/3 with a certificate browsers accept. For local
 development, compatible browser clients can use a short-lived self-signed
@@ -375,8 +405,9 @@ The next truthful product gates are:
 3. a native Defold WebTransport client extension (HTTP/3/QUIC, streams, datagrams,
    TLS and callbacks) generated through the normal binding pipeline; browser-host
    JavaScript may use the browser adapter only after that host bridge is proven;
-4. the selected server adapter, authentication/resume token service, snapshot
-   delta codec, interest management, persistence/matchmaking, and rate limits;
+4. the selected server adapter, matchmaking, snapshot delta codec, interest
+   management, and rate limits (authenticated resume and bounded restart
+   ledger are now implemented);
 5. loopback plus real-browser/native QUIC runs, certificate/origin tests, induced
    loss/reorder/MTU/backpressure tests, 32-bot soak metrics, and allocation traces.
 

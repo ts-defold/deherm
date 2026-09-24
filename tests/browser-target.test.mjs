@@ -20,7 +20,7 @@ import {
   createBrowserTarget,
   resolveWebBundle
 } from "../packages/cli/src/dev/browser-target.mjs";
-import { startBundleServer } from "../packages/cli/src/dev/browser-host.mjs";
+import { connectCdp, startBundleServer } from "../packages/cli/src/dev/browser-host.mjs";
 import { readInspectorSession } from "../packages/cli/src/dev/inspector-session.mjs";
 import { applyDevEvent, createDevModel, snapshotDevModel } from "../packages/cli/src/dev/model.mjs";
 
@@ -162,6 +162,68 @@ test("the browser target publishes and owns a browser debugger session", async (
   } finally {
     await target.stop();
     await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("browser exception diagnostics retain source location and exception description", async () => {
+  const previousWebSocket = globalThis.WebSocket;
+  class FakeWebSocket {
+    static CLOSED = 3;
+
+    constructor() {
+      this.readyState = 1;
+      this.listeners = new Map();
+      queueMicrotask(() => this.emit("open"));
+    }
+
+    addEventListener(type, listener) {
+      const group = this.listeners.get(type) ?? [];
+      group.push(listener);
+      this.listeners.set(type, group);
+    }
+
+    send() {}
+
+    close() {
+      this.readyState = FakeWebSocket.CLOSED;
+      this.emit("close");
+    }
+
+    emit(type, value = {}) {
+      for (const listener of this.listeners.get(type) ?? []) listener(value);
+    }
+  }
+
+  globalThis.WebSocket = FakeWebSocket;
+  try {
+    const failures = [];
+    const client = await connectCdp("ws://fixture", { onFailure: (failure) => failures.push(failure) });
+    client.socket.emit("message", {
+      data: JSON.stringify({
+        method: "Runtime.exceptionThrown",
+        params: {
+          exceptionDetails: {
+            text: "Uncaught Error",
+            exception: { description: "Error: retained hashLiteral call" },
+            url: "http://fixture/app.js",
+            lineNumber: 7,
+            columnNumber: 11
+          }
+        }
+      })
+    });
+    assert.deepEqual(failures, [{
+      kind: "exception",
+      detail: "Error: retained hashLiteral call",
+      text: "Uncaught Error",
+      url: "http://fixture/app.js",
+      line: 8,
+      column: 12
+    }]);
+    assert.deepEqual(client.failures, failures);
+    await client.close();
+  } finally {
+    globalThis.WebSocket = previousWebSocket;
   }
 });
 

@@ -18,6 +18,8 @@ export const MAX_PLAYERS = 32;
 export const MAX_PROJECTILES = 512;
 export const MAX_PICKUPS = 32;
 export const INPUT_HISTORY_TICKS = 256;
+/** Fixed protocol width of the authenticated session-resume credential. */
+export const SESSION_TOKEN_BYTES = 40;
 /** Axes stay held this long without a fresh input before they are released. */
 export const INPUT_HOLD_TICKS = 6;
 

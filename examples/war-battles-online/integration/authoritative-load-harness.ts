@@ -216,6 +216,27 @@ class ImpairedTransport implements GameTransport {
   }
 }
 
+/**
+ * Admission uses the host WebCrypto provider and is intentionally asynchronous
+ * at the session boundary. Keep the deterministic simulation clock paused until
+ * every initial handshake has reached its ready/closed terminal state. A timer
+ * turn is required here because Deno's WebCrypto completion is not guaranteed
+ * to run in the same microtask turn as Node's provider; this is harness
+ * synchronization only and does not alter production admission semantics.
+ */
+async function settleInitialAdmissions(
+  sessions: readonly { readonly ready: boolean; readonly closed: boolean }[],
+): Promise<void> {
+  const maximumTurns = 256;
+  for (let turn = 0; turn < maximumTurns; turn += 1) {
+    if (sessions.every((session) => session.ready || session.closed)) return;
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
+  }
+  const pending = sessions.reduce((count, session) => count + (session.ready || session.closed ? 0 : 1), 0);
+  throw new Error(`initial session admission did not settle (${pending} pending after ${maximumTurns} event-loop turns)`);
+}
+
 export interface LoadHarnessEvidence {
   readonly schemaVersion: number;
   readonly kind: string;
@@ -227,8 +248,24 @@ export interface LoadHarnessEvidence {
   readonly errors: Record<string, unknown>;
 }
 
+/**
+ * Optional observation seam for runtime measurements. The default load gate
+ * does not pass an observer, so its evidence remains deterministic. A runtime
+ * owner may supply a monotonic clock to observe the real authoritative step
+ * without teaching the production server about a benchmark or changing the
+ * deterministic workload record.
+ */
+export interface AuthoritativeLoadObserver {
+  readonly now: () => number;
+  readonly onAuthoritativeStep?: (sample: {
+    readonly tick: number;
+    readonly durationMilliseconds: number;
+  }) => void;
+}
+
 export async function runAuthoritativeLoadHarness(
   config: Readonly<typeof LOAD_HARNESS_CONFIG> = LOAD_HARNESS_CONFIG,
+  observer?: AuthoritativeLoadObserver,
 ): Promise<LoadHarnessEvidence> {
   const serverErrors: string[] = [];
   const serverLogs: string[] = [];
@@ -272,6 +309,12 @@ export async function runAuthoritativeLoadHarness(
   // handshake sequencing required by a real reliable transport.
   let simulationTime = config.baseLatencyMilliseconds * 4 + config.jitterMilliseconds * 2;
   network.advanceTo(simulationTime);
+  await settleInitialAdmissions(sessions);
+  // Welcome frames are scheduled only after async admission completes. Move
+  // the deterministic network clock past one bounded reliable-lane latency,
+  // then consume those frames before the first authoritative step.
+  simulationTime += config.baseLatencyMilliseconds + config.jitterMilliseconds + 1;
+  network.advanceTo(simulationTime);
   await Promise.resolve();
   for (const client of clients) client.update(0);
   await Promise.resolve();
@@ -289,7 +332,15 @@ export async function runAuthoritativeLoadHarness(
       });
       clients[index]!.setAim((player % 2 === 0 ? -1 : 1) * 256, ((tick + player) % 5) - 2);
     }
+    const stepStarted = observer === undefined ? undefined : observer.now();
     server.step();
+    if (stepStarted !== undefined && observer !== undefined) {
+      const durationMilliseconds = observer.now() - stepStarted;
+      if (!Number.isFinite(durationMilliseconds) || durationMilliseconds < 0) {
+        throw new Error(`authoritative observer clock moved backwards at tick ${server.world.tick}`);
+      }
+      observer.onAuthoritativeStep?.({ tick: server.world.tick, durationMilliseconds });
+    }
     for (const client of clients) client.update(TICK_MILLISECONDS);
     await Promise.resolve();
     simulationTime += TICK_MILLISECONDS;

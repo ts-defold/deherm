@@ -6,6 +6,7 @@ test
 tools
 headless
 integration
+server/state
 README.md
 package.json
 tsconfig.json

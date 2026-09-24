@@ -168,7 +168,16 @@ export async function connectCdp(webSocketDebuggerUrl, options = {}) {
       if (retain) transcript.push(line);
       options.onConsole?.(line, message.params.type ?? "log");
     } else if (message.method === "Runtime.exceptionThrown") {
-      const failure = { kind: "exception", detail: message.params.exceptionDetails.text };
+      const details = message.params.exceptionDetails;
+      const exception = details.exception;
+      const failure = {
+        kind: "exception",
+        detail: exception?.description ?? exception?.value ?? details.text,
+        text: details.text,
+        url: details.url || null,
+        line: Number.isInteger(details.lineNumber) ? details.lineNumber + 1 : null,
+        column: Number.isInteger(details.columnNumber) ? details.columnNumber + 1 : null,
+      };
       if (retain) failures.push(failure);
       options.onFailure?.(failure);
     } else if (message.method === "Log.entryAdded" && message.params.entry.level === "error") {

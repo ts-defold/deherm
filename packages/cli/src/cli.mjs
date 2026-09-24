@@ -699,7 +699,10 @@ export async function run(argv = process.argv.slice(2)) {
       formatBuildArtifactReport, recomputeBundleFingerprint, summarizeBuildArtifacts, verifyProjectBuildArtifacts
     } = await import("./build-artifacts.mjs");
     const projectRoot = await findProjectRoot(process.cwd(), options.project);
-    const result = await verifyProjectBuildArtifacts(projectRoot, { requireBinding: options.allowUnbound !== true });
+    const result = await verifyProjectBuildArtifacts(projectRoot, {
+      requireBinding: options.allowUnbound !== true,
+      requireTransforms: true,
+    });
     if (options.recompute) {
       for (const entry of result.entries) {
         if (entry.kind !== "bundle" || !entry.build?.entryPoint) continue;

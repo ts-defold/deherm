@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -195,6 +196,34 @@ test("an unrecorded or absent bundle is a report by default and a blocker before
   const gated = await verifyProjectBuildArtifacts(root, { requireBinding: true });
   assert.equal(gated.ok, false);
   assert.match(formatBuildArtifactReport(gated).join("\n"), /binds it to no sources/);
+});
+
+test("a diagnostic no-ttsc bundle can be inspected but Bob refuses to package it", async (t) => {
+  const root = await bundleProject();
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await buildAndRecord(root);
+
+  const diagnostic = await verifyProjectBuildArtifacts(root);
+  assert.equal(diagnostic.ok, true);
+  assert.equal(diagnostic.entries[0].build.ttsc, false);
+
+  const gated = await verifyProjectBuildArtifacts(root, { requireTransforms: true });
+  assert.equal(gated.ok, false);
+  assert.equal(gated.entries[0].status, "transform-disabled");
+  assert.match(formatBuildArtifactReport(gated).join("\n"), /--no-ttsc is diagnostic-only/u);
+});
+
+test("the verify-bundle CLI keeps diagnostics visible but exits before Bob for no-ttsc", async (t) => {
+  const root = await bundleProject();
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await buildAndRecord(root);
+
+  const inspection = spawnSync(process.execPath, [
+    path.resolve("bin/deherm.mjs"), "verify-bundle", "--project", root
+  ], { cwd: path.resolve("."), encoding: "utf8" });
+  assert.equal(inspection.status, 1, `${inspection.stdout}\n${inspection.stderr}`);
+  assert.match(inspection.stdout, /bundle .*was built with TypeScript transforms disabled/u);
+  assert.match(inspection.stdout, /--no-ttsc is diagnostic-only/u);
 });
 
 test("generated extension sources bind to their inputs the way a bundle does", async (t) => {

@@ -196,7 +196,7 @@ test("Defold-local deterministic sources are fresh copies of the canonical core"
     [fromExample("integration/sync-defold-sources.mjs"), "--check"],
     { cwd: repositoryRoot, encoding: "utf8" },
   );
-  assert.match(result, /15 generated Defold sources are fresh/);
+  assert.match(result, /16 generated Defold sources are fresh/);
 });
 
 test("the built project is the arena, and the mockup stays out of the build", async () => {

@@ -13,7 +13,7 @@ export type ReliableChannel =
 export type SendDisposition = "sent" | "backpressured" | "too-large" | "closed";
 
 export interface TransportCapabilities {
-  readonly protocol: "webtransport-h3" | "webrtc-datachannel" | "in-memory";
+  readonly protocol: "webtransport-h3" | "websocket-tcp" | "webrtc-datachannel" | "in-memory";
   readonly reliableStreams: boolean;
   readonly datagrams: boolean;
   readonly maxDatagramBytes: number;

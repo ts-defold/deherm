@@ -207,7 +207,7 @@ async function run() {
     );
 
     server = spawn(denoBinary, [
-      "run", "--unstable-net", "--allow-net", "--allow-read",
+      "run", "--unstable-net", "--allow-net", "--allow-read", "--allow-env",
       resolve(exampleRoot, "server/deno-main.ts"),
       "--hostname", "localhost",
       "--port", String(quicPort),

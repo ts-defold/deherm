@@ -15,7 +15,7 @@ COPY core ./core
 COPY server ./server
 COPY docker/entrypoint.sh ./docker/entrypoint.sh
 
-RUN chmod +x ./server/make-cert.sh ./docker/entrypoint.sh \
+RUN chmod +x ./server/make-cert.sh ./server/ensure-resume-key.sh ./docker/entrypoint.sh \
   && mkdir -p ./server/certs
 
 ENV WAR_BATTLES_HOSTNAME=0.0.0.0 \

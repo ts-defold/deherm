@@ -6,10 +6,8 @@
 // in-memory pair in a unit test, over Deno's QUIC endpoint in `server/`, or over
 // anything else that implements the four methods.
 //
-// What is deliberately NOT here, and what a deployment must add: authentication,
-// matchmaking, persistence, and a signed resume token. `issueResumeToken` below
-// is a non-cryptographic placeholder that proves the resume *path*, not the
-// resume *security*; see the comment on it.
+// Admission authentication and its bounded restart ledger are injected as
+// control-plane seams. They never participate in the fixed-step simulation.
 
 import {
   MAX_PLAYERS,
@@ -65,6 +63,8 @@ import {
   type SendDisposition,
   type TransportReceiver,
 } from "./transport.ts";
+import { SessionTokenService, type SessionTokenProvider } from "./session-auth.ts";
+import { SessionLedger } from "./session-persistence.ts";
 
 export interface MatchServerOptions {
   readonly matchId?: number;
@@ -79,8 +79,16 @@ export interface MatchServerOptions {
   readonly inputBudgetPerTick?: number;
   /** Ticks a disconnected authenticated slot remains reserved for resume. */
   readonly resumeGraceTicks?: number;
-  /** Deterministic test seam; omitted values use a process-unique secret. */
+  /** Legacy deterministic test seam; production callers should provide resumeKey. */
   readonly resumeSecret?: number;
+  /** HMAC key material for authenticated resume credentials. */
+  readonly resumeKey?: Uint8Array;
+  /** Injected token service for key rotation or an external auth boundary. */
+  readonly resumeTokenService?: SessionTokenProvider;
+  /** Fixed-capacity durable admission ledger, restored by the host first. */
+  readonly sessionLedger?: SessionLedger;
+  /** Called after commit/release so a host can checkpoint outside the tick loop. */
+  readonly onSessionStateChange?: (reason: "commit" | "release", tick: number) => void;
   readonly onError?: (error: unknown) => void;
   readonly onLog?: (line: string) => void;
 }
@@ -114,11 +122,11 @@ export class MatchServer {
   private snapshotBufferCursor = 0;
   private readonly onError: (error: unknown) => void;
   private readonly onLog: (line: string) => void;
-  private readonly salt: number;
-  /** One current token per slot; zero generation means the slot never welcomed a human. */
-  private readonly resumeGeneration = new Uint32Array(MAX_PLAYERS);
-  private readonly resumeExpiresAt = new Uint32Array(MAX_PLAYERS);
-  private readonly resumeTokens = new Uint8Array(MAX_PLAYERS * RESUME_TOKEN_BYTES);
+  readonly resumeTokenService: SessionTokenProvider;
+  readonly sessionLedger: SessionLedger;
+  /** World ticks restart at zero; admission ticks continue from the checkpoint. */
+  readonly sessionTickBase: number;
+  private readonly onSessionStateChange: (reason: "commit" | "release", tick: number) => void;
   private closed = false;
 
   readonly stats: MatchServerStats = {
@@ -136,8 +144,19 @@ export class MatchServer {
     this.resumeGraceTicks = clampInteger(options.resumeGraceTicks ?? TICK_RATE * 30, 1, 0xffff_ffff);
     this.onError = options.onError ?? (() => {});
     this.onLog = options.onLog ?? (() => {});
-    const resumeSecret = options.resumeSecret === undefined ? nextProcessResumeSecret() : options.resumeSecret >>> 0;
-    this.salt = ((matchId * 0x9e37_79b1) ^ resumeSecret) >>> 0;
+    this.resumeTokenService = options.resumeTokenService ?? new SessionTokenService({
+      keys: [{ id: 1, secret: options.resumeKey ?? localDevelopmentResumeKey(options.resumeSecret) }],
+    });
+    this.sessionLedger = options.sessionLedger ?? new SessionLedger({
+      matchId,
+      rosterSize: this.rosterSize,
+      restartReservationTicks: this.resumeGraceTicks,
+    });
+    if (this.sessionLedger.matchId !== matchId || this.sessionLedger.rosterSize !== this.rosterSize) {
+      throw new Error("session ledger context does not match the match server");
+    }
+    this.sessionTickBase = this.sessionLedger.persistedCheckpointTick;
+    this.onSessionStateChange = options.onSessionStateChange ?? (() => {});
     this.botCommand = createInputCommand(matchId, 1);
     for (let slot = 0; slot < MAX_PLAYERS; slot += 1) this.slotOwner.push(undefined);
     for (let index = 0; index < SNAPSHOT_BUFFER_RING; index += 1) {
@@ -198,17 +217,34 @@ export class MatchServer {
     return humans;
   }
 
+  /** @internal Guards async admission continuations against a closed session. */
+  ownsSlot(session: ServerSession, slot: number): boolean {
+    return this.slotOwner[slot] === session && !session.closed;
+  }
+
+  /** Logical admission tick used by credentials and grace windows. */
+  sessionTick(): number {
+    return (this.sessionTickBase + this.world.tick) >>> 0;
+  }
+
   // --- session plumbing -----------------------------------------------------
 
   /** @internal */
-  claimSlot(session: ServerSession, resumeToken: Uint8Array): number {
+  async claimSlot(session: ServerSession, resumeToken: Uint8Array): Promise<number> {
     const hasResumeToken = !isZeroToken(resumeToken);
     if (hasResumeToken) {
-      const resumed = this.slotForToken(resumeToken);
+      const claims = await this.resumeTokenService.verify(resumeToken, {
+        matchId: this.world.matchId,
+        nowTick: this.sessionTick(),
+        rosterSize: this.rosterSize,
+      });
+      if (session.closed || !this.sessions.has(session)) return -1;
+      const resumed = claims?.slot ?? -1;
       // A non-zero token is an explicit resume request. It must never fall
       // through to a fresh slot: accepting that fallback would turn a stale,
       // foreign, or forged credential into a different authenticated player.
-      if (resumed < 0 || this.slotOwner[resumed] !== undefined || this.resumeExpired(resumed)) return -1;
+      if (resumed < 0 || claims === null || this.sessionLedger.generation[resumed] !== claims.generation
+        || this.slotOwner[resumed] !== undefined || !this.sessionLedger.isReserved(resumed, this.sessionTick())) return -1;
       this.slotOwner[resumed] = session;
       session.resumed = true;
       this.refreshStats();
@@ -219,7 +255,7 @@ export class MatchServer {
       // A slot that has already welcomed a human remains reserved through the
       // bounded resume grace period. Fresh anonymous joins may only take a slot
       // that has never authenticated, or one whose reservation has expired.
-      if (this.resumeGeneration[slot] !== 0 && !this.resumeExpired(slot)) continue;
+      if (this.sessionLedger.generation[slot] !== 0 && this.sessionLedger.isReserved(slot, this.sessionTick())) continue;
       this.slotOwner[slot] = session;
       // A human takes the slot over exactly as it stands: the bot's score, its
       // position and its ammunition all continue. Nothing is reset mid-round.
@@ -237,38 +273,34 @@ export class MatchServer {
       // A failed welcome must not extend an already-expired credential. The
       // reservation is renewed only for a session whose own welcome committed;
       // a fresh takeover of an expired slot leaves its old token stale.
-      if (this.resumeGeneration[slot] !== 0 && session.resumeCommitted) {
-        this.resumeExpiresAt[slot] = (this.world.tick + this.resumeGraceTicks) >>> 0;
+      if (this.sessionLedger.generation[slot] !== 0 && session.resumeCommitted) {
+        this.sessionLedger.reserveUntil(slot, (this.sessionTick() + this.resumeGraceTicks) >>> 0);
+        this.onSessionStateChange("release", this.sessionTick());
       }
     }
     this.sessions.delete(session);
     this.refreshStats();
   }
 
-  /**
-   * @internal
-   * A placeholder resume token: a keyed hash of the match, the slot and a
-   * process-lifetime salt. It is NOT a signed credential - anyone who can see a
-   * token can reuse it, and anyone who can guess the salt can forge one. A
-   * deployment must replace this with a token minted and verified by whatever
-   * authenticates the player. It exists so that the reconnect *path* has a real
-   * implementation to exercise, and it is called out here rather than buried.
-   */
-  issueResumeToken(slot: number, target: Uint8Array): void {
-    const generation = this.prepareResumeToken(slot, target);
+  /** @internal Issues and commits an authenticated credential. */
+  async issueResumeToken(slot: number, target: Uint8Array): Promise<void> {
+    const generation = await this.prepareResumeToken(slot, target);
     this.commitResumeToken(slot, generation, target);
   }
 
   /** @internal Stages a token for a welcome without invalidating the current one. */
-  prepareResumeToken(slot: number, target: Uint8Array): number {
+  async prepareResumeToken(slot: number, target: Uint8Array): Promise<number> {
     if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize) throw new RangeError("resume slot is outside the roster");
     if (target.byteLength !== RESUME_TOKEN_BYTES) throw new RangeError("resume token target has the wrong size");
-    const generation = (this.resumeGeneration[slot]! + 1) >>> 0 || 1;
-    let state = (this.salt ^ (slot * 0x85eb_ca6b) ^ Math.imul(generation, 0x27d4_eb2d)) >>> 0;
-    for (let index = 0; index < RESUME_TOKEN_BYTES; index += 1) {
-      state = (Math.imul(state ^ index, 0x2545_f491) >>> 0) ^ (state >>> 13);
-      target[index] = state & 0xff;
+    const generation = (this.sessionLedger.generation[slot]! + 1) >>> 0 || 1;
+    const token = await this.resumeTokenService.issue({
+      matchId: this.world.matchId, slot, generation,
+      issuedAtTick: this.sessionTick(), expiresAtTick: 0,
+    });
+    if (token.byteLength !== RESUME_TOKEN_BYTES) {
+      throw new Error(`resume token provider returned ${token.byteLength} bytes; expected ${RESUME_TOKEN_BYTES}`);
     }
+    target.set(token);
     return generation;
   }
 
@@ -276,29 +308,10 @@ export class MatchServer {
   commitResumeToken(slot: number, generation: number, token: Uint8Array): void {
     if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize) throw new RangeError("resume slot is outside the roster");
     if (token.byteLength !== RESUME_TOKEN_BYTES) throw new RangeError("resume token has the wrong size");
-    const expected = (this.resumeGeneration[slot]! + 1) >>> 0 || 1;
+    const expected = (this.sessionLedger.generation[slot]! + 1) >>> 0 || 1;
     if (generation !== expected) throw new Error("resume token generation is stale");
-    this.resumeGeneration[slot] = generation;
-    this.resumeTokens.set(token, slot * RESUME_TOKEN_BYTES);
-    this.resumeExpiresAt[slot] = 0;
-  }
-
-  private slotForToken(token: Uint8Array): number {
-    for (let slot = 0; slot < this.rosterSize; slot += 1) {
-      if (this.resumeGeneration[slot] === 0) continue;
-      let match = true;
-      const offset = slot * RESUME_TOKEN_BYTES;
-      for (let index = 0; index < RESUME_TOKEN_BYTES; index += 1) {
-        if (this.resumeTokens[offset + index] !== token[index]) { match = false; break; }
-      }
-      if (match) return slot;
-    }
-    return -1;
-  }
-
-  private resumeExpired(slot: number): boolean {
-    const expiresAt = this.resumeExpiresAt[slot]!;
-    return expiresAt !== 0 && this.world.tick > expiresAt;
+    this.sessionLedger.commit(slot, generation);
+    this.onSessionStateChange("commit", this.sessionTick());
   }
 
   private refreshStats(): void {
@@ -361,6 +374,8 @@ export class ServerSession implements TransportReceiver {
   private pendingSnapshotTick = 0;
   private pendingSnapshotReady = false;
   private inputBudget = 0;
+  /** Closes the double-hello race while async HMAC verification is pending. */
+  private sessionHandling = false;
 
   constructor(server: MatchServer) {
     this.server = server;
@@ -377,9 +392,15 @@ export class ServerSession implements TransportReceiver {
   }
 
   onReliable(channel: ReliableChannel, payload: Uint8Array): void {
+    if (channel === TRANSPORT_CHANNEL_SESSION) {
+      void this.handleSession(payload).catch((error: unknown) => {
+        this.server.report(error);
+        this.close(4_003, "protocol error");
+      });
+      return;
+    }
     try {
-      if (channel === TRANSPORT_CHANNEL_SESSION) this.handleSession(payload);
-      else if (channel === TRANSPORT_CHANNEL_CONTROL) this.handleControl(payload);
+      if (channel === TRANSPORT_CHANNEL_CONTROL) this.handleControl(payload);
       else if (channel === 4) this.handleInput(payload);
       else throw new Error(`client sent an unexpected reliable channel ${channel}`);
     } catch (error: unknown) {
@@ -402,6 +423,7 @@ export class ServerSession implements TransportReceiver {
   onClose(code: number, reason: string): void {
     if (this.closed) return;
     this.closed = true;
+    this.sessionHandling = false;
     this.ready = false;
     this.server.log(`session-closed:${code}:${reason}`);
     this.server.releaseSlot(this);
@@ -501,7 +523,7 @@ export class ServerSession implements TransportReceiver {
     });
   }
 
-  private handleSession(payload: Uint8Array): void {
+  private async handleSession(payload: Uint8Array): Promise<void> {
     const kind = messageKind(payload);
     if (kind === MESSAGE_PING) {
       readPing(payload, this.ping);
@@ -511,9 +533,10 @@ export class ServerSession implements TransportReceiver {
       return;
     }
     if (kind !== MESSAGE_HELLO) throw new Error("first session message must be a hello");
-    if (this.ready) throw new Error("session already established");
+    if (this.ready || this.sessionHandling) throw new Error("session handshake already established or pending");
+    this.sessionHandling = true;
     readHello(payload, this.hello);
-    const slot = this.server.claimSlot(this, this.hello.resumeToken);
+    const slot = await this.server.claimSlot(this, this.hello.resumeToken);
     if (slot < 0) {
       const hasResumeToken = !isZeroToken(this.hello.resumeToken);
       const length = writeReject(this.rejectBuffer, hasResumeToken
@@ -525,7 +548,8 @@ export class ServerSession implements TransportReceiver {
     }
     this.slot = slot;
     this.name = this.hello.name === "" ? `player${slot + 1}` : this.hello.name;
-    const stagedResumeGeneration = this.server.prepareResumeToken(slot, this.resumeToken);
+    const stagedResumeGeneration = await this.server.prepareResumeToken(slot, this.resumeToken);
+    if (this.closed || !this.server.ownsSlot(this, slot)) return;
     writeWelcome(this.welcomeBuffer, {
       matchId: this.server.world.matchId,
       playerId: slot + 1,
@@ -616,15 +640,20 @@ function isZeroToken(token: Uint8Array): boolean {
   return true;
 }
 
-let processResumeSecret = 0x6d2b_79f5;
-
-function nextProcessResumeSecret(): number {
-  // A monotonic process-local secret keeps same-match server instances from
-  // minting interchangeable bearer tokens without pulling randomness into the
-  // deterministic simulation. Deployments should replace this seam with their
-  // authenticated token service; tests can pass resumeSecret explicitly.
-  processResumeSecret = (processResumeSecret + 0x9e37_79b9) >>> 0;
-  return processResumeSecret;
+function localDevelopmentResumeKey(seed: number | undefined): Uint8Array {
+  const key = new Uint8Array(32);
+  if (seed !== undefined) {
+    let state = seed >>> 0;
+    for (let index = 0; index < key.length; index += 1) {
+      state = (Math.imul(state ^ index, 0x2545_f491) >>> 0) ^ (state >>> 13);
+      key[index] = state & 0xff;
+    }
+    return key;
+  }
+  // Local development still gets an unpredictable bearer secret. Production
+  // hosts should inject a rotated secret from their secret manager.
+  globalThis.crypto.getRandomValues(key);
+  return key;
 }
 
 /** Exported so a host can size its own buffers without importing the layout. */

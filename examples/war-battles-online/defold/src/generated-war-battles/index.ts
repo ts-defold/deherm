@@ -2,6 +2,7 @@
 export * from "./arena";
 export * from "./bots";
 export * from "./browser-webtransport";
+export * from "./browser-websocket";
 export * from "./client";
 export * from "./constants";
 export * from "./content";

@@ -1,7 +1,8 @@
-import { INPUT_BUTTON_MASK, MAX_PLAYERS, SNAPSHOT_BYTES, TICK_RATE } from "./constants.ts";
+import { INPUT_BUTTON_MASK, MAX_PLAYERS, SESSION_TOKEN_BYTES, SNAPSHOT_BYTES, TICK_RATE } from "./constants.ts";
 import { WEAPON_COUNT } from "./content.ts";
 
 /**
+ * Version 6 adds authenticated 40-byte resume credentials to hello/welcome.
  * Version 5 adds authoritative weapon-branch state to the compact snapshot and
  * reliable control lane. Version 4 added authoritative chassis state. Version
  * 2 added the weapon-request byte to
@@ -10,7 +11,7 @@ import { WEAPON_COUNT } from "./content.ts";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 5;
+export const PROTOCOL_VERSION = 6;
 export const INPUT_PACKET_BYTES = 32;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
@@ -145,12 +146,12 @@ export const MESSAGE_CONTROL = 5;
 export const MESSAGE_PING = 6;
 export const MESSAGE_PONG = 7;
 
-export const RESUME_TOKEN_BYTES = 16;
+export const RESUME_TOKEN_BYTES = SESSION_TOKEN_BYTES;
 export const PLAYER_NAME_BYTES = 16;
 
 export const HELLO_BYTES = ENVELOPE_BYTES + 4 + PLAYER_NAME_BYTES + RESUME_TOKEN_BYTES + 4;
 const WELCOME_BASE_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
-/** The trailing cadence byte is an additive extension to the welcome frame. */
+/** The trailing cadence byte is part of the version-6 welcome frame. */
 export const WELCOME_BYTES = WELCOME_BASE_BYTES + 1;
 export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
 export const PING_BYTES = ENVELOPE_BYTES + 8;
@@ -276,9 +277,8 @@ export function writeWelcome(target: Uint8Array, message: Readonly<WelcomeMessag
 }
 
 export function readWelcome(payload: Uint8Array, output: WelcomeMessage): WelcomeMessage {
-  // Accept the pre-cadence frame while all current servers advertise the
-  // interval in the additive trailing byte.
-  const view = expect(payload, MESSAGE_WELCOME, WELCOME_BASE_BYTES);
+  if (payload.byteLength !== WELCOME_BYTES) throw new Error("welcome frame has an invalid length");
+  const view = expect(payload, MESSAGE_WELCOME, WELCOME_BYTES);
   output.matchId = view.getUint32(4, true);
   output.playerId = view.getUint8(8);
   output.team = view.getUint8(9);
@@ -287,7 +287,7 @@ export function readWelcome(payload: Uint8Array, output: WelcomeMessage): Welcom
   output.mapSeed = view.getUint32(12, true);
   output.serverTick = view.getUint32(16, true);
   output.tickRate = TICK_RATE;
-  output.snapshotIntervalTicks = payload.byteLength >= WELCOME_BYTES ? view.getUint8(WELCOME_BASE_BYTES) : 3;
+  output.snapshotIntervalTicks = view.getUint8(WELCOME_BASE_BYTES);
   output.resumeToken.set(payload.subarray(20, 20 + RESUME_TOKEN_BYTES));
   return output;
 }

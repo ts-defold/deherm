@@ -29,9 +29,9 @@
   },
   "target": "arm64-macos",
   "status": "observed-clean",
-  "artifactKey": "90b31c6c76b6216226a6ce975b420bb5df2f26e7f1db9e934d7b2d41245383f2",
-  "sourceKey": "3caf08941f96f302050e46db0174daa531603ec50569ae83630e91ddc424ccdc",
-  "evidenceKey": "6a40b88f73962e3204a1a6ea3ccbc37890a1c73aa072eb95f217b9797a7a96f0",
+  "artifactKey": "9b452e06033a1aa501df9a0bf2272e5c5cbc27e9cc5307d516b736b717dcc7ec",
+  "sourceKey": "c11504dd57027a410af8367e3a59495d5d4d8e86b64550a0d92d64ad2095ff64",
+  "evidenceKey": "87e9e5c3ac86baa4759aeb241bb1fdfefb5c6eb7fbff005f705453ac0e130ac1",
   "artifacts": [
     {
       "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
@@ -60,8 +60,8 @@
     },
     {
       "path": "examples/war-battles-online/defold/build/default/deherm/app.dehermc",
-      "bytes": 253052,
-      "sha256": "3acaa91643c67f9bf864a30f210614bbe5ab9ed14e7798bdb27618efd8905ec9"
+      "bytes": 263693,
+      "sha256": "bb82d4265ee29f2860d690ac99fe470499337d0321225db9f66151d7baf65905"
     }
   ],
   "sourceInputs": [
@@ -75,9 +75,9 @@
     {
       "path": "examples/war-battles-online/defold",
       "kind": "tree",
-      "fileCount": 505,
-      "bytes": 1986374,
-      "sha256": "c9e1a874a88b07d2d2aff7aebef5224712ac163fd2fe0017008333666c8a8c36"
+      "fileCount": 506,
+      "bytes": 2000327,
+      "sha256": "26112297c937c43a525fc997586209544b6431dc00532013a3feb33ba230ed7b"
     },
     {
       "path": "examples/war-battles-online/defold/.defignore#authored-rules",
@@ -91,8 +91,8 @@
     },
     {
       "path": "examples/war-battles-online/defold/deherm.lock",
-      "bytes": 27683,
-      "sha256": "b1953741d0b4287074e72f06af3fd6d3ad0b5ca50231a3edb78465b517984692"
+      "bytes": 27812,
+      "sha256": "e4a6af3eab2ac254c4c313cd8f5c2d099c0ad337f93f33c6e26891bce27c4e06"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/ir/binding-lowering-plan.sentinel.json",
@@ -102,7 +102,7 @@
     {
       "path": "examples/war-battles-online/defold/.deherm/generated/components/manifest.json",
       "bytes": 16852,
-      "sha256": "cef1660e196815ea0fa48e2b300168d576c605018e3dd4cd4e92b148575f24b5"
+      "sha256": "14629a09deda77b8e29f31e5ccbfdbfb53179ac02ce3f8131013241272fbc461"
     }
   ],
   "observation": {
@@ -142,11 +142,11 @@
       "method": "system-exit",
       "exitCode": 0,
       "signal": null,
-      "port": 63238
+      "port": 57411
     },
     "transcript": {
       "canonicalLineCount": 62,
-      "canonicalSha256": "ff323fbd6143a6c8774e5849a07f6e6009820bce95b11b498d6a0e01d50c3bad"
+      "canonicalSha256": "760fa817f1e21648298213e4e8411ebac28a7e68fbf3b28556365f993539e08a"
     }
   }
 }

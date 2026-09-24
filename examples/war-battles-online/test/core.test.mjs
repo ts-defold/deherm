@@ -321,12 +321,12 @@ test("a closed snapshot send releases the server session", async () => {
     : sendReliable(channel, payload, signal);
   session.attach(serverTransport);
   client.attach(clientTransport);
-  await new Promise((resolve) => setImmediate(resolve));
+  await settle();
   assert.equal(server.countHumans(), 1);
   server.step();
   server.step();
   server.step();
-  await new Promise((resolve) => setImmediate(resolve));
+  await settle();
   assert.equal(session.closed, true);
   assert.equal(server.countHumans(), 0, "a terminal snapshot send must release its claimed slot");
   assert.deepEqual(errors, []);
@@ -951,7 +951,14 @@ function failWelcome(server, client, disposition) {
   return session;
 }
 
-const settle = () => new Promise((resolve) => setImmediate(resolve));
+async function settle() {
+  // Native WebCrypto key import/signing crosses task boundaries. Give the
+  // control-plane handshake bounded room to complete without assuming a
+  // particular host's crypto scheduling latency.
+  for (let turn = 0; turn < 12; turn += 1) {
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+}
 
 test("a welcomed player resumes its slot and the new stream starts from a keyframe", async () => {
   const errors = [];

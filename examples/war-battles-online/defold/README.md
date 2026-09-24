@@ -223,11 +223,10 @@ For a no-rebuild development session, the browser host may install an explicit
 uses that seam; game code exposes its current fixed-shape counters as
 `globalThis.__warBattlesTelemetryV1` and mutates the same object in place.
 
-WebTransport exists only on the browser host — a native Defold engine has no
-WebTransport client extension yet — so on native the arena logs
-`war-battles:arena-online-unavailable:no-webtransport` and plays offline against
-bots. See [`../server/README.md`](../server/README.md) for the server, the
-certificate, and how to put two clients in one match.
+On HTML5 the arena prefers browser WebTransport/HTTP3 and falls back explicitly
+to WebSocket/TCP. A native Defold engine has neither adapter yet, so native
+builds play offline against bots. See [`../server/README.md`](../server/README.md)
+for both server lanes, the certificate, and the packaged browser proofs.
 
 ## Building
 

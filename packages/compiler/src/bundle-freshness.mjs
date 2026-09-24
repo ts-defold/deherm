@@ -381,6 +381,9 @@ export function formatBuildArtifactReport(result, options = {}) {
       lines.push(`${marker} ${entry.kind} ${entry.name} exists but deherm.lock binds it to no sources`);
       if (entry.fingerprint?.onDisk) lines.push(`   fingerprint on disk: ${entry.fingerprint.onDisk}`);
       lines.push("   Nothing relates this artifact to the TypeScript Bob will package with it.");
+    } else if (entry.status === "transform-disabled") {
+      lines.push(`${marker} ${entry.kind} ${entry.name} was built with TypeScript transforms disabled`);
+      lines.push("   --no-ttsc is diagnostic-only; rebuild with 'deherm dev --once' before Bob packages the project.");
     } else if (entry.status === "equivalent-rebuild") {
       lines.push(`${marker} ${entry.kind} ${entry.name}: its sources changed, but they compile to the artifact on disk`);
       lines.push(`   ${entry.sources.changed.length + entry.sources.missing.length} bound source(s) differ; the program does not`);

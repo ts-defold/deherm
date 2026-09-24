@@ -185,6 +185,19 @@ versions, and explicitly excludes WAN, ingress, native Defold, impairment,
 load, persistent-stream runtime, and allocation claims. Those remain separate
 gates rather than implied by loopback transport success.
 
+## Reliable WebSocket fallback tranche
+
+The browser now has an executable fallback on the Deno server's existing TCP
+health/control listener (`/ws`). It uses the same bounded five-byte reliable
+frame envelope as WebTransport, reports `websocket-tcp`, and exposes no
+datagram capability: tick inputs therefore use the explicit reliable
+`input-fallback` lane. Arena connection order remains WebTransport first,
+WebSocket second, then pre-welcome offline fallback. The focused adapter test
+proves control and input lane delivery and rejects malformed frames; the
+browser gate is `pnpm runtime:websocket`. This does not promote TCP to QUIC or
+claim unreliable input semantics, native Defold WebSocket extension coverage,
+WAN behavior, or WebTransport evidence.
+
 ## Bounded combat-feedback tranche
 
 The arena now renders a one-shot sprite-only `muzzle` prototype at the
@@ -256,8 +269,8 @@ again.
 
 ## Bounded reconnect/resume tranche
 
-After a welcome, the server issues one rotating resume credential per player
-slot. Closing an authenticated session releases the connection but reserves
+After a welcome, the server issues one rotating 40-byte authenticated resume
+credential per player slot. Closing an authenticated session releases the connection but reserves
 that slot for a bounded, tick-based grace window; the world continues from its
 existing player state with the bot takeover policy already used for a missing
 human. A reconnect with the current token restores the same player id and
@@ -273,11 +286,28 @@ also closes the server session and releases the claimed slot.
 Non-zero resume attempts never fall through to a new anonymous slot. Unknown,
 stale, active-session, and foreign-match tokens all receive `REJECT_BAD_RESUME`;
 anonymous joins can use only never-authenticated or expired reservations. The
-credential is deliberately a deterministic in-process placeholder, not signed
-authentication; a deployment must replace issuance and verification with its
-authenticated token service. Focused tests cover identity/state retention,
-keyframe recovery, token rotation, and invalid/stale/foreign rejection. They
-do not claim persistence across process restart or cryptographic security.
+credential is a fixed-size HMAC-SHA-256 token issued by the injected
+`SessionTokenService`; its generation remains revocable through the bounded
+`SessionLedger`. Focused tests cover identity/state retention, keyframe
+recovery, token rotation, invalid/stale/foreign rejection, tampering, and
+restart restore. A deployment must configure the same secret across restarts.
+The durable checkpoint covers admission identity/generation and reservation
+state only; it does not claim persistence of `BattleWorld` simulation state.
+
+The control-plane replacement seam is now implemented in
+`examples/war-battles-online/core/session-auth.ts` and
+`core/session-persistence.ts`. `SessionTokenService` issues and verifies a
+fixed-size HMAC-SHA-256 credential with match/slot/generation/expiry claims and
+bounded key rotation; malformed, foreign, stale, or expired credentials fail
+closed. `SessionLedger` persists exactly `MAX_PLAYERS` fixed records in a
+versioned, checksummed binary envelope, and `DurableSessionPersistence`
+serializes explicit control-plane writes. The Deno file adapter uses a sibling
+temporary file plus rename for restart-safe checkpoints. Focused tests cover
+tampering, key rotation, expiry, deterministic bytes, restart restore, and
+corruption/foreign-context refusal. MatchServer now injects this service and
+ledger at the hello/welcome boundary, while the Deno host restores and flushes
+the ledger only at explicit lifecycle events; the simulation hot path remains
+unchanged.
 
 ## Deterministic 32-player impairment/load tranche
 
@@ -406,20 +436,35 @@ correctly failed there because Colima's default macOS user-mode network did not
 forward the published QUIC/UDP path; containerized UDP ingress therefore remains
 environment-dependent evidence and must not be inferred from `/readyz`.
 
+The deterministic Docker owner gate checks the rendered Compose mounts, restart
+policy, `/readyz` healthcheck, and the entrypoint's private generated resume key
+plus fixed session-ledger paths. The key helper proves first-boot generation,
+restart-stable bytes, permissions, and malformed-state rejection; the Deno/Chrome
+WebSocket gate (with its `--docker` mode) separately proves the labelled
+`websocket-tcp` reliable fallback, restarts the container, and resumes the same
+slot; it never promotes that transport to WebTransport or datagrams.
+
 `integration/check-packaged-online.mjs` closes a different boundary: the actual
 Bob-produced Defold/Wasm game runs in Chrome, the generated browser host loads
 the deherm bundle, `arena.script.ts` connects through the production
-`BrowserWebTransportClient`, and its fixed-shape live telemetry reports online
-state plus received snapshots and sent inputs. A development-only browser
-configuration object supplies the loopback URL and certificate hash before
-engine startup, while `game.project` remains the production configuration
-authority. On 2026-09-23 the reviewed local gate observed player 1 apply four
-snapshots, send twelve inputs, and reach authoritative server tick 243.
+`BrowserWebTransportClient`, and its fixed-shape live telemetry reports the
+selected transport/input lane, online state, received snapshots, and sent
+inputs. A development-only browser configuration object supplies the loopback
+URL, optional WebSocket endpoint, and certificate hash before engine startup,
+while `game.project` remains the production configuration authority. The normal
+gate proves `webtransport-h3-quic` plus datagram input; its `--fallback` mode
+makes only QUIC unavailable and proves the same packaged game selects
+`websocket-tcp` plus the reliable `input-fallback` lane. Both modes require an
+authoritative welcome, snapshots, and server-accepted input.
 
 This tranche does not claim native Defold networking, WAN deployment,
-authenticated admission/resume tokens, process-restart persistence, network
-fallback, or dedicated-server failover. Those are product frontiers, not API or
-generator blockers.
+matchmaking/account identity, network failover, or dedicated-server failover.
+Authenticated resume credentials, fail-closed durable admission, and local
+Docker process-restart resume are now proven at their named boundaries.
+Production acknowledgement, Origin policy, non-root volume ownership, fsync,
+and wrap-safe deadline work is tracked in
+[`#126`](https://github.com/ts-defold/deherm/issues/126); those frontiers are
+not API or generator blockers.
 
 # Verification
 

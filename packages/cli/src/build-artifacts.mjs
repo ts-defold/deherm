@@ -234,6 +234,14 @@ export async function verifyProjectBuildArtifacts(projectRoot, options = {}) {
       if (["unbound", "artifact-absent", "lock-missing"].includes(entry.status)) entry.severity = "error";
     }
   }
+  if (options.requireTransforms) {
+    for (const entry of result.entries) {
+      if (entry.kind === "bundle" && entry.build?.ttsc === false) {
+        entry.status = "transform-disabled";
+        entry.severity = "error";
+      }
+    }
+  }
   return summarizeBuildArtifacts(result);
 }
 

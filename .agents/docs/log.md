@@ -1,5 +1,35 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - Packaged War Battles owns QUIC, TCP fallback, and durable resume evidence
+
+The Bob-produced HTML5 game now completes the same authoritative session over
+browser WebTransport/HTTP3 or an explicitly labelled WebSocket/TCP fallback.
+Both owner gates require the client telemetry and the Deno MatchServer's
+`inputsAccepted` counter/marker; client-side sends alone are not a pass. The
+fallback uses a generation/winner guard so late callbacks cannot replace or
+close the selected transport. A Docker owner gate restarts the server and
+proves the same authenticated player slot resumes from a fixed-capacity,
+versioned session ledger. Persistence errors close new QUIC and WebSocket
+admission until a later serialized write succeeds. The final local observations
+were 8 server-accepted inputs over QUIC and 11 over forced WebSocket fallback;
+the Docker restart gate also passed. These are local browser/container
+boundaries, not WAN, matchmaking, account identity, native networking, or
+cross-region failover claims. Production follow-ups are tracked in
+[`#126`](https://github.com/ts-defold/deherm/issues/126).
+
+## 2026-09-23 - Diagnostic bundles are inspectable but not Bob input
+
+The `--no-ttsc` development lane is now recorded in the bundle freshness
+binding and remains available for runtime inspection, while `verify-bundle`,
+`verify-generated`, and the Bob wrapper fail closed when a recorded bundle has
+`ttsc: false`. This closes a real failure in which a War Battles diagnostic
+bundle retained the runtime `hashLiteral` call and reached packaged Wasm. The
+browser host could inspect the resulting page, but the bundle was not a valid
+packaged program. Focused tests prove the default inspection report stays
+available and the pre-Bob gates return failure with the transform diagnostic;
+this is packaging-boundary evidence, not a new gameplay or browser-runtime
+claim.
+
 ## 2026-09-23 - Bounded Stage-3 War Battles chassis tranche
 
 The War Battles canonical simulation now has four fixed-capacity chassis rows:

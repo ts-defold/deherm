@@ -1998,7 +1998,7 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
   // than every file verified above. The freshness binding is checked here so a
   // single `verify-generated` covers both, and reported rather than thrown so
   // the caller can print both fingerprints.
-  const buildArtifacts = await verifyProjectBuildArtifacts(resolvedProjectRoot);
+  const buildArtifacts = await verifyProjectBuildArtifacts(resolvedProjectRoot, { requireTransforms: true });
   return {
     root,
     defoldRevision: manifest.defoldRevision,
