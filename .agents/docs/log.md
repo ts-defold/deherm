@@ -1,5 +1,27 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - Bob's default project view excludes authoring-only inputs
+
+The earlier Bob boundary hid the largest tool and cache directories but still
+left root package metadata and raw TypeScript authoring inputs in Bob's resource
+walk. The boundary now owns a marked, replaceable `.defignore` block containing
+the invariant tool/cache directories, package-manager and generated déherm
+metadata, plus every exact `.ts` file discovered outside already ignored
+trees. Exact paths preserve generated Defold proxy siblings in the same source
+directory. Scaffolds include the initial component immediately; the public
+generator, managed-extension installer, and pre-Bob target reconciliation all
+recompute the same block. User rules remain outside it in their original order,
+and stale managed entries disappear when inputs or targets change.
+
+Focused tests prove legacy unmarked rules migrate, unknown rules survive,
+dependency TypeScript is never enumerated, raw authoring files are excluded,
+generated `.script` resources remain visible, and target-specific typed-native
+exclusion still toggles idempotently. An explicit `[project] custom_resources`
+entry wins over default file-level exclusions, so author intent remains
+authoritative. This is deterministic input-boundary evidence; Defold's own
+resource graph remains responsible for selecting the runtime assets archived
+into a particular game.
+
 ## 2026-09-24 - Static Hermes gate now carries the authored War Battles application seam
 
 The reachable-only gate now compiles two distinct release inputs with the

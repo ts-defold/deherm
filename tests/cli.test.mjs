@@ -1199,9 +1199,15 @@ test("project binding identities survive normalized-name collisions and reserved
 
 test("project generation uses an input key and does not rewrite current outputs", async () => {
   const project = await fixture();
+  await mkdir(path.join(project, "src"));
+  await writeFile(path.join(project, "src", "main.script.ts"), "export default {};\n");
+  await writeFile(path.join(project, "src", "main.script"), "-- generated Defold proxy\n");
   const inventory = await inspectDefoldProject({ project });
   const first = await writeGeneratedProject(inventory);
   assert.equal(first.cached, false);
+  const defignore = await readFile(path.join(project, ".defignore"), "utf8");
+  assert.match(defignore, /^\/src\/main\.script\.ts$/mu);
+  assert.doesNotMatch(defignore, /^\/src\/main\.script$/mu);
   const manifestPath = path.join(first.root, "manifest.json");
   const before = await stat(manifestPath);
   const second = await writeGeneratedProject(inventory);

@@ -159,12 +159,12 @@ export async function reconcileTypedNativeUpload(options) {
   }
   if (wanted) {
     result.message =
-      `${TYPED_NATIVE_EXTENSION} excluded from the ${disposition.platform} upload and npm tooling hidden through .defignore ` +
+      `${TYPED_NATIVE_EXTENSION} excluded from the ${disposition.platform} upload and non-runtime project inputs hidden through .defignore ` +
       `(${disposition.code})`;
     return result;
   }
   result.message =
-    `${TYPED_NATIVE_EXTENSION} uploadable for ${disposition.platform}; npm tooling hidden through .defignore ` +
+    `${TYPED_NATIVE_EXTENSION} uploadable for ${disposition.platform}; non-runtime project inputs hidden through .defignore ` +
     `(runtime ${disposition.runtimeId})`;
   return result;
 }

@@ -210,6 +210,16 @@ The runtime smoke emitted `init:hermes` and `module:42`. Full platform support,
 automated launch/termination, and the complete generated API remain separate
 work; a successful custom-engine link does not imply complete API coverage.
 
+Bob walks the Defold project root, so every scaffold and every generation pass
+maintains a package-owned block in `.defignore`. The block hides dependency,
+cache, editor, VCS, package-manager, déherm lock/config, and raw TypeScript
+authoring inputs. It names TypeScript files individually
+rather than excluding their containing directory, keeping generated
+`.script`, `.gui_script`, and `.render_script` proxies visible. User-authored
+ignore rules remain outside the block and are preserved. This gives Bob the
+smallest safe project view while leaving Defold's resource graph authoritative
+for actual game assets.
+
 # Bundle freshness before Bob
 
 Bob archives whatever `/deherm/app.dehermc` is on disk as a `custom_resources`

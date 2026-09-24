@@ -1490,6 +1490,11 @@ export async function installNativeExtension(projectRoot, options = {}) {
 }
 
 export async function writeGeneratedProject(inventory, outputDirectory = ".deherm", options = {}) {
+  // Generation is a valid public entry point independent of the CLI command.
+  // Establish Bob's minimal project view here as well as in the scaffold and
+  // pre-build paths so no caller can accidentally expose package tooling or
+  // raw TypeScript authoring inputs to resource/extension discovery.
+  await reconcileBobProjectBoundary({ projectRoot: inventory.projectRoot });
   if (typeof outputDirectory !== "string" || !outputDirectory || path.isAbsolute(outputDirectory)) {
     throw new Error("Generated output must be a relative subdirectory of the Defold project");
   }

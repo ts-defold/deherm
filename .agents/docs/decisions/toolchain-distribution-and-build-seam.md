@@ -404,16 +404,25 @@ also see `node_modules/@ts-defold/deherm/defold/defold_hermes`, it discovers a
 second, incomplete extension and compiles files whose generated revision output
 was intentionally excluded from the npm package.
 
-`packages/cli/src/bob-project-boundary.mjs` therefore owns a conservative,
-idempotent `.defignore` projection. It excludes only invariant tool/cache trees:
-`/node_modules`, `/.deherm`, `/.internal`, `/build`, `/.git`, `/.github`,
-`/.vscode`, and `/.idea`. Authored resource directories are never inferred as
-unused. `deherm create` writes the boundary into every new template,
-`deherm generate` re-establishes it while installing the managed extension,
-and the dev builder reconciles it immediately before every Bob invocation.
-Unknown user entries remain in their original order. Target selection composes
-with the same write by adding or removing only
-`/defold_hermes_typed_native`.
+`packages/cli/src/bob-project-boundary.mjs` therefore owns an idempotent,
+marked `.defignore` projection. It excludes invariant tool/cache trees,
+package-manager metadata, generated déherm configuration, and the exact `.ts`
+authoring files found below the project. The exact-file rule matters: a
+`/src/controller.script.ts` input is hidden while its sibling generated
+`/src/controller.script` resource remains visible. Authored resource
+directories are never inferred as unused; Defold's own resource graph remains
+the authority for what the game requires. A path explicitly named by
+`[project] custom_resources` is therefore removed from the default file-level
+exclusions, including a `.ts` file deliberately shipped as data.
+
+`deherm create` writes this boundary into every new template, including its
+initial TypeScript component. The public project generator re-establishes it
+even when invoked outside the CLI, and the dev builder reconciles it immediately
+before every Bob invocation. Unknown user entries remain outside the marked
+block in their original order. Reconciliation replaces the entire managed
+block, so deleted TypeScript inputs and target-specific generated extensions do
+not leave stale exclusions. Target selection composes with the same write by
+adding or removing only `/defold_hermes_typed_native`.
 
 Observed on 2026-09-24 with the pinned local Bob/Extender path: before this
 boundary Bob discovered the package seed below `/node_modules` and failed on
