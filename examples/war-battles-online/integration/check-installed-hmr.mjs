@@ -10,7 +10,13 @@ import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { DEFAULT_HMR_SOAK_CYCLES, HMR_STATE_API, runHmrStateSoak, validateHmrSoakEvidence } from "./hmr-state-soak.mjs";
+import {
+  DEFAULT_HMR_SOAK_CYCLES,
+  HMR_STATE_API,
+  formatHmrFailure,
+  runHmrStateSoak,
+  validateHmrSoakEvidence,
+} from "./hmr-state-soak.mjs";
 import {
   assertInstalledPackageTreeSha256,
   createWarBattlesHmrDriver,
@@ -103,6 +109,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error(`war-battles-installed-hmr:blocked:${error.message}`);
+  console.error(`war-battles-installed-hmr:blocked:${formatHmrFailure(error)}`);
   process.exitCode = 1;
 });

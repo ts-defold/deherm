@@ -13,6 +13,19 @@ const execFile = promisify(execFileCallback);
 const timeoutMs = Number(process.env.DEHERM_WAR_BATTLES_HMR_TIMEOUT_MS ?? 90_000);
 const shutdownTimeoutMs = Number(process.env.DEHERM_WAR_BATTLES_HMR_SHUTDOWN_TIMEOUT_MS ?? 15_000);
 const markerPattern = /war-battles:hmr-reload:edit=([^:]+):tick=(\d+):entities=(\d+):elapsed=([0-9.]+)/u;
+export const DEFAULT_INSTALLED_HMR_BUILD_SERVER = "http://127.0.0.1:9010";
+
+export function installedHmrLaunchConfiguration(environment = process.env) {
+  return {
+    buildServer:
+      environment.DEHERM_BUILD_SERVER || environment.DEFOLD_HERMES_BUILD_SERVER || DEFAULT_INSTALLED_HMR_BUILD_SERVER,
+    // Online policy resolution is the correctness default. An explicit
+    // DEHERM_OFFLINE=1 remains supported, but the harness must not silently
+    // reuse an older authenticated surface for the same Defold revision after
+    // the package's stable runtime ABI has advanced.
+    environment: { ...environment },
+  };
+}
 
 export function dependencyLinkType(platform = process.platform) {
   return platform === "win32" ? "junction" : "dir";
@@ -328,6 +341,7 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
   } else packageBoundary = await makePackedBoundary(repositoryRoot);
 
   const ownsProcessGroup = process.platform !== "win32";
+  const launchConfiguration = installedHmrLaunchConfiguration(process.env);
   const child = spawn(
     process.execPath,
     [
@@ -341,11 +355,12 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
       projectRoot,
       "--headless",
       "--json",
-      ...(process.env.DEHERM_BUILD_SERVER ? ["--build-server", process.env.DEHERM_BUILD_SERVER] : []),
+      "--build-server",
+      launchConfiguration.buildServer,
     ],
     {
       cwd: packageBoundary.packageRoot,
-      env: { ...process.env, DEHERM_OFFLINE: process.env.DEHERM_OFFLINE ?? "1" },
+      env: launchConfiguration.environment,
       stdio: ["ignore", "pipe", "pipe"],
       // A failed soak must not leave the CLI, Bob, or dmengine writing the next
       // run's source and session log. POSIX gives this installed boundary its own

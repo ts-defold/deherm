@@ -684,6 +684,18 @@ one reload signal, and one matching runtime activation for each edit, continuous
 heap/component/Lua-registry telemetry, and no runtime error. The exact
 fingerprints were `5de1ceb3...` -> `6334816a...` -> `5de1ceb3...`.
 
+The installed-package soak no longer silently forces `DEHERM_OFFLINE=1`.
+That default could combine the package's current stable runtime sources with an
+older authenticated generated surface for the same Defold revision; the first
+observable result was a native compile failure because the cached handle header
+predated `LegacyHandleApi`. The correctness default now refreshes the published
+policy, while an explicitly requested offline run still uses the authenticated
+cache and fails closed if it is insufficient. The example harness also defaults
+to the pinned local Extender at `127.0.0.1:9010`; an explicit build-server
+override remains available. The production hosted service currently rejects the
+pinned dev SDK's `r8Cmd` field before compilation, so that response is service
+compatibility evidence rather than HMR evidence.
+
 That run also made the former state boundary visible: the fresh-realm candidate
 constructed a new Hermes component `self` and ran `init` when a live Lua proxy
 first dispatched into it. War Battles restarted its match and spawned another
@@ -733,6 +745,16 @@ tests while live Windows cleanup remains host-parity evidence. The standalone
 soak remain separately named evidence rather than being promoted into one
 another. This closes the measured state-preservation boundary in
 [issue #120](https://github.com/ts-defold/deherm/issues/120).
+
+A fresh run of the repaired default installed command completed all six live
+component edits without environment overrides. It retained the 40-entity game,
+started from 51 live components, emitted seven telemetry samples, and peaked at
+56 live components while transient gameplay continued. This proves the packed
+npm package, refreshed policy, local Extender build, native engine activation,
+fingerprint acknowledgement, and telemetry loop together on this macOS host. It
+does not promote non-reloadable Defold resources into in-process HMR: project,
+input-binding, and native-extension changes still take the documented rebuild
+and graceful engine-restart lane.
 The Rezi console exists and has deterministic renderer fixtures, but still
 needs PTY/performance/platform evidence. Its focus, layer, pointer, selection,
 and keymap behavior is covered by deterministic renderer and lifecycle tests

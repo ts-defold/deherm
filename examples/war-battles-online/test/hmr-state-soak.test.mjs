@@ -6,15 +6,18 @@ import {
   HMR_SOAK_SCHEMA_VERSION,
   HMR_STATE_API,
   HISTORICAL_REGRESSION_COUNTS,
+  formatHmrFailure,
   parseHmrStateEvent,
   runHmrStateSoak,
   validateHmrRuntimeHealth,
   validateHmrSoakEvidence,
 } from "../integration/hmr-state-soak.mjs";
 import {
+  DEFAULT_INSTALLED_HMR_BUILD_SERVER,
   dependencyLinkType,
   assertInstalledPackageTreeSha256,
   cleanupOwnedHmrRun,
+  installedHmrLaunchConfiguration,
   installedPackageTreeSha256,
   ownedPosixGroupAlive,
   parseCliEventLine,
@@ -26,6 +29,31 @@ import {
 } from "../integration/installed-hmr-driver.mjs";
 
 const fingerprint = (value) => value.toString(16).padStart(64, "0");
+
+test("installed HMR refreshes policy and uses the pinned local Extender by default", () => {
+  const launch = installedHmrLaunchConfiguration({ PATH: "/bin" });
+  assert.equal(launch.buildServer, DEFAULT_INSTALLED_HMR_BUILD_SERVER);
+  assert.equal(Object.hasOwn(launch.environment, "DEHERM_OFFLINE"), false);
+  assert.deepEqual(launch.environment, { PATH: "/bin" });
+
+  const explicit = installedHmrLaunchConfiguration({
+    DEHERM_BUILD_SERVER: "http://example.test:9000",
+    DEHERM_OFFLINE: "1",
+  });
+  assert.equal(explicit.buildServer, "http://example.test:9000");
+  assert.equal(explicit.environment.DEHERM_OFFLINE, "1");
+});
+
+test("installed HMR diagnostics preserve aggregate root causes", () => {
+  const failure = new AggregateError(
+    [new Error("policy surface is stale"), new Error("native compile failed")],
+    "native HMR run and cleanup failed",
+  );
+  assert.equal(
+    formatHmrFailure(failure),
+    "native HMR run and cleanup failed; caused by: policy surface is stale; caused by: native compile failed",
+  );
+});
 
 function snapshot(gameplayTick, componentCount = 51, transientPopulation = 0) {
   return {

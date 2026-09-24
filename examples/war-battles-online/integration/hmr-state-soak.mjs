@@ -20,6 +20,20 @@ export const DEFAULT_HMR_SOAK_LIMITS = Object.freeze({
 function fail(message) {
   throw new Error(`war-battles-hmr-soak:${message}`);
 }
+
+export function formatHmrFailure(error) {
+  const seen = new Set();
+  const describe = (value) => {
+    if (value === undefined || value === null) return [];
+    if ((typeof value === "object" || typeof value === "function") && seen.has(value)) return [];
+    if (typeof value === "object" || typeof value === "function") seen.add(value);
+    const own = value instanceof Error ? value.message : String(value);
+    if (!(value instanceof AggregateError)) return own ? [own] : [];
+    const nested = value.errors.flatMap(describe);
+    return own ? [own, ...nested] : nested;
+  };
+  return [...new Set(describe(error))].join("; caused by: ") || "unknown HMR failure";
+}
 function integer(value, label, { min = 0 } = {}) {
   if (!Number.isSafeInteger(value) || value < min) fail(`${label} must be a safe integer >= ${min}`);
   return value;

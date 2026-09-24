@@ -208,6 +208,11 @@ function engineRelativePath(platform) {
   return mapped;
 }
 
+export function nativeBobFailureOutputRoot(projectRoot, platform) {
+  const [platformDirectory] = engineRelativePath(platform);
+  return path.join(path.resolve(projectRoot), "build", platformDirectory);
+}
+
 export async function createDefoldBuilder(options) {
   const projectRoot = path.resolve(options.projectRoot);
   const emit = options.emit ?? (() => {});
@@ -257,7 +262,15 @@ export async function createDefoldBuilder(options) {
         emit({ type: "defold-build-succeeded", reason, resources });
         return { resources, outputRoot, platform };
       } catch (error) {
-        const logFile = await emitBobFailureDiagnostics(projectRoot, outputRoot, emit);
+        // Native Extender diagnostics are written beside the linked engine,
+        // not below Bob's compiled-resource --output tree. Looking in
+        // build/default hid the actionable compiler error behind "java exited
+        // 1" in the TUI and in machine-mode HMR failures.
+        const logFile = await emitBobFailureDiagnostics(
+          projectRoot,
+          nativeBobFailureOutputRoot(projectRoot, platform),
+          emit
+        );
         const detail = error instanceof Error ? error.message : String(error);
         const diagnostic = logFile
           ? `${detail}; see ${path.relative(projectRoot, logFile).split(path.sep).join("/")}`

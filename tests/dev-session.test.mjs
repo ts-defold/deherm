@@ -13,7 +13,8 @@ import {
 import {
   bobFailureLogFile,
   defaultDefoldBundleBuildOutput,
-  defaultDefoldBundleOutput
+  defaultDefoldBundleOutput,
+  nativeBobFailureOutputRoot
 } from "../packages/cli/src/dev/defold-builder.mjs";
 import { applyDevEvent, createDevModel } from "../packages/cli/src/dev/model.mjs";
 
@@ -189,6 +190,11 @@ test("default development bundles use a project-keyed native cache outside Defol
   assert.equal(browserBuild, path.join(project, "build", "deherm-wasm-web"));
   assert.equal(bobFailureLogFile(browserBuild), path.join(browserBuild, "log.txt"),
     "bundle diagnostics follow Bob's actual --output tree");
+  assert.equal(
+    bobFailureLogFile(nativeBobFailureOutputRoot(project, "arm64-macos")),
+    path.join(project, "build", "arm64-osx", "log.txt"),
+    "native diagnostics follow Extender's platform output tree"
+  );
   assert.notEqual(browserBuild, path.join(project, "build", "default"),
     "browser compilation never mutates the live native resource tree");
   assert.throws(() => defaultDefoldBundleBuildOutput(project, "../../outside"), /Invalid Defold bundle platform/u);

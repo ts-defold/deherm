@@ -521,6 +521,20 @@ compiler so an unchanged bundle is not signalled as a new generation. The
 watcher excludes `.internal`, `.deherm`, build outputs, and generated proxies so
 editor cache churn and self-authored outputs do not form rebuild loops.
 
+The installed War Battles soak uses online policy resolution and the pinned
+local Extender by default:
+
+```sh
+pnpm extender:start
+pnpm --dir examples/war-battles-online runtime:installed-hmr
+```
+
+Set `DEHERM_OFFLINE=1` only to test an already authenticated cache, and set
+`DEHERM_BUILD_SERVER` only to exercise another compatible Extender. Native Bob
+failures are read from `build/<extender-platform>/log.txt`, so both JSON output
+and the TUI retain the compiler's actionable diagnostic instead of collapsing
+it to the Java process exit code.
+
 `deherm language-server --stdio --project <game.project>` is the installed,
 editor-neutral Defold semantic server. It consumes
 `.deherm/generated/resource-symbols.json` and contributes project resource

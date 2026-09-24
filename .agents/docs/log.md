@@ -3134,3 +3134,28 @@ outlast the asynchronous HMAC resume handshake. The product path was repeatably
 healthy in isolation. The test now waits for the bounded handshake state change
 for at most 64 event-loop turns and still asserts the exact `ready` state and
 player identity; the complete 80-test game/session suite passes afterward.
+
+## 2026-09-24 - Installed HMR freshness and diagnostic closure
+
+The packed-package HMR command was not reaching the reload transaction. Its
+driver silently defaulted to offline resolution, so a current stable runtime
+source tree could compile against an older authenticated generated surface for
+the same Defold revision. The reproduced failure was exact: the stable scalar
+adapter referenced `script_handle_lowering::LegacyHandleApi`, while the cached
+generated header predated that type. A second independent default pointed the
+dev-SDK build at the production hosted Extender, which rejected the SDK's
+`r8Cmd` platform field before native compilation. Neither failure was evidence
+against the Hermes HMR transaction.
+
+The installed soak now refreshes policy by default, preserves an explicit
+offline request, and uses the pinned local Extender unless the caller supplies a
+different server. Native Bob failure collection now follows Extender's actual
+`build/<platform>/log.txt` output rather than the compiled-resource
+`build/default` tree, and aggregate soak errors print their nested root causes.
+Focused launch-policy, diagnostic, and dev-builder tests pass. A fresh command
+with no environment overrides completed six live component edits through the
+packed npm package: the engine retained 40 entities, began with 51 components,
+emitted seven telemetry samples, and peaked at 56 components. This is native
+macOS packed-package HMR and telemetry evidence. Non-reloadable Defold resource
+changes remain rebuild-and-restart behavior, and the hosted production Extender
+remains incompatible with this pinned dev SDK.
