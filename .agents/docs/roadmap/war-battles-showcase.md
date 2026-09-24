@@ -562,10 +562,16 @@ three native Defold `.tilemap` variants without changing collision rules.
 The runtime retains six fixed 10,800-byte role buffers and reprojects only when
 the authoritative map seed changes. Steady frames therefore allocate nothing
 and issue no tilemap calls; a seed transition writes only cells whose resolved
-Defold tile id changed, then swaps the current and scratch buffers. This is
-compile- and unit-level evidence for seeded native realization. The default
-frontier map remains the checked project resource; observing a non-default
-theme in a live packaged engine remains part of the next runtime-art gate.
+Defold tile id changed, then swaps the current and scratch buffers. The default
+frontier map remains the checked project resource. The dedicated
+`runtime:arena-theme` gate now compiles a temporary, exactly representable seed
+through Bob, observes the refinery projection marker from the live packaged
+native engine, requires component teardown, then restores the authored
+collection byte-for-byte and deletes its isolated build output. This is native
+runtime/control-flow evidence, not a screenshot or aesthetic oracle. Defold
+editor number properties pass through a float representation, so editor-authored
+seed values must remain in the exact integer range; full-width uint32 protocol
+seeds remain authoritative after they enter the TypeScript world.
 
 This closes the previously unresolved deterministic terrain grammar, but not
 the whole production-art pass. The generated palette themes currently reuse

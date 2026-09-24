@@ -3245,3 +3245,24 @@ packaged native runtime re-observed that bundle through graceful teardown, and
 a subsequent browser HMR run preserved the bundle, bytecode, source map, and
 lock hashes exactly. The 12-test Static Hermes product gate and packaged-runtime
 freshness check pass against the refreshed artifact.
+
+## 2026-09-24 - Non-default arena theme executes in packaged Defold
+
+The remaining seeded-art runtime boundary is now explicit. The
+`runtime:arena-theme` gate edits only a temporary `main.collection` map-seed
+property, builds into an isolated Bob output through the pinned local Extender,
+runs the packaged native engine, requires the refinery theme marker and normal
+arena initialization, performs the same component-aware graceful shutdown as
+the primary packaged gate, then restores the source bytes and removes the owned
+output. A fresh arm64-macOS run observed
+`war-battles:arena-theme:refinery:seed=1` and exited cleanly through
+`@system/exit`.
+
+The first attempted seed also produced useful negative evidence: a large
+32-bit integer authored as a Defold number property was rounded by the compiled
+float property representation (`1463898691` became `1463898752`). The final
+gate uses an exactly representable editor seed and tests that constraint.
+Full-width network and simulation seeds are still uint32 values after entering
+TypeScript. The successful marker proves the generated component executed the
+non-default tile projection without a rejected engine diagnostic; it does not
+claim human visual inspection or browser/GPU parity.

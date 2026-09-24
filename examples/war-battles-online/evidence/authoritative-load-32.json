@@ -525,8 +525,8 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 7269,
-      "sha256": "0f3088f673aa1e4339043061456afb2930ac199cc2d5723237f8e82f59b9bbeb"
+      "bytes": 7380,
+      "sha256": "f9648c8844562aa0d2c8164d4d01b8d31571fbb65bee07cd3c916eacca0be9c9"
     },
     {
       "path": "package.json",
@@ -541,5 +541,5 @@
       "sha256": "fbacd2a0d4c0edb257c033ab73b71c0f2d60fb5f42a8c779a37b674c10844dd9"
     }
   ],
-  "sourceKey": "bce548a5bb185b2196180bc28ef250b87d792982848234f17c2098e291eba9d4"
+  "sourceKey": "6f7b60a5e050cc7e7ccb68982ae6f489c42518dbbb57cc1959e9486a3076aaa6"
 }
