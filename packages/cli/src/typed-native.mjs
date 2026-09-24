@@ -29,8 +29,15 @@
 // non-Hermes target gets a named refusal instead of an undefined `_sh_*`
 // symbol at link time.
 
-import { access, readFile, rm, writeFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import path from "node:path";
+
+import {
+  BOB_TOOLING_IGNORE_ENTRIES,
+  reconcileBobProjectBoundary
+} from "./bob-project-boundary.mjs";
+
+export { BOB_TOOLING_IGNORE_ENTRIES };
 
 
 /** The materialised extension's directory name, relative to a project root. */
@@ -112,18 +119,15 @@ export async function typedNativeDisposition(defoldPlatform, options = {}) {
   };
 }
 
-function parseIgnoreFile(text) {
-  return text.split(/\r?\n/);
-}
-
 /**
  * Make the project on disk match the target's disposition before Bob walks it.
  *
  * Idempotent in both directions, and it never deletes the materialised unit: a
  * web build hides it, and the next Hermes build reveals the same files again.
- * The exclusion is written only when there is something to exclude, and the
- * `.defignore` itself is removed when this entry was its only content, so a
- * project that never assembled a unit is left exactly as it was.
+ * npm dependencies remain hidden on every target. The installed package
+ * contains the revision-neutral extension seed; generation materialises the
+ * selected revision into `/defold_hermes`, and Bob must never rediscover the
+ * incomplete seed below `/node_modules` as a second native extension.
  */
 export async function reconcileTypedNativeUpload(options) {
   const projectRoot = path.resolve(options.projectRoot);
@@ -131,24 +135,21 @@ export async function reconcileTypedNativeUpload(options) {
   const materialised = await access(path.join(projectRoot, TYPED_NATIVE_EXTENSION))
     .then(() => true, () => false);
   const defignore = path.join(projectRoot, ".defignore");
-  let existing;
-  try {
-    existing = await readFile(defignore, "utf8");
-  } catch (error) {
-    if (error?.code !== "ENOENT") throw error;
-  }
-  const lines = existing === undefined ? [] : parseIgnoreFile(existing);
-  const present = lines.some((line) => line.trim() === TYPED_NATIVE_IGNORE_ENTRY);
   const wanted = !disposition.eligible && materialised;
+  const boundary = await reconcileBobProjectBoundary({
+    projectRoot,
+    includeEntries: wanted ? [TYPED_NATIVE_IGNORE_ENTRY] : [],
+    excludeEntries: wanted ? [] : [TYPED_NATIVE_IGNORE_ENTRY]
+  });
   const result = {
     ...disposition,
     defignore,
     materialised,
     ignored: wanted,
-    changed: present !== wanted,
+    changed: boundary.changed,
     message: ""
   };
-  if (present === wanted) {
+  if (!boundary.changed) {
     result.message = wanted
       ? `${TYPED_NATIVE_EXTENSION} stays excluded from the ${disposition.platform} upload (${disposition.code})`
       : materialised
@@ -157,18 +158,13 @@ export async function reconcileTypedNativeUpload(options) {
     return result;
   }
   if (wanted) {
-    const next = [...lines.filter((line, index) => line.trim() !== "" || index !== lines.length - 1)];
-    next.push(TYPED_NATIVE_IGNORE_ENTRY);
-    await writeFile(defignore, `${next.join("\n")}\n`);
     result.message =
-      `${TYPED_NATIVE_EXTENSION} excluded from the ${disposition.platform} upload through .defignore ` +
+      `${TYPED_NATIVE_EXTENSION} excluded from the ${disposition.platform} upload and npm tooling hidden through .defignore ` +
       `(${disposition.code})`;
     return result;
   }
-  const next = lines.filter((line) => line.trim() !== TYPED_NATIVE_IGNORE_ENTRY);
-  if (next.every((line) => line.trim() === "")) await rm(defignore, { force: true });
-  else await writeFile(defignore, `${next.join("\n").replace(/\n+$/, "")}\n`);
   result.message =
-    `${TYPED_NATIVE_EXTENSION} re-enabled for the ${disposition.platform} upload (runtime ${disposition.runtimeId})`;
+    `${TYPED_NATIVE_EXTENSION} uploadable for ${disposition.platform}; npm tooling hidden through .defignore ` +
+    `(runtime ${disposition.runtimeId})`;
   return result;
 }

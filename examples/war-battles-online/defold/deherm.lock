@@ -327,7 +327,7 @@
   },
   "generation": {
     "schemaVersion": 1,
-    "projectGeneratorSha256": "4c32ccbcd580dc247c392f7b048048e81cfeeb4693a4aca4ca541679181e2cbf",
+    "projectGeneratorSha256": "e7f7934378790b46baaafd0e27f404665c391214205c85ff45af1ea1a850431f",
     "nativeExtensionGeneratorSha256": "7c85459ce52d51aaf1e2d184615be90af562b8916699327c9968ae1c214073a1",
     "nativeExtensionClang": {
       "required": false
@@ -338,7 +338,7 @@
         "script-typed-native-bridge.ts": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f"
       }
     },
-    "cacheKey": "0eb23769ebd81c22096a9d89408c5d06457b7ac1a070ed52b1abe425ed390e09"
+    "cacheKey": "d0b8600ff8117b23f747349594c714a58393beca71a89f3440cedfed87c04e21"
   },
   "defoldResolution": {
     "schemaVersion": 1,
@@ -348,10 +348,9 @@
     "evidence": {
       "archive": ".internal/cache/arm64-osx/build.zip",
       "platform": "arm64-osx",
-      "size": 8565051,
-      "modifiedMs": 1790165122886
-    },
-    "via": "deherm-lock"
+      "size": 8587608,
+      "modifiedMs": 1790253426011
+    }
   },
   "defoldSurface": {
     "layer": "user-cache"
@@ -360,7 +359,7 @@
     "schemaVersion": 1,
     "engineRoot": "8aaf5de591249c9f85e079a59456688a5ac95ce47e115a7b8ccad4f6299eae36",
     "nativeRoot": "0499f56f899a668241f171e213759fcdd4c92a6f6a08c8d50a946672766eb363",
-    "root": "ee49d9eed6a39181c4e83ba7c2603918b0384040bab5e334424d3f0f80cfc736"
+    "root": "ee4cbae664cab1771d25c02b50c4816adaeb24ec0c44dfe2fe5b47c66350b751"
   },
   "inputs": {
     "valueLayoutsSha256": "a70876547c5c36d0dde6d6a3bf2e51c46dc0d00de6e46918eb01f82b149c7de3",
@@ -387,7 +386,7 @@
   "generatedOutputs": {
     "output": {
       "script-contexts.json": "788eee1e76b18f9a64da2849520e9088db9c42b03582aafecd635dc0610d850b",
-      "generated/native-extensions/index.json": "f3fa3546137a751f658e8da9183c824ee4a630df9b04f19f037b9be26c8c111f",
+      "generated/native-extensions/index.json": "5116926a5f2f33fe2b948db433ef79e77159793074c3ad0755412c7324c1fe8c",
       "sdk/contexts/shared.ts": "9530ce2c75345eeb75a45baca57180cd9ab7a043373b7cff866bfb595c36ac94",
       "sdk/contexts/game-object.ts": "ae25e99a99a7798fee5d93252f3ca3cdb0043addbc105e55b04b609ccecfe340",
       "sdk/contexts/gui.ts": "ee394ccf53c2fce1f7dbda9588f066ba8e87ff84ee4514aa9dc5769f34adad5e",
@@ -411,8 +410,8 @@
     "headerCount": 0,
     "generatedRouteCount": 0,
     "blockedRouteCount": 0,
-    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/0eb23769ebd81c22096a9d89408c5d06457b7ac1a070ed52b1abe425ed390e09",
-    "treeSha256": "842aad6b8a924aaa5bf685743fa683dd3664de917c266e246d4e8f04fa8d924c"
+    "keyedOutput": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05/d0b8600ff8117b23f747349594c714a58393beca71a89f3440cedfed87c04e21",
+    "treeSha256": "e76b69e49a25f0952ff497d76fca075b28258d013f8695e4c6f10ae478e308c4"
   },
   "engineProfiles": {
     "source": "defold-default",
@@ -469,12 +468,12 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "98a7f39159fddd0c552bb72562ecc60f2374b04a4f7993a42cf5191f45bc6a0c",
+        "fingerprint": "ea36f46e322278111c3be79d753e156b3568dd9cbb55d9197d2fbe01700c6dae",
         "outputs": {
-          "deherm/app.dehermc": "06f913aeb492d74ebe510903dc60bf90fe075abbeedc65df372eca6e159613dc"
+          "deherm/app.dehermc": "82c12dade761e05b4ab35afe98914f5cbc479e1db112b682ab3ff0bc9e21bab8"
         },
         "build": {
-          "entryPoint": "main/arena.script.ts",
+          "entryPoint": "main/player.script.ts",
           "preludeEntries": [
             ".deherm/generated/components/registry.ts"
           ],
@@ -492,7 +491,7 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "de50d4f9c4c34b2644ff00df830b8941b3d6d947e68df98a1c2f547b192c1ca9",
+          "digest": "eb60244c0c431b4c8dfc3f7effaf5837d977c188941db13823ea50ec7ff5bbb2",
           "fileCount": 69,
           "files": {
             ".deherm/generated/components/registry.ts": "c0a197d87b0a948fa4b21ab93182ee334c7a511975eafccc21f11f22d09ca6b8",

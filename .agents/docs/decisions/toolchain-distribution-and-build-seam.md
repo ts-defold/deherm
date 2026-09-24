@@ -393,6 +393,36 @@ an interactive session:
   machine and needs the host compilers there. Both are workable; an unchecked
   mismatch is not.
 
+## Bob receives a project, not the package workspace
+
+Bob recursively walks its project root while discovering native extensions.
+That makes the upload boundary a correctness property, not only a transfer-size
+optimization: the installed npm package deliberately contains a
+revision-neutral `defold_hermes` seed, while `deherm generate` materializes the
+selected Defold revision into the project-owned `/defold_hermes`. If Bob can
+also see `node_modules/@ts-defold/deherm/defold/defold_hermes`, it discovers a
+second, incomplete extension and compiles files whose generated revision output
+was intentionally excluded from the npm package.
+
+`packages/cli/src/bob-project-boundary.mjs` therefore owns a conservative,
+idempotent `.defignore` projection. It excludes only invariant tool/cache trees:
+`/node_modules`, `/.deherm`, `/.internal`, `/build`, `/.git`, `/.github`,
+`/.vscode`, and `/.idea`. Authored resource directories are never inferred as
+unused. `deherm create` writes the boundary into every new template,
+`deherm generate` re-establishes it while installing the managed extension,
+and the dev builder reconciles it immediately before every Bob invocation.
+Unknown user entries remain in their original order. Target selection composes
+with the same write by adding or removing only
+`/defold_hermes_typed_native`.
+
+Observed on 2026-09-24 with the pinned local Bob/Extender path: before this
+boundary Bob discovered the package seed below `/node_modules` and failed on
+its deliberately absent generated headers; after reconciliation Bob compiled
+the project-owned extension, launched the arm64-macOS engine, connected the
+Hermes inspector, applied generation 1/1, and emitted War Battles runtime
+telemetry. This is native build/launch evidence for the boundary, not a claim
+that arbitrary user-authored directories can be removed from an upload.
+
 ## The binding that closes the seam
 
 `deherm.lock` gains a `buildArtifacts` section. Each entry names a materialised

@@ -7,7 +7,10 @@ import { join, relative, resolve } from "node:path";
 // development loop, this packaged harness, and the runtime bug-pool harvester
 // all classify engine output the same way.
 import { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic } from "@ts-defold/deherm/dev/runtime-diagnostics";
-import { TYPED_NATIVE_IGNORE_ENTRY } from "@ts-defold/deherm/dev/typed-native";
+import {
+  BOB_TOOLING_IGNORE_ENTRIES,
+  TYPED_NATIVE_IGNORE_ENTRY
+} from "@ts-defold/deherm/dev/typed-native";
 
 import { DYNAMIC_SERVICE_PORT_ENV, requestGracefulShutdown } from "./graceful-shutdown.mjs";
 import { projectionEnvelope } from "./projections.mjs";
@@ -307,17 +310,22 @@ export async function sha256Artifact(repositoryRoot, path) {
 
 /**
  * Canonicalise `.defignore` for runtime source evidence without hiding rules
- * authored by the game. The web/native target reconciler exclusively owns one
- * exact trimmed line; adding or removing that line must not invalidate native
- * evidence. Every other line remains an input because it can change what Bob
- * uploads and therefore what the observed engine actually executes.
+ * authored by the game. The project boundary owns the invariant tooling/cache
+ * exclusions, and the web/native target reconciler owns one transient transport
+ * exclusion. Adding or removing those exact trimmed lines must not invalidate
+ * native evidence. Every other line remains an input because it can change what
+ * Bob uploads and therefore what the observed engine actually executes.
  *
  * Reconciliation rewrites line endings and trailing blank lines, so those are
  * normalised here as syntax rather than treated as semantic project changes.
  */
-export function normalizedDefignoreText(text = "", managedEntry = TYPED_NATIVE_IGNORE_ENTRY) {
+export function normalizedDefignoreText(
+  text = "",
+  managedEntries = [...BOB_TOOLING_IGNORE_ENTRIES, TYPED_NATIVE_IGNORE_ENTRY]
+) {
+  const managed = new Set(Array.isArray(managedEntries) ? managedEntries : [managedEntries]);
   const lines = text.replaceAll("\r\n", "\n").replaceAll("\r", "\n").split("\n")
-    .filter((line) => line.trim() !== managedEntry);
+    .filter((line) => !managed.has(line.trim()));
   while (lines.length > 0 && lines.at(-1) === "") lines.pop();
   return lines.length === 0 ? "" : `${lines.join("\n")}\n`;
 }

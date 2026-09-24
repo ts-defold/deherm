@@ -13,6 +13,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
+import { BOB_TOOLING_IGNORE_ENTRIES } from "../packages/cli/src/bob-project-boundary.mjs";
 
 import {
   TYPED_NATIVE_EXTENSION,
@@ -70,7 +71,10 @@ test("a web build hides an already materialised unit and a Hermes build reveals 
     const excluded = await reconcileTypedNativeUpload({ projectRoot: root, platform: "wasm-web" });
     assert.equal(excluded.ignored, true);
     assert.equal(excluded.changed, true);
-    assert.equal((await readFile(defignore, "utf8")).trim(), TYPED_NATIVE_IGNORE_ENTRY);
+    assert.deepEqual((await readFile(defignore, "utf8")).trim().split("\n"), [
+      ...BOB_TOOLING_IGNORE_ENTRIES,
+      TYPED_NATIVE_IGNORE_ENTRY
+    ]);
 
     // Idempotent: a second web build changes nothing and says so.
     const again = await reconcileTypedNativeUpload({ projectRoot: root, platform: "wasm-web" });
@@ -80,23 +84,23 @@ test("a web build hides an already materialised unit and a Hermes build reveals 
     const restored = await reconcileTypedNativeUpload({ projectRoot: root, platform: "arm64-macos" });
     assert.equal(restored.ignored, false);
     assert.equal(restored.changed, true);
-    // The default state of a project is no file at all, not an empty one.
-    await assert.rejects(() => readFile(defignore, "utf8"), { code: "ENOENT" });
+    assert.deepEqual((await readFile(defignore, "utf8")).trim().split("\n"), BOB_TOOLING_IGNORE_ENTRIES);
   } finally {
     await rm(root, { recursive: true, force: true });
   }
 });
 
-test("a project with no materialised unit is left exactly as it was", async () => {
-  // There is nothing to hide, so a web build must not invent a .defignore in a
-  // project that never assembled a unit.
+test("npm tooling is hidden even when no typed-native unit is materialised", async () => {
   const root = await project({ materialised: false });
   try {
     const result = await reconcileTypedNativeUpload({ projectRoot: root, platform: "wasm-web" });
     assert.equal(result.materialised, false);
     assert.equal(result.ignored, false);
-    assert.equal(result.changed, false);
-    await assert.rejects(() => readFile(path.join(root, ".defignore"), "utf8"), { code: "ENOENT" });
+    assert.equal(result.changed, true);
+    assert.deepEqual(
+      (await readFile(path.join(root, ".defignore"), "utf8")).trim().split("\n"),
+      BOB_TOOLING_IGNORE_ENTRIES
+    );
   } finally {
     await rm(root, { recursive: true, force: true });
   }
@@ -110,11 +114,11 @@ test("a project's own .defignore entries survive both directions", async () => {
 
     await reconcileTypedNativeUpload({ projectRoot: root, platform: "wasm-web" });
     const hidden = (await readFile(defignore, "utf8")).split("\n").filter(Boolean);
-    assert.deepEqual(hidden, ["/reference", "/notes", TYPED_NATIVE_IGNORE_ENTRY]);
+    assert.deepEqual(hidden, ["/reference", "/notes", ...BOB_TOOLING_IGNORE_ENTRIES, TYPED_NATIVE_IGNORE_ENTRY]);
 
     await reconcileTypedNativeUpload({ projectRoot: root, platform: "arm64-macos" });
     const revealed = (await readFile(defignore, "utf8")).split("\n").filter(Boolean);
-    assert.deepEqual(revealed, ["/reference", "/notes"]);
+    assert.deepEqual(revealed, ["/reference", "/notes", ...BOB_TOOLING_IGNORE_ENTRIES]);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

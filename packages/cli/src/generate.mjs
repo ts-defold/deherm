@@ -34,6 +34,7 @@ import { safeParameterIdentifier } from "./names.mjs";
 import { hostDefoldPlatform } from "./toolchains.mjs";
 import { checkProject, loadDehermPluginConfig } from "./transform-compiler.mjs";
 import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } from "./native-extension-api.mjs";
+import { reconcileBobProjectBoundary } from "./bob-project-boundary.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const require = createRequire(import.meta.url);
@@ -1370,6 +1371,7 @@ export function generateExtensionTypes(inventory, layouts) {
 }
 
 export async function installNativeExtension(projectRoot, options = {}) {
+  await reconcileBobProjectBoundary({ projectRoot });
   const source = path.resolve(options.source ?? path.join(packageRoot, "defold", "defold_hermes"));
   const surfaceSource = options.surfaceRepositoryRoot
     ? path.join(path.resolve(options.surfaceRepositoryRoot), "defold", "defold_hermes")

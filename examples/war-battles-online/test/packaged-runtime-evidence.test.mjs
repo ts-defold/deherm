@@ -134,12 +134,13 @@ test("checked evidence pins component teardown and the canonical settle window",
   assert.throws(() => checkedSettleMs(undefined), /must be 1500ms/);
 });
 
-test("runtime source evidence removes only the target-managed defignore rule", () => {
+test("runtime source evidence removes only package-managed defignore rules", () => {
   assert.equal(normalizedDefignoreText(), "");
   assert.equal(normalizedDefignoreText("/defold_hermes_typed_native\n"), "");
   assert.equal(normalizedDefignoreText("  /defold_hermes_typed_native  \r\n"), "");
+  assert.equal(normalizedDefignoreText("/node_modules\n/.deherm\n/build\n"), "");
   assert.equal(
-    normalizedDefignoreText("/reference\r\n/defold_hermes_typed_native\r\n/notes\r\n"),
+    normalizedDefignoreText("/reference\r\n/node_modules\r\n/defold_hermes_typed_native\r\n/notes\r\n"),
     "/reference\n/notes\n",
   );
   assert.equal(

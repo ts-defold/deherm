@@ -23,31 +23,27 @@
       "autoEngageSeconds": 0
     },
     "inlineValueTexts": [
-      "live players [0:1] = 8",
-      "live botSkill [0:1] = 2",
-      "live mapSeed [0:1] = 0",
-      "live autoEngageSeconds [0:1] = 0"
+      "= 8",
+      "= 2",
+      "= 0",
+      "= 0"
     ],
-    "projectedInstanceCount": 36,
+    "projectedInstanceCount": 39,
     "omittedInstanceCount": 0
   },
   "screenshot": {
     "path": "examples/war-battles-online/evidence/vscode-live-values.png",
-    "bytes": 833216,
-    "sha256": "11a06addbbf73baceb013e1fc0f35bca5215c987edf77949108b6b84f9aed08d",
+    "bytes": 794252,
+    "sha256": "f75c9876b51cc6af0de4279aa9afcfcfb1d4049ddf1ba1420f1faa314fe82b3f",
     "width": 2880,
     "height": 1800
   },
   "observedArtifacts": {
-    "npmPackage": {
-      "path": "ts-defold-deherm-0.0.0.tgz",
-      "bytes": 604063,
-      "sha256": "d1b3e7c487b1495884b774541344c454404fbf7853b7dc767ea6ca4a2497cdaf"
-    },
+    "npmPackage": null,
     "vsix": {
       "path": "editors/vscode/dist/deherm.vsix",
-      "bytes": 93318,
-      "sha256": "e0225916fa8b58938607e73ff0e85a4a10458abbe9748afafb3c19a0498f5a76"
+      "bytes": 93296,
+      "sha256": "e9732cefedc78d7ac59d39c6cb99b0b437d099d85810467c5278b4419e923d7f"
     }
   },
   "sourceInputs": [
@@ -68,8 +64,8 @@
     },
     {
       "path": "editors/vscode/src/live-values.ts",
-      "bytes": 16631,
-      "sha256": "08af7d58ab81e406850968aaf55f64ce51d0011b6bf57a6fe8b8f1eb4fd79d97"
+      "bytes": 16525,
+      "sha256": "ba7e03ec8ed79cef33769a514bef7392383b7bfb0e6a2d91cde63b098ce47acb"
     },
     {
       "path": "packages/cli/src/dev/inspector-bridge.mjs",
@@ -88,9 +84,9 @@
     },
     {
       "path": "examples/war-battles-online/integration/vscode-visual-evidence.mjs",
-      "bytes": 5647,
-      "sha256": "471cf9d771aee15c2597b197d7592a0a73cd41e5c7724a56f4dab405328c54c7"
+      "bytes": 5628,
+      "sha256": "69a26553e7bd311a5c31bcd3a1c55a59a945a0e830ab35c8766fb0c98292cf7e"
     }
   ],
-  "evidenceKey": "b7cf54ad807929ccadda069292c48053785de38b9aae14850da81ef6f38d325a"
+  "evidenceKey": "b145777681770085761c3da89ac3ca9eeb660f420c2067f5823c8f11748b8b99"
 }

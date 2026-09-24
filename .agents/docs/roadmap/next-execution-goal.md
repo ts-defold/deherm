@@ -316,10 +316,11 @@ generated audio resources, collision/score flow, restart, bots, Dynamic Hermes,
 reachable typed-native Static Hermes, and browser-host WebGL 2 are implemented
 and observed. Checked native and browser evidence is current, and Chrome's
 playability gate observes fire, audio-call, and round-two restart markers. The
-native source identity normalizes only the target-transient `.defignore` entry
-that the package owns to keep typed-native code out of a Wasm upload; every
-user-authored ignore rule remains hashed, while target selection cannot
-invalidate otherwise identical native evidence. Installed-TUI HMR proof is
+native source identity normalizes only package-owned `.defignore` entries: the
+invariant tooling/cache boundary plus the target-transient entry that keeps
+typed-native code out of a Wasm upload. Every user-authored ignore rule remains
+hashed, while target selection cannot invalidate otherwise identical native
+evidence. Installed-TUI HMR proof is
 complete through the packed-package path. The remaining work in this tranche
 is the multiplayer expansion; the literal VS Code visual observation is now
 source-bound checked evidence.

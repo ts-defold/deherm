@@ -1,5 +1,28 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - Bob sees only the materialized project, and live lenses are compact
+
+The installed-package War Battles launch exposed a real recursive-discovery
+failure: Bob found both the project-owned `/defold_hermes` and the npm package's
+revision-neutral seed below `/node_modules`. The seed correctly lacks
+revision-derived generated headers, so Extender tried to compile an extension
+that was never meant to be an upload input and failed. A shared, idempotent Bob
+project boundary now excludes `/node_modules`, `/.deherm`, `/.internal`,
+`/build`, `/.git`, `/.github`, `/.vscode`, and `/.idea`, while preserving every
+user-authored `.defignore` rule. New scaffolds write it, generation re-establishes
+it, and dev/native bundle builds reconcile it before Bob; the target-specific
+typed-native exclusion composes into the same file. Focused boundary,
+scaffolding, managed-extension, and target-selection tests pass. The pinned
+local Bob/Extender flow then built the project extension, launched War Battles,
+connected the Hermes inspector, applied generation 1/1, and streamed live
+telemetry.
+
+The source declaration inlays now show only `= 8`, `= 2`, `= 0`, and `= 0`.
+Target/component/instance/property detail remains in hover. A newly packaged
+VSIX was installed in the isolated VS Code profile and the 2880x1800 renderer
+evidence was re-recorded against a live arm64 engine; the authenticated state
+projected 39 current-schema instances with zero omissions.
+
 ## 2026-09-24 - Actual VS Code renderer shows live War Battles values
 
 The last tooling observation is now literal rather than inferred. An isolated
@@ -7,7 +30,7 @@ VS Code 1.129.1 profile installed the packaged `deherm.vsix`, opened the War
 Battles Defold project against an exact `npm pack` installation, and rendered
 four live inlay hints beside the declarations in `main/arena.script.ts`:
 
-`players: property.number(8), live players [0:1] = 8`
+`players: property.number(8), = 8`
 
 The same source-bound projection appears beside `botSkill`, `mapSeed`, and
 `autoEngageSeconds`; the document-level CodeLens remains a navigation/status
@@ -15,19 +38,17 @@ summary rather than the only place values appear.
 
 The packaged arm64 engine connected to the active loopback inspector and the
 authenticated editor projection reported current-schema arena instance `0:1`,
-36 live projected instances, and zero omissions. The actual 2880x1800 VS Code
+39 live projected instances, and zero omissions. The actual 2880x1800 VS Code
 renderer capture is checked in as `evidence/vscode-live-values.png`; its
 digest, exact inline texts, live values, component/schema identities, source
 inputs, npm tarball digest, and VSIX digest are sealed in the adjacent JSON.
 The new offline test rejects source, screenshot, property, or evidence-key
 drift.
 
-The hosted Defold Extender did not build a fresh engine during this observation:
-its server image rejected the pinned SDK's newer `r8Cmd` build field before the
-project extension compiled. The observation therefore used the already proven
-packaged engine and passed the active dev resource URI plus inspector port
-explicitly. This is genuine engine-to-control-plane-to-VS-Code renderer
-evidence, not a claim about that hosted Extender deployment.
+The refreshed observation used the pinned local Bob/Extender path and the
+materialized project extension after the Bob input boundary was corrected. This
+is genuine engine-to-control-plane-to-VS-Code renderer evidence, not a claim
+about the hosted Extender deployment.
 
 ## 2026-09-24 - Static product gates no longer depend on mutable dev reachability
 

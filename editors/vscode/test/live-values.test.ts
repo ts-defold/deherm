@@ -149,11 +149,11 @@ test("live hints project each authenticated runtime value onto its authored prop
     now: 10_500
   }), [{
     propertyName: "health",
-    label: "live health [3:1] = 100",
+    label: "= 100",
     tooltip: "local-engine · player [3:1] · health=100"
   }, {
     propertyName: "label",
-    label: "live label [3:1] = \"ready\"",
+    label: "= \"ready\"",
     tooltip: "local-engine · player [3:1] · label=\"ready\""
   }]);
 });

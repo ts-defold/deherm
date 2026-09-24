@@ -5,6 +5,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { createDefoldProject } from "../packages/cli/src/scaffold.mjs";
+import { BOB_TOOLING_IGNORE_ENTRIES } from "../packages/cli/src/bob-project-boundary.mjs";
 
 const revision = "a".repeat(40);
 
@@ -41,6 +42,10 @@ test("scaffold resolves its default from Defold's moving stable channel, not a p
   assert.equal(created.defoldRevision, revision);
   assert.deepEqual(requests, ["https://example.invalid/stable/info.json"]);
   assert.match(await readFile(path.join(projectRoot, "game.project"), "utf8"), new RegExp(`defold_sdk = ${revision}`));
+  assert.deepEqual(
+    (await readFile(path.join(projectRoot, ".defignore"), "utf8")).trim().split("\n"),
+    BOB_TOOLING_IGNORE_ENTRIES
+  );
 });
 
 test("an explicit scaffold revision is authoritative and requires no channel lookup", async (t) => {

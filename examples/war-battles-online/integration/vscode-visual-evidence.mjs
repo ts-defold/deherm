@@ -54,7 +54,7 @@ export function requireArenaInstance(state) {
 export function requireInlineValueTexts(renderedText) {
   const normalized = renderedText.replace(/\s+/gu, " ");
   return Object.entries(EXPECTED_PROPERTIES).map(([name, value]) => {
-    const expected = `live ${name} [0:1] = ${value}`;
+    const expected = `= ${value}`;
     if (!normalized.includes(expected)) {
       throw new Error(`The rendered VS Code document does not contain the inline ${name} value`);
     }

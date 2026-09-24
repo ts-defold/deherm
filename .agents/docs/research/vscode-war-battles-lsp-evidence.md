@@ -92,16 +92,20 @@ On 2026-09-24 the distinct visual gate was recorded from an actual VS Code
 Code profile installed the packaged VSIX, the project-local package was the
 exact `npm pack` artifact above, and the existing packaged arm64 engine was
 launched with the active dev resource and inspector ports. The authenticated
-state endpoint reported current-schema arena instance `0:1`, 36 projected live
+state endpoint reported current-schema arena instance `0:1`, 39 projected live
 instances, and zero omissions. The rendered editor displayed source-owned inlay
 hints directly beside the four declarations in `main/arena.script.ts`:
 
 ```text
-players: property.number(8),             live players [0:1] = 8
-botSkill: property.number(2),            live botSkill [0:1] = 2
-mapSeed: property.number(0),             live mapSeed [0:1] = 0
-autoEngageSeconds: property.number(0),   live autoEngageSeconds [0:1] = 0
+players: property.number(8),             = 8
+botSkill: property.number(2),            = 2
+mapSeed: property.number(0),             = 0
+autoEngageSeconds: property.number(0),   = 0
 ```
+
+The compact labels carry no duplicated property or instance text. Hover retains
+the target, component, instance identity, property name, and any additional
+live values.
 
 The 2880x1800 renderer screenshot, exact inline texts, live values, source inputs,
 package/VSIX digests, and screenshot digest are bound by

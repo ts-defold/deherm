@@ -243,6 +243,13 @@ disconnected, replaced-session, unknown, and schema-stale rows disappear rather
 than retaining or guessing values; ordinary TypeScript semantics remain with
 VS Code's built-in service.
 
+Declaration inlays are deliberately smaller than the transport record: the
+visible text is only `= <live value>` beside the authored property declaration.
+Target, component, instance identity, property name, and additional live
+instances remain available in the hover. The source already names the property
+and its authored default, so repeating either in the inlay spends horizontal
+space without adding information.
+
 Each live-value CodeLens carries only the already-open document's normalized
 project root and authored TypeScript path as its navigation payload. The thin
 client's reveal command validates both fields against the refreshed project

@@ -404,15 +404,14 @@ export function liveValueHints({
     grouped.set(value.propertyName, group);
   }
   return [...grouped.entries()].slice(0, Math.max(0, maximumHints)).map(([propertyName, entries]) => {
-    const visible = entries.slice(0, 3).map((entry) =>
-      `${entry.identity || ` [${entry.targetId}/${entry.componentId}]`} = ${entry.value}`);
+    const visible = entries.slice(0, 3).map((entry) => entry.value);
     if (entries.length > 3) visible.push(` · +${entries.length - 3}`);
     const tooltipEntries = entries.slice(0, 16).map((entry) =>
       `${entry.targetId} · ${entry.componentId}${entry.identity} · ${label(propertyName, 32)}=${entry.value}`);
     if (entries.length > 16) tooltipEntries.push(`+${entries.length - 16} more live instances`);
     return {
       propertyName,
-      label: `live ${label(propertyName, 32)}${visible.join(" ·")}`,
+      label: `= ${visible.join(" · ")}`,
       tooltip: tooltipEntries.join("\n")
     };
   });

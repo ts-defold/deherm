@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { spawn, spawnSync } from "node:child_process";
-import { mkdtemp, mkdir, symlink, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -58,6 +58,7 @@ test("installed package drives the bounded incremental dev loop", async () => {
   const project = path.join(root, "project");
   await mkdir(path.join(project, "src"), { recursive: true });
   await mkdir(path.join(project, "main"), { recursive: true });
+  await mkdir(path.join(project, ".deherm", "ir"), { recursive: true });
   await writeFile(path.join(project, "game.project"), "[project]\ntitle = Installed dev loop\n");
   await writeFile(path.join(project, "src", "main.ts"), 'import { value } from "./feature.ts";\nconsole.log("dev-loop", value);\n');
   await writeFile(path.join(project, "src", "feature.ts"), 'export const value = "first";\n');
@@ -67,6 +68,14 @@ test("installed package drives the bounded incremental dev loop", async () => {
     ""
   ].join("\n"));
   await writeFile(path.join(project, "main", "tiles.atlas"), 'images { image: "/main/tile.png" }\n');
+  // The installed development loop starts after `deherm generate`, so retain
+  // that real precondition in the otherwise network-free fixture. The policy
+  // is copied as consumer state rather than imported from the package: the npm
+  // artifact deliberately ships emitters, not one pinned Defold revision.
+  await writeFile(
+    path.join(project, ".deherm", "ir", "defold-component-proxy-contract.json"),
+    await readFile(path.join(repositoryRoot, "packages", "bindings", "generated", "defold-component-proxy-contract.json"))
+  );
 
   const runner = path.join(repositoryRoot, "tests", "fixtures", "installed-dev-loop-runner.mjs");
   const execution = await runAsync(process.execPath, [runner, packageRoot, project]);

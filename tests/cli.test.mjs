@@ -141,6 +141,8 @@ test("managed native extension install is content-keyed and replaces through a s
 
   const first = await installNativeExtension(project, { source });
   assert.equal(first.installed, true);
+  assert.match(await readFile(path.join(project, ".defignore"), "utf8"), /^\/node_modules$/mu);
+  assert.match(await readFile(path.join(project, ".defignore"), "utf8"), /^\/\.deherm$/mu);
   const sentinelPath = path.join(project, "defold_hermes", ".deherm-managed.json");
   const firstIdentity = JSON.parse(await readFile(sentinelPath, "utf8"));
   assert.equal(firstIdentity.schemaVersion, 3);
