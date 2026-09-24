@@ -14,8 +14,9 @@ import {
   decodeSessionState,
   encodeSessionState,
   createInMemoryTransportPair,
+  tickDeadline,
 } from "../core/index.ts";
-import { admitNewSession, configuredResumeKey, createSessionAdmissionGate } from "../server/deno-main.ts";
+import { admitNewSession, configuredResumeKey, createSessionAdmissionGate, websocketOriginAllowed } from "../server/deno-main.ts";
 
 async function settle() {
   for (let turn = 0; turn < 12; turn += 1) {
@@ -49,6 +50,42 @@ test("session tokens are authenticated, scoped, expiring, and key-rotatable", as
   assert.deepEqual(await rotated.verify(token, { matchId: 77, nowTick: 100, rosterSize: 8 }), claims);
   const next = await rotated.issue({ ...claims, generation: 10 });
   assert.deepEqual(await rotated.verify(next, { matchId: 77, nowTick: 100, rosterSize: 8 }), { ...claims, generation: 10 });
+});
+
+test("credential expiry and ledger reservations remain ordered across uint32 wrap", async () => {
+  const service = new SessionTokenService({ keys: [{ id: 1, secret: new Uint8Array(32).fill(0x55) }] });
+  const token = await service.issue({
+    matchId: 77, slot: 0, generation: 1,
+    issuedAtTick: 0xffff_fffe, expiresAtTick: 1,
+  });
+  assert.notEqual(await service.verify(token, { matchId: 77, nowTick: 0, rosterSize: 1 }), null);
+  assert.notEqual(await service.verify(token, { matchId: 77, nowTick: 1, rosterSize: 1 }), null);
+  assert.equal(await service.verify(token, { matchId: 77, nowTick: 2, rosterSize: 1 }), null);
+  await assert.rejects(
+    service.issue({ matchId: 77, slot: 0, generation: 2, issuedAtTick: 1, expiresAtTick: 0x8000_0001 }),
+    /serial-order horizon/,
+  );
+
+  const ledger = new SessionLedger({ matchId: 77, rosterSize: 1 });
+  ledger.commit(0, 1);
+  ledger.reserveFor(0, 0xffff_fffe, 3);
+  assert.equal(ledger.expiresAtTick[0], tickDeadline(0xffff_fffe, 3));
+  assert.equal(ledger.isReserved(0, 0xffff_ffff), true);
+  assert.equal(ledger.isReserved(0, 0), true);
+  assert.equal(ledger.isReserved(0, 1), true);
+  assert.equal(ledger.isReserved(0, 2), false);
+  assert.equal(ledger.expire(2), 1);
+});
+
+test("WebSocket Origin admission is exact in production and loopback-only by default", () => {
+  assert.equal(websocketOriginAllowed("http://localhost:8000", []), true);
+  assert.equal(websocketOriginAllowed("https://127.0.0.1:8443", []), true);
+  assert.equal(websocketOriginAllowed("https://game.example", []), false);
+  assert.equal(websocketOriginAllowed(null, []), false);
+  assert.equal(websocketOriginAllowed("https://game.example", ["https://game.example"]), true);
+  assert.equal(websocketOriginAllowed("https://evil.example", ["https://game.example"]), false);
+  assert.equal(websocketOriginAllowed("https://game.example", ["not an origin"]), false);
+  assert.equal(websocketOriginAllowed("https://game.example/path", ["https://game.example"]), false);
 });
 
 test("durable session state is fixed-size, deterministic, versioned, and restartable", async () => {

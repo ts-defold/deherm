@@ -3,7 +3,9 @@ import { INPUT_BUTTON_MASK, MAX_PLAYERS, SESSION_TOKEN_BYTES, SNAPSHOT_BYTES, TI
 import { WEAPON_COUNT } from "./content";
 
 /**
- * Version 7 adds the authoritative central command-beacon state to snapshots.
+ * Version 8 adds an explicit credential acknowledgement after welcome so a
+ * server never revokes the last credential merely because a welcome was
+ * enqueued locally. Version 7 adds the authoritative central command-beacon state to snapshots.
  * Version 6 adds authenticated 40-byte resume credentials to hello/welcome.
  * Version 5 adds authoritative weapon-branch state to the compact snapshot and
  * reliable control lane. Version 4 added authoritative chassis state. Version
@@ -13,7 +15,7 @@ import { WEAPON_COUNT } from "./content";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 7;
+export const PROTOCOL_VERSION = 8;
 export const INPUT_PACKET_BYTES = 32;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
@@ -147,6 +149,7 @@ export const MESSAGE_SNAPSHOT = 4;
 export const MESSAGE_CONTROL = 5;
 export const MESSAGE_PING = 6;
 export const MESSAGE_PONG = 7;
+export const MESSAGE_WELCOME_ACK = 8;
 
 export const RESUME_TOKEN_BYTES = SESSION_TOKEN_BYTES;
 export const PLAYER_NAME_BYTES = 16;
@@ -155,6 +158,7 @@ export const HELLO_BYTES = ENVELOPE_BYTES + 4 + PLAYER_NAME_BYTES + RESUME_TOKEN
 const WELCOME_BASE_BYTES = ENVELOPE_BYTES + 4 + 4 + 4 + 4 + RESUME_TOKEN_BYTES;
 /** The trailing cadence byte is part of the version-6 welcome frame. */
 export const WELCOME_BYTES = WELCOME_BASE_BYTES + 1;
+export const WELCOME_ACK_BYTES = ENVELOPE_BYTES + RESUME_TOKEN_BYTES;
 export const CONTROL_BYTES = ENVELOPE_BYTES + 4;
 export const PING_BYTES = ENVELOPE_BYTES + 8;
 /** Snapshot frames carry a small codec header after the reliable envelope. */
@@ -200,6 +204,11 @@ export interface WelcomeMessage {
   tickRate: number;
   /** Ticks between authoritative snapshots; absent on legacy welcomes. */
   snapshotIntervalTicks?: number;
+  resumeToken: Uint8Array;
+}
+
+export interface WelcomeAckMessage {
+  /** Echoes the credential received in the welcome being acknowledged. */
   resumeToken: Uint8Array;
 }
 
@@ -291,6 +300,21 @@ export function readWelcome(payload: Uint8Array, output: WelcomeMessage): Welcom
   output.tickRate = TICK_RATE;
   output.snapshotIntervalTicks = view.getUint8(WELCOME_BASE_BYTES);
   output.resumeToken.set(payload.subarray(20, 20 + RESUME_TOKEN_BYTES));
+  return output;
+}
+
+export function writeWelcomeAck(target: Uint8Array, message: Readonly<WelcomeAckMessage>): number {
+  requireCapacity(target, WELCOME_ACK_BYTES);
+  requireTokenLength(message.resumeToken);
+  envelope(target, MESSAGE_WELCOME_ACK);
+  target.set(message.resumeToken, ENVELOPE_BYTES);
+  return WELCOME_ACK_BYTES;
+}
+
+export function readWelcomeAck(payload: Uint8Array, output: WelcomeAckMessage): WelcomeAckMessage {
+  expect(payload, MESSAGE_WELCOME_ACK, WELCOME_ACK_BYTES);
+  if (payload.byteLength !== WELCOME_ACK_BYTES) throw new Error("welcome acknowledgement has an invalid length");
+  output.resumeToken.set(payload.subarray(ENVELOPE_BYTES));
   return output;
 }
 

@@ -9,6 +9,7 @@
  */
 
 import { MAX_PLAYERS } from "./constants.ts";
+import { MAX_TICK_SPAN, tickAfter, tickAtOrBefore, tickDeadline } from "./ticks.ts";
 
 export const SESSION_STATE_MAGIC = 0x31534257; // "WBS1" little-endian
 export const SESSION_STATE_VERSION = 1;
@@ -90,7 +91,7 @@ export class SessionLedger {
     unsigned(tick, "tick");
     const generation = this.generation[slot]!;
     const expires = this.expiresAtTick[slot]!;
-    return generation !== 0 && (expires === 0 || tick <= expires);
+    return generation !== 0 && (expires === 0 || tickAtOrBefore(tick, expires));
   }
 
   /** Records a successful welcome; expiry zero denotes an active owner. */
@@ -118,6 +119,12 @@ export class SessionLedger {
     this.revision += 1;
   }
 
+  /** Releases an owner for a bounded span in uint32 serial-number order. */
+  reserveFor(slot: number, tick: number, duration: number): void {
+    unsigned(tick, "tick");
+    this.reserveUntil(slot, tickDeadline(tick, duration));
+  }
+
   /** Invalidates a slot, normally after a bounded reservation has expired. */
   clear(slot: number): void {
     this.requireSlot(slot);
@@ -134,7 +141,7 @@ export class SessionLedger {
     let cleared = 0;
     for (let slot = 0; slot < this.rosterSize; slot += 1) {
       const expires = this.expiresAtTick[slot]!;
-      if (this.generation[slot] !== 0 && expires !== 0 && tick > expires) {
+      if (this.generation[slot] !== 0 && expires !== 0 && tickAfter(tick, expires)) {
         this.clear(slot);
         cleared += 1;
       }
@@ -171,7 +178,7 @@ export class SessionLedger {
     // bounded reservation window while still allowing its current token to
     // resume. Explicitly disconnected reservations retain their deadline.
     if (restartReservationTicks > 0) {
-      const deadline = (restored.checkpointTick + restartReservationTicks) >>> 0;
+      const deadline = tickDeadline(restored.checkpointTick, restartReservationTicks);
       for (let slot = 0; slot < this.rosterSize; slot += 1) {
         if (this.generation[slot] !== 0 && this.expiresAtTick[slot] === 0) this.expiresAtTick[slot] = deadline;
       }
@@ -358,6 +365,7 @@ function unsigned(value: number, field: string): void {
 
 function boundedTicks(value: number, field: string): number {
   unsigned(value, field);
+  if (value > MAX_TICK_SPAN) throw persistence("range", `${field} must be at most ${MAX_TICK_SPAN}`);
   return value >>> 0;
 }
 

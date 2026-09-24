@@ -2800,3 +2800,30 @@ classified, all five generated exceptions retain explicit package-side
 provenance, the 14 public entrypoints reach 87 local runtime inputs, and no
 packed file contains the full, 12-character, or binary-Base64 locked Defold
 revision identity.
+
+## 2026-09-24 - War Battles acknowledged admission and crash-durable state
+
+The reconnect protocol is now version 8. A welcome stages a credential, but the
+server commits its generation only after the client echoes the exact 40-byte
+credential in `welcome-ack`; a locally enqueued welcome is no longer treated as
+remote receipt. Missing acknowledgement closes and releases the session after
+five seconds. A focused loss test proves that dropping only the acknowledgement
+keeps the prior credential current and resumable. Admission expiry and grace
+windows now use bounded half-range uint32 serial ordering, including a focused
+wraparound credential and ledger test.
+
+The Deno WebSocket fallback rejects missing and cross-origin upgrades by
+default, permits only loopback HTTP(S) origins without configuration, and uses
+an exact configured allowlist for deployments. Durable session and world files
+share one replacement primitive that syncs the temporary file before rename
+and syncs the containing directory afterward where the host supports directory
+sync. Compose runs a bounded root-only volume ownership migrator, then runs the
+long-lived server as fixed uid/gid 10001.
+
+Focused TypeScript admission/protocol/durability tests pass. The real
+Chrome-to-Deno HTTP/3 gate completed protocol-v8 admission, three snapshots,
+and at least three server-accepted datagram inputs. The Bob-built Defold 1.14.0 macOS
+application also re-ran to graceful exit and refreshed its source-bound runtime
+evidence. These observations prove the named loopback and packaged boundaries;
+they do not claim WAN ingress, public certificate deployment, matchmaking,
+application identity, secret-manager integration, or native Defold networking.

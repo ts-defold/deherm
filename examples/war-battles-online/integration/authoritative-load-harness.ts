@@ -226,11 +226,13 @@ class ImpairedTransport implements GameTransport {
  */
 async function settleInitialAdmissions(
   sessions: readonly { readonly ready: boolean; readonly closed: boolean }[],
+  pumpReliableHandshake: () => void,
 ): Promise<void> {
   const maximumTurns = 256;
   for (let turn = 0; turn < maximumTurns; turn += 1) {
     if (sessions.every((session) => session.ready || session.closed)) return;
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
+    pumpReliableHandshake();
     await Promise.resolve();
   }
   const pending = sessions.reduce((count, session) => count + (session.ready || session.closed ? 0 : 1), 0);
@@ -309,12 +311,13 @@ export async function runAuthoritativeLoadHarness(
   // handshake sequencing required by a real reliable transport.
   let simulationTime = config.baseLatencyMilliseconds * 4 + config.jitterMilliseconds * 2;
   network.advanceTo(simulationTime);
-  await settleInitialAdmissions(sessions);
-  // Welcome frames are scheduled only after async admission completes. Move
-  // the deterministic network clock past one bounded reliable-lane latency,
-  // then consume those frames before the first authoritative step.
-  simulationTime += config.baseLatencyMilliseconds + config.jitterMilliseconds + 1;
-  network.advanceTo(simulationTime);
+  await settleInitialAdmissions(sessions, () => {
+    // Protocol-v8 admission is a reliable hello/welcome/ack exchange. Pump one
+    // worst-case reliable latency per host-crypto turn while the simulation
+    // clock remains paused; completion still requires the server-side ack.
+    simulationTime += config.baseLatencyMilliseconds + config.jitterMilliseconds + 1;
+    network.advanceTo(simulationTime);
+  });
   await Promise.resolve();
   for (const client of clients) client.update(0);
   await Promise.resolve();

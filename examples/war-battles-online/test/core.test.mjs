@@ -45,6 +45,7 @@ import {
   WEAPON_UPGRADE_CANNON_BLAST,
   WEAPON_UPGRADE_CANNON_PIERCER,
   WELCOME_BYTES,
+  WELCOME_ACK_BYTES,
   WEAPON_AUTOCANNON,
   WEAPON_CANNON,
   WEAPON_MORTAR,
@@ -61,12 +62,14 @@ import {
   readInputPacket,
   readSnapshotFrame,
   readWelcome,
+  readWelcomeAck,
   sendTickInput,
   writeHello,
   writeInputPacket,
   writeSnapshotDelta,
   writeSnapshotKeyframe,
   writeWelcome,
+  writeWelcomeAck,
 } from "../core/index.ts";
 import {
   CHASSIS_ARTILLERY,
@@ -145,6 +148,11 @@ test("session messages round-trip and reject a foreign kind", () => {
   assert.equal(observedWelcome.mapSeed, 0x1234_5678);
   assert.equal(observedWelcome.serverTick, 4_321);
   assert.equal(observedWelcome.snapshotIntervalTicks, 6);
+  const acknowledgement = new Uint8Array(WELCOME_ACK_BYTES);
+  writeWelcomeAck(acknowledgement, { resumeToken: token });
+  const observedAcknowledgement = { resumeToken: new Uint8Array(RESUME_TOKEN_BYTES) };
+  readWelcomeAck(acknowledgement, observedAcknowledgement);
+  assert.deepEqual([...observedAcknowledgement.resumeToken], [...token]);
   assert.throws(() => readHello(welcome, observedHello), /not kind/);
   hello[2] -= 1;
   assert.throws(() => readHello(hello, observedHello), /version mismatch/);
@@ -930,6 +938,12 @@ test("playable orchestration is deterministic and supports restart and upgrades"
 
 // --- server and client ------------------------------------------------------
 
+test("authoritative stats expose the initial bot roster before first admission", () => {
+  const server = new MatchServer({ rosterSize: 8 });
+  assert.deepEqual({ humans: server.stats.humans, bots: server.stats.bots }, { humans: 0, bots: 8 });
+  server.close();
+});
+
 /** Wires a client to a server session over the in-memory transport pair. */
 function join(server, name, errors, options = {}) {
   const client = new BattleClient({ name, onError: (error) => errors.push(error), ...options });
@@ -949,6 +963,9 @@ function failWelcome(server, client, disposition) {
   const clientTransport = {
     capabilities,
     sendReliable(channel, payload) {
+      if (disposition === "drop-ack" && channel === TRANSPORT_CHANNEL_SESSION && payload[3] === 8) {
+        return Promise.resolve("sent");
+      }
       session.onReliable(channel, payload.slice());
       return Promise.resolve("sent");
     },
@@ -961,7 +978,7 @@ function failWelcome(server, client, disposition) {
   const serverTransport = {
     capabilities,
     sendReliable(channel, payload) {
-      if (channel === TRANSPORT_CHANNEL_SESSION && payload[3] === 2) {
+      if (channel === TRANSPORT_CHANNEL_SESSION && payload[3] === 2 && disposition !== "drop-ack") {
         if (disposition === "reject") return Promise.reject(new Error("welcome send rejected"));
         return Promise.resolve("closed");
       }
@@ -1159,6 +1176,33 @@ test("failed welcome delivery does not consume an old or initial resume credenti
   await settle();
   assert.equal(stale.state, "rejected");
   assert.equal(staleRejects[0].code, REJECT_BAD_RESUME);
+  server.close();
+  assert.deepEqual(errors, []);
+});
+
+test("a welcome enqueued without credential acknowledgement keeps the previous token current", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 1, resumeGraceTicks: 600 });
+  const owner = join(server, "owner", errors);
+  await settle();
+  const oldToken = owner.resumeToken.slice();
+  const generation = server.sessionLedger.generation[0];
+  owner.close(1_001, "link lost");
+
+  const lostAck = new BattleClient({ onError: (error) => errors.push(error) });
+  lostAck.resumeToken.set(oldToken);
+  failWelcome(server, lostAck, "drop-ack");
+  await settle();
+  assert.equal(lostAck.state, "ready", "the client did receive the welcome before its acknowledgement was lost");
+  assert.equal(server.sessionLedger.generation[0], generation, "enqueue alone must not rotate durable admission");
+  for (let tick = 0; tick < 302; tick += 1) server.step();
+  await settle();
+  assert.equal(lostAck.state, "closed", "an unacknowledged welcome must release its slot on a bounded timer");
+
+  const retry = join(server, "retry", errors, { resumeToken: oldToken });
+  await settle();
+  assert.equal(retry.state, "ready");
+  assert.equal(server.sessionLedger.generation[0], generation + 1);
   server.close();
   assert.deepEqual(errors, []);
 });

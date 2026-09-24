@@ -1,4 +1,5 @@
 import { MAX_PLAYERS, SESSION_TOKEN_BYTES } from "./constants.ts";
+import { MAX_TICK_SPAN, tickAfter } from "./ticks.ts";
 
 /**
  * Authenticated resume credentials for the War Battles control plane.
@@ -132,8 +133,8 @@ export class SessionTokenService implements SessionTokenProvider {
       if (claims.matchId !== expected.matchId || claims.generation === 0) return null;
       if (claims.slot >= MAX_PLAYERS) return null;
       if (expected.rosterSize !== undefined && (!Number.isInteger(expected.rosterSize) || claims.slot >= expected.rosterSize)) return null;
-      if (claims.issuedAtTick > expected.nowTick) return null;
-      if (claims.expiresAtTick !== 0 && expected.nowTick > claims.expiresAtTick) return null;
+      if (tickAfter(claims.issuedAtTick, expected.nowTick)) return null;
+      if (claims.expiresAtTick !== 0 && tickAfter(expected.nowTick, claims.expiresAtTick)) return null;
       validateClaims(claims);
       const body = token.subarray(0, SESSION_TOKEN_HEADER_BYTES);
       const key = await this.cryptoKey(keyId);
@@ -191,8 +192,11 @@ function validateClaims(claims: SessionTokenClaims): void {
   unsigned(claims.issuedAtTick, "issuedAtTick");
   unsigned(claims.expiresAtTick, "expiresAtTick");
   if (claims.generation === 0) throw new RangeError("generation must be nonzero");
-  if (claims.expiresAtTick !== 0 && claims.expiresAtTick < claims.issuedAtTick) {
-    throw new RangeError("expiresAtTick must be zero or at/after issuedAtTick");
+  if (claims.expiresAtTick !== 0) {
+    const lifetime = (claims.expiresAtTick - claims.issuedAtTick) >>> 0;
+    if (lifetime > MAX_TICK_SPAN || tickAfter(claims.issuedAtTick, claims.expiresAtTick)) {
+      throw new RangeError("expiresAtTick must be zero or within the uint32 serial-order horizon");
+    }
   }
 }
 

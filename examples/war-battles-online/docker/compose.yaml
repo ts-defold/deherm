@@ -1,4 +1,15 @@
 services:
+  war-battles-init:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    user: "0:0"
+    entrypoint: ["./docker/init-volumes.sh"]
+    volumes:
+      - war-battles-local-cert:/srv/war-battles-online/server/certs
+      - war-battles-local-state:/srv/war-battles-online/server/state
+    restart: "no"
+
   war-battles:
     build:
       context: ..
@@ -9,6 +20,11 @@ services:
       WAR_BATTLES_HEALTH_PORT: 8080
       WAR_BATTLES_ROSTER: ${WAR_BATTLES_ROSTER:-8}
       WAR_BATTLES_BOT_SKILL: ${WAR_BATTLES_BOT_SKILL:-2}
+      WAR_BATTLES_ALLOWED_ORIGINS: ${WAR_BATTLES_ALLOWED_ORIGINS:-}
+    user: "10001:10001"
+    depends_on:
+      war-battles-init:
+        condition: service_completed_successfully
     ports:
       # WebTransport is HTTP/3 over QUIC: publish UDP, not only TCP.
       - "${WAR_BATTLES_QUIC_PORT:-4433}:4433/udp"

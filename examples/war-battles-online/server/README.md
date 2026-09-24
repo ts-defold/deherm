@@ -160,14 +160,16 @@ whose kind fixes the lane it is allowed on:
 | --- | --- | --- | --- |
 | `hello` | session | client → server | 68 |
 | `welcome` | session | server → client | 61 |
+| `welcome-ack` | session | client → server | 44 |
 | `reject` | session | server → client | ≤ 102 |
 | `ping` / `pong` | session | both | 12 |
 | `control` | control | client → server | 8 |
 | `snapshot` | snapshot | server → client | 17,776 keyframe; compact delta after join |
 
-`PROTOCOL_VERSION` is 7: snapshots carry the authoritative command-beacon
+`PROTOCOL_VERSION` is 8: snapshots carry the authoritative command-beacon
 state, while hello/welcome frames carry 40-byte authenticated
-resume credentials, and the snapshot carries the authoritative chassis and
+resume credentials, the client echoes the exact welcome credential before its
+rotation becomes current, and the snapshot carries the authoritative chassis and
 weapon-branch state, and the reliable control lane carries chassis and branch
 selection. The
 input packet is still exactly 32 bytes:
@@ -201,14 +203,16 @@ current token restores the same player id and state, rotates the token, and
 starts a fresh snapshot baseline whose first frame is a keyframe. A non-zero
 resume attempt never falls through to an anonymous slot: unknown, stale,
 active-session, and foreign-match tokens return `REJECT_BAD_RESUME`. Anonymous
-joins can use only never-authenticated or expired reservations. Credentials
-are staged for the welcome and committed only after a
-`sent` disposition, so a failed welcome retains the previous token and releases
-the slot for retry without extending that token's original grace deadline.
+joins can use only never-authenticated or expired reservations. Credentials are
+staged for the welcome and committed only after the client echoes that exact
+credential in `welcome-ack`. A locally enqueued but lost welcome therefore
+cannot revoke the last received token. Missing acknowledgements close and
+release the session after five seconds; failed delivery retains the previous
+token without extending its original grace deadline.
 A terminal snapshot-send disposition closes the server session and releases
 its claimed slot instead of leaving a disconnected human owner behind.
 
-The version-6 welcome is 61 bytes and ends with one
+The welcome remains 61 bytes and ends with one
 `snapshotIntervalTicks` cadence byte. Older welcome layouts fail closed.
 
 `core/session-auth.ts` owns the fixed-size HMAC credential and bounded key
@@ -223,4 +227,11 @@ unpredictable local-development key, so restart resume requires explicit key
 configuration. Malformed keys and corrupt state fail closed. A failed
 checkpoint also fails closed for new admissions until a later checkpoint write
 recovers; the serialized writer remains retryable and keeps ledger revisions
-dirty until a write succeeds.
+dirty until a write succeeds. Resume deadlines and credential expiry use
+half-range uint32 serial-number ordering, so wrapping the fixed tick clock does
+not expire a live session early or extend it indefinitely.
+
+Browser WebSocket upgrades require an Origin. With no configuration, only
+`localhost`, `127.0.0.1`, and `[::1]` HTTP(S) origins are accepted. Production
+deployments must supply exact canonical origins through repeated
+`--allowed-origin` arguments or comma-separated `WAR_BATTLES_ALLOWED_ORIGINS`.

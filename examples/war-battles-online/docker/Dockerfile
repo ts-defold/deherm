@@ -9,14 +9,18 @@ WORKDIR /srv/war-battles-online
 USER root
 RUN apt-get update \
   && apt-get install -y --no-install-recommends openssl xxd \
+  && groupadd --gid 10001 war-battles \
+  && useradd --uid 10001 --gid 10001 --no-create-home --shell /usr/sbin/nologin war-battles \
   && rm -rf /var/lib/apt/lists/*
 
 COPY core ./core
 COPY server ./server
 COPY docker/entrypoint.sh ./docker/entrypoint.sh
+COPY docker/init-volumes.sh ./docker/init-volumes.sh
 
-RUN chmod +x ./server/make-cert.sh ./server/ensure-resume-key.sh ./docker/entrypoint.sh \
-  && mkdir -p ./server/certs
+RUN chmod +x ./server/make-cert.sh ./server/ensure-resume-key.sh ./docker/entrypoint.sh ./docker/init-volumes.sh \
+  && mkdir -p ./server/certs ./server/state \
+  && chown -R 10001:10001 /srv/war-battles-online
 
 ENV WAR_BATTLES_HOSTNAME=0.0.0.0 \
     WAR_BATTLES_PORT=4433 \
@@ -30,4 +34,5 @@ EXPOSE 8080/tcp
 HEALTHCHECK --interval=3s --timeout=2s --start-period=5s --retries=20 \
   CMD deno eval --allow-net="127.0.0.1:8080" "const r = await fetch('http://127.0.0.1:8080/readyz'); if (!r.ok) Deno.exit(1);"
 
+USER 10001:10001
 ENTRYPOINT ["./docker/entrypoint.sh"]

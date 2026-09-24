@@ -47,7 +47,14 @@ checkpoints it outside the simulation tick, and atomically replaces it on
 write. Its fixed header binds match, arena, roster, and team-mode identity, and
 restore rebases admission time against the session ledger so the world tick is
 not counted twice. A malformed, truncated, or foreign checkpoint leaves
-readiness closed.
+readiness closed. Both durable files are synced before rename and their parent
+directory is synced afterward where the host supports it.
+
+Compose first runs a bounded root-only `war-battles-init` service to migrate
+named-volume ownership. The long-running server is fixed to uid/gid 10001 and
+never runs as root. Browser WebSocket fallback is loopback-Origin-only by
+default; set `WAR_BATTLES_ALLOWED_ORIGINS` to a comma-separated exact allowlist
+for a non-loopback deployment.
 
 The owner check is deterministic and does not require a running daemon:
 `node --test test/docker-durability.test.mjs` validates the rendered Compose
@@ -59,5 +66,5 @@ container, and verifies that the authenticated slot resumes from the persisted
 ledger.
 
 This is a development deployment. Production still needs a trusted certificate,
-origin/authentication checks, bounded admission and queues, and an ingress that
-preserves HTTP/3 UDP.
+application identity/matchmaking policy, deployment secret management, and an
+ingress that preserves HTTP/3 UDP.

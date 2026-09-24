@@ -278,9 +278,11 @@ state, rotates the token again, and starts a fresh session-local snapshot
 baseline. Its first authoritative frame is therefore a complete keyframe, and
 the client clears all pending bytes and acknowledgement bits at the welcome
 boundary before applying it. Token rotation is two-phase: a staged credential
-becomes current only after the reliable welcome reports `sent`; failed or
-closed delivery releases the slot while retaining the prior credential and its
-original grace deadline. A snapshot send that reports a terminal transport
+becomes current only after the client echoes that exact credential in a
+protocol-v8 `welcome-ack`; local enqueue success alone is not admission evidence.
+A missing acknowledgement closes and releases the session after five seconds,
+while failed or closed delivery retains the prior credential and its original
+grace deadline. A snapshot send that reports a terminal transport
 also closes the server session and releases the claimed slot.
 
 Non-zero resume attempts never fall through to a new anonymous slot. Unknown,
@@ -303,10 +305,13 @@ fixed-size HMAC-SHA-256 credential with match/slot/generation/expiry claims and
 bounded key rotation; malformed, foreign, stale, or expired credentials fail
 closed. `SessionLedger` persists exactly `MAX_PLAYERS` fixed records in a
 versioned, checksummed binary envelope, and `DurableSessionPersistence`
-serializes explicit control-plane writes. The Deno file adapter uses a sibling
-temporary file plus rename for restart-safe checkpoints. Focused tests cover
-tampering, key rotation, expiry, deterministic bytes, restart restore, and
-corruption/foreign-context refusal. MatchServer now injects this service and
+serializes explicit control-plane writes. The Deno file adapter uses a synced
+sibling temporary file, rename, and parent directory sync (when supported) for
+crash-durable checkpoints. Session expiry and grace deadlines use half-range
+uint32 serial ordering across clock wrap. Focused tests cover tampering, key
+rotation, expiry including wrap, exact acknowledgement, lost acknowledgement,
+deterministic bytes, restart restore, and corruption/foreign-context refusal.
+MatchServer now injects this service and
 ledger at the hello/welcome boundary, while the Deno host restores and flushes
 the ledger only at explicit lifecycle events; the simulation hot path remains
 unchanged.
@@ -409,8 +414,8 @@ authoritative world counts live team-1/team-2 tanks inside its fixed 96 px
 radius each tick, advances signed progress toward the leading team, decays a
 contested bar toward neutral, and awards a capture point at three seconds of
 uncontested pressure. Owner, progress, both team scores, and capture events are
-stored in the fixed snapshot header; protocol version 7 rejects peers that
-cannot decode the added state. A three-point objective score ends offline team
+stored in the fixed snapshot header; the state was introduced in protocol 7
+and remains mandatory in current protocol 8, so older peers fail closed. A three-point objective score ends offline team
 rounds through the existing bounded restart path.
 
 Bots periodically choose the beacon as a goal through their existing fixed
@@ -497,10 +502,13 @@ storage tests prove the retained queue stays bounded and that the single latest
 retry can recover without preserving an unbounded history. This remains local
 Deno/Docker evidence, not a claim that Colyseus H3 interop or native Defold
 transport is complete.
-Production acknowledgement, Origin policy, non-root volume ownership, fsync,
-and wrap-safe deadline work is tracked in
-[`#126`](https://github.com/ts-defold/deherm/issues/126); those frontiers are
-not API or generator blockers.
+Protocol-v8 acknowledgement, exact WebSocket Origin admission, non-root runtime
+ownership, fsync-backed atomic replacement, and wrap-safe deadlines are now
+implemented and covered by focused owner tests. Compose uses a bounded root-only
+volume migrator and runs the long-lived server as uid/gid 10001. These are
+control-plane correctness claims; a trusted public certificate, application
+identity/matchmaking, secret management, WAN failover, and native Defold
+transport remain separate deployment frontiers.
 
 # Verification
 

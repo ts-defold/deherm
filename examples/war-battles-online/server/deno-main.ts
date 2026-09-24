@@ -63,6 +63,7 @@ interface Options extends MatchServerOptions {
   sessionStatePath?: string;
   worldCheckpointPath?: string;
   worldCheckpointIntervalTicks: number;
+  allowedOrigins: string[];
 }
 
 function parseArguments(argv: readonly string[]): Options {
@@ -77,6 +78,7 @@ function parseArguments(argv: readonly string[]): Options {
     snapshotIntervalTicks: 3,
     teams: false,
     worldCheckpointIntervalTicks: TICK_RATE,
+    allowedOrigins: [],
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]!;
@@ -95,6 +97,7 @@ function parseArguments(argv: readonly string[]): Options {
     else if (argument === "--session-state") { options.sessionStatePath = required(value, argument); index += 1; }
     else if (argument === "--world-checkpoint") { options.worldCheckpointPath = required(value, argument); index += 1; }
     else if (argument === "--world-checkpoint-interval") { options.worldCheckpointIntervalTicks = integer(value, argument); index += 1; }
+    else if (argument === "--allowed-origin") { options.allowedOrigins.push(required(value, argument)); index += 1; }
     else throw new Error(`unknown argument: ${argument}`);
   }
   return options;
@@ -112,6 +115,33 @@ export function configuredResumeKey(text: string | undefined, statePath: string 
     throw new Error("a durable session state path requires --resume-key or WAR_BATTLES_RESUME_KEY");
   }
   return text === undefined ? undefined : hexSecret(text);
+}
+
+/** Exact production allowlist with a loopback-only zero-configuration default. */
+export function websocketOriginAllowed(origin: string | null, configuredOrigins: readonly string[]): boolean {
+  if (origin === null) return false;
+  let candidate: URL;
+  try { candidate = new URL(origin); }
+  catch { return false; }
+  if ((candidate.protocol !== "http:" && candidate.protocol !== "https:") || candidate.origin !== origin) return false;
+  if (configuredOrigins.length > 0) {
+    return configuredOrigins.includes(candidate.origin);
+  }
+  return candidate.hostname === "localhost" || candidate.hostname === "127.0.0.1" || candidate.hostname === "[::1]";
+}
+
+function normalizeOrigin(origin: string): string {
+  const parsed = new URL(origin);
+  if ((parsed.protocol !== "http:" && parsed.protocol !== "https:") || parsed.origin !== origin) {
+    throw new Error(`allowed origin must be a canonical http(s) origin: ${origin}`);
+  }
+  return parsed.origin;
+}
+
+function configuredOrigins(cli: readonly string[], environment: string | undefined): readonly string[] {
+  const entries = [...cli];
+  if (environment !== undefined) entries.push(...environment.split(",").map((entry) => entry.trim()).filter(Boolean));
+  return entries.map(normalizeOrigin);
 }
 
 /**
@@ -191,6 +221,7 @@ const rejectedReceiver: TransportReceiver = {
 
 export async function main(argv: readonly string[]): Promise<void> {
   const options = parseArguments(argv);
+  const allowedOrigins = configuredOrigins(options.allowedOrigins, Deno.env.get("WAR_BATTLES_ALLOWED_ORIGINS"));
   const statePath = options.sessionStatePath ?? Deno.env.get("WAR_BATTLES_SESSION_STATE");
   const worldPath = options.worldCheckpointPath ?? Deno.env.get("WAR_BATTLES_WORLD_CHECKPOINT");
   const resumeKeyPath = options.resumeKeyPath ?? Deno.env.get("WAR_BATTLES_RESUME_KEY_FILE");
@@ -308,6 +339,9 @@ export async function main(argv: readonly string[]): Promise<void> {
   const healthServer = Deno.serve({ hostname: options.hostname, port: options.healthPort }, (request: Request): Response => {
     const path = new URL(request.url).pathname;
     if (path === "/ws" && request.headers.get("upgrade")?.toLowerCase() === "websocket") {
+      if (!websocketOriginAllowed(request.headers.get("origin"), allowedOrigins)) {
+        return new Response("websocket origin is not allowed\n", { status: 403 });
+      }
       if (stopping || !ready || !admission.allowed) {
         return new Response("server is not accepting sessions\n", { status: 503 });
       }

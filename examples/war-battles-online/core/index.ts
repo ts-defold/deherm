@@ -1,5 +1,6 @@
 export * from "./constants.ts";
 export * from "./fixed.ts";
+export * from "./ticks.ts";
 export * from "./arena.ts";
 export * from "./content.ts";
 export * from "./events.ts";

@@ -9,10 +9,12 @@ import {
   SESSION_STATE_BYTES,
   type SessionStateStorage,
 } from "../core/session-persistence.ts";
+import { replaceDurably, type DurableFileRuntime } from "./durable-file.ts";
 
-interface DenoFileApi {
+interface DenoFileApi extends DurableFileRuntime {
   readFile(path: string): Promise<Uint8Array>;
-  writeFile(path: string, data: Uint8Array): Promise<void>;
+  writeFile(path: string, data: Uint8Array, options?: { mode?: number }): Promise<void>;
+  chmod(path: string, mode: number): Promise<void>;
   rename(oldPath: string, newPath: string): Promise<void>;
 }
 
@@ -43,8 +45,7 @@ export class DenoDurableSessionFile implements SessionStateStorage {
 
   async write(bytes: Uint8Array): Promise<void> {
     if (bytes.byteLength !== SESSION_STATE_BYTES) throw new RangeError("session state write exceeds fixed capacity");
-    await Deno.writeFile(this.temporaryPath, new Uint8Array(bytes));
-    await Deno.rename(this.temporaryPath, this.path);
+    await replaceDurably(Deno, this.temporaryPath, this.path, bytes);
   }
 }
 
@@ -53,4 +54,3 @@ function isNotFound(error: unknown): boolean {
   const candidate = error as { name?: unknown; code?: unknown };
   return candidate.name === "NotFound" || candidate.code === "ENOENT";
 }
-

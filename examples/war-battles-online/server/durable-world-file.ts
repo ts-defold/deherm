@@ -4,10 +4,12 @@ import {
   WORLD_CHECKPOINT_BYTES,
   type WorldCheckpointStorage,
 } from "./world-persistence.ts";
+import { replaceDurably, type DurableFileRuntime } from "./durable-file.ts";
 
-interface DenoFileApi {
+interface DenoFileApi extends DurableFileRuntime {
   readFile(path: string): Promise<Uint8Array>;
-  writeFile(path: string, data: Uint8Array): Promise<void>;
+  writeFile(path: string, data: Uint8Array, options?: { mode?: number }): Promise<void>;
+  chmod(path: string, mode: number): Promise<void>;
   rename(oldPath: string, newPath: string): Promise<void>;
 }
 
@@ -36,8 +38,7 @@ export class DenoDurableWorldFile implements WorldCheckpointStorage {
 
   async write(bytes: Uint8Array): Promise<void> {
     if (bytes.byteLength !== WORLD_CHECKPOINT_BYTES) throw new RangeError("world checkpoint exceeds fixed capacity");
-    await Deno.writeFile(this.temporaryPath, new Uint8Array(bytes));
-    await Deno.rename(this.temporaryPath, this.path);
+    await replaceDurably(Deno, this.temporaryPath, this.path, bytes);
   }
 }
 

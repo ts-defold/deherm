@@ -36,6 +36,7 @@ import {
   PING_BYTES,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_KEYFRAME,
+  WELCOME_ACK_BYTES,
   WELCOME_BYTES,
   createInputCommand,
   messageKind,
@@ -46,6 +47,7 @@ import {
   writeHello,
   writeInputPacket,
   writePing,
+  writeWelcomeAck,
   type InputCommand,
   type RejectMessage,
   type WelcomeMessage,
@@ -136,6 +138,7 @@ export class BattleClient implements TransportReceiver {
   private readonly helloBuffer = new Uint8Array(HELLO_BYTES);
   private readonly controlBuffer = new Uint8Array(CONTROL_BYTES);
   private readonly pingBuffer = new Uint8Array(PING_BYTES);
+  private readonly welcomeAckBuffer = new Uint8Array(WELCOME_ACK_BYTES);
   private readonly inputBuffer = new Uint8Array(INPUT_PACKET_BYTES);
   private readonly history: InputCommand[] = [];
   private readonly historyTick = new Int32Array(INPUT_HISTORY_TICKS);
@@ -353,6 +356,8 @@ export class BattleClient implements TransportReceiver {
     this.team = this.welcome.team;
     this.rosterSize = this.welcome.maximumPlayers;
     this.resumeToken.set(this.welcome.resumeToken);
+    writeWelcomeAck(this.welcomeAckBuffer, { resumeToken: this.resumeToken });
+    void this.send(TRANSPORT_CHANNEL_SESSION, this.welcomeAckBuffer);
     this.remoteInterpolationTicks = payload.byteLength >= WELCOME_BYTES
       ? clamp(Math.trunc(this.welcome.snapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS), 1, 30)
       : (this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS);

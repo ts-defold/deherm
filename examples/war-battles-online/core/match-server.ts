@@ -24,6 +24,7 @@ import {
   MESSAGE_CONTROL,
   MESSAGE_HELLO,
   MESSAGE_PING,
+  MESSAGE_WELCOME_ACK,
   REJECT_FULL,
   REJECT_BAD_RESUME,
   REJECT_MAXIMUM_BYTES,
@@ -39,6 +40,7 @@ import {
   readHello,
   readInputPacket,
   readPing,
+  readWelcomeAck,
   writePing,
   writeReject,
   writeWelcome,
@@ -46,6 +48,7 @@ import {
   type HelloMessage,
   type InputCommand,
   type PingMessage,
+  type WelcomeAckMessage,
 } from "./protocol.ts";
 import {
   writeSnapshotDelta,
@@ -65,6 +68,7 @@ import {
 } from "./transport.ts";
 import { SessionTokenService, type SessionTokenProvider } from "./session-auth.ts";
 import { SessionLedger } from "./session-persistence.ts";
+import { MAX_TICK_SPAN, tickAfter, tickDeadline } from "./ticks.ts";
 
 export interface MatchServerOptions {
   readonly matchId?: number;
@@ -103,6 +107,7 @@ export interface MatchServerStats {
 }
 
 const SNAPSHOT_BUFFER_RING = 8;
+const WELCOME_ACK_TIMEOUT_TICKS = TICK_RATE * 5;
 
 export class MatchServer {
   readonly world: BattleWorld;
@@ -141,7 +146,7 @@ export class MatchServer {
     this.botSkill = clampInteger(options.botSkill ?? 2, 0, 3);
     this.teams = options.teams ?? false;
     this.inputBudgetPerTick = clampInteger(options.inputBudgetPerTick ?? 8, 1, 64);
-    this.resumeGraceTicks = clampInteger(options.resumeGraceTicks ?? TICK_RATE * 30, 1, 0xffff_ffff);
+    this.resumeGraceTicks = clampInteger(options.resumeGraceTicks ?? TICK_RATE * 30, 1, MAX_TICK_SPAN);
     this.onError = options.onError ?? (() => {});
     this.onLog = options.onLog ?? (() => {});
     this.resumeTokenService = options.resumeTokenService ?? new SessionTokenService({
@@ -168,6 +173,7 @@ export class MatchServer {
       this.world.addPlayer(playerId, this.teams ? (playerId <= this.rosterSize / 2 ? 1 : 2) : 0);
       this.world.setBotSkill(playerId, this.botSkill);
     }
+    this.refreshStats();
   }
 
   /**
@@ -279,7 +285,7 @@ export class MatchServer {
       // reservation is renewed only for a session whose own welcome committed;
       // a fresh takeover of an expired slot leaves its old token stale.
       if (this.sessionLedger.generation[slot] !== 0 && session.resumeCommitted) {
-        this.sessionLedger.reserveUntil(slot, (this.sessionTick() + this.resumeGraceTicks) >>> 0);
+        this.sessionLedger.reserveFor(slot, this.sessionTick(), this.resumeGraceTicks);
         this.onSessionStateChange("release", this.sessionTick());
       }
     }
@@ -309,7 +315,7 @@ export class MatchServer {
     return generation;
   }
 
-  /** @internal Commits the staged token only after its welcome was sent. */
+  /** @internal Commits the staged token only after the client echoes it. */
   commitResumeToken(slot: number, generation: number, token: Uint8Array): void {
     if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize) throw new RangeError("resume slot is outside the roster");
     if (token.byteLength !== RESUME_TOKEN_BYTES) throw new RangeError("resume token has the wrong size");
@@ -364,6 +370,7 @@ export class ServerSession implements TransportReceiver {
   };
   private readonly control: ControlMessage = { action: 0, argument: 0 };
   private readonly ping: PingMessage = { clientTime: 0, serverTick: 0 };
+  private readonly welcomeAck: WelcomeAckMessage = { resumeToken: new Uint8Array(RESUME_TOKEN_BYTES) };
   private readonly command: InputCommand;
   private readonly welcomeBuffer = new Uint8Array(WELCOME_BYTES);
   private readonly rejectBuffer = new Uint8Array(REJECT_MAXIMUM_BYTES);
@@ -381,6 +388,9 @@ export class ServerSession implements TransportReceiver {
   private inputBudget = 0;
   /** Closes the double-hello race while async HMAC verification is pending. */
   private sessionHandling = false;
+  private awaitingWelcomeAck = false;
+  private stagedResumeGeneration = 0;
+  private welcomeAckDeadline = 0;
 
   constructor(server: MatchServer) {
     this.server = server;
@@ -393,6 +403,10 @@ export class ServerSession implements TransportReceiver {
 
   /** @internal */
   beginTick(): void {
+    if (this.awaitingWelcomeAck && tickAfter(this.server.sessionTick(), this.welcomeAckDeadline)) {
+      this.close(4_008, "welcome acknowledgement timeout");
+      return;
+    }
     this.inputBudget = this.server.inputBudgetPerTick;
   }
 
@@ -537,6 +551,10 @@ export class ServerSession implements TransportReceiver {
       this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.pingBuffer);
       return;
     }
+    if (kind === MESSAGE_WELCOME_ACK) {
+      this.handleWelcomeAck(payload);
+      return;
+    }
     if (kind !== MESSAGE_HELLO) throw new Error("first session message must be a hello");
     if (this.ready || this.sessionHandling) throw new Error("session handshake already established or pending");
     this.sessionHandling = true;
@@ -567,24 +585,38 @@ export class ServerSession implements TransportReceiver {
       snapshotIntervalTicks: this.server.snapshotIntervalTicks,
       resumeToken: this.resumeToken,
     });
-    this.ready = true;
+    this.stagedResumeGeneration = stagedResumeGeneration;
+    this.awaitingWelcomeAck = true;
+    this.welcomeAckDeadline = tickDeadline(this.server.sessionTick(), WELCOME_ACK_TIMEOUT_TICKS);
     // The client can send its first datagram immediately after processing the
     // welcome, before the match's next fixed tick calls beginTick(). Grant the
     // same bounded initial budget here so a healthy first input is not mistaken
     // for a rate-limit violation.
     this.inputBudget = this.server.inputBudgetPerTick;
     this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.welcomeBuffer, (disposition) => {
-      if (disposition === "sent" && !this.closed) {
-        this.server.commitResumeToken(slot, stagedResumeGeneration, this.resumeToken);
-        this.resumeCommitted = true;
-        this.server.log(`session-joined:${this.name}:slot=${slot + 1}`);
-        return;
-      }
+      if (disposition === "sent" && !this.closed) return;
       // The staged credential was never made current. Release the slot so an
       // initial join can retry anonymously and an established player can retry
       // with its previous credential during the normal grace window.
       this.close(1_001, "welcome delivery failed");
     });
+  }
+
+  private handleWelcomeAck(payload: Uint8Array): void {
+    if (!this.awaitingWelcomeAck || this.ready || this.slot < 0) {
+      throw new Error("unexpected welcome acknowledgement");
+    }
+    readWelcomeAck(payload, this.welcomeAck);
+    if (!equalBytes(this.welcomeAck.resumeToken, this.resumeToken)) {
+      throw new Error("welcome acknowledgement credential mismatch");
+    }
+    this.server.commitResumeToken(this.slot, this.stagedResumeGeneration, this.resumeToken);
+    this.awaitingWelcomeAck = false;
+    this.stagedResumeGeneration = 0;
+    this.welcomeAckDeadline = 0;
+    this.resumeCommitted = true;
+    this.ready = true;
+    this.server.log(`session-joined:${this.name}:slot=${this.slot + 1}`);
   }
 
   private handleControl(payload: Uint8Array): void {
@@ -637,6 +669,13 @@ function clampInteger(value: number, minimum: number, maximum: number): number {
   const integer = Math.trunc(value);
   if (!Number.isFinite(integer)) return minimum;
   return integer < minimum ? minimum : integer > maximum ? maximum : integer;
+}
+
+function equalBytes(left: Uint8Array, right: Uint8Array): boolean {
+  if (left.byteLength !== right.byteLength) return false;
+  let difference = 0;
+  for (let index = 0; index < left.byteLength; index += 1) difference |= left[index]! ^ right[index]!;
+  return difference === 0;
 }
 
 function isZeroToken(token: Uint8Array): boolean {

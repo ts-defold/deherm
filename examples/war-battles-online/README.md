@@ -165,9 +165,11 @@ snaps to the truth. Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 7,
-which adds 40-byte authenticated resume credentials alongside the authoritative
-chassis and weapon-branch state. The tick input packet is still exactly 32 bytes (version 1 reserved byte
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 8.
+It carries 40-byte authenticated resume credentials and requires the client to
+acknowledge the exact welcome credential before the server commits its rotation,
+alongside the authoritative chassis, weapon-branch, and command-beacon state.
+The tick input packet is still exactly 32 bytes (version 1 reserved byte
 15 and wrote zero; it is now the weapon request, so every other offset is
 unchanged), and the session, control and snapshot lanes now carry a typed
 four-byte envelope whose kind fixes the lane it is allowed on. Full table in
@@ -204,7 +206,8 @@ The Deno host can also persist the authoritative match. Configure
 `--world-checkpoint` or `WAR_BATTLES_WORLD_CHECKPOINT` to store a fixed-size,
 versioned and checksummed wrapper around the canonical world snapshot. Startup
 restores this image before session admission; a 60-tick control-plane boundary
-and orderly shutdown write it atomically. Slow storage retains only one active
+and orderly shutdown write it through a synced temporary file, atomic rename,
+and containing-directory sync where the host supports it. Slow storage retains only one active
 write and one coalesced latest image. Match, arena, roster, and team-mode
 identity are repeated outside the payload, so truncated, corrupt, or foreign
 checkpoints fail closed. Restore rebases the admission clock against the
@@ -329,7 +332,8 @@ browser/runtime queues are outside the simulation allocation boundary.
 Deployments must terminate HTTP/3 with a certificate browsers accept. For local
 development, compatible browser clients can use a short-lived self-signed
 certificate hash. Production needs a normal trusted certificate, an exposed UDP
-port, correct HTTP/3/WebTransport settings and origin/authentication checks.
+port, correct HTTP/3/WebTransport settings, an exact configured Origin allowlist,
+and application identity/authentication above the transport.
 The server must bound concurrent sessions, streams, message sizes, queued bytes,
 input lead/lag, and per-player packet rate.
 
