@@ -17,6 +17,7 @@ import {
   CONTROL_SET_CHASSIS,
   CONTROL_SET_WEAPON_UPGRADE,
   EVENT_KILL,
+  EVENT_OBJECTIVE_CAPTURE,
   EVENT_PICKUP_TAKEN,
   HELLO_BYTES,
   INPUT_BUTTON_BOOST,
@@ -52,7 +53,9 @@ import {
   createBattleEvent,
   createInMemoryTransportPair,
   createInputCommand,
+  createObjectiveView,
   createPlayerView,
+  OBJECTIVE_CAPTURE_TICKS,
   isqrt,
   readHello,
   readInputPacket,
@@ -145,6 +148,31 @@ test("session messages round-trip and reject a foreign kind", () => {
   assert.throws(() => readHello(welcome, observedHello), /not kind/);
   hello[2] -= 1;
   assert.throws(() => readHello(hello, observedHello), /version mismatch/);
+});
+
+test("team command beacon capture is authoritative and snapshot-safe", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1, 1, 0, 0);
+  world.addPlayer(2, 2, 9_000, 9_000);
+  const view = createObjectiveView();
+  for (let tick = 1; tick <= OBJECTIVE_CAPTURE_TICKS; tick += 1) {
+    world.step();
+  }
+  world.readObjective(view);
+  assert.equal(view.owner, 1);
+  assert.equal(view.teamOneScore, 1);
+  assert.equal(view.teamTwoScore, 0);
+  const event = createBattleEvent();
+  assert.equal(world.events.read(world.events.sequence - 1, event), true);
+  assert.equal(event.kind, EVENT_OBJECTIVE_CAPTURE);
+  assert.equal(event.a, 1);
+
+  const bytes = new Uint8Array(SNAPSHOT_BYTES);
+  world.writeSnapshot(bytes);
+  const restored = new BattleWorld(77);
+  restored.restoreSnapshot(bytes);
+  assert.deepEqual(restored.readObjective(createObjectiveView()), view);
+  assert.equal(restored.stateHash(), world.stateHash());
 });
 
 test("32-player snapshot deltas are compact and keyframes recover the baseline", () => {

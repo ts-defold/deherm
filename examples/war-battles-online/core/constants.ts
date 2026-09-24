@@ -123,6 +123,13 @@ export const OVERDRIVE_TICKS = 600;
  */
 export const KNOCKBACK_PER_DAMAGE = 160;
 
+// --- objective -------------------------------------------------------------
+
+/** Central command beacon used by team matches. Progress is signed: + is team 1, - is team 2. */
+export const OBJECTIVE_RADIUS = 96 * UNITS_PER_PIXEL;
+export const OBJECTIVE_CAPTURE_TICKS = 180;
+export const OBJECTIVE_SCORE_LIMIT = 3;
+
 // --- input ------------------------------------------------------------------
 
 export const INPUT_BUTTON_FIRE = 1 << 0;
@@ -140,7 +147,10 @@ export const DIRECTION_DIAGONAL = 181;
 export const PLAYER_SNAPSHOT_BYTES = 94;
 export const PROJECTILE_SNAPSHOT_BYTES = 28;
 export const PICKUP_SNAPSHOT_BYTES = 12;
-export const SNAPSHOT_HEADER_BYTES = 24;
+// The header carries the authoritative central-objective state in addition to
+// the map seed. Keeping it in the fixed header means every rollback/reconnect
+// frame restores the mode without adding per-entity bytes.
+export const SNAPSHOT_HEADER_BYTES = 32;
 export const SNAPSHOT_BYTES =
   SNAPSHOT_HEADER_BYTES +
   MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES +

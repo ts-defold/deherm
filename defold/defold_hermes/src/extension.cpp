@@ -22,6 +22,7 @@
 #include <defold_hermes/static_unit_registry.h>
 #include <defold_hermes/deherm_profile.hpp>
 
+#include <array>
 #include <cstdlib>
 #include <memory>
 #include <stdexcept>
@@ -506,8 +507,78 @@ bool ActivateBundle(bool initial) {
   return true;
 }
 
+#if !defined(DM_PLATFORM_HTML5)
+bool ActivateStaticApplication() {
+  const auto application = deherm_static_application();
+  if (!application) return false;
+  if (gRuntime) return true;
+
+  size_t auxiliaryCount = 0;
+  const auto* auxiliaries = deherm_static_units(&auxiliaryCount);
+  if (auxiliaryCount + 1 > DEHERM_MAX_STATIC_UNITS) {
+    dmLogError(
+        "Static Hermes unit registry exceeded its bounded capacity (%u auxiliary plus application)",
+        static_cast<unsigned>(auxiliaryCount));
+    return false;
+  }
+
+  std::array<defold_hermes::StaticUnitCreator, DEHERM_MAX_STATIC_UNITS> units{};
+  for (size_t index = 0; index < auxiliaryCount; ++index) {
+    units[index] = reinterpret_cast<defold_hermes::StaticUnitCreator>(auxiliaries[index]);
+  }
+  // The application is deliberately last: auxiliary transport units install
+  // their direct ABI globals before authored code captures them, while
+  // Runtime::loadStatic captures application/component entrypoints only after
+  // the final unit has evaluated.
+  units[auxiliaryCount] =
+      reinterpret_cast<defold_hermes::StaticUnitCreator>(application);
+
+  std::unique_ptr<defold_hermes::Runtime> candidate;
+  bool inspectorMovedToCandidate = false;
+  try {
+    candidate = std::make_unique<defold_hermes::Runtime>(gHost);
+    gInspector.bindRuntime(candidate.get());
+    inspectorMovedToCandidate = true;
+    candidate->loadStatic(
+        units.data(), auxiliaryCount + 1,
+        "deherm://static-application");
+  } catch (const std::exception& error) {
+    if (inspectorMovedToCandidate) gInspector.bindRuntime(nullptr);
+    dmLogError("Static Hermes application activation failed: %s", error.what());
+    return false;
+  }
+
+  gRuntime = std::move(candidate);
+  gBundleGeneration = 1;
+  gRejectedBundleGeneration = 0;
+  dmLogInfo(
+      "DEHERM_EVENT static-application-activated auxiliary_count=%u runtime_id=%u fingerprint=%s",
+      static_cast<unsigned>(auxiliaryCount), gRuntime->identity(),
+      gRuntime->bundleFingerprint().empty()
+          ? "unavailable"
+          : gRuntime->bundleFingerprint().c_str());
+  return true;
+}
+#endif
+
 bool EnsureBundleLoaded() {
-  if (gBundleResource) return true;
+#if !defined(DM_PLATFORM_HTML5)
+  // A generated application unit is authoritative for a Static Hermes build.
+  // It needs no placeholder .dehermc resource and cannot accidentally fall
+  // through to the Dynamic Hermes path if its evaluation fails.
+  if (deherm_static_application()) return ActivateStaticApplication();
+#endif
+  if (gBundleResource) {
+#if defined(DM_PLATFORM_HTML5)
+    return true;
+#else
+    // A detached bootstrap finalizes and releases its native runtime, but the
+    // immutable Defold resource remains acquired. Re-evaluate that resource on
+    // the next attachment instead of treating presence of the bytes as proof
+    // that a usable Hermes runtime still exists.
+    return gRuntime ? true : ActivateBundle(true);
+#endif
+  }
   if (!gResourceFactory || gBundlePath.empty()) return false;
   const auto result = dmResource::Get(
       gResourceFactory, gBundlePath.c_str(), &gBundleResource);
@@ -761,6 +832,13 @@ int DetachLuaInstance(lua_State* state) {
       gBootstrapAttachment.identifier == dmGameObject::GetIdentifier(instance) &&
       gBootstrapAttachment.instanceGeneration == dmGameObject::GetGeneration(instance)) {
     FinalizeAttachedApplication("script detach");
+#if !defined(DM_PLATFORM_HTML5)
+    // Runtime::finalize deliberately clears the captured application and marks
+    // the realm unloaded. Discard that finalized realm so a later bootstrap
+    // attachment takes the normal static or bytecode activation path.
+    gInspector.bindRuntime(nullptr);
+    gRuntime.reset();
+#endif
     DetachCapturedLuaInstances();
     InvalidateBootstrapAttachment();
   }

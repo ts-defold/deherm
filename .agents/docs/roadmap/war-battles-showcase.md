@@ -395,10 +395,31 @@ the same authoritative world path using a stable tick/slot hash. Defold exposes
 branch one/two as Q/E and keeps the active branch in the compact HUD status.
 Focused tests cover data rows, meaningful fire-time effects, one-time purchase,
 free reselection, invalid IDs, reliable control, and snapshot restoration. The
-raw world image is now 17,752 bytes and the keyframe is 17,768 bytes; the
+raw world image is now 17,760 bytes and the keyframe is 17,776 bytes; the
 updated 200-frame trace measures 1,869–3,201-byte normal deltas (p50 2,438).
 This tranche does not claim persistent destructible spaces, final
 accessibility, or a VM allocation benchmark.
+
+## Bounded Stage-3 command-beacon objective tranche
+
+Team matches now have one deterministic central command beacon. The
+authoritative world counts live team-1/team-2 tanks inside its fixed 96 px
+radius each tick, advances signed progress toward the leading team, decays a
+contested bar toward neutral, and awards a capture point at three seconds of
+uncontested pressure. Owner, progress, both team scores, and capture events are
+stored in the fixed snapshot header; protocol version 7 rejects peers that
+cannot decode the added state. A three-point objective score ends offline team
+rounds through the existing bounded restart path.
+
+Bots periodically choose the beacon as a goal through their existing fixed
+movement/input controller, so they contest it without an AI-only simulation
+shortcut. The Defold HUD adds one authored text node for owner/progress/score
+and consumes the authoritative capture event for a bounded announcement;
+free-for-all matches remain inert because team-zero players never contribute.
+Focused core coverage proves capture, event emission, snapshot restore, and
+state-hash equality; integration coverage proves the authored HUD resource and
+generated source path. This tranche does not claim destructible terrain,
+network matchmaking, or human visual-quality review.
 
 ## Bounded performance and operability evidence tranche
 
@@ -407,7 +428,7 @@ fixture over the real `BattleWorld` and snapshot codec. It records p50/p95/p99
 simulation and frame operation-cost percentiles after a 60-tick warm-up, plus
 keyframe/delta counts, total and per-simulated-second snapshot bytes, and
 reconciliation drift immediately before authoritative restore. The current
-record contains 540 measured ticks, 200 snapshot frames (one 17,768-byte
+record contains 540 measured ticks, 200 snapshot frames (one 17,776-byte
 keyframe followed by 199 deltas), 440,267 total snapshot bytes, and a maximum
 42 fixed-point-unit pre-restore error; post-restore error is zero.
 

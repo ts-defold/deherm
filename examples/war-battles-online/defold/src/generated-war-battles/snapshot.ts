@@ -3,6 +3,7 @@ import {
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
+  OBJECTIVE_CAPTURE_TICKS,
   PICKUP_SNAPSHOT_BYTES,
   PLAYER_SNAPSHOT_BYTES,
   PROJECTILE_SNAPSHOT_BYTES,
@@ -22,7 +23,7 @@ import {
 import type { BattleWorld } from "./world";
 
 const SNAPSHOT_MAGIC = 0x57425331;
-const SNAPSHOT_VERSION = 4;
+const SNAPSHOT_VERSION = 5;
 
 export interface SnapshotFrameScratch {
   readonly baseline: Uint8Array;
@@ -214,8 +215,13 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
   view.setUint32(8, world.tick, true);
   view.setUint32(12, world.matchId, true);
   view.setUint16(16, world.projectileCursor, true);
-  view.setUint16(18, 0, true);
-  view.setUint32(20, world.mapSeed, true);
+  view.setInt16(18, world.objectiveProgress, true);
+  view.setUint8(20, world.objectiveOwner);
+  view.setUint8(21, 0);
+  view.setUint16(22, world.objectiveTeamOneScore, true);
+  view.setUint16(24, world.objectiveTeamTwoScore, true);
+  view.setUint16(26, 0, true);
+  view.setUint32(28, world.mapSeed, true);
 
   let cursor = SNAPSHOT_HEADER_BYTES;
   for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
@@ -304,7 +310,17 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
   if (view.getUint16(4, true) !== SNAPSHOT_VERSION) throw new Error("snapshot version mismatch");
   if (view.getUint16(6, true) !== SNAPSHOT_BYTES) throw new Error("snapshot size mismatch");
   if (view.getUint32(12, true) !== world.matchId) throw new Error("snapshot match id mismatch");
-  if (view.getUint32(20, true) !== world.mapSeed) throw new Error("snapshot arena seed mismatch");
+  if (view.getUint32(28, true) !== world.mapSeed) throw new Error("snapshot arena seed mismatch");
+  const objectiveProgress = view.getInt16(18, true);
+  const objectiveOwner = view.getUint8(20);
+  if (objectiveProgress < -OBJECTIVE_CAPTURE_TICKS || objectiveProgress > OBJECTIVE_CAPTURE_TICKS) throw new Error("snapshot objective progress is invalid");
+  if (objectiveOwner > 2 || view.getUint8(21) !== 0 || view.getUint16(26, true) !== 0) {
+    throw new Error("snapshot objective header is invalid");
+  }
+  world.objectiveProgress = objectiveProgress;
+  world.objectiveOwner = objectiveOwner;
+  world.objectiveTeamOneScore = view.getUint16(22, true);
+  world.objectiveTeamTwoScore = view.getUint16(24, true);
   world.tick = view.getUint32(8, true);
   world.projectileCursor = view.getUint16(16, true);
   if (world.projectileCursor >= MAX_PROJECTILES) throw new Error("snapshot projectile cursor is invalid");

@@ -25,7 +25,7 @@ evidence/    what each gate actually observed
 pnpm install                      # once, at the repository root
 cd examples/war-battles-online
 pnpm generate                     # SDK, component proxies, synced sources
-pnpm check                        # generated state, art, tilemap, types, 58 tests
+pnpm check                        # generated state, art, tilemap, types, focused tests
 pnpm play                         # the built arm64-macOS engine
 ```
 
@@ -67,6 +67,13 @@ authoritative content: the HUD names the active role, bots receive deterministic
 role variety, and `7`–`0` spends credits once to unlock a chassis through the
 same reliable path online and offline; later switches are free.
 
+**Team command beacon.** Team matches contest a central 96 px capture zone. A
+lead builds signed progress over three seconds, a tie bleeds it toward neutral,
+and a completed capture awards one objective point. Owner, progress, scores,
+capture events, and the three-point round limit are authoritative and survive
+rollback, compact snapshots, and reconnect. Bots periodically push the beacon
+through the same movement/input path; free-for-all matches leave it inert.
+
 **Six weapons, six ways to fight.** Every tank spawns with the cannon and
 unlimited ammunition for it; the other five are picked up. Each weapon has two
 data-driven branches: the first selection purchases that branch once with
@@ -95,7 +102,7 @@ guarantees at least eight tiles of corridor between any two blocks. Every open
 cell is reachable — the test suite floods the map to prove it. Cover is
 **not destructible**, on purpose: the grid is derived from a four-byte seed
 rather than stored, so a joining client rebuilds it exactly and the raw world
-state stays a fixed 17,752 bytes. Network snapshots use a 17,768-byte keyframe
+state stays a fixed 17,760 bytes. Network snapshots use a 17,776-byte keyframe
 only for join/recovery and a bounded changed-byte delta thereafter; a 32-player
 bot trace measured 1,869–3,201-byte normal deltas (p50 2,438) over 200 frames,
 versus the former fixed 17,640-byte message. The codec sends a keyframe at least
@@ -158,7 +165,7 @@ snaps to the truth. Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 6,
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 7,
 which adds 40-byte authenticated resume credentials alongside the authoritative
 chassis and weapon-branch state. The tick input packet is still exactly 32 bytes (version 1 reserved byte
 15 and wrote zero; it is now the weapon request, so every other offset is
@@ -194,7 +201,7 @@ exclusive packaged observations, not labels copied from a standalone adapter
 harness.
 
 The compact snapshot unit test independently proves the codec against a full
-32-player world: the former 17,640-byte frame is now a 17,768-byte keyframe,
+32-player world: the former 17,640-byte frame is now a 17,776-byte keyframe,
 while the measured 20 Hz bot trace uses 1,869–3,201-byte deltas (p50 2,438).
 The test also proves keyframe reconstruction, exact-base enforcement, sorted
 run bounds, and rejection of a delta without its baseline. This is protocol and
@@ -290,7 +297,8 @@ runtime. It deliberately describes semantics instead of naming a vendor:
 - reconnect/session resume lives above the connection. A new connection presents
   its current resume token, then the server either restores the player slot and
   sends a fresh full snapshot or refuses the resume. A transport connection
-  itself is never assumed resumable. Version 6 carries a 40-byte HMAC resume
+  itself is never assumed resumable. Version 7 carries command-beacon state;
+  version 6 carries a 40-byte HMAC resume
   credential; the Deno host accepts an explicit 32-byte secret and persists a
   fixed-capacity generation ledger at lifecycle checkpoints.
 

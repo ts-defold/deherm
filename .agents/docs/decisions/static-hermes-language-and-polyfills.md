@@ -33,6 +33,19 @@ Authored code remains idiomatic TypeScript. `ttsc` owns the semantic lowering:
 4. Static Hermes emits named C units which Defold links into the extension.
 5. The runtime evaluates those units and drives the registered lifecycle.
 
+The native unit registry separates those responsibilities explicitly. Up to
+sixteen total units are registered in fixed static storage: zero or more
+auxiliary transport/polyfill units and at most one application unit. Auxiliary
+units always evaluate first; the application unit evaluates last and is the
+only unit allowed to supply the application/component entrypoints captured by
+`Runtime::loadStatic()`. A build with an application unit does not acquire or
+evaluate `/deherm/app.dehermc`, while a build with auxiliary units only keeps
+the existing mixed AOT-plus-Dynamic-Hermes behavior. Repeating the same creator
+in the same role is an idempotent success because Defold may run
+`AppInitialize` again during an in-process engine reboot. Null, cross-role,
+second-application, and over-capacity registrations fail closed without
+allocating.
+
 This is not ordinary TypeScript erasure. Hermes `--transform-ts` is incompatible
 with `-typed`; it is therefore reserved for the explicit compatibility profile.
 The strict transformer must preserve return, parameter, field, tuple, exact
@@ -51,6 +64,17 @@ The executable prints `static.ffi:42`,
 `static.lifecycle:typed-strict:init,update,message,final`, and
 `defold-hermes-static:ok`. The ordinary bundled app is also compile-checked as
 an untyped AOT compatibility unit but is not used by the strict runner.
+
+The production extension now owns the matching application-unit selection
+seam. A focused native registry executable proves deterministic auxiliary
+ordering, one application, same-role idempotence, cross-role rejection, and the
+shared fixed capacity. Finalized native runtimes are discarded on bootstrap
+detach; a later attachment re-evaluates either the registered Static application
+or the still-acquired bytecode resource instead of trying to initialize a realm
+whose application entrypoint was cleared by `Runtime::finalize()`. This
+establishes how a generated full application will enter and re-enter the
+runtime; it is not yet evidence that the authored War Battles module graph can
+be lowered into that application unit.
 
 The proof also reproduced a pinned TS-to-Flow frontend bug: return annotations
 on function expressions, arrow functions, and class methods were left as TS

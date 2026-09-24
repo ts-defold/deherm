@@ -18,6 +18,8 @@ export const EVENT_PICKUP_TAKEN = 6;
 export const EVENT_PICKUP_RESPAWN = 7;
 export const EVENT_RESPAWN = 8;
 export const EVENT_WEAPON_CHANGED = 9;
+/** A team completed a central command-beacon capture. `a` is the team id. */
+export const EVENT_OBJECTIVE_CAPTURE = 10;
 
 export const EVENT_CAPACITY = 256;
 

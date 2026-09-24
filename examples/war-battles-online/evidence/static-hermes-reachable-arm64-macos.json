@@ -28,7 +28,7 @@
   "engineRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "source": {
     "usage": "examples/war-battles-online/defold/.deherm/generated/defold-api-usage.json",
-    "usageSha256": "ceb1719002b0e6ec515fb3e0fce3e261d07341370befb2e7d0aea48e6168fc95",
+    "usageSha256": "823edc8f8a56cc683884ab8ae05fda440af635efc8a6557dd7d2d656075749ca",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
     "loweringPlanSha256": "c374bf4bc0b1e7d4bde7b7970ab790eb6f84960e5aaf0789c38d9df194b82184",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
@@ -218,5 +218,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "7b3cbb2e852c1cceb87dd07496af524a904f35c44f5fc9b0907fb2b3cbcc3180"
+  "recordSha256": "3cc0d0a807172311a739aabc7b8c44e446e756e1bcfb53134c582287cebc3479"
 }

@@ -76,6 +76,7 @@ export function botDifficulty(id: number): BotDifficulty {
 const GOAL_FIGHT = 0;
 const GOAL_PICKUP = 1;
 const GOAL_HUNT = 2;
+const GOAL_OBJECTIVE = 3;
 
 /**
  * Per-bot memory. Kept outside `BattleWorld` on purpose: it is not authoritative
@@ -251,6 +252,16 @@ export class BotController {
       this.goal[slot] = GOAL_PICKUP;
       this.goalX[slot] = world.pickupX[pad]!;
       this.goalY[slot] = world.pickupY[pad]!;
+      return;
+    }
+    // Team bots periodically contest the central beacon. They still fight on
+    // sight, but this stable cadence makes team matches produce real pushes and
+    // counter-pushes instead of collapsing into free-for-all behaviour.
+    if (world.playerTeam[slot] !== 0 && (hash(tick, slot * 19 + 31) & 0xff) < 96
+      && (world.objectiveOwner !== world.playerTeam[slot] || Math.abs(world.objectiveProgress) < 120)) {
+      this.goal[slot] = GOAL_OBJECTIVE;
+      this.goalX[slot] = 0;
+      this.goalY[slot] = 0;
       return;
     }
     if (enemy < 0) {

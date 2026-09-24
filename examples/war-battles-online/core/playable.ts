@@ -10,6 +10,7 @@ import {
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
   MAX_PLAYERS,
+  OBJECTIVE_SCORE_LIMIT,
   TILE_UNITS,
   VELOCITY_SCALE,
   WORLD_MAX_X,
@@ -130,7 +131,7 @@ export class PlayableBattle {
     }
     this.world.step();
 
-    if (this.leaderScore() >= this.fragLimit) {
+    if (this.leaderScore() >= this.fragLimit || this.objectiveLeaderScore() >= OBJECTIVE_SCORE_LIMIT) {
       this.restartCountdown += 1;
       if (this.restartCountdown >= AUTO_RESTART_TICKS) this.restart();
     } else {
@@ -170,6 +171,12 @@ export class PlayableBattle {
       if (this.world.playerScore[slot]! > best) best = this.world.playerScore[slot]!;
     }
     return best;
+  }
+
+  /** Highest command-beacon score; zero for free-for-all rounds. */
+  objectiveLeaderScore(): number {
+    if (!this.teams) return 0;
+    return Math.max(this.world.objectiveTeamOneScore, this.world.objectiveTeamTwoScore);
   }
 
   private populateWorld(): void {

@@ -2,6 +2,7 @@ import { INPUT_BUTTON_MASK, MAX_PLAYERS, SESSION_TOKEN_BYTES, SNAPSHOT_BYTES, TI
 import { WEAPON_COUNT } from "./content.ts";
 
 /**
+ * Version 7 adds the authoritative central command-beacon state to snapshots.
  * Version 6 adds authenticated 40-byte resume credentials to hello/welcome.
  * Version 5 adds authoritative weapon-branch state to the compact snapshot and
  * reliable control lane. Version 4 added authoritative chassis state. Version
@@ -11,7 +12,7 @@ import { WEAPON_COUNT } from "./content.ts";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 6;
+export const PROTOCOL_VERSION = 7;
 export const INPUT_PACKET_BYTES = 32;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;

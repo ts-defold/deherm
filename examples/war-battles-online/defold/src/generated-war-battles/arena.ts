@@ -5,7 +5,7 @@
 // WHY NON-DESTRUCTIBLE. The grid is derived from a single `mapSeed` word, so it
 // is *content* rather than state: it never enters a snapshot, a joining client
 // rebuilds it exactly from the seed in the session message, and the authoritative
-// snapshot stays a fixed 17,752 bytes with no terrain delta codec. Destructible
+// snapshot stays a fixed 17,760 bytes with no terrain delta codec. Destructible
 // cover would put 10,800 mutable cells on the wire, or force a delta encoder that
 // this slice does not have. Quake 3's arenas are not destructible either; the
 // cover you learn stays where you learned it, which is what makes a map readable

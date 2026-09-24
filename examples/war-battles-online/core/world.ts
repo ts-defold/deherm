@@ -10,6 +10,8 @@ import {
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
+  OBJECTIVE_CAPTURE_TICKS,
+  OBJECTIVE_RADIUS,
   MUZZLE_OFFSET,
   OVERDRIVE_TICKS,
   PLAYER_RADIUS,
@@ -63,6 +65,7 @@ import {
   EVENT_PICKUP_TAKEN,
   EVENT_RESPAWN,
   EVENT_WEAPON_CHANGED,
+  EVENT_OBJECTIVE_CAPTURE,
   EventRing,
 } from "./events.ts";
 import { createDirection, length, normalizeInto, slewInto, spreadInto, type Direction } from "./fixed.ts";
@@ -126,6 +129,13 @@ export interface PickupView {
   respawnTicks: number;
   x: number;
   y: number;
+}
+
+export interface ObjectiveView {
+  owner: number;
+  progress: number;
+  teamOneScore: number;
+  teamTwoScore: number;
 }
 
 const ENTITY_KIND_PLAYER = 1;
@@ -222,6 +232,12 @@ export class BattleWorld {
   readonly pickupRespawnTicks = new Uint16Array(MAX_PICKUPS);
   readonly pickupX = new Int32Array(MAX_PICKUPS);
   readonly pickupY = new Int32Array(MAX_PICKUPS);
+
+  /** Signed central-beacon capture progress: positive is team 1, negative team 2. */
+  objectiveProgress = 0;
+  objectiveOwner = 0;
+  objectiveTeamOneScore = 0;
+  objectiveTeamTwoScore = 0;
 
   private readonly inputTick = new Uint32Array(MAX_PLAYERS * INPUT_HISTORY_TICKS);
   private readonly inputSequence = new Uint16Array(MAX_PLAYERS * INPUT_HISTORY_TICKS);
@@ -335,6 +351,7 @@ export class BattleWorld {
     this.separatePlayers();
     this.stepProjectiles();
     this.stepPickups();
+    this.stepObjective();
   }
 
   // --- progression ----------------------------------------------------------
@@ -515,6 +532,14 @@ export class BattleWorld {
     output.x = this.pickupX[index]!;
     output.y = this.pickupY[index]!;
     return output.active;
+  }
+
+  readObjective(output: ObjectiveView): ObjectiveView {
+    output.owner = this.objectiveOwner;
+    output.progress = this.objectiveProgress;
+    output.teamOneScore = this.objectiveTeamOneScore;
+    output.teamTwoScore = this.objectiveTeamTwoScore;
+    return output;
   }
 
   // --- serialisation --------------------------------------------------------
@@ -1065,6 +1090,46 @@ export class BattleWorld {
     }
   }
 
+  /** Resolve central command-beacon presence with the same integer positions used by collision. */
+  private stepObjective(): void {
+    let teamOne = 0;
+    let teamTwo = 0;
+    const radiusSquared = OBJECTIVE_RADIUS * OBJECTIVE_RADIUS;
+    for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+      if (this.playerActive[slot] === 0 || this.playerHealth[slot]! <= 0) continue;
+      const team = this.playerTeam[slot]!;
+      if (team !== 1 && team !== 2) continue;
+      const x = this.playerX[slot]!;
+      const y = this.playerY[slot]!;
+      if (x * x + y * y > radiusSquared) continue;
+      if (team === 1) teamOne += 1;
+      else teamTwo += 1;
+    }
+    const before = this.objectiveProgress;
+    if (teamOne > teamTwo) {
+      this.objectiveProgress = Math.min(OBJECTIVE_CAPTURE_TICKS, before < 0 ? before + 2 : before + 1);
+    } else if (teamTwo > teamOne) {
+      this.objectiveProgress = Math.max(-OBJECTIVE_CAPTURE_TICKS, before > 0 ? before - 2 : before - 1);
+    } else if (before > 0) {
+      this.objectiveProgress = before - 1;
+    } else if (before < 0) {
+      this.objectiveProgress = before + 1;
+    }
+    if (this.objectiveProgress >= OBJECTIVE_CAPTURE_TICKS && this.objectiveOwner !== 1) {
+      this.objectiveOwner = 1;
+      this.objectiveTeamOneScore = Math.min(0xffff, this.objectiveTeamOneScore + 1);
+      this.events.push(EVENT_OBJECTIVE_CAPTURE, 1, this.objectiveTeamOneScore, 0, 0, this.tick);
+    } else if (this.objectiveProgress <= -OBJECTIVE_CAPTURE_TICKS && this.objectiveOwner !== 2) {
+      this.objectiveOwner = 2;
+      this.objectiveTeamTwoScore = Math.min(0xffff, this.objectiveTeamTwoScore + 1);
+      this.events.push(EVENT_OBJECTIVE_CAPTURE, 2, this.objectiveTeamTwoScore, 0, 0, this.tick);
+    } else if (this.objectiveOwner === 1 && this.objectiveProgress < OBJECTIVE_CAPTURE_TICKS) {
+      this.objectiveOwner = 0;
+    } else if (this.objectiveOwner === 2 && this.objectiveProgress > -OBJECTIVE_CAPTURE_TICKS) {
+      this.objectiveOwner = 0;
+    }
+  }
+
   /** Returns false when the pickup would do nothing, which leaves it on the pad. */
   private collect(slot: number, index: number): boolean {
     const definition = pickupByKind(this.pickupKind[index]!);
@@ -1165,4 +1230,8 @@ export function createProjectileView(): ProjectileView {
 
 export function createPickupView(): PickupView {
   return { index: 0, kind: 0, active: false, respawnTicks: 0, x: 0, y: 0 };
+}
+
+export function createObjectiveView(): ObjectiveView {
+  return { owner: 0, progress: 0, teamOneScore: 0, teamTwoScore: 0 };
 }

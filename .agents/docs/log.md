@@ -2710,3 +2710,44 @@ repository outputs matched the historical source-pipeline result byte-for-byte,
 and all 19 non-sentinel IR documents were semantically equal after JSON parsing.
 This closes the two-revision structural proof. It is generation/materialization
 evidence, not a claim that every emitted binding was run in a live engine.
+
+## 2026-09-24 - War Battles command-beacon objective tranche
+
+The next Stage-3 product slice adds a fixed central command beacon to team
+matches. `BattleWorld` counts live team-1/team-2 tanks in a 96 px radius each
+tick, advances signed capture progress, decays contested progress toward
+neutral, and awards a team objective point after 180 authoritative ticks. The
+owner, progress, both team scores, and capture events are part of the fixed
+snapshot header; protocol 7 therefore rejects peers that cannot decode the
+expanded 17,760-byte raw image and 17,776-byte keyframe. A three-point score
+ends offline team rounds through the existing bounded restart path.
+
+Bots periodically select the beacon as their movement goal through the same
+input staging path as humans. The Defold HUD owns one additional text node for
+owner/progress/score and coalesces capture events into the existing bounded
+announcement node. Free-for-all remains inert because team-zero players never
+contribute. Focused core coverage proves capture, event emission, snapshot
+restore and state-hash equality; integration coverage checks the authored HUD
+node and generated source path. These are deterministic/in-process and source
+integration observations, not a visual-quality or WAN claim.
+
+## 2026-09-24 - Static application selection and native reattachment seam
+
+The native extension now distinguishes a single Static Hermes application unit
+from bounded auxiliary transport/polyfill units. Auxiliaries evaluate first and
+the application evaluates last through `Runtime::loadStatic`; the presence of
+an application is authoritative and prevents fallback to `/deherm/app.dehermc`.
+The registry uses fixed static storage, permits a same-role re-registration as
+an idempotent Defold engine-reboot operation, and rejects null, cross-role,
+second-application, and over-capacity registrations. Script detach discards the
+finalized native runtime and unbinds the inspector; a subsequent attachment
+re-evaluates the registered application or the retained bytecode resource.
+
+A focused native executable compiles the production registry and proves empty
+state, stable auxiliary order, same-role idempotence, role conflicts, the
+single-application invariant, and the sixteen-unit bound. Extension syntax
+checks cover 61 native/debug and 58 HTML5 translation units. The packaged
+War Battles engine proof remains Dynamic Hermes and loaded
+`/deherm/app.dehermc`; no authored War Battles module is registered as the
+Static application yet, so this wave proves the runtime selection/lifecycle
+seam rather than a full Static gameplay graph.

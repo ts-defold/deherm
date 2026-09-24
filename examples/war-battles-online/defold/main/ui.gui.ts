@@ -2,8 +2,11 @@ import { defineComponent, gui, hashLiteral, vmath, type DefoldHash, type Node, t
 
 import {
   EVENT_KILL,
+  EVENT_OBJECTIVE_CAPTURE,
   MAX_PLAYERS,
+  OBJECTIVE_CAPTURE_TICKS,
   createPlayerView,
+  createObjectiveView,
   chassisById,
   weaponUpgradeById,
   weaponUpgradeId,
@@ -12,6 +15,7 @@ import {
   type BattleEvent,
   type BattleWorld,
   type PlayerView,
+  type ObjectiveView,
 } from "../src/generated-war-battles/index";
 import { arenaMatch } from "../src/arena-match";
 
@@ -33,10 +37,12 @@ interface UiSelf {
   score: number;
   node: Node;
   status: Node;
+  objective: Node;
   frags: Node;
   hint: Node;
   announcement: Node;
   view: PlayerView;
+  objectiveView: ObjectiveView;
   order: Int32Array;
   event: BattleEvent;
   presentationWorld: BattleWorld | undefined;
@@ -121,6 +127,21 @@ function leaderboard(self: UiSelf): string {
   return text;
 }
 
+function objectiveLine(self: UiSelf): string {
+  const match = arenaMatch();
+  const world = match?.world;
+  if (world === undefined) return "";
+  const localSlot = match === undefined ? -1 : match.localSlot;
+  if (localSlot < 0 || world.playerTeam[localSlot] === 0) return "FREE-FOR-ALL  —  COMMAND BEACON DISABLED";
+  const objective = world.readObjective(self.objectiveView);
+  if (objective.teamOneScore === 0 && objective.teamTwoScore === 0 && objective.progress === 0) {
+    return "COMMAND BEACON  —  TEAM MATCH CAPTURE ZONE";
+  }
+  const owner = objective.owner === 1 ? "BLUE" : objective.owner === 2 ? "RED" : "CONTESTED";
+  const percent = Math.round((Math.abs(objective.progress) * 100) / OBJECTIVE_CAPTURE_TICKS);
+  return `COMMAND BEACON  ${owner}  BLUE ${objective.teamOneScore} - ${objective.teamTwoScore} RED  ${percent}%`;
+}
+
 function announce(self: UiSelf, text: string, color: Vector4): void {
   // This is deliberately one authored node. A kill storm replaces the current
   // notice rather than allocating GUI nodes or retaining a queue.
@@ -147,6 +168,10 @@ function drainPresentation(self: UiSelf, match: ReturnType<typeof arenaMatch>): 
   while (self.eventCursor < world.events.sequence) {
     if (!world.events.read(self.eventCursor, self.event)) break;
     self.eventCursor += 1;
+    if (self.event.kind === EVENT_OBJECTIVE_CAPTURE) {
+      announce(self, `TEAM ${self.event.a === 1 ? "BLUE" : "RED"} CAPTURED COMMAND BEACON`, self.roundColor);
+      continue;
+    }
     if (self.event.kind !== EVENT_KILL) continue;
     const attacker = self.event.a;
     const victim = self.event.b;
@@ -184,10 +209,12 @@ export default defineComponent({
     self.score = 0;
     self.node = gui.getNode("score");
     self.status = gui.getNode("status");
+    self.objective = gui.getNode("objective");
     self.frags = gui.getNode("frags");
     self.hint = gui.getNode("hint");
     self.announcement = gui.getNode("announcement");
     self.view = createPlayerView();
+    self.objectiveView = createObjectiveView();
     self.order = new Int32Array(MAX_PLAYERS);
     self.event = createBattleEvent();
     self.presentationWorld = undefined;
@@ -202,6 +229,7 @@ export default defineComponent({
     self.engaged = false;
     gui.setText(self.node, "SCORE 0");
     gui.setText(self.announcement, "");
+    gui.setText(self.objective, "");
     gui.setEnabled(self.announcement, false);
     __defoldHostV1.log("info", "war-battles:ui-init");
   },
@@ -214,6 +242,7 @@ export default defineComponent({
       gui.setText(self.hint, "ARROWS/WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 WEAPON  7-0 CHASSIS  Q/E BRANCH  R RESTART");
     }
     gui.setText(self.status, statusLine(self));
+    gui.setText(self.objective, objectiveLine(self));
     drainPresentation(self, match);
     ageAnnouncement(self);
     if (self.countdown > 0) {

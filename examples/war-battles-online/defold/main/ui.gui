@@ -6,6 +6,28 @@ fonts {
 nodes {
   position {
     x: 640.0
+    y: 606.0
+    z: 0.0
+  }
+  size {
+    x: 1000.0
+    y: 30.0
+  }
+  color {
+    x: 0.45
+    y: 0.85
+    z: 1.0
+    w: 1.0
+  }
+  type: TYPE_TEXT
+  text: ""
+  font: "score_font"
+  id: "objective"
+  pivot: PIVOT_N
+}
+nodes {
+  position {
+    x: 640.0
     y: 650.0
     z: 0.0
   }

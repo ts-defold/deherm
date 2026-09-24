@@ -588,7 +588,7 @@ test("real generated receiver evidence resolves authored Defold hash literals", 
   assert.match((await index.hover(uri, text, position)).contents.value, /1 receiver/u);
   const definitions = await index.definition(uri, text, position);
   assert.equal(definitions.length, 1);
-  assert.deepEqual(definitions[0].range.start, { line: 21, character: 30 });
+  assert.deepEqual(definitions[0].range.start, positionOf(text, '"#add_score"', 0, 0));
 });
 
 test("missing generated semantics is an actionable request error, not a server crash", async () => {
