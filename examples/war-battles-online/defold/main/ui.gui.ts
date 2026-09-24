@@ -1,6 +1,7 @@
 import { defineComponent, gui, hashLiteral, vmath, type DefoldHash, type Node, type Vector4 } from "@deherm/project";
 
 import {
+  EVENT_HAZARD_DAMAGE,
   EVENT_KILL,
   EVENT_OBJECTIVE_CAPTURE,
   MAX_PLAYERS,
@@ -90,9 +91,11 @@ function statusLine(self: UiSelf): string {
   const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
   const upgradeLabel = upgrade === undefined ? "BASE" : upgrade.name.toUpperCase();
   const overdrive = self.view.overdriveTicks > 0 ? "  OVERDRIVE" : "";
+  const hazard = world.activeHazardIndex();
+  const hazardText = hazard < 0 ? "  VENTS COOLING" : `  VENT ${hazard + 1} LIVE`;
   return `${chassis.name.toUpperCase()} ${chassis.role.toUpperCase()}  HP ${self.view.health}/${chassis.maxHealth}` +
     ` AR ${self.view.armor}  ${weapon.name.toUpperCase()}/${upgradeLabel} ${ammo}` +
-    `  CR ${self.view.credits} B${self.view.boostTicks} R${match?.mode === "offline" ? match.battle.round : 1}${overdrive}`;
+    `  CR ${self.view.credits} B${self.view.boostTicks} R${match?.mode === "offline" ? match.battle.round : 1}${overdrive}${hazardText}`;
 }
 
 function leaderboard(self: UiSelf): string {
@@ -172,10 +175,16 @@ function drainPresentation(self: UiSelf, match: ReturnType<typeof arenaMatch>): 
       announce(self, `TEAM ${self.event.a === 1 ? "BLUE" : "RED"} CAPTURED COMMAND BEACON`, self.roundColor);
       continue;
     }
+    if (self.event.kind === EVENT_HAZARD_DAMAGE) {
+      if (self.event.a === localPlayerId) announce(self, `VENT ${self.event.b + 1} HIT YOU`, self.deathColor);
+      continue;
+    }
     if (self.event.kind !== EVENT_KILL) continue;
     const attacker = self.event.a;
     const victim = self.event.b;
-    if (attacker === localPlayerId) {
+    if (attacker === 0) {
+      announce(self, victim === localPlayerId ? "VENT DESTROYED YOU" : `P${victim} DESTROYED BY VENT`, self.deathColor);
+    } else if (attacker === localPlayerId) {
       announce(self, `YOU DESTROYED P${victim}`, self.killColor);
     } else if (victim === localPlayerId) {
       announce(self, `P${attacker} DESTROYED YOU`, self.deathColor);

@@ -14,6 +14,15 @@ import {
 const root = path.resolve(import.meta.dirname, "..");
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
+async function copyLockedApplicationSources(sourceRoot, project, projectLock) {
+  const lockedApplication = projectLock.buildArtifacts.artifacts["deherm/app.dehermc"];
+  for (const relative of Object.keys(lockedApplication.sources.files)) {
+    const destination = path.join(project, relative);
+    await mkdir(path.dirname(destination), { recursive: true });
+    await writeFile(destination, await readFile(path.join(sourceRoot, relative)));
+  }
+}
+
 test("host-family resolver derives release member digests without flat tool fallbacks", async () => {
   const manifest = JSON.parse(await readFile(path.join(root, "packages/toolchains/host-compilers.json"), "utf8"));
   const digests = hostFamilyExpectedDigests(manifest, "darwin-arm64");
@@ -49,10 +58,18 @@ test("War Battles Static Hermes gate derives a closed release route set", async 
     assert.equal(report.stages.find(({ name }) => name === "compile").status, "observed-unpinned");
     assert.ok(report.stages.find(({ name }) => name === "compile").emittedCBytes > 0);
     assert.equal(report.stages.find(({ name }) => name === "compile").exportedUnit, "deherm_typed_native");
+    assert.equal(report.stages.find(({ name }) => name === "compile").staticApplication.exportedUnit, "deherm_static_application");
+    assert.ok(report.stages.find(({ name }) => name === "compile").staticApplication.emittedCBytes > 0);
+    assert.equal(report.stages.find(({ name }) => name === "compile").staticApplication.hasDefoldRuntimeEntrypoint, true);
     assert.match(
       await readFile(path.join(output, "derived-unit.c"), "utf8"),
       /#define CREATE_THIS_UNIT sh_export_deherm_typed_native\b/,
       "compiled unit must export the symbol consumed by the staged extension"
+    );
+    assert.match(
+      await readFile(path.join(output, "static-application.c"), "utf8"),
+      /#define CREATE_THIS_UNIT sh_export_deherm_static_application\b/,
+      "compiled application unit must export the symbol consumed by the staged application extension"
     );
     assert.ok(report.blockers.some(({ code }) => code === "shermes-unpinned-diagnostic"));
     assert.ok(report.blockers.some(({ code }) => code === "link-not-requested"));
@@ -79,27 +96,102 @@ test("default toolchain policy fails closed before unpinned emission", async () 
 test("Static application evidence requires the activation marker", () => {
   assert.equal(staticApplicationActivationObserved({ stdout: "engine booted", stderr: "" }), false);
   assert.equal(staticApplicationActivationObserved({
-    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1",
+    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=abc123",
     stderr: ""
   }), true);
+  assert.equal(staticApplicationActivationObserved({
+    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=abc123",
+    stderr: ""
+  }, "abc123"), true);
+  assert.equal(staticApplicationActivationObserved({
+    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1 fingerprint=stale",
+    stderr: ""
+  }, "abc123"), false);
 });
 
-test("Static product gate rejects an authored source tree newer than its release projection", async () => {
+test("Static product gate rejects an application bundle outside the project lock", async () => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-bundle-drift-"));
+  try {
+    const applicationBundle = path.join(output, "app.dehermc");
+    const source = await readFile(path.join(root, "examples/war-battles-online/defold/deherm/app.dehermc"));
+    await writeFile(applicationBundle, Buffer.concat([source, Buffer.from("\n// stale replacement\n")]));
+    const report = await buildGate({ applicationBundle, output: path.join(output, "gate") });
+    assert.equal(report.status, "blocked");
+    assert.match(report.blockers[0]?.message ?? "", /bundle digest does not match project lock/u);
+    assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("Static product gate rejects a lock and bundle that are stale against current application sources", async () => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-source-lock-drift-"));
+  const project = path.join(output, "project");
+  const sourceRoot = path.join(root, "examples/war-battles-online/defold");
+  try {
+    const projectLock = JSON.parse(await readFile(path.join(sourceRoot, "deherm.lock"), "utf8"));
+    await copyLockedApplicationSources(sourceRoot, project, projectLock);
+    await writeFile(path.join(project, "deherm.lock"), `${JSON.stringify(projectLock, null, 2)}\n`);
+    await writeFile(path.join(project, "src/generated-war-battles/world.ts"), "// stale imported source\n");
+    const report = await buildGate({
+      project,
+      applicationBundle: path.join(sourceRoot, "deherm/app.dehermc"),
+      output: path.join(output, "gate"),
+    });
+    assert.equal(report.status, "blocked");
+    assert.match(report.blockers[0]?.message ?? "", /application source is stale: src\/generated-war-battles\/world\.ts/u);
+    assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("Static product gate rejects a truncated application source inventory", async () => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-truncated-sources-"));
+  const sourceRoot = path.join(root, "examples/war-battles-online/defold");
+  try {
+    const projectLock = JSON.parse(await readFile(path.join(sourceRoot, "deherm.lock"), "utf8"));
+    const sources = projectLock.buildArtifacts.artifacts["deherm/app.dehermc"].sources;
+    delete sources.files["src/generated-war-battles/world.ts"];
+    sources.fileCount -= 1;
+    const projectLockPath = path.join(output, "deherm.lock");
+    await writeFile(projectLockPath, `${JSON.stringify(projectLock, null, 2)}\n`);
+    const report = await buildGate({
+      project: sourceRoot,
+      projectLock: projectLockPath,
+      output: path.join(output, "gate"),
+    });
+    assert.equal(report.status, "blocked");
+    assert.match(report.blockers[0]?.message ?? "", /application source digest is inconsistent/u);
+    assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("Static product gate rejects an authored source tree newer than its locked application", async () => {
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-source-drift-"));
   const project = path.join(output, "project");
   try {
     const projection = JSON.parse(await readFile(path.join(
       root, "examples/war-battles-online/evidence/static-hermes-reachable-arm64-macos.json"), "utf8"));
     const sourceRoot = path.join(root, "examples/war-battles-online/defold");
+    const projectLock = JSON.parse(await readFile(path.join(sourceRoot, "deherm.lock"), "utf8"));
+    await copyLockedApplicationSources(sourceRoot, project, projectLock);
     for (const relative of projection.source.authoredFiles) {
       const destination = path.join(project, relative);
       await mkdir(path.dirname(destination), { recursive: true });
       await writeFile(destination, await readFile(path.join(sourceRoot, relative)));
     }
     await writeFile(path.join(project, projection.source.authoredFiles[0]), "// source drift\n");
-    const report = await buildGate({ project, output: path.join(output, "gate") });
+    const report = await buildGate({
+      project,
+      output: path.join(output, "gate"),
+      applicationBundle: path.join(sourceRoot, "deherm/app.dehermc"),
+      projectLock: path.join(sourceRoot, "deherm.lock"),
+    });
     assert.equal(report.status, "blocked");
-    assert.match(report.blockers[0]?.message ?? "", /does not describe the current authored TypeScript sources/u);
+    assert.match(report.blockers[0]?.message ?? "", /project lock application source is stale: main\/arena\.script\.ts/u);
     assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -175,7 +267,10 @@ exit 0
     assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /fake-java/);
     assert.ok(report.stages.find(({ name }) => name === "link").output.sha256);
     assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.nativeArtifact.target, "arm64-osx");
-    assert.ok(report.blockers.some(({ code }) => code === "application-not-requested"));
+    assert.ok(report.stages.find(({ name }) => name === "link").stagedProject.emittedApplicationCSha256);
+    assert.ok(report.stages.find(({ name }) => name === "link").stagedProject.applicationExtensionSourceSha256);
+    assert.equal(report.blockers.some(({ code }) => code === "application-not-requested"), false);
+    assert.equal(report.stages.find(({ name }) => name === "application").status, "not-requested");
     assert.deepEqual(await readFile(authoredUnit), authoredBytes, "link staging mutated the authored project");
   } finally {
     await rm(output, { recursive: true, force: true });

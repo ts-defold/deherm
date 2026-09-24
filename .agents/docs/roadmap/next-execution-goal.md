@@ -105,8 +105,11 @@ below without changing its completion rule.
    completed three independent six-edit native War Battles HMR soaks while
    preserving runtime id `1`, arena instance `0:1`, all 19 persistent component
    identities, and advancing gameplay through every edit; the persisted record
-   revalidates offline and is keyed to the deterministic packed-package tree
-   digest rather than a temporary install path. An actual VS Code 1.129.1
+   is keyed to the deterministic packed-package tree digest rather than a
+   temporary install path. It remains authenticated historical runtime evidence:
+   after the package changed at `0b75079`, its strict current-tree checker
+   correctly reports the older package digest instead of relabelling the run as
+   current. An actual VS Code 1.129.1
    renderer now shows current-schema arena instance `0:1` and its live values
    beside all four `property.*` declarations in `arena.script.ts`; the
    source-bound screenshot record revalidates
@@ -212,18 +215,33 @@ Public ledger: [#92 Complete generated exact-call verification across emitted tr
 
 Public ledger: [#93 Shrink published Defold policies to source-derived recipe facts](https://github.com/ts-defold/deherm/issues/93), [#94 Add lazy policy transfer and writable project surface caches](https://github.com/ts-defold/deherm/issues/94), and [#95 Use OS-native user cache roots with a safe migration path](https://github.com/ts-defold/deherm/issues/95).
 
-1. Replace the remaining fifteen SDK compatibility snapshots with
+Correctness status: complete. Policy-only materialization recreates the 28 SDK
+files, all 118 revision outputs, and the canonical lowering plan without a
+Defold checkout; the frozen source-pipeline hashes, authenticated descriptor
+checks, two-revision derivation, capability/version refusal, offline cache
+reuse, and zero-write second pass are executable gates. Issue #93 remains open
+only for representation and transfer optimization: 12 SDK compatibility
+sources (105,573 materialized bytes), 106 revision-output compatibility sources
+(1,718,286 bytes), and the remaining redundant derived documents in the
+25,078,691-byte reachable policy graph must move behind compact facts and
+package emitters. That work must preserve the existing consumer result rather
+than being treated as an API-availability or clean-realization blocker.
+
+1. Replace the remaining twelve SDK compatibility snapshots with
    compiler-owned pure emitters from primary IR and compact recipe facts.
-2. Replace the 10.21 MB lowering-plan object with a compact revision recipe and
-   reconstruct the plan locally in `@deherm/compiler`.
-3. Remove revision-derived SDK/native outputs and source archives from npm; the
+2. **Completed.** The copied lowering-plan object is now a compact revision
+   recipe reconstructed byte-for-byte in `@deherm/compiler`.
+3. **Completed.** Revision-derived SDK/native outputs and source archives are
+   absent from npm; the
    package carries stable machinery and policy carries Defold-derived facts.
-4. Prove policy + npm package + project extensions regenerate final TypeScript,
+4. **Completed.** Policy + npm package + project extensions regenerate final TypeScript,
    native, Static Hermes, and browser artifacts on a clean machine without a
    Defold checkout.
-5. Preserve keyed/idempotent no-write generation and explicit verification.
-6. Enforce `minimumPackageVersion` and `requiredCapabilities` only for genuinely
-   new compiler machinery.
+5. **Completed and retained as a gate.** Generation is keyed/idempotent,
+   writes nothing on an unchanged second pass, and verifies exact output bytes.
+6. **Completed and retained as a gate.** `minimumPackageVersion` and
+   `requiredCapabilities` are enforced only for genuinely new compiler
+   machinery.
 
 ## 3. Close cross-platform build and publication delivery
 
@@ -249,6 +267,15 @@ optimization and does not reopen this gate.
 ## 4. Finish the installed developer experience
 
 Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and profiling](https://github.com/ts-defold/deherm/issues/96).
+
+Status: complete and closable. The final gap named in the public ledger was a
+literal VS Code presentation observation; the source-bound VS Code 1.129.1
+record now revalidates offline and shows current-schema values at all four
+authored declarations. The older installed-HMR soak remains valid for the exact
+package digest it records, while changes after that run deliberately make the
+current-tree freshness checker report stale. Re-recording a soak for every npm
+payload change is continuing release/product evidence, not unfinished TUI,
+watch, HMR, telemetry, debugging, or profiling functionality.
 
 1. **Completed.** `npx deherm` enters the TUI, discovers `game.project`, or
    offers a scaffold when absent, entirely from the packed npm package.
@@ -325,17 +352,22 @@ complete through the packed-package path. The remaining work in this tranche
 is the multiplayer expansion; the literal VS Code visual observation is now
 source-bound checked evidence.
 
-The next Static Hermes seam is now recorded separately as the generated
+The Static Hermes product seam is recorded separately as the generated
 `native-arm64-macos-static-hermes-reachable` projection. The release usage
 manifest is dynamic-access-free and selects all 27 of the 27 reachable War
 Battles routes for the sound typed-native lane, with zero reachable blockers.
 The project-owned bridge source is pinned at SHA-256
 `d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f`, and
-`build/gates/war-battles-static-hermes-project/report.json` records passed
-compilation, Bob/Extender linkage, and an engine launch with typed-native unit
-registration. This is still not full Static Hermes gameplay evidence: the
-full War Battles game remains Dynamic Hermes, and Defold semantics and full-game
-Static AOT execution remain separate, unproven gates.
+The pinned product gate now compiles both the typed-native bridge and the
+current authored War Battles bundle as a Static Hermes application, links both
+through local Bob/Extender, and runs the resulting engine from Bob's archive
+directory. The gate authenticates the app bundle digest and embedded fingerprint
+against `deherm.lock`, then requires that exact fingerprint in the engine's
+activation event. The engine reported `static-application-activated`, initialized the
+arena/camera/UI/player, exercised early gameplay, and emitted live memory and
+instance telemetry. Broader match-state coverage, browser behavior, WAN
+multiplayer, and visual quality remain separate gates; Static AOT application
+startup and execution are no longer unproven.
 
 1. Make the tutorial-faithful game playable with real tutorial art, correctly
    sliced/anchored animation, tint/material effects, input, GUI, audio,

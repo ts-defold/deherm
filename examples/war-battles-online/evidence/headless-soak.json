@@ -13,10 +13,10 @@
   "seed": 12648430,
   "matchId": 77,
   "mapSeed": 12648430,
-  "stateHash": 2926619952,
-  "replayBodyHash": 545353510,
+  "stateHash": 1968399868,
+  "replayBodyHash": 1304249400,
   "alivePlayers": 32,
-  "totalKills": 20,
+  "totalKills": 33,
   "rollbackCount": 1,
   "rollbackMatchesUninterrupted": true,
   "sourceInputs": [
@@ -24,8 +24,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 21,
-      "bytes": 302273,
-      "sha256": "30af7bc3a905ce518f5c0a82ca0314260bfa23353b2a869d60f8ef1d09873e92"
+      "bytes": 306894,
+      "sha256": "1e72cfd442990d5e25b6e4f9e60085481c30d64a101faa35c7ba4f566997fd76"
     },
     {
       "path": "examples/war-battles-online/headless/fixture.ts",
@@ -60,8 +60,8 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 6320,
-      "sha256": "5e841852812480c0df93058e0956f1d3fc29a88d6393b0d520f05cafab2f57c7"
+      "bytes": 6565,
+      "sha256": "eca6d74c4b6a6f9f43f2fa89251034123f5d5acb137b4b40d4f5fc6485226f90"
     },
     {
       "path": "package.json",
@@ -76,6 +76,6 @@
       "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
     }
   ],
-  "sourceKey": "deb5fa2d04e8abad172949ef4ec4ff7fdeef6c5a61a845db3055841408e6e715",
+  "sourceKey": "974625f3791e3d66052e4e74d1825532bdbb0610ef66c3b3d7b748d55944d278",
   "evidenceBoundary": "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence."
 }

@@ -17,6 +17,7 @@ import {
   CONTROL_SET_CHASSIS,
   CONTROL_SET_WEAPON_UPGRADE,
   EVENT_KILL,
+  EVENT_HAZARD_DAMAGE,
   EVENT_OBJECTIVE_CAPTURE,
   EVENT_PICKUP_TAKEN,
   HELLO_BYTES,
@@ -26,6 +27,7 @@ import {
   MAP_HEIGHT,
   MAP_WIDTH,
   MAX_PICKUPS,
+  MAX_HAZARDS,
   MAX_PLAYERS,
   MatchServer,
   PICKUP_HEALTH,
@@ -57,6 +59,9 @@ import {
   createObjectiveView,
   createPlayerView,
   OBJECTIVE_CAPTURE_TICKS,
+  HAZARD_ACTIVE_TICKS,
+  HAZARD_CYCLE_TICKS,
+  HAZARD_RADIUS,
   isqrt,
   readHello,
   readInputPacket,
@@ -276,12 +281,12 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   }
   lengths.sort((left, right) => left - right);
   assert.equal(lengths.length, 200);
-  assert.equal(lengths[0], 1_869);
+  assert.equal(lengths[0], 2_041);
   assert.equal(lengths.at(-1), SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_438);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_539);
   assert.equal(lengths.filter((length) => length === SNAPSHOT_MESSAGE_BYTES).length, 10);
   const normal = lengths.filter((length) => length !== SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(normal.at(-1), 3_201);
+  assert.equal(normal.at(-1), 3_255);
 });
 
 test("a replaced in-flight snapshot forces a recovery keyframe", async () => {
@@ -425,6 +430,55 @@ test("line of sight is blocked by cover and spawn pads stand in the open", () =>
   for (let index = 0; index < 16; index += 1) {
     assert.equal(map.solidAtWorld(map.spawnX[index], map.spawnY[index]), false);
   }
+});
+
+test("rotating hazard vents are deterministic, open, and authoritative", () => {
+  const first = new ArenaMap(0x57_41_52_42);
+  const second = new ArenaMap(0x57_41_52_42);
+  assert.deepEqual([...first.hazardX], [...second.hazardX]);
+  assert.deepEqual([...first.hazardY], [...second.hazardY]);
+  assert.equal(first.hazardX[0], first.hazardX[1] * -1);
+  assert.equal(first.hazardY[0], first.hazardY[2] * -1);
+  for (let index = 0; index < MAX_HAZARDS; index += 1) {
+    assert.equal(first.solidAtWorld(first.hazardX[index], first.hazardY[index]), false);
+  }
+
+  const world = new BattleWorld(77, 0x57_41_52_42);
+  world.addPlayer(1, 0, world.map.hazardX[0], world.map.hazardY[0]);
+  world.playerSpawnProtectTicks[0] = 0;
+  world.playerArmor[0] = 0;
+  const hazard = { index: 0, active: false, x: 0, y: 0, remainingTicks: 0 };
+  world.readHazard(0, hazard);
+  assert.equal(hazard.active, true);
+  assert.equal(hazard.remainingTicks, HAZARD_ACTIVE_TICKS);
+  for (let tick = 1; tick <= HAZARD_CYCLE_TICKS / 20; tick += 1) world.step();
+  assert.equal(world.playerHealth[0], 100 - 8, "a live vent pulse must damage a tank authoritatively");
+  let sawHazardEvent = false;
+  const event = createBattleEvent();
+  for (let sequence = world.events.oldest(); sequence < world.events.sequence; sequence += 1) {
+    if (world.events.read(sequence, event) && event.kind === EVENT_HAZARD_DAMAGE) sawHazardEvent = true;
+  }
+  assert.equal(sawHazardEvent, true, "hazard damage must reach the presentation ring");
+  assert.equal(world.activeHazardIndex(), 0);
+  for (let tick = world.tick + 1; tick <= HAZARD_CYCLE_TICKS; tick += 1) world.step();
+  assert.equal(world.activeHazardIndex(), 1, "the next vent must take over at the cycle boundary");
+  assert.ok(HAZARD_RADIUS > 0);
+
+  const lethal = new BattleWorld(78, 0x57_41_52_42);
+  lethal.addPlayer(1, 0, lethal.map.hazardX[0], lethal.map.hazardY[0]);
+  lethal.playerSpawnProtectTicks[0] = 0;
+  lethal.playerArmor[0] = 0;
+  lethal.playerHealth[0] = 8;
+  for (let tick = 1; tick <= HAZARD_CYCLE_TICKS / 20; tick += 1) lethal.step();
+  let sawKill = false;
+  let sawPostKillHit = false;
+  for (let sequence = lethal.events.oldest(); sequence < lethal.events.sequence; sequence += 1) {
+    if (!lethal.events.read(sequence, event)) continue;
+    if (event.kind === EVENT_KILL) sawKill = true;
+    if (event.kind === EVENT_HAZARD_DAMAGE) sawPostKillHit = true;
+  }
+  assert.equal(sawKill, true, "lethal hazard damage must emit the terminal kill event");
+  assert.equal(sawPostKillHit, false, "a lethal pulse must not overwrite its kill presentation with a hit event");
 });
 
 test("integer square root is exact at and around perfect squares", () => {

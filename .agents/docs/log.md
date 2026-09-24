@@ -1,5 +1,49 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - Static Hermes gate now carries the authored War Battles application seam
+
+The reachable-only gate now compiles two distinct release inputs with the
+selected `shermes`: the authenticated typed-native bridge unit and the authored
+`defold/deherm/app.dehermc` bundle as `deherm_static_application`. Link staging
+adds both emitted units to disposable sibling extensions; the generated C++
+shell registers the application creator through
+`deherm_register_static_application`, so `defold_hermes` can select
+`ActivateStaticApplication()` without replacing the Dynamic Hermes realm in the
+shared extension. The report records both compiler commands, input/output
+digests, the `__defoldAppV1`/`__defoldComponentsV1` runtime-entrypoint check,
+and both staged extension hashes.
+
+The application input is not trusted merely because it exists: the gate reads
+the project `deherm.lock`, requires the bundle SHA-256 and embedded build
+fingerprint to match its `deherm/app.dehermc` record, and requires the running
+engine to report that exact fingerprint in the activation event. A stale or
+substituted bundle now fails at provenance rather than producing misleading
+compile or runtime evidence. The same provenance pass re-hashes all 69 sources
+named by the locked bundle record, closing the mutually stale bundle-plus-lock
+case for imported core, generated SDK, and component sources.
+The per-file table is itself authenticated through the package-owned
+`sourceBindingDigest({ build, files })` recipe, so lowering `fileCount` and
+dropping a source cannot turn a truncated lock into acceptable provenance.
+
+The focused gate run proves the new compile boundary and the fake-Bob link
+boundary without mutating the authored project. The real pinned toolchain then
+emitted a 236,622-byte typed-native unit and a 3,197,436-byte application unit,
+and local Bob/Extender linked both into an 18,514,456-byte Defold engine. That
+run exposed and fixed three product-boundary defects: Bob's compiler output
+could overflow Node's default child-process buffer, debug extension translation
+units selected the `_dbg` Hermes model while the authenticated native archive
+exports `_rel`, and the engine was initially launched outside Bob's resource
+directory.
+
+The corrected engine loaded `archive:game.dmanifest`, reported
+`static-application-activated` with all 27 reachable routes and zero blockers,
+initialized the War Battles arena/camera/UI/player, fired and resolved a rocket,
+entered the eight-player match, and emitted repeated runtime telemetry with zero
+callback roots, six live Lua handles, and zero arena high-water bytes. This is
+observed native Static Hermes application execution and early gameplay/runtime
+evidence for the current bundle. It is not a claim about every match state,
+browser execution, WAN multiplayer, or visual quality.
+
 ## 2026-09-24 - Bob sees only the materialized project, and live lenses are compact
 
 The installed-package War Battles launch exposed a real recursive-discovery
@@ -2877,3 +2921,29 @@ application also re-ran to graceful exit and refreshed its source-bound runtime
 evidence. These observations prove the named loopback and packaged boundaries;
 they do not claim WAN ingress, public certificate deployment, matchmaking,
 application identity, secret-manager integration, or native Defold networking.
+
+## 2026-09-24 - Policy-realization and installed-experience ledger audit
+
+The policy-only consumer has no remaining correctness dependency on a Defold
+checkout. Focused materialization/client tests regenerate the 28 SDK files,
+118 revision outputs, and lowering plan against authenticated source-pipeline
+hashes; reject document, descriptor, capability, version, and path tampering;
+reuse a warm authenticated cache offline; and write nothing on a second pass.
+Issue #93 therefore remains a size and ownership optimization only. Its precise
+remaining compatibility-source debt is 12 SDK files (105,573 materialized
+bytes) and 106 revision outputs (1,718,286 bytes), plus redundant derived
+documents in the 25,078,691-byte reachable policy graph. The current npm dry
+run is 605,060 compressed bytes and 2,557,962 unpacked bytes; those package and
+policy measurements remain separate.
+
+Issue #96's previously named literal VS Code gap is closed by the checked VS
+Code 1.129.1 record showing current-schema live values at all four authored
+arena property declarations. The installed-HMR soak remains historical evidence
+bound to its recorded package digest; after `0b75079` changed the package, its
+current-tree checker correctly reports stale. That freshness result does not
+erase the observed soak or reopen completed developer-experience functionality.
+The development-session test fixtures had not adopted the revision-policy
+component contract required by the public `deherm dev` path, so four tests
+failed before entering the loop. They now install the same generated contract
+fixture; all nine focused session tests pass without introducing a package-side
+fallback or weakening the package/policy boundary.

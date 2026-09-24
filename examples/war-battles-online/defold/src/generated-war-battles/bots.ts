@@ -15,6 +15,7 @@
 
 import {
   DIRECTION_SCALE,
+  HAZARD_RADIUS,
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
   MAX_PICKUPS,
@@ -335,6 +336,22 @@ export class BotController {
         const acrossY = Math.trunc((desiredX * sideways) / distance);
         desiredX = alongX + acrossX;
         desiredY = alongY + acrossY;
+      }
+    }
+
+    // Environmental vents are authoritative hazards, not an AI-only shortcut.
+    // Add a deterministic repulsion while a bot is inside the live radius so
+    // bots naturally clear the field and still use their ordinary input path.
+    const hazard = world.activeHazardIndex();
+    if (hazard >= 0) {
+      const awayX = selfX - world.map.hazardX[hazard]!;
+      const awayY = selfY - world.map.hazardY[hazard]!;
+      const distanceSquared = awayX * awayX + awayY * awayY;
+      const escapeRadius = HAZARD_RADIUS * 2;
+      if (distanceSquared < escapeRadius * escapeRadius && (awayX !== 0 || awayY !== 0)) {
+        const weight = distanceSquared < HAZARD_RADIUS * HAZARD_RADIUS ? 3 : 1;
+        desiredX += awayX * weight;
+        desiredY += awayY * weight;
       }
     }
 

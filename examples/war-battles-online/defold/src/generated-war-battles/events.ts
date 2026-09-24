@@ -21,6 +21,8 @@ export const EVENT_RESPAWN = 8;
 export const EVENT_WEAPON_CHANGED = 9;
 /** A team completed a central command-beacon capture. `a` is the team id. */
 export const EVENT_OBJECTIVE_CAPTURE = 10;
+/** A live tank was damaged by the currently active environmental vent. */
+export const EVENT_HAZARD_DAMAGE = 11;
 
 export const EVENT_CAPACITY = 256;
 

@@ -428,6 +428,25 @@ state-hash equality; integration coverage proves the authored HUD resource and
 generated source path. This tranche does not claim destructible terrain,
 network matchmaking, or human visual-quality review.
 
+## Bounded Stage-3 rotating hazard tranche
+
+Four point-symmetric environmental vents are deterministic map content. Their
+centres are derived from `mapSeed`, while the active vent, four-second live
+window, ten-second cycle, and half-second damage pulses are pure functions of
+the authoritative tick. A live vent damages tanks in a fixed radius, emits a
+bounded `EVENT_HAZARD_DAMAGE`, and can kill without awarding a player frag.
+Because the schedule is derived rather than mutable, no terrain bytes are added
+to the fixed snapshot; rollback, reconnect, and durable checkpoint restore keep
+the same hazard phase from the restored tick.
+
+Bots add deterministic repulsion from the active field to their existing
+movement command, while the HUD reports the live vent/cooldown and hit/death
+announcements. Focused core coverage proves symmetric open
+vent placement, authoritative pulse damage, event delivery, and cycle handoff;
+the 32-player replay/rollback and owned headless evidence are refreshed against
+the new content. This remains a reactive hazard slice, not destructible terrain
+or a WAN visual-quality claim.
+
 ## Bounded performance and operability evidence tranche
 
 `integration/check-performance.mjs` owns a deterministic 32-slot, 600-tick

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -16,6 +16,20 @@ import {
   defaultDefoldBundleOutput
 } from "../packages/cli/src/dev/defold-builder.mjs";
 import { applyDevEvent, createDevModel } from "../packages/cli/src/dev/model.mjs";
+
+const componentPolicySource = new URL(
+  "../packages/bindings/generated/defold-component-proxy-contract.json",
+  import.meta.url
+);
+
+async function installComponentPolicy(generatedRoot) {
+  const irRoot = path.join(generatedRoot, "ir");
+  await mkdir(irRoot, { recursive: true });
+  await writeFile(
+    path.join(irRoot, "defold-component-proxy-contract.json"),
+    await readFile(componentPolicySource)
+  );
+}
 
 test("normal session logs summarize component snapshots without property values", () => {
   const event = {
@@ -184,9 +198,9 @@ test("one-shot dev session compiles a typed resource generation without claiming
   const root = await mkdtemp(path.join(tmpdir(), "deherm-dev-session-"));
   const entry = path.join(root, "src", "main.ts");
   const generatedRoot = path.join(root, "generated-sdk");
-  const { mkdir } = await import("node:fs/promises");
   await mkdir(path.dirname(entry), { recursive: true });
   await mkdir(path.join(generatedRoot, "generated"), { recursive: true });
+  await installComponentPolicy(generatedRoot);
   for (const file of ["resource-symbols.json", "script-route-symbol-index.json", "dmsdk-call-symbol-index.json"]) {
     await writeFile(path.join(generatedRoot, "generated", file), '{"stale":true}\n');
   }
@@ -206,8 +220,8 @@ test("one-shot dev session compiles a typed resource generation without claiming
 test("one-shot dev session composes the generated component registry into the runtime bundle", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-dev-components-"));
   const entry = path.join(root, "main", "battle.gui.ts");
-  const { mkdir } = await import("node:fs/promises");
   await mkdir(path.dirname(entry), { recursive: true });
+  await installComponentPolicy(path.join(root, ".deherm"));
   await writeFile(entry, [
     "function defineComponent<T>(definition: T): T { return definition; }",
     "export default defineComponent({ init() {} });",
@@ -223,8 +237,8 @@ test("one-shot dev session composes the generated component registry into the ru
 
 test("dev resolves an explicit GUI entry relative to the project root", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-dev-gui-entry-"));
-  const { mkdir } = await import("node:fs/promises");
   await mkdir(path.join(root, "main"), { recursive: true });
+  await installComponentPolicy(path.join(root, ".deherm"));
   await writeFile(path.join(root, "main", "battle.gui.ts"), [
     "function defineComponent<T>(definition: T): T { return definition; }",
     "export default defineComponent({ init() {} });",
@@ -238,9 +252,9 @@ test("dev resolves an explicit GUI entry relative to the project root", async ()
 
 test("one-shot dev session bundles mixed component contexts through the unfiltered SDK with ttsc", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "deherm-dev-mixed-components-"));
-  const { mkdir } = await import("node:fs/promises");
   await mkdir(path.join(root, "main"), { recursive: true });
   await mkdir(path.join(root, ".deherm", "sdk"), { recursive: true });
+  await installComponentPolicy(path.join(root, ".deherm"));
   await writeFile(path.join(root, ".deherm", "sdk", "index.ts"), [
     "export const go = Object.freeze({});",
     "export const gui = Object.freeze({});",

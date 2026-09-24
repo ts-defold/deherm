@@ -29,9 +29,9 @@
   },
   "target": "arm64-macos",
   "status": "observed-clean",
-  "artifactKey": "48aa623c31b5f43c056c4d27bb15fff81a9b175bbc05fbe9cb8ab57e36f963f5",
-  "sourceKey": "5278764b808c5913dbb9cb3ba84edf9d9b4402ac739d3165fcba9ecdddfbadaa",
-  "evidenceKey": "4c28490a97dae9b3c7de85756b85f7bfea97f84443b0a9b8fb44c0428b7343ad",
+  "artifactKey": "27edefda261215111e05b0cbfea4fa662faaf286bb3b3fb9c4bb4f80dd8b198b",
+  "sourceKey": "634b0d2802796357665fa065f3b4715a7e286d21e75051e0bdf1e490a06b9296",
+  "evidenceKey": "fd15420650d87dd6519bbc3c3f9a3d1434779a592dafb448de3370a0a06bc7d9",
   "artifacts": [
     {
       "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
@@ -60,8 +60,8 @@
     },
     {
       "path": "examples/war-battles-online/defold/build/default/deherm/app.dehermc",
-      "bytes": 270156,
-      "sha256": "82c12dade761e05b4ab35afe98914f5cbc479e1db112b682ab3ff0bc9e21bab8"
+      "bytes": 274836,
+      "sha256": "74d16f32e6abb963fccf359771c9486f6bfb1de0e526786cbb5b387ce300378d"
     }
   ],
   "sourceInputs": [
@@ -76,8 +76,8 @@
       "path": "examples/war-battles-online/defold",
       "kind": "tree",
       "fileCount": 719,
-      "bytes": 4575421,
-      "sha256": "e2bee31c921810191f6a56f89589fa1593709729aaa5a5952954c4dbcef10911"
+      "bytes": 4580543,
+      "sha256": "12129337ff19bfd3a979a2d595af01a75d2ac71c9cdc740c5bf095b69e78f995"
     },
     {
       "path": "examples/war-battles-online/defold/.defignore#authored-rules",
@@ -92,7 +92,7 @@
     {
       "path": "examples/war-battles-online/defold/deherm.lock",
       "bytes": 28419,
-      "sha256": "1487a68e2cc95cb2dff3f67597641df5a149a2596d6611f32972c03c114a5a78"
+      "sha256": "6dc72966de4b8af37322b90d90d3d10436204c5652a8eddbc1e2af09c92bf163"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/ir/binding-lowering-plan.sentinel.json",
@@ -102,7 +102,7 @@
     {
       "path": "examples/war-battles-online/defold/.deherm/generated/components/manifest.json",
       "bytes": 20096,
-      "sha256": "e6ccd4f50cf4798985d710968f29de34960ed9bc050c0236d63db66565872c4b"
+      "sha256": "f7c7842836486a8d11aaf14750e11615e0ea940dd3802e4fe1ceb9be291ffbeb"
     }
   ],
   "observation": {
@@ -142,11 +142,11 @@
       "method": "system-exit",
       "exitCode": 0,
       "signal": null,
-      "port": 63055
+      "port": 50964
     },
     "transcript": {
       "canonicalLineCount": 62,
-      "canonicalSha256": "1f7880425edffe4059e2454d52dafd2681e411c208a7ddf74148fee00ce34912"
+      "canonicalSha256": "26394f738aed55ac2ff24cd402be850d1ba5ab4449b846decab0265db1355d96"
     }
   }
 }

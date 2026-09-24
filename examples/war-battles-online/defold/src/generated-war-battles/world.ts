@@ -2,12 +2,18 @@
 import {
   BASE_HEALTH,
   DIRECTION_SCALE,
+  HAZARD_ACTIVE_TICKS,
+  HAZARD_CYCLE_TICKS,
+  HAZARD_DAMAGE,
+  HAZARD_PULSE_TICKS,
+  HAZARD_RADIUS,
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
   INPUT_HISTORY_TICKS,
   INPUT_HOLD_TICKS,
   KNOCKBACK_PER_DAMAGE,
   MAX_ARMOR,
+  MAX_HAZARDS,
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
@@ -60,6 +66,7 @@ import {
   EVENT_BOUNCE,
   EVENT_EXPLOSION,
   EVENT_FIRE,
+  EVENT_HAZARD_DAMAGE,
   EVENT_HIT,
   EVENT_KILL,
   EVENT_PICKUP_RESPAWN,
@@ -137,6 +144,14 @@ export interface ObjectiveView {
   progress: number;
   teamOneScore: number;
   teamTwoScore: number;
+}
+
+export interface HazardView {
+  index: number;
+  active: boolean;
+  x: number;
+  y: number;
+  remainingTicks: number;
 }
 
 const ENTITY_KIND_PLAYER = 1;
@@ -353,6 +368,7 @@ export class BattleWorld {
     this.stepProjectiles();
     this.stepPickups();
     this.stepObjective();
+    this.stepHazards();
   }
 
   // --- progression ----------------------------------------------------------
@@ -540,6 +556,25 @@ export class BattleWorld {
     output.progress = this.objectiveProgress;
     output.teamOneScore = this.objectiveTeamOneScore;
     output.teamTwoScore = this.objectiveTeamTwoScore;
+    return output;
+  }
+
+  /** Returns the one rotating vent that can currently pulse, or -1 during its cooldown. */
+  activeHazardIndex(tick = this.tick): number {
+    const phase = tick % HAZARD_CYCLE_TICKS;
+    return phase < HAZARD_ACTIVE_TICKS
+      ? Math.trunc(tick / HAZARD_CYCLE_TICKS) % MAX_HAZARDS
+      : -1;
+  }
+
+  readHazard(index: number, output: HazardView): HazardView {
+    if (!Number.isInteger(index) || index < 0 || index >= MAX_HAZARDS) throw new RangeError("hazard index is out of range");
+    const phase = this.tick % HAZARD_CYCLE_TICKS;
+    output.index = index;
+    output.x = this.map.hazardX[index]!;
+    output.y = this.map.hazardY[index]!;
+    output.active = this.activeHazardIndex() === index;
+    output.remainingTicks = output.active ? HAZARD_ACTIVE_TICKS - phase : 0;
     return output;
   }
 
@@ -1128,6 +1163,30 @@ export class BattleWorld {
       this.objectiveOwner = 0;
     } else if (this.objectiveOwner === 2 && this.objectiveProgress > -OBJECTIVE_CAPTURE_TICKS) {
       this.objectiveOwner = 0;
+    }
+  }
+
+  /** Pulses one deterministic vent every half-second while it is live. */
+  private stepHazards(): void {
+    const phase = this.tick % HAZARD_CYCLE_TICKS;
+    if (phase >= HAZARD_ACTIVE_TICKS || phase % HAZARD_PULSE_TICKS !== 0) return;
+    const hazard = this.activeHazardIndex();
+    if (hazard < 0) return;
+    const hazardX = this.map.hazardX[hazard]!;
+    const hazardY = this.map.hazardY[hazard]!;
+    const radiusSquared = HAZARD_RADIUS * HAZARD_RADIUS;
+    for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+      if (this.playerActive[slot] === 0 || this.playerHealth[slot]! <= 0) continue;
+      const dx = this.playerX[slot]! - hazardX;
+      const dy = this.playerY[slot]! - hazardY;
+      if (dx * dx + dy * dy > radiusSquared) continue;
+      const applied = this.applyDamage(slot, HAZARD_DAMAGE, -1, this.playerX[slot]!, this.playerY[slot]!);
+      // A lethal applyDamage already emitted KILL + EXPLOSION. Do not append a
+      // weaker hit event after them or presentation consumers will overwrite
+      // the terminal announcement with "vent hit you".
+      if (applied > 0 && this.playerHealth[slot]! > 0) {
+        this.events.push(EVENT_HAZARD_DAMAGE, slot + 1, hazard, hazardX, hazardY, this.tick);
+      }
     }
   }
 

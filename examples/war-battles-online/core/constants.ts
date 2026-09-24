@@ -17,6 +17,8 @@ export const TICK_MILLISECONDS = 1000 / TICK_RATE;
 export const MAX_PLAYERS = 32;
 export const MAX_PROJECTILES = 512;
 export const MAX_PICKUPS = 32;
+/** Fixed environmental hazard vents; their positions are derived from mapSeed. */
+export const MAX_HAZARDS = 4;
 export const INPUT_HISTORY_TICKS = 256;
 /** Fixed protocol width of the authenticated session-resume credential. */
 export const SESSION_TOKEN_BYTES = 40;
@@ -129,6 +131,15 @@ export const KNOCKBACK_PER_DAMAGE = 160;
 export const OBJECTIVE_RADIUS = 96 * UNITS_PER_PIXEL;
 export const OBJECTIVE_CAPTURE_TICKS = 180;
 export const OBJECTIVE_SCORE_LIMIT = 3;
+
+// Rotating hazard vents make the non-destructible arena reactive without adding
+// mutable terrain to the fixed snapshot. The active vent and pulse schedule are
+// pure functions of the authoritative tick and map seed.
+export const HAZARD_RADIUS = 72 * UNITS_PER_PIXEL;
+export const HAZARD_CYCLE_TICKS = 600;
+export const HAZARD_ACTIVE_TICKS = 240;
+export const HAZARD_PULSE_TICKS = 30;
+export const HAZARD_DAMAGE = 8;
 
 // --- input ------------------------------------------------------------------
 

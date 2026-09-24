@@ -280,12 +280,15 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(scene, /id: "objective"/);
   assert.match(uiSource, /EVENT_KILL/);
   assert.match(uiSource, /EVENT_OBJECTIVE_CAPTURE/);
+  assert.match(uiSource, /EVENT_HAZARD_DAMAGE/);
+  assert.match(uiSource, /VENT \$\{hazard \+ 1\} LIVE/);
   assert.match(uiSource, /COMMAND BEACON/);
   assert.match(uiSource, /gui\.setEnabled\(self\.announcement, false\)/);
   assert.match(uiSource, /ANNOUNCEMENT_TICKS = 180/);
   assert.match(uiSource, /self\.presentationWorld !== world/);
   assert.match(uiSource, /YOU DESTROYED P\$\{victim\}/);
   assert.match(uiSource, /P\$\{attacker\} DESTROYED YOU/);
+  assert.match(uiSource, /VENT DESTROYED YOU/);
   assert.match(uiSource, /ROUND \$\{round\}/);
 
   // The scripted demonstration the runtime gates observe is still exactly what

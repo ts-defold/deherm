@@ -19,6 +19,7 @@ import {
   MAP_CELLS,
   MAP_HEIGHT,
   MAP_WIDTH,
+  MAX_HAZARDS,
   MAX_PICKUPS,
   TILE_UNITS,
   WORLD_MIN_X,
@@ -117,6 +118,9 @@ export class ArenaMap {
   readonly pickupX = new Int32Array(MAX_PICKUPS);
   readonly pickupY = new Int32Array(MAX_PICKUPS);
   readonly pickupKind = new Uint8Array(MAX_PICKUPS);
+  /** Four deterministic vent centres; hazard activity is derived from tick. */
+  readonly hazardX = new Int32Array(MAX_HAZARDS);
+  readonly hazardY = new Int32Array(MAX_HAZARDS);
 
   constructor(seed: number) {
     if (!Number.isInteger(seed) || seed < 0 || seed > 0xffff_ffff) {
@@ -303,6 +307,7 @@ export class ArenaMap {
 
     this.placeSpawnPoints();
     this.placePickupPads();
+    this.placeHazards();
   }
 
   private stamp(centreX: number, centreY: number, stamp: Stamp): void {
@@ -365,6 +370,21 @@ export class ArenaMap {
       this.pickupX[index] = point.x;
       this.pickupY[index] = point.y;
       this.pickupKind[index] = cycle[index % cycle.length]!;
+    }
+  }
+
+  private placeHazards(): void {
+    // Keep the vents away from the central command beacon while preserving
+    // point symmetry. They are derived content, not mutable terrain state.
+    const cells = [
+      [30, 22], [MAP_WIDTH - 1 - 30, 22],
+      [30, MAP_HEIGHT - 1 - 22], [MAP_WIDTH - 1 - 30, MAP_HEIGHT - 1 - 22],
+    ] as const;
+    const point: WorldPoint = { x: 0, y: 0 };
+    for (let index = 0; index < MAX_HAZARDS; index += 1) {
+      this.nearestOpen(cellCentreX(cells[index]![0]), cellCentreY(cells[index]![1]), point);
+      this.hazardX[index] = point.x;
+      this.hazardY[index] = point.y;
     }
   }
 }

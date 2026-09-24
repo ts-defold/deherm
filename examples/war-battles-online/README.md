@@ -74,6 +74,14 @@ capture events, and the three-point round limit are authoritative and survive
 rollback, compact snapshots, and reconnect. Bots periodically push the beacon
 through the same movement/input path; free-for-all matches leave it inert.
 
+**Rotating hazard vents.** Four point-symmetric vents are derived from the map
+seed and never add mutable terrain to the snapshot. One vent activates for four
+seconds every ten-second cycle, pulsing damage twice per second to tanks inside
+its fixed radius. The authoritative event ring reports each hit, bots steer out
+of a live field through their ordinary input path, and the HUD names the live
+vent or its cooldown. Tick/map-seed derivation keeps the schedule identical
+after rollback, reconnect, or a durable world restore.
+
 **Six weapons, six ways to fight.** Every tank spawns with the cannon and
 unlimited ammunition for it; the other five are picked up. Each weapon has two
 data-driven branches: the first selection purchases that branch once with
@@ -417,6 +425,16 @@ The separate hash-bound packaged evidence now proves the actual example's GUI
 component attachment, Dynamic Hermes load, TypeScript initialization, first
 render, and bounded update survival. It does not prove the older five-route
 fixture scenarios or every generated API.
+
+The Static Hermes product gate compiles the same current `deherm/app.dehermc`
+bundle plus its 27-route typed-native bridge, links both through pinned local
+Bob/Extender, and runs the resulting Defold engine. The bundle SHA-256 and
+embedded fingerprint must match `deherm.lock`; a passing run then requires the
+same fingerprint on the `static-application-activated` marker and observes arena, camera, GUI, player,
+early weapon/gameplay, and live telemetry output. Run it with
+`node scripts/check-war-battles-static-hermes-build-gate.mjs --link --run` from
+the repository root while local Extender is available; the shorter
+`pnpm gate:war-battles-static-hermes-typed-native-bridge` stops after linkage.
 
 The next truthful product gates are:
 
