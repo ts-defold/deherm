@@ -11,16 +11,18 @@
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { projectionEnvelope } from "../examples/war-battles-online/integration/projections.mjs";
+import { checkProject, loadDehermPluginConfig } from "../packages/cli/src/transform-compiler.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const projectRoot = path.join(repositoryRoot, "examples/war-battles-online/defold");
 const inputPaths = Object.freeze({
-  usage: path.join(projectRoot, ".deherm/generated/defold-api-usage.json"),
+  releaseConfig: path.join(projectRoot, "tsconfig.deherm.release.json"),
   loweringPlan: path.join(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
   bridge: path.join(repositoryRoot, "packages/bindings/generated/defold-typed-native-bridge.json"),
   typedNativeSource: path.join(projectRoot, ".deherm/static-hermes/generated/script-typed-native-bridge.ts"),
@@ -33,8 +35,51 @@ export const PROJECTION_ID = "native-arm64-macos-static-hermes-reachable";
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const canonical = (value) => JSON.stringify(value);
 
+async function authoredSourceIdentity(usage) {
+  const files = Object.keys(usage.files ?? {}).sort();
+  assert.ok(files.length > 0, "release usage has no authored source inventory");
+  const hash = createHash("sha256");
+  for (const relative of files) {
+    assert.ok(!path.isAbsolute(relative) && relative !== ".." && !relative.startsWith("../") && !relative.includes("/../"),
+      `release usage has an unsafe authored source path: ${relative}`);
+    const bytes = await readFile(path.join(projectRoot, relative));
+    const name = Buffer.from(relative);
+    const header = Buffer.allocUnsafe(8);
+    header.writeUInt32LE(name.byteLength, 0);
+    header.writeUInt32LE(bytes.byteLength, 4);
+    hash.update(header).update(name).update(bytes);
+  }
+  return { files, sha256: hash.digest("hex") };
+}
+
 async function readJson(file) {
   return JSON.parse(await readFile(file, "utf8"));
+}
+
+/**
+ * Reconstruct release reachability from authored sources into disposable
+ * outputs. The checked-in/generated usage file is intentionally not an input:
+ * dev typechecks write that path and must never be able to authorize a product
+ * projection.
+ */
+export async function reconstructReleaseUsage() {
+  const temporaryRoot = await mkdtemp(path.join(tmpdir(), "deherm-war-battles-release-usage-"));
+  try {
+    const config = await loadDehermPluginConfig(inputPaths.releaseConfig);
+    config.apiUsage = path.join(temporaryRoot, "defold-api-usage.json");
+    config.dmsdkUsage = path.join(temporaryRoot, "dmsdk-usage.json");
+    const result = await checkProject({
+      tsconfig: inputPaths.releaseConfig,
+      cwd: projectRoot,
+      config
+    });
+    if (!result.ok) {
+      throw new Error(`Independent War Battles release reachability reconstruction failed:\n${result.diagnostics}`);
+    }
+    return await readJson(config.apiUsage);
+  } finally {
+    await rm(temporaryRoot, { recursive: true, force: true });
+  }
 }
 
 function routeUnits(plan) {
@@ -73,7 +118,7 @@ export function assertTypedNativeBridgeProvenance(bridge, expected) {
 /** Build a projection from generator-owned inputs without writing anything. */
 export async function buildWarBattlesStaticHermesProjection() {
   const [usage, plan, bridge, typedNativeSource, transportEvidence, upstreamLock] = await Promise.all([
-    readJson(inputPaths.usage),
+    reconstructReleaseUsage(),
     readJson(inputPaths.loweringPlan),
     readJson(inputPaths.bridge),
     readFile(inputPaths.typedNativeSource, "utf8"),
@@ -85,6 +130,7 @@ export async function buildWarBattlesStaticHermesProjection() {
   assert.ok(Array.isArray(usage.routes) && usage.routes.length > 0, "release usage has no reachable routes");
   assert.equal(usage.routeCount, usage.routes.length, "release usage route count is inconsistent");
   const loweringPlanSha256 = sha256(await readFile(inputPaths.loweringPlan));
+  const authoredSources = await authoredSourceIdentity(usage);
   const engineRevision = /^DEFOLD_REV=([0-9a-f]{40})$/m.exec(upstreamLock)?.[1];
   assert.ok(engineRevision, "upstream.lock does not pin a Defold revision");
   const claimedRoutes = assertTypedNativeBridgeProvenance(bridge, {
@@ -147,8 +193,9 @@ export async function buildWarBattlesStaticHermesProjection() {
     target: "arm64-macos",
     engineRevision,
     source: {
-      usage: "examples/war-battles-online/defold/.deherm/generated/defold-api-usage.json",
-      usageSha256: sha256(await readFile(inputPaths.usage)),
+      releaseConfig: "examples/war-battles-online/defold/tsconfig.deherm.release.json",
+      authoredFiles: authoredSources.files,
+      authoredSourceTreeSha256: authoredSources.sha256,
       loweringPlan: "packages/bindings/generated/defold-binding-lowering-plan.json",
       loweringPlanSha256,
       typedNativeBridge: "packages/bindings/generated/defold-typed-native-bridge.json",

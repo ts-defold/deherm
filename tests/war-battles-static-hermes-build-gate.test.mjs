@@ -1,12 +1,18 @@
 import assert from "node:assert/strict";
-import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { chmod, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { buildGate, hostFamilyExpectedDigests } from "../scripts/check-war-battles-static-hermes-build-gate.mjs";
+import {
+  buildGate,
+  hostFamilyExpectedDigests,
+  staticApplicationActivationObserved,
+} from "../scripts/check-war-battles-static-hermes-build-gate.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
+const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 
 test("host-family resolver derives release member digests without flat tool fallbacks", async () => {
   const manifest = JSON.parse(await readFile(path.join(root, "packages/toolchains/host-compilers.json"), "utf8"));
@@ -28,31 +34,11 @@ test("root and example scripts name the typed-native bridge gate explicitly", as
 test("War Battles Static Hermes gate derives a closed release route set", async () => {
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-"));
   try {
-    // Keep the emission test hermetic while the working tree's generator wave
-    // may be changing the lowering plan. Routes absent from the authenticated
-    // bridge are represented as blocked in this test-only plan, as the real
-    // gate must do rather than silently broadening the bridge.
-    const bridge = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-typed-native-bridge.json"), "utf8"));
-    const claimed = new Set(bridge.claimedRoutes.map(({ id }) => id));
-    const plan = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-binding-lowering-plan.json"), "utf8"));
-    for (const unit of plan.units ?? []) {
-      if (unit.identity?.surface !== "script" || claimed.has(unit.identity.id)) continue;
-      if (unit.backends?.staticHermesCAbi?.selection === "emit") {
-        unit.backends.staticHermesCAbi.selection = "blocked-capability";
-        unit.backends.staticHermesCAbi.blockerSet = 0;
-      }
-    }
-    const fixturePlan = path.join(output, "lowering-plan.fixture.json");
-    await writeFile(fixturePlan, `${JSON.stringify(plan)}\n`);
     const report = await buildGate({
       output,
       shermes: path.join(root, "build/native/bin/shermes"),
       allowUnpinnedToolchain: true,
-      // The checked-in product copy is intentionally stale while another
-      // generator wave is in flight; compile the bridge bytes authenticated by
-      // defold-typed-native-bridge.json for this focused emission test.
-      typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts"),
-      loweringPlan: fixturePlan
+      typedNativeSource: path.join(root, "packages/static-hermes/src/generated/script-typed-native-bridge.ts")
     });
     assert.equal(report.schemaVersion, 1);
     assert.equal(report.kind, "deherm.war-battles.static-hermes-build-gate");
@@ -90,6 +76,72 @@ test("default toolchain policy fails closed before unpinned emission", async () 
   }
 });
 
+test("Static application evidence requires the activation marker", () => {
+  assert.equal(staticApplicationActivationObserved({ stdout: "engine booted", stderr: "" }), false);
+  assert.equal(staticApplicationActivationObserved({
+    stdout: "INFO:DEFOLD_HERMES: DEHERM_EVENT static-application-activated auxiliary_count=1",
+    stderr: ""
+  }), true);
+});
+
+test("Static product gate rejects an authored source tree newer than its release projection", async () => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-source-drift-"));
+  const project = path.join(output, "project");
+  try {
+    const projection = JSON.parse(await readFile(path.join(
+      root, "examples/war-battles-online/evidence/static-hermes-reachable-arm64-macos.json"), "utf8"));
+    const sourceRoot = path.join(root, "examples/war-battles-online/defold");
+    for (const relative of projection.source.authoredFiles) {
+      const destination = path.join(project, relative);
+      await mkdir(path.dirname(destination), { recursive: true });
+      await writeFile(destination, await readFile(path.join(sourceRoot, relative)));
+    }
+    await writeFile(path.join(project, projection.source.authoredFiles[0]), "// source drift\n");
+    const report = await buildGate({ project, output: path.join(output, "gate") });
+    assert.equal(report.status, "blocked");
+    assert.match(report.blockers[0]?.message ?? "", /does not describe the current authored TypeScript sources/u);
+    assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("Static product gate rejects a lowering-plan override outside the checked projection", async () => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-plan-drift-"));
+  try {
+    const source = path.join(root, "packages/bindings/generated/defold-binding-lowering-plan.json");
+    const plan = JSON.parse(await readFile(source, "utf8"));
+    plan.units[0].identity.stableId ^= 1;
+    const loweringPlan = path.join(output, "lowering-plan.json");
+    await writeFile(loweringPlan, `${JSON.stringify(plan, null, 2)}\n`);
+    const report = await buildGate({ loweringPlan, output: path.join(output, "gate") });
+    assert.equal(report.status, "blocked");
+    assert.match(report.blockers[0]?.message ?? "", /different canonical lowering plan/u);
+    assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("Static product gate rejects a self-consistent replacement projection", async () => {
+  const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-projection-drift-"));
+  try {
+    const source = path.join(root, "examples/war-battles-online/evidence/static-hermes-reachable-arm64-macos.json");
+    const projection = JSON.parse(await readFile(source, "utf8"));
+    projection.evidenceBoundary.gameplay = "forged";
+    const { recordSha256: _discarded, ...body } = projection;
+    projection.recordSha256 = sha256(JSON.stringify(body));
+    const replacement = path.join(output, "projection.json");
+    await writeFile(replacement, `${JSON.stringify(projection, null, 2)}\n`);
+    const report = await buildGate({ projection: replacement, output: path.join(output, "gate") });
+    assert.equal(report.status, "blocked");
+    assert.match(report.blockers[0]?.message ?? "", /not an independently reconstructed release projection/u);
+    assert.deepEqual(report.stages, [{ name: "provenance", status: "blocked" }]);
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
 test("link stage stages a temporary extension and consumes Bob output", async () => {
   const output = await mkdtemp(path.join(tmpdir(), "deherm-static-gate-fake-link-"));
   const authoredUnit = path.join(root, "examples/war-battles-online/defold/defold_hermes_typed_native/src/deherm_typed_native_unit.cpp");
@@ -118,8 +170,8 @@ exit 0
       java: fakeJava,
       buildServer: "https://fake.invalid"
     });
-    assert.equal(report.stages.find(({ name }) => name === "link").status, "passed");
-    assert.equal(report.evidenceBoundary.linkage, "observed: Bob/Extender linked the staged derived unit into Defold");
+    assert.equal(report.stages.find(({ name }) => name === "link").status, "observed-unpinned");
+    assert.match(report.evidenceBoundary.linkage, /unpinned diagnostic compiler/u);
     assert.match(report.stages.find(({ name }) => name === "link").command.join(" "), /fake-java/);
     assert.ok(report.stages.find(({ name }) => name === "link").output.sha256);
     assert.equal(report.stages.find(({ name }) => name === "link").stagedProject.nativeArtifact.target, "arm64-osx");

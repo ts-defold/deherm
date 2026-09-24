@@ -27,8 +27,18 @@
   "target": "arm64-macos",
   "engineRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "source": {
-    "usage": "examples/war-battles-online/defold/.deherm/generated/defold-api-usage.json",
-    "usageSha256": "823edc8f8a56cc683884ab8ae05fda440af635efc8a6557dd7d2d656075749ca",
+    "releaseConfig": "examples/war-battles-online/defold/tsconfig.deherm.release.json",
+    "authoredFiles": [
+      "main/arena.script.ts",
+      "main/camera.script.ts",
+      "main/pickup.script.ts",
+      "main/player.script.ts",
+      "main/rocket.script.ts",
+      "main/tank.script.ts",
+      "main/ui.gui.ts",
+      "reference/battle.gui.ts"
+    ],
+    "authoredSourceTreeSha256": "45fd0e7dae157eb09046ae6b5e4ac8517c2c12b135aa31a78d28e4ea02051ecc",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
     "loweringPlanSha256": "d61c2004c39054ab8da2eba1bbc988969ca5f1b872cff4936987ce20e7536712",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
@@ -218,5 +228,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "c2b97208f597b60d68883644bd4e9b3df6266094a812f85cd20842a2443181e3"
+  "recordSha256": "5d8bbe4eb77075212924243155b4f70693009e4aecbf1b42a51b8ddef0978d9e"
 }

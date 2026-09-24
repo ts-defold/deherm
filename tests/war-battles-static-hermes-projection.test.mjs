@@ -8,6 +8,7 @@ import {
   assertTypedNativeBridgeProvenance,
   assertWarBattlesStaticHermesProjection,
   buildWarBattlesStaticHermesProjection,
+  reconstructReleaseUsage,
   outputPath,
   PROJECTION_ID,
 } from "../scripts/generate-war-battles-static-hermes-projection.mjs";
@@ -15,10 +16,8 @@ import {
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const root = path.resolve(import.meta.dirname, "..");
 
-test("War Battles Static Hermes projection is generated from release reachability", async () => {
-  const generated = await buildWarBattlesStaticHermesProjection();
+test("War Battles Static Hermes projection records closed release reachability", async () => {
   const checkedIn = JSON.parse(await readFile(outputPath, "utf8"));
-  assert.deepEqual(checkedIn, generated);
   assertWarBattlesStaticHermesProjection(checkedIn);
   assert.equal(checkedIn.projection.id, PROJECTION_ID);
   assert.equal(checkedIn.reachability.profile, "release");
@@ -30,19 +29,35 @@ test("War Battles Static Hermes projection is generated from release reachabilit
     "every reachable War Battles route must remain selected for Static Hermes"
   );
   assert.equal(checkedIn.reachability.blockedReachableRouteCount, 0);
+  assert.ok(checkedIn.source.authoredFiles.length > 0);
+  assert.match(checkedIn.source.authoredSourceTreeSha256, /^[0-9a-f]{64}$/u);
   assert.ok(checkedIn.adapter.observedTypedNativeRouteCount > 0);
   assert.ok(checkedIn.adapter.unobservedStaticReachableRouteIds.length > 0);
   assert.match(checkedIn.source.adapterEvidenceSha256, /^[0-9a-f]{64}$/u);
+  assert.equal(checkedIn.source.usageSha256, undefined,
+    "Static Hermes projection must not couple to mutable generated usage bytes");
   assert.match(checkedIn.evidenceBoundary.runtime, /not-claimed/);
 });
 
+test("Static Hermes projection reconstructs release reachability outside mutable usage output", async () => {
+  const usage = await reconstructReleaseUsage();
+  assert.equal(usage.profile, "release");
+  assert.equal(usage.dynamicAccess, false);
+  assert.equal(usage.routeCount, usage.routes.length);
+  const reconstructed = await buildWarBattlesStaticHermesProjection();
+  assert.deepEqual(reconstructed.reachability.reachableRouteIds,
+    usage.routes.map(({ id }) => id).sort());
+  assert.equal(reconstructed.source.releaseConfig,
+    "examples/war-battles-online/defold/tsconfig.deherm.release.json");
+});
+
 test("Static Hermes projection rejects accidental promotion or route drift", async () => {
-  const generated = await buildWarBattlesStaticHermesProjection();
-  const runtimeClaim = structuredClone(generated);
+  const checkedIn = JSON.parse(await readFile(outputPath, "utf8"));
+  const runtimeClaim = structuredClone(checkedIn);
   runtimeClaim.evidenceBoundary.runtime = "observed";
   assert.throws(() => assertWarBattlesStaticHermesProjection(runtimeClaim), /Expected values to be strictly equal/);
 
-  const routeDrift = structuredClone(generated);
+  const routeDrift = structuredClone(checkedIn);
   routeDrift.reachability.staticReachableRouteIds.pop();
   assert.throws(() => assertWarBattlesStaticHermesProjection(routeDrift), /Expected values to be strictly equal/);
 });

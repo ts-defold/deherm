@@ -14,13 +14,15 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { buildWarBattlesStaticHermesProjection } from "./generate-war-battles-static-hermes-projection.mjs";
+
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const defaultProject = path.join(repositoryRoot, "examples/war-battles-online/defold");
 const typedNativeUnitName = "deherm_typed_native";
 const defaultPaths = Object.freeze({
   project: defaultProject,
   manifest: path.join(defaultProject, ".deherm/manifest.json"),
-  usage: path.join(defaultProject, ".deherm/generated/defold-api-usage.json"),
+  projection: path.join(repositoryRoot, "examples/war-battles-online/evidence/static-hermes-reachable-arm64-macos.json"),
   loweringPlan: path.join(repositoryRoot, "packages/bindings/generated/defold-binding-lowering-plan.json"),
   bridge: path.join(repositoryRoot, "packages/bindings/generated/defold-typed-native-bridge.json"),
   universalSource: path.join(defaultProject, ".deherm/static-hermes/generated/script-universal-value.ts"),
@@ -69,7 +71,7 @@ function parseArgs(argv) {
       return path.resolve(next);
     };
     if (arg === "--project") options.project = value();
-    else if (arg === "--usage") options.usage = value();
+    else if (arg === "--projection") options.projection = value();
     else if (arg === "--bridge") options.bridge = value();
     else if (arg === "--typed-native-source") options.typedNativeSource = value();
     else if (arg === "--universal-source") options.universalSource = value();
@@ -94,6 +96,7 @@ function usageText() {
   return [
     "Usage: node scripts/check-war-battles-static-hermes-build-gate.mjs [options]",
     "",
+    "  --projection <file>               checked release-reachability projection",
     "  --shermes <file>                  compiler override (digest is still checked)",
     "  --allow-unpinned-toolchain        emit diagnostically with an unpinned compiler",
     "  --link                            attempt the local Bob/Extender link gate",
@@ -111,13 +114,77 @@ function resolveDefoldRevision(upstreamLock) {
   return match[1];
 }
 
+function releaseUsageFromProjection(projection, canonicalLoweringPlan, canonicalLoweringPlanSha256) {
+  if (projection?.schemaVersion !== 1 || projection?.projection?.id !== "native-arm64-macos-static-hermes-reachable") {
+    throw new Error("Static Hermes gate requires the checked War Battles release projection");
+  }
+  const { recordSha256, ...body } = projection;
+  if (recordSha256 !== sha256(canonical(body))) {
+    throw new Error("Static Hermes release projection digest is stale");
+  }
+  const reachability = projection.reachability;
+  if (reachability?.profile !== "release" || reachability.dynamicAccess !== false) {
+    throw new Error("Static Hermes release projection is not closed release reachability");
+  }
+  if (projection.source?.loweringPlanSha256 !== canonicalLoweringPlanSha256) {
+    throw new Error("Static Hermes release projection was derived from a different canonical lowering plan");
+  }
+  const routeIds = reachability.reachableRouteIds;
+  if (!Array.isArray(routeIds) || routeIds.length !== reachability.reachableRouteCount ||
+      new Set(routeIds).size !== routeIds.length) {
+    throw new Error("Static Hermes release projection has an invalid reachable-route inventory");
+  }
+  const units = new Map((canonicalLoweringPlan.units ?? [])
+    .filter((unit) => unit.identity?.surface === "script")
+    .map((unit) => [unit.identity.id, unit]));
+  const routes = routeIds.map((id) => {
+    const unit = units.get(id);
+    if (!unit) throw new Error(`${id}: release projection route is absent from the canonical lowering plan`);
+    return { id, stableId: unit.identity.stableId };
+  });
+  return {
+    schemaVersion: 1,
+    profile: "release",
+    defoldRevision: projection.engineRevision,
+    dynamicAccess: false,
+    declaredDynamicAccess: false,
+    routes
+  };
+}
+
+async function verifyProjectionAuthoredSources(projection, projectRoot) {
+  const files = projection.source?.authoredFiles;
+  const expected = projection.source?.authoredSourceTreeSha256;
+  if (!Array.isArray(files) || files.length === 0 || new Set(files).size !== files.length ||
+      !/^[0-9a-f]{64}$/u.test(expected ?? "")) {
+    throw new Error("Static Hermes release projection has no bounded authored-source identity");
+  }
+  const sorted = [...files].sort();
+  if (canonical(sorted) !== canonical(files)) {
+    throw new Error("Static Hermes release projection authored sources are not canonical");
+  }
+  const root = path.resolve(projectRoot);
+  const hash = createHash("sha256");
+  for (const relative of files) {
+    const target = path.resolve(root, relative);
+    const confined = path.relative(root, target);
+    if (!confined || confined === ".." || confined.startsWith(`..${path.sep}`) || path.isAbsolute(confined)) {
+      throw new Error(`Static Hermes release projection has an unsafe authored source path: ${relative}`);
+    }
+    const bytes = await readFile(target);
+    const name = Buffer.from(relative);
+    const header = Buffer.allocUnsafe(8);
+    header.writeUInt32LE(name.byteLength, 0);
+    header.writeUInt32LE(bytes.byteLength, 4);
+    hash.update(header).update(name).update(bytes);
+  }
+  const actual = hash.digest("hex");
+  if (actual !== expected) {
+    throw new Error("Static Hermes release projection does not describe the current authored TypeScript sources");
+  }
+}
+
 function resolveStaticRoutes(usage, loweringPlan) {
-  if (usage.schemaVersion !== 1 || usage.profile !== "release") {
-    throw new Error("Static Hermes gate requires schemaVersion 1 release usage");
-  }
-  if (usage.dynamicAccess === true || usage.declaredDynamicAccess === true) {
-    throw new Error("Static Hermes gate refuses release usage with dynamic API access");
-  }
   const units = new Map((loweringPlan.units ?? [])
     .filter((unit) => unit.identity?.surface === "script")
     .map((unit) => [unit.identity.id, unit]));
@@ -407,8 +474,46 @@ function runApplication(executable, cwd) {
   };
 }
 
+export function staticApplicationActivationObserved(result) {
+  return /DEHERM_EVENT static-application-activated\b/u.test(`${result.stdout ?? ""}\n${result.stderr ?? ""}`);
+}
+
 function stage(name, status, details = {}) {
   return { name, status, ...details };
+}
+
+async function recordApplication(report, { options, executable, linkDetails, stagedRoot, diagnosticToolchain }) {
+  if (!options.run) {
+    report.blockers.push(blocker("application-not-requested", "Defold application execution was not requested"));
+    report.stages.push(stage("application", "blocked", { requested: false, executable: linkDetails.output }));
+    return;
+  }
+  // Extender's zip preserves a non-executable mode for dmengine; make the
+  // staged copy runnable without touching the authored project.
+  await chmod(executable, 0o755);
+  const result = runApplication(executable, stagedRoot);
+  const activationObserved = staticApplicationActivationObserved(result);
+  const completedOrStillRunning = result.status === 0 || result.timedOut;
+  const observed = activationObserved && completedOrStillRunning;
+  report.stages.push(stage("application", observed
+    ? diagnosticToolchain ? "observed-unpinned" : "observed"
+    : "blocked", {
+    requested: true,
+    executable: linkDetails.output,
+    activationObserved,
+    result
+  }));
+  if (!observed) {
+    report.blockers.push(blocker(
+      "application-activation-unobserved",
+      "The linked Defold executable did not report Static Hermes application activation",
+      { exitStatus: result.status, timedOut: result.timedOut, error: result.error, stderr: result.stderr, stdout: result.stdout }
+    ));
+    return;
+  }
+  report.evidenceBoundary.runtime = diagnosticToolchain
+    ? "observed only with an unpinned diagnostic compiler: linked Defold executable reported Static Hermes activation"
+    : "observed: linked Defold executable reported Static Hermes activation";
 }
 
 export async function buildGate(rawOptions = {}) {
@@ -449,17 +554,29 @@ export async function buildGate(rawOptions = {}) {
   let emittedCPath = null;
   try {
     loaded.manifest = await readJson(options.manifest);
-    loaded.usage = await readJson(options.usage);
+    loaded.projectionBytes = await readFile(options.projection);
+    loaded.projection = JSON.parse(loaded.projectionBytes);
+    loaded.reconstructedProjection = await buildWarBattlesStaticHermesProjection();
+    if (canonical(loaded.projection) !== canonical(loaded.reconstructedProjection)) {
+      throw new Error("Static Hermes gate projection is not an independently reconstructed release projection");
+    }
     loaded.loweringPlan = await readJson(options.loweringPlan);
+    loaded.loweringPlanBytes = await readFile(options.loweringPlan);
     loaded.bridge = await readJson(options.bridge);
     loaded.universalSource = await readFile(options.universalSource, "utf8");
     loaded.typedNativeSource = await readFile(options.typedNativeSource, "utf8");
     loaded.upstreamLock = await readFile(defaultPaths.upstreamLock, "utf8");
     loaded.hostCompilers = await readJson(defaultPaths.hostCompilers);
     const revision = resolveDefoldRevision(loaded.upstreamLock);
+    loaded.usage = releaseUsageFromProjection(
+      loaded.projection,
+      loaded.loweringPlan,
+      sha256(loaded.loweringPlanBytes)
+    );
+    await verifyProjectionAuthoredSources(loaded.projection, options.project);
     if (loaded.manifest.defoldRevision !== revision || loaded.usage.defoldRevision !== revision ||
         loaded.loweringPlan.defoldRevision !== revision || loaded.bridge.defoldRevision !== revision) {
-      throw new Error("release usage, bridge, lowering plan, and project manifest do not share pinned Defold revision");
+      throw new Error("release projection, bridge, lowering plan, and project manifest do not share pinned Defold revision");
     }
     const reachability = resolveStaticRoutes(loaded.usage, loaded.loweringPlan);
     const bridge = bridgeBodyAndClaims(loaded.bridge);
@@ -470,6 +587,12 @@ export async function buildGate(rawOptions = {}) {
         `typed-native bridge source is stale: report expects ${loaded.bridge.generatedSha256.typescript}, ` +
         `project source is ${typedNativeSourceSha256}`
       );
+    }
+    if (loaded.projection.source?.typedNativeBridgeSha256 !== sha256(await readFile(options.bridge))) {
+      throw new Error("Static Hermes release projection was derived from a different typed-native bridge");
+    }
+    if (loaded.projection.source?.typedNativeSourceSha256 !== typedNativeSourceSha256) {
+      throw new Error("Static Hermes release projection was derived from a different typed-native source");
     }
     for (const route of reachability.selected) {
       if (bridge.claims.get(route.id) !== route.stableId) {
@@ -488,7 +611,7 @@ export async function buildGate(rawOptions = {}) {
     };
     const sourceFiles = {
       manifest: options.manifest,
-      usage: options.usage,
+      projection: options.projection,
       loweringPlan: options.loweringPlan,
       bridge: options.bridge,
       universalSource: options.universalSource,
@@ -516,6 +639,7 @@ export async function buildGate(rawOptions = {}) {
   if (tool.selected && existsSync(tool.selected)) toolSha = sha256(await readFile(tool.selected));
   const expectedSha = tool.record?.sha256 ?? null;
   const pinned = Boolean(toolSha && expectedSha && toolSha === expectedSha);
+  const diagnosticToolchain = !pinned;
   report.toolchain = {
     host: tool.host,
     shermes: {
@@ -631,22 +755,13 @@ export async function buildGate(rawOptions = {}) {
           } else {
             const executableBytes = await readFile(executable);
             linkDetails.output = { executable: displayPath(executable), sha256: sha256(executableBytes), bytes: executableBytes.byteLength };
-            report.stages.push(stage("link", "passed", linkDetails));
-            report.evidenceBoundary.linkage = "observed: Bob/Extender linked the staged derived unit into Defold";
-            if (options.run) {
-              // Extender's zip preserves a non-executable mode for dmengine;
-              // make the staged copy runnable without touching the authored
-              // project or claiming that the bundle itself was repackaged.
-              await chmod(executable, 0o755);
-              const appResult = runApplication(executable, staged.stagedRoot);
-              const appPassed = appResult.status === 0 || appResult.timedOut;
-              report.stages.push(stage("application", appPassed ? "observed" : "blocked", { requested: true, executable: linkDetails.output, result: appResult }));
-              if (!appPassed) report.blockers.push(blocker("application-run-failed", "The linked Defold executable failed during headless launch", { exitStatus: appResult.status, error: appResult.error, stderr: appResult.stderr, stdout: appResult.stdout }));
-              else report.evidenceBoundary.runtime = "observed: linked Defold executable launched under the gate";
-            } else {
-              report.blockers.push(blocker("application-not-requested", "Defold application execution was not requested"));
-              report.stages.push(stage("application", "blocked", { requested: false, executable: linkDetails.output }));
-            }
+            report.stages.push(stage("link", diagnosticToolchain ? "observed-unpinned" : "passed", linkDetails));
+            report.evidenceBoundary.linkage = diagnosticToolchain
+              ? "observed only with an unpinned diagnostic compiler: Bob/Extender linked the staged derived unit into Defold"
+              : "observed: Bob/Extender linked the staged derived unit into Defold";
+            await recordApplication(report, {
+              options, executable, linkDetails, stagedRoot: staged.stagedRoot, diagnosticToolchain
+            });
           }
           if (!options.keep) await rm(staged.stagedRoot, { recursive: true, force: true });
         }
@@ -665,10 +780,13 @@ export async function buildGate(rawOptions = {}) {
         } else {
           const executableBytes = await readFile(executable);
           linkDetails.output = { executable: displayPath(executable), sha256: sha256(executableBytes), bytes: executableBytes.byteLength };
-          report.stages.push(stage("link", "passed", linkDetails));
-          report.evidenceBoundary.linkage = "observed: Bob/Extender linked the staged derived unit into Defold";
-          report.blockers.push(blocker("application-not-requested", "Defold application execution was not requested"));
-          report.stages.push(stage("application", "blocked", { requested: false, executable: linkDetails.output }));
+          report.stages.push(stage("link", diagnosticToolchain ? "observed-unpinned" : "passed", linkDetails));
+          report.evidenceBoundary.linkage = diagnosticToolchain
+            ? "observed only with an unpinned diagnostic compiler: Bob/Extender linked the staged derived unit into Defold"
+            : "observed: Bob/Extender linked the staged derived unit into Defold";
+          await recordApplication(report, {
+            options, executable, linkDetails, stagedRoot: staged.stagedRoot, diagnosticToolchain
+          });
         }
         if (!options.keep) await rm(staged.stagedRoot, { recursive: true, force: true });
       }
