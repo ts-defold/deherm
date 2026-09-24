@@ -29,10 +29,15 @@ export const BOB_TOOLING_IGNORE_ENTRIES = Object.freeze([
   ...BOB_TOOLING_IGNORE_DIRECTORIES,
   "/package.json",
   "/package-lock.json",
+  "/npm-shrinkwrap.json",
   "/pnpm-lock.yaml",
+  "/pnpm-workspace.yaml",
   "/yarn.lock",
   "/bun.lock",
   "/bun.lockb",
+  "/.npmrc",
+  "/.nvmrc",
+  "/.node-version",
   "/tsconfig.json",
   "/tsconfig.deherm.json",
   "/tsconfig.deherm.base.json",
@@ -43,8 +48,17 @@ export const BOB_TOOLING_IGNORE_ENTRIES = Object.freeze([
   "/tsconfig.deherm.bundle.json",
   "/tsconfig.deherm.release.json",
   "/deherm.lock",
+  "/AGENTS.md",
+  "/CHANGELOG.md",
+  "/LICENSE",
   "/README.md"
 ]);
+
+// Every file kind the TypeScript compiler/bundler can consume as authoring
+// input. Defold does not consume these directly: déherm emits the corresponding
+// proxy resource and/or app.dehermc. Keep this explicit because `.defignore`
+// accepts path prefixes, not globs, at the pinned Defold revision.
+const BOB_AUTHORING_SOURCE_EXTENSIONS = Object.freeze([".ts", ".tsx", ".mts", ".cts"]);
 
 const bobWalkPrunedDirectories = new Set(
   BOB_TOOLING_IGNORE_DIRECTORIES.map((entry) => entry.slice(1))
@@ -127,11 +141,13 @@ export async function discoverBobAuthoringIgnoreEntries(projectRoot) {
         continue;
       }
       if (child.isSymbolicLink()) {
-        if (child.name.endsWith(".ts")) entries.push(`/${portable(relative)}`);
+        if (BOB_AUTHORING_SOURCE_EXTENSIONS.some((extension) => child.name.endsWith(extension))) {
+          entries.push(`/${portable(relative)}`);
+        }
         continue;
       }
       // Never follow a symlink out of the project while deriving Bob inputs.
-      if (!child.isFile() || !child.name.endsWith(".ts")) continue;
+      if (!child.isFile() || !BOB_AUTHORING_SOURCE_EXTENSIONS.some((extension) => child.name.endsWith(extension))) continue;
       entries.push(`/${portable(relative)}`);
     }
   }

@@ -213,8 +213,9 @@ work; a successful custom-engine link does not imply complete API coverage.
 Bob walks the Defold project root, so every scaffold and every generation pass
 maintains a package-owned block in `.defignore`. The block hides dependency,
 cache, editor, VCS, package-manager, déherm lock/config, and raw TypeScript
-authoring inputs. It names TypeScript files individually
-rather than excluding their containing directory, keeping generated
+authoring inputs (`.ts`, `.tsx`, `.mts`, and `.cts`). Pinned Bob treats these
+entries as absolute path prefixes rather than globs, so it names files
+individually rather than excluding their containing directory, keeping generated
 `.script`, `.gui_script`, and `.render_script` proxies visible. User-authored
 ignore rules remain outside the block and are preserved. This gives Bob the
 smallest safe project view while leaving Defold's resource graph authoritative

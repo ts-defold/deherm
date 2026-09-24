@@ -406,8 +406,9 @@ was intentionally excluded from the npm package.
 
 `packages/cli/src/bob-project-boundary.mjs` therefore owns an idempotent,
 marked `.defignore` projection. It excludes invariant tool/cache trees,
-package-manager metadata, generated déherm configuration, and the exact `.ts`
-authoring files found below the project. The exact-file rule matters: a
+package-manager/workspace metadata, generated déherm configuration, and the
+exact `.ts`, `.tsx`, `.mts`, and `.cts` authoring files found below the project.
+The exact-file rule matters: a
 `/src/controller.script.ts` input is hidden while its sibling generated
 `/src/controller.script` resource remains visible. Authored resource
 directories are never inferred as unused; Defold's own resource graph remains

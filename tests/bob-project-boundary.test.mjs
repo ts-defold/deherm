@@ -69,11 +69,18 @@ test("the Bob boundary discovers exact TypeScript inputs without excluding their
   await writeFile(path.join(root, "src", "controller.script.ts"), "");
   await writeFile(path.join(root, "src", "controller.script"), "");
   await writeFile(path.join(root, "src", "shared", "math.ts"), "");
+  await writeFile(path.join(root, "src", "shared", "hud.tsx"), "");
+  await writeFile(path.join(root, "src", "shared", "worker.mts"), "");
+  await writeFile(path.join(root, "src", "shared", "legacy.cts"), "");
+  await writeFile(path.join(root, "src", "shared", "runtime.js"), "");
   await writeFile(path.join(root, "node_modules", "fake", "poison.ts"), "");
 
   assert.deepEqual(await discoverBobAuthoringIgnoreEntries(root), [
     "/src/controller.script.ts",
-    "/src/shared/math.ts"
+    "/src/shared/hud.tsx",
+    "/src/shared/legacy.cts",
+    "/src/shared/math.ts",
+    "/src/shared/worker.mts"
   ]);
 });
 

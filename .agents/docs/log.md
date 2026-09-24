@@ -7,8 +7,12 @@ left root package metadata and raw TypeScript authoring inputs in Bob's resource
 walk. The boundary now owns a marked, replaceable `.defignore` block containing
 the invariant tool/cache directories, package-manager and generated déherm
 metadata, plus every exact `.ts` file discovered outside already ignored
-trees. Exact paths preserve generated Defold proxy siblings in the same source
-directory. Scaffolds include the initial component immediately; the public
+trees. A follow-up audit against pinned Bob source confirmed `.defignore`
+accepts absolute path prefixes rather than globs, so the exact inventory now
+also covers `.tsx`, `.mts`, and `.cts` compiler inputs and the scaffold defaults
+exclude workspace/package-manager metadata. Exact paths preserve generated
+Defold proxy siblings in the same source directory. Scaffolds include the
+initial component immediately; the public
 generator, managed-extension installer, and pre-Bob target reconciliation all
 recompute the same block. User rules remain outside it in their original order,
 and stale managed entries disappear when inputs or targets change.
@@ -18,7 +22,9 @@ dependency TypeScript is never enumerated, raw authoring files are excluded,
 generated `.script` resources remain visible, and target-specific typed-native
 exclusion still toggles idempotently. An explicit `[project] custom_resources`
 entry wins over default file-level exclusions, so author intent remains
-authoritative. This is deterministic input-boundary evidence; Defold's own
+authoritative. A sibling `.js` fixture remains visible as a negative control:
+this is an explicit TypeScript compiler-input boundary, not a broad source-tree
+exclusion. This is deterministic input-boundary evidence; Defold's own
 resource graph remains responsible for selecting the runtime assets archived
 into a particular game.
 
