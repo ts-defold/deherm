@@ -12,8 +12,9 @@ The service publishes UDP `4433` for HTTP/3/WebTransport and binds TCP `8080`
 to host loopback only for `/healthz`, `/readyz`, and the `/ws` reliable fallback.
 The named certificate volume is reused on restart so Chrome's pinned certificate
 hash remains valid. A separate named state volume owns a generated 256-bit resume
-key and the fixed-capacity authenticated session ledger, so browser sessions can
-resume their player identity after a container restart. It will
+key, fixed-capacity authenticated session ledger, and authoritative world
+checkpoint, so browser sessions can resume their player identity and the match
+can resume its tick/state after a container restart. It will
 fail closed when that certificate expires instead of silently invalidating the
 client pin. Rotate it deliberately and update every configured SHA-256 together:
 
@@ -39,6 +40,14 @@ ingress works.
 The TCP fallback can still be exercised when a local container backend cannot
 forward QUIC/UDP. It is labelled `websocket-tcp`, carries inputs on the reliable
 fallback lane, and is not evidence for WebTransport or datagrams.
+
+The mounted `server/state/world.bin` is a fixed-size, versioned and checksummed
+world image. The server restores it before admitting sessions, periodically
+checkpoints it outside the simulation tick, and atomically replaces it on
+write. Its fixed header binds match, arena, roster, and team-mode identity, and
+restore rebases admission time against the session ledger so the world tick is
+not counted twice. A malformed, truncated, or foreign checkpoint leaves
+readiness closed.
 
 The owner check is deterministic and does not require a running daemon:
 `node --test test/docker-durability.test.mjs` validates the rendered Compose

@@ -44,6 +44,8 @@ or, from this package, `pnpm serve`.
 | `--bot-skill` | 0 recruit, 1 regular, 2 veteran, 3 nightmare |
 | `--snapshot-interval` | Ticks between authoritative snapshots; 3 is 20 Hz |
 | `--teams` | Two teams instead of a free-for-all |
+| `--world-checkpoint` | Fixed authoritative state file; also `WAR_BATTLES_WORLD_CHECKPOINT` |
+| `--world-checkpoint-interval` | Ticks between control-plane world writes; default 60 |
 
 It prints its listening address, the certificate digest and the roster, then one
 line per session join and leave.
@@ -113,6 +115,20 @@ WebSocket/TCP; both paths are exercised against the Bob-produced game. Native
 Defold remains offline until a native WebTransport or WebSocket adapter is
 provided, and then plays the same match against bots without mislabelling that
 path as networked.
+
+When `--world-checkpoint` (or `WAR_BATTLES_WORLD_CHECKPOINT`) is configured,
+the host restores the fixed authoritative world image before opening either
+transport listener. It checkpoints once per configured interval (60 ticks by
+default) and again during orderly shutdown; these writes are outside
+`BattleWorld.step()`. A slow store retains one active write and one coalesced
+latest image rather than an unbounded queue. The file is a versioned, fixed-size envelope around the
+canonical world snapshot, with repeated match/arena/roster/team-mode identity
+and a CRC guard. Corrupt, truncated, foreign-match, foreign-arena,
+foreign-roster, and foreign-team-mode files fail closed before session
+admission. After restore, the admission clock is rebased against the
+session-ledger checkpoint so the restored world tick is not counted twice. The
+Deno adapter writes a sibling temporary file and renames it atomically, and
+Docker mounts `server/state/world.bin` beside the resume ledger.
 
 ## What is proven, and what is not
 

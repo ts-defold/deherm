@@ -9,12 +9,13 @@ const exampleRoot = resolve(import.meta.dirname, "..");
 const dockerRoot = join(exampleRoot, "docker");
 
 test("Docker deployment owns durable resume state and readiness", async () => {
-  const [compose, dockerfile, entrypoint, docs, packageJson] = await Promise.all([
+  const [compose, dockerfile, entrypoint, docs, packageJson, worldFile] = await Promise.all([
     readFile(join(dockerRoot, "compose.yaml"), "utf8"),
     readFile(join(dockerRoot, "Dockerfile"), "utf8"),
     readFile(join(dockerRoot, "entrypoint.sh"), "utf8"),
     readFile(join(dockerRoot, "README.md"), "utf8"),
     readFile(join(exampleRoot, "package.json"), "utf8"),
+    readFile(join(exampleRoot, "server/durable-world-file.ts"), "utf8"),
   ]);
 
   assert.match(compose, /war-battles-local-state:\s*\/srv\/war-battles-online\/server\/state/u);
@@ -26,6 +27,9 @@ test("Docker deployment owns durable resume state and readiness", async () => {
   assert.match(entrypoint, /--allow-env/u);
   assert.match(entrypoint, /--resume-key-file \.\/server\/state\/resume-key\.hex/u);
   assert.match(entrypoint, /--session-state \.\/server\/state\/sessions\.bin/u);
+  assert.match(entrypoint, /--world-checkpoint \.\/server\/state\/world\.bin/u);
+  assert.match(worldFile, /writeFile\(this\.temporaryPath/u);
+  assert.match(worldFile, /rename\(this\.temporaryPath, this\.path\)/u);
   assert.match(docs, /not evidence for WebTransport or datagrams/u);
   assert.match(docs, /Production still needs/u);
   assert.match(packageJson, /runtime:websocket:docker/u);

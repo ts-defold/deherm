@@ -1,5 +1,33 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - Static product gates no longer depend on mutable dev reachability
+
+Refreshing War Battles after the revision-parametric policy wave exposed a
+hidden ordering dependency: `deherm dev` legitimately rewrites the ignored
+`defold-api-usage.json` with a development profile, while the Static Hermes
+product gate and its unit tests treated that mutable file as persistent release
+evidence. A development build could therefore make the next repository check
+fail before provenance, even though the checked release projection remained
+current. The build gate now independently reconstructs release reachability by
+running the release checker into disposable usage outputs, then compares the
+checked `native-arm64-macos-static-hermes-reachable` projection to that
+reconstruction. It rehydrates stable ids from the authenticated canonical
+lowering plan and verifies the projection's plan, typed-native bridge, revision,
+closed route inventory, and bounded authored TypeScript source-tree digest before
+compilation. The projection records its release config rather than a mutable
+usage-file hash, so ordinary dev builds cannot mutate or authorize the product
+evidence. The focused projection/build-gate suite passes 13/13, including
+source-drift rejection, rejection of a lowering-plan override outside the
+checked projection digest, rejection of a self-consistent replacement for the
+checked product projection, an activation-marker requirement for runtime
+evidence, propagation of unpinned diagnostic status through link/run stages,
+and the fake Bob link stage. This is deterministic release-reachability and compile/link
+harness evidence, not full Static Hermes gameplay evidence.
+
+The same audit corrected the War Battles README's stale soak prose from 1,402
+kills to the 20 kills recorded by the current content-addressed 36,000-tick
+evidence. The evidence file remains authoritative.
+
 ## 2026-09-24 - Component proxy facts crossed the policy boundary
 
 `defold-component-proxy-contract.json` is now generated from each Defold
@@ -2751,3 +2779,24 @@ War Battles engine proof remains Dynamic Hermes and loaded
 `/deherm/app.dehermc`; no authored War Battles module is registered as the
 Static application yet, so this wave proves the runtime selection/lifecycle
 seam rather than a full Static gameplay graph.
+
+## 2026-09-24 - Packed SDK emitter and repository generator separation
+
+The npm package boundary audit found that the policy materializer imported
+script and dmSDK modules which also contained repository paths, reference-
+archive ingestion, reviewed overrides, and generator runners. Those modules
+are now split by ownership: `packages/compiler/src/sdk/` contains only the
+supplied-input emitters used by policy materialization, while the private
+`packages/generator/src/sdk/` modules own source ingestion and repository
+writes. Repository command shims and generator-source registries point at the
+private owners; materialization continues to reproduce the generated SDK.
+
+The packed-file classifier now fails closed when a path has neither a forbidden
+nor a positive stable classification. The previously implicit root metadata
+and binary files have explicit classes, and focused tests distinguish private
+generator entrypoints from the exact packed SDK emitters and pin their exported
+capabilities. The measured dry-run tarball remains 214 files. All 214 are
+classified, all five generated exceptions retain explicit package-side
+provenance, the 14 public entrypoints reach 87 local runtime inputs, and no
+packed file contains the full, 12-character, or binary-Base64 locked Defold
+revision identity.

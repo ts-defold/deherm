@@ -30,8 +30,8 @@
   "target": "arm64-macos",
   "status": "observed-clean",
   "artifactKey": "4b72278d41230dca02e18e34a3c1cffa4c041112b3df1163f63e329e0c16b2d3",
-  "sourceKey": "84bc5e635975fb47f70045714861e735e91ae46bacf12bff1d31343b735e2a62",
-  "evidenceKey": "602e91ade51341fd10d1e616dfc8802e160d1cee6a4165c473eb2882259ad077",
+  "sourceKey": "7bba2f5c6e72cf4e5e5f69120bc1d3a12dd6abefe2ef4481342dbbb2e2dc6eb8",
+  "evidenceKey": "da2cad2c410867c9110a48541f3c0d1729b086c9ac75cdfcef62f26780c1d23e",
   "artifacts": [
     {
       "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
@@ -92,12 +92,12 @@
     {
       "path": "examples/war-battles-online/defold/deherm.lock",
       "bytes": 28445,
-      "sha256": "bdc723ac91de29ff131349a4af05da0be7b905ac70a53de3f052fd6bfa3a1519"
+      "sha256": "d06b25c6caa7ff3e07c3dff80f344d2eeae12c4da38c3825e76b1640cfe4ffbd"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/ir/binding-lowering-plan.sentinel.json",
-      "bytes": 7065,
-      "sha256": "c5ea275213d7933aae7960037e6234446948b7b69d96d297cef94c174b3cb166"
+      "bytes": 7264,
+      "sha256": "d0bdf962ae56159264d41d5a93ec27a65741a4f2b1129059b17ba446c741e748"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/generated/components/manifest.json",
@@ -142,11 +142,11 @@
       "method": "system-exit",
       "exitCode": 0,
       "signal": null,
-      "port": 55015
+      "port": 63754
     },
     "transcript": {
       "canonicalLineCount": 62,
-      "canonicalSha256": "bf931a1ba7e221bd18f1fc98bd2886663a078bd7651238686aabec0699069abc"
+      "canonicalSha256": "9b33e9d8542d0e0201c2c2fa5215d0fb02325724d2832734788372fc31232054"
     }
   }
 }

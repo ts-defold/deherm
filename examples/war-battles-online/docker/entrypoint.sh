@@ -26,6 +26,7 @@ exec deno run --unstable-net --allow-net --allow-env --allow-read --allow-write 
   --key ./server/certs/localhost.key \
   --resume-key-file ./server/state/resume-key.hex \
   --session-state ./server/state/sessions.bin \
+  --world-checkpoint ./server/state/world.bin \
   --roster "${WAR_BATTLES_ROSTER}" \
   --bot-skill "${WAR_BATTLES_BOT_SKILL}" \
   ${WAR_BATTLES_EXTRA_ARGS:-}

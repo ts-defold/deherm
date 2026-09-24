@@ -17,7 +17,8 @@ services:
     volumes:
       # A stable named volume keeps the pinned certificate across restarts.
       - war-battles-local-cert:/srv/war-battles-online/server/certs
-      # The local resume key and bounded session ledger rotate only explicitly.
+      # The local resume key, session ledger, and authoritative world checkpoint
+      # rotate only explicitly.
       - war-battles-local-state:/srv/war-battles-online/server/state
     restart: unless-stopped
 

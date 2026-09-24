@@ -25,7 +25,7 @@
       "kind": "tree",
       "fileCount": 20,
       "bytes": 296845,
-      "sha256": "86e2293ca03d63f358eddac2c3762ec8c80944d4ca2db4fcf13d9d82e396c8b5"
+      "sha256": "28fd09626528e697a87df7ac8c077ce3c0d54b3e1115cd4f7ce97af5b5173749"
     },
     {
       "path": "examples/war-battles-online/headless/fixture.ts",
@@ -66,8 +66,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 44594,
-      "sha256": "ef75ef88f938bc89b61de963ab703b2752c2315f70933f4b72b1473e55941418"
+      "bytes": 44712,
+      "sha256": "8f07439a4890463159b4f4ee55b7f0fea8c279edd4128bf81733b241de69e809"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -76,6 +76,6 @@
       "sha256": "731a3267235b8c3e3d704d272f749586736c728c98ecacb1cc5b5abb95d5a51d"
     }
   ],
-  "sourceKey": "dc536c9d5f5675d8b771ed171ade07005f8d83c37bdceb41bfbc9fa1b5bfaf21",
+  "sourceKey": "7d910249b3516535ccfa366e11418e66c228c6d0353c63e20fcd803cacdf0f25",
   "evidenceBoundary": "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence."
 }

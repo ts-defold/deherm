@@ -30,6 +30,8 @@ import {
 } from "../core/deno-webtransport-server.ts";
 import { acceptDenoWebSocket } from "../core/deno-websocket-server.ts";
 import { DenoDurableSessionFile } from "./durable-session-file.ts";
+import { DenoDurableWorldFile } from "./durable-world-file.ts";
+import { DurableWorldCheckpoint } from "./world-persistence.ts";
 import type { GameTransport, TransportReceiver } from "../core/transport.ts";
 import type { ServerSession } from "../core/match-server.ts";
 
@@ -59,6 +61,8 @@ interface Options extends MatchServerOptions {
   resumeKeyText?: string;
   resumeKeyPath?: string;
   sessionStatePath?: string;
+  worldCheckpointPath?: string;
+  worldCheckpointIntervalTicks: number;
 }
 
 function parseArguments(argv: readonly string[]): Options {
@@ -72,6 +76,7 @@ function parseArguments(argv: readonly string[]): Options {
     botSkill: 2,
     snapshotIntervalTicks: 3,
     teams: false,
+    worldCheckpointIntervalTicks: TICK_RATE,
   };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]!;
@@ -88,6 +93,8 @@ function parseArguments(argv: readonly string[]): Options {
     else if (argument === "--resume-key") { options.resumeKeyText = required(value, argument); index += 1; }
     else if (argument === "--resume-key-file") { options.resumeKeyPath = required(value, argument); index += 1; }
     else if (argument === "--session-state") { options.sessionStatePath = required(value, argument); index += 1; }
+    else if (argument === "--world-checkpoint") { options.worldCheckpointPath = required(value, argument); index += 1; }
+    else if (argument === "--world-checkpoint-interval") { options.worldCheckpointIntervalTicks = integer(value, argument); index += 1; }
     else throw new Error(`unknown argument: ${argument}`);
   }
   return options;
@@ -132,6 +139,20 @@ export function admitNewSession<T>(admission: SessionAdmissionGate, create: () =
   return admission.allowed ? create() : undefined;
 }
 
+/** Restores world state before the transport listener can admit a session. */
+export async function restoreWorldBeforeAdmission(
+  server: MatchServer,
+  persistence: DurableWorldCheckpoint | undefined,
+): Promise<boolean> {
+  if (persistence === undefined) return false;
+  const restored = await persistence.restore(server.world);
+  if (restored) {
+    server.stats.tick = server.world.tick;
+    server.rebaseSessionClock();
+  }
+  return restored;
+}
+
 function required(value: string | undefined, option: string): string {
   if (value === undefined) throw new Error(`${option} requires a value`);
   return value;
@@ -171,6 +192,7 @@ const rejectedReceiver: TransportReceiver = {
 export async function main(argv: readonly string[]): Promise<void> {
   const options = parseArguments(argv);
   const statePath = options.sessionStatePath ?? Deno.env.get("WAR_BATTLES_SESSION_STATE");
+  const worldPath = options.worldCheckpointPath ?? Deno.env.get("WAR_BATTLES_WORLD_CHECKPOINT");
   const resumeKeyPath = options.resumeKeyPath ?? Deno.env.get("WAR_BATTLES_RESUME_KEY_FILE");
   let configuredResumeKeyText = options.resumeKeyText ?? Deno.env.get("WAR_BATTLES_RESUME_KEY");
   if (configuredResumeKeyText !== undefined && resumeKeyPath !== undefined) {
@@ -183,6 +205,14 @@ export async function main(argv: readonly string[]): Promise<void> {
   let ready = true;
   let stopping = false;
   const admission = createSessionAdmissionGate(true);
+  let sessionPersistenceHealthy = true;
+  let worldPersistenceHealthy = true;
+  const recoverAdmission = (): void => {
+    if (!stopping && sessionPersistenceHealthy && worldPersistenceHealthy) {
+      admission.recover();
+      ready = true;
+    }
+  };
   const ledger = new SessionLedger({
     matchId,
     rosterSize,
@@ -208,10 +238,11 @@ export async function main(argv: readonly string[]): Promise<void> {
     onSessionStateChange: (_reason, tick) => {
       if (persistence === undefined) return;
       void persistence.flush(tick).then(() => {
-        admission.recover();
-        if (!stopping) ready = true;
+        sessionPersistenceHealthy = true;
+        recoverAdmission();
       }).catch((error: unknown) => {
         console.error("war-battles-server:session-state-write-error:", error);
+        sessionPersistenceHealthy = false;
         admission.fail();
         ready = false;
       });
@@ -219,6 +250,15 @@ export async function main(argv: readonly string[]): Promise<void> {
     onError: (error: unknown) => console.error("war-battles-server:error:", error),
     onLog: (line: string) => console.log(`war-battles-server:${line}`),
   });
+  const worldPersistence = worldPath === undefined ? undefined : new DurableWorldCheckpoint(new DenoDurableWorldFile(worldPath), {
+    matchId,
+    mapSeed: server.world.mapSeed,
+    rosterSize: server.rosterSize,
+    teams: server.teams,
+  });
+  if (worldPersistence !== undefined && await restoreWorldBeforeAdmission(server, worldPersistence)) {
+    console.log(`war-battles-server:world-checkpoint:${worldPath}:tick=${server.world.tick}`);
+  }
 
   const pending = new Map<TransportReceiver, ServerSession>();
   const listener = DenoWebTransportServer.start({
@@ -341,11 +381,24 @@ export async function main(argv: readonly string[]): Promise<void> {
   // the real gate must observe that the authoritative server accepted input.
   const inputMilestone = 3;
   let inputMilestoneLogged = false;
+  let nextWorldCheckpointTick = server.world.tick + Math.max(1, options.worldCheckpointIntervalTicks);
   const timer = setInterval(() => {
     const now = Date.now();
     const elapsed = now - previous;
     previous = now;
     server.advance(elapsed, 8);
+    if (worldPersistence !== undefined && server.world.tick >= nextWorldCheckpointTick) {
+      nextWorldCheckpointTick = server.world.tick + Math.max(1, options.worldCheckpointIntervalTicks);
+      void worldPersistence.flush(server.world).then(() => {
+        worldPersistenceHealthy = true;
+        recoverAdmission();
+      }).catch((error: unknown) => {
+        console.error("war-battles-server:world-checkpoint-write-error:", error);
+        worldPersistenceHealthy = false;
+        admission.fail();
+        ready = false;
+      });
+    }
     if (!inputMilestoneLogged && server.stats.inputsAccepted >= inputMilestone) {
       inputMilestoneLogged = true;
       console.log(`war-battles-server:stats:inputs-accepted:count=${inputMilestone}`);
@@ -359,7 +412,13 @@ export async function main(argv: readonly string[]): Promise<void> {
     admission.fail();
     clearInterval(timer);
     server.close(1_001, "server shutting down");
-    void (persistence?.flush(server.sessionTick()) ?? Promise.resolve()).then(() => listener.close()).then(() => healthServer.shutdown()).then(() => {
+    const sessionFlush = persistence?.flush(server.sessionTick()) ?? Promise.resolve();
+    const worldFlush = worldPersistence?.flush(server.world) ?? Promise.resolve();
+    void Promise.allSettled([sessionFlush, worldFlush]).then((results) => {
+      const failed = results.find((result) => result.status === "rejected");
+      if (failed?.status === "rejected") throw failed.reason;
+      return listener.close();
+    }).then(() => healthServer.shutdown()).then(() => {
       console.log("war-battles-server:stopped");
       Deno.exit(0);
     }).catch((error: unknown) => {

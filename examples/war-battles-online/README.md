@@ -200,6 +200,17 @@ endpoint and require `stats.inputsAccepted >= 3` plus the exact
 exclusive packaged observations, not labels copied from a standalone adapter
 harness.
 
+The Deno host can also persist the authoritative match. Configure
+`--world-checkpoint` or `WAR_BATTLES_WORLD_CHECKPOINT` to store a fixed-size,
+versioned and checksummed wrapper around the canonical world snapshot. Startup
+restores this image before session admission; a 60-tick control-plane boundary
+and orderly shutdown write it atomically. Slow storage retains only one active
+write and one coalesced latest image. Match, arena, roster, and team-mode
+identity are repeated outside the payload, so truncated, corrupt, or foreign
+checkpoints fail closed. Restore rebases the admission clock against the
+session ledger, preventing the restored world tick from being counted twice.
+Docker mounts this beside the resume ledger as `server/state/world.bin`.
+
 The compact snapshot unit test independently proves the codec against a full
 32-player world: the former 17,640-byte frame is now a 17,776-byte keyframe,
 while the measured 20 Hz bot trace uses 1,869–3,201-byte deltas (p50 2,438).
@@ -212,7 +223,7 @@ benchmark.
 
 [`evidence/headless-soak.json`](./evidence/headless-soak.json) is a ten-minute
 32-bot match: 36,000 ticks, a 36,864,032-byte replay of the inputs the real bot
-controller produced, 1,402 kills, and an authoritative restore-and-replay that
+controller produced, 20 kills, and an authoritative restore-and-replay that
 finishes at the same state hash as uninterrupted play. In-process determinism
 only — not a network, Defold, rendering or allocation result.
 

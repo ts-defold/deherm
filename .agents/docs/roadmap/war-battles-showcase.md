@@ -291,8 +291,10 @@ credential is a fixed-size HMAC-SHA-256 token issued by the injected
 `SessionLedger`. Focused tests cover identity/state retention, keyframe
 recovery, token rotation, invalid/stale/foreign rejection, tampering, and
 restart restore. A deployment must configure the same secret across restarts.
-The durable checkpoint covers admission identity/generation and reservation
-state only; it does not claim persistence of `BattleWorld` simulation state.
+The durable session ledger covers admission identity/generation and reservation
+state, while the Deno host's separate world checkpoint covers the fixed
+`BattleWorld` simulation image. They are restored before admission; the world
+restore rebases the admission clock against the ledger checkpoint.
 
 The control-plane replacement seam is now implemented in
 `examples/war-battles-online/core/session-auth.ts` and
@@ -482,6 +484,19 @@ This tranche does not claim native Defold networking, WAN deployment,
 matchmaking/account identity, network failover, or dedicated-server failover.
 Authenticated resume credentials, fail-closed durable admission, and local
 Docker process-restart resume are now proven at their named boundaries.
+The Deno host also owns a fixed-size, versioned and checksummed authoritative
+world checkpoint. It restores the checkpoint before opening transport listeners,
+writes at an explicit 60-tick control-plane boundary and during orderly
+shutdown, coalesces slow storage to one active plus one latest pending image,
+and atomically replaces the state file. Match/arena/roster/team-mode identity is
+repeated outside the canonical world payload; truncated, corrupt, or foreign
+checkpoints fail closed. Restore rebases the admission clock against the
+session ledger so the world tick is not counted twice. The focused restart test proves state-hash equality
+and restored tick/state before a new session is admitted. Slow and failing
+storage tests prove the retained queue stays bounded and that the single latest
+retry can recover without preserving an unbounded history. This remains local
+Deno/Docker evidence, not a claim that Colyseus H3 interop or native Defold
+transport is complete.
 Production acknowledgement, Origin policy, non-root volume ownership, fsync,
 and wrap-safe deadline work is tracked in
 [`#126`](https://github.com/ts-defold/deherm/issues/126); those frontiers are

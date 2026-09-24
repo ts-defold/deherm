@@ -125,7 +125,7 @@ export class MatchServer {
   readonly resumeTokenService: SessionTokenProvider;
   readonly sessionLedger: SessionLedger;
   /** World ticks restart at zero; admission ticks continue from the checkpoint. */
-  readonly sessionTickBase: number;
+  private sessionTickBase: number;
   private readonly onSessionStateChange: (reason: "commit" | "release", tick: number) => void;
   private closed = false;
 
@@ -225,6 +225,11 @@ export class MatchServer {
   /** Logical admission tick used by credentials and grace windows. */
   sessionTick(): number {
     return (this.sessionTickBase + this.world.tick) >>> 0;
+  }
+
+  /** Rebase admission time after restoring a world checkpoint. */
+  rebaseSessionClock(): void {
+    this.sessionTickBase = (this.sessionLedger.persistedCheckpointTick - this.world.tick) >>> 0;
   }
 
   // --- session plumbing -----------------------------------------------------
