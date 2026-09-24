@@ -16,6 +16,7 @@ import {
   CONTROL_BUY_UPGRADE,
   CONTROL_SET_CHASSIS,
   CONTROL_SET_WEAPON_UPGRADE,
+  DEFAULT_ARENA_SEED,
   EVENT_KILL,
   EVENT_EJECT,
   EVENT_TANK_ACQUIRED,
@@ -86,6 +87,17 @@ import {
   writeWelcome,
   writeWelcomeAck,
 } from "../core/index.ts";
+import {
+  ARENA_DECOR_ROLE_COUNT,
+  ARENA_GROUND_ROLE_WALL_BASE,
+  ARENA_MARK_ROLE_COUNT,
+  ARENA_VISUAL_CELL_COUNT,
+  ARENA_WALL_MASK_BITS,
+  ARENA_WALL_MASK_TO_FRAME,
+  arenaThemeIndex,
+  arenaWallMask,
+  projectArenaVisualRoles,
+} from "../core/arena-visual.ts";
 import {
   CHASSIS_ARTILLERY,
   CHASSIS_BULWARK,
@@ -464,6 +476,63 @@ test("the arena is reproducible from its seed, point-symmetric and fully connect
   // Cover, but still an arena: somewhere between a field and a maze.
   const solid = MAP_WIDTH * MAP_HEIGHT - first.openCellCount();
   assert.ok(solid > 800 && solid < 3_000, `arena has ${solid} solid cells`);
+});
+
+test("the arena visual projector owns an explicit and exhaustive four-neighbour wall grammar", () => {
+  assert.deepEqual(ARENA_WALL_MASK_BITS, { north: 1, south: 2, east: 4, west: 8 });
+  assert.deepEqual(
+    [...ARENA_WALL_MASK_TO_FRAME],
+    [
+      "centre",
+      "centre",
+      "centre",
+      "centre",
+      "centre",
+      "sw",
+      "nw",
+      "w",
+      "centre",
+      "se",
+      "ne",
+      "e",
+      "centre",
+      "s",
+      "n",
+      "centre",
+    ],
+  );
+  for (let expected = 0; expected < 16; expected += 1) {
+    const map = {
+      cellAt(cellX, cellY) {
+        if (cellX === 1 && cellY === 2) return (expected & ARENA_WALL_MASK_BITS.north) === 0 ? CELL_FLOOR : CELL_WALL;
+        if (cellX === 1 && cellY === 0) return (expected & ARENA_WALL_MASK_BITS.south) === 0 ? CELL_FLOOR : CELL_WALL;
+        if (cellX === 2 && cellY === 1) return (expected & ARENA_WALL_MASK_BITS.east) === 0 ? CELL_FLOOR : CELL_WALL;
+        if (cellX === 0 && cellY === 1) return (expected & ARENA_WALL_MASK_BITS.west) === 0 ? CELL_FLOOR : CELL_WALL;
+        return CELL_FLOOR;
+      },
+    };
+    assert.equal(arenaWallMask(map, 1, 1), expected, `wall mask ${expected} must round-trip`);
+    assert.ok(ARENA_WALL_MASK_TO_FRAME[expected].length > 0);
+  }
+});
+
+test("one allocation-free semantic projection drives every arena theme", () => {
+  const map = new ArenaMap(DEFAULT_ARENA_SEED);
+  const ground = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  const decor = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  const marks = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  projectArenaVisualRoles(map, DEFAULT_ARENA_SEED, ground, decor, marks);
+  assert.ok(ground.some((role) => role < 4));
+  assert.ok(ground.some((role) => role >= ARENA_GROUND_ROLE_WALL_BASE && role < ARENA_GROUND_ROLE_WALL_BASE + 16));
+  assert.ok(decor.some((role) => role > 0 && role < ARENA_DECOR_ROLE_COUNT));
+  assert.ok(marks.some((role) => role > 0 && role < ARENA_MARK_ROLE_COUNT));
+  assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED, DEFAULT_ARENA_SEED, 3), 0);
+  assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED ^ 1, DEFAULT_ARENA_SEED, 3), 1);
+  assert.equal(arenaThemeIndex(DEFAULT_ARENA_SEED ^ 2, DEFAULT_ARENA_SEED, 3), 2);
+  assert.throws(
+    () => projectArenaVisualRoles(map, DEFAULT_ARENA_SEED ^ 1, ground, decor, marks),
+    /visual seed does not match/,
+  );
 });
 
 test("line of sight is blocked by cover and spawn pads stand in the open", () => {
@@ -1275,6 +1344,14 @@ async function settle() {
   }
 }
 
+async function settleUntil(predicate, what, maximumTurns = 64) {
+  for (let turn = 0; turn < maximumTurns; turn += 1) {
+    if (predicate()) return;
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  if (!predicate()) throw new Error(`${what} did not settle within ${maximumTurns} event-loop turns`);
+}
+
 test("a welcomed player resumes its slot and the new stream starts from a keyframe", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, botSkill: 1, onError: (error) => errors.push(error) });
@@ -1462,7 +1539,7 @@ test("a welcome enqueued without credential acknowledgement keeps the previous t
   const errors = [];
   const server = new MatchServer({ rosterSize: 1, resumeGraceTicks: 600 });
   const owner = join(server, "owner", errors);
-  await settle();
+  await settleUntil(() => owner.state === "ready", "initial owner welcome");
   const oldToken = owner.resumeToken.slice();
   const generation = server.sessionLedger.generation[0];
   owner.close(1_001, "link lost");
@@ -1470,15 +1547,15 @@ test("a welcome enqueued without credential acknowledgement keeps the previous t
   const lostAck = new BattleClient({ onError: (error) => errors.push(error) });
   lostAck.resumeToken.set(oldToken);
   failWelcome(server, lostAck, "drop-ack");
-  await settle();
+  await settleUntil(() => lostAck.state === "ready", "unacknowledged welcome delivery");
   assert.equal(lostAck.state, "ready", "the client did receive the welcome before its acknowledgement was lost");
   assert.equal(server.sessionLedger.generation[0], generation, "enqueue alone must not rotate durable admission");
   for (let tick = 0; tick < 302; tick += 1) server.step();
-  await settle();
+  await settleUntil(() => lostAck.state === "closed", "unacknowledged welcome timeout");
   assert.equal(lostAck.state, "closed", "an unacknowledged welcome must release its slot on a bounded timer");
 
   const retry = join(server, "retry", errors, { resumeToken: oldToken });
-  await settle();
+  await settleUntil(() => retry.state === "ready", "old-token retry");
   assert.equal(retry.state, "ready");
   assert.equal(server.sessionLedger.generation[0], generation + 1);
   server.close();
@@ -1489,7 +1566,7 @@ test("a failed resumed welcome preserves the original grace deadline", async () 
   const errors = [];
   const server = new MatchServer({ rosterSize: 1, resumeGraceTicks: 2 });
   const owner = join(server, "owner", errors);
-  await settle();
+  await settleUntil(() => owner.state === "ready", "short-grace owner welcome");
   const oldToken = owner.resumeToken.slice();
   owner.close(1_001, "link lost");
   server.step();
@@ -1497,7 +1574,7 @@ test("a failed resumed welcome preserves the original grace deadline", async () 
   const failedResume = new BattleClient({ onError: (error) => errors.push(error) });
   failedResume.resumeToken.set(oldToken);
   failWelcome(server, failedResume, "closed");
-  await settle();
+  await settleUntil(() => failedResume.state === "closed", "failed resumed welcome");
   assert.equal(failedResume.state, "closed");
 
   server.step();
@@ -1507,7 +1584,7 @@ test("a failed resumed welcome preserves the original grace deadline", async () 
     resumeToken: oldToken,
     onReject: (reject) => rejects.push({ ...reject }),
   });
-  await settle();
+  await settleUntil(() => expired.state === "rejected", "expired resume rejection");
   assert.equal(expired.state, "rejected");
   assert.equal(rejects[0].code, REJECT_BAD_RESUME);
   server.close();

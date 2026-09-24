@@ -17,6 +17,7 @@ import {
   BattleClient,
   BrowserWebSocketClient,
   BrowserWebTransportClient,
+  DEFAULT_ARENA_SEED,
   EVENT_EXPLOSION,
   EVENT_FIRE,
   EVENT_COVER_CHANGED,
@@ -29,6 +30,7 @@ import {
   MAX_PICKUPS,
   MAX_PROJECTILES,
   MAX_COVER_PANELS,
+  MAP_WIDTH,
   cellOfX,
   cellOfY,
   WEAPON_MORTAR,
@@ -37,6 +39,15 @@ import {
   type GameTransport,
   type TransportReceiver,
 } from "../src/generated-war-battles/index";
+import {
+  ARENA_MARK_ROLE_CRATE,
+  ARENA_MARK_ROLE_SANDBAG,
+  ARENA_VISUAL_CELL_COUNT,
+  arenaThemeIndex,
+  projectArenaVisualRoles,
+} from "../src/generated-war-battles/arena-visual";
+import { ArenaMap } from "../src/generated-war-battles/arena";
+import { ARENA_ART_THEMES, arenaDecorTileId, arenaGroundTileId, arenaMarkTileId } from "../src/generated-arena-art";
 import { MAX_VISIBLE_PROJECTILES, pixelX, pixelY, startArena, type ArenaMatch } from "../src/arena-match";
 
 interface WarBattlesRuntimeConfig {
@@ -88,11 +99,9 @@ const RESTART = hashLiteral("#restart");
 const CAMERA = "/camera#follow";
 const CAMERA_IMPACT = "camera_impact";
 const ARENA_TILEMAP = "/level#tilemap";
+const ARENA_GROUND_LAYER = "ground";
+const ARENA_DECOR_LAYER = "decor";
 const ARENA_MARKS_LAYER = "marks";
-// Stable IDs emitted by tools/generate-art.mjs and checked against the art
-// manifest by the integration suite. Defold's set_tile API uses one-based IDs.
-const CRATE_TILE = 14;
-const SANDBAG_TILE = 15;
 
 const SFX_FIRE = "#sfx_fire";
 const SFX_HIT = "#sfx_hit";
@@ -145,6 +154,15 @@ interface ArenaSelf {
   spawnedPickup: Uint8Array;
   /** 0 intact, 1 destroyed; fixed-width visual cache avoids engine calls on steady frames. */
   coverVisualDestroyed?: Uint8Array;
+  /** Seed/theme currently projected into Defold's three tilemap layers. */
+  visualMapSeed?: number;
+  visualTheme?: number;
+  visualGroundRoles?: Uint8Array;
+  visualDecorRoles?: Uint8Array;
+  visualMarkRoles?: Uint8Array;
+  visualGroundScratch?: Uint8Array;
+  visualDecorScratch?: Uint8Array;
+  visualMarkScratch?: Uint8Array;
   visibleProjectiles: number;
   effectIds: DefoldHash[];
   effectTicks: number[];
@@ -387,10 +405,87 @@ function syncCoverTiles(self: ArenaSelf): void {
     const cellX = cellOfX(world.map.coverX[panel]!);
     const cellY = cellOfY(world.map.coverY[panel]!);
     const cell = world.map.cellAt(cellX, cellY);
-    const tile = destroyed === 1 ? 0 : cell === CELL_CRATE ? CRATE_TILE : cell === CELL_SANDBAG ? SANDBAG_TILE : 0;
+    const role = cell === CELL_CRATE ? ARENA_MARK_ROLE_CRATE : cell === CELL_SANDBAG ? ARENA_MARK_ROLE_SANDBAG : 0;
+    const tile = destroyed === 1 ? 0 : arenaMarkTileId(self.visualTheme ?? 0, role);
     tilemap.setTile(ARENA_TILEMAP, ARENA_MARKS_LAYER, cellX + 1, cellY + 1, tile);
     visualDestroyed[panel] = destroyed;
   }
+}
+
+function ensureArenaVisualState(self: ArenaSelf): void {
+  if (
+    self.visualGroundRoles !== undefined &&
+    self.visualDecorRoles !== undefined &&
+    self.visualMarkRoles !== undefined &&
+    self.visualGroundScratch !== undefined &&
+    self.visualDecorScratch !== undefined &&
+    self.visualMarkScratch !== undefined &&
+    self.visualMapSeed !== undefined &&
+    self.visualTheme !== undefined
+  ) {
+    return;
+  }
+  self.visualGroundRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualDecorRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualMarkRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualGroundScratch = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualDecorScratch = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  self.visualMarkScratch = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+  const baseline = new ArenaMap(DEFAULT_ARENA_SEED);
+  projectArenaVisualRoles(
+    baseline,
+    DEFAULT_ARENA_SEED,
+    self.visualGroundRoles,
+    self.visualDecorRoles,
+    self.visualMarkRoles,
+  );
+  self.visualMapSeed = DEFAULT_ARENA_SEED;
+  self.visualTheme = arenaThemeIndex(DEFAULT_ARENA_SEED, DEFAULT_ARENA_SEED, ARENA_ART_THEMES.length);
+}
+
+/**
+ * Re-project only when the authoritative map changes. The six fixed arrays are
+ * retained on `self`; steady frames allocate nothing and make no tilemap calls.
+ */
+function syncArenaVisualMap(self: ArenaSelf): void {
+  const world = self.match.world;
+  if (world === undefined) return;
+  ensureArenaVisualState(self);
+  const seed = world.mapSeed >>> 0;
+  const theme = arenaThemeIndex(seed, DEFAULT_ARENA_SEED, ARENA_ART_THEMES.length);
+  if (self.visualMapSeed === seed && self.visualTheme === theme) return;
+
+  const currentGround = self.visualGroundRoles!;
+  const currentDecor = self.visualDecorRoles!;
+  const currentMarks = self.visualMarkRoles!;
+  const nextGround = self.visualGroundScratch!;
+  const nextDecor = self.visualDecorScratch!;
+  const nextMarks = self.visualMarkScratch!;
+  const priorTheme = self.visualTheme!;
+  projectArenaVisualRoles(world.map, seed, nextGround, nextDecor, nextMarks);
+  for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
+    const x = (index % MAP_WIDTH) + 1;
+    const y = Math.floor(index / MAP_WIDTH) + 1;
+    const oldGround = arenaGroundTileId(priorTheme, currentGround[index]!);
+    const newGround = arenaGroundTileId(theme, nextGround[index]!);
+    const oldDecor = arenaDecorTileId(priorTheme, currentDecor[index]!);
+    const newDecor = arenaDecorTileId(theme, nextDecor[index]!);
+    const oldMark = arenaMarkTileId(priorTheme, currentMarks[index]!);
+    const newMark = arenaMarkTileId(theme, nextMarks[index]!);
+    if (oldGround !== newGround) tilemap.setTile(ARENA_TILEMAP, ARENA_GROUND_LAYER, x, y, newGround);
+    if (oldDecor !== newDecor) tilemap.setTile(ARENA_TILEMAP, ARENA_DECOR_LAYER, x, y, newDecor);
+    if (oldMark !== newMark) tilemap.setTile(ARENA_TILEMAP, ARENA_MARKS_LAYER, x, y, newMark);
+  }
+  self.visualGroundRoles = nextGround;
+  self.visualDecorRoles = nextDecor;
+  self.visualMarkRoles = nextMarks;
+  self.visualGroundScratch = currentGround;
+  self.visualDecorScratch = currentDecor;
+  self.visualMarkScratch = currentMarks;
+  self.visualMapSeed = seed;
+  self.visualTheme = theme;
+  self.coverVisualDestroyed?.fill(0);
+  defold.log("info", `war-battles:arena-theme:${ARENA_ART_THEMES[theme]!.id}:seed=${seed}`);
 }
 
 function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): void {
@@ -695,6 +790,7 @@ export default defineComponent({
       botSkill: Math.max(0, Math.min(3, Math.trunc(self.botSkill))),
       mapSeed: self.mapSeed > 0 ? Math.trunc(self.mapSeed) : 0,
     });
+    syncArenaVisualMap(self);
     self.online = connectOnline(self);
     updateTelemetry(self);
     defold.log("info", `war-battles:arena-init:players=${players}:online=${self.online ? 1 : 0}`);
@@ -714,6 +810,7 @@ export default defineComponent({
 
   update(self: ArenaSelf, dt: number): void {
     self.elapsed += dt;
+    syncArenaVisualMap(self);
     if (!self.engaged) {
       if (self.autoEngageSeconds > 0 && self.elapsed >= self.autoEngageSeconds) engage(self);
       updateTelemetry(self);

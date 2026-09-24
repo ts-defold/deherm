@@ -4,7 +4,11 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { EXPECTED_PROPERTIES, verifyVisualEvidence } from "../integration/vscode-visual-evidence.mjs";
+import {
+  EXPECTED_LIVE_PROPERTIES,
+  EXPECTED_PROPERTY_DEFAULTS,
+  verifyVisualEvidence,
+} from "../integration/vscode-visual-evidence.mjs";
 
 const exampleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(exampleRoot, "../..");
@@ -12,7 +16,11 @@ const repositoryRoot = path.resolve(exampleRoot, "../..");
 test("recorded VS Code evidence shows genuine live arena values", async () => {
   const document = JSON.parse(await readFile(path.join(exampleRoot, "evidence/vscode-live-values.json"), "utf8"));
   await verifyVisualEvidence(document, repositoryRoot);
-  assert.deepEqual(document.observation.properties, EXPECTED_PROPERTIES);
+  assert.deepEqual(document.observation.properties, EXPECTED_LIVE_PROPERTIES);
+  assert.deepEqual(
+    document.observation.inlineValueTexts,
+    Object.values(EXPECTED_PROPERTY_DEFAULTS).map((value) => `= ${value}`),
+  );
   assert.equal(document.observation.targetId, "local-engine");
   assert.equal(document.observation.instanceId.slot, 0);
   assert.equal(document.observation.instanceId.generation, 1);

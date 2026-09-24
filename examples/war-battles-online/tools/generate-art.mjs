@@ -27,6 +27,25 @@ import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { deflateSync, inflateSync } from "node:zlib";
 
+import {
+  ARENA_DECOR_ROLE_COUNT,
+  ARENA_DECOR_ROLE_FLOOR_VENT,
+  ARENA_DECOR_ROLE_LAVA_FISSURE,
+  ARENA_DECOR_ROLE_PICKUP_PEDESTAL,
+  ARENA_DECOR_ROLE_PIPE_JUNCTION,
+  ARENA_DECOR_ROLE_PIPE_RUN,
+  ARENA_DECOR_ROLE_THERMAL_VENT,
+  ARENA_GROUND_ROLE_WALL_BASE,
+  ARENA_GROUND_VARIANT_COUNT,
+  ARENA_MARK_ROLE_COUNT,
+  ARENA_MARK_ROLE_CRATE,
+  ARENA_MARK_ROLE_PICKUP,
+  ARENA_MARK_ROLE_SANDBAG,
+  ARENA_MARK_ROLE_SPAWN,
+  ARENA_WALL_MASK_BITS,
+  ARENA_WALL_MASK_TO_FRAME,
+} from "../core/arena-visual.ts";
+
 const here = dirname(fileURLToPath(import.meta.url));
 const exampleRoot = resolve(here, "..");
 const projectRoot = resolve(exampleRoot, "defold");
@@ -34,6 +53,7 @@ const assetsRoot = resolve(projectRoot, "assets");
 const outputRoot = resolve(assetsRoot, "derived", "arena");
 const worldArtRoot = resolve(assetsRoot, "derived", "world");
 const mainRoot = resolve(projectRoot, "main");
+const sourceRoot = resolve(projectRoot, "src");
 
 /** Fixed seed keeps every noise field and scatter byte-reproducible. */
 const SEED = 0x41524e41; // "ARNA"
@@ -685,6 +705,57 @@ const TEAM_ORDER = ["blue", "red", "green", "sand"];
 const TILE = 16;
 const SHEET_COLUMNS = 8;
 
+const ARENA_THEMES = Object.freeze([
+  Object.freeze({ id: "frontier", name: "Frontier", replacements: [] }),
+  Object.freeze({
+    id: "refinery",
+    name: "Slate Refinery",
+    replacements: [
+      [C.groundDeep, C.shadowDeep],
+      [C.groundDark, C.metalDark],
+      [C.groundBase, C.metalMid],
+      [C.groundLight, C.metalLight],
+      [C.dustMid, C.smokeDark],
+      [C.dustLight, C.smokeLight],
+      [C.woodDark, C.emberDeep],
+      [C.woodBase, C.ember],
+      [C.woodLight, C.flame],
+      [C.woodHi, C.goldLight],
+    ],
+  }),
+  Object.freeze({
+    id: "canyon",
+    name: "Ember Canyon",
+    replacements: [
+      [C.groundDeep, C.woodDark],
+      [C.groundDark, C.dustMid],
+      [C.groundBase, C.woodLight],
+      [C.groundLight, C.dustLight],
+      [C.shadowDeep, C.woodDark],
+      [C.metalDark, C.woodBase],
+      [C.metalMid, C.woodLight],
+      [C.metalLight, C.dustLight],
+      [C.metalHi, C.hot],
+    ],
+  }),
+]);
+
+const colorKey = (color) => `${color[0]},${color[1]},${color[2]},${color[3] ?? 255}`;
+
+function applyTheme(canvas, theme) {
+  const themed = canvas.clone();
+  if (theme.replacements.length === 0) return themed;
+  const replacements = new Map(theme.replacements.map(([from, to]) => [colorKey(from), to]));
+  for (let y = 0; y < themed.height; y += 1) {
+    for (let x = 0; x < themed.width; x += 1) {
+      const pixel = themed.get(x, y);
+      const replacement = replacements.get(colorKey(pixel));
+      if (replacement) themed.set(x, y, replacement);
+    }
+  }
+  return themed;
+}
+
 /**
  * Import the checked Sprite Fusion selections through our local world-art
  * projection. Defold still owns the final tile sheet and map: the external
@@ -937,7 +1008,7 @@ function pickupPadTile() {
  * `layer` says whether a tile replaces the ground or overlays it.
  */
 function buildTileSheet() {
-  const tiles = [
+  const baseTiles = [
     { role: "ground.0", layer: "ground", canvas: groundTile(0) },
     { role: "ground.1", layer: "ground", canvas: groundTile(1) },
     { role: "ground.2", layer: "ground", canvas: groundTile(2) },
@@ -957,6 +1028,15 @@ function buildTileSheet() {
     { role: "pickupPad", layer: "overlay", canvas: pickupPadTile() },
     ...loadWorldTiles(),
   ];
+  const tiles = ARENA_THEMES.flatMap((theme) =>
+    baseTiles.map((tile) => ({
+      ...tile,
+      role: `theme.${theme.id}.${tile.role}`,
+      semanticRole: tile.role,
+      theme: theme.id,
+      canvas: applyTheme(tile.canvas, theme),
+    })),
+  );
   const rows = Math.ceil(tiles.length / SHEET_COLUMNS);
   const sheet = new Canvas(SHEET_COLUMNS * TILE, rows * TILE);
   tiles.forEach((tile, index) => {
@@ -1953,32 +2033,44 @@ function check(label, condition, detail) {
  * 1px perimeter - never at an interior seam.
  */
 function verifyWallSeams(tiles) {
-  const byRole = new Map(tiles.map((tile) => [tile.role, tile.canvas]));
   const layout = [
     ["wall.nw", "wall.n", "wall.n", "wall.ne"],
     ["wall.w", "wall.centre", "wall.centre", "wall.e"],
     ["wall.w", "wall.centre", "wall.centre", "wall.e"],
     ["wall.sw", "wall.s", "wall.s", "wall.se"],
   ];
-  const block = new Canvas(4 * TILE, 4 * TILE);
-  layout.forEach((row, j) => row.forEach((role, i) => block.blit(byRole.get(role), i * TILE, j * TILE)));
+  for (const theme of ARENA_THEMES) {
+    const byRole = new Map(
+      tiles.filter((tile) => tile.theme === theme.id).map((tile) => [tile.semanticRole, tile.canvas]),
+    );
+    const block = new Canvas(4 * TILE, 4 * TILE);
+    layout.forEach((row, j) => row.forEach((role, i) => block.blit(byRole.get(role), i * TILE, j * TILE)));
 
-  let transparent = 0;
-  let interiorOutline = 0;
-  let perimeterNonOutline = 0;
-  const isOutline = (c) => c[0] === C.outline[0] && c[1] === C.outline[1] && c[2] === C.outline[2];
-  for (let y = 0; y < block.height; ++y) {
-    for (let x = 0; x < block.width; ++x) {
-      const pixel = block.get(x, y);
-      if (pixel[3] === 0) transparent += 1;
-      const perimeter = x === 0 || y === 0 || x === block.width - 1 || y === block.height - 1;
-      if (!perimeter && isOutline(pixel)) interiorOutline += 1;
-      if (perimeter && !isOutline(pixel)) perimeterNonOutline += 1;
+    let transparent = 0;
+    let interiorOutline = 0;
+    let perimeterNonOutline = 0;
+    const isOutline = (c) => c[0] === C.outline[0] && c[1] === C.outline[1] && c[2] === C.outline[2];
+    for (let y = 0; y < block.height; ++y) {
+      for (let x = 0; x < block.width; ++x) {
+        const pixel = block.get(x, y);
+        if (pixel[3] === 0) transparent += 1;
+        const perimeter = x === 0 || y === 0 || x === block.width - 1 || y === block.height - 1;
+        if (!perimeter && isOutline(pixel)) interiorOutline += 1;
+        if (perimeter && !isOutline(pixel)) perimeterNonOutline += 1;
+      }
     }
+    check(`${theme.id} wall block 4x4 is fully opaque`, transparent === 0, `${transparent} transparent px`);
+    check(
+      `${theme.id} wall seams carry no interior outline`,
+      interiorOutline === 0,
+      `${interiorOutline} interior outline px`,
+    );
+    check(
+      `${theme.id} wall block perimeter is a clean 1px border`,
+      perimeterNonOutline === 0,
+      `${perimeterNonOutline} stray px`,
+    );
   }
-  check("wall block 4x4 is fully opaque", transparent === 0, `${transparent} transparent px`);
-  check("wall seams carry no interior outline", interiorOutline === 0, `${interiorOutline} interior outline px`);
-  check("wall block perimeter is a clean 1px border", perimeterNonOutline === 0, `${perimeterNonOutline} stray px`);
 }
 
 function verifySandbagWrap(canvas) {
@@ -2026,11 +2118,124 @@ function verifySprite(sprite, bytes) {
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 
+function buildThemeMap(theme, tiles) {
+  const themed = tiles.filter((tile) => tile.theme === theme.id);
+  const tileId = (role) => {
+    const tile = themed.find((candidate) => candidate.semanticRole === role);
+    if (!tile) throw new Error(`theme ${theme.id} has no tile for ${role}`);
+    return tile.id;
+  };
+  const wallTileIds = Object.fromEntries(
+    themed.filter((tile) => tile.semanticRole.startsWith("wall.")).map((tile) => [tile.semanticRole.slice(5), tile.id]),
+  );
+  const wallMaskTileIds = ARENA_WALL_MASK_TO_FRAME.map((role) => wallTileIds[role]);
+  const groundTileIds = Array.from({ length: ARENA_GROUND_VARIANT_COUNT }, (_, index) => tileId(`ground.${index}`));
+  const groundRoleTileIds = Array.from({ length: ARENA_GROUND_ROLE_WALL_BASE + 16 }, () => 0);
+  groundTileIds.forEach((id, index) => {
+    groundRoleTileIds[index] = id;
+  });
+  wallMaskTileIds.forEach((id, mask) => {
+    groundRoleTileIds[ARENA_GROUND_ROLE_WALL_BASE + mask] = id;
+  });
+
+  const markRoleTileIds = Array.from({ length: ARENA_MARK_ROLE_COUNT }, () => 0);
+  markRoleTileIds[ARENA_MARK_ROLE_CRATE] = tileId("crate");
+  markRoleTileIds[ARENA_MARK_ROLE_SANDBAG] = tileId("sandbag");
+  markRoleTileIds[ARENA_MARK_ROLE_SPAWN] = tileId("spawnPad");
+  markRoleTileIds[ARENA_MARK_ROLE_PICKUP] = tileId("world.pickup-pedestal");
+
+  const decorRoleTileIds = Array.from({ length: ARENA_DECOR_ROLE_COUNT }, () => 0);
+  decorRoleTileIds[ARENA_DECOR_ROLE_FLOOR_VENT] = tileId("world.floor-vent");
+  decorRoleTileIds[ARENA_DECOR_ROLE_LAVA_FISSURE] = tileId("world.lava-fissure");
+  decorRoleTileIds[ARENA_DECOR_ROLE_PICKUP_PEDESTAL] = tileId("world.pickup-pedestal");
+  decorRoleTileIds[ARENA_DECOR_ROLE_PIPE_JUNCTION] = tileId("world.pipe-junction");
+  decorRoleTileIds[ARENA_DECOR_ROLE_PIPE_RUN] = tileId("world.pipe-run");
+  decorRoleTileIds[ARENA_DECOR_ROLE_THERMAL_VENT] = tileId("world.thermal-vent");
+
+  return {
+    id: theme.id,
+    name: theme.name,
+    groundTileIds,
+    wallTileIds,
+    wallMaskTileIds,
+    groundRoleTileIds,
+    markRoleTileIds,
+    decorRoleTileIds,
+    crateTileId: markRoleTileIds[ARENA_MARK_ROLE_CRATE],
+    sandbagTileId: markRoleTileIds[ARENA_MARK_ROLE_SANDBAG],
+    spawnPadTileId: markRoleTileIds[ARENA_MARK_ROLE_SPAWN],
+    pickupPadTileId: tileId("pickupPad"),
+    worldTileIds: Object.fromEntries(
+      themed
+        .filter((tile) => tile.semanticRole.startsWith("world."))
+        .map((tile) => [tile.semanticRole.slice(6), tile.id]),
+    ),
+  };
+}
+
+function renderArenaArtContract(themeMaps) {
+  const themes = themeMaps.map(({ id, name, groundRoleTileIds, markRoleTileIds, decorRoleTileIds }) => ({
+    id,
+    name,
+    groundRoleTileIds,
+    markRoleTileIds,
+    decorRoleTileIds,
+  }));
+  const renderNumberArray = (property, values) => {
+    const inline = `    ${property}: [${values.join(", ")}],`;
+    if (inline.length <= 120) return [inline];
+    const lines = [];
+    let line = "      ";
+    for (const value of values) {
+      const token = `${value},`;
+      if (line.length > 6 && line.length + token.length + 1 > 120) {
+        lines.push(line);
+        line = "      ";
+      }
+      line += line.length === 6 ? token : ` ${token}`;
+    }
+    lines.push(line);
+    return [`    ${property}: [`, ...lines, "    ],"];
+  };
+  const renderedThemes = themes.flatMap((theme) => [
+    "  {",
+    `    id: ${JSON.stringify(theme.id)},`,
+    `    name: ${JSON.stringify(theme.name)},`,
+    ...renderNumberArray("groundRoleTileIds", theme.groundRoleTileIds),
+    ...renderNumberArray("markRoleTileIds", theme.markRoleTileIds),
+    ...renderNumberArray("decorRoleTileIds", theme.decorRoleTileIds),
+    "  },",
+  ]);
+  return [
+    "// Generated by tools/generate-art.mjs. Do not edit.",
+    "// Defold tile ids are one-based, matching tilemap.setTile.",
+    "export const ARENA_ART_THEMES = [",
+    ...renderedThemes,
+    "] as const;",
+    'export type ArenaArtThemeId = (typeof ARENA_ART_THEMES)[number]["id"];',
+    "",
+    "export function arenaGroundTileId(themeIndex: number, role: number): number {",
+    "  return ARENA_ART_THEMES[themeIndex]?.groundRoleTileIds[role] ?? 0;",
+    "}",
+    "",
+    "export function arenaDecorTileId(themeIndex: number, role: number): number {",
+    "  return ARENA_ART_THEMES[themeIndex]?.decorRoleTileIds[role] ?? 0;",
+    "}",
+    "",
+    "export function arenaMarkTileId(themeIndex: number, role: number): number {",
+    "  return ARENA_ART_THEMES[themeIndex]?.markRoleTileIds[role] ?? 0;",
+    "}",
+    "",
+  ].join("\n");
+}
+
 function build() {
   const outputs = new Map(); // absolute path -> Buffer
   const { sheet, tiles, rows, cells } = buildTileSheet();
   verifyWallSeams(tiles);
-  verifySandbagWrap(tiles.find((tile) => tile.role === "sandbag").canvas);
+  for (const theme of ARENA_THEMES) {
+    verifySandbagWrap(tiles.find((tile) => tile.theme === theme.id && tile.semanticRole === "sandbag").canvas);
+  }
 
   const sheetBytes = encodePng(sheet.width, sheet.height, sheet.data);
   outputs.set(resolve(outputRoot, "arena-tiles.png"), sheetBytes);
@@ -2075,30 +2280,41 @@ function build() {
   const orphans = [...spriteNames].filter((name) => !referenced.has(name));
   check("every generated PNG is referenced by the atlas", orphans.length === 0, orphans.join(", "));
 
-  const wallTileIds = {};
-  for (const tile of tiles) {
-    if (!tile.role.startsWith("wall.")) continue;
-    wallTileIds[tile.role.slice(5)] = tile.id;
+  const themeMaps = ARENA_THEMES.map((theme) => buildThemeMap(theme, tiles));
+  for (const theme of themeMaps) {
+    check(
+      `${theme.id}: all 16 wall masks resolve`,
+      theme.wallMaskTileIds.length === 16 && theme.wallMaskTileIds.every(Number.isInteger),
+    );
+    check(`${theme.id}: ground role table is total`, theme.groundRoleTileIds.filter(Number.isInteger).length === 32);
+    check(`${theme.id}: mark role table is total`, theme.markRoleTileIds.every(Number.isInteger));
+    check(`${theme.id}: decor role table is total`, theme.decorRoleTileIds.every(Number.isInteger));
   }
+  const primaryTheme = themeMaps[0];
   const tileIdMap = {
     ordering: "Defold tile order: 1-based, left to right, top row first",
-    groundTileIds: tiles.filter((t) => t.role.startsWith("ground.")).map((t) => t.id),
-    wallTileIds,
-    crateTileId: tiles.find((t) => t.role === "crate").id,
-    sandbagTileId: tiles.find((t) => t.role === "sandbag").id,
-    spawnPadTileId: tiles.find((t) => t.role === "spawnPad").id,
-    pickupPadTileId: tiles.find((t) => t.role === "pickupPad").id,
-    worldTileIds: Object.fromEntries(
-      tiles.filter((tile) => tile.role.startsWith("world.")).map((tile) => [tile.role.slice(6), tile.id]),
-    ),
+    themeIndexRule: "((mapSeed XOR defaultArenaSeed) unsigned) modulo theme count",
+    themeOrder: themeMaps.map((theme) => theme.id),
+    autotile: {
+      maskBits: ARENA_WALL_MASK_BITS,
+      bitMeaning: "set when the orthogonal neighbour is a concrete wall",
+      maskToFrame: [...ARENA_WALL_MASK_TO_FRAME],
+    },
+    ...primaryTheme,
+    themes: Object.fromEntries(themeMaps.map((theme) => [theme.id, theme])),
     tiles: tiles.map((tile) => ({
       id: tile.id,
       role: tile.role,
+      semanticRole: tile.semanticRole,
+      theme: tile.theme,
       layer: tile.layer,
       cell: tile.cell,
       pixelRect: [tile.cell[0] * TILE, tile.cell[1] * TILE, TILE, TILE],
     })),
   };
+
+  const artContractText = renderArenaArtContract(themeMaps);
+  outputs.set(resolve(sourceRoot, "generated-arena-art.ts"), Buffer.from(artContractText));
 
   const manifest = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -2223,6 +2439,11 @@ function build() {
       file: "/main/arena-tiles.tilesource",
       sha256: sha256(Buffer.from(tileSourceText)),
       note: 'The stub `animations { id: "anim" }` block mirrors main/tutorial-map.tilesource; no tile animations are defined.',
+    },
+    typescriptContract: {
+      file: "/src/generated-arena-art.ts",
+      sha256: sha256(Buffer.from(artContractText)),
+      note: "Generated one-based tile ids for the runtime's semantic arena-role projector.",
     },
     rendering: {
       sampling: "nearest-neighbor",

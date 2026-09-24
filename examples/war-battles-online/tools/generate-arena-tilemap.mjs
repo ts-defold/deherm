@@ -25,24 +25,27 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  ArenaMap,
-  CELL_CRATE,
-  CELL_FLOOR,
-  CELL_SANDBAG,
-  CELL_WALL,
-  SPAWN_POINT_COUNT,
-  cellOfX,
-  cellOfY,
-} from "../core/arena.ts";
-import { MAP_HEIGHT, MAP_WIDTH, MAX_HAZARDS, MAX_PICKUPS } from "../core/constants.ts";
+import { ArenaMap, CELL_FLOOR } from "../core/arena.ts";
+import { ARENA_VISUAL_CELL_COUNT, arenaThemeIndex, projectArenaVisualRoles } from "../core/arena-visual.ts";
+import { MAP_HEIGHT, MAP_WIDTH } from "../core/constants.ts";
 import { DEFAULT_ARENA_SEED } from "../core/playable.ts";
+import {
+  ARENA_ART_THEMES,
+  arenaDecorTileId,
+  arenaGroundTileId,
+  arenaMarkTileId,
+} from "../defold/src/generated-arena-art.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const exampleRoot = resolve(here, "..");
 const projectRoot = resolve(exampleRoot, "defold");
 const manifestPath = resolve(projectRoot, "assets/derived/arena/arena-art.json");
-const targetPath = resolve(projectRoot, "main/arena.tilemap");
+const outputArgument = process.argv.indexOf("--output");
+const targetPath =
+  outputArgument >= 0
+    ? resolve(process.cwd(), process.argv[outputArgument + 1] ?? "")
+    : resolve(projectRoot, "main/arena.tilemap");
+if (outputArgument >= 0 && !process.argv[outputArgument + 1]) throw new Error("--output requires a file path");
 
 const TILE_SOURCE = "/main/arena-tiles.tilesource";
 const MATERIAL = "/builtins/materials/tile_map.material";
@@ -64,76 +67,32 @@ try {
   );
 }
 const tiles = manifest?.tileSheet?.map;
-if (!tiles?.groundTileIds || !tiles?.wallTileIds) {
+if (!tiles?.themes || !tiles?.autotile || !Array.isArray(tiles.themeOrder)) {
   throw new Error(`${relative(exampleRoot, manifestPath)} has no tileSheet.map; regenerate the art`);
 }
-
-const ground = tiles.groundTileIds;
-const wall = tiles.wallTileIds;
-const crateTile = tiles.crateTileId;
-const sandbagTile = tiles.sandbagTileId;
-const spawnPadTile = tiles.spawnPadTileId;
-const worldTiles = tiles.worldTileIds;
-if (
-  !worldTiles ||
-  !Number.isInteger(worldTiles["pickup-pedestal"]) ||
-  !Number.isInteger(worldTiles["thermal-vent"]) ||
-  !Number.isInteger(worldTiles["lava-fissure"]) ||
-  !Number.isInteger(worldTiles["floor-vent"]) ||
-  !Number.isInteger(worldTiles["pipe-junction"]) ||
-  !Number.isInteger(worldTiles["pipe-run"])
-) {
-  throw new Error(
-    `${relative(exampleRoot, manifestPath)} has no complete worldTileIds; regenerate world art, then arena art`,
-  );
+if (ARENA_ART_THEMES.length !== tiles.themeOrder.length)
+  throw new Error("generated art contract theme count disagrees with manifest");
+for (let index = 0; index < ARENA_ART_THEMES.length; index += 1) {
+  const contract = ARENA_ART_THEMES[index];
+  const record = tiles.themes[contract.id];
+  if (
+    contract.id !== tiles.themeOrder[index] ||
+    !record ||
+    JSON.stringify(contract.groundRoleTileIds) !== JSON.stringify(record.groundRoleTileIds) ||
+    JSON.stringify(contract.decorRoleTileIds) !== JSON.stringify(record.decorRoleTileIds) ||
+    JSON.stringify(contract.markRoleTileIds) !== JSON.stringify(record.markRoleTileIds)
+  ) {
+    throw new Error(`generated art contract theme ${contract.id} disagrees with manifest`);
+  }
 }
-const pickupPadTile = worldTiles["pickup-pedestal"];
 
 const map = new ArenaMap(seed);
-
-/**
- * Picks the wall tile for one cell from its four orthogonal neighbours. A
- * neighbour that is off the grid counts as wall, so the arena border reads as a
- * continuous block rather than as a ring of corners.
- *
- * Only a concrete wall counts. A crate standing against a wall is solid to the
- * simulation but is drawn on the overlay layer, so the wall keeps the edge tile
- * that tells the eye where the block actually ends.
- */
-function isWall(cellX, cellY) {
-  if (cellX < 0 || cellY < 0 || cellX >= MAP_WIDTH || cellY >= MAP_HEIGHT) return true;
-  return map.cellAt(cellX, cellY) === CELL_WALL;
-}
-
-function wallTile(cellX, cellY) {
-  const north = isWall(cellX, cellY + 1);
-  const south = isWall(cellX, cellY - 1);
-  const east = isWall(cellX + 1, cellY);
-  const west = isWall(cellX - 1, cellY);
-  if (north && south && east && west) return wall.centre;
-  if (!north && !east && south && west) return wall.ne;
-  if (!north && !west && south && east) return wall.nw;
-  if (!south && !east && north && west) return wall.se;
-  if (!south && !west && north && east) return wall.sw;
-  if (!north && south && east && west) return wall.n;
-  if (!south && north && east && west) return wall.s;
-  if (!east && north && south && west) return wall.e;
-  if (!west && north && south && east) return wall.w;
-  // A one-cell-thick spur or an isolated block has no matching edge tile; the
-  // solid centre is the honest fallback and still reads as impassable.
-  return wall.centre;
-}
-
-/**
- * Ground variation is a hash of the cell, not a running generator, so a single
- * cell's tile never depends on how many cells were emitted before it.
- */
-function groundTile(cellX, cellY) {
-  let hash = (seed ^ Math.imul(cellX, 0x9e37_79b1) ^ Math.imul(cellY, 0x85eb_ca6b)) >>> 0;
-  hash ^= hash >>> 15;
-  hash = Math.imul(hash, 0x2545_f491) >>> 0;
-  return ground[(hash >>> 3) % ground.length];
-}
+const themeIndex = arenaThemeIndex(seed, DEFAULT_ARENA_SEED, ARENA_ART_THEMES.length);
+const theme = ARENA_ART_THEMES[themeIndex];
+const groundRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+const decorRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+const markRoles = new Uint8Array(ARENA_VISUAL_CELL_COUNT);
+projectArenaVisualRoles(map, seed, groundRoles, decorRoles, markRoles);
 
 // Two layers, because the art manifest says so: ground and wall tiles are
 // opaque, while crates, sandbags and floor markings are transparent overlays
@@ -141,55 +100,15 @@ function groundTile(cellX, cellY) {
 const groundCells = [];
 const decorCells = [];
 const markCells = [];
-const marked = new Set();
-function mark(x, y, tile) {
-  const key = `${x},${y}`;
-  if (marked.has(key)) return;
-  marked.add(key);
-  markCells.push({ x, y, tile });
+for (let index = 0; index < ARENA_VISUAL_CELL_COUNT; index += 1) {
+  const x = index % MAP_WIDTH;
+  const y = Math.floor(index / MAP_WIDTH);
+  groundCells.push({ x, y, tile: arenaGroundTileId(themeIndex, groundRoles[index]) });
+  const decor = arenaDecorTileId(themeIndex, decorRoles[index]);
+  const mark = arenaMarkTileId(themeIndex, markRoles[index]);
+  if (decor !== 0) decorCells.push({ x, y, tile: decor });
+  if (mark !== 0) markCells.push({ x, y, tile: mark });
 }
-
-const decorated = new Set();
-function decorate(x, y, tile) {
-  if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT || map.cellAt(x, y) !== CELL_FLOOR) return;
-  const key = `${x},${y}`;
-  if (decorated.has(key)) return;
-  decorated.add(key);
-  decorCells.push({ x, y, tile });
-}
-
-for (let cellY = 0; cellY < MAP_HEIGHT; cellY += 1) {
-  for (let cellX = 0; cellX < MAP_WIDTH; cellX += 1) {
-    const cell = map.cellAt(cellX, cellY);
-    if (cell === CELL_WALL) {
-      groundCells.push({ x: cellX, y: cellY, tile: wallTile(cellX, cellY) });
-      continue;
-    }
-    groundCells.push({ x: cellX, y: cellY, tile: groundTile(cellX, cellY) });
-    if (cell === CELL_CRATE) mark(cellX, cellY, crateTile);
-    else if (cell === CELL_SANDBAG) mark(cellX, cellY, sandbagTile);
-  }
-}
-for (let index = 0; index < SPAWN_POINT_COUNT; index += 1) {
-  mark(cellOfX(map.spawnX[index]), cellOfY(map.spawnY[index]), spawnPadTile);
-}
-for (let index = 0; index < MAX_PICKUPS; index += 1) {
-  mark(cellOfX(map.pickupX[index]), cellOfY(map.pickupY[index]), pickupPadTile);
-}
-for (let index = 0; index < MAX_HAZARDS; index += 1) {
-  const x = cellOfX(map.hazardX[index]);
-  const y = cellOfY(map.hazardY[index]);
-  // Hazard geometry comes from the authoritative ArenaMap; these are purely
-  // visual Defold tile roles, so collision remains owned by the simulation.
-  decorate(x, y, worldTiles["floor-vent"]);
-  decorate(x - 1, y, worldTiles["lava-fissure"]);
-  decorate(x + 1, y, worldTiles["lava-fissure"]);
-  decorate(x, y + 1, worldTiles["thermal-vent"]);
-  decorate(x, y - 1, worldTiles["pipe-junction"]);
-  decorate(x + (index % 2 === 0 ? 2 : -2), y - 1, worldTiles["pipe-run"]);
-}
-decorCells.sort((a, b) => a.y - b.y || a.x - b.x);
-markCells.sort((a, b) => a.y - b.y || a.x - b.x);
 
 function emitLayer(id, z, cells) {
   const lines = ["layers {", `  id: "${id}"`, `  z: ${z}`];
@@ -229,6 +148,7 @@ if (check) {
   process.stdout.write(
     `Wrote ${relative(exampleRoot, targetPath)}\n` +
       `  arena ${MAP_WIDTH}x${MAP_HEIGHT} tiles (${MAP_WIDTH * 16}x${MAP_HEIGHT * 16} px), seed ${seed}\n` +
+      `  theme ${theme.id} (${theme.name})\n` +
       `  ground cells ${groundCells.length}, solid ${solid} (${((100 * solid) / (MAP_WIDTH * MAP_HEIGHT)).toFixed(1)}%), decor cells ${decorCells.length}, overlay cells ${markCells.length}\n`,
   );
 }

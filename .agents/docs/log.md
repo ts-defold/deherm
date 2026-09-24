@@ -3180,3 +3180,40 @@ bytes, waits for the complete CLI/Bob/engine process tree to close, then
 restores each file or removes it when the pre-run state was absent. A focused
 filesystem test covers both cases. Runtime behavior and cleanup evidence remain
 separate.
+
+## 2026-09-24 - Seeded Defold-native arena grammar
+
+War Battles no longer couples its live component to two hard-coded crate and
+sandbag tile ids. A shared semantic projector now converts the authoritative
+`ArenaMap` into caller-owned ground, decor, and mark role buffers. The art
+generator emits three complete role-to-tile contracts and an explicit
+four-neighbour wall grammar covering all sixteen masks; the native `.tilemap`
+generator and the live component consume the same generated TypeScript
+contract.
+
+Focused evidence passes for all sixteen masks, the allocation-free projection,
+all three theme tables, generated-art freshness, seam and opacity checks,
+Defold-source mirroring, TypeScript context checking, and temporary native
+`.tilemap` materialization for frontier, refinery, and canyon seeds. The
+generated atlas was visually inspected at an integer 8x scale. The default
+frontier map now has fresh packaged-native runtime evidence; a non-default map
+seed has compile and generated-resource evidence but has not yet been observed
+in a live packaged engine.
+
+## 2026-09-24 - Current War Battles HMR remains transactional
+
+A fresh packed-package/native run disproved the suspected runtime regression.
+Six consecutive edits produced six distinct bundle fingerprints, each was
+acknowledged by the running Hermes runtime, gameplay advanced to tick 781, and
+the arena instance plus persistent component identities survived. The run
+started with 40 entities and 51 components, peaked at 55 components, and
+observed 65 transient identity detachments after the first accepted reload.
+The refreshed evidence is recorded in
+`examples/war-battles-online/evidence/installed-hmr-soak-native.json`.
+
+The investigation did expose a false-negative harness configuration. A
+one-cycle soak could complete a real reload and then inevitably fail the
+post-first-reload detachment assertion, which requires at least two accepted
+reloads by definition. The command, evidence validator, and runner now reject
+cycle counts below two before starting Defold. This is harness correctness;
+the six-cycle native transaction above is the runtime evidence.

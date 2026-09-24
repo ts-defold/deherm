@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
@@ -181,7 +182,7 @@ test("Defold-local deterministic sources are fresh copies of the canonical core"
     cwd: repositoryRoot,
     encoding: "utf8",
   });
-  assert.match(result, /16 generated Defold sources are fresh/);
+  assert.match(result, /17 generated Defold sources are fresh/);
 });
 
 test("the built project is the arena, and the mockup stays out of the build", async () => {
@@ -335,6 +336,29 @@ test("the arena tilemap is the picture of the arena the simulation collides with
   assert.match(tilemap, /z: 0\.05/);
 });
 
+test("the Defold tilemap generator materializes every seeded visual theme", () => {
+  const outputRoot = mkdtempSync(path.join(os.tmpdir(), "war-battles-themes-"));
+  const themes = [
+    [0x57_41_52_42, "frontier"],
+    [0x57_41_52_43, "refinery"],
+    [0x57_41_52_40, "canyon"],
+  ];
+  for (const [seed, theme] of themes) {
+    const output = path.join(outputRoot, `${theme}.tilemap`);
+    const result = execFileSync(
+      process.execPath,
+      [fromExample("tools/generate-arena-tilemap.mjs"), "--seed", String(seed), "--output", output],
+      { cwd: repositoryRoot, encoding: "utf8" },
+    );
+    assert.match(result, new RegExp(`theme ${theme} `));
+    const tilemap = readFileSync(output, "utf8");
+    assert.match(tilemap, /id: "ground"/);
+    assert.match(tilemap, /id: "decor"/);
+    assert.match(tilemap, /id: "marks"/);
+    assert.equal((tilemap.match(/cell \{/g) ?? []).length > 10_800, true);
+  }
+});
+
 test("the generated arena art is fresh and its tile map is machine-readable", async () => {
   const result = execFileSync(process.execPath, [fromExample("tools/generate-art.mjs"), "--check"], {
     cwd: repositoryRoot,
@@ -343,6 +367,26 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
   assert.match(result, /war-battles-art:fresh/);
   const manifest = JSON.parse(await readFile(fromExample("defold/assets/derived/arena/arena-art.json"), "utf8"));
   const map = manifest.tileSheet.map;
+  assert.deepEqual(map.themeOrder, ["frontier", "refinery", "canyon"]);
+  assert.deepEqual(map.autotile.maskBits, { north: 1, south: 2, east: 4, west: 8 });
+  assert.deepEqual(map.autotile.maskToFrame, [
+    "centre",
+    "centre",
+    "centre",
+    "centre",
+    "centre",
+    "sw",
+    "nw",
+    "w",
+    "centre",
+    "se",
+    "ne",
+    "e",
+    "centre",
+    "s",
+    "n",
+    "centre",
+  ]);
   assert.equal(map.groundTileIds.length, 4);
   assert.deepEqual(Object.keys(map.wallTileIds).sort(), ["centre", "e", "n", "ne", "nw", "s", "se", "sw", "w"]);
   for (const key of ["crateTileId", "sandbagTileId", "spawnPadTileId", "pickupPadTileId"]) {
@@ -357,9 +401,24 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
     "thermal-vent",
   ]);
   assert.equal(map.worldTileIds["pickup-pedestal"] > map.pickupPadTileId, true);
+  for (const themeId of map.themeOrder) {
+    const theme = map.themes[themeId];
+    assert.equal(theme.groundRoleTileIds.length, 32, `${themeId} must cover all ground and wall roles`);
+    assert.equal(theme.wallMaskTileIds.length, 16, `${themeId} must cover all neighbour masks`);
+    assert.equal(theme.markRoleTileIds.length, 5, `${themeId} must cover every mark role`);
+    assert.equal(theme.decorRoleTileIds.length, 7, `${themeId} must cover every decor role`);
+    assert.ok(theme.wallMaskTileIds.every((tileId) => Number.isInteger(tileId) && tileId > 0));
+  }
   const arenaSource = await readFile(fromExample("defold/main/arena.script.ts"), "utf8");
-  assert.match(arenaSource, new RegExp(`const CRATE_TILE = ${map.crateTileId};`));
-  assert.match(arenaSource, new RegExp(`const SANDBAG_TILE = ${map.sandbagTileId};`));
+  assert.doesNotMatch(arenaSource, /const (?:CRATE|SANDBAG)_TILE/);
+  assert.match(arenaSource, /syncArenaVisualMap\(self\)/);
+  assert.match(arenaSource, /projectArenaVisualRoles\(world\.map, seed/);
+  assert.match(arenaSource, /arenaGroundTileId\(theme/);
+  assert.match(arenaSource, /arenaDecorTileId\(theme/);
+  assert.match(arenaSource, /arenaMarkTileId\(theme/);
+  const generatedContract = await readFile(fromExample("defold/src/generated-arena-art.ts"), "utf8");
+  assert.match(generatedContract, /export const ARENA_ART_THEMES/);
+  for (const themeId of map.themeOrder) assert.match(generatedContract, new RegExp(`id: "${themeId}"`));
   // The atlas the components address by name has to actually declare them.
   const atlas = await readFile(fromExample("defold/main/arena-sprites.atlas"), "utf8");
   for (const animation of [

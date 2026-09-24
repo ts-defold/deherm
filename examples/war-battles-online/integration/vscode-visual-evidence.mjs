@@ -3,11 +3,17 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 export const VISUAL_EVIDENCE_KIND = "deherm.war-battles.vscode-live-values-evidence";
-export const VISUAL_EVIDENCE_SCHEMA_VERSION = 2;
+export const VISUAL_EVIDENCE_SCHEMA_VERSION = 3;
 export const ARENA_SOURCE = "main/arena.script.ts";
-export const EXPECTED_PROPERTIES = Object.freeze({
+export const EXPECTED_PROPERTY_DEFAULTS = Object.freeze({
   players: 8,
   botSkill: 1,
+  mapSeed: 0,
+  autoEngageSeconds: 0,
+});
+export const EXPECTED_LIVE_PROPERTIES = Object.freeze({
+  players: 8,
+  botSkill: 2,
   mapSeed: 0,
   autoEngageSeconds: 0,
 });
@@ -37,7 +43,7 @@ export function requireArenaInstance(state) {
     for (const instance of target.instances ?? []) {
       if (instance.source !== ARENA_SOURCE || instance.schemaStatus !== "current") continue;
       const properties = propertyRecord(instance);
-      for (const [name, expected] of Object.entries(EXPECTED_PROPERTIES)) {
+      for (const [name, expected] of Object.entries(EXPECTED_LIVE_PROPERTIES)) {
         if (properties[name] !== expected) {
           throw new Error(`Live arena property ${name} is ${String(properties[name])}, expected ${expected}`);
         }
@@ -50,7 +56,7 @@ export function requireArenaInstance(state) {
 
 export function requireInlineValueTexts(renderedText) {
   const normalized = renderedText.replace(/\s+/gu, " ");
-  return Object.entries(EXPECTED_PROPERTIES).map(([name, value]) => {
+  return Object.entries(EXPECTED_PROPERTY_DEFAULTS).map(([name, value]) => {
     const expected = `= ${value}`;
     if (!normalized.includes(expected)) {
       throw new Error(`The rendered VS Code document does not contain the inline ${name} value`);
@@ -126,7 +132,7 @@ export async function verifyVisualEvidence(document, repositoryRoot) {
     throw new Error("VS Code visual evidence has no inline property values");
   }
   requireInlineValueTexts(document.observation.inlineValueTexts.join("\n"));
-  for (const [name, expected] of Object.entries(EXPECTED_PROPERTIES)) {
+  for (const [name, expected] of Object.entries(EXPECTED_LIVE_PROPERTIES)) {
     if (document.observation.properties?.[name] !== expected) {
       throw new Error(`Recorded VS Code property ${name} is stale`);
     }

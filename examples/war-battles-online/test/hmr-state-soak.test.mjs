@@ -129,6 +129,10 @@ test("installed HMR validator accepts repeated compatible transactions", () => {
   assert.equal(result.telemetry.transientEvidence.detachedAfterFirstAccepted, 1);
 });
 
+test("installed HMR validator requires enough cycles to observe a post-first-reload detach", () => {
+  assert.throws(() => validateHmrSoakEvidence(report(1)), /cyclesRequired must be a safe integer >= 2/);
+});
+
 test("installed HMR validator rejects monotonic transient identity accumulation", () => {
   const invalid = report(3);
   invalid.cycles[0].accepted.snapshot = snapshot(11, 52, 1);
@@ -507,6 +511,10 @@ test("runHmrStateSoak requires the native adapter and closes it after a failed v
       closed = true;
     },
   };
-  await assert.rejects(() => runHmrStateSoak(adapter, { cycles: 1 }), /did not advance gameplay/);
+  await assert.rejects(() => runHmrStateSoak(adapter, { cycles: 2 }), /did not advance gameplay/);
   assert.equal(closed, true);
+});
+
+test("runHmrStateSoak rejects a cycle count that cannot measure post-first-reload detach", async () => {
+  await assert.rejects(() => runHmrStateSoak({}, { cycles: 1 }), /cycles must be a safe integer >= 2/);
 });

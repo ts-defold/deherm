@@ -545,11 +545,33 @@ edge grammar and its edge-continuity checks pass.
 The approved prop subset is now wired through that boundary. The checked
 `generate-world-art.mjs` projection validates the immutable request, asset,
 hash, dimension, and selection records and emits six normalized 16 px cells.
-`generate-art.mjs` imports those cells into the one Defold arena tilesource, and
-`generate-arena-tilemap.mjs` places the pickup-pedestal and hazard motifs on
-`marks`/`decor` layers from the authoritative `ArenaMap`. This is runtime map
-input, not proof that the still-unresolved basalt terrain family tiles
-seamlessly.
+`generate-art.mjs` imports those cells into the one Defold arena tilesource.
+
+Terrain realization now has one shared semantic projection instead of two
+similar hand-written maps. `core/arena-visual.ts` projects an authoritative
+`ArenaMap` into caller-owned ground, decor, and mark role buffers. It declares
+the north/south/east/west mask bits and all sixteen four-neighbour wall-mask
+results explicitly. `generate-art.mjs` maps those roles into three complete
+themes (`frontier`, `refinery`, and `canyon`) and emits the TypeScript tile-id
+contract consumed by both the checked `.tilemap` generator and the live Defold
+component. The generator proves opaque wall coverage, clean interior seams, a
+one-pixel perimeter, wrap-safe sandbags, all sixteen masks, and all required
+role tables for every theme. A seeded temporary-output test materializes all
+three native Defold `.tilemap` variants without changing collision rules.
+
+The runtime retains six fixed 10,800-byte role buffers and reprojects only when
+the authoritative map seed changes. Steady frames therefore allocate nothing
+and issue no tilemap calls; a seed transition writes only cells whose resolved
+Defold tile id changed, then swaps the current and scratch buffers. This is
+compile- and unit-level evidence for seeded native realization. The default
+frontier map remains the checked project resource; observing a non-default
+theme in a live packaged engine remains part of the next runtime-art gate.
+
+This closes the previously unresolved deterministic terrain grammar, but not
+the whole production-art pass. The generated palette themes currently reuse
+one structural tile family, and the authored HUD/title/minimap/leader-board,
+driver animation, wreckage, crater, and broader environment-detail targets
+above remain open.
 
 ## Bounded performance and operability evidence tranche
 

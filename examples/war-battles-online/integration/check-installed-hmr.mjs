@@ -37,7 +37,6 @@ const cycles = Number.parseInt(
   option("--cycles", process.env.DEHERM_WAR_BATTLES_HMR_CYCLES ?? String(DEFAULT_HMR_SOAK_CYCLES)),
   10,
 );
-if (!Number.isSafeInteger(cycles) || cycles < 1) throw new Error("--cycles must be a positive integer");
 const evidencePath = resolve(option("--evidence", process.env.DEHERM_WAR_BATTLES_HMR_EVIDENCE ?? defaultEvidencePath));
 const installedPackageRoot = process.env.DEHERM_INSTALLED_PACKAGE_ROOT
   ? resolve(process.env.DEHERM_INSTALLED_PACKAGE_ROOT)
@@ -51,6 +50,9 @@ async function loadDriver() {
 }
 
 async function main() {
+  if (!Number.isSafeInteger(cycles) || cycles < 2) {
+    throw new Error("--cycles must be an integer >= 2 so post-first-reload detach evidence can be measured");
+  }
   let evidence;
   if (!args.has("--check-evidence")) {
     const adapter = await loadDriver();

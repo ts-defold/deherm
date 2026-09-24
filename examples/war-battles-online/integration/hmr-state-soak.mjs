@@ -248,7 +248,7 @@ export function validateHmrSoakEvidence(report, options = {}) {
   if (report.runtimeApi?.name !== HMR_STATE_API || report.runtimeApi.available !== true)
     fail(`native runtime state API ${HMR_STATE_API} is required`);
   const cyclesRequired = options.cycles ?? report.cyclesRequired ?? DEFAULT_HMR_SOAK_CYCLES;
-  integer(cyclesRequired, "cyclesRequired", { min: 1 });
+  integer(cyclesRequired, "cyclesRequired", { min: 2 });
   if (!Array.isArray(report.cycles) || report.cycles.length < cyclesRequired)
     fail(`expected ${cyclesRequired} completed reload cycles`);
   const limits = { ...DEFAULT_HMR_SOAK_LIMITS, ...(options.limits ?? report.limits) };
@@ -346,6 +346,7 @@ export function parseHmrStateEvent(line) {
 
 export async function runHmrStateSoak(adapter, options = {}) {
   const cycles = options.cycles ?? DEFAULT_HMR_SOAK_CYCLES;
+  integer(cycles, "cycles", { min: 2 });
   for (const method of [
     "baselineSnapshot",
     "activeFingerprint",
