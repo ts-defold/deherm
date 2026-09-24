@@ -7,24 +7,21 @@ import { promisify } from "node:util";
 import path from "node:path";
 import { tmpdir } from "node:os";
 
+import { DEFAULT_LOCAL_DEV_BUILD_SERVER, localDevLaunchConfiguration } from "./dev-launch-config.mjs";
 import { HMR_STATE_API, validateHmrRuntimeHealth } from "./hmr-state-soak.mjs";
 
 const execFile = promisify(execFileCallback);
 const timeoutMs = Number(process.env.DEHERM_WAR_BATTLES_HMR_TIMEOUT_MS ?? 90_000);
 const shutdownTimeoutMs = Number(process.env.DEHERM_WAR_BATTLES_HMR_SHUTDOWN_TIMEOUT_MS ?? 15_000);
 const markerPattern = /war-battles:hmr-reload:edit=([^:]+):tick=(\d+):entities=(\d+):elapsed=([0-9.]+)/u;
-export const DEFAULT_INSTALLED_HMR_BUILD_SERVER = "http://127.0.0.1:9010";
+export const DEFAULT_INSTALLED_HMR_BUILD_SERVER = DEFAULT_LOCAL_DEV_BUILD_SERVER;
 
 export function installedHmrLaunchConfiguration(environment = process.env) {
-  return {
-    buildServer:
-      environment.DEHERM_BUILD_SERVER || environment.DEFOLD_HERMES_BUILD_SERVER || DEFAULT_INSTALLED_HMR_BUILD_SERVER,
-    // Online policy resolution is the correctness default. An explicit
-    // DEHERM_OFFLINE=1 remains supported, but the harness must not silently
-    // reuse an older authenticated surface for the same Defold revision after
-    // the package's stable runtime ABI has advanced.
-    environment: { ...environment },
-  };
+  // Online policy resolution is the correctness default. An explicit
+  // DEHERM_OFFLINE=1 remains supported, but the harness must not silently
+  // reuse an older authenticated surface for the same Defold revision after
+  // the package's stable runtime ABI has advanced.
+  return localDevLaunchConfiguration(environment);
 }
 
 export function dependencyLinkType(platform = process.platform) {

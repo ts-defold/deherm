@@ -3217,3 +3217,31 @@ post-first-reload detachment assertion, which requires at least two accepted
 reloads by definition. The command, evidence validator, and runner now reject
 cycle counts below two before starting Defold. This is harness correctness;
 the six-cycle native transaction above is the runtime evidence.
+
+## 2026-09-24 - Browser HMR uses the pinned development Extender
+
+The browser HMR gate reproduced a target-connect timeout while native HMR
+continued to activate exact bundle fingerprints and report live telemetry. The
+browser session had omitted its build-server selection, so Bob sent the pinned
+Defold development SDK to the production Extender. Production rejected the
+SDK's newer `r8Cmd` schema before an HTML5 page existed; this was a build-lane
+configuration failure, not a browser activation failure.
+
+Native and browser HMR now consume the same environment-overridable local
+development launch policy. A fresh wasm-web run against the pinned local
+Extender connected the browser host, observed browser telemetry, rebuilt an
+authored TypeScript edit, and acknowledged the exact new fingerprint
+`5d10d3df80ac54660862328251030989d26a39c233921bda9a7149d09a8b66c3`
+as browser generation 3. The gate also fails immediately on the real Bob or
+browser diagnostic and restores `deherm.lock` plus the mirrored application
+bundle and sidecars only after the dev process has exited. This is browser
+event/page evidence, not visual canvas evidence.
+
+The broader Static Hermes gate then caught the reason all mirrored artifacts
+must participate in cleanup: restoring the lock alone left the browser gate's
+development bundle on the canonical Bob input path. The public one-shot
+compiler owner regenerated the canonical application and lock together, the
+packaged native runtime re-observed that bundle through graceful teardown, and
+a subsequent browser HMR run preserved the bundle, bytecode, source map, and
+lock hashes exactly. The 12-test Static Hermes product gate and packaged-runtime
+freshness check pass against the refreshed artifact.

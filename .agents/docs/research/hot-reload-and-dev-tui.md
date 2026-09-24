@@ -471,6 +471,15 @@ nothing produces the running fingerprint and cannot satisfy it. Recorded as
 `examples/war-battles-online/evidence/browser-hot-reload-wasm-web.json`. This
 is event and page evidence; no claim is made about what the canvas draws.
 
+The native and browser HMR gates share one local-development launch policy.
+Unless `DEHERM_BUILD_SERVER` or `DEFOLD_HERMES_BUILD_SERVER` explicitly names a
+different service, they use the repository's pinned Extender at
+`127.0.0.1:9010`. This matters when the pinned Defold development SDK has a
+newer Extender schema than Defold's production service. A browser build failure
+is terminal for the gate and is reported immediately rather than being hidden
+behind a target-connect timeout. The gate snapshots and restores its generated
+lock and mirrored application artifacts after the complete dev process exits.
+
 # `deherm dev` control plane
 
 ## Daemon/controller core

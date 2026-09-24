@@ -31,6 +31,7 @@ import {
   stopOwnedProcessTree,
   windowsTaskkillArguments,
 } from "../integration/installed-hmr-driver.mjs";
+import { DEFAULT_LOCAL_DEV_BUILD_SERVER, localDevLaunchConfiguration } from "../integration/dev-launch-config.mjs";
 
 const fingerprint = (value) => value.toString(16).padStart(64, "0");
 
@@ -46,6 +47,18 @@ test("installed HMR refreshes policy and uses the pinned local Extender by defau
   });
   assert.equal(explicit.buildServer, "http://example.test:9000");
   assert.equal(explicit.environment.DEHERM_OFFLINE, "1");
+});
+
+test("native and browser HMR share the environment-overridable local development server", () => {
+  assert.equal(DEFAULT_LOCAL_DEV_BUILD_SERVER, DEFAULT_INSTALLED_HMR_BUILD_SERVER);
+  assert.deepEqual(localDevLaunchConfiguration({ PATH: "/bin" }), {
+    buildServer: DEFAULT_LOCAL_DEV_BUILD_SERVER,
+    environment: { PATH: "/bin" },
+  });
+  assert.equal(
+    localDevLaunchConfiguration({ DEFOLD_HERMES_BUILD_SERVER: "http://example.test:9011" }).buildServer,
+    "http://example.test:9011",
+  );
 });
 
 test("installed HMR diagnostics preserve aggregate root causes", () => {

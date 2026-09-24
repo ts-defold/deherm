@@ -21,6 +21,9 @@ import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { localDevLaunchConfiguration } from "./dev-launch-config.mjs";
+import { restoreHarnessOwnedGeneratedFile } from "./installed-hmr-driver.mjs";
+
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 const projectRoot = resolve(exampleRoot, "defold");
@@ -30,7 +33,18 @@ const argumentSet = new Set(process.argv.slice(2));
 
 const timeoutMs = Number.parseInt(process.env.DEHERM_BROWSER_HOT_RELOAD_TIMEOUT_MS ?? "180000", 10);
 
+function terminalSessionFailure(event) {
+  if (event?.type === "defold-build-failed") {
+    return `Defold build failed (${event.reason ?? "unknown reason"}): ${event.diagnostic ?? "no diagnostic"}`;
+  }
+  if (event?.type === "log" && event.level === "error" && event.source === "browser") {
+    return event.message ?? "browser target failed";
+  }
+  return undefined;
+}
+
 function startSession() {
+  const launchConfiguration = localDevLaunchConfiguration(process.env);
   const child = spawn(
     process.execPath,
     [
@@ -47,8 +61,14 @@ function startSession() {
       // The native engine is not part of this gate; the browser target is.
       "--no-launch",
       "--web",
+      "--build-server",
+      launchConfiguration.buildServer,
     ],
-    { cwd: repositoryRoot, stdio: ["ignore", "pipe", "pipe"] },
+    {
+      cwd: repositoryRoot,
+      env: launchConfiguration.environment,
+      stdio: ["ignore", "pipe", "pipe"],
+    },
   );
 
   const events = [];
@@ -83,11 +103,23 @@ function startSession() {
         resolve_(existing);
         return;
       }
+      const existingFailure = events.map(terminalSessionFailure).find(Boolean);
+      if (existingFailure) {
+        reject(new Error(`${existingFailure}\nwhile waiting for ${what}`));
+        return;
+      }
       const timer = setTimeout(() => {
         waiters.delete(observe);
         reject(new Error(`Timed out waiting for ${what}\nstderr:\n${stderr.join("")}`));
       }, timeoutMs);
       const observe = (event) => {
+        const failure = terminalSessionFailure(event);
+        if (failure) {
+          clearTimeout(timer);
+          waiters.delete(observe);
+          reject(new Error(`${failure}\nwhile waiting for ${what}`));
+          return;
+        }
         if (!predicate(event)) return;
         clearTimeout(timer);
         waiters.delete(observe);
@@ -101,6 +133,24 @@ function startSession() {
 
 async function run() {
   const original = await readFile(entryPoint, "utf8");
+  const lockFile = resolve(projectRoot, "deherm.lock");
+  const originalLock = await readFile(lockFile).catch((error) => {
+    if (error?.code === "ENOENT") return undefined;
+    throw error;
+  });
+  const applicationArtifacts = [
+    resolve(projectRoot, "deherm/app.dehermc"),
+    resolve(projectRoot, "deherm/app.dehermc.hbc"),
+    resolve(projectRoot, "deherm/app.dehermc.map"),
+  ];
+  const originalApplicationArtifacts = await Promise.all(
+    applicationArtifacts.map((file) =>
+      readFile(file).catch((error) => {
+        if (error?.code === "ENOENT") return undefined;
+        throw error;
+      }),
+    ),
+  );
   const marker = `browser-hot-reload:${Date.now()}`;
   const session = startSession();
   let restored = false;
@@ -266,6 +316,15 @@ async function run() {
         done();
       });
     });
+    // The compiler records and mirrors its temporary browser-gate bundle into
+    // the Defold project. Restore only after the complete session has exited so
+    // no late rebuild can rewrite an artifact behind cleanup.
+    await Promise.all([
+      restoreHarnessOwnedGeneratedFile(lockFile, originalLock),
+      ...applicationArtifacts.map((file, index) =>
+        restoreHarnessOwnedGeneratedFile(file, originalApplicationArtifacts[index]),
+      ),
+    ]);
   }
 }
 
