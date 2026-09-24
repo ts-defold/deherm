@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  findPropertyDeclarationAnchors,
   formatSnapshotValue,
+  liveValueHints,
   liveValueLenses,
   parseInspectorStateDescriptor,
   pollInspectorState,
@@ -137,6 +139,43 @@ test("live lenses consume only server-enriched current schemas for the exact aut
     documentPath: "/work/game/main/player.ts",
     now: 10_500
   }), []);
+});
+
+test("live hints project each authenticated runtime value onto its authored property", () => {
+  assert.deepEqual(liveValueHints({
+    state: fixtureState(),
+    projectRoot: "/work/game",
+    documentPath: "/work/game/main/player.script.ts",
+    now: 10_500
+  }), [{
+    propertyName: "health",
+    label: "live health [3:1] = 100",
+    tooltip: "local-engine · player [3:1] · health=100"
+  }, {
+    propertyName: "label",
+    label: "live label [3:1] = \"ready\"",
+    tooltip: "local-engine · player [3:1] · label=\"ready\""
+  }]);
+});
+
+test("property anchors match property factory declarations and ignore comments, strings, and type fields", () => {
+  const source = [
+    "interface Self { health: number; label: string }",
+    "// health: property.number(999)",
+    "const decoy = 'label: property.string(\"wrong\")';",
+    "const pattern = /health: property.number/;",
+    "export default defineComponent({",
+    "  properties: {",
+    "    health: property.number(100),",
+    "    label:",
+    "      property.string(\"ready\"),",
+    "  },",
+    "});"
+  ].join("\n");
+  assert.deepEqual(findPropertyDeclarationAnchors(source, new Set(["health", "label"])), [
+    { propertyName: "health", line: 6 },
+    { propertyName: "label", line: 7 }
+  ]);
 });
 
 test("raw component snapshot rows are never joined locally even if they mimic enrichment fields", () => {

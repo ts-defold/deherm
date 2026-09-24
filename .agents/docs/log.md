@@ -1,5 +1,34 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - Actual VS Code renderer shows live War Battles values
+
+The last tooling observation is now literal rather than inferred. An isolated
+VS Code 1.129.1 profile installed the packaged `deherm.vsix`, opened the War
+Battles Defold project against an exact `npm pack` installation, and rendered
+four live inlay hints beside the declarations in `main/arena.script.ts`:
+
+`players: property.number(8), live players [0:1] = 8`
+
+The same source-bound projection appears beside `botSkill`, `mapSeed`, and
+`autoEngageSeconds`; the document-level CodeLens remains a navigation/status
+summary rather than the only place values appear.
+
+The packaged arm64 engine connected to the active loopback inspector and the
+authenticated editor projection reported current-schema arena instance `0:1`,
+36 live projected instances, and zero omissions. The actual 2880x1800 VS Code
+renderer capture is checked in as `evidence/vscode-live-values.png`; its
+digest, exact inline texts, live values, component/schema identities, source
+inputs, npm tarball digest, and VSIX digest are sealed in the adjacent JSON.
+The new offline test rejects source, screenshot, property, or evidence-key
+drift.
+
+The hosted Defold Extender did not build a fresh engine during this observation:
+its server image rejected the pinned SDK's newer `r8Cmd` build field before the
+project extension compiled. The observation therefore used the already proven
+packaged engine and passed the active dev resource URI plus inspector port
+explicitly. This is genuine engine-to-control-plane-to-VS-Code renderer
+evidence, not a claim about that hosted Extender deployment.
+
 ## 2026-09-24 - Static product gates no longer depend on mutable dev reachability
 
 Refreshing War Battles after the revision-parametric policy wave exposed a

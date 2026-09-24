@@ -21,6 +21,17 @@ export interface LiveValueLens {
   readonly navigation: LiveValueNavigation;
 }
 
+export interface LiveValueHint {
+  readonly propertyName: string;
+  readonly label: string;
+  readonly tooltip: string;
+}
+
+export interface PropertyDeclarationAnchor {
+  readonly propertyName: string;
+  readonly line: number;
+}
+
 export interface LiveValueNavigation {
   readonly projectRoot: string;
   readonly documentPath: string;
@@ -48,6 +59,8 @@ interface EnrichedInstance {
   readonly instanceId?: { readonly slot?: unknown; readonly generation?: unknown };
   readonly properties?: readonly LiveProperty[];
 }
+
+type CurrentEnrichedInstance = EnrichedInstance & { readonly componentId: string };
 
 interface DevTarget {
   readonly id?: unknown;
@@ -229,6 +242,182 @@ function instanceTitle(targetId: string, instance: EnrichedInstance): string {
   return `$(pulse) ${label(targetId)} · ${componentId}${instanceIdentity(instance)}${rendered.length ? ` · ${rendered.join(", ")}` : ""}`;
 }
 
+function liveInstances({
+  state,
+  projectRoot,
+  documentPath,
+  now,
+  maximumAgeMs
+}: {
+  state: DevState | undefined;
+  projectRoot: string;
+  documentPath: string;
+  now: number;
+  maximumAgeMs: number;
+}): Array<{ readonly targetId: string; readonly instance: CurrentEnrichedInstance }> {
+  if (!state || !/\.(?:script|gui|render)\.ts$/u.test(documentPath)) return [];
+  const matches: Array<{ targetId: string; instance: CurrentEnrichedInstance }> = [];
+  for (const target of state.targets) {
+    if (typeof target.id !== "string" || target.status === "disconnected" ||
+        !Number.isSafeInteger(target.connectionEpoch) || !target.componentSnapshot) continue;
+    const sampledAt = target.componentSnapshot.sampledAt;
+    if (typeof sampledAt !== "number" || !Number.isFinite(sampledAt) ||
+        sampledAt > now + maximumAgeMs || now - sampledAt > maximumAgeMs) continue;
+    const instances = Array.isArray(target.instances) ? target.instances : [];
+    for (const instance of instances) {
+      // Source ownership and schema status are server-enriched fields. Their
+      // absence is not guessed from component ids or filenames here.
+      if (!instance || instance.schemaStatus !== "current" || typeof instance.componentId !== "string" ||
+          !sameSource(projectRoot, instance.source, documentPath)) continue;
+      matches.push({ targetId: target.id, instance: instance as CurrentEnrichedInstance });
+    }
+  }
+  return matches;
+}
+
+/** Locate authored Defold property declarations without trusting runtime coordinates. */
+export function findPropertyDeclarationAnchors(
+  sourceText: string,
+  propertyNames: ReadonlySet<string>
+): PropertyDeclarationAnchor[] {
+  let masked = "";
+  let state: "code" | "line-comment" | "block-comment" | "single" | "double" | "template" = "code";
+  let escaped = false;
+  for (let index = 0; index < sourceText.length; index += 1) {
+    const current = sourceText[index];
+    const next = sourceText[index + 1];
+    if (state === "code") {
+      if (current === "/" && next === "/") {
+        masked += "  ";
+        index += 1;
+        state = "line-comment";
+      } else if (current === "/" && next === "*") {
+        masked += "  ";
+        index += 1;
+        state = "block-comment";
+      } else if (current === "'") {
+        masked += " ";
+        state = "single";
+      } else if (current === '"') {
+        masked += " ";
+        state = "double";
+      } else if (current === "`") {
+        masked += " ";
+        state = "template";
+      } else {
+        masked += current;
+      }
+      continue;
+    }
+    if (current === "\n") {
+      masked += "\n";
+      if (state === "line-comment" || state === "single" || state === "double") state = "code";
+      escaped = false;
+      continue;
+    }
+    masked += " ";
+    if (state === "line-comment") continue;
+    if (state === "block-comment") {
+      if (current === "*" && next === "/") {
+        masked += " ";
+        index += 1;
+        state = "code";
+      }
+      continue;
+    }
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (current === "\\") {
+      escaped = true;
+      continue;
+    }
+    if ((state === "single" && current === "'") ||
+        (state === "double" && current === '"') ||
+        (state === "template" && current === "`")) state = "code";
+  }
+
+  const anchors: PropertyDeclarationAnchor[] = [];
+  const seen = new Set<string>();
+  // Defold property declarations are object fields. Requiring the authored key
+  // to begin a line avoids treating a regular-expression body as a declaration
+  // while still allowing the factory call to wrap onto following lines.
+  const declaration = /^[\t ]*([A-Za-z_$][\w$]*)[\t ]*:[\t \r\n]*property[\t ]*\./gmu;
+  let scannedOffset = 0;
+  let line = 0;
+  for (const match of masked.matchAll(declaration)) {
+    const propertyName = match[1];
+    if (!propertyNames.has(propertyName) || seen.has(propertyName) || match.index === undefined) continue;
+    seen.add(propertyName);
+    while (scannedOffset < match.index) {
+      if (masked.charCodeAt(scannedOffset) === 10) line += 1;
+      scannedOffset += 1;
+    }
+    anchors.push({ propertyName, line });
+  }
+  return anchors;
+}
+
+export function liveValueHints({
+  state,
+  projectRoot,
+  documentPath,
+  now = Date.now(),
+  maximumAgeMs = liveValuesMaximumAgeMs,
+  maximumHints = 24
+}: {
+  state: DevState | undefined;
+  projectRoot: string;
+  documentPath: string;
+  now?: number;
+  maximumAgeMs?: number;
+  maximumHints?: number;
+}): LiveValueHint[] {
+  const values: Array<{
+    propertyName: string;
+    targetId: string;
+    componentId: string;
+    identity: string;
+    value: string;
+  }> = [];
+  for (const { targetId, instance } of liveInstances({ state, projectRoot, documentPath, now, maximumAgeMs })) {
+    const identity = instanceIdentity(instance);
+    const properties = Array.isArray(instance.properties) ? instance.properties : [];
+    for (const property of properties) {
+      if (typeof property.name !== "string" || !/^[A-Za-z_$][\w$]*$/u.test(property.name)) continue;
+      values.push({
+        propertyName: property.name,
+        targetId: label(targetId),
+        componentId: label(instance.componentId),
+        identity,
+        value: formatSnapshotValue(property.value)
+      });
+    }
+  }
+  values.sort((left, right) => left.propertyName.localeCompare(right.propertyName) ||
+      left.targetId.localeCompare(right.targetId) || left.componentId.localeCompare(right.componentId));
+  const grouped = new Map<string, typeof values>();
+  for (const value of values) {
+    const group = grouped.get(value.propertyName) ?? [];
+    group.push(value);
+    grouped.set(value.propertyName, group);
+  }
+  return [...grouped.entries()].slice(0, Math.max(0, maximumHints)).map(([propertyName, entries]) => {
+    const visible = entries.slice(0, 3).map((entry) =>
+      `${entry.identity || ` [${entry.targetId}/${entry.componentId}]`} = ${entry.value}`);
+    if (entries.length > 3) visible.push(` · +${entries.length - 3}`);
+    const tooltipEntries = entries.slice(0, 16).map((entry) =>
+      `${entry.targetId} · ${entry.componentId}${entry.identity} · ${label(propertyName, 32)}=${entry.value}`);
+    if (entries.length > 16) tooltipEntries.push(`+${entries.length - 16} more live instances`);
+    return {
+      propertyName,
+      label: `live ${label(propertyName, 32)}${visible.join(" ·")}`,
+      tooltip: tooltipEntries.join("\n")
+    };
+  });
+}
+
 export function liveValueLenses({
   state,
   projectRoot,
@@ -244,30 +433,17 @@ export function liveValueLenses({
   maximumAgeMs?: number;
   maximumLenses?: number;
 }): LiveValueLens[] {
-  if (!state || !/\.(?:script|gui|render)\.ts$/u.test(documentPath)) return [];
   const lenses: LiveValueLens[] = [];
-  for (const target of state.targets) {
-    if (typeof target.id !== "string" || target.status === "disconnected" ||
-        !Number.isSafeInteger(target.connectionEpoch) || !target.componentSnapshot) continue;
-    const sampledAt = target.componentSnapshot.sampledAt;
-    if (typeof sampledAt !== "number" || !Number.isFinite(sampledAt) ||
-        sampledAt > now + maximumAgeMs || now - sampledAt > maximumAgeMs) continue;
-    const instances = Array.isArray(target.instances) ? target.instances : [];
-    for (const instance of instances) {
-      // Source ownership and schema status are server-enriched fields. Their
-      // absence is not guessed from component ids or filenames here.
-      if (!instance || instance.schemaStatus !== "current" || typeof instance.componentId !== "string" ||
-          !sameSource(projectRoot, instance.source, documentPath)) continue;
-      lenses.push({
-        targetId: target.id,
-        componentId: instance.componentId,
-        title: instanceTitle(target.id, instance),
-        navigation: {
-          projectRoot: path.resolve(projectRoot),
-          documentPath: path.resolve(documentPath)
-        }
-      });
-    }
+  for (const { targetId, instance } of liveInstances({ state, projectRoot, documentPath, now, maximumAgeMs })) {
+    lenses.push({
+      targetId,
+      componentId: instance.componentId,
+      title: instanceTitle(targetId, instance),
+      navigation: {
+        projectRoot: path.resolve(projectRoot),
+        documentPath: path.resolve(documentPath)
+      }
+    });
   }
   return lenses
     .sort((left, right) => left.targetId.localeCompare(right.targetId) || left.title.localeCompare(right.title))

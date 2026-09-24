@@ -1,9 +1,9 @@
 ---
 type: Research Note
 title: Installed War Battles language-server and VS Code client evidence
-description: Package-consumer protocol evidence for Defold semantic completion, hover, definition, diagnostics ownership, and context-specific projections, with the remaining desktop visual limitation recorded explicitly.
+description: Package-consumer protocol and actual VS Code renderer evidence for Defold semantic completion, live values, hover, definition, diagnostics ownership, and context-specific projections.
 tags: [research, evidence, vscode, lsp, war-battles, diagnostics]
-status: active
+status: verified
 generated: { by: codex/gpt-5, at: 2026-09-23T14:35:00-04:00 }
 sources:
   - id: package-manifest
@@ -30,6 +30,14 @@ sources:
     resource: ../../editors/vscode/test
     title: Thin VSIX client tests
     author: team:ts-defold
+  - id: visual-evidence
+    resource: ../../examples/war-battles-online/evidence/vscode-live-values.json
+    title: Source-bound inline live-value observation
+    author: team:ts-defold
+  - id: visual-screenshot
+    resource: ../../examples/war-battles-online/evidence/vscode-live-values.png
+    title: Actual VS Code renderer capture
+    author: team:ts-defold
 ---
 
 # Observation
@@ -38,10 +46,10 @@ On 2026-09-23, the packed `@ts-defold/deherm@0.0.0` artifact was created with
 `pnpm pack` and its `deherm-language-server.mjs` was run from an installed
 package directory against a temporary consumer copy of the War Battles
 generated symbol table. The server initialized and exited cleanly (exit code
-0). The package tarball SHA-256 was
-`8c7e5c3c98ba7f524b75e48fcb3c6babe1505a28140f5fed6004f44b95931a97`.
+0). The package tarball SHA-256 for the final visual observation was
+`d1b3e7c487b1495884b774541344c454404fbf7853b7dc767ea6ca4a2497cdaf`.
 The packaged thin VSIX SHA-256 was
-`e144fa30d7c6fbe134d395652545deae3fa01a0f24e8bfe19bd151bbf90fe51b`.
+`e0225916fa8b58938607e73ff0e85a4a10458abbe9748afafb3c19a0498f5a76`.
 
 The protocol observation returned all of the following:
 
@@ -79,12 +87,28 @@ pnpm package:vscode # VSIX emitted, client-only manifest
 git diff --check
 ```
 
-This evidence closes the installed protocol and route-projection portion of the
-roadmap item. A distinct human-visible VS Code screenshot was not recorded: the
-macOS desktop was locked, and native-app UI automation reported that it could
-not unlock the display. No visual claim is made here; the literal VS Code visual
-observation remains open until an unlocked Extension Host session can be
-observed.
+On 2026-09-24 the distinct visual gate was recorded from an actual VS Code
+1.129.1 renderer despite the macOS desktop remaining locked. An isolated VS
+Code profile installed the packaged VSIX, the project-local package was the
+exact `npm pack` artifact above, and the existing packaged arm64 engine was
+launched with the active dev resource and inspector ports. The authenticated
+state endpoint reported current-schema arena instance `0:1`, 36 projected live
+instances, and zero omissions. The rendered editor displayed source-owned inlay
+hints directly beside the four declarations in `main/arena.script.ts`:
+
+```text
+players: property.number(8),             live players [0:1] = 8
+botSkill: property.number(2),            live botSkill [0:1] = 2
+mapSeed: property.number(0),             live mapSeed [0:1] = 0
+autoEngageSeconds: property.number(0),   live autoEngageSeconds [0:1] = 0
+```
+
+The 2880x1800 renderer screenshot, exact inline texts, live values, source inputs,
+package/VSIX digests, and screenshot digest are bound by
+`vscode-live-values.json`. `pnpm runtime:vscode:check` revalidates that record
+offline. This closes the literal VS Code presentation boundary; it does not
+claim that a locked macOS display was unlocked or that hosted Extender produced
+a new engine during this observation.
 
 The receiver projection is intentionally narrower than sender projection: it
 requires the generated static-evidence source, one-based line/column join, and

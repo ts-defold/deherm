@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 2,
+  "kind": "deherm.war-battles.vscode-live-values-evidence",
+  "platform": "arm64-macos",
+  "observation": {
+    "editor": "Visual Studio Code",
+    "title": "arena.script.ts — defold",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.129.1 Chrome/148.0.7778.280 Electron/42.6.0 Safari/537.36",
+    "targetId": "local-engine",
+    "targetRuntime": "hermes",
+    "source": "main/arena.script.ts",
+    "instanceId": {
+      "slot": 0,
+      "generation": 1
+    },
+    "componentId": "deherm.component/v1/1b5cd6bc1e1ea3d250982bba082705186607d6bd01c00e264f8cfd865c654d8f",
+    "schemaFingerprint": "d7d20f2bcbec38a3269b0937cf084fe3a69b8a9136f991b4cc08299153031bfb",
+    "schemaStatus": "current",
+    "properties": {
+      "players": 8,
+      "botSkill": 2,
+      "mapSeed": 0,
+      "autoEngageSeconds": 0
+    },
+    "inlineValueTexts": [
+      "live players [0:1] = 8",
+      "live botSkill [0:1] = 2",
+      "live mapSeed [0:1] = 0",
+      "live autoEngageSeconds [0:1] = 0"
+    ],
+    "projectedInstanceCount": 36,
+    "omittedInstanceCount": 0
+  },
+  "screenshot": {
+    "path": "examples/war-battles-online/evidence/vscode-live-values.png",
+    "bytes": 833216,
+    "sha256": "11a06addbbf73baceb013e1fc0f35bca5215c987edf77949108b6b84f9aed08d",
+    "width": 2880,
+    "height": 1800
+  },
+  "observedArtifacts": {
+    "npmPackage": {
+      "path": "ts-defold-deherm-0.0.0.tgz",
+      "bytes": 604063,
+      "sha256": "d1b3e7c487b1495884b774541344c454404fbf7853b7dc767ea6ca4a2497cdaf"
+    },
+    "vsix": {
+      "path": "editors/vscode/dist/deherm.vsix",
+      "bytes": 93318,
+      "sha256": "e0225916fa8b58938607e73ff0e85a4a10458abbe9748afafb3c19a0498f5a76"
+    }
+  },
+  "sourceInputs": [
+    {
+      "path": "package.json",
+      "bytes": 44712,
+      "sha256": "8f07439a4890463159b4f4ee55b7f0fea8c279edd4128bf81733b241de69e809"
+    },
+    {
+      "path": "editors/vscode/package.json",
+      "bytes": 3877,
+      "sha256": "6ccd3a7949ce76b22e94bda49a0220126b40f1faf172c97da240e35b5d343267"
+    },
+    {
+      "path": "editors/vscode/src/extension.ts",
+      "bytes": 16498,
+      "sha256": "487abd23ccc031ace69dc1e09ba69ad89b8fe5f41815eaa2a88f82c2561634fa"
+    },
+    {
+      "path": "editors/vscode/src/live-values.ts",
+      "bytes": 16631,
+      "sha256": "08af7d58ab81e406850968aaf55f64ce51d0011b6bf57a6fe8b8f1eb4fd79d97"
+    },
+    {
+      "path": "packages/cli/src/dev/inspector-bridge.mjs",
+      "bytes": 12191,
+      "sha256": "a14e9b63ab7bc09ca1e1152614174d191c6f7ec04283eb21732c793169e9ca01"
+    },
+    {
+      "path": "examples/war-battles-online/defold/main/arena.script.ts",
+      "bytes": 25232,
+      "sha256": "10136669e6abc0b03795c8578caae60c507e21fc5375e4c1b33927b0867859f2"
+    },
+    {
+      "path": "examples/war-battles-online/integration/check-vscode-visual.mjs",
+      "bytes": 5341,
+      "sha256": "f1faab716573f3de7a4503e672861ebd644d47d35d3e4d0989b0e57fb3c9273b"
+    },
+    {
+      "path": "examples/war-battles-online/integration/vscode-visual-evidence.mjs",
+      "bytes": 5647,
+      "sha256": "471cf9d771aee15c2597b197d7592a0a73cd41e5c7724a56f4dab405328c54c7"
+    }
+  ],
+  "evidenceKey": "b7cf54ad807929ccadda069292c48053785de38b9aae14850da81ef6f38d325a"
+}

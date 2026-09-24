@@ -64,7 +64,7 @@ below without changing its completion rule.
    writes `.deherm/dev/session.log`, supports keyboard/mouse log navigation and
    clipboard copy, and tears down the engine when `q` quits the session. Real
    War Battles runtime evidence includes two activated HMR generations.
-8. **Active — finish Hermes developer inspection.** The native Hermes CDP core,
+8. **Completed — Hermes developer inspection.** The native Hermes CDP core,
    bounded engine transport, standard CLI discovery/WebSocket bridge, and HMR
    runtime rebinding are implemented and proven in real War Battles. The
    incremental compiler already emits source-content maps and feeds them into
@@ -87,7 +87,8 @@ below without changing its completion rule.
    the existing DAP. Native and browser runtimes now emit the same bounded live
    instance/property snapshot; the CLI joins exact schemas, the TUI renders the
    genuine rows, and the VS Code client polls the authenticated state into
-   bounded CodeLens values beside authored component files. A packaged
+   bounded CodeLens summaries and declaration-anchored live values in authored
+   component files. A packaged
    arm64-macOS War Battles engine has now emitted the snapshot through the
    public dev session and the authenticated endpoint joined current schemas
    with zero omissions. Generated route/argument metadata now also drives
@@ -105,9 +106,11 @@ below without changing its completion rule.
    preserving runtime id `1`, arena instance `0:1`, all 19 persistent component
    identities, and advancing gameplay through every edit; the persisted record
    revalidates offline and is keyed to the deterministic packed-package tree
-   digest rather than a temporary install path. Next record the actual VS Code
-   visual observation, then
-   continue native/browser War Battles. Do not reopen the
+   digest rather than a temporary install path. An actual VS Code 1.129.1
+   renderer now shows current-schema arena instance `0:1` and its live values
+   beside all four `property.*` declarations in `arena.script.ts`; the
+   source-bound screenshot record revalidates
+   offline. Continue native/browser War Battles. Do not reopen the
    compiler/distribution or core TUI/HMR seams without a concrete regression.
    The component-only native runtime now preserves the active Hermes realm and
    `self` objects across compatible definition reloads; its ASan/UBSan-backed
@@ -118,8 +121,7 @@ below without changing its completion rule.
    `hmrPersistentState` cell now retains explicitly keyed module state, and a
    fresh installed six-edit soak observed 56 transient detaches after the first
    accepted generation while runtime id `1`, arena instance `0:1`, and all 19
-   persistent identities remained stable. The remaining tooling observation is
-   literal VS Code presentation.
+   persistent identities remained stable.
 
 Every route remains public when Defold exposes it. Verification status controls
 the evidence label, never whether the generator ships the route; a missing
@@ -258,7 +260,7 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
 4. **Completed.** Logs are laptop-scrollable, mouse-selectable, copyable, and
    mirrored to `.deherm/dev/session.log`; full errors remain in the file and
    `q` tears down the engine and quits the session.
-5. **Active.** The incremental compiler emits transformed JavaScript through
+5. **Completed.** The incremental compiler emits transformed JavaScript through
    TypeScript-Go's mapped emitter, composes those authored maps through esbuild,
    and passes the final map to `hermesc -source-map` for debug bytecode. Native Hermes now
    exposes a standard CLI CDP endpoint and preserves one frontend across HMR.
@@ -281,9 +283,10 @@ Public ledger: [#96 Finish installed TUI, watch, HMR, telemetry, debugging, and 
    reveal only their still-registered owning authored resource through a
    revalidated project/document payload; arbitrary runtime paths fail closed.
    A packaged arm64-macOS War Battles engine has emitted that live state through
-   the public dev session. The installed VSIX's provider and reveal command now
-   pass a real Extension Host observation; record the actual VS Code visual observation
-   and finish the remaining route-specific Defold semantic projections.
+   the public dev session. The installed VSIX's provider and reveal command pass
+   a real Extension Host observation, and an actual VS Code renderer capture now
+   records current-schema arena instance `0:1` with `players=8`, `botSkill=2`,
+   `mapSeed=0`, and `autoEngageSeconds=0` beside their authored declarations.
 
 ## 5. Finish public API ergonomics and project integration
 
@@ -318,8 +321,8 @@ that the package owns to keep typed-native code out of a Wasm upload; every
 user-authored ignore rule remains hashed, while target selection cannot
 invalidate otherwise identical native evidence. Installed-TUI HMR proof is
 complete through the packed-package path. The remaining work in this tranche
-is the multiplayer expansion;
-literal VS Code visual observation remains a tooling-tranche debt.
+is the multiplayer expansion; the literal VS Code visual observation is now
+source-bound checked evidence.
 
 The next Static Hermes seam is now recorded separately as the generated
 `native-arm64-macos-static-hermes-reachable` projection. The release usage

@@ -19,6 +19,8 @@ import {
   type DehermProject
 } from "./core.js";
 import {
+  findPropertyDeclarationAnchors,
+  liveValueHints,
   liveValueLenses,
   liveValuesPollIntervalMs,
   pollInspectorState,
@@ -219,7 +221,7 @@ interface ProjectLiveState {
   failure?: string;
 }
 
-class DehermLiveValues implements vscode.CodeLensProvider, vscode.Disposable {
+class DehermLiveValues implements vscode.CodeLensProvider, vscode.InlayHintsProvider, vscode.Disposable {
   private readonly changed = new vscode.EventEmitter<void>();
   private readonly states = new Map<string, ProjectLiveState>();
   private readonly timers = new Map<string, NodeJS.Timeout>();
@@ -227,6 +229,7 @@ class DehermLiveValues implements vscode.CodeLensProvider, vscode.Disposable {
   private revision = 0;
 
   readonly onDidChangeCodeLenses = this.changed.event;
+  readonly onDidChangeInlayHints = this.changed.event;
 
   constructor(
     private readonly output: vscode.OutputChannel,
@@ -245,6 +248,31 @@ class DehermLiveValues implements vscode.CodeLensProvider, vscode.Disposable {
       new vscode.Range(0, 0, 0, 0),
       { title, command: "deherm.liveValues.reveal", arguments: [navigation] }
     ));
+  }
+
+  provideInlayHints(document: vscode.TextDocument, range: vscode.Range): vscode.InlayHint[] {
+    const project = owningDehermProject(this.projects.all(), document.uri.fsPath);
+    if (!project) return [];
+    const state = this.states.get(project.projectRoot)?.state;
+    const hints = liveValueHints({
+      state,
+      projectRoot: project.projectRoot,
+      documentPath: document.uri.fsPath
+    });
+    const anchors = new Map(findPropertyDeclarationAnchors(
+      document.getText(),
+      new Set(hints.map((hint) => hint.propertyName))
+    ).map((anchor) => [anchor.propertyName, anchor]));
+    return hints.flatMap((live) => {
+      const anchor = anchors.get(live.propertyName);
+      if (!anchor) return [];
+      const position = document.lineAt(anchor.line).range.end;
+      if (!range.contains(position)) return [];
+      const hint = new vscode.InlayHint(position, live.label, vscode.InlayHintKind.Type);
+      hint.paddingLeft = true;
+      hint.tooltip = live.tooltip;
+      return [hint];
+    });
   }
 
   async reveal(navigation: unknown): Promise<void> {
@@ -354,6 +382,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
     output,
     activeLiveValues,
     vscode.languages.registerCodeLensProvider([
+      { scheme: "file", language: "typescript", pattern: "**/*.script.ts" },
+      { scheme: "file", language: "typescript", pattern: "**/*.gui.ts" },
+      { scheme: "file", language: "typescript", pattern: "**/*.render.ts" }
+    ], activeLiveValues),
+    vscode.languages.registerInlayHintsProvider([
       { scheme: "file", language: "typescript", pattern: "**/*.script.ts" },
       { scheme: "file", language: "typescript", pattern: "**/*.gui.ts" },
       { scheme: "file", language: "typescript", pattern: "**/*.render.ts" }
