@@ -16,7 +16,7 @@
   "profile": false,
   "laneSources": {
     ".deherm/static-hermes/generated/script-universal-value.ts": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0",
-    ".deherm/static-hermes/generated/script-typed-native-bridge.ts": "562854b576634573f0790def0bde422b21c52f6d1b16eb1407439ca66d8889ec"
+    ".deherm/static-hermes/generated/script-typed-native-bridge.ts": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f"
   },
   "vendoredHeaders": {
     "hermes/Support/sh_tryfast_fp_cvt.h": "765d5904d92d2fbfe1c0fbd7a7da1c1e50f3b66a467b21f4721538a444386d15",
@@ -35,10 +35,10 @@
   "hermesArchiveModel": "rel",
   "compiledWithAssertsOff": true,
   "externCalleeCount": 37,
-  "externCallSiteCount": 67,
-  "emittedCSha256": "a8c7ee594288a95db6cbf581c3d0729207e4c10f3cb4e936ee4b01332a7d63d6",
-  "emittedCBytes": 266732,
-  "adaptedSourceSha256": "753a5d67f4824be6270a57b7c437f0bb87fd6dca8264fd657bbea04898cbe395",
+  "externCallSiteCount": 68,
+  "emittedCSha256": "5da0f101e4b64f2edc36d205423b42df32602d2324beea84ecfc1abae92b7654",
+  "emittedCBytes": 290027,
+  "adaptedSourceSha256": "4dc1260c936295a0631c66742087b31b01b6266f3c35b909b76787d5d0af2fbc",
   "evidenceBoundary": {
     "cEmission": "observed",
     "compilation": "requires-extender",

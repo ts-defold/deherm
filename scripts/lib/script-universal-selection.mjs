@@ -2,7 +2,7 @@ import { stableBindingId } from "./binding-identity.mjs";
 
 export const universalTargetSupport = Object.freeze({
   nativeDynamicHermes: "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
-  nativeStaticHermes: "generated-sound-typed-fixed-capacity-frame-marshal-runtime-proven-for-non-callback-non-handle-non-defold-value-shapes-packaged-engine-unverified",
+  nativeStaticHermes: "generated-sound-typed-fixed-capacity-frame-marshal-runtime-proven-for-optional-input-callbacks-that-decline-to-jsi-non-handle-non-defold-value-shapes-packaged-engine-unverified",
   html5BrowserHost: "generated-direct-wasm-memory-provider-plus-23-registry-eligible-callback-trampolines-node-and-native-harness-proven-2-higher-order-lua-closures-blocked-packaged-browser-engine-unverified"
 });
 

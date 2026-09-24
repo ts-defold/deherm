@@ -3,16 +3,16 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "generated-script-recording-engine",
   "evidenceBoundary": "This harness proves only that the generated binding stack matches this repository's declared contract for each route. It is a null/observer engine: it is not Defold, and nothing here is engine conformance evidence. Trace records are keyed by the canonical lowering plan's interned contract index so a later real-engine differential can diff against them per contract.",
-  "planSha256": "b17db9fe5750fe813bd8f0b88b738e7f22da1ed072032dd3425880add7cd4d30",
+  "planSha256": "8172c8da976b02bcd558d18b14357343c300105342e5ed92c7c93c8d2621662e",
   "planFallback": null,
   "inputHashes": {
-    "projection": "5f4b2a167a48199de4fe98e4c4c49dfac24f32e4063d1f9311a9acf79b952887",
-    "universal": "231ccfb4408ce646e2053cf5e8c225aad50864e7b6612d3bcada41df7e4a1559",
-    "handleLowering": "70e4a6ebcd5fcb173f6cb1cb74c63c6a421ee9fb3b824e5f56cfd2b8f079d150",
-    "tableRecords": "eb2cfb2cc46874e6d727b9d22153cc24642250340ce56d400b8d8e6aaee2acbd",
+    "projection": "e9d2fd4906e2aa6795ae294fec67960fe524e35878bb6a40c16634eafeb2f8d9",
+    "universal": "c53f52c74d4bb5d07d6614e1ccace2f3baf7246994df4ed49a38fec9a7c01185",
+    "handleLowering": "8b7af8715fd9f3b9eeaa9a74f558d9f74b5aeda84f27650b2e9e0f5a0119cafc",
+    "tableRecords": "ad99eac7d868e4998a06436ab6d5eb4048e30a77c17138a581080b9249f2ae50",
     "valueBindings": "805dbd25cbf2fc9472f207f9244e4996296a99418411e0880dca1640e596b176",
     "overloadDispatch": "829f556760905005f05f0757eaa244d86c6e6af047d50ece033662344fe48d39",
-    "loweringPlan": "c6d8f311dcdfba43f1606492b3590a851c5214d43cbaa741533f29d402ff56e4"
+    "loweringPlan": "a581fbfc27a35f3b72a5f09675f269cf26e086235e4e518090dbc31de8ec83c3"
   },
   "planInputDrift": [],
   "transports": {
@@ -54,7 +54,7 @@
         "status": "blocked",
         "lane": "not-emitted",
         "reason": "canonical-lowering-plan-blocked-capability",
-        "routeCount": 470
+        "routeCount": 419
       },
       {
         "id": 2,
@@ -118,7 +118,7 @@
         "status": "exercise",
         "lane": "static-hermes-typed-native",
         "reason": "",
-        "routeCount": 466
+        "routeCount": 517
       },
       {
         "id": 10,
@@ -50095,7 +50095,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 249,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 249,
         "luaStack": 249,
         "browserWasmHost": 249
       },
@@ -50167,7 +50167,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -63024,7 +63024,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 249,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 249,
         "luaStack": 249,
         "browserWasmHost": 249
       },
@@ -63096,7 +63096,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -63436,7 +63436,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 276,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 276,
         "luaStack": 276,
         "browserWasmHost": 276
       },
@@ -63511,7 +63511,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -68549,7 +68549,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 310,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 310,
         "luaStack": 310,
         "browserWasmHost": 310
       },
@@ -68600,7 +68600,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -71241,7 +71241,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 326,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 326,
         "luaStack": 326,
         "browserWasmHost": 326
       },
@@ -71315,7 +71315,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -71830,7 +71830,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 330,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 330,
         "luaStack": 330,
         "browserWasmHost": 330
       },
@@ -71880,7 +71880,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -71908,7 +71908,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -71958,7 +71958,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -71986,7 +71986,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 332,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 332,
         "luaStack": 332,
         "browserWasmHost": 332
       },
@@ -72036,7 +72036,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72064,7 +72064,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 333,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 333,
         "luaStack": 333,
         "browserWasmHost": 333
       },
@@ -72114,7 +72114,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72142,7 +72142,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 334,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 334,
         "luaStack": 334,
         "browserWasmHost": 334
       },
@@ -72192,7 +72192,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72220,7 +72220,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 333,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 333,
         "luaStack": 333,
         "browserWasmHost": 333
       },
@@ -72270,7 +72270,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72298,7 +72298,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -72348,7 +72348,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72376,7 +72376,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 333,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 333,
         "luaStack": 333,
         "browserWasmHost": 333
       },
@@ -72426,7 +72426,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72454,7 +72454,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -72504,7 +72504,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72532,7 +72532,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -72582,7 +72582,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72610,7 +72610,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -72660,7 +72660,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72688,7 +72688,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -72738,7 +72738,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72766,7 +72766,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -72816,7 +72816,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72844,7 +72844,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -72894,7 +72894,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -72922,7 +72922,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 333,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 333,
         "luaStack": 333,
         "browserWasmHost": 333
       },
@@ -72972,7 +72972,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73000,7 +73000,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -73050,7 +73050,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73078,7 +73078,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -73128,7 +73128,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73235,7 +73235,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -73285,7 +73285,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73313,7 +73313,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 333,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 333,
         "luaStack": 333,
         "browserWasmHost": 333
       },
@@ -73363,7 +73363,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73391,7 +73391,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -73441,7 +73441,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73469,7 +73469,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 335,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 335,
         "luaStack": 335,
         "browserWasmHost": 335
       },
@@ -73519,7 +73519,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73547,7 +73547,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -73597,7 +73597,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73625,7 +73625,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 336,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 336,
         "luaStack": 336,
         "browserWasmHost": 336
       },
@@ -73676,7 +73676,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73704,7 +73704,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -73754,7 +73754,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73782,7 +73782,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -73832,7 +73832,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73860,7 +73860,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 337,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 337,
         "luaStack": 337,
         "browserWasmHost": 337
       },
@@ -73910,7 +73910,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -73938,7 +73938,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -73988,7 +73988,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74093,7 +74093,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -74143,7 +74143,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74248,7 +74248,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -74298,7 +74298,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74326,7 +74326,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 339,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 339,
         "luaStack": 339,
         "browserWasmHost": 339
       },
@@ -74376,7 +74376,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74404,7 +74404,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -74454,7 +74454,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74482,7 +74482,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -74532,7 +74532,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74560,7 +74560,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 340,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 340,
         "luaStack": 340,
         "browserWasmHost": 340
       },
@@ -74610,7 +74610,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74638,7 +74638,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 341,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 341,
         "luaStack": 341,
         "browserWasmHost": 341
       },
@@ -74688,7 +74688,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74716,7 +74716,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -74766,7 +74766,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74794,7 +74794,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 292,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 292,
         "luaStack": 292,
         "browserWasmHost": 292
       },
@@ -74844,7 +74844,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -74956,7 +74956,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 331,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 331,
         "luaStack": 331,
         "browserWasmHost": 331
       },
@@ -75006,7 +75006,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -75034,7 +75034,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 333,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 333,
         "luaStack": 333,
         "browserWasmHost": 333
       },
@@ -75084,7 +75084,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -75112,7 +75112,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 343,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 343,
         "luaStack": 343,
         "browserWasmHost": 343
       },
@@ -75162,7 +75162,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -75190,7 +75190,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 343,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 343,
         "luaStack": 343,
         "browserWasmHost": 343
       },
@@ -75240,7 +75240,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         2,
         3
       ]
@@ -77945,7 +77945,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 367,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 367,
         "luaStack": 367,
         "browserWasmHost": 367
       },
@@ -78020,7 +78020,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -78439,7 +78439,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 371,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 371,
         "luaStack": 371,
         "browserWasmHost": 371
       },
@@ -78511,7 +78511,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -79655,7 +79655,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 384,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 384,
         "luaStack": 384,
         "browserWasmHost": 384
       },
@@ -79726,7 +79726,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -83785,7 +83785,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 413,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 413,
         "luaStack": 413,
         "browserWasmHost": 413
       },
@@ -83856,7 +83856,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -87861,7 +87861,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 449,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 449,
         "luaStack": 449,
         "browserWasmHost": 449
       },
@@ -87936,7 +87936,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -88276,7 +88276,7 @@
       "marshallingPrograms": {
         "typescriptSdk": 0,
         "dynamicHermesJsi": 451,
-        "staticHermesCAbi": 0,
+        "staticHermesCAbi": 451,
         "luaStack": 451,
         "browserWasmHost": 451
       },
@@ -88350,7 +88350,7 @@
       },
       "applicability": [
         0,
-        1,
+        9,
         10,
         3
       ]
@@ -97270,13 +97270,13 @@
       },
       "static-hermes": {
         "status": {
-          "exercise": 466,
-          "blocked": 588,
+          "exercise": 517,
+          "blocked": 537,
           "omit": 2
         },
         "lanes": {
-          "not-emitted": 590,
-          "static-hermes-typed-native": 466
+          "not-emitted": 539,
+          "static-hermes-typed-native": 517
         }
       },
       "browser-wasm": {
@@ -97340,9 +97340,9 @@
     "expectedTrace": "tests/fixtures/generated_script_recording_expected_trace.txt"
   },
   "artifactHashes": {
-    "header": "33eb3492b1ee41459bde6102b4c1bb94aea029229c62ceb69e4dd0644db99c32",
-    "tables": "8e3f41ecae9e1f469fe46bb64ae825049cbb94434dd3b824159e4ba696fa0f77",
-    "provider": "0fc9f15f9a102580000487e16763ac69b07ee5df90ccd0f2c5f8bf80234d71fd",
+    "header": "f803c11a9af7ac9992bd586c177cc5c66113f3bb298f62f081f036ac26a9f054",
+    "tables": "56b71c87969369afb3c792cc884e6687a688b9e5ce522760237deece654b30b5",
+    "provider": "365eb33c7adda67d2390ac911cd21e28bf9014ef91a6151f7854082db9ac5acd",
     "luaAdapter": "e8429156d7c289fd90125ab5daeeb8ce1427fc878be61d44cb6a3cf022175862",
     "nativePodDriver": "c60ebe3fd13b85808109d0de95edf6be76fa9c40aff2ea700220d9362c84a676",
     "nativePodDriverJs": "5c86bf82e3f036fc359e61cf370450d44d93ec4119bc4d7b9c2ec98118323d7a",
@@ -97350,6 +97350,6 @@
     "browserCallbackDriverJs": "46d940a2660dbbf187016d2be178dbb69b3127f17ccb897c12b00dbc024ec92c",
     "driver": "a0a2dc3a70dc4dad47cd197d1c0e57da8873be95d72228c2f33f74066ae71630",
     "driverJs": "45e96075867bdf777c8f5c97d6416acc5025775ee877b6f55ebdb0d44fc0a523",
-    "expectedTrace": "c1d5da3f910691d36a056f9cce25d77a4b35f2f79f02ca9dc58e325496fe1b0e"
+    "expectedTrace": "4839c10a9050b0389594d7de8c77e048cd84f215ae510c239f039d2fa0ed880b"
   }
 }

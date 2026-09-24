@@ -12,6 +12,8 @@ const IMPLEMENTED_FAMILIES = Object.freeze([
   "dynamic-values",
   "multi-result",
   "overload-dispatch",
+  "callback-lifecycle",
+  "borrowed-handle",
 ]);
 const IMPLEMENTED_FAMILY_SET = new Set(IMPLEMENTED_FAMILIES);
 const SUPPORTED_RELEASE_EXPECTATION = "no-retained-result-release";
@@ -58,6 +60,19 @@ export function planStaticScriptExactValue(recording, shapeIndex, seed, ancestor
         kind: "hash", low: Number(value & UINT32_MAX), high: Number(value >> 32n), specification: specification()
       };
     }
+    case shapeCodes.guiNode:
+      // The reviewed GUI structured family uses a bounded synthetic registry
+      // token for exact-call verification.  Its slot is fixed and its ordinal
+      // is derived from the generated seed ledger, so this vector cannot
+      // accidentally claim arbitrary retained-handle ownership.
+      return {
+        kind: "gui-node",
+        semantic: shape.aux,
+        runtime: 1,
+        low: 1,
+        high: recording.handleSeeds.length + 1,
+        specification: specification()
+      };
     case shapeCodes.url: {
       const lanes = Array.from({ length: 4 }, (_, lane) => exactUnsigned64(seed + lane));
       return {
@@ -142,6 +157,23 @@ function shapeContains(recording, shapeIndex, code, ancestors = new Set()) {
   return shape.children.some((child) => shapeContains(recording, child, code, nested));
 }
 
+// A callback-bearing Static route is emitted only when every callback is an
+// optional input.  Its exact Static vector therefore calls the same route at
+// its declared minimum arity, omitting all optional tail arguments.  Keep the
+// decision structural: a callback that appears in a required prefix is a
+// generator defect, not a reason to manufacture a callable frame value.
+export function staticExactArgumentShapes(recording, route) {
+  const callbackSlots = route.argumentShapes.flatMap((shape, slot) =>
+    shapeContains(recording, shape, shapeCodes.callback) ? [slot] : []);
+  if (callbackSlots.length === 0) return route.argumentShapes;
+  const minimum = route.arity?.minimum;
+  assert(Number.isInteger(minimum) && minimum >= 0 && minimum <= route.argumentShapes.length,
+    `${route.id}: optional callback route has invalid minimum arity`);
+  assert(callbackSlots.every((slot) => slot >= minimum),
+    `${route.id}: Static Hermes callback appears in required argument prefix`);
+  return route.argumentShapes.slice(0, minimum);
+}
+
 function validateStaticLane(recording, lanes, targetIndex, route) {
   assert(Array.isArray(route.applicability) && targetIndex < route.applicability.length,
     `${route.id}: Static Hermes applicability lane is missing`);
@@ -217,7 +249,8 @@ export function materializeStaticScriptExactVectors(recording) {
       `${route.id}: exact argument shape/value arity drifted`);
     assert(route.resultShapes.length === contract.resultValues.length,
       `${route.id}: exact result shape/value arity drifted`);
-    const argumentPlans = route.argumentShapes.map((shape, slot) => {
+    const argumentShapes = staticExactArgumentShapes(recording, route);
+    const argumentPlans = argumentShapes.map((shape, slot) => {
       const specification = contract.argumentValues[slot];
       const plan = planStaticScriptExactValue(recording, shape, slot + 1);
       assert(specification === plan.specification,
@@ -254,7 +287,7 @@ export function materializeStaticScriptExactVectors(recording) {
     assert(resultPlans.reduce((sum, plan) => sum + tableEntryCount(plan), 0) <=
       contract.bounds.outputEntryCapacity,
     `${route.id}: exact output table-entry capacity is insufficient`);
-    const shapes = [...route.argumentShapes, ...route.resultShapes];
+    const shapes = [...argumentShapes, ...route.resultShapes];
     assert(typeof contract.bounds.matrix4Arena === "boolean" &&
       (!shapes.some((index) => shapeContains(recording, index, shapeCodes.matrix4)) ||
         contract.bounds.matrix4Arena),
@@ -263,16 +296,21 @@ export function materializeStaticScriptExactVectors(recording) {
       (!shapes.some((index) => shapeContains(recording, index, shapeCodes.url)) ||
         contract.bounds.urlArena),
     `${route.id}: exact URL arena flag drifted`);
-    assert(contract.releaseExpectation === SUPPORTED_RELEASE_EXPECTATION,
+    assert(contract.releaseExpectation === SUPPORTED_RELEASE_EXPECTATION ||
+      contract.releaseExpectation === "generated-owned-handle-release",
       `${route.id}: unsupported Static Hermes release expectation ${contract.releaseExpectation}`);
+    if (contract.releaseExpectation === "generated-owned-handle-release") {
+      assert(resultPlans.length > 0 && resultPlans.every(({ kind }) => kind === "gui-node"),
+        `${route.id}: generated-owned release lacks a bounded GUI-node exact result`);
+    }
     return [{
       routeIndex,
       id: route.id,
       stableId: route.stableId,
       loweringFamily: route.loweringFamily,
-      argumentShapes: route.argumentShapes,
+      argumentShapes,
       resultShapes: route.resultShapes,
-      argumentValues: contract.argumentValues,
+      argumentValues: contract.argumentValues.slice(0, argumentShapes.length),
       resultValues: contract.resultValues,
       bounds: contract.bounds,
       releaseExpectation: contract.releaseExpectation
@@ -291,7 +329,7 @@ export function materializeStaticScriptExactVectors(recording) {
     exactVectorCount: vectors.length,
     families,
     vectorSha256: sha256(canonicalJson(vectors)),
-    evidenceBoundary: "The generated sound-typed Static Hermes runner replays every lowering-plan-emitted route through the production bounded frame and the generated recording provider. Exact argument and result predicates are derived from the interned contract values; generation fails on applicability, driven arity, argument/result/table capacity, arena-flag, recursive-shape, or release-policy drift. It proves exact bridge lookup, ordered values, result decoding, and target applicability. It does not execute Defold implementation semantics, prove every dynamic or overload alternative, claim optional-result omission behavior, instrument allocator calls, or claim negative exhaustion coverage for each route; allocation evidence belongs to separate instrumented runtime benchmarks, not ASan/UBSan execution."
+    evidenceBoundary: "The generated sound-typed Static Hermes runner replays every lowering-plan-emitted route through the production bounded frame and the generated recording provider. Exact argument and result predicates are derived from the interned contract values; optional callback-input routes are replayed at declared minimum arity with the callback omitted, while present callbacks are declined by the typed adapter before frame acquisition and remain on the captured JSI lifecycle. Generation fails on applicability, driven arity, argument/result/table capacity, arena-flag, recursive-shape, or release-policy drift. It proves exact bridge lookup, ordered values, result decoding, and target applicability. It does not execute Defold implementation semantics, prove every dynamic or overload alternative, claim optional-result omission behavior, instrument allocator calls, or claim negative exhaustion coverage for each route; allocation evidence belongs to separate instrumented runtime benchmarks, not ASan/UBSan execution."
   };
   return { report, vectors };
 }

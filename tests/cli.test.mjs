@@ -14,6 +14,8 @@ import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } fr
 import { writeProjectDmSdkCallSymbolIndex, writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../packages/cli/src/resource-symbols.mjs";
 import { hostDefoldPlatform } from "../packages/cli/src/toolchains.mjs";
 import { PUBLIC_EXTENSION_ZIP_LIMITS, discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject, resolveEngineProfiles } from "../packages/cli/src/project.mjs";
+import { materializePolicySurface } from "../packages/compiler/src/policy-surface-materializer.mjs";
+import { derivePolicy } from "../scripts/generate-api-policy.mjs";
 import { generateComponentProxies } from "../packages/compiler/src/component-proxy-generator.mjs";
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
@@ -939,7 +941,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.deepEqual(lock.generatedOutputs, manifest.generatedOutputs);
   assert.deepEqual(lock.engineProfiles, manifest.engineProfiles);
   const verified = await verifyGeneratedProject(project);
-  assert.equal(verified.checkedFiles, 28);
+  assert.equal(verified.checkedFiles, 30);
   assert.equal(verified.planSha256, loweringPlan.planSha256);
   const verifiedCli = spawnSync(process.execPath, [path.resolve("bin/deherm.mjs"), "verify-generated", "--project", project, "--json"], {
     cwd: process.cwd(),
@@ -1182,6 +1184,57 @@ test("project generation uses an input key and does not rewrite current outputs"
   const changedInventory = await inspectDefoldProject({ project });
   const changed = await writeGeneratedProject(changedInventory);
   assert.equal(changed.cached, false);
+  assert.notEqual(changed.generationKey, first.generationKey);
+});
+
+test("project generation refreshes package-owned Static Hermes sources without a revision change", async (t) => {
+  const project = await fixture();
+  // Materialize an authenticated revision surface in a temporary cache. Its
+  // Static Hermes tree is intentionally left unchanged while the package
+  // output below changes, reproducing a published package update over the
+  // same Defold revision without depending on a developer's home cache.
+  const cacheHome = await mkdtemp(path.join(tmpdir(), "deherm-static-hermes-cache-"));
+  const surfaceCopy = path.join(cacheHome, "surfaces", bundledDefoldRevision);
+  await mkdir(path.dirname(surfaceCopy), { recursive: true });
+  const derived = await derivePolicy();
+  const objects = new Map(Object.entries(derived.root.subtrees).map(([namespace, digest]) => [namespace, {
+    digest,
+    value: JSON.parse(derived.objects.get(digest))
+  }]));
+  await materializePolicySurface({
+    revision: derived.defoldRevision,
+    entry: { policyRoot: derived.rootHash },
+    policy: derived.root,
+    objects
+  }, { outputRoot: surfaceCopy });
+  const env = { DEHERM_CACHE_HOME: cacheHome, DEHERM_OFFLINE: "1" };
+  const packageBridge = path.resolve("packages/static-hermes/src/generated/script-typed-native-bridge.ts");
+  const original = await readFile(packageBridge, "utf8");
+  t.after(async () => {
+    await writeFile(packageBridge, original);
+    await rm(cacheHome, { recursive: true, force: true });
+    await rm(project, { recursive: true, force: true });
+  });
+
+  const inventory = await inspectDefoldProject({ project });
+  const first = await writeGeneratedProject(inventory, ".deherm", { env });
+  assert.equal(first.cached, false);
+  assert.equal(
+    createHash("sha256").update(await readFile(path.join(first.root, "static-hermes/generated/script-typed-native-bridge.ts"))).digest("hex"),
+    createHash("sha256").update(original).digest("hex")
+  );
+
+  const manifestPath = path.join(first.root, "manifest.json");
+  const before = await stat(manifestPath);
+  const unchanged = await writeGeneratedProject(inventory, ".deherm", { env });
+  assert.equal(unchanged.cached, true);
+  assert.equal((await stat(manifestPath)).mtimeMs, before.mtimeMs, "unchanged package inputs must not rewrite the project");
+
+  const changedSource = `${original}\n// package emitter fixture change\n`;
+  await writeFile(packageBridge, changedSource);
+  const changed = await writeGeneratedProject(inventory, ".deherm", { env });
+  assert.equal(changed.cached, false, "changed package Static Hermes output must invalidate the project cache");
+  assert.equal(await readFile(path.join(changed.root, "static-hermes/generated/script-typed-native-bridge.ts"), "utf8"), changedSource);
   assert.notEqual(changed.generationKey, first.generationKey);
 });
 

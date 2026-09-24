@@ -40,6 +40,7 @@ function valueExpression(value) {
     case "number": return `new DehermStaticNumber(${JSON.stringify(value.value)})`;
     case "string": return `new DehermStaticString(${JSON.stringify(value.value)})`;
     case "hash": return `new DehermStaticHandle(1,0,0,${value.low},${value.high})`;
+    case "gui-node": return `new DehermStaticHandle(3,${value.semantic},${value.runtime},${value.low},${value.high})`;
     case "url": return `new DehermStaticUrl(${value.halves.join(",")})`;
     case "vector3": return `new DehermStaticDefoldValue(1,${value.lanes.join(",")},0)`;
     case "vector4": return `new DehermStaticDefoldValue(2,${value.lanes.join(",")})`;
@@ -67,6 +68,8 @@ function valuePredicate(value, expression) {
       return `${expression}.exactTag()===4&&${expression}.exactString()===${JSON.stringify(value.value)}`;
     case "hash":
       return `${expression}.exactTag()===5&&${expression}.exactNumber(0)===1&&${expression}.exactNumber(1)===0&&${expression}.exactNumber(2)===0&&${expression}.exactNumber(3)===${value.low}&&${expression}.exactNumber(4)===${value.high}`;
+    case "gui-node":
+      return `${expression}.exactTag()===5&&${expression}.exactNumber(0)===3&&${expression}.exactNumber(1)===${value.semantic}&&${expression}.exactNumber(2)===${value.runtime}&&${expression}.exactNumber(3)===${value.low}&&${expression}.exactNumber(4)===${value.high}`;
     case "url":
       return `${expression}.exactTag()===8&&${value.halves.map((half, index) =>
         `${expression}.exactNumber(${index})===${half}`).join("&&")}`;
@@ -108,9 +111,15 @@ function exactPlan(shapeIndex, specification, seed) {
 const executions = vectors.map((vector, vectorIndex) => {
   const arguments_ = vector.argumentShapes.map((shape, slot) => valueExpression(
     exactPlan(shape, vector.argumentValues[slot], slot + 1)));
-  const predicates = vector.resultShapes.map((shape, slot) => valuePredicate(
-    exactPlan(shape, vector.resultValues[slot], 257 + slot), `results${vectorIndex}[${slot}]`));
-  return `let results${vectorIndex}:Array<DehermStaticValue>=dispatchScriptUniversalValue(${vector.stableId},[${arguments_.join(",")}]);if(results${vectorIndex}.length!==${vector.resultShapes.length}${predicates.length ? `||!(${predicates.join("&&")})` : ""})++mismatches;++executed;`;
+  const resultPlans = vector.resultShapes.map((shape, slot) => exactPlan(
+    shape, vector.resultValues[slot], 257 + slot));
+  const predicates = resultPlans.map((value, slot) => valuePredicate(
+    value, `results${vectorIndex}[${slot}]`));
+  const releaseResults = resultPlans.map((value, index) => value.kind === "gui-node"
+    ? `{const exactResult${vectorIndex}_${index}:any=results${vectorIndex}[${index}];if(exactResult${vectorIndex}_${index} instanceof DehermStaticHandle)exactResult${vectorIndex}_${index}.dispose();}`
+    : "").join("");
+  const expectedRelease = vector.releaseExpectation === "generated-owned-handle-release" ? 1 : 0;
+  return `__dehermStaticExactSetup();let results${vectorIndex}:Array<DehermStaticValue>=dispatchScriptUniversalValue(${vector.stableId},[${arguments_.join(",")}]);if(results${vectorIndex}.length!==${vector.resultShapes.length}${predicates.length ? `||!(${predicates.join("&&")})` : ""})++mismatches;++executed;${releaseResults}if(__dehermStaticExactTeardown(${expectedRelease})===0)++mismatches;`;
 }).join("\n");
 
 const maximumContainerLength = Math.max(0, ...vectors.flatMap((vector) => [
@@ -132,6 +141,8 @@ const arrayHelpers = Array.from({ length: maximumContainerLength + 1 }, (_, leng
 const runnerSource = `${staticTransport}
 ${arrayHelpers}
 const __staticScriptExactReport=$SHBuiltin.extern_c({include:"static_script_exact_fixture.h"},function deherm_static_script_exact_report(planned:c_uint,executed:c_uint,mismatches:c_uint):void{});
+const __dehermStaticExactSetup=$SHBuiltin.extern_c({include:"static_script_exact_fixture.h"},function deherm_static_script_exact_setup():void{});
+const __dehermStaticExactTeardown=$SHBuiltin.extern_c({include:"static_script_exact_fixture.h"},function deherm_static_script_exact_teardown(expected:c_uint):c_uint{throw 0;});
 let executed:number=0,mismatches:number=0;
 ${executions}
 __staticScriptExactReport(${vectors.length},executed,mismatches);
@@ -151,6 +162,8 @@ uint32_t deherm_static_script_exact_argument_count(uint32_t vector);
 const char* deherm_static_script_exact_expected_arguments(uint32_t vector);
 const char* deherm_static_script_exact_route_id(uint32_t vector);
 void deherm_static_script_exact_report(uint32_t planned,uint32_t executed,uint32_t mismatches);
+void deherm_static_script_exact_setup(void);
+uint32_t deherm_static_script_exact_teardown(uint32_t expectedHandleRelease);
 #ifdef __cplusplus
 }
 #endif
@@ -159,12 +172,16 @@ const switchRows = (expression) => vectors.map((vector, index) =>
   `case UINT32_C(${index}):return ${expression(vector)};`).join("");
 const fixture = `#include "static_script_exact_fixture.h"
 #include <cstdint>
+extern "C" void deherm_recording_static_exact_setup(void);
+extern "C" int deherm_recording_static_exact_teardown(uint32_t expectedHandleRelease);
 extern "C" uint32_t deherm_static_script_exact_vector_count(void){return UINT32_C(${vectors.length});}
 extern "C" uint32_t deherm_static_script_exact_route_index(uint32_t vector){switch(vector){${switchRows((vector) => `UINT32_C(${vector.routeIndex})`)}default:return UINT32_MAX;}}
 extern "C" uint32_t deherm_static_script_exact_stable_id(uint32_t vector){switch(vector){${switchRows((vector) => `UINT32_C(${vector.stableId})`)}default:return UINT32_MAX;}}
 extern "C" uint32_t deherm_static_script_exact_argument_count(uint32_t vector){switch(vector){${switchRows((vector) => `UINT32_C(${vector.argumentShapes.length})`)}default:return UINT32_MAX;}}
 extern "C" const char* deherm_static_script_exact_expected_arguments(uint32_t vector){switch(vector){${switchRows((vector) => JSON.stringify(vector.argumentValues.join(" ")))}default:return "";}}
 extern "C" const char* deherm_static_script_exact_route_id(uint32_t vector){switch(vector){${switchRows((vector) => JSON.stringify(vector.id))}default:return "";}}
+extern "C" void deherm_static_script_exact_setup(void){deherm_recording_static_exact_setup();}
+extern "C" uint32_t deherm_static_script_exact_teardown(uint32_t expectedHandleRelease){return deherm_recording_static_exact_teardown(expectedHandleRelease) ? 1u : 0u;}
 `;
 
 await mkdir(outputDirectory, { recursive: true });

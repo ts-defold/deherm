@@ -44,6 +44,9 @@ const relativeOutputs = {
 // crossing the frame instead of failing.
 const kHandleKindHash = 1;
 const kHandleKindUrl = 2;
+const kHandleKindGuiNode = 3;
+const kHandleKindLuaSemantic = 6;
+const kSemanticHandleKindGuiNode = 14;
 const kDefoldKindVector3 = 1;
 const kDefoldKindVector4 = 2;
 const kDefoldKindQuaternion = 3;
@@ -52,7 +55,12 @@ const kDefoldKindMatrix4 = 4;
 // A claimed route must marshal every value it can see. These shape kinds carry
 // something this transport cannot represent in sound TypeScript, so a route
 // declaring one is left on its baseline transport rather than half-supported.
-const kUnsupportedShapeKinds = new Set(["callback", "handle", "userdata", "opaque"]);
+// Callback-bearing routes can still be claimed when their callback parameter
+// is optional: the sound-typed adapter declines calls carrying a function and
+// falls back to the captured JSI bridge before touching the Static frame. The
+// lowering plan structurally blocks required callbacks and callback results;
+// retained handles remain unsupported here.
+const kUnsupportedShapeKinds = new Set(["handle", "userdata", "opaque"]);
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -70,6 +78,7 @@ function assertAbiTags(capiHeader) {
     .map((match) => match[1]);
   assert.equal(handleKinds[kHandleKindHash], "kHash", "ScriptHandleKind::kHash moved");
   assert.equal(handleKinds[kHandleKindUrl], "kUrl", "ScriptHandleKind::kUrl moved");
+  assert.equal(handleKinds[kHandleKindGuiNode], "kGuiNode", "ScriptHandleKind::kGuiNode moved");
 
   const defoldSection = /enum class ScriptDefoldValueKind : uint8_t \{([\s\S]*?)\};/.exec(capiHeader);
   assert.ok(defoldSection, "script_bridge_capi.hpp no longer declares ScriptDefoldValueKind");
@@ -152,6 +161,26 @@ const __DEHERM_TYPED_NATIVE_MAX_ARGUMENTS: number = ${maximumArgumentCount};
 /** Deepest value graph this transport will marshal before declining. */
 const __DEHERM_TYPED_NATIVE_MAX_DEPTH: number = 8;
 
+// Public GUI nodes retain the SDK's generation-checked host-object shape while
+// carrying the private Static lease that must be released exactly once.  The
+// lease is deliberately kept separate from the public \`kind\` brand: callers
+// see \`"gui-node"\`, while the frame still receives the ABI's numeric kind 3.
+class DehermStaticGuiNode {
+  runtime: number;
+  slot: number;
+  generation: number;
+  kind: string;
+  lease: DehermStaticHandle;
+  constructor(lease: DehermStaticHandle) {
+    this.lease = lease;
+    this.runtime = lease.runtime;
+    this.slot = lease.payloadLow;
+    this.generation = lease.payloadHigh;
+    this.kind = "gui-node";
+  }
+  dispose(): void { this.lease.dispose(); }
+}
+
 function __dehermTypedNativeClaims(stableId: number): boolean {
   let low: number = 0;
   let high: number = __dehermTypedNativeRoutes.length - 1;
@@ -208,9 +237,46 @@ function __dehermToStatic(value: any, depth: number): DehermStaticValue {
     // \`dmhash_t\`, so the two transports agree on the wire value by construction.
     return new DehermStaticHandle(${kHandleKindHash}, 0, 0, __dehermSplitLow(value), __dehermSplitHigh(value));
   }
+  if (value instanceof DehermStaticGuiNode) {
+    const node: any = value;
+    return node.lease;
+  }
+  // GUI nodes are generated HostObjects on the JSI twin.  Static Hermes has
+  // no host-object RTTI, so the generated handle ABI is recognized by the
+  // same immutable runtime/slot/generation/kind shape exposed by that host
+  // object.  A handle produced by this frame is accepted directly as well;
+  // both paths preserve the registry token and its explicit dispose lease.
+  if (value instanceof DehermStaticHandle) return value;
   if (kind !== "object" || depth > __DEHERM_TYPED_NATIVE_MAX_DEPTH) {
     __dehermTypedNativeDeclined = true;
     return new DehermStaticUndefined();
+  }
+  const handleName: any = value.kind;
+  const handleRuntime: any = value.runtime;
+  const handleSlot: any = value.slot;
+  const handleGeneration: any = value.generation;
+  if (handleName === "gui-node" && typeof handleRuntime === "number" &&
+      typeof handleSlot === "number" && typeof handleGeneration === "number" &&
+      Number.isSafeInteger(handleRuntime) && Number.isSafeInteger(handleSlot) &&
+      Number.isSafeInteger(handleGeneration) && handleRuntime > 0 &&
+      handleSlot >= 0 && handleGeneration > 0 && typeof value.dispose === "function") {
+    return new DehermStaticHandle(${kHandleKindGuiNode}, 0,
+      handleRuntime, handleSlot, handleGeneration);
+  }
+  // The Dynamic Hermes/browser twin exposes the same borrowed node as a
+  // numeric __dehermHandleV1 token. Accept that shape structurally too, so a
+  // node returned before a transport switch remains usable by a claimed
+  // Static setter without admitting other retained-handle kinds.
+  const handleV1: any = value.__dehermHandleV1;
+  const handleNumericKind: any = value.kind;
+  const handlePayload: any = value.payload;
+  if (handleV1 === true && handleNumericKind === ${kHandleKindGuiNode} &&
+      typeof handleRuntime === "number" && Number.isSafeInteger(handleRuntime) &&
+      handleRuntime > 0 && typeof handlePayload === "bigint" &&
+      handlePayload >= BigInt(0) && handlePayload <= BigInt("0xffffffffffffffff")) {
+    return new DehermStaticHandle(${kHandleKindGuiNode},
+      Number.isSafeInteger(value.semanticKind) ? value.semanticKind : 0,
+      handleRuntime, __dehermSplitLow(handlePayload), __dehermSplitHigh(handlePayload));
   }
   const valueKind: any = value.__dehermValueKind;
   if (typeof valueKind === "string") {
@@ -342,6 +408,10 @@ function __dehermFromStatic(value: DehermStaticValue): any {
   }
   if (value instanceof DehermStaticHandle) {
     const item: DehermStaticHandle = raw;
+    if (item.kind === ${kHandleKindGuiNode} ||
+        (item.kind === ${kHandleKindLuaSemantic} && item.semanticKind === ${kSemanticHandleKindGuiNode})) {
+      return new DehermStaticGuiNode(item);
+    }
     if (item.kind !== ${kHandleKindHash}) {
       // A retained engine handle has no sound-typed representation. The
       // lowering plan is supposed to keep such a route off this transport, so
@@ -392,16 +462,27 @@ function __dehermFromStatic(value: DehermStaticValue): any {
 /** The JSI bridge this unit is layered over. Every declined route lands here. */
 const __dehermJsiBridge: any = __dehermGlobal.__defoldScriptBridgeV1;
 
+// Static Hermes is normally layered over the captured JSI bridge, but a
+// standalone typed-native bundle may not install one.  Declined values must
+// then fail closed explicitly instead of turning a missing fallback into an
+// accidental native-frame call or an opaque TypeError.
+function __dehermDeclineToJsi(stableId: number, args: any): any {
+  if (!__dehermJsiBridge || typeof __dehermJsiBridge.call !== "function") {
+    throw "deherm typed-native route declined: JSI bridge unavailable";
+  }
+  return __dehermJsiBridge.call(stableId, args);
+}
+
 function __dehermTypedNativeCall(stableId: number, args: any): any {
   const count: number = args.length;
   if (count > __DEHERM_TYPED_NATIVE_MAX_ARGUMENTS || !__dehermTypedNativeClaims(stableId)) {
-    return __dehermJsiBridge.call(stableId, args);
+    return __dehermDeclineToJsi(stableId, args);
   }
   __dehermTypedNativeDeclined = false;
   const values: Array<DehermStaticValue> = [];
   for (let index: number = 0; index < count; ++index) {
     values.push(__dehermToStatic(args[index], 0));
-    if (__dehermTypedNativeDeclined) return __dehermJsiBridge.call(stableId, args);
+    if (__dehermTypedNativeDeclined) return __dehermDeclineToJsi(stableId, args);
   }
   const results: Array<DehermStaticValue> = dispatchScriptUniversalValue(stableId, values);
   const resultCount: number = results.length;

@@ -14,16 +14,23 @@ The project now records a separate generated Static Hermes projection at
 Run `node bin/deherm.mjs typecheck --project examples/war-battles-online/defold
 --release` before generating it; the generator then reads the release usage
 manifest, canonical lowering plan, and typed-native adapter census. The current
-record has 27 reachable routes, 17 selected for Static Hermes, and 10 retained
-as explicit blockers. Fourteen selected routes were observed crossing the
-typed-native adapter in the packaged Dynamic Hermes run.
+record has 27 reachable routes, all 27 selected for Static Hermes, and zero
+reachable blockers. The canonical typed-native exact set is 517/517 routes.
+The project-owned bridge source is pinned at SHA-256
+`d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f`.
+
+The project-owned gate report at
+`build/gates/war-battles-static-hermes-project/report.json` records passed
+Static Hermes compilation and Bob/Extender linkage, plus an engine launch that
+observed the typed-native unit registration marker. This report is generated
+build output and is intentionally not copied into tracked evidence.
 
 This is an honest product projection, not a gameplay claim: no packaged War
 Battles application has executed entirely as Static Hermes yet. The record
-keeps compilation, linkage, engine semantics, visual behavior, and the three
-selected routes not exercised by the bounded gameplay transcript out of the
-claim. `pnpm check:war-battles-projections` regenerates the record in memory and
-fails if the checked-in evidence or any named blocker drifts.
+keeps full-game Static AOT gameplay, Defold semantics, visual behavior, and
+allocation/performance out of the claim. Full War Battles gameplay remains
+Dynamic Hermes. `pnpm check:war-battles-projections` regenerates the record in
+memory and fails if the checked-in evidence or any named blocker drifts.
 
 The two checked evidence documents -
 [`../evidence/packaged-runtime-arm64-macos.json`](../evidence/packaged-runtime-arm64-macos.json)

@@ -23,8 +23,13 @@ test("War Battles Static Hermes projection is generated from release reachabilit
   assert.equal(checkedIn.projection.id, PROJECTION_ID);
   assert.equal(checkedIn.reachability.profile, "release");
   assert.equal(checkedIn.reachability.dynamicAccess, false);
-  assert.ok(checkedIn.reachability.staticReachableRouteCount > 0);
-  assert.ok(checkedIn.reachability.blockedReachableRouteCount > 0);
+  assert.equal(checkedIn.reachability.reachableRouteCount, 27);
+  assert.equal(
+    checkedIn.reachability.staticReachableRouteCount,
+    checkedIn.reachability.reachableRouteCount,
+    "every reachable War Battles route must remain selected for Static Hermes"
+  );
+  assert.equal(checkedIn.reachability.blockedReachableRouteCount, 0);
   assert.ok(checkedIn.adapter.observedTypedNativeRouteCount > 0);
   assert.ok(checkedIn.adapter.unobservedStaticReachableRouteIds.length > 0);
   assert.match(checkedIn.source.adapterEvidenceSha256, /^[0-9a-f]{64}$/u);

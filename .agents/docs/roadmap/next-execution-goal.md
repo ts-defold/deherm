@@ -31,12 +31,12 @@ dogfoods the result in a playable native/browser War Battles project.
 This is the current implementation queue. It refines the broader ordered work
 below without changing its completion rule.
 
-1. **Completed — Static script exact calls.** The sound-typed executable runs
-   all 325 Static universal function routes; the three timer routes make the
-   applicable function target total 328/328. The generated constant lane adds
-   141 zero-argument Static routes, so clean-room typed-native ownership is now
-   466 routes in total. The policy graph must continue to build and execute
-   this target rather than relying only on local evidence.
+1. **Completed — Static script exact calls.** The sound-typed executable and
+   canonical typed-native bridge now own a generator-derived exact set of
+   517/517 script routes, including the borrowed GUI-node family. The bounded
+   native and sanitizer fixtures prove the exact transport and handle lease
+   lifecycle; the policy graph must continue to build and execute this target
+   rather than relying only on local evidence.
 2. **Completed — dmSDK hash-state 10.** All
    `dmHash{Init,Clone,UpdateBuffer,Final,Release}{32,64}` routes use the bounded,
    generation-tagged state registry and pass native exact, sanitizer, stale,
@@ -323,13 +323,15 @@ literal VS Code visual observation remains a tooling-tranche debt.
 
 The next Static Hermes seam is now recorded separately as the generated
 `native-arm64-macos-static-hermes-reachable` projection. The release usage
-manifest is dynamic-access-free and currently selects 17 of the 27 reachable
-War Battles routes for the sound typed-native lane; 10 reachable routes remain
-blocked with machine-readable lowering reasons. The packaged Dynamic Hermes
-typed-native census observes 14 of those selected routes. This is the strongest
-current product projection, but it is not Static Hermes gameplay evidence:
-full application execution, compilation/linkage, and Defold semantics remain
-separate gates.
+manifest is dynamic-access-free and selects all 27 of the 27 reachable War
+Battles routes for the sound typed-native lane, with zero reachable blockers.
+The project-owned bridge source is pinned at SHA-256
+`d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f`, and
+`build/gates/war-battles-static-hermes-project/report.json` records passed
+compilation, Bob/Extender linkage, and an engine launch with typed-native unit
+registration. This is still not full Static Hermes gameplay evidence: the
+full War Battles game remains Dynamic Hermes, and Defold semantics and full-game
+Static AOT execution remain separate, unproven gates.
 
 1. Make the tutorial-faithful game playable with real tutorial art, correctly
    sliced/anchored animation, tint/material effects, input, GUI, audio,

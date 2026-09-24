@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "scope": "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callbacks are promoted only when the generated lifecycle ledger marks them registry-eligible, and optimized lanes remain preferred at runtime.",
-  "evidenceBoundary": "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no Lua closure or retained Lua handle and whose Defold value types all have a pinned transparent layout; packaged Defold and packaged browser execution remain unverified.",
+  "evidenceBoundary": "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no retained Lua handle, whose Defold value types all have a pinned transparent layout, and whose callback inputs are optional and declined to the JSI lane when present; packaged Defold and packaged browser execution remain unverified.",
   "selection": {
     "loweringFamilies": [
       "borrowed-handle",
@@ -938,7 +938,7 @@
   },
   "targetSupport": {
     "nativeDynamicHermes": "generated-recursive-jsi-lua-adapter-with-23-registry-eligible-callback-inputs-and-2-rooted-higher-order-lua-closure-results-native-harness-proven-packaged-engine-unverified",
-    "nativeStaticHermes": "generated-sound-typed-fixed-capacity-frame-marshal-runtime-proven-for-non-callback-non-handle-non-defold-value-shapes-packaged-engine-unverified",
+    "nativeStaticHermes": "generated-sound-typed-fixed-capacity-frame-marshal-runtime-proven-for-optional-input-callbacks-that-decline-to-jsi-non-handle-non-defold-value-shapes-packaged-engine-unverified",
     "html5BrowserHost": "generated-direct-wasm-memory-provider-plus-23-registry-eligible-callback-trampolines-node-and-native-harness-proven-2-higher-order-lua-closures-blocked-packaged-browser-engine-unverified"
   },
   "targetEvidence": {
@@ -957,8 +957,8 @@
       "cAbiCompileLinkRuntime": "proven",
       "staticCompiler": "proven",
       "staticHermesRuntime": "proven-representative-recursive-value-graph-with-transparent-defold-value-records",
-      "emittedRouteCount": 466,
-      "emittedShapeRule": "no-callback-no-lua-handle-and-every-defold-value-type-transparent",
+      "emittedRouteCount": 475,
+      "emittedShapeRule": "optional-input-callbacks-decline-to-jsi-no-lua-handle-and-every-defold-value-type-transparent",
       "transparentValueTypes": [
         "hash",
         "matrix4",
@@ -1007,9 +1007,9 @@
     }
   },
   "inputHashes": {
-    "projection": "5f4b2a167a48199de4fe98e4c4c49dfac24f32e4063d1f9311a9acf79b952887",
+    "projection": "e9d2fd4906e2aa6795ae294fec67960fe524e35878bb6a40c16634eafeb2f8d9",
     "callbacks": "2303eaf9998bb4e4de658cc3d8966ebcae540a986d19bfd228954fea49e90c57",
-    "classification": "dfbbc0136c5683bcaae4277974d14115bb1c99229974a3a1108b8a36a6a969bb",
+    "classification": "e4eda9a115ae971e4b9f1372d9777deaa394fd9085ea727a069f5b6c984f9ab9",
     "policy": "b3175f748511992272cd33980fc6c0737e920c152d9880f1e63e503061e11f7b",
     "layouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
     "constants": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198"

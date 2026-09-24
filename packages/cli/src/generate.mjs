@@ -38,6 +38,20 @@ const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const require = createRequire(import.meta.url);
 const generatedContextExportNames = new Set(["projectExtensions"]);
 
+// These are the Static Hermes units that project generation owns below
+// `.deherm/static-hermes/generated/`.  Keep the list next to the copy lane and
+// cache identity: adding a copied unit without adding it to the identity would
+// recreate the stale-project-source bug this registry prevents.
+const projectStaticHermesOutputs = Object.freeze([
+  "script-universal-value.ts",
+  "script-typed-native-bridge.ts"
+]);
+
+const projectStaticHermesReports = Object.freeze([
+  "packages/bindings/generated/defold-script-universal-value-bindings.json",
+  "packages/bindings/generated/defold-typed-native-bridge.json"
+]);
+
 // `.script_api` names Defold's engine value types by their Lua spelling. The
 // binding compiler already derives exact layouts for those types from the
 // pinned dmSDK headers, so the extension lane joins to that generated evidence
@@ -66,6 +80,37 @@ export function createDefoldValueTypeCatalog(layouts) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+async function packageStaticHermesSourceRoot(defoldRevision) {
+  // A published package may not carry revision-output snapshots, in which
+  // case the authenticated surface repository remains the source.  A source
+  // checkout does carry the package-generated units, but only use them when
+  // both generator reports identify the requested revision.  This keeps a
+  // project for another Defold revision on its revision-keyed surface while
+  // still letting package output updates invalidate and refresh project-owned
+  // Static Hermes sources.
+  try {
+    const reports = await Promise.all(projectStaticHermesReports.map(async (relative) =>
+      JSON.parse(await readFile(path.join(packageRoot, relative), "utf8"))));
+    if (reports.some((report) => report?.defoldRevision !== defoldRevision)) return null;
+    await Promise.all(projectStaticHermesOutputs.map((name) =>
+      access(path.join(packageRoot, "packages", "static-hermes", "src", "generated", name))));
+    return path.join(packageRoot, "packages", "static-hermes", "src", "generated");
+  } catch (error) {
+    if (error?.code === "ENOENT" || error instanceof SyntaxError) return null;
+    throw error;
+  }
+}
+
+async function projectStaticHermesInputs({ core, defoldRevision }) {
+  const packageSourceRoot = await packageStaticHermesSourceRoot(defoldRevision);
+  const sourceRoot = packageSourceRoot ?? path.join(core.repositorySourceRoot, "packages", "static-hermes", "src", "generated");
+  const outputSources = Object.fromEntries(await Promise.all(projectStaticHermesOutputs.map(async (name) => [
+    name,
+    sha256(await readFile(path.join(sourceRoot, name)))
+  ])));
+  return { sourceRoot, outputSources };
 }
 
 function assertPublishedNativeArtifacts(artifactPolicy, revision) {
@@ -164,7 +209,7 @@ async function revisionOutputDigest(repositoryRoot) {
   return hash.digest("hex");
 }
 
-async function projectGenerationIdentity({ inventory, outputDirectory, core, engineProfiles, nativeExtensionClang }) {
+async function projectGenerationIdentity({ inventory, outputDirectory, core, engineProfiles, nativeExtensionClang, staticHermesInputs }) {
   const projectGeneratorSha256 = sha256(await readFile(fileURLToPath(import.meta.url)));
   const nativeExtensionGeneratorSha256 = sha256(Buffer.concat(await Promise.all([
     readFile(path.join(packageRoot, "packages", "cli", "src", "native-extension-api.mjs")),
@@ -177,11 +222,19 @@ async function projectGenerationIdentity({ inventory, outputDirectory, core, eng
     outputDirectory: outputDirectory.split(path.sep).join("/"),
     packageVersion: core.packageVersion,
     coreInputs: core.inputs,
+    staticHermesInputs: { outputs: staticHermesInputs.outputSources },
     engineProfiles,
     nativeExtensionClang,
     inventory
   }));
-  return { schemaVersion: 1, projectGeneratorSha256, nativeExtensionGeneratorSha256, nativeExtensionClang, cacheKey };
+  return {
+    schemaVersion: 1,
+    projectGeneratorSha256,
+    nativeExtensionGeneratorSha256,
+    nativeExtensionClang,
+    staticHermesInputs: { outputs: staticHermesInputs.outputSources },
+    cacheKey
+  };
 }
 
 function compareCodeUnits(left, right) {
@@ -659,7 +712,12 @@ const authoredContexts = [
 
 function generatedOutputPaths() {
   return {
-    output: ["script-contexts.json", "generated/native-extensions/index.json", ...authoredContexts.map(({ id }) => `sdk/contexts/${id}.ts`)],
+    output: [
+      "script-contexts.json",
+      "generated/native-extensions/index.json",
+      ...authoredContexts.map(({ id }) => `sdk/contexts/${id}.ts`),
+      ...projectStaticHermesOutputs.map((name) => `static-hermes/generated/${name}`)
+    ],
     project: [
       "tsconfig.deherm.base.json",
       ...authoredContexts.map(({ id }) => `tsconfig.deherm.${id}.json`),
@@ -1455,12 +1513,14 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const nativeExtensionClang = resolveNativeExtensionClang({ inventory, clang: options.clang });
   const portableInventory = { ...inventory, projectRoot: "." };
   const bindingIr = buildProjectBindingIr(inventory, core.valueLayouts);
+  const staticHermesInputs = await projectStaticHermesInputs({ core, defoldRevision: core.revision });
   const generation = await projectGenerationIdentity({
     inventory: portableInventory,
     outputDirectory: relativeRoot,
     core,
     engineProfiles,
-    nativeExtensionClang
+    nativeExtensionClang,
+    staticHermesInputs
   });
   const generationKey = generation.cacheKey;
   // The Defold revision and the native input set are independent cache keys.
@@ -1573,9 +1633,9 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   const staticHermesRoot = path.join(root, "static-hermes", "generated");
   await rm(staticHermesRoot, { recursive: true, force: true });
   await mkdir(staticHermesRoot, { recursive: true });
-  for (const name of ["script-universal-value.ts", "script-typed-native-bridge.ts"]) {
+  for (const name of projectStaticHermesOutputs) {
     await cp(
-      path.join(core.repositorySourceRoot, "packages", "static-hermes", "src", "generated", name),
+      path.join(staticHermesInputs.sourceRoot, name),
       path.join(staticHermesRoot, name)
     );
   }
@@ -1624,11 +1684,17 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     await writeFile(path.join(inventory.projectRoot, relative), source);
   }
   const generatedOutputs = {
-    output: Object.fromEntries(Object.entries({
-      "script-contexts.json": scriptContextsSource,
-      "generated/native-extensions/index.json": nativeExtensionsIndexSource,
-      ...contextSources
-    }).map(([relative, source]) => [relative, sha256(source)])),
+    output: {
+      ...Object.fromEntries(Object.entries({
+        "script-contexts.json": scriptContextsSource,
+        "generated/native-extensions/index.json": nativeExtensionsIndexSource,
+        ...contextSources
+      }).map(([relative, source]) => [relative, sha256(source)])),
+      ...Object.fromEntries(projectStaticHermesOutputs.map((name) => [
+        `static-hermes/generated/${name}`,
+        staticHermesInputs.outputSources[name]
+      ]))
+    },
     project: Object.fromEntries(Object.entries(projectConfigSources).map(([relative, source]) => [relative, sha256(source)]))
   };
   const generatedSdkSha256 = await directoryDigest(sdkRoot);
@@ -1855,12 +1921,14 @@ export async function verifyGeneratedProject(projectRoot, outputDirectory = ".de
     inventory,
     clang: manifest.generation?.nativeExtensionClang?.command
   });
+  const staticHermesInputs = await projectStaticHermesInputs({ core, defoldRevision: core.revision });
   const expectedGeneration = await projectGenerationIdentity({
     inventory,
     outputDirectory: relativeRoot,
     core,
     engineProfiles: manifest.engineProfiles,
-    nativeExtensionClang
+    nativeExtensionClang,
+    staticHermesInputs
   });
   if (JSON.stringify(manifest.generation) !== JSON.stringify(expectedGeneration)) {
     throw new Error("Generated manifest project-generation key is stale or invalid");

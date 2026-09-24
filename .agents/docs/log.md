@@ -1,5 +1,20 @@
 # Defold Hermes knowledge log
 
+## 2026-09-23 - War Battles Static Hermes reachable wave
+
+The release-clean War Battles usage manifest now reaches 27 routes and selects
+all 27 for the Static Hermes typed-native lane, with zero reachable blockers.
+The canonical generator-owned typed-native exact set is 517/517, including the
+borrowed GUI-node family and its bounded lease lifecycle. The project-owned
+bridge source is pinned at SHA-256
+`d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f`.
+The generated report at
+`build/gates/war-battles-static-hermes-project/report.json` records passed
+Static Hermes compilation, Bob/Extender linkage, and an engine launch that
+observed the typed-native unit registration marker. This is transport and
+packaging evidence only: full War Battles gameplay remains Dynamic Hermes, and
+full-game Static AOT gameplay is not proven.
+
 ## 2026-09-23 - Packaged War Battles owns QUIC, TCP fallback, and durable resume evidence
 
 The Bob-produced HTML5 game now completes the same authoritative session over

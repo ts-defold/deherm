@@ -1257,8 +1257,42 @@ int main() {
   Expect(AdapterDispatch(adapter, value::BindingId::GuiSetParent, parentSetter, 3, nullptr), adapter.lastError());
   Expect(gGuiSetterCalls == 9, "generated GUI setter family did not preserve representative codec shapes");
 
+  // The same generation-checked node token must not become a different handle
+  // kind or cross a runtime boundary.  Both failures stay on the bounded Lua
+  // adapter path and never dereference the userdata registry entry.
+  ScriptValue wrongKind = node;
+  wrongKind.handleKind = ScriptHandleKind::kLuaUserdata;
+  ScriptValue wrongKindText[] = {wrongKind, String(readyText, sizeof(readyText) - 1)};
+  Expect(!AdapterDispatch(adapter, value::BindingId::GuiSetText, wrongKindText, 2, nullptr),
+      "GUI node token accepted a mismatched retained-handle kind");
+  Expect(std::strstr(adapter.lastError(), "stale") != nullptr ||
+      std::strstr(adapter.lastError(), "arguments") != nullptr,
+      "wrong-kind GUI node rejection was not diagnostic");
+  ScriptValue foreign = node;
+  ++foreign.length;
+  ScriptValue foreignText[] = {foreign, String(readyText, sizeof(readyText) - 1)};
+  Expect(!AdapterDispatch(adapter, value::BindingId::GuiSetText, foreignText, 2, nullptr),
+      "GUI node token accepted a foreign runtime token");
+  Expect(std::strstr(adapter.lastError(), "stale") != nullptr,
+      "foreign GUI node rejection was not diagnostic");
+
+  gAllocations.store(0, std::memory_order_relaxed);
+  gTrackAllocations.store(true, std::memory_order_relaxed);
+  for (uint32_t iteration = 0; iteration < 100000; ++iteration) {
+    Expect(AdapterDispatch(adapter, value::BindingId::GuiSetText, setTextArguments, 2, nullptr),
+        adapter.lastError());
+  }
+  gTrackAllocations.store(false, std::memory_order_relaxed);
+  Expect(gAllocations.load(std::memory_order_relaxed) == 0,
+      "warmed GUI node dispatch allocated on the registry hot path");
+
   adapter.api().releaseHandle(
       adapter.api().context, node.handleKind, node.length, node.payload);
+  const auto staleBeforeDoubleRelease = adapter.handleStats().staleAccesses;
+  adapter.api().releaseHandle(
+      adapter.api().context, node.handleKind, node.length, node.payload);
+  Expect(adapter.handleStats().staleAccesses > staleBeforeDoubleRelease,
+      "double release of a GUI node token was not rejected");
   Expect(!AdapterDispatch(adapter, value::BindingId::GuiSetText, setTextArguments, 2, nullptr),
       "released GUI node handle unexpectedly remained live");
   Expect(std::strstr(adapter.lastError(), "stale") != nullptr, "stale GUI node failure was not diagnostic");

@@ -446,8 +446,9 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
   observation.arguments.clear();
   observation.violation.clear();
 
-  if (frame->argumentCount != descriptor.argumentCount) {
-    observation.violation = "arity-mismatch";
+  if (frame->argumentCount < descriptor.minimumArgumentCount ||
+      frame->argumentCount > descriptor.argumentCount) {
+    observation.violation = "arity-mismatch:" + std::string(textOf(descriptor.canonical));
   } else if (frame->argumentCount && !frame->arguments) {
     observation.violation = "argument-storage-is-null";
   } else {
@@ -648,6 +649,29 @@ uint32_t deherm_recording_browser_handle_release_count(void) {
 
 void deherm_recording_browser_drain_handle_releases(void) {
   drainReleasedScriptHandles();
+}
+
+void deherm_recording_static_exact_setup(void) {
+  gBrowserHandleReleaseCount = 0;
+  gBrowserHandleIssuedOrdinal = DEHERM_RECORDING_HANDLE_SEED_COUNT;
+  for (uint32_t ordinal = 0; ordinal < DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY; ++ordinal) {
+    gBrowserHandleReleaseByOrdinal[ordinal] = 0;
+  }
+}
+
+int deherm_recording_static_exact_teardown(uint32_t expectedHandleRelease) {
+  drainReleasedScriptHandles();
+  const uint32_t expected = expectedHandleRelease ? 1u : 0u;
+  if (gBrowserHandleReleaseCount != expected ||
+      (expectedHandleRelease &&
+       gBrowserHandleIssuedOrdinal != DEHERM_RECORDING_HANDLE_SEED_COUNT + 1u)) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError),
+        "static exact synthetic GUI-node lease mismatch expected=%u actual=%u issued=%u",
+        expected, gBrowserHandleReleaseCount, gBrowserHandleIssuedOrdinal);
+    return 0;
+  }
+  return 1;
 }
 
 int deherm_recording_browser_verify_handle_releases(void) {

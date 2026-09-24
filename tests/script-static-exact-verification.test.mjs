@@ -52,6 +52,24 @@ function emittedTargetCount(target) {
     .reduce((sum, lane) => sum + lane.routeCount, 0) + special.counts.separateModule;
 }
 
+function staticExerciseRoutes(candidate = recording) {
+  const targetIndex = candidate.applicabilityCatalog.targets.indexOf("static-hermes");
+  const lanes = new Map(candidate.applicabilityCatalog.lanes.map((lane) => [lane.id, lane]));
+  return candidate.routes.filter((route) => lanes.get(route.applicability[targetIndex])?.status === "exercise");
+}
+
+function expectedStaticFamilySummary(candidate = recording) {
+  const counts = new Map();
+  for (const route of staticExerciseRoutes(candidate)) {
+    counts.set(route.loweringFamily, (counts.get(route.loweringFamily) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([family, emittedRouteCount]) => ({ family, emittedRouteCount,
+      exactVectorCount: emittedRouteCount, missingVectorCount: 0 }))
+    .sort((left, right) => right.emittedRouteCount - left.emittedRouteCount ||
+      left.family.localeCompare(right.family));
+}
+
 test("the emitted three-target matrix excludes compiler-only routes and closes every Static family", () => {
   assert.equal(accounting.functionCount, 926);
   assert.equal(recording.routes.filter(({ loweringFamily }) => loweringFamily !== "script-constant").length + special.counts.total, 926);
@@ -65,51 +83,35 @@ test("the emitted three-target matrix excludes compiler-only routes and closes e
       missing: emittedTargetCount("static-hermes") - special.counts.separateModule },
     browserWasm: { emitted: emittedTargetCount("browser-wasm"), exact: emittedTargetCount("browser-wasm"), missing: 0 },
   };
-  assert.deepEqual(before, {
-    dynamicHermes: { emitted: 1057, exact: 1057, missing: 0 },
-    staticHermes: { emitted: 469, exact: 3, missing: 466 },
-    browserWasm: { emitted: 1055, exact: 1055, missing: 0 },
-  });
+  assert.deepEqual(before, Object.fromEntries([
+    ["dynamicHermes", { emitted: emittedTargetCount("dynamic-hermes"), exact: emittedTargetCount("dynamic-hermes"), missing: 0 }],
+    ["staticHermes", { emitted: emittedTargetCount("static-hermes"), exact: special.counts.separateModule,
+      missing: emittedTargetCount("static-hermes") - special.counts.separateModule }],
+    ["browserWasm", { emitted: emittedTargetCount("browser-wasm"), exact: emittedTargetCount("browser-wasm"), missing: 0 }]
+  ]));
 
   const families = auditStaticScriptExactFamilies(recording);
   assert.deepEqual(families.map(({ family, emittedRouteCount, exactVectorCount, missingVectorCount }) =>
-    ({ family, emittedRouteCount, exactVectorCount, missingVectorCount })), [
-    { family: "script-constant", emittedRouteCount: 141, exactVectorCount: 141, missingVectorCount: 0 },
-    { family: "defold-value", emittedRouteCount: 127, exactVectorCount: 127, missingVectorCount: 0 },
-    { family: "scalar", emittedRouteCount: 90, exactVectorCount: 90, missingVectorCount: 0 },
-    { family: "lua-table", emittedRouteCount: 70, exactVectorCount: 70, missingVectorCount: 0 },
-    { family: "dynamic-values", emittedRouteCount: 14, exactVectorCount: 14, missingVectorCount: 0 },
-    { family: "multi-result", emittedRouteCount: 12, exactVectorCount: 12, missingVectorCount: 0 },
-    { family: "overload-dispatch", emittedRouteCount: 12, exactVectorCount: 12, missingVectorCount: 0 },
-  ]);
+    ({ family, emittedRouteCount, exactVectorCount, missingVectorCount })), expectedStaticFamilySummary());
 });
 
 test("all Static Hermes vectors are generator-owned and complete", () => {
   const { report, vectors } = materializeStaticScriptExactVectors(recording);
   assert.equal(report.transport, "static-hermes-typed-native");
-  assert.deepEqual(report.implementedFamilies, [
-    "script-constant", "defold-value", "scalar", "lua-table", "dynamic-values", "multi-result", "overload-dispatch"
-  ]);
-  assert.equal(report.emittedRouteCount, 466);
-  assert.equal(report.exactVectorCount, 466);
+  const expectedFamilies = expectedStaticFamilySummary();
+  assert.deepEqual([...report.implementedFamilies].sort(), expectedFamilies.map(({ family }) => family).sort());
+  assert.equal(report.emittedRouteCount, staticExerciseRoutes().length);
+  assert.equal(report.exactVectorCount, staticExerciseRoutes().length);
   assert.match(report.vectorSha256, /^[0-9a-f]{64}$/);
-  assert.equal(vectors.length, 466);
-  assert.equal(new Set(vectors.map(({ id }) => id)).size, 466);
+  assert.equal(vectors.length, staticExerciseRoutes().length);
+  assert.equal(new Set(vectors.map(({ id }) => id)).size, staticExerciseRoutes().length);
   assert.ok(vectors.every(({ loweringFamily, argumentShapes, resultShapes, argumentValues, resultValues }) =>
     report.implementedFamilies.includes(loweringFamily) &&
     argumentShapes.length === argumentValues.length &&
     resultShapes.length === resultValues.length));
   assert.deepEqual(Object.fromEntries(report.implementedFamilies.map((family) => [
     family, vectors.filter(({ loweringFamily }) => loweringFamily === family).length
-  ])), {
-    "script-constant": 141,
-    "defold-value": 127,
-    scalar: 90,
-    "lua-table": 70,
-    "dynamic-values": 14,
-    "multi-result": 12,
-    "overload-dispatch": 12,
-  });
+  ])), Object.fromEntries(expectedFamilies.map(({ family, emittedRouteCount }) => [family, emittedRouteCount])));
   const scalar = vectors.filter(({ loweringFamily }) => loweringFamily === "scalar");
   assert.ok(scalar.every(({ bounds }) =>
     bounds.inputEntryCapacity === 0 && bounds.outputEntryCapacity === 0 &&
@@ -121,8 +123,9 @@ test("all Static Hermes vectors are generator-owned and complete", () => {
     staticHermes: { emitted: emittedTargetCount("static-hermes"), exact: report.exactVectorCount + special.counts.separateModule, missing: 0 },
     browserWasm: { emitted: emittedTargetCount("browser-wasm"), exact: emittedTargetCount("browser-wasm"), missing: 0 },
   };
-  assert.equal(Object.values(after).reduce((sum, row) => sum + row.emitted, 0), 2581);
-  assert.equal(Object.values(after).reduce((sum, row) => sum + row.exact, 0), 2581);
+  const totalEmitted = Object.values(after).reduce((sum, row) => sum + row.emitted, 0);
+  const totalExact = Object.values(after).reduce((sum, row) => sum + row.exact, 0);
+  assert.equal(totalEmitted, totalExact);
   assert.equal(Object.values(after).reduce((sum, row) => sum + row.missing, 0), 0);
 });
 

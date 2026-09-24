@@ -5,8 +5,8 @@
 
 #define DEHERM_RECORDING_SCHEMA_VERSION 2u
 #define DEHERM_RECORDING_DEFOLD_REVISION "7f0f554f41f9dce1e0ddff99bf08200657d1ee05"
-#define DEHERM_RECORDING_PLAN_SHA256 "b17db9fe5750fe813bd8f0b88b738e7f22da1ed072032dd3425880add7cd4d30"
-#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "c1d5da3f910691d36a056f9cce25d77a4b35f2f79f02ca9dc58e325496fe1b0e"
+#define DEHERM_RECORDING_PLAN_SHA256 "8172c8da976b02bcd558d18b14357343c300105342e5ed92c7c93c8d2621662e"
+#define DEHERM_RECORDING_EXPECTED_TRACE_SHA256 "4839c10a9050b0389594d7de8c77e048cd84f215ae510c239f039d2fa0ed880b"
 #define DEHERM_RECORDING_ROUTE_COUNT 1056u
 #define DEHERM_RECORDING_SHAPE_COUNT 439u
 #define DEHERM_RECORDING_SHAPE_REF_COUNT 2408u
@@ -81,6 +81,7 @@ typedef struct DehermRecordingRoute {
   uint8_t luaHandleCodec;
   uint8_t luaResultHandleCodec;
   uint8_t luaArgumentCount;
+  uint8_t minimumArgumentCount;
 } DehermRecordingRoute;
 
 typedef struct DehermRecordingHandleSeed {
@@ -134,6 +135,9 @@ int deherm_recording_browser_invoke_callback(uint32_t route, uint32_t callback,
 uint32_t deherm_recording_browser_release_callbacks(uint32_t route);
 int deherm_recording_browser_verify_route(uint32_t route, uint32_t stableId,
     const char* expectedArguments, uint32_t expectedArgumentCount);
+/** Static exact-call synthetic GUI-node lease controls. */
+void deherm_recording_static_exact_setup(void);
+int deherm_recording_static_exact_teardown(uint32_t expectedHandleRelease);
 /** Synthesises the declared shape onto a caller-owned wire value graph. */
 uint32_t deherm_recording_find_route(uint32_t stableId);
 

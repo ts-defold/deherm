@@ -778,6 +778,46 @@ function transparentValueTypes(target, layouts) {
     .map(([name]) => name));
 }
 
+// Static Hermes can safely claim an optional callback-shaped route when the
+// sound-typed adapter declines any call that actually contains a JavaScript
+// function.  The omitted-callback arity then reaches the ordinary bounded Lua
+// route, while a present callback falls back to the Dynamic Hermes/JSI lane
+// before the Static frame is touched.  Required callbacks and callback result
+// values remain blocked: there is no sound-typed callable-result transport.
+function staticOptionalCallbackTransport(signature) {
+  const callbacks = [];
+  const walk = (shape, optional, phase) => {
+    if (!shape || typeof shape !== "object") return;
+    if (shape.kind === "callback") {
+      callbacks.push({ phase, optional: optional || shape.optional === true });
+      return;
+    }
+    // An `optional` value wrapper means nil is accepted; it does not imply
+    // that the containing function parameter may be omitted.  Arity
+    // optionality is carried by the parameter/field declaration below.
+    const childOptional = optional;
+    if (shape.value) walk(shape.value, childOptional, phase);
+    if (shape.element) walk(shape.element, childOptional, phase);
+    if (shape.key) walk(shape.key, childOptional, phase);
+    if (shape.pointee) walk(shape.pointee, childOptional, phase);
+    if (shape.target) walk(shape.target, childOptional, phase);
+    if (shape.result) walk(shape.result, childOptional, phase);
+    for (const value of shape.values ?? []) walk(value, childOptional, phase);
+    for (const value of shape.types ?? []) walk(value, childOptional, phase);
+    for (const parameter of shape.parameters ?? []) {
+      walk(parameter.value ?? parameter.type, childOptional || parameter.optional === true, "input");
+    }
+    for (const value of shape.returns ?? []) {
+      walk(value.value ?? value.type ?? value, childOptional, "output");
+    }
+    for (const field of shape.fields ?? []) {
+      walk(field.value ?? field.type, childOptional || field.optional === true, phase);
+    }
+  };
+  walk(signature, false, "input");
+  return callbacks.length > 0 && callbacks.every(({ phase, optional }) => phase === "input" && optional);
+}
+
 function backendRecord(unit, target, resolutions, implementationLanes, valueTypes) {
   const missingKinds = unit.shapeKinds.filter((kind) => target.unsupportedValueKinds.includes(kind));
   const resolved = new Map(resolutions.get(unit.identity.id) ?? []);
@@ -789,17 +829,41 @@ function backendRecord(unit, target, resolutions, implementationLanes, valueType
     target.target !== "dynamicHermesJsi";
   const universalCallbackTransport = !unit.shapeKinds.includes("callback") ||
     universalImplementation?.browserCallback?.registryEligible === true;
+  const optionalCallbackTransport = target.target === "staticHermesCAbi" &&
+    staticOptionalCallbackTransport(unit.publicSignature);
   const opaqueShapeKinds = new Set(target.opaqueShapeKinds ?? []);
+  // The generated GUI structured family owns a bounded generation-checked
+  // node adapter.  It is selected by context plus value shape and the
+  // generator-owned operation template, never by a route-name allowlist.
+  const guiNodeOperation = universalImplementation?.browserCallback?.owner === "gui-node-flipbook" ||
+    implementations.some(({ lane, generationIdentity }) =>
+      lane === "script-value-bindings" &&
+      ["gui-node-lookup", "gui-node-setter", "gui-node-text-set"].includes(
+        generationIdentity?.operation?.template));
+  const guiContext = unit.resolvedContract.context?.token ?? unit.resolvedContract.context;
+  const guiNodeStaticAdapter = target.target === "staticHermesCAbi" &&
+    unit.identity.surface === "script" &&
+    (guiContext === "active-gui-scene" ||
+      (guiContext === "captured-gui-script-instance" &&
+        universalImplementation?.browserCallback?.owner === "gui-node-flipbook")) &&
+    (universalImplementation?.defoldValueTypes ?? []).includes("node") &&
+    guiNodeOperation;
   const staticTransportBlockers = target.target === "staticHermesCAbi" && universalImplementation
     ? [...new Set([
         ...universalImplementation.shapeKinds.filter((kind) => opaqueShapeKinds.has(kind))
+          .filter((kind) => (kind !== "callback" || !optionalCallbackTransport) &&
+            !(guiNodeStaticAdapter && kind === "handle"))
           .map((kind) => `shape-kind:${kind}`),
         ...(universalImplementation.defoldValueTypes ?? [])
-          .filter((name) => !valueTypes.has(name)).map((name) => `value-type:${name}`)
+          .filter((name) => !valueTypes.has(name) &&
+            !(guiNodeStaticAdapter && name === "node"))
+          .map((name) => `value-type:${name}`)
       ])].sort(compareCodeUnits)
     : [];
   const universalStaticTransport = target.target === "staticHermesCAbi" &&
-    Boolean(universalImplementation) && staticTransportBlockers.length === 0;
+    Boolean(universalImplementation) &&
+    (optionalCallbackTransport || !unit.shapeKinds.includes("callback")) &&
+    staticTransportBlockers.length === 0;
   const universalScriptTarget = Boolean(universalImplementation) && (
     (target.target === "dynamicHermesJsi" &&
       (universalCallbackTransport || higherOrderClosure)) ||

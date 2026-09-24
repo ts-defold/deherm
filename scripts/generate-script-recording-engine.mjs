@@ -210,6 +210,7 @@ typedef struct DehermRecordingRoute {
   uint8_t luaHandleCodec;
   uint8_t luaResultHandleCodec;
   uint8_t luaArgumentCount;
+  uint8_t minimumArgumentCount;
 } DehermRecordingRoute;
 
 typedef struct DehermRecordingHandleSeed {
@@ -263,6 +264,9 @@ int deherm_recording_browser_invoke_callback(uint32_t route, uint32_t callback,
 uint32_t deherm_recording_browser_release_callbacks(uint32_t route);
 int deherm_recording_browser_verify_route(uint32_t route, uint32_t stableId,
     const char* expectedArguments, uint32_t expectedArgumentCount);
+/** Static exact-call synthetic GUI-node lease controls. */
+void deherm_recording_static_exact_setup(void);
+int deherm_recording_static_exact_teardown(uint32_t expectedHandleRelease);
 /** Synthesises the declared shape onto a caller-owned wire value graph. */
 uint32_t deherm_recording_find_route(uint32_t stableId);
 
@@ -291,7 +295,7 @@ function renderTables(model, native, shapeRefs) {
       `${route.luaAdapter.status === "skip" ? 1 : 0}, ${entry.luaAdapterReason}, ` +
       `${route.luaAdapter.handleCodec === "lua-userdata" ? 1 : route.luaAdapter.handleCodec === "gui-node" ? 2 : 0}, ` +
       `${route.luaAdapter.resultHandleCodec === "lua-userdata" ? 1 : route.luaAdapter.resultHandleCodec === "gui-node" ? 2 : route.luaAdapter.resultHandleCodec === "semantic" ? 3 : 0}, ` +
-      `${route.luaAdapter.argumentCount ?? route.arity.minimum}}`;
+      `${route.luaAdapter.argumentCount ?? route.arity.minimum}, ${route.arity.minimum}}`;
   }).join(",\n");
   const routeIndex = new Map(model.routes.map((route, order) => [route.id, order]));
   const order = model.order.map((id) => `  ${routeIndex.get(id)}u`).join(",\n");
@@ -788,8 +792,9 @@ bool Dispatch(void*, ScriptCallFrame* frame) {
   observation.arguments.clear();
   observation.violation.clear();
 
-  if (frame->argumentCount != descriptor.argumentCount) {
-    observation.violation = "arity-mismatch";
+  if (frame->argumentCount < descriptor.minimumArgumentCount ||
+      frame->argumentCount > descriptor.argumentCount) {
+    observation.violation = "arity-mismatch:" + std::string(textOf(descriptor.canonical));
   } else if (frame->argumentCount && !frame->arguments) {
     observation.violation = "argument-storage-is-null";
   } else {
@@ -990,6 +995,29 @@ uint32_t deherm_recording_browser_handle_release_count(void) {
 
 void deherm_recording_browser_drain_handle_releases(void) {
   drainReleasedScriptHandles();
+}
+
+void deherm_recording_static_exact_setup(void) {
+  gBrowserHandleReleaseCount = 0;
+  gBrowserHandleIssuedOrdinal = DEHERM_RECORDING_HANDLE_SEED_COUNT;
+  for (uint32_t ordinal = 0; ordinal < DEHERM_RECORDING_BROWSER_HANDLE_RELEASE_CAPACITY; ++ordinal) {
+    gBrowserHandleReleaseByOrdinal[ordinal] = 0;
+  }
+}
+
+int deherm_recording_static_exact_teardown(uint32_t expectedHandleRelease) {
+  drainReleasedScriptHandles();
+  const uint32_t expected = expectedHandleRelease ? 1u : 0u;
+  if (gBrowserHandleReleaseCount != expected ||
+      (expectedHandleRelease &&
+       gBrowserHandleIssuedOrdinal != DEHERM_RECORDING_HANDLE_SEED_COUNT + 1u)) {
+    ++gViolations;
+    std::snprintf(gLastError, sizeof(gLastError),
+        "static exact synthetic GUI-node lease mismatch expected=%u actual=%u issued=%u",
+        expected, gBrowserHandleReleaseCount, gBrowserHandleIssuedOrdinal);
+    return 0;
+  }
+  return 1;
 }
 
 int deherm_recording_browser_verify_handle_releases(void) {

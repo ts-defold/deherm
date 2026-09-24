@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 9,
-  "lastServerTick": 90,
-  "lastLocalTick": 93,
+  "observedInputsSent": 8,
+  "lastServerTick": 117,
+  "lastLocalTick": 119,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -97,8 +97,8 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 6047,
-      "sha256": "1bb9135f8c589f34a31765396e8320d891f659a41bc8aca9e5dcad6a8c14c017"
+      "bytes": 6289,
+      "sha256": "b7c0ed18dbc36fb3b29643a911b5dd310adbd09ff748fc3071e434eb23f2781b"
     },
     {
       "path": "examples/war-battles-online/server/deno-main.ts",
@@ -109,8 +109,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 44024,
-      "sha256": "50f917a658d5c1de61d738fd4915be7bcdd6cfa73b2721fa183b5dd5bdf44fa5"
+      "bytes": 44455,
+      "sha256": "627b75f3ae238349b36cd91416071d2f73cfa20f55fc0d5217b4cfe4c2e4efd3"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -125,6 +125,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "d2481d216e8bcae77ac4456bb9b6bfab6fd9d520c5328b99806f6811107b6c5a",
+  "sourceKey": "e12f940735161bdd38db1f3e6ffbf67b6d4d7b80264d9919f509d3c512838272",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence."
 }

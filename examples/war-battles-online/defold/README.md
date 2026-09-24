@@ -258,6 +258,16 @@ into the same Hermes runtime as the bytecode bundle. The unit installs itself
 over the script bridge, so the routes it claims cross into the engine through
 `extern_c` and every other route keeps crossing over JSI in the same binary.
 
+The canonical typed-native bridge owns an exact set of **517/517** generated
+script routes. The project-owned bridge source consumed by the Static Hermes
+projection is pinned at SHA-256
+`d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f`.
+The project-owned gate report,
+`build/gates/war-battles-static-hermes-project/report.json`, records passed
+Static Hermes compilation, Bob/Extender linkage, and an engine launch that
+observed the typed-native unit registration marker. That is build and transport
+evidence; it is not full-game Static AOT gameplay evidence.
+
 The shipped default is telemetry **off**. Add `--profile` to the assemble step
 to build with transport telemetry on: the running game then prints a
 `DEHERM_EVENT transport-span` census every two seconds and one final census
@@ -316,12 +326,13 @@ or a transport census, and nothing here can inspect a window or a canvas.
 
 The fourth row is intentionally narrower than packaged gameplay. It is the
 strongest current Static Hermes product projection: release typecheck proves a
-dynamic-access-free reachable set, the canonical lowering plan selects the
-sound typed-native subset and preserves blocked routes, and the packaged
-typed-native census shows which of that subset crossed the generated adapter
-in a real Dynamic Hermes run. It does not claim that the full game has run as a
-Static Hermes application; compilation, linkage, and gameplay remain separate
-gates.
+dynamic-access-free reachable set of 27 routes, the canonical lowering plan
+selects all 27 with zero reachable blockers, and the canonical exact set is
+517/517. The project-owned gate separately proves compilation, Bob/Extender
+linkage, and engine launch with typed-native unit registration. The packaged
+typed-native census remains a separate Dynamic Hermes transport observation.
+Full War Battles gameplay remains Dynamic Hermes; this projection does not
+claim full-game Static Hermes AOT execution or Defold gameplay semantics.
 
 ## Graceful shutdown and component teardown
 

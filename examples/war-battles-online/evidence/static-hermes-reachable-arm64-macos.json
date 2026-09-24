@@ -30,11 +30,11 @@
     "usage": "examples/war-battles-online/defold/.deherm/generated/defold-api-usage.json",
     "usageSha256": "ceb1719002b0e6ec515fb3e0fce3e261d07341370befb2e7d0aea48e6168fc95",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
-    "loweringPlanSha256": "c6d8f311dcdfba43f1606492b3590a851c5214d43cbaa741533f29d402ff56e4",
+    "loweringPlanSha256": "a581fbfc27a35f3b72a5f09675f269cf26e086235e4e518090dbc31de8ec83c3",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
-    "typedNativeBridgeSha256": "f6f2dc1eb7e7d7983b79e5fc876a9f6414305bd398b634b330fd259b2e620149",
+    "typedNativeBridgeSha256": "6b5010d72292e2869be9f8178c924bc9f170dbab705e3ff5cc4dc536d5b016de",
     "typedNativeSource": "examples/war-battles-online/defold/.deherm/static-hermes/generated/script-typed-native-bridge.ts",
-    "typedNativeSourceSha256": "562854b576634573f0790def0bde422b21c52f6d1b16eb1407439ca66d8889ec",
+    "typedNativeSourceSha256": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f",
     "adapterEvidence": "examples/war-battles-online/evidence/packaged-typed-native-transport-arm64-macos.json",
     "adapterEvidenceSha256": "c3a56211db4b35a78a2b6cb5c982f04bac43b334153ea6f8fc208ff8034a7c38"
   },
@@ -71,7 +71,7 @@
       "script:vmath.vector3",
       "script:vmath.vector4"
     ],
-    "staticReachableRouteCount": 17,
+    "staticReachableRouteCount": 27,
     "staticReachableRouteIds": [
       "script:camera.get_cameras",
       "script:camera.get_orthographic_auto_zoom",
@@ -81,7 +81,17 @@
       "script:go.get_position",
       "script:go.set_position",
       "script:go.set_rotation",
+      "script:gui.get_node",
+      "script:gui.play_flipbook",
+      "script:gui.set_color",
+      "script:gui.set_enabled",
+      "script:gui.set_euler",
+      "script:gui.set_position",
+      "script:gui.set_size",
+      "script:gui.set_text",
+      "script:gui.set_texture",
       "script:msg.post",
+      "script:sound.play",
       "script:sys.get_config_number",
       "script:sys.get_config_string",
       "script:vmath.length",
@@ -91,100 +101,8 @@
       "script:vmath.vector3",
       "script:vmath.vector4"
     ],
-    "blockedReachableRouteCount": 10,
-    "blockedReachableRoutes": [
-      {
-        "id": "script:gui.get_node",
-        "stableId": 509983822,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.play_flipbook",
-        "stableId": 1867420328,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "shape-kind:callback",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.set_color",
-        "stableId": 681356529,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.set_enabled",
-        "stableId": 344287147,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.set_euler",
-        "stableId": 3920485847,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.set_position",
-        "stableId": 1474440329,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.set_size",
-        "stableId": 1335131087,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.set_text",
-        "stableId": 1480837389,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:gui.set_texture",
-        "stableId": 1539901009,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "value-type:node"
-        ]
-      },
-      {
-        "id": "script:sound.play",
-        "stableId": 900417529,
-        "selection": "blocked-capability",
-        "blockers": [
-          "current-backend:projection-emitted-backend-policy-required",
-          "shape-kind:callback"
-        ]
-      }
-    ]
+    "blockedReachableRouteCount": 0,
+    "blockedReachableRoutes": []
   },
   "adapter": {
     "observedTypedNativeRouteCount": 14,
@@ -277,6 +195,16 @@
     "observedStaticReachableRouteCount": 14,
     "unobservedStaticReachableRouteIds": [
       "script:camera.get_orthographic_auto_zoom",
+      "script:gui.get_node",
+      "script:gui.play_flipbook",
+      "script:gui.set_color",
+      "script:gui.set_enabled",
+      "script:gui.set_euler",
+      "script:gui.set_position",
+      "script:gui.set_size",
+      "script:gui.set_text",
+      "script:gui.set_texture",
+      "script:sound.play",
       "script:sys.get_config_string",
       "script:vmath.vector4"
     ]
@@ -290,5 +218,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "5cd448c08409beb59933ba594763af2c4554cf3522cca890ee9da020435b630a"
+  "recordSha256": "d4ccc76ceca20209621becd641ea2abc2669eb82cf25f871e6f5c5c3dbf4d0f2"
 }

@@ -4,13 +4,13 @@
   "transport": "typed-native",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "inputHashes": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "c6d8f311dcdfba43f1606492b3590a851c5214d43cbaa741533f29d402ff56e4",
-    "packages/bindings/generated/defold-script-universal-value-bindings.json": "231ccfb4408ce646e2053cf5e8c225aad50864e7b6612d3bcada41df7e4a1559",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "a581fbfc27a35f3b72a5f09675f269cf26e086235e4e518090dbc31de8ec83c3",
+    "packages/bindings/generated/defold-script-universal-value-bindings.json": "c53f52c74d4bb5d07d6614e1ccace2f3baf7246994df4ed49a38fec9a7c01185",
     "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp": "5abcca927b7d97ca7e1e07103f490d485c345ba9072db64e93ffe328e580267c"
   },
-  "planTypedNativeEmit": 466,
-  "planTypedNativeBackendEmit": 492,
-  "claimedRouteCount": 466,
+  "planTypedNativeEmit": 517,
+  "planTypedNativeBackendEmit": 543,
+  "claimedRouteCount": 517,
   "declinedRouteCount": 0,
   "maximumArgumentCount": 32,
   "claimedRoutes": [
@@ -151,6 +151,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.set_enabled",
+      "stableId": 344287147,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_clipping_inverted",
+      "stableId": 344438576,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:resource.release",
       "stableId": 366027815,
       "maximumArgumentCount": 1
@@ -206,6 +216,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.get_node",
+      "stableId": 509983822,
+      "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.set_id",
+      "stableId": 510669267,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:tilemap.set_tile",
       "stableId": 530608877,
       "maximumArgumentCount": 6
@@ -249,6 +269,11 @@
       "id": "script:go.set_parent",
       "stableId": 593473189,
       "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:gui.set_inner_radius",
+      "stableId": 599811265,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:vmath.quat_rotation_y",
@@ -301,6 +326,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.set_particlefx",
+      "stableId": 634729758,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:font.add_font",
       "stableId": 638454056,
       "maximumArgumentCount": 2
@@ -324,6 +354,11 @@
       "id": "script:constant.bullet3d.collision_object.CF_NO_CONTACT_RESPONSE",
       "stableId": 665620171,
       "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.set_color",
+      "stableId": 681356529,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:resource.create_buffer",
@@ -411,6 +446,11 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:gui.set_outline",
+      "stableId": 852399392,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:constant.material.CONSTANT_TYPE_USER",
       "stableId": 887839062,
       "maximumArgumentCount": 0
@@ -419,6 +459,11 @@
       "id": "script:vmath.matrix4_translation",
       "stableId": 889923285,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:sound.play",
+      "stableId": 900417529,
+      "maximumArgumentCount": 3
     },
     {
       "id": "script:socket.sleep",
@@ -519,6 +564,11 @@
       "id": "script:constant.b2d.shape.SHAPE_TYPE_CAPSULE",
       "stableId": 1096045379,
       "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:physics.set_event_listener",
+      "stableId": 1107212821,
+      "maximumArgumentCount": 1
     },
     {
       "id": "script:msg.post",
@@ -626,6 +676,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:model.play_anim",
+      "stableId": 1281580293,
+      "maximumArgumentCount": 5
+    },
+    {
       "id": "script:sys.get_config_int",
       "stableId": 1282948964,
       "maximumArgumentCount": 2
@@ -659,6 +714,11 @@
       "id": "script:vmath.euler_to_quat",
       "stableId": 1329930197,
       "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:gui.set_size",
+      "stableId": 1335131087,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:compute.get_samplers",
@@ -706,6 +766,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.set_leading",
+      "stableId": 1425442548,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:constant.material.CONSTANT_TYPE_NORMAL",
       "stableId": 1430186134,
       "maximumArgumentCount": 0
@@ -741,9 +806,24 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:gui.set_position",
+      "stableId": 1474440329,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:go.get_id",
       "stableId": 1477563324,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.set_text",
+      "stableId": 1480837389,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_shadow",
+      "stableId": 1482532654,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:render.set_stencil_op",
@@ -781,6 +861,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:gui.set_texture",
+      "stableId": 1539901009,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:json.decode",
       "stableId": 1547570734,
       "maximumArgumentCount": 2
@@ -809,6 +894,11 @@
       "id": "script:collectionfactory.unload",
       "stableId": 1613326455,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.set_clipping_mode",
+      "stableId": 1648551722,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:camera.get_fov",
@@ -846,6 +936,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:gui.set_outer_bounds",
+      "stableId": 1712128015,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:sys.get_sys_info",
       "stableId": 1715761682,
       "maximumArgumentCount": 1
@@ -856,9 +951,19 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:gui.set_tracking",
+      "stableId": 1740794531,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:profiler.view_recorded_frame",
       "stableId": 1794446851,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:factory.load",
+      "stableId": 1808015212,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:render.dispatch_compute",
@@ -881,8 +986,18 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.play_flipbook",
+      "stableId": 1867420328,
+      "maximumArgumentCount": 4
+    },
+    {
       "id": "script:physics.get_maskbit",
       "stableId": 1870095059,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_blend_mode",
+      "stableId": 1874419309,
       "maximumArgumentCount": 2
     },
     {
@@ -909,6 +1024,11 @@
       "id": "script:constant.material.CONSTANT_TYPE_WORLDVIEW",
       "stableId": 1901890586,
       "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.set_fill_angle",
+      "stableId": 1932260719,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:gui.set_safe_area_mode",
@@ -972,6 +1092,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:gui.set_yanchor",
+      "stableId": 2042797604,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:gui.get_width",
       "stableId": 2048321486,
       "maximumArgumentCount": 0
@@ -1007,6 +1132,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.set_size_mode",
+      "stableId": 2104597123,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:render.set_listener",
+      "stableId": 2106330303,
+      "maximumArgumentCount": 1
+    },
+    {
       "id": "script:gui.reset_nodes",
       "stableId": 2107179008,
       "maximumArgumentCount": 0
@@ -1015,6 +1150,16 @@
       "id": "script:vmath.matrix4_scale",
       "stableId": 2116175008,
       "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:sprite.play_flipbook",
+      "stableId": 2116188218,
+      "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:gui.set_adjust_mode",
+      "stableId": 2124339589,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:crash.load_previous",
@@ -1109,6 +1254,11 @@
     {
       "id": "script:go.world_to_local_transform",
       "stableId": 2265777619,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_flipbook_playback_rate",
+      "stableId": 2274625155,
       "maximumArgumentCount": 2
     },
     {
@@ -1434,9 +1584,19 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:gui.set_alpha",
+      "stableId": 2749898006,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:vmath.quat",
       "stableId": 2756728049,
       "maximumArgumentCount": 4
+    },
+    {
+      "id": "script:gui.set_clipping_visible",
+      "stableId": 2765276089,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:go.get_scale",
@@ -1452,6 +1612,11 @@
       "id": "script:vmath.matrix4_orthographic",
       "stableId": 2797369728,
       "maximumArgumentCount": 6
+    },
+    {
+      "id": "script:particlefx.play",
+      "stableId": 2809933664,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:tilemap.get_tile",
@@ -1474,6 +1639,11 @@
       "maximumArgumentCount": 6
     },
     {
+      "id": "script:gui.set_screen_position",
+      "stableId": 2837486932,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:hash",
       "stableId": 2845099200,
       "maximumArgumentCount": 1
@@ -1482,6 +1652,11 @@
       "id": "script:sys.set_engine_throttle",
       "stableId": 2847174763,
       "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:font.prewarm_text",
+      "stableId": 2848412671,
+      "maximumArgumentCount": 3
     },
     {
       "id": "script:constant.graphics.SEMANTIC_TYPE_TEXTURE_TRANSFORM_2D",
@@ -1517,6 +1692,11 @@
       "id": "script:constant.bullet3d.constraint.CONSTRAINT_TYPE_HINGE2",
       "stableId": 2920845474,
       "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.set_inherit_alpha",
+      "stableId": 2930785382,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:physics.set_shape",
@@ -1562,6 +1742,11 @@
     {
       "id": "script:json.encode",
       "stableId": 2983061638,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_xanchor",
+      "stableId": 2994148867,
       "maximumArgumentCount": 2
     },
     {
@@ -1665,6 +1850,11 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.set_flipbook_cursor",
+      "stableId": 3158379927,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:go.get_scale_uniform",
       "stableId": 3159049394,
       "maximumArgumentCount": 1
@@ -1723,6 +1913,11 @@
       "id": "script:constant.bullet3d.collision_object.CO_SOFT_BODY",
       "stableId": 3222245995,
       "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.set_perimeter_vertices",
+      "stableId": 3222725677,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:constant.b2d.body.B2_STATIC_BODY",
@@ -1803,6 +1998,11 @@
       "id": "script:constant.b2d.joint.JOINT_TYPE_UNKNOWN",
       "stableId": 3437012774,
       "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.set_font",
+      "stableId": 3446342703,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:constant.b2d.shape.SHAPE_TYPE_CHAIN",
@@ -2060,6 +2260,16 @@
       "maximumArgumentCount": 2
     },
     {
+      "id": "script:gui.set_visible",
+      "stableId": 3757373152,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_rotation",
+      "stableId": 3759172468,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:render.enable_material",
       "stableId": 3764411239,
       "maximumArgumentCount": 1
@@ -2068,6 +2278,11 @@
       "id": "script:constant.graphics.SEMANTIC_TYPE_BONE_INDICES",
       "stableId": 3768632141,
       "maximumArgumentCount": 0
+    },
+    {
+      "id": "script:gui.set_slice9",
+      "stableId": 3771988895,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:bit.bnot",
@@ -2120,6 +2335,16 @@
       "maximumArgumentCount": 1
     },
     {
+      "id": "script:gui.set_euler",
+      "stableId": 3920485847,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_scale",
+      "stableId": 3923373356,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:physics.update_mass",
       "stableId": 3925799645,
       "maximumArgumentCount": 2
@@ -2163,6 +2388,21 @@
       "id": "script:physics.get_group",
       "stableId": 3971564819,
       "maximumArgumentCount": 1
+    },
+    {
+      "id": "script:gui.set_layer",
+      "stableId": 3974957251,
+      "maximumArgumentCount": 2
+    },
+    {
+      "id": "script:gui.set_parent",
+      "stableId": 3975981566,
+      "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:gui.set_pivot",
+      "stableId": 3991574614,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:sys.get_application_path",
@@ -2240,6 +2480,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:gui.set_line_break",
+      "stableId": 4102050116,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:physics.set_vflip",
       "stableId": 4109527981,
       "maximumArgumentCount": 2
@@ -2255,6 +2500,11 @@
       "maximumArgumentCount": 0
     },
     {
+      "id": "script:gui.set_material",
+      "stableId": 4118133459,
+      "maximumArgumentCount": 2
+    },
+    {
       "id": "script:vmath.quat_axis_angle",
       "stableId": 4121318819,
       "maximumArgumentCount": 2
@@ -2263,6 +2513,11 @@
       "id": "script:camera.screen_xy_to_world",
       "stableId": 4124133706,
       "maximumArgumentCount": 3
+    },
+    {
+      "id": "script:collectionfactory.load",
+      "stableId": 4139911040,
+      "maximumArgumentCount": 2
     },
     {
       "id": "script:gui.set_texture_data",
@@ -2352,7 +2607,7 @@
   ],
   "declinedRoutes": [],
   "generatedSha256": {
-    "typescript": "562854b576634573f0790def0bde422b21c52f6d1b16eb1407439ca66d8889ec"
+    "typescript": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f"
   },
   "evidenceBoundary": {
     "routeSelection": "derived-from-the-canonical-lowering-plan",
@@ -2361,5 +2616,5 @@
     "linkage": "not-claimed",
     "runtime": "not-claimed"
   },
-  "reportSha256": "7c6e4a471cc3b2ddfeec7671715acb3e2a96c219dd0be4012baea52f87c88a23"
+  "reportSha256": "ab67f3880f7bd54def183192c0281dc48590b63be79a4b5e4f086f8a0353f8b9"
 }

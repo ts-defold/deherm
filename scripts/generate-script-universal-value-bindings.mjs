@@ -389,6 +389,44 @@ function collectDefoldValueTypes(value, output = new Set()) {
   return output;
 }
 
+// Static Hermes may carry an optional callback route only for calls whose
+// callback argument is omitted.  The sound-typed bridge declines a present
+// JavaScript function before acquiring a native frame, so it cannot silently
+// lose callback ownership; required callbacks and callback results stay out of
+// this lane until a callable-result transport exists.
+function staticOptionalCallbackTransport(signature) {
+  const callbacks = [];
+  const walk = (shape, optional, phase) => {
+    if (!shape || typeof shape !== "object") return;
+    if (shape.kind === "callback") {
+      callbacks.push({ phase, optional: optional || shape.optional === true });
+      return;
+    }
+    // Nil-able values are not automatically omitted parameters.  Only the
+    // declaration's optional bit grants the Static lane its omission proof.
+    const childOptional = optional;
+    if (shape.value) walk(shape.value, childOptional, phase);
+    if (shape.element) walk(shape.element, childOptional, phase);
+    if (shape.key) walk(shape.key, childOptional, phase);
+    if (shape.pointee) walk(shape.pointee, childOptional, phase);
+    if (shape.target) walk(shape.target, childOptional, phase);
+    if (shape.result) walk(shape.result, childOptional, phase);
+    for (const value of shape.values ?? []) walk(value, childOptional, phase);
+    for (const value of shape.types ?? []) walk(value, childOptional, phase);
+    for (const parameter of shape.parameters ?? []) {
+      walk(parameter.value ?? parameter.type, childOptional || parameter.optional === true, "input");
+    }
+    for (const value of shape.returns ?? []) {
+      walk(value.value ?? value.type ?? value, childOptional, "output");
+    }
+    for (const field of shape.fields ?? []) {
+      walk(field.value ?? field.type, childOptional || field.optional === true, phase);
+    }
+  };
+  walk(signature, false, "input");
+  return callbacks.length > 0 && callbacks.every(({ phase, optional }) => phase === "input" && optional);
+}
+
 function parseArguments(argv) {
   const options = { check: false, outputRoot: repositoryRoot };
   for (let index = 0; index < argv.length; ++index) {
@@ -2438,8 +2476,9 @@ export function generateUniversalValueBindings(inputs) {
   // report models transparently. Engine-owned values and Lua closures stay out
   // until the retained-handle and closure transports land.
   const transparentValueTypes = new Set(Object.keys(layouts.transparent));
-  const staticHermesEligible = selected.filter(({ shapeKinds, defoldValueTypes }) =>
-    !shapeKinds.some((kind) => ["callback", "handle"].includes(kind)) &&
+  const staticHermesEligible = selected.filter(({ id, shapeKinds, defoldValueTypes }) =>
+    (!shapeKinds.includes("callback") || staticOptionalCallbackTransport(signatureById.get(id))) &&
+    !shapeKinds.includes("handle") &&
     defoldValueTypes.every((name) => transparentValueTypes.has(name)));
   const artifacts = [
     relativePaths.header,
@@ -2469,7 +2508,7 @@ export function generateUniversalValueBindings(inputs) {
     schemaVersion: 1,
     defoldRevision: projection.defoldRevision,
     scope: "Every callable script route selected mechanically by one bounded universal value-graph fallback; browser callbacks are promoted only when the generated lifecycle ledger marks them registry-eligible, and optimized lanes remain preferred at runtime.",
-    evidenceBoundary: "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no Lua closure or retained Lua handle and whose Defold value types all have a pinned transparent layout; packaged Defold and packaged browser execution remain unverified.",
+    evidenceBoundary: "The shared recursive Lua backend, fixed-layout C ABI, sound-typed Static Hermes frame marshaller, direct-memory browser provider, and browser callback trampoline are generated and independently harness-tested. Static Hermes runtime execution proves the shape subset that carries no retained Lua handle, whose Defold value types all have a pinned transparent layout, and whose callback inputs are optional and declined to the JSI lane when present; packaged Defold and packaged browser execution remain unverified.",
     selection: policy.selection,
     bounds: policy.bounds,
     tablePolicy: policy.tablePolicy,
@@ -2499,7 +2538,7 @@ export function generateUniversalValueBindings(inputs) {
         staticCompiler: "proven",
         staticHermesRuntime: "proven-representative-recursive-value-graph-with-transparent-defold-value-records",
         emittedRouteCount: staticHermesEligible.length,
-        emittedShapeRule: "no-callback-no-lua-handle-and-every-defold-value-type-transparent",
+        emittedShapeRule: "optional-input-callbacks-decline-to-jsi-no-lua-handle-and-every-defold-value-type-transparent",
         transparentValueTypes: [...transparentValueTypes].sort(compare),
         opaqueValueTypes: Object.keys(layouts.opaque).sort(compare),
         defoldValueLayoutSource: relativePaths.layouts,
