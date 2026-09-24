@@ -1352,12 +1352,12 @@ constexpr Route kRoutes[] = {
 };
 
 constexpr RuntimeProfile kRuntimeProfiles[] = {
-  {0, 1, 9u, 198u, 201, "bullet-only", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "f0b71c047ed49a3ce96d9fec21f215d5279d1a67d6cf7b1ca2850a237d5b2e08", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
-  {1, 2, 11u, 343u, 313, "default-legacy-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "86aa4a3c9f3bf3e25be216cde81f7c10bbb82c0b1d9bc253549ee5c822ac8730", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
-  {2, 4, 3u, 171u, 182, "legacy-no-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "1d71f8ec8f69147743c11df72bafe9601ffbcf65f8cc568e71d01f6cf5ca389b", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
-  {3, 8, 1u, 26u, 70, "no-physics", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "e98ea2491703ab70fb825391d82e9a4b989bcaef00390e439e3df9a600aba91a", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
-  {4, 16, 13u, 417u, 380, "v3-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "4986f1ce48a4ac0794db982c2aba6df98f50d0b8d1be96d2b47d87ef40e487fa", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
-  {5, 32, 5u, 245u, 249, "v3-no-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "84e476bd290eb2b22320e97a361882270a777c77dbb5eb40749ca46f08a6b493", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
+  {0, 1, 0, 1, 9u, 198u, 201, "bullet-only", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "f0b71c047ed49a3ce96d9fec21f215d5279d1a67d6cf7b1ca2850a237d5b2e08", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
+  {1, 2, 1, 2, 11u, 343u, 313, "default-legacy-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "86aa4a3c9f3bf3e25be216cde81f7c10bbb82c0b1d9bc253549ee5c822ac8730", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
+  {2, 4, 2, 4, 3u, 171u, 182, "legacy-no-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "1d71f8ec8f69147743c11df72bafe9601ffbcf65f8cc568e71d01f6cf5ca389b", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
+  {3, 8, 3, 8, 1u, 26u, 70, "no-physics", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "e98ea2491703ab70fb825391d82e9a4b989bcaef00390e439e3df9a600aba91a", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
+  {4, 16, 4, 16, 13u, 417u, 380, "v3-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "4986f1ce48a4ac0794db982c2aba6df98f50d0b8d1be96d2b47d87ef40e487fa", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
+  {5, 32, 5, 32, 5u, 245u, 249, "v3-no-bullet", "deherm.script-route-capabilities/v1", "7f0f554f41f9dce1e0ddff99bf08200657d1ee05", "84e476bd290eb2b22320e97a361882270a777c77dbb5eb40749ca46f08a6b493", "33ab628fb2dc8e58b5296346f189892f54fa2a23ee3f4c5b063300299066936b"},
 };
 
 constexpr uint16_t kStableOrder[] = { 97, 344, 293, 303, 96, 215, 305, 399, 76, 90, 283, 298, 205, 285, 306, 12, 65, 128, 291, 6, 35, 84, 358, 307, 206, 240, 105, 375, 99, 26, 95, 201, 161, 404, 250, 144, 228, 278, 134, 260, 33, 55, 281, 243, 91, 113, 316, 252, 225, 63, 92, 112, 93, 89, 194, 314, 268, 156, 214, 199, 256, 244, 200, 173, 277, 393, 406, 78, 386, 339, 117, 362, 0, 270, 396, 5, 392, 110, 8, 186, 44, 22, 108, 170, 196, 249, 373, 73, 203, 342, 208, 183, 150, 174, 336, 287, 331, 267, 299, 198, 230, 376, 402, 213, 60, 69, 182, 276, 126, 176, 151, 370, 43, 202, 192, 328, 27, 50, 405, 284, 149, 269, 221, 36, 158, 77, 31, 168, 61, 85, 80, 237, 327, 366, 263, 102, 361, 15, 88, 130, 353, 175, 16, 4, 29, 25, 343, 129, 204, 308, 219, 107, 235, 379, 106, 141, 380, 220, 288, 265, 282, 115, 139, 125, 374, 322, 310, 166, 295, 233, 10, 259, 57, 381, 236, 160, 41, 335, 94, 321, 131, 241, 289, 100, 309, 155, 301, 59, 292, 7, 28, 42, 181, 397, 346, 67, 165, 352, 136, 193, 377, 190, 258, 79, 48, 234, 349, 17, 242, 147, 369, 217, 163, 114, 154, 62, 207, 135, 185, 74, 121, 70, 21, 172, 66, 24, 56, 388, 72, 329, 254, 195, 255, 359, 262, 313, 266, 371, 333, 218, 357, 398, 227, 58, 311, 347, 245, 395, 338, 19, 124, 162, 390, 340, 391, 145, 49, 98, 348, 297, 81, 384, 272, 191, 54, 300, 64, 104, 153, 103, 264, 382, 75, 351, 320, 164, 148, 40, 177, 83, 273, 1, 330, 140, 274, 210, 345, 280, 2, 37, 337, 209, 368, 296, 11, 318, 109, 187, 143, 169, 394, 46, 34, 180, 302, 354, 53, 216, 246, 184, 39, 38, 365, 350, 247, 111, 356, 232, 387, 294, 9, 20, 319, 364, 248, 334, 372, 367, 238, 224, 159, 47, 261, 120, 68, 257, 13, 86, 222, 211, 383, 279, 401, 197, 157, 171, 251, 101, 326, 290, 122, 355, 45, 118, 51, 317, 71, 132, 14, 363, 178, 324, 119, 82, 378, 323, 325, 226, 188, 133, 332, 146, 212, 189, 239, 179, 18, 315, 400, 23, 116, 123, 403, 229, 223, 304, 271, 312, 152, 87, 275, 3, 167, 231, 253, 52, 385, 341, 138, 286, 137, 389, 30, 32, 127, 360, 142 };
@@ -1455,8 +1455,16 @@ int protectedDetectRuntimeProfile(lua_State* state) {
     output.profile = match;
     output.status = RuntimeProfileDetectionStatus::kMatched;
   } else if (matches > 1) {
-    output.profile = nullptr;
-    output.status = RuntimeProfileDetectionStatus::kAmbiguous;
+    const uint8_t canonical = match->detectionCanonicalProfileIndex;
+    bool equivalent = true;
+    for (uint8_t index = 0; index < kRuntimeProfileCount; ++index) {
+      if (output.mismatches[index] == 0 && kRuntimeProfiles[index].detectionCanonicalProfileIndex != canonical) {
+        equivalent = false;
+        break;
+      }
+    }
+    output.profile = equivalent ? &kRuntimeProfiles[canonical] : nullptr;
+    output.status = equivalent ? RuntimeProfileDetectionStatus::kMatched : RuntimeProfileDetectionStatus::kAmbiguous;
   } else {
     output.status = RuntimeProfileDetectionStatus::kNoMatch;
   }

@@ -3,8 +3,9 @@
   "generator": "scripts/generate-typed-native-bridge.mjs",
   "transport": "typed-native",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "canonicalPlanRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "inputHashes": {
-    "packages/bindings/generated/defold-binding-lowering-plan.json": "a581fbfc27a35f3b72a5f09675f269cf26e086235e4e518090dbc31de8ec83c3",
+    "packages/bindings/generated/defold-binding-lowering-plan.json": "79102a7c5856d8d1ae8c1d4bfff38c45db25c4a6da76ab24c1309ff27ae8bec4",
     "packages/bindings/generated/defold-script-universal-value-bindings.json": "c53f52c74d4bb5d07d6614e1ccace2f3baf7246994df4ed49a38fec9a7c01185",
     "defold/defold_hermes/include/defold_hermes/script_bridge_capi.hpp": "5abcca927b7d97ca7e1e07103f490d485c345ba9072db64e93ffe328e580267c"
   },
@@ -2616,5 +2617,5 @@
     "linkage": "not-claimed",
     "runtime": "not-claimed"
   },
-  "reportSha256": "ab67f3880f7bd54def183192c0281dc48590b63be79a4b5e4f086f8a0353f8b9"
+  "reportSha256": "252915bfcfed22e5854dbbfe11cd99b4d3a5835c7c5383a88c1647c51e36013b"
 }

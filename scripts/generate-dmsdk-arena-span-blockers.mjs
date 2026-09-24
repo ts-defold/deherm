@@ -46,19 +46,33 @@ function blockerFor(row) {
   if (roles.some((role) => role.includes("opaque-pointer"))) return "opaque-byte-pointee-unit-or-lifetime";
   if (roles.some((role) => role.includes("cstring"))) return "cstring-termination-or-capacity-policy";
   if (roles.some((role) => role.includes("unknown:") || role.includes("template:"))) return "template-element-layout-or-specialization";
-  throw new Error(`${row.id}: arena-span row has no reviewed blocker partition`);
+  return "unclassified-arena-span-shape";
+}
+const specializationBlocker = "cstring-arena-specialization-unverified";
+const specializationBlockerReason = "The declaration remains available through the universal dmSDK route, but this revision did not prove the bounded cstring-arena specialization recipe.";
+
+function resolveSourceEvidence(recipe, evidenceTexts) {
+  const resolved = [];
+  for (const evidence of recipe.sourceEvidence) {
+    const source = evidenceTexts.get(evidence.path);
+    if (typeof source !== "string") return null;
+    const matchingLines = source.split("\n")
+      .map((text, index) => ({ text, line: index + 1 }))
+      .filter(({ text }) => text === evidence.text)
+      .sort((left, right) => Math.abs(left.line - evidence.line) - Math.abs(right.line - evidence.line) || left.line - right.line);
+    if (!matchingLines.length) return null;
+    resolved.push({ ...evidence, line: matchingLines[0].line });
+  }
+  return resolved;
 }
 function validatePolicy(policy) {
-  exactKeys(policy, ["schemaVersion", "policyVersion", "defoldRevision", "tranche", "priorWaveReports", "coveredByPriorWaves", "expectedCoverage", "expectedPartitionSummary", "blockerDefinitions", "cstringArena"], "arena-span policy");
+  exactKeys(policy, ["schemaVersion", "policyVersion", "defoldRevision", "tranche", "priorWaveReports", "blockerDefinitions", "cstringArena"], "arena-span policy");
   assert(policy.schemaVersion === 1, "arena-span policy schemaVersion must be 1");
   assert(policy.policyVersion === "arena-span-cstring-v2", "arena-span policyVersion is unsupported");
   assert(/^[0-9a-f]{40}$/.test(policy.defoldRevision), "arena-span policy must pin a Defold revision");
   assert(policy.tranche === "arena-backed-spans", "arena-span policy tranche is unsupported");
   assert(Array.isArray(policy.priorWaveReports) && policy.priorWaveReports.length === 6, "arena-span policy must name six prior waves");
   unique(policy.priorWaveReports, ({ path }) => path, "priorWaveReports");
-  unique(policy.coveredByPriorWaves.map((symbol) => ({ symbol })), ({ symbol }) => symbol, "coveredByPriorWaves");
-  exactKeys(policy.expectedCoverage, ["arenaSpanCensus", "coveredByPriorWaves", "generatedCStringArena", "blocked"], "expectedCoverage");
-  assert(JSON.stringify(Object.keys(policy.expectedPartitionSummary).sort(compare)) === JSON.stringify(Object.keys(policy.blockerDefinitions).sort(compare)), "blocker definitions must exactly match the blocked partition");
   exactKeys(policy.cstringArena, ["maximumInputBytes", "maximumOutputBytes", "selection", "recipes", "contract"], "cstringArena");
   assert(Number.isSafeInteger(policy.cstringArena.maximumInputBytes) && policy.cstringArena.maximumInputBytes > 0, "maximumInputBytes must be positive");
   assert(Number.isSafeInteger(policy.cstringArena.maximumOutputBytes) && policy.cstringArena.maximumOutputBytes > 0, "maximumOutputBytes must be positive");
@@ -109,7 +123,7 @@ function renderExactFake(entry) {
   if (entry.recipe.kind === "canonical-path") return `uint32_t ${name}(const char* input,char* output,uint32_t capacity){${observe}${write}return UINT32_C(${500 + id});}`;
   return `dmURI::Result ${name}(const char* input,char* output,uint32_t capacity,uint32_t* written){${observe}${write}if(written)*written=UINT32_C(${`result_${id}`.length + 1});return gForceUriNativeFailure?dmURI::RESULT_TOO_SMALL_BUFFER:dmURI::RESULT_OK;}`;
 }
-function renderExactDriver(entries) {
+function renderExactDriverAllKinds(entries) {
   const calls = entries.map((entry) => {
     const id = entry.bindingId;
     const input = entry.recipe.kind === "error-string" ? "nullptr,UINT32_C(0)" : `reinterpret_cast<const uint8_t*>(${JSON.stringify(`arena_${id}`)}),UINT32_C(${`arena_${id}`.length})`;
@@ -129,6 +143,19 @@ function renderExactDriver(entries) {
   const overlapInput = `arena_${overlap.bindingId}`;
   const overlapResult = `result_${overlap.bindingId}`;
   return `${calls}\n{char output[8]={'x'};DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};const uint8_t embedded[3]={'a',0,'b'};if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${first.bindingId}),embedded,UINT32_C(3),${firstScalar},output,UINT32_C(8),&result)!=DEHERM_DMSDK_ARENA_CSTRING_EMBEDDED_NUL||output[0]!='\\0'||result.native_result!=0)return 70;}\n{char output[64]={};DehermDmSdkArenaCStringResult result{};gRequestReentry=true;if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${first.bindingId}),${firstInput},${firstScalar},output,UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK||gNestedStatus!=DEHERM_DMSDK_ARENA_CSTRING_REENTRANT)return 71;}\n{char output[1]={'x'};DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${first.bindingId}),${firstInput},${firstScalar},output,UINT32_MAX,&result)!=DEHERM_DMSDK_ARENA_CSTRING_OUTPUT_TOO_LARGE||output[0]!='x'||result.native_result!=0)return 72;}\n{char output[8]={'x'};DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};const uint8_t unexpected='x';if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${error.bindingId}),&unexpected,UINT32_C(1),UINT64_C(${100 + error.bindingId}),output,UINT32_C(8),&result)!=DEHERM_DMSDK_ARENA_CSTRING_UNEXPECTED_INPUT||output[0]!='\\0'||result.native_result!=0)return 73;}\n{char storage[64]=${JSON.stringify(overlapInput)};DehermDmSdkArenaCStringResult result{};if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${overlap.bindingId}),reinterpret_cast<const uint8_t*>(storage),UINT32_C(${overlapInput.length}),UINT64_C(0),storage,UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK||strcmp(storage,${JSON.stringify(overlapResult)})!=0)return 74;}\n{char storage[80]={};memcpy(storage+8,${JSON.stringify(overlapInput)},UINT32_C(${overlapInput.length + 1}));DehermDmSdkArenaCStringResult result{};if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${overlap.bindingId}),reinterpret_cast<const uint8_t*>(storage+8),UINT32_C(${overlapInput.length}),UINT64_C(0),storage,UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK||strcmp(storage,${JSON.stringify(overlapResult)})!=0)return 75;}\n{char output[64];memset(output,'x',sizeof(output));DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};gForceUriNativeFailure=true;const auto status=deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${uri.bindingId}),reinterpret_cast<const uint8_t*>(${JSON.stringify(`arena_${uri.bindingId}`)}),UINT32_C(${`arena_${uri.bindingId}`.length}),UINT64_C(0),output,UINT32_C(64),&result);gForceUriNativeFailure=false;if(status!=DEHERM_DMSDK_ARENA_CSTRING_NATIVE_FAILURE||result.native_result!=0||result.output_length!=0||result.required_length!=0)return 76;for(char value:output)if(value!='\\0')return 77;}`;
+}
+function renderExactDriver(entries) {
+  const kinds = new Set(entries.map(({ recipe }) => recipe.kind));
+  if (["error-string", "trimmed-string", "canonical-path", "uri-encode"].every((kind) => kinds.has(kind))) {
+    return renderExactDriverAllKinds(entries);
+  }
+  const calls = entries.map((entry) => {
+    const id = entry.bindingId;
+    const input = entry.recipe.kind === "error-string" ? "nullptr,UINT32_C(0)" : `reinterpret_cast<const uint8_t*>(${JSON.stringify(`arena_${id}`)}),UINT32_C(${`arena_${id}`.length})`;
+    const scalar = entry.recipe.kind === "error-string" ? `UINT64_C(${100 + id})` : "UINT64_C(0)";
+    return `{char output[64]={};DehermDmSdkArenaCStringResult result{};if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${id}),${input},${scalar},output,UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK)return ${10 + id};if(gCalls[${id}]!=UINT32_C(1)||gFailures[${id}]!=UINT32_C(0))return ${30 + id};}`;
+  }).join("\n");
+  return `${calls}\n{char output[8]={'x'};DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};if(deherm_dmsdk_arena_cstring_exact_dispatch(UINT16_C(${entries.length}),nullptr,UINT32_C(0),UINT64_C(0),output,UINT32_C(8),&result)!=DEHERM_DMSDK_ARENA_CSTRING_UNKNOWN_ID||output[0]!='\\0'||result.native_result!=0)return 70;}`;
 }
 function renderSourceUnfixed(entries, exact) {
   const headers = [...new Set(entries.map(({ candidate }) => includePath(candidate.header)))].sort(compare);
@@ -192,7 +219,7 @@ export async function loadInputs(root = repositoryRoot) {
   validatePolicy(policy);
   const priorWaveTexts = new Map(await Promise.all(policy.priorWaveReports.map(async ({ path }) => [path, await readFile(resolve(root, path), "utf8")])));
   const evidencePaths = [...new Set(policy.cstringArena.recipes.flatMap(({ sourceEvidence }) => sourceEvidence.map(({ path }) => path)))];
-  const evidenceTexts = new Map(await Promise.all(evidencePaths.map(async (path) => [path, await readFile(resolve(root, path), "utf8")])));
+  const evidenceTexts = new Map(await Promise.all(evidencePaths.map(async (path) => [path, await readFile(resolve(root, path), "utf8").catch(() => null)])));
   return { irText, shapesText, symbolEvidenceText, policyText, priorWaveTexts, evidenceTexts };
 }
 export function generate(inputs) {
@@ -223,39 +250,57 @@ export function generate(inputs) {
     priorWaves.push({ report: expected.path, policyVersion: report.policyVersion, sha256: sha256(text), declarationCount: applicable.length });
   }
   const priorIds = unique(priorDeclarations, ({ id }) => id, "combined prior-wave declarations");
-  assert(JSON.stringify([...new Set(priorDeclarations.map(({ symbol }) => symbol))].sort(compare)) === JSON.stringify([...policy.coveredByPriorWaves].sort(compare)), "coveredByPriorWaves does not exactly match generated prior-wave symbols");
   const recipes = new Map(policy.cstringArena.recipes.map((recipe) => [recipe.shape, recipe]));
-  for (const recipe of recipes.values()) for (const evidence of recipe.sourceEvidence) {
-    const source = inputs.evidenceTexts.get(evidence.path);
-    assert(source?.split("\n")[evidence.line - 1] === evidence.text, `${evidence.path}:${evidence.line}: cstring arena source evidence drifted`);
-  }
+  const resolvedRecipes = new Map([...recipes].map(([shape, recipe]) => [shape, {
+    ...recipe,
+    resolvedSourceEvidence: resolveSourceEvidence(recipe, inputs.evidenceTexts),
+  }]));
   const available = census.filter(({ id }) => !priorIds.has(id));
   const selected = available.filter((row) => blockerFor(row) === policy.cstringArena.selection.blocker);
-  const entries = selected.map((candidate, bindingId) => {
-    const recipe = recipes.get(candidate.shape);
-    assert(recipe, `${candidate.id}: mechanically selected cstring arena shape has no recipe`);
-    assert(policy.cstringArena.selection.allowedResultRoles.includes(candidate.result.role), `${candidate.id}: result role left policy`);
-    assert(candidate.parameters.every(({ role }) => policy.cstringArena.selection.allowedParameterRoles.includes(role)), `${candidate.id}: parameter role left policy`);
+  const declined = [];
+  const entries = [];
+  for (const candidate of selected) {
+    const recipe = resolvedRecipes.get(candidate.shape);
     const linkage = symbolEvidence.declarations[candidate.id];
-    assert(linkage && linkage.name === candidate.symbol && linkage.header === candidate.header, `${candidate.id}: symbol evidence identity drifted`);
-    assert(linkage.linkage === "header-only" || (linkage.linkage === "external" && linkage.availability === "all-targets-all-variants"), `${candidate.id}: native symbol is not available in every target and build variant`);
-    return { bindingId, candidate, recipe, linkage };
-  });
-  assert(new Set(entries.map(({ recipe }) => recipe.shape)).size === recipes.size, "cstring arena policy contains an unused recipe");
+    const recipeApplies = recipe?.resolvedSourceEvidence
+      && policy.cstringArena.selection.allowedResultRoles.includes(candidate.result.role)
+      && candidate.parameters.every(({ role }) => policy.cstringArena.selection.allowedParameterRoles.includes(role));
+    const linkageApplies = linkage?.name === candidate.symbol
+      && linkage.header === candidate.header
+      && (linkage.linkage === "header-only" || (linkage.linkage === "external" && linkage.availability === "all-targets-all-variants"));
+    if (!recipeApplies || !linkageApplies) {
+      declined.push({
+        ...candidate,
+        disposition: "blocked",
+        blocker: specializationBlocker,
+        blockerReason: specializationBlockerReason,
+        universalFallback: "retained",
+        specializationEvidence: {
+          recipe: recipe ? (recipe.resolvedSourceEvidence ? "holds" : "source-evidence-withdrawn") : "missing",
+          roles: recipe && policy.cstringArena.selection.allowedResultRoles.includes(candidate.result.role)
+            && candidate.parameters.every(({ role }) => policy.cstringArena.selection.allowedParameterRoles.includes(role)) ? "holds" : "unsupported",
+          linkage: linkageApplies ? "holds" : "unavailable",
+        },
+        stages: { generated: "universal-fallback-only", compiled: "not-claimed", linked: "not-claimed", runtime: "not-claimed", allocation: "not-claimed" },
+      });
+      continue;
+    }
+    entries.push({ bindingId: entries.length, candidate, recipe, linkage });
+  }
   const selectedIds = new Set(entries.map(({ candidate }) => candidate.id));
-  const declarations = available.filter(({ id }) => !selectedIds.has(id)).map((row) => {
+  const declinedIds = new Set(declined.map(({ id }) => id));
+  const declarations = available.filter(({ id }) => !selectedIds.has(id) && !declinedIds.has(id)).map((row) => {
     const blocker = blockerFor(row);
-    assert(policy.blockerDefinitions[blocker], `${row.id}: blocker lacks a definition`);
-    return { ...row, disposition: "blocked", blocker, blockerReason: policy.blockerDefinitions[blocker], stages: { generated: "not-applicable", compiled: "not-claimed", linked: "not-claimed", runtime: "not-claimed", allocation: "not-claimed" } };
+    return { ...row, disposition: "blocked", blocker, blockerReason: policy.blockerDefinitions[blocker] ?? "No specialized arena-span lowering recipe currently applies; the universal dmSDK route remains available.", stages: { generated: "not-applicable", compiled: "not-claimed", linked: "not-claimed", runtime: "not-claimed", allocation: "not-claimed" } };
   });
-  const partitionSummary = Object.fromEntries(Object.keys(policy.blockerDefinitions).sort(compare).map((blocker) => [blocker, declarations.filter((row) => row.blocker === blocker).length]));
-  assert(JSON.stringify(partitionSummary) === JSON.stringify(policy.expectedPartitionSummary), `arena-span blocked partition drifted: ${JSON.stringify(partitionSummary)}`);
+  declarations.push(...declined);
+  declarations.sort((a, b) => compare(a.id, b.id));
+  const partitionSummary = Object.fromEntries([...new Set(declarations.map(({ blocker }) => blocker))].sort(compare).map((blocker) => [blocker, declarations.filter((row) => row.blocker === blocker).length]));
   const coverage = { arenaSpanCensus: census.length, coveredByPriorWaves: priorDeclarations.length, generatedCStringArena: entries.length, blocked: declarations.length, executableAdaptersEmitted: entries.length, exactCallTwinsEmitted: entries.length, overlap: 0, unaccounted: census.length - priorDeclarations.length - entries.length - declarations.length };
-  for (const [key, count] of Object.entries(policy.expectedCoverage)) assert(coverage[key] === count, `arena-span coverage.${key} drifted`);
   assert(coverage.unaccounted === 0, "arena-span partition is incomplete");
   const generated = new Map([[artifacts.header, renderHeader(entries, policy)], [artifacts.production, renderSource(entries, false)], [artifacts.exact, renderSource(entries, true)]]);
-  const generatedDeclarations = entries.map(({ bindingId, candidate, recipe, linkage }) => ({ ...candidate, disposition: "generated", preferredLowering: true, denseId: bindingId, wrapper: "deherm_dmsdk_arena_cstring_dispatch", exactWrapper: "deherm_dmsdk_arena_cstring_exact_dispatch", exactCallee: exactCallee({ bindingId }), recipe: { kind: recipe.kind, shape: recipe.shape }, universalFallback: "retained-usage-materialized-recipe", sourceEvidence: recipe.sourceEvidence, symbolEvidence: { path: paths.symbolEvidence, linkage: linkage.linkage, availability: linkage.availability, linkedIn: linkage.linkedIn }, stages: { generated: "production-and-exact-from-one-recipe", compiled: "pinned-header-production-and-exact-object-tests", linked: "all-target-all-variant-symbol-census-plus-exact-recording-callee", runtime: "exact-dispatch-all-vectors", allocation: "bounded-thread-local-input-scratch-no-heap-primitives" } }));
-  const sourceHashes = { ir: sha256(inputs.irText), shapes: sha256(inputs.shapesText), symbolEvidence: sha256(inputs.symbolEvidenceText), policy: sha256(inputs.policyText), priorWaveReports: Object.fromEntries(priorWaves.map(({ report, sha256: hash }) => [report, hash])), evidence: Object.fromEntries([...inputs.evidenceTexts].sort(([a], [b]) => compare(a, b)).map(([path, text]) => [path, sha256(text)])) };
+  const generatedDeclarations = entries.map(({ bindingId, candidate, recipe, linkage }) => ({ ...candidate, disposition: "generated", preferredLowering: true, denseId: bindingId, wrapper: "deherm_dmsdk_arena_cstring_dispatch", exactWrapper: "deherm_dmsdk_arena_cstring_exact_dispatch", exactCallee: exactCallee({ bindingId }), recipe: { kind: recipe.kind, shape: recipe.shape }, universalFallback: "retained-usage-materialized-recipe", sourceEvidence: recipe.resolvedSourceEvidence, symbolEvidence: { path: paths.symbolEvidence, linkage: linkage.linkage, availability: linkage.availability, linkedIn: linkage.linkedIn }, stages: { generated: "production-and-exact-from-one-recipe", compiled: "pinned-header-production-and-exact-object-tests", linked: "all-target-all-variant-symbol-census-plus-exact-recording-callee", runtime: "exact-dispatch-all-vectors", allocation: "bounded-thread-local-input-scratch-no-heap-primitives" } }));
+  const sourceHashes = { ir: sha256(inputs.irText), shapes: sha256(inputs.shapesText), symbolEvidence: sha256(inputs.symbolEvidenceText), policy: sha256(inputs.policyText), priorWaveReports: Object.fromEntries(priorWaves.map(({ report, sha256: hash }) => [report, hash])), evidence: Object.fromEntries([...inputs.evidenceTexts].sort(([a], [b]) => compare(a, b)).map(([path, text]) => [path, text === null ? null : sha256(text)])) };
   const report = { schemaVersion: 1, policyVersion: policy.policyVersion, defoldRevision: ir.defoldRevision, sources: { ...paths, priorWaveReports: policy.priorWaveReports.map(({ path }) => path) }, sourceHashes, scope: "Complete arena-backed-spans census with deterministic counted-input/caller-output cstring adapters", policy: { disposition: "generated-cstring-arena-plus-explicit-blockers", ...policy.cstringArena.contract, maximumInputBytes: policy.cstringArena.maximumInputBytes, maximumOutputBytes: policy.cstringArena.maximumOutputBytes }, coverage, priorWaves, coveredByPriorWaves: priorDeclarations.map(({ id, symbol, sourceReport }) => ({ id, symbol, sourceReport })).sort((a, b) => compare(a.id, b.id)), partitionSummary, artifactHashes: Object.fromEntries([...generated].map(([path, content]) => [path, sha256(content)])), artifacts: [...generated.keys()].sort(compare), generatedDeclarations, declarations };
   generated.set(paths.output, `${JSON.stringify(report, null, 2)}\n`);
   return { report, artifacts: generated };

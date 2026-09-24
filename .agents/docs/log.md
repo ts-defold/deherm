@@ -1,5 +1,29 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - Cross-revision policy derivation covers both binding surfaces
+
+The historical Defold 1.13.1 control now exercises the complete registered
+binding pipeline: all 31 script generators and all 19 dmSDK generators ran with
+the current package/compiler and zero refused. The ratchet is derived from the
+two ownership registries, so adding a generator cannot leave the historical
+proof silently scoped to the old list. Production and clean-room checks no
+longer require the pinned 926-script, 1,361-dmSDK, or 2,428-unified cardinalities;
+they compare current source-derived ID sets and their own coverage metadata.
+Synthetic route add/remove tests prove the script projection and dmSDK census
+move with their authoritative inputs. This establishes version-parametric
+generation across the tested revisions; it does not claim a future, genuinely
+new parser or ABI construct is already implemented.
+
+Policy sealing is now route-granular for a dmSDK declaration whose source is
+parseable but cannot be assigned to a `dmsdk/<namespace>/` header: the exact
+declaration becomes an authenticated `@shared.dmsdk.blockers` entry while
+namespaceable declarations still publish. Pipeline-wide failure remains
+correct only when the generator cannot establish a complete emitted-or-blocked
+partition. Focused policy, materializer, package-boundary, projection,
+derivation, and dmSDK-pipeline suites pass 81/81. The historical 50-stage run is
+generation evidence; the separate policy-only materialization comparison
+remains the realization evidence.
+
 ## 2026-09-23 - War Battles Static Hermes reachable wave
 
 The release-clean War Battles usage manifest now reaches 27 routes and selects
@@ -2570,3 +2594,92 @@ Bob wasm-web plus Chrome/WebGL2 runtime/playability gates. The browser gate
 observed the tutorial-to-arena marker chain, restart and sound markers and a
 fully composited frame; it is automated browser evidence rather than a human
 visual-quality judgment or WAN test.
+
+## 2026-09-23 - Policy realization gate audit
+
+The committed policy derivation and site-resolution checks passed for Defold
+`7f0f554f41f9dce1e0ddff99bf08200657d1ee05`, including all 193 authenticated
+objects and the tampered-object rejection control. A direct run of the compiler
+surface materializer exposed a stale migration-debt byte assertion: all 28 SDK
+files and all 118 revision outputs had already matched their current canonical
+bytes, but the test still expected the previous 106-snapshot byte total. The
+sentinel was updated to the measured 1,717,737 bytes, and the materializer test
+is now part of the root `pnpm check` chain so policy-only reconstruction cannot
+silently fall outside the normal gate again.
+
+The evidence remains one-revision evidence. The package/policy ownership split,
+capability contract, content-addressed cache, idempotent realization, and
+revision-leak checks are executable. One unchanged packed package has not yet
+been tested against two independently derived Defold revisions, so routine
+cross-version compatibility is the next structural proof rather than a fact
+inferred from the current green revision.
+
+The latest scheduled run supplied a more specific cross-version failure: all
+three stable/beta/alpha scratch derivations stopped before parsing because the
+workspace repinned `DEFOLD_SDK_URL` and `DEFOLD_SDK_SHA256` but never hydrated
+that exact SDK. `derive-revision.mjs` now runs the existing digest-verifying
+`defold-sdk` bootstrap inside every scratch workspace after repinning and before
+the evidence audit/generator chain. A focused invariant test pins that ordering
+input. This fixes missing revision data; it does not itself prove that the
+downstream parsers and emitters handle each newly unblocked revision.
+
+The first real 1.13.1 derivation then reached script generation and exposed a
+second revision leak: the first SDK pass read the prior revision's generated Lua
+registration/profile catalogs before their owning generators ran. Script SDK
+generation is now split into a semantic bootstrap pass (IR/types only) and a
+final constants/modules pass after registration, borrowed-handle classification,
+and route profiles have been regenerated. The final surface remains owned by the
+same generator; the extra pass only removes the circular previous-revision seed.
+
+The next 1.13.1 attempt reached typed-native generation and correctly lacked the
+newer Bullet3D routes, while the carried canonical plan still selected them.
+Typed-native selection now treats a different-revision plan as an optimization
+hint: it intersects selected stable IDs with the derived revision's universal
+frames, records absent routes as declined, and leaves them on JSI. Same-revision
+plan/frame drift remains fatal. This preserves the complete API while avoiding
+an invalid Static Hermes claim for a route the target engine does not expose.
+
+The resumed 1.13.1 pipeline then found two named runtime profiles with the same
+exact Lua function-presence vector. The generator already computed conservative
+profile equivalence, but an older uniqueness assertion still aborted before that
+result could be emitted and the generated detector ignored the equivalence
+metadata. Equivalence now keys the actual registration-presence vector, emits a
+canonical profile index/mask, and lets the native detector return that
+representative only when every matching profile belongs to the same class.
+
+Materializing the first emitted 1.13.1 policy exposed another mixed-revision
+input: derivation regenerated dmSDK TypeScript but not the complete dmSDK
+binding pipeline, so its scalar catalog named `EndianSwap16` while the derived
+SDK IR did not. The declared derivation now runs the full dmSDK runtime pipeline,
+then rebuilds the canonical lowering plan from the finished dmSDK/script inputs
+and reruns typed-native plus recording consumers before policy publication.
+
+A fresh full 1.13.1 derivation then proved two more revision leaks. The scalar
+thunk generator embedded the current SDK revision in a lifecycle-evidence path;
+it now builds that path from the selected dmSDK IR revision and a focused test
+rejects literal `/sdk/<revision>/defoldsdk` paths in that package-owned emitter.
+The dmSDK runtime also consumed current-revision target metadata and symbol
+evidence. The derivation chain now regenerates Defold's bundle-target registry
+from the selected source and measures symbol linkage from that revision's exact
+SDK archive before any dmSDK lowering consumes it. A historical target present
+in source metadata but absent from the published SDK link plan is reported as an
+unavailable target rather than aborting every other target's evidence.
+
+The optimized dmSDK families were then made route-local and source-derived:
+named scalar, enum, digest/span/hash, arena, borrowed handle, scratch scalar-out,
+and C-string specialization drift now withdraws only that optimization while the
+universal recipe remains. Target-conditionals are generated from the selected
+Defold bundle manifests instead of being copied from the checkout pin. The
+canonical lowering planner no longer asserts the current revision's literal API
+counts; it verifies the current input sets and their self-consistency.
+
+The unchanged package/compiler code subsequently completed the full Defold
+1.13.1 derivation: 19 dmSDK steps, 31 script steps, the canonical lowering plan,
+typed-native bridge, recording engine, and a 19.50 MB policy with 56 namespaces
+and 197 subtrees. Its dmSDK catalog contains 1,336 universal recipes with zero
+omissions. Policy-only materialization wrote 20 documents, 28 SDK files, and
+118 repository outputs; a second pass wrote zero files. All SDK files and
+repository outputs matched the historical source-pipeline result byte-for-byte,
+and all 19 non-sentinel IR documents were semantically equal after JSON parsing.
+This closes the two-revision structural proof. It is generation/materialization
+evidence, not a claim that every emitted binding was run in a live engine.

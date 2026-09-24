@@ -40,6 +40,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
+import { dmSdkGenerationSteps } from "./lib/dmsdk-generator-pipeline.mjs";
 import { scriptGenerationSteps } from "./lib/script-generator-pipeline.mjs";
 import { DERIVED_REVISION_ENV, CARRIED_REVIEW_LEDGER_ENV } from "./lib/reviewed-revision.mjs";
 import { REVISION_AUDIT_ENV } from "./lib/revision-audit.mjs";
@@ -47,6 +48,20 @@ import { REVISION_AUDIT_ENV } from "./lib/revision-audit.mjs";
 const run = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const baselinePath = path.join(root, "packages", "bindings", "probes", "cross-revision-baseline.json");
+const baselineComment = "How much of the complete binding-generation chain refuses to derive a Defold revision other than the pinned one. Measured by scripts/check-cross-revision-derivation.mjs. This number only goes DOWN: a change that makes more steps refuse fails the check with the new refusals named. The ordinary pinned-revision check cannot expose assumptions written against that same revision.";
+
+/**
+ * Every revision-derived binding generator, tagged by surface.
+ *
+ * The original ratchet covered only the script pipeline. That could prove a
+ * historical script revision no longer refused while a new dmSDK assumption
+ * quietly reintroduced package-version coupling. Keep the two registries as
+ * the authority and measure their union instead of maintaining another list.
+ */
+export const crossRevisionGenerationSteps = Object.freeze([
+  ...scriptGenerationSteps.map((step) => Object.freeze({ ...step, surface: "script" })),
+  ...dmSdkGenerationSteps.map((step) => Object.freeze({ ...step, surface: "dmsdk" }))
+]);
 
 /**
  * What a refusal is really about.
@@ -109,7 +124,7 @@ async function main() {
   };
 
   const refusals = [];
-  for (const step of scriptGenerationSteps) {
+  for (const step of crossRevisionGenerationSteps) {
     try {
       // Each step declares the runtime it is written for, exactly as
       // `runScriptGeneration` in `generate-script-runtime.mjs` reads it. Running
@@ -123,7 +138,7 @@ async function main() {
       const text = `${error.stderr ?? ""}${error.stdout ?? ""}`;
       const message = (text.split("\n").find((line) => /^\s*(Error|AssertionError)/.test(line))
         ?? text.split("\n")[0] ?? "").trim();
-      refusals.push({ step: step.script, cause: classify(message), message: message.slice(0, 300) });
+      refusals.push({ surface: step.surface, step: step.script, cause: classify(message), message: message.slice(0, 300) });
     }
   }
 
@@ -132,7 +147,7 @@ async function main() {
 
   const report = [];
   report.push(`Cross-revision derivation: Defold ${revision}`);
-  report.push(`${scriptGenerationSteps.length} script-generation steps, ${refusals.length} refused ` +
+  report.push(`${crossRevisionGenerationSteps.length} binding-generation steps, ${refusals.length} refused ` +
     `(baseline ${baseline.refusingSteps}).`);
   report.push("");
   for (const cause of [...CAUSES.map(({ id }) => id), "unclassified"]) {
@@ -145,7 +160,7 @@ async function main() {
     report.push("");
     report.push(fix);
     report.push("");
-    for (const row of rows) report.push(`  ${row.step}\n      ${row.message}`);
+    for (const row of rows) report.push(`  [${row.surface}] ${row.step}\n      ${row.message}`);
     report.push("");
   }
   const text = report.join("\n");
@@ -154,9 +169,11 @@ async function main() {
 
   if (update) {
     await writeFile(baselinePath, `${JSON.stringify({
-      ...baseline, refusingSteps: refusals.length, totalSteps: scriptGenerationSteps.length,
+      ...baseline, comment: baselineComment,
+      refusingSteps: refusals.length, totalSteps: crossRevisionGenerationSteps.length,
       refusalsByCause: Object.fromEntries([...byCause].map(([cause, rows]) => [cause, rows.length])),
-      steps: refusals.map(({ step, cause }) => ({ step, cause })).sort((a, b) => a.step < b.step ? -1 : 1)
+      steps: refusals.map(({ surface, step, cause }) => ({ surface, step, cause }))
+        .sort((a, b) => a.surface.localeCompare(b.surface) || a.step.localeCompare(b.step))
     }, null, 2)}\n`);
     console.log(`\nBaseline updated to ${refusals.length}.`);
     return;
@@ -178,4 +195,6 @@ async function main() {
   }
 }
 
-await main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await main();
+}

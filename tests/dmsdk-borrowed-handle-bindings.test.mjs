@@ -77,7 +77,7 @@ test("borrowed-handle census is independently structural, exhaustive, and provid
   }
 });
 
-test("borrowed-handle generation is clean-room deterministic and rejects census drift", async () => {
+test("borrowed-handle generation is clean-room deterministic and treats historical counts as observations", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-borrowed-handle-generate-"));
   try {
     run(process.execPath, ["scripts/generate-dmsdk-borrowed-handle-bindings.mjs", "--output-root", directory]);
@@ -92,12 +92,35 @@ test("borrowed-handle generation is clean-room deterministic and rejects census 
       policy: await readFile(path.join(root, report.sources.policy), "utf8"),
     };
     const changed = JSON.parse(contents.policy);
-    changed.expectedCoverage.generated += 1;
-    await assert.rejects(() => build({ ...contents, policy: JSON.stringify(changed) }), /census changed/);
+    changed.expectedCoverage = { candidates: 1, generated: 1, blocked: 0, handleKinds: 1, maxArguments: 1 };
+    const observed = await build({ ...contents, policy: JSON.stringify(changed) });
+    assert.deepEqual(observed.report.coverage, report.coverage);
+    assert.equal(observed.report.abi.maxArguments, report.abi.maxArguments);
     await assert.rejects(() => build({ ...contents, ir: `${contents.ir}\n` }), /IR provenance mismatch/);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test("borrowed-handle specialization drift blocks only that route and retains universal fallback", async () => {
+  const contents = Object.fromEntries(await Promise.all([
+    ["ir", reportPath.replace("defold-dmsdk-borrowed-handle-bindings.json", "defold-sdk-ir.json")],
+    ["shapes", path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json")],
+    ["projection", path.join(root, "packages/bindings/generated/defold-dmsdk-projection-ir.json")],
+    ["policy", path.join(root, "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json")],
+  ].map(async ([key, source]) => [key, await readFile(source, "utf8")])))
+  const shapes = JSON.parse(contents.shapes);
+  const policy = JSON.parse(contents.policy);
+  const candidate = shapes.rows.find((row) => row.tranche === policy.family && row.symbol === "dmBuffer::IsBufferValid");
+  assert.ok(candidate);
+  candidate.result.role = "scalar:future-lane";
+  const report = (await build({ ...contents, shapes: JSON.stringify(shapes) })).report;
+  const drifted = report.declarations.find(({ id }) => id === candidate.id);
+  assert.equal(drifted.disposition, "blocked");
+  assert.ok(drifted.blockers.includes("borrowed-handle-specialization-unverified"));
+  assert.equal(drifted.universalFallback, "retained");
+  assert.equal(report.coverage.generated, 157);
+  assert.ok(report.declarations.some(({ disposition }) => disposition === "generated-provider-boundary"));
 });
 
 test("all 158 selected signatures compile against the complete pinned SDK projection", async () => {

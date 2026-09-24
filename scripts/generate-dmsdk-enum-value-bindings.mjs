@@ -3,6 +3,10 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { semanticDeclarationId, semanticEntryMap } from "./lib/dmsdk-semantic-id.mjs";
+
+export { semanticDeclarationId } from "./lib/dmsdk-semantic-id.mjs";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -179,15 +183,24 @@ async function build() {
   const scalarReport = JSON.parse(contents.scalarReport);
   const overrides = JSON.parse(contents.overrides);
   const candidates = shapes.rows.filter(({ tranche }) => tranche === overrides.family);
-  if (candidates.length !== 10 || Object.keys(overrides.entries).length !== 10) throw new Error("enum-value policy must account for all 10 discovered candidates");
+  const policiesBySemanticId = semanticEntryMap(overrides.entries, "enum-value policy");
   const declarationById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const index = typeIndex(ir);
   const reportRows = [];
   const entries = [];
   for (const candidate of candidates) {
-    const policy = overrides.entries[candidate.id];
-    if (!policy) throw new Error(`Missing enum-value policy for ${candidate.id}`);
+    const policy = policiesBySemanticId.get(semanticDeclarationId(candidate.id));
     const declaration = declarationById.get(candidate.id);
+    if (!declaration) throw new Error(`Enum-value candidate is absent from dmSDK IR: ${candidate.id}`);
+    if (!policy) {
+      reportRows.push({
+        ...candidate,
+        emitted: false,
+        blocker: "unreviewed-enum-value-optimization",
+        stages: { generated: "universal-fallback-retained", compiled: "not-applicable", linked: "not-applicable", runtime: "not-applicable" }
+      });
+      continue;
+    }
     if (policy.status === "blocked") {
       reportRows.push({ ...candidate, emitted: false, blocker: policy.blocker, stages: { generated: "blocked-by-policy", compiled: "not-applicable", linked: "not-applicable", runtime: "not-applicable" } });
       continue;
@@ -221,7 +234,8 @@ async function build() {
     sources: paths,
     sourceHashes: Object.fromEntries(Object.entries(contents).map(([name, content]) => [name, sha256(content)])),
     policy: { cEnumRepresentation: "int32_t", enumInputs: "generated exact-domain validation before native call", uint64: "C uint64_t and native JSI bigint", allocation: "stack-only fixed slots; no glue allocation or ownership transfer", html5: "fail-closed until Wasm BigInt and linked-symbol matrix are validated" },
-    coverage: { baselineRuntimePending: shapes.coverage.runtimePending, previouslyEmittedScalar: scalarReport.coverage.generated, discovered: 10, emitted: entries.length, blocked: reportRows.filter(({ emitted }) => !emitted).length, hostRuntimeVerified: reportRows.filter(({ stages }) => stages.runtime === "packaged-sdk-host-runtime-test").length, engineContextPending: reportRows.filter(({ stages }) => stages.runtime === "engine-context-pending").length, remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - scalarReport.coverage.generated - entries.length },
+    universalFallback: { preserved: true, catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json", mutation: "none" },
+    coverage: { baselineRuntimePending: shapes.coverage.runtimePending, previouslyEmittedScalar: scalarReport.coverage.generated, discovered: candidates.length, emitted: entries.length, blocked: reportRows.filter(({ emitted }) => !emitted).length, hostRuntimeVerified: reportRows.filter(({ stages }) => stages.runtime === "packaged-sdk-host-runtime-test").length, engineContextPending: reportRows.filter(({ stages }) => stages.runtime === "engine-context-pending").length, remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - scalarReport.coverage.generated - entries.length },
     artifactHashes: Object.fromEntries([...artifacts].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])),
     artifacts: [...artifacts.keys()].sort(),
     declarations: reportRows,
@@ -241,7 +255,7 @@ export async function run(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
   const { artifacts, report } = await build();
   for (const [path, content] of artifacts) await writeOrCheck(options.outRoot, path, content, options.check);
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.emitted}/10 enum-value dmSDK bindings; ${report.coverage.blocked} policy-blocked.\n`);
+  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.emitted}/${report.coverage.discovered} enum-value dmSDK bindings; ${report.coverage.blocked} optimization-blocked.\n`);
   return report;
 }
 

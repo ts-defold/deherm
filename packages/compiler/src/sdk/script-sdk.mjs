@@ -943,7 +943,7 @@ async function output(file, contents) {
   await writeFile(file, contents);
 }
 
-export async function runScriptSdkGenerator() {
+export async function runScriptSdkGenerator({ semanticOnly = false } = {}) {
 ({ loadScriptSemanticOverrides } = await import(pathToFileURL(path.join(root, "scripts/lib/script-semantic-overrides.mjs"))));
 ({ assertReviewedRevision, observeReviewedSource } = await import(pathToFileURL(path.join(root, "scripts/lib/reviewed-revision.mjs"))));
 ({ VOID, recordAudit } = await import(pathToFileURL(path.join(root, "scripts/lib/revision-audit.mjs"))));
@@ -1079,7 +1079,7 @@ if (absentHandleTypes.length) {
   console.log(`semantic handle types withdrawn at ${defoldRevision} (absent from the archive): ${absentHandleTypes.sort().join(", ")}`);
 }
 const typesSource = generateTypes(model, renderer, trees, semanticHandleTypes);
-const constantLowering = await loadScriptConstantPolicy(defoldRevision, trees);
+const constantLowering = semanticOnly ? null : await loadScriptConstantPolicy(defoldRevision, trees);
 const unresolvedTypes = [...renderer.unresolved].sort();
 const ir = {
   schemaVersion: 1,
@@ -1107,12 +1107,14 @@ const sdkDocumentation = {
 await output(irPath, `${JSON.stringify(ir, null, 2)}\n`);
 await output(documentationPath, `${JSON.stringify(sdkDocumentation, null, 2)}\n`);
 await output(path.join(generatedRoot, "types.ts"), typesSource);
-await output(path.join(generatedRoot, "modules.ts"), generateModules(trees, new Map(
-  constantLowering.entries.map((entry) => [entry.name, entry])
-)));
 await output(path.join(generatedRoot, "runtime.ts"), generateRuntime());
 await output(path.join(generatedRoot, "index.ts"), generateIndex(trees));
-await output(constantLoweringReportPath, `${JSON.stringify(constantLowering, null, 2)}\n`);
+if (!semanticOnly) {
+  await output(path.join(generatedRoot, "modules.ts"), generateModules(trees, new Map(
+    constantLowering.entries.map((entry) => [entry.name, entry])
+  )));
+  await output(constantLoweringReportPath, `${JSON.stringify(constantLowering, null, 2)}\n`);
+}
 console.log(`${check ? "checked" : "generated"} ${model.functions.length} script functions, ${model.classes.length + model.aliases.length + model.enums.length} types, ${ir.typeSurfaceUnresolvedCount} type-surface unresolved, ${ir.runtimeUnimplementedCount} runtime bindings pending`);
 
 // The census of documented globals, always printed, so what we did not bind is

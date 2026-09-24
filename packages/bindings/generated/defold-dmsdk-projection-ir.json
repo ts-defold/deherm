@@ -47,14 +47,14 @@
       "targetConditionals": "cc01a8a5e6b0e85af728d55a00cd80801177d3e8eb54f1308de9279a01ed60d9",
       "loweringEvidence": {
         "scalar": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
-        "enumValue": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555",
+        "enumValue": "2cdec68fb7b117822795b5f8d0bff1f3f4f87b3ab990a49d3b78a491e36b0970",
         "namedScalar": "fd128d866f95e34448d49e5d53e7412ab15bd59f821306b48fddce2dcffb6794",
         "fixedDigest": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
         "base64Span": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
         "astcProbe": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
         "xteaSpan": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
         "hashSpan": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
-        "arenaSpan": "5d7e4def887574e34fae8e9ed880a90ebf45ba6c05dfca97552b79ae10f3b845"
+        "arenaSpan": "6f93462a4e5218e7eb5e934d7d7ba1f3402ebb90c2b468822fb6cae56e356bfd"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",

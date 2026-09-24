@@ -95,8 +95,10 @@ function assertAbiTags(capiHeader) {
 
 export function selectClaimedRoutes(plan, universal) {
   assert.equal(universal.schemaVersion, 1, "Unsupported universal-value binding report schema");
+  const sameRevision = plan.defoldRevision === universal.defoldRevision;
   const universalById = new Map(universal.bindings.map((binding) => [binding.stableId, binding]));
   const claimed = [];
+  const declined = [];
   for (const unit of plan.units) {
     if (unit.identity.surface !== "script") continue;
     if (unit.backends?.staticHermesCAbi?.selection !== "emit") continue;
@@ -104,6 +106,14 @@ export function selectClaimedRoutes(plan, universal) {
     assert.ok(Number.isInteger(stableId) && stableId >= 0 && stableId <= 0xffffffff,
       `${unit.identity.id} has no stable ID`);
     const binding = universalById.get(stableId);
+    if (!binding && !sameRevision) {
+      declined.push({
+        id: unit.identity.id,
+        stableId,
+        reason: "canonical-route-absent-from-derived-revision"
+      });
+      continue;
+    }
     assert.ok(binding, `${unit.identity.id}: canonical typed-native selection has no universal-value frame`);
     const unsupported = binding.shapeKinds.filter((kind) => kUnsupportedShapeKinds.has(kind));
     assert.deepEqual(unsupported, [],
@@ -128,9 +138,10 @@ export function selectClaimedRoutes(plan, universal) {
     });
   }
   claimed.sort((left, right) => left.stableId - right.stableId);
+  declined.sort((left, right) => left.stableId - right.stableId);
   const maximumArgumentCount = claimed.reduce(
     (maximum, route) => Math.max(maximum, route.maximumArgumentCount), 0);
-  return { claimed, declined: [], maximumArgumentCount };
+  return { claimed, declined, maximumArgumentCount, planRevisionMatched: sameRevision };
 }
 
 export function renderTypescript({ claimed, maximumArgumentCount }) {
@@ -530,16 +541,22 @@ export async function run(argv = process.argv) {
   const planScriptTypedNativeEmit = plan.units.filter((unit) =>
     unit.identity.surface === "script" &&
     unit.backends?.staticHermesCAbi?.selection === "emit").length;
-  assert.equal(selection.claimed.length, planScriptTypedNativeEmit,
-    "typed-native bridge selection differs from the canonical script plan");
-  assert.equal(selection.declined.length, 0,
-    "typed-native bridge cannot decline a route selected by the canonical script plan");
+  if (selection.planRevisionMatched) {
+    assert.equal(selection.claimed.length, planScriptTypedNativeEmit,
+      "typed-native bridge selection differs from the canonical script plan");
+    assert.equal(selection.declined.length, 0,
+      "typed-native bridge cannot decline a route selected by the canonical script plan");
+  } else {
+    assert.equal(selection.claimed.length + selection.declined.length, planScriptTypedNativeEmit,
+      "typed-native fallback does not account for every canonical script route");
+  }
   const typescript = renderTypescript(selection);
   const body = {
     schemaVersion: 1,
     generator: "scripts/generate-typed-native-bridge.mjs",
     transport: "typed-native",
-    defoldRevision: plan.defoldRevision,
+    defoldRevision: universal.defoldRevision,
+    canonicalPlanRevision: plan.defoldRevision,
     inputHashes: {
       [relativeInputs.plan]: sha256(planRaw),
       [relativeInputs.universal]: sha256(universalRaw),
@@ -554,7 +571,9 @@ export async function run(argv = process.argv) {
     declinedRoutes: selection.declined,
     generatedSha256: { typescript: sha256(typescript) },
     evidenceBoundary: {
-      routeSelection: "derived-from-the-canonical-lowering-plan",
+      routeSelection: selection.planRevisionMatched
+        ? "derived-from-the-canonical-lowering-plan"
+        : "canonical-plan-intersected-with-derived-universal-frames",
       cEmission: "requires-shermes-emit-c-consumer",
       compilation: "not-claimed",
       linkage: "not-claimed",

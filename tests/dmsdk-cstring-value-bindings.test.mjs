@@ -57,12 +57,76 @@ test("C-string semantic contracts fail closed on unresolved rows, overlap, and d
 
   const drift=structuredClone(policy);
   drift.stringContractRules[0].declarationIds[0]="dmsdk:removed-or-renamed-declaration";
-  assert.throws(()=>resolveCStringContracts(candidates,drift),/contract declaration drifted or is not a candidate/);
+  const drifted=resolveCStringContracts(candidates,drift);
+  assert.equal(drifted.filter(({rule})=>rule?.id==="cstring-semantic-contract-unresolved").length,1);
 
   const unsupported=structuredClone(policy);
   unsupported.inputContractTokens.encoding=["unchecked-native-bytes"];
   unsupported.stringContractRules.find(({input})=>input).input.encoding="unchecked-native-bytes";
   assert.throws(()=>resolveCStringContracts(candidates,unsupported),/token catalog differs from generator capabilities/);
+});
+
+test("C-string reviewed recipes follow semantic identity when declaration ordinals move",async()=>{
+  const [projection,policy]=await Promise.all([
+    readFile(path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"utf8").then(JSON.parse),
+    readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8").then(JSON.parse)
+  ]);
+  const reviewedIds=new Set(policy.stringContractRules.flatMap(({declarationIds})=>declarationIds));
+  const shifted=projection.rows.filter(({id})=>reviewedIds.has(id)).map((row,index)=>({
+    ...row,
+    id: row.id.replace(/:\d+:\d+$/u, `:${row.provenance.line ?? 0}:${9000 + index}`)
+  }));
+  const resolved=resolveCStringContracts(shifted,policy);
+  assert.equal(resolved.filter(({rule})=>!rule).length,14);
+  assert.equal(resolved.filter(({rule})=>rule?.id==="cstring-semantic-contract-unresolved").length,0);
+});
+
+async function generateWithPolicy(mutator) {
+  const directory=await mkdtemp(path.join(tmpdir(),"deherm-cstring-policy-"));
+  const policyPath=path.join(directory,"policy.json");
+  const policy=JSON.parse(await readFile(path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json"),"utf8"));
+  await mutator(policy);
+  await writeFile(policyPath,`${JSON.stringify(policy,null,2)}\n`);
+  const output=path.join(directory,"out");
+  run(process.execPath,["scripts/generate-dmsdk-cstring-value-bindings.mjs","--output-root",output,"--projection",path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"--sdk-ir",path.join(root,"packages/bindings/generated/defold-sdk-ir.json"),"--policy",policyPath]);
+  const report=JSON.parse(await readFile(path.join(output,"packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"),"utf8"));
+  return { directory, report };
+}
+
+test("expected counts and recorded hashes do not gate a current revision",async()=>{
+  const {directory,report}=await generateWithPolicy((policy)=>{
+    policy.expectedCoverage={candidates:1,generated:1,blocked:0};
+    policy.sourceEvidence[0].sha256="stale-revision-hash";
+  });
+  try {
+    assert.deepEqual({candidates:report.coverage.candidates,generated:report.coverage.generated,blocked:report.coverage.blocked},{candidates:20,generated:14,blocked:6});
+  } finally { await rm(directory,{recursive:true,force:true}); }
+});
+
+test("drifted semantic evidence blocks only its reviewed specialization",async()=>{
+  const {directory,report}=await generateWithPolicy((policy)=>{
+    policy.sourceEvidence.find(({id})=>id==="hash-null-terminated-input").anchors=["anchor from a future revision"];
+  });
+  try {
+    assert.equal(report.coverage.generated,12);
+    assert.equal(report.coverage.blocked,8);
+    for(const row of report.declarations.filter(({symbol})=>["dmHashString32","dmHashString64"].includes(symbol))) {
+      assert.equal(row.disposition,"blocked");
+      assert.equal(row.blocker,"cstring-source-evidence-drifted");
+    }
+    assert.equal(report.declarations.filter(({disposition})=>disposition==="generated").length,12);
+  } finally { await rm(directory,{recursive:true,force:true}); }
+});
+
+test("mixed projection and SDK revisions remain a hard provenance failure",async()=>{
+  const directory=await mkdtemp(path.join(tmpdir(),"deherm-cstring-revision-"));
+  try {
+    const ir=JSON.parse(await readFile(path.join(root,"packages/bindings/generated/defold-sdk-ir.json"),"utf8"));
+    ir.defoldRevision="different-revision";
+    const sdkIrPath=path.join(directory,"sdk-ir.json");
+    await writeFile(sdkIrPath,`${JSON.stringify(ir,null,2)}\n`);
+    assert.throws(()=>run(process.execPath,["scripts/generate-dmsdk-cstring-value-bindings.mjs","--output-root",path.join(directory,"out"),"--projection",path.join(root,"packages/bindings/generated/defold-dmsdk-projection-ir.json"),"--sdk-ir",sdkIrPath,"--policy",path.join(root,"packages/bindings/overrides/dmsdk-cstring-value-bindings.json")]),/projection and SDK IR revisions differ/);
+  } finally { await rm(directory,{recursive:true,force:true}); }
 });
 
 test("selected value algebra and generated storage are exact and census-derived",async()=>{

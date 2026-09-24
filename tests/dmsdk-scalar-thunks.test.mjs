@@ -6,15 +6,43 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { resolveScalarSourceEvidence } from "../scripts/generate-dmsdk-scalar-thunks.mjs";
+import { DERIVED_REVISION_ENV } from "../scripts/lib/reviewed-revision.mjs";
+
 const testDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(testDirectory, "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-scalar-thunks.json");
 const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
+const otherRevision = "0123456789abcdef0123456789abcdef01234567";
 
 function run(command, args, options = {}) {
   return execFileSync(command, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe", ...options });
 }
+
+test("scalar source-anchor drift withdraws evidence only during a declared revision derivation", () => {
+  const input = {
+    content: "void renamed_finalize();\n",
+    relativePath: "upstream/defold/engine/example.cpp",
+    needle: "void Finalize()",
+    owner: "dmsdk:dmExample::Finalize"
+  };
+  assert.throws(() => resolveScalarSourceEvidence({ ...input, env: {} }), /Expected source evidence not found/u);
+  assert.deepEqual(resolveScalarSourceEvidence({
+    ...input,
+    env: { [DERIVED_REVISION_ENV]: otherRevision }
+  }), {
+    path: input.relativePath,
+    status: "withdrawn",
+    reason: "source-anchor-moved",
+    anchor: input.needle
+  });
+  assert.equal(resolveScalarSourceEvidence({
+    ...input,
+    content: null,
+    env: { [DERIVED_REVISION_ENV]: otherRevision }
+  }).reason, "absent-source");
+});
 
 test("scalar thunk artifacts are deterministic", async () => {
   const outputRoot = await mkdtemp(join(tmpdir(), "deherm-dmsdk-scalar-"));

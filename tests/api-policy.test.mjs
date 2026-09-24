@@ -593,20 +593,36 @@ test("the runtime handshake's revision-keyed fields are stripped and reconstruct
 });
 
 test("only engine targets belong in a Defold revision's policy", () => {
-  const policy = buildPolicy(fixture());
+  const input = fixture();
+  input.registrationSurface.targets["defold-engine"].blockers[0].route = "gui.get_node";
+  const policy = buildPolicy(input);
   const shared = JSON.parse(policy.objects.get(policy.subtrees["@shared"]));
   assert.deepEqual(Object.keys(shared.registration), ["defold-engine"]);
   // Refusals are the load-bearing part: they are what stops a later generation
   // from guessing.
   assert.equal(shared.registration["defold-engine"].blockers.length, 1);
+  assert.equal(shared.registration["defold-engine"].blockers[0].route, "gui.get_node");
+  const gui = JSON.parse(policy.objects.get(policy.subtrees.gui));
+  assert.ok(gui.script.functions.some(({ id }) => id === "script:gui.get_node"));
   // `<globals>` is a parser marker, not a namespace, and must not become a key.
   assert.equal("<globals>" in policy.subtrees, false);
 });
 
-test("a dmSDK declaration outside dmsdk/<namespace>/ fails closed", () => {
+test("an unnamespaceable dmSDK declaration is sealed as a blocker without suppressing other declarations", () => {
   const bad = fixture();
-  bad.dmsdkIr.declarations = [{ id: "dmsdk:X", name: "X", header: "engine/x/src/private/x.h" }];
-  assert.throws(() => buildPolicy(bad), /carry no dmsdk\/<namespace>\/ header/);
+  bad.dmsdkIr.declarations = [
+    { id: "dmsdk:X", name: "X", header: "engine/x/src/private/x.h" },
+    { id: "dmsdk:dmGui::Y", name: "dmGui::Y", header: "upstream/defold/engine/gui/src/dmsdk/gui/gui.h", kind: "record" }
+  ];
+  const policy = buildPolicy(bad);
+  const shared = JSON.parse(policy.objects.get(policy.subtrees["@shared"]));
+  assert.deepEqual(shared.dmsdk.blockers, [{
+    code: "dmsdk-declaration-without-namespace",
+    id: "dmsdk:X",
+    header: "engine/x/src/private/x.h"
+  }]);
+  const gui = JSON.parse(policy.objects.get(policy.subtrees.gui));
+  assert.deepEqual(gui.dmsdk.declarations.map(({ id }) => id), ["dmsdk:dmGui::Y"]);
 });
 
 test("path templates carry the schema version and never a root-level segment", () => {

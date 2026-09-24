@@ -3,6 +3,7 @@
 // its upstream import pipeline remains independently owned.
 
 export const dmSdkGeneratorSources = Object.freeze([
+  "scripts/generate-dmsdk-target-conditionals.mjs",
   "scripts/classify-dmsdk-bindings.mjs",
   "scripts/generate-dmsdk-scalar-thunks.mjs",
   "scripts/generate-dmsdk-abi-shapes.mjs",
@@ -23,8 +24,10 @@ export const dmSdkGeneratorSources = Object.freeze([
   "scripts/generate-dmsdk-generated-adapter-exact.mjs",
   "scripts/generate-dmsdk-runtime.mjs",
   "scripts/lib/dmsdk-generator-pipeline.mjs",
+  "scripts/lib/dmsdk-semantic-id.mjs",
   "scripts/lib/reviewed-revision.mjs",
   "scripts/lib/revision-audit.mjs",
+  "packages/compiler/src/preprocessor-conditions.mjs",
   "packages/compiler/src/dmsdk-call-symbol-index.mjs",
   "packages/compiler/src/dmsdk-concrete-call-plan.mjs",
   "packages/compiler/src/dmsdk-generated-adapter-corpus.mjs",
@@ -39,12 +42,18 @@ export const dmSdkGeneratorSources = Object.freeze([
 
 export const dmSdkPinnedInputs = Object.freeze([
   "upstream.lock",
+  "upstream/defold/share/extender/build_input.yml",
+  "upstream/defold/share/extender/variants/debug_input.appmanifest",
+  "upstream/defold/share/extender/variants/release_input.appmanifest",
+  "upstream/defold/share/extender/variants/headless_input.appmanifest",
+  "packages/bindings/generated/defold-sdk-inventory.json",
   "packages/bindings/generated/defold-sdk-ir.json",
-  "packages/bindings/generated/defold-dmsdk-target-conditionals.json",
   // Measured against the pinned engine/defoldsdk.zip, which is 533MB and is
   // therefore not part of the clean room. The measurement travels as this
   // committed artifact, exactly as the Clang-derived IR above does.
   "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+  "packages/bindings/overrides/dmsdk-target-macros.json",
+  "packages/toolchains/defold-bundle-targets.json",
   "packages/bindings/overrides/dmsdk-enum-value-bindings.json",
   "packages/bindings/overrides/dmsdk-named-scalar-policies.json",
   "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
@@ -60,6 +69,7 @@ export const dmSdkPinnedInputs = Object.freeze([
 ]);
 
 export const generatedDmSdkArtifacts = Object.freeze([
+  "packages/bindings/generated/defold-dmsdk-target-conditionals.json",
   "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
   "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h",
@@ -181,6 +191,7 @@ export const generatedDmSdkArtifacts = Object.freeze([
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.
 export const dmSdkGenerationSteps = Object.freeze([
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-target-conditionals.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/classify-dmsdk-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-scalar-thunks.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-abi-shapes.mjs" }),

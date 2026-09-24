@@ -16,7 +16,7 @@ const includes = ["-Idefold/defold_hermes/include", "-isystem", path.join(sdk, "
 
 test("hash-state family is structural, exhaustive, evidence-gated, and clean-room deterministic", async () => {
   const report = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"), "utf8"));
-  assert.deepEqual(report.coverage, { discovered: 10, generated: 10, registryCapacityPerWidth: 16, exactFixtureCount: 10 });
+  assert.deepEqual(report.coverage, { discovered: 10, generated: 10, blocked: 0, registryCapacityPerWidth: 16, exactFixtureCount: 10 });
   assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 10);
   assert.deepEqual(new Set(report.declarations.map(({ operation }) => operation)), new Set(["Init", "Clone", "UpdateBuffer", "Final", "Release"]));
   for (const declaration of report.declarations) {
@@ -31,10 +31,16 @@ test("hash-state family is structural, exhaustive, evidence-gated, and clean-roo
     for (const [key, relative] of Object.entries(report.sources)) options[key] = await readFile(path.join(root, relative), "utf8");
     const changed = JSON.parse(options.symbols);
     changed.declarations[report.declarations[0].id].availability = "partial";
-    await assert.rejects(() => build({ ...options, symbols: JSON.stringify(changed) }), /symbol evidence rejected/);
+    const linkageDrift = await build({ ...options, symbols: JSON.stringify(changed) });
+    assert.equal(linkageDrift.report.coverage.generated, 9);
+    assert.equal(linkageDrift.report.coverage.blocked, 1);
+    assert.equal(linkageDrift.report.blockedDeclarations[0].blocker, "hash-state-linkage-unverified");
+    assert.equal(linkageDrift.report.blockedDeclarations[0].universalFallback, "retained");
     const changedPolicy = JSON.parse(options.policy);
     changedPolicy.candidateSelector.expectedCount = 11;
-    await assert.rejects(() => build({ ...options, policy: JSON.stringify(changedPolicy) }), /census changed/);
+    const staleHistoricalCount = await build({ ...options, policy: JSON.stringify(changedPolicy) });
+    assert.equal(staleHistoricalCount.report.coverage.discovered, 10);
+    assert.equal(staleHistoricalCount.report.coverage.generated, 10);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
 

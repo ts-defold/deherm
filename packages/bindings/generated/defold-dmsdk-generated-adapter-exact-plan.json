@@ -9245,12 +9245,12 @@
   "productionCatalogSha256": "be7d6d8bf8563cd052e57a96346fd025e61f3798ee3189d0a7a0cd731e1016f2",
   "exactCatalogSha256": "6317e8e8338b0616665d3b52beb8b7015446f73378c401b978d2d094d8d7a325",
   "sourceHashes": {
-    "productionCatalog": "c2dd03c45f16898831792fec17459d0358d52fcbd394de0b2c65790cf3087aaa",
+    "productionCatalog": "0c44cb8eff9d4908b9e0dbe44011688abedf77b6bedef34cb69dd48b535cd529",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "familyReports": {
       "arenaCString": {
         "path": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
-        "sha256": "5d7e4def887574e34fae8e9ed880a90ebf45ba6c05dfca97552b79ae10f3b845"
+        "sha256": "6f93462a4e5218e7eb5e934d7d7ba1f3402ebb90c2b468822fb6cae56e356bfd"
       },
       "scalar": {
         "path": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
@@ -9258,7 +9258,7 @@
       },
       "enumValue": {
         "path": "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
-        "sha256": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555"
+        "sha256": "2cdec68fb7b117822795b5f8d0bff1f3f4f87b3ab990a49d3b78a491e36b0970"
       },
       "fixedDigest": {
         "path": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
@@ -9282,13 +9282,13 @@
       },
       "cstringValue": {
         "path": "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
-        "sha256": "e68a58450d6bbc6a242ef1acf6f96269e87a6e709a65d98de2b4ddfc91a41f07"
+        "sha256": "78e6bf8b77b95e0635a00ec95912641c2979ecda148aab2b1bbd4fc824b0e2ac"
       },
       "hashState": {
         "path": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
-        "sha256": "66325311eeb4c07d867e021b32c00cb2036a84cb4b9725ac3eddcb581e6c93b9"
+        "sha256": "56a74c8a6829aff5c6f5356c20fd1b6f321a6bd53efdfba2982a9c076bb1219c"
       }
     }
   },
-  "corpusSha256": "e66094f0b9cc3203483322ed67cae3f5bc2c35cd763ec8f6a7a431e0ee3d91b0"
+  "corpusSha256": "3a10537e4d21126d4d1c4f3a91eb91e775cc9f944be1b8a514d1ce2945b5d405"
 }

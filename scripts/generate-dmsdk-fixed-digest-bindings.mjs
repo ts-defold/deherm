@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { semanticDeclarationId, semanticEntryMap } from "./lib/dmsdk-semantic-id.mjs";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -29,6 +31,15 @@ function selectedCandidates(shapes, selector) {
     && row.header === selector.header
     && row.symbol.startsWith(selector.symbolPrefix)
     && row.shape === selector.shape).sort((left, right) => left.id.localeCompare(right.id));
+}
+
+export function nearestEvidenceLine(header, text, hintLine) {
+  const needle = text.trim();
+  const matches = header.split(/\r?\n/u)
+    .flatMap((line, index) => line.trim() === needle ? [index + 1] : []);
+  if (!matches.length) return 0;
+  return matches.sort((left, right) =>
+    Math.abs(left - hintLine) - Math.abs(right - hintLine) || left - right)[0];
 }
 
 function renderHeader(entries) {
@@ -59,18 +70,18 @@ async function build(options) {
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   if (declarations.size !== ir.declarations.length || new Set(shapes.rows.map(({ id }) => id)).size !== shapes.rows.length) throw new Error("IR or ABI-shape census contains duplicate declaration ids");
   const candidates = selectedCandidates(shapes, policy.candidateSelector);
-  const policyIds = Object.keys(policy.entries).sort(); const candidateIds = candidates.map(({ id }) => id).sort();
-  if (JSON.stringify(policyIds) !== JSON.stringify(candidateIds)) throw new Error(`fixed-digest policy must account for exactly ${candidates.length} mechanically selected candidates`);
+  const policiesBySemanticId = semanticEntryMap(policy.entries, "fixed-digest policy");
   const evidenceHeaders = new Map();
   const entries = await Promise.all(candidates.map(async (candidate, id) => {
-    const declaration = declarations.get(candidate.id); const entry = policy.entries[candidate.id];
+    const declaration = declarations.get(candidate.id); const entry = policiesBySemanticId.get(semanticDeclarationId(candidate.id));
     if (!declaration || entry.status !== "emit" || !Number.isInteger(entry.digestBytes) || entry.digestBytes <= 0 || !entry.evidence) throw new Error(`Invalid fixed-digest policy for ${candidate.id}`);
-    if (entry.evidence.header !== declaration.header || entry.evidence.line !== declaration.line || typeof entry.evidence.text !== "string") throw new Error(`Fixed-digest evidence does not match census location for ${candidate.id}`);
+    if (entry.evidence.header !== declaration.header || typeof entry.evidence.text !== "string") throw new Error(`Fixed-digest evidence does not match census header for ${candidate.id}`);
     let header = evidenceHeaders.get(entry.evidence.header);
     if (!header) { header = await readFile(resolve(root, entry.evidence.header), "utf8"); evidenceHeaders.set(entry.evidence.header, header); }
-    if (header.split("\n")[entry.evidence.line - 1] !== entry.evidence.text) throw new Error(`Fixed-digest evidence drifted for ${candidate.id}`);
+    const evidenceLine = nearestEvidenceLine(header, entry.evidence.text, declaration.line);
+    if (evidenceLine === 0) throw new Error(`Fixed-digest evidence drifted for ${candidate.id}`);
     if (!entry.evidence.text.includes(`output is ${entry.digestBytes} bytes`)) throw new Error(`Fixed-digest byte count lacks pinned-header evidence for ${candidate.id}`);
-    return { id, candidate, declaration, digestBytes: entry.digestBytes, evidence: entry.evidence, wrapper: `deherm_dmsdk_fixed_digest_${snake(declaration.name)}` };
+    return { id, candidate, declaration, digestBytes: entry.digestBytes, evidence: { ...entry.evidence, line: evidenceLine }, wrapper: `deherm_dmsdk_fixed_digest_${snake(declaration.name)}` };
   }));
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_fixed_digest.h", renderHeader(entries)],

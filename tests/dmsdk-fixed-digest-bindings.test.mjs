@@ -6,6 +6,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { nearestEvidenceLine } from "../scripts/generate-dmsdk-fixed-digest-bindings.mjs";
+
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json");
 const sdkRoot = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
@@ -13,6 +15,19 @@ const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
 function run(command, args) { return execFileSync(command, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe" }); }
 function includeArgs() { return [`-I${join(repositoryRoot, "defold/defold_hermes/include")}`, "-isystem", join(sdkRoot, "sdk/include"), "-isystem", join(sdkRoot, "include")]; }
+
+test("fixed-digest evidence resolves the occurrence nearest the current declaration", () => {
+  const header = [
+    "/** output is 32 bytes */",
+    "void Unrelated();",
+    "",
+    "",
+    "/** output is 32 bytes */",
+    "void HashSha256();"
+  ].join("\n");
+  assert.equal(nearestEvidenceLine(header, "/** output is 32 bytes */", 6), 5);
+  assert.equal(nearestEvidenceLine(header, "/** missing */", 6), 0);
+});
 
 test("fixed-digest generator is deterministic and provenance-bound to the IR census", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-fixed-digest-"));

@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { semanticDeclarationId, semanticEntryMap } from "./lib/dmsdk-semantic-id.mjs";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -95,18 +97,20 @@ async function build(options) {
 
   const declarationsById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const candidates = selectedCandidates(shapes, policy.candidateSelector);
-  const candidateIds = candidates.map(({ id }) => id).sort();
-  const policyIds = Object.keys(policy.entries).sort();
-  if (JSON.stringify(candidateIds) !== JSON.stringify(policyIds)) {
-    throw new Error(`astc-probe policy must account for exactly ${candidates.length} mechanically selected candidates`);
-  }
+  const policiesBySemanticId = semanticEntryMap(policy.entries, "astc-probe policy");
 
   const evidenceHeaders = new Map();
-  const entries = await Promise.all(candidates.map(async (candidate, id) => {
+  const entries = [];
+  const blocked = [];
+  for (const candidate of candidates) {
     const declaration = declarationsById.get(candidate.id);
-    const policyEntry = policy.entries[candidate.id];
-    if (!declaration
-      || policyEntry.status !== "emit"
+    if (!declaration) throw new Error(`ASTC-probe candidate is absent from dmSDK IR: ${candidate.id}`);
+    const policyEntry = policiesBySemanticId.get(semanticDeclarationId(candidate.id));
+    if (!policyEntry) {
+      blocked.push({ ...candidate, emitted: false, blocker: "unreviewed-astc-probe-optimization" });
+      continue;
+    }
+    if (policyEntry.status !== "emit"
       || !["block-size", "dimensions"].includes(policyEntry.mode)
       || !Array.isArray(policyEntry.evidence)) {
       throw new Error(`Invalid astc-probe policy for ${candidate.id}`);
@@ -118,25 +122,34 @@ async function build(options) {
         header = await readFile(resolve(root, evidence.header), "utf8");
         evidenceHeaders.set(evidence.header, header);
       }
-      if (header.split("\n")[evidence.line - 1] !== evidence.text) {
-        throw new Error(`Astc-probe evidence drifted for ${candidate.id}`);
+      const hint = evidence.header === declaration.header ? declaration.line : evidence.line;
+      const matches = header.split("\n")
+        .map((line, index) => line.trim() === evidence.text.trim() ? index + 1 : 0)
+        .filter(Boolean)
+        .sort((left, right) => Math.abs(left - hint) - Math.abs(right - hint));
+      if (matches.length === 0) {
+        blocked.push({ ...candidate, emitted: false, blocker: "astc-probe-evidence-withdrawn" });
+        break;
       }
+      evidence.line = matches[0];
     }
+
+    if (blocked.at(-1)?.id === candidate.id) continue;
 
     if (!policyEntry.evidence.some(({ text }) => text.includes("memsize"))
       || !policyEntry.evidence.some(({ text }) => text.includes("memsize < 16"))) {
       throw new Error(`Astc-probe policy lacks bounded-input evidence for ${candidate.id}`);
     }
 
-    return {
-      id,
+    entries.push({
+      id: entries.length,
       candidate,
       declaration,
       mode: policyEntry.mode,
       evidence: policyEntry.evidence,
       wrapper: `deherm_dmsdk_astc_probe_${snake(declaration.name)}`,
-    };
-  }));
+    });
+  }
 
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe.h", renderHeader(entries)],
@@ -166,13 +179,13 @@ async function build(options) {
       baselineRuntimePending: shapes.coverage.runtimePending,
       discovered: candidates.length,
       emitted: entries.length,
-      policyBlocked: 0,
+      policyBlocked: blocked.length,
       hostBehaviorVerified: entries.length,
       remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - 26 - 7 - 4 - 2 - entries.length,
     },
     artifactHashes: Object.fromEntries([...artifacts].map(([key, value]) => [key, sha256(value)])),
     artifacts: [...artifacts.keys()].sort(),
-    declarations: entries.map((entry) => ({
+    declarations: [...entries.map((entry) => ({
       ...entry.candidate,
       bindingId: entry.id,
       mode: entry.mode,
@@ -185,7 +198,7 @@ async function build(options) {
         runtime: "pinned-source-host-behavior-test",
         allocation: "100000-warmed-dispatch-zero-cpp-allocations",
       },
-    })),
+    })), ...blocked],
   };
 
   artifacts.set(

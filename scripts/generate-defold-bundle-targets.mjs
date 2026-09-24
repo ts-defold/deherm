@@ -31,6 +31,10 @@ export const platformSourcePath = path.join(
   "upstream", "defold", "com.dynamo.cr", "com.dynamo.cr.bob", "src", "com", "dynamo", "bob", "Platform.java"
 );
 export const platformPairsPath = path.join(root, "packages", "toolchains", "defold-platform-pairs.json");
+export const generatedBundleTargetArtifacts = Object.freeze([
+  "packages/toolchains/defold-bundle-targets.json",
+  "packages/toolchains/defold-platform-pairs.json"
+]);
 
 // The SDK levels each cross build has to match are pinned by the engine, not by
 // us: an Android archive built against a different NDK API level or a different

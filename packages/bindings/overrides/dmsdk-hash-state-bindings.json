@@ -6,8 +6,7 @@
     "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
     "symbolPattern": "^dmHash(?:Init|Clone|UpdateBuffer|Final|Release)(?:32|64)$",
     "operations": ["Init", "Clone", "UpdateBuffer", "Final", "Release"],
-    "widths": [32, 64],
-    "expectedCount": 10
+    "widths": [32, 64]
   },
   "registry": {
     "capacityPerWidth": 16,

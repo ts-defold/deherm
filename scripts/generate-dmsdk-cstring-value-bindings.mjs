@@ -21,10 +21,13 @@ const relative = Object.freeze({
 });
 
 function options(argv) {
-  const value = { check: false, outputRoot: root };
+  const value = { check: false, outputRoot: root, projection: relative.projection, sdkIr: relative.sdkIr, policy: relative.policy };
   for (let index = 0; index < argv.length; ++index) {
     if (argv[index] === "--check") value.check = true;
     else if (argv[index] === "--output-root") value.outputRoot = path.resolve(argv[++index]);
+    else if (argv[index] === "--projection") value.projection = path.resolve(argv[++index]);
+    else if (argv[index] === "--sdk-ir") value.sdkIr = path.resolve(argv[++index]);
+    else if (argv[index] === "--policy") value.policy = path.resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argv[index]}`);
   }
   return value;
@@ -76,11 +79,29 @@ function blocker(row, policy) {
   return matches[0];
 }
 
+function semanticIdentityFromDeclarationId(id) {
+  if (typeof id !== "string" || !id.startsWith("dmsdk:")) return null;
+  const at = id.indexOf("@");
+  if (at < 0) return null;
+  const source = id.slice(at + 1);
+  const lastColon = source.lastIndexOf(":");
+  const previousColon = source.lastIndexOf(":", lastColon - 1);
+  if (lastColon < 0 || previousColon < 0) return null;
+  return { symbol: id.slice("dmsdk:".length, at), header: source.slice(0, previousColon) };
+}
+
+function semanticIdentity(row) {
+  return { symbol: row.symbol, header: row.provenance.header };
+}
+
+function sameSemanticIdentity(left, right) {
+  return left?.symbol === right?.symbol && left?.header === right?.header;
+}
+
 function validateContractShape(row, contract, policy) {
   const hasInput = row.signature.parameters.some(({ type }) => type.kind === "cstring");
   const hasResult = row.signature.result.kind === "cstring";
-  assert.equal(Boolean(contract.input), hasInput, `${row.id}: C-string input contract shape drifted`);
-  assert.equal(Boolean(contract.result), hasResult, `${row.id}: C-string result contract shape drifted`);
+  if (Boolean(contract.input) !== hasInput || Boolean(contract.result) !== hasResult) return false;
   if (contract.input) {
     assert.ok(supportedInputContractTokens.nullability.includes(contract.input.nullability), `${contract.id}: unsupported input nullability token`);
     assert.ok(supportedInputContractTokens.encoding.includes(contract.input.encoding), `${contract.id}: unsupported input encoding token`);
@@ -89,35 +110,50 @@ function validateContractShape(row, contract, policy) {
     assert.ok(supportedResultContractTokens.nullability.includes(contract.result.nullability), `${contract.id}: unsupported result nullability token`);
     assert.ok(supportedResultContractTokens.encoding.includes(contract.result.encoding), `${contract.id}: unsupported result encoding token`);
   }
+  return true;
 }
 
 export function resolveCStringContracts(rows, policy) {
   assert.deepEqual(policy.inputContractTokens, supportedInputContractTokens, "C-string input token catalog differs from generator capabilities");
   assert.deepEqual(policy.resultContractTokens, supportedResultContractTokens, "C-string result token catalog differs from generator capabilities");
   const seenRuleIds = new Set();
-  const declaredRows = new Set();
   for (const contract of policy.stringContractRules) {
     assert.ok(typeof contract.id === "string" && contract.id, "C-string contract rule has no id");
     assert.ok(!seenRuleIds.has(contract.id), `duplicate C-string contract rule id: ${contract.id}`);
     seenRuleIds.add(contract.id);
     assert.ok(Array.isArray(contract.declarationIds) && contract.declarationIds.length > 0, `${contract.id}: no declaration IDs`);
-    for (const declarationId of contract.declarationIds) declaredRows.add(declarationId);
   }
-  const candidateIds = new Set(rows.map(({ id }) => id));
-  for (const declarationId of declaredRows) {
-    assert.ok(candidateIds.has(declarationId), `C-string contract declaration drifted or is not a candidate: ${declarationId}`);
+
+  // Declaration IDs contain source offsets and an IR-local ordinal. They are
+  // useful as an exact match when a revision is unchanged, but must not be an
+  // admission gate when a pinned Defold revision moves a declaration. A
+  // semantic fallback is accepted only when it identifies one current row;
+  // ambiguity remains fail-closed as an unresolved specialization.
+  const semanticRows = new Map();
+  for (const row of rows) {
+    const key = JSON.stringify(semanticIdentity(row));
+    const bucket = semanticRows.get(key) ?? [];
+    bucket.push(row);
+    semanticRows.set(key, bucket);
   }
+  const matchesFor = (contract, row) => {
+    if (contract.declarationIds.includes(row.id)) return true;
+    const identities = contract.declarationIds.map(semanticIdentityFromDeclarationId).filter(Boolean);
+    if (!identities.some((identity) => sameSemanticIdentity(identity, semanticIdentity(row)))) return false;
+    const key = JSON.stringify(semanticIdentity(row));
+    return (semanticRows.get(key) ?? []).length === 1;
+  };
 
   return rows.map((row) => {
     const rule = blocker(row, policy);
-    const matches = policy.stringContractRules.filter(({ declarationIds }) => declarationIds.includes(row.id));
+    const matches = policy.stringContractRules.filter((contract) => matchesFor(contract, row));
     assert.ok(matches.length <= 1, `${row.id} matches overlapping C-string contract rules`);
     assert.ok(!(rule && matches.length), `${row.id} is both policy-blocked and assigned a C-string contract`);
     const contract = matches[0] ?? null;
-    if (contract) validateContractShape(row, contract, policy);
+    const contractShapeValid = contract ? validateContractShape(row, contract, policy) : false;
     return {
       row,
-      rule: rule ?? (contract ? null : { id: "cstring-semantic-contract-unresolved" }),
+      rule: rule ?? (contract ? (contractShapeValid ? null : { id: "cstring-contract-shape-drifted" }) : { id: "cstring-semantic-contract-unresolved" }),
       contract
     };
   });
@@ -481,42 +517,68 @@ async function writeOrCheck(outputRoot, name, content, check) {
   else { await mkdir(path.dirname(target), { recursive: true }); await writeFile(target, content); }
 }
 
-async function main() {
-  const opt = options(process.argv.slice(2));
-  const [projectionRaw, irRaw, policyRaw] = await Promise.all([
-    readFile(path.join(root, relative.projection), "utf8"), readFile(path.join(root, relative.sdkIr), "utf8"), readFile(path.join(root, relative.policy), "utf8")
-  ]);
-  const projection = JSON.parse(projectionRaw); const sdkIr = JSON.parse(irRaw); const policy = JSON.parse(policyRaw);
-  assert.equal(policy.schemaVersion, 2); const candidates = projection.rows.filter(candidate);
-  const semanticEvidence = {};
-  const semanticEvidenceIds = new Set();
-  for (const evidence of policy.sourceEvidence) {
-    assert.ok(!semanticEvidenceIds.has(evidence.id), `duplicate C-string source evidence id: ${evidence.id}`);
-    semanticEvidenceIds.add(evidence.id);
-    const content = await readFile(path.join(root, evidence.path), "utf8");
-    assert.equal(sha256(content), evidence.sha256, `${evidence.id} evidence hash drifted`);
-    for (const anchor of evidence.anchors) assert.ok(content.includes(anchor), `${evidence.id} evidence anchor drifted: ${anchor}`);
-    semanticEvidence[evidence.id] = evidence;
-  }
-  for (const contract of policy.stringContractRules) {
-    for (const evidenceId of contract.sourceEvidence) assert.ok(semanticEvidenceIds.has(evidenceId), `${contract.id}: unknown source evidence ${evidenceId}`);
-  }
-  const blockerEvidence = {};
-  const blockerEvidenceById = new Map(policy.blockerSourceEvidence.map((evidence) => [evidence.id, evidence]));
-  assert.equal(blockerEvidenceById.size, policy.blockerSourceEvidence.length, "duplicate C-string blocker evidence id");
-  for (const rule of policy.blockerRules) {
-    for (const evidenceId of rule.sourceEvidence) {
-      const evidence = blockerEvidenceById.get(evidenceId);
-      assert.ok(evidence, `${rule.id}: unknown blocker evidence ${evidenceId}`);
+async function inspectEvidence(entries, { anchors = false } = {}) {
+  const reports = {};
+  const issues = new Map();
+  for (const evidence of entries) {
+    assert.ok(typeof evidence.id === "string" && evidence.id, "C-string evidence has no id");
+    if (reports[evidence.id] || issues.has(evidence.id)) throw new Error(`duplicate C-string evidence id: ${evidence.id}`);
+    try {
       const content = await readFile(path.join(root, evidence.path), "utf8");
-      assert.ok(content.includes(evidence.contains), `${rule.id} evidence drifted`);
-      blockerEvidence[evidenceId] = { ...evidence, sha256: sha256(content) };
+      const actualHash = sha256(content);
+      const missingAnchors = anchors ? (evidence.anchors ?? []).filter((anchor) => !content.includes(anchor)) :
+        (content.includes(evidence.contains) ? [] : [evidence.contains]);
+      reports[evidence.id] = { ...evidence, sha256: actualHash };
+      if (missingAnchors.length) issues.set(evidence.id, { id: "cstring-source-evidence-drifted", missingAnchors });
+    } catch (error) {
+      reports[evidence.id] = { ...evidence, sha256: null };
+      issues.set(evidence.id, { id: "cstring-source-evidence-missing", error: error.code ?? "read-failed" });
     }
   }
-  const classified = resolveCStringContracts(candidates, policy).map((entry) => ({ ...entry, stableId: stableId(entry.row) }));
+  return { reports, issues };
+}
+
+async function main() {
+  const opt = options(process.argv.slice(2));
+  const inputPath = (value) => path.isAbsolute(value) ? value : path.join(root, value);
+  const [projectionRaw, irRaw, policyRaw] = await Promise.all([
+    readFile(inputPath(opt.projection), "utf8"), readFile(inputPath(opt.sdkIr), "utf8"), readFile(inputPath(opt.policy), "utf8")
+  ]);
+  const projection = JSON.parse(projectionRaw); const sdkIr = JSON.parse(irRaw); const policy = JSON.parse(policyRaw);
+  assert.equal(projection.schemaVersion, 1, "C-string projection schema drifted");
+  assert.equal(sdkIr.schemaVersion, 1, "C-string SDK IR schema drifted");
+  assert.equal(projection.defoldRevision, sdkIr.defoldRevision, "C-string projection and SDK IR revisions differ");
+  assert.equal(policy.schemaVersion, 2);
+  const candidates = projection.rows.filter(candidate);
+  const { reports: semanticEvidence, issues: semanticEvidenceIssues } = await inspectEvidence(policy.sourceEvidence, { anchors: true });
+  const semanticEvidenceIds = new Set(policy.sourceEvidence.map(({ id }) => id));
+  const blockerEvidenceById = new Map(policy.blockerSourceEvidence.map((evidence) => [evidence.id, evidence]));
+  assert.equal(blockerEvidenceById.size, policy.blockerSourceEvidence.length, "duplicate C-string blocker evidence id");
+  const { reports: blockerEvidence, issues: blockerEvidenceIssues } = await inspectEvidence(policy.blockerSourceEvidence);
+  for (const contract of policy.stringContractRules) {
+    for (const evidenceId of contract.sourceEvidence) {
+      if (!semanticEvidenceIds.has(evidenceId)) semanticEvidenceIssues.set(evidenceId, { id: "cstring-source-evidence-missing", owner: contract.id });
+    }
+  }
+  for (const rule of policy.blockerRules) {
+    for (const evidenceId of rule.sourceEvidence) {
+      if (!blockerEvidenceById.has(evidenceId)) blockerEvidenceIssues.set(evidenceId, { id: "cstring-source-evidence-missing", owner: rule.id });
+    }
+  }
+  const classified = resolveCStringContracts(candidates, policy).map((entry) => {
+    let rule = entry.rule;
+    if (entry.contract) {
+      const drifted = entry.contract.sourceEvidence.filter((id) => semanticEvidenceIssues.has(id));
+      if (drifted.length) rule = { id: "cstring-source-evidence-drifted", sourceEvidence: drifted };
+    }
+    if (rule?.sourceEvidence) {
+      const drifted = rule.sourceEvidence.filter((id) => blockerEvidenceIssues.has(id));
+      if (drifted.length) rule = { id: "cstring-blocker-evidence-drifted", sourceEvidence: drifted };
+    }
+    return { ...entry, rule, stableId: stableId(entry.row) };
+  });
   const entries = classified.filter(({ rule }) => !rule);
   const blocked = classified.filter(({ rule }) => rule);
-  assert.deepEqual({ candidates: candidates.length, generated: entries.length, blocked: blocked.length }, policy.expectedCoverage);
   assert.equal(new Set(classified.map(({ stableId: value }) => value)).size, classified.length, "Stable ID collision");
   const storage = storageShape(entries);
   const domains = enumDomains(entries, sdkIr);
@@ -529,7 +591,7 @@ async function main() {
     schemaVersion: 1, defoldRevision: projection.defoldRevision,
     sources: { projection: relative.projection, sdkIr: relative.sdkIr, policy: relative.policy, hashes: { projection: sha256(projectionRaw), sdkIr: sha256(irRaw), policy: sha256(policyRaw), semanticEvidence, blockerEvidence } },
     selector: "global pointer-family function + nonvariadic + no callback/record/template/span + const input cstrings + exact result {void,cstring,enum,bool,i32,u32,u64} + exact parameter {cstring,enum,u32,u64}; independent of lowering/evidence disposition",
-    coverage: { ...policy.expectedCoverage, nativeAbiGenerated: entries.length, headerObjectCompiled: 0, pinnedEngineLinked: 0, stubAbiLinkedAndRuntimeTested: 0, nativeDynamicHermesAdapterGenerated: entries.length, nativeStaticHermesDirectMemoryAbiGenerated: entries.length, browserDirectMemoryDescriptorGenerated: entries.length, allTargetConformant: 0 },
+    coverage: { candidates: candidates.length, generated: entries.length, blocked: blocked.length, nativeAbiGenerated: entries.length, headerObjectCompiled: 0, pinnedEngineLinked: 0, stubAbiLinkedAndRuntimeTested: 0, nativeDynamicHermesAdapterGenerated: entries.length, nativeStaticHermesDirectMemoryAbiGenerated: entries.length, browserDirectMemoryDescriptorGenerated: entries.length, allTargetConformant: 0 },
     stringPolicy: {
       input: "The staged JavaScript adapter deliberately narrows const char* inputs to non-null JavaScript strings, uses the host JSI UTF-8 conversion, rejects embedded NUL, and synthesizes the terminator. Lone-surrogate handling therefore follows the selected JSI engine and remains outside cross-target conformance until a shared UTF-16-to-UTF-8 policy is generated. The C ABI itself continues to accept exact caller-provided non-NUL byte views; this policy does not claim every native byte domain is intrinsically UTF-8.",
       result: "Reviewed result contracts explicitly choose nullable or non-null and decode copied null-terminated native bytes as UTF-8. Source hashes and anchors pin the declaration evidence; they do not prove arbitrary engine-returned bytes are valid Unicode.",
@@ -540,6 +602,7 @@ async function main() {
     declarations: classified.map(({ row, rule, contract, stableId: value }) => ({
       id: row.id, projectionId: row.projectionId, stableId: value, denseId: rule ? null : entries.findIndex(({ row: candidateRow }) => candidateRow.id === row.id), symbol: row.symbol,
       provenance: row.provenance, disposition: rule ? "blocked" : "generated", blocker: rule?.id ?? null,
+      universalFallback: rule ? "retained" : "retained-usage-materialized-recipe",
       stringContract: contract ? { id: contract.id, input: contract.input, result: contract.result, sourceEvidence: contract.sourceEvidence } : null,
       targetDisposition: rule ? { nativeDynamicHermes: "blocked", nativeStaticHermes: "blocked", html5BrowserHost: "blocked" } : { typescriptSdk: "staged-private-not-barrel-exported", nativeDynamicHermes: "staged-private-jsi-unregistered-unlinked", nativeStaticHermes: "staged-private-c-abi-uncompiled-unlinked", html5BrowserHost: "staged-private-descriptor-unregistered-unlinked" }
     })),

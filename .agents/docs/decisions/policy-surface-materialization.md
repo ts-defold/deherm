@@ -102,8 +102,8 @@ receive revision modules through their generated `@deherm/project` surface.
 
 # Current executable cut
 
-The authenticated `@compiler` subtree is now a **66,255-byte manifest**, not a
-21 MB container. It references 16 independently content-addressed semantic
+The authenticated `@compiler` subtree is now a **67,114-byte manifest**, not a
+21 MB container. It references 19 independently content-addressed semantic
 documents, a 28-entry SDK manifest, and a 118-entry revision-output manifest.
 Of those outputs, 12 are package-rendered and 106 remain compatibility sources.
 This keeps each object shareable and makes the remaining migration
@@ -227,17 +227,26 @@ implementation-independent equivalence proof. A deliberate semantic change first
 `packages/sdk/src/generated` through the source pipeline and then runs
 `scripts/capture-policy-surface-old-pipeline.mjs --update`; the capture command
 has a check-only default and records the Defold revision plus an aggregate tree
-digest. Sixteen files (3,791,819 bytes) are locally rendered; 12 files
-(78,435 bytes) remain authenticated compatibility sources, and the test names
+digest. Sixteen files (3,908,177 bytes) are locally rendered; 12 files
+(105,573 bytes) remain authenticated compatibility sources, and the test names
 all 12 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
-no Defold checkout. The same test requires all 114 revision outputs (1,536,904
+no Defold checkout. The same test requires all 118 revision outputs (1,723,658
 bytes) to match the source pipeline byte for byte: 12 package-rendered files
-(5,385 bytes) and 102 authenticated snapshots (1,531,519 bytes).
+(5,372 bytes) and 106 authenticated snapshots (1,718,286 bytes).
 
-The `<5 MB` compiler-object budget is enforced; the current manifest is 64,441
+The `<5 MB` compiler-object budget is enforced; the current manifest is 67,114
 bytes. This is a structural transfer boundary, not yet a total-size victory.
-The 12 SDK support-source objects and 102 revision-output objects must still be
+The 12 SDK support-source objects and 106 revision-output objects must still be
 replaced by compiler-owned emitters over compact semantic facts. Those changes
 will reduce total transfer size without changing the consumer contract; the
 work is tracked in [#93](https://github.com/ts-defold/deherm/issues/93).
+
+This proves policy-only realization for the pinned Defold revision and, through
+the independent Defold 1.13.1 derivation described in
+`revision-parametric-derivation.md`, for a second historical revision using the
+same package/compiler implementation. The historical policy reconstructed all
+28 SDK files and 118 revision outputs byte-for-byte and reconstructed its 19
+semantic IR documents equivalently. Routine revision changes therefore stay on
+the policy side of the boundary; an actually new recipe capability remains the
+explicit condition that can require a package upgrade.

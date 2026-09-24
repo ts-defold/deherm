@@ -125,6 +125,14 @@ For each revision not already in the website index:
    capabilities, and publish the usable policy regardless of those evidence
    gaps.
 
+The sealing boundary is route-granular. A source-derived route or declaration
+that cannot be classified is retained as a machine-readable blocker in the
+shared policy data; it does not discard the other namespaces and routes that
+were derived successfully. The policy remains deterministic because every
+source declaration is either emitted in its derived namespace or named exactly
+once by a blocker, while the materializer continues to realize only the
+authenticated usable surface.
+
 The derivation is keyed by exact inputs. An already indexed revision is a no-op.
 Content-addressed subtrees shared with older revisions are not rewritten.
 
@@ -158,6 +166,12 @@ harness notes and do not open route issues.
 A new or changed Defold API is not a failed nightly. A missing review, moved
 source hash, changed census, unavailable fixture, unexercised route, or absent
 specialization is report data.
+
+An unclassifiable route is likewise report data when the source-derived pipeline
+can identify it. Its blocker is published beside the usable routes for that
+revision, and the route is not guessed or silently omitted. A failure that
+prevents the pipeline from establishing this complete emitted-or-blocked
+partition remains a derivation failure and cannot produce a partial policy.
 
 The workflow may be red only when it cannot safely publish a coherent store at
 all: malformed authoritative input, corrupt content-addressed output, an index

@@ -513,9 +513,10 @@ function implementationLaneIndex(units, inputs, defoldRevision) {
 
   if (dmsdkUniversal.schemaVersion !== 1 ||
       dmsdkUniversal.defoldRevision !== defoldRevision ||
-      dmsdkUniversal.coverage.declarations !== 1361 ||
-      dmsdkUniversal.coverage.recipes !== 1361 ||
-      dmsdkUniversal.recipes.length !== 1361) {
+      dmsdkUniversal.coverage.declarations !== dmsdkUniversal.recipes.length ||
+      dmsdkUniversal.coverage.recipes !== dmsdkUniversal.recipes.length ||
+      dmsdkUniversal.coverage.silentlyOmitted !== 0 ||
+      dmsdkUniversal.recipes.length !== units.filter(({ identity }) => identity.surface === "dmsdk").length) {
     throw new Error("dmSDK universal implementation lane schema, revision, or census drifted");
   }
   for (let reportRow = 0; reportRow < dmsdkUniversal.recipes.length; ++reportRow) {
@@ -1084,8 +1085,15 @@ export function generateBindingLoweringPlan(inputs) {
   const parsed = Object.fromEntries(Object.entries(inputs).map(([name, content]) => [name, JSON.parse(content)]));
   const { scriptProjection, scriptUniversalValue, scriptConstantLowering, dmsdkProjection, semanticPolicies } = parsed;
   if (scriptProjection.defoldRevision !== dmsdkProjection.defoldRevision) throw new Error("Projection Defold revisions differ");
-  if (scriptProjection.routeCount !== 926 || scriptProjection.rows.length !== 926) throw new Error("Script projection census drifted");
-  if (dmsdkProjection.coverage.projectedDeclarations !== 1361 || dmsdkProjection.rows.length !== 1361) throw new Error("dmSDK projection census drifted");
+  if (scriptProjection.schemaVersion !== 1 || scriptProjection.routeCount !== scriptProjection.rows.length) throw new Error("Script projection census drifted");
+  if (dmsdkProjection.schemaVersion !== 1 ||
+      dmsdkProjection.coverage.classifiedDeclarations !== dmsdkProjection.rows.length ||
+      dmsdkProjection.coverage.projectedDeclarations !== dmsdkProjection.rows.length ||
+      dmsdkProjection.coverage.uniqueSourceIds !== dmsdkProjection.rows.length ||
+      dmsdkProjection.coverage.uniqueProjectionIds !== dmsdkProjection.rows.length ||
+      dmsdkProjection.coverage.projectionGaps !== 0 ||
+      dmsdkProjection.coverage.unprojectedDeclarations !== 0 ||
+      dmsdkProjection.coverage.silentUnknowns !== 0) throw new Error("dmSDK projection census drifted");
   const constantEntriesByName = new Map(scriptConstantLowering.entries.map((entry, rowIndex) => [entry.name, { entry, rowIndex }]));
   const constantBindings = scriptUniversalValue.bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant");
   if (constantEntriesByName.size !== scriptConstantLowering.entries.length ||
@@ -1112,8 +1120,8 @@ export function generateBindingLoweringPlan(inputs) {
     }),
     ...dmsdkProjection.rows.map(dmsdkUnit)
   ].sort((left, right) => compareCodeUnits(left.identity.surface, right.identity.surface) || compareCodeUnits(left.identity.id, right.identity.id));
-  if (units.length !== 2428 || new Set(units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size !== 2428) {
-    throw new Error("Unified lowering plan must contain 2,428 unique units");
+  if (new Set(units.map(({ identity }) => `${identity.surface}:${identity.id}`)).size !== units.length) {
+    throw new Error("Unified lowering plan contains duplicate units");
   }
   const { resolutions, ruleMatches } = applySemanticPolicies(units, semanticPolicies);
   const implementationLanes = implementationLaneIndex(

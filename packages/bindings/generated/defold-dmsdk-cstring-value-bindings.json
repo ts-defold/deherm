@@ -6,9 +6,9 @@
     "sdkIr": "packages/bindings/generated/defold-sdk-ir.json",
     "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
     "hashes": {
-      "projection": "bbe895d62582cc9f1955d619b5b879d75be7bf6b572c38d8553300e7edace0c0",
+      "projection": "159ebfcb0aafabfa5dca7a88c6ad894e4eb60ab58fe408c16b39b99216ff1c09",
       "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
-      "policy": "0eb7a1eb92d08fccc88e9151afa66d7edf75f91fb6d1d033e086a6451be875ca",
+      "policy": "638bf604816778abdee87b0c1ca659047c3f429a620a5fc33a371a5d5ba98de4",
       "semanticEvidence": {
         "buffer-string-results": {
           "id": "buffer-string-results",
@@ -626,6 +626,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "enum-literal-result-utf8",
         "input": null,
@@ -668,6 +669,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "enum-literal-result-utf8",
         "input": null,
@@ -710,6 +712,7 @@
       },
       "disposition": "blocked",
       "blocker": "restricted-string-domain-requires-validator",
+      "universalFallback": "retained",
       "stringContract": null,
       "targetDisposition": {
         "nativeDynamicHermes": "blocked",
@@ -739,6 +742,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "enum-literal-result-utf8",
         "input": null,
@@ -781,6 +785,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "enum-literal-result-utf8",
         "input": null,
@@ -822,6 +827,7 @@
       },
       "disposition": "blocked",
       "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+      "universalFallback": "retained",
       "stringContract": null,
       "targetDisposition": {
         "nativeDynamicHermes": "blocked",
@@ -850,6 +856,7 @@
       },
       "disposition": "blocked",
       "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+      "universalFallback": "retained",
       "stringContract": null,
       "targetDisposition": {
         "nativeDynamicHermes": "blocked",
@@ -878,6 +885,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "hash-input-js-utf8",
         "input": {
@@ -917,6 +925,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "hash-input-js-utf8",
         "input": {
@@ -956,6 +965,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "resource-extension-cpp-js-utf8",
         "input": {
@@ -999,6 +1009,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "enum-literal-result-utf8",
         "input": null,
@@ -1040,6 +1051,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "case-compare-js-utf8",
         "input": {
@@ -1079,6 +1091,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "filesystem-paths-js-utf8",
         "input": {
@@ -1119,6 +1132,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "filesystem-paths-js-utf8",
         "input": {
@@ -1159,6 +1173,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "filesystem-paths-js-utf8",
         "input": {
@@ -1198,6 +1213,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "utf8-length-js-utf8",
         "input": {
@@ -1238,6 +1254,7 @@
       },
       "disposition": "blocked",
       "blocker": "profiler-logical-context-unresolved",
+      "universalFallback": "retained",
       "stringContract": null,
       "targetDisposition": {
         "nativeDynamicHermes": "blocked",
@@ -1267,6 +1284,7 @@
       },
       "disposition": "blocked",
       "blocker": "profiler-logical-context-unresolved",
+      "universalFallback": "retained",
       "stringContract": null,
       "targetDisposition": {
         "nativeDynamicHermes": "blocked",
@@ -1295,6 +1313,7 @@
       },
       "disposition": "blocked",
       "blocker": "profiler-logical-context-unresolved",
+      "universalFallback": "retained",
       "stringContract": null,
       "targetDisposition": {
         "nativeDynamicHermes": "blocked",
@@ -1323,6 +1342,7 @@
       },
       "disposition": "generated",
       "blocker": null,
+      "universalFallback": "retained-usage-materialized-recipe",
       "stringContract": {
         "id": "resource-extension-c-js-utf8",
         "input": {

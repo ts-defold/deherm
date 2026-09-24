@@ -23,6 +23,9 @@ import {
   renderAuditSummary
 } from "../scripts/lib/revision-audit.mjs";
 import { auditReviewedEvidence, evidencePath, reviewedClaims } from "../scripts/lib/reviewed-evidence.mjs";
+import { crossRevisionGenerationSteps } from "../scripts/check-cross-revision-derivation.mjs";
+import { dmSdkGenerationSteps } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
+import { scriptGenerationSteps } from "../scripts/lib/script-generator-pipeline.mjs";
 import {
   derivationSteps,
   derivedSurfaceRoots,
@@ -30,6 +33,7 @@ import {
   fingerprintDifference,
   materializeWorkspace,
   ownedArtifactPaths,
+  revisionSupportSteps,
   surfaceFingerprint
 } from "../scripts/derive-revision.mjs";
 
@@ -227,6 +231,40 @@ test("the derivation chain is declared once, and every step is a repository scri
   }
   const last = derivationSteps.at(-1);
   assert.deepEqual([last.script, last.args], ["scripts/generate-api-policy.mjs", ["--check"]]);
+  assert.ok(derivationSteps.some(({ script }) => script === "scripts/generate-dmsdk-runtime.mjs"),
+    "revision derivation must regenerate the complete dmSDK binding family");
+  const sdk = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-sdk.mjs");
+  const targets = derivationSteps.findIndex(({ script }) => script === "scripts/generate-defold-bundle-targets.mjs");
+  const symbols = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-symbol-evidence.mjs");
+  const dmsdkRuntime = derivationSteps.findIndex(({ script }) => script === "scripts/generate-dmsdk-runtime.mjs");
+  assert.ok(targets >= 0 && sdk >= 0 && symbols > targets && symbols > sdk && dmsdkRuntime > symbols,
+    "revision-derived dmSDK consumers must run after symbol evidence is measured from that revision's SDK archive");
+  const plan = derivationSteps.findIndex(({ script }) => script === "scripts/ensure-binding-lowering-plan.mjs");
+  const typed = derivationSteps.findIndex(({ script }) => script === "scripts/generate-typed-native-bridge.mjs");
+  const recording = derivationSteps.findIndex(({ script }) => script === "scripts/generate-script-recording-engine.mjs");
+  assert.ok(plan >= 0 && typed > plan && recording > plan,
+    "revision-derived consumers must run after the canonical lowering plan is rebuilt");
+});
+
+test("the historical cross-revision ratchet covers both complete binding pipelines", () => {
+  const expected = [
+    ...scriptGenerationSteps.map(({ script }) => `script:${script}`),
+    ...dmSdkGenerationSteps.map(({ script }) => `dmsdk:${script}`)
+  ];
+  const observed = crossRevisionGenerationSteps.map(({ surface, script }) => `${surface}:${script}`);
+  assert.deepEqual(observed, expected);
+  assert.equal(new Set(observed).size, observed.length,
+    "a generator may not be counted twice by the cross-revision ratchet");
+});
+
+test("the final script SDK pass follows revision-local profiles before downstream consumers", () => {
+  const index = (script) => scriptGenerationSteps.findIndex((step) => step.script === script);
+  const profiles = index("scripts/generate-script-route-availability-profiles.mjs");
+  const sdk = index("scripts/generate-script-sdk.mjs");
+  const projection = index("scripts/generate-script-projection-ir.mjs");
+  const typedNative = index("scripts/generate-typed-native-bridge.mjs");
+  assert.ok(profiles >= 0 && sdk > profiles && projection > sdk && typedNative > projection,
+    "revision-local profile data must replace the semantic bootstrap before projection and typed-native emission");
 });
 
 test("the engine slice carries the vectormath package the dmSDK importer needs", () => {
@@ -235,6 +273,19 @@ test("the engine slice carries the vectormath package the dmSDK importer needs",
   // inventory, so a CI derivation and a local derivation of the SAME revision
   // produce different policy roots.
   assert.ok(enginePaths.includes("packages"));
+  assert.ok(enginePaths.includes("share/extender/variants"));
+});
+
+test("every derived revision hydrates its own digest-pinned Defold SDK before parsing", () => {
+  assert.deepEqual(revisionSupportSteps, [
+    { runtime: "bash", script: "scripts/bootstrap-upstreams.sh", args: ["defold-sdk"] }
+  ]);
+});
+
+test("package-owned dmSDK scalar emission resolves SDK evidence from the derived revision", async () => {
+  const source = await readFile(path.join(repositoryRoot, "scripts/generate-dmsdk-scalar-thunks.mjs"), "utf8");
+  assert.match(source, /sdk\/\$\{defoldRevision\}\/defoldsdk/);
+  assert.doesNotMatch(source, /sdk\/[0-9a-f]{40}\/defoldsdk/);
 });
 
 test("every declared surface root is a repository-relative path", () => {
@@ -258,6 +309,9 @@ test("workspace materialization respects tracked working-tree deletions", async 
 
 test("the adoptable set covers the artifacts every ownership registry declares", () => {
   const owned = ownedArtifactPaths();
+  assert.ok(owned.has("packages/toolchains/defold-bundle-targets.json"));
+  assert.ok(owned.has("packages/toolchains/defold-platform-pairs.json"));
+  assert.ok(owned.has("packages/bindings/generated/defold-dmsdk-target-conditionals.json"));
   assert.ok(owned.has("upstream.lock"));
   assert.ok(owned.has("packages/bindings/generated/defold-api-policy.json"));
   assert.ok(owned.has("packages/bindings/generated/defold-lua-registration-gate.json"));

@@ -344,29 +344,33 @@ async function validateRouteProvenance(cleanRoot) {
     load("packages/bindings/generated/defold-typed-native-bridge.json"),
     load("packages/bindings/generated/defold-binding-lowering-plan.json")
   ]);
-  assert(inventory.countsByKind?.function === 926, `Pinned inventory contains ${inventory.countsByKind?.function} functions, expected 926`);
-  assert(ir.counts?.functions === 926, `Clean IR contains ${ir.counts?.functions} functions, expected 926`);
-  assert(accounting.functionCount === 926, `Clean accounting contains ${accounting.functionCount} functions, expected 926`);
-  assert(projection.routeCount === 926 && projection.generationCounts?.projected === 926,
-    "Clean projection IR does not project all 926 script routes");
-  assert(projection.defoldRevision === ir.defoldRevision && profiles.defoldRevision === ir.defoldRevision,
-    "Script projection/profile revision differs from the imported IR");
-  assert(profiles.profiles?.["default-legacy-bullet"]?.availableRouteCount === 343 &&
-    profiles.profiles?.["v3-bullet"]?.availableRouteCount === 417 &&
-    profiles.profiles?.["no-physics"]?.availableRouteCount === 26,
-  "Script route profile catalog does not retain the pinned runtime census");
-  const inventoryNames = new Set(inventory.declarations
-    .filter(({ kind }) => kind === "function")
-    .map(({ name }) => name));
+  const inventoryFunctions = inventory.declarations.filter(({ kind }) => kind === "function");
   const irIds = ids(ir.functions, "script IR");
   const accountingIds = ids(accounting.rows, "script accounting");
   const projectionIds = ids(projection.rows, "script projection");
+  const routeCount = irIds.size;
+  assert(inventory.countsByKind?.function === inventoryFunctions.length && inventoryFunctions.length === routeCount,
+    `Pinned inventory function census ${inventoryFunctions.length} does not match the IR route census ${routeCount}`);
+  assert(ir.counts?.functions === routeCount, `Clean IR function count metadata is stale: ${ir.counts?.functions} versus ${routeCount}`);
+  assert(accounting.functionCount === routeCount && accountingIds.size === routeCount,
+    `Clean accounting function census does not match the IR route census ${routeCount}`);
+  assert(projection.routeCount === routeCount && projection.generationCounts?.projected === routeCount && projectionIds.size === routeCount,
+    `Clean projection IR does not project the current ${routeCount} script routes`);
+  assert(projection.defoldRevision === ir.defoldRevision && profiles.defoldRevision === ir.defoldRevision,
+    "Script projection/profile revision differs from the imported IR");
+  const inventoryNames = new Set(inventoryFunctions.map(({ name }) => name));
   const irRawNames = new Set(ir.functions.map(({ rawName }) => rawName));
-  assert(inventoryNames.size === 926 && irRawNames.size === 926, "Pinned inventory and IR must each contain 926 unique raw function names");
+  assert(inventoryNames.size === inventoryFunctions.length && irRawNames.size === routeCount,
+    "Pinned inventory and IR must each contain unique raw function names");
   for (const name of inventoryNames) assert(irRawNames.has(name), `Script IR is missing pinned function ${name}`);
-  assert(irIds.size === 926 && accountingIds.size === 926, "Full script route ledger must contain exactly 926 unique IDs");
   for (const id of irIds) assert(accountingIds.has(id), `Accounting is missing generated route ${id}`);
   for (const id of irIds) assert(projectionIds.has(id), `Projection IR is missing generated route ${id}`);
+  for (const [profileName, profile] of Object.entries(profiles.profiles ?? {})) {
+    assert(profile.documentedRouteCount === (profile.documentedRoutes ?? []).length,
+      `${profileName} documented route count is stale`);
+    assert(profile.availableRouteCount === (profile.availableRoutes ?? []).length,
+      `${profileName} available route count is stale`);
+  }
   const executableIds = [
     ...ids(scalar.bindings, "scalar routes"),
     ...ids(value.bindings, "value routes"),
@@ -383,18 +387,16 @@ async function validateRouteProvenance(cleanRoot) {
   const universalConstantIds = ids(
     universal.bindings.filter(({ loweringFamily }) => loweringFamily === "script-constant"),
     "universal constant routes");
-  assert(universalCallableIds.size === 915,
-    "Universal fallback must cover exactly the 915 callable non-intrinsic script routes");
+  assert(universalCallableIds.size + universalConstantIds.size === universal.bindings.length,
+    "Universal fallback route partitions do not cover the current catalog");
   for (const id of universalCallableIds) assert(irIds.has(id), `Universal fallback route is absent from pinned IR: ${id}`);
-  assert(universalConstantIds.size === 141,
-    "Universal constant machinery must cover exactly the 141 non-inlined constants");
   const constantEntries = constantLowering.entries;
-  assert(constantEntries.length === 483 && constantLowering.counts?.total === 483,
-    "Constant lowering policy must cover all 483 documented constants");
+  assert(constantLowering.counts?.total === constantEntries.length,
+    "Constant lowering policy count metadata is stale");
   const runtimeConstantIds = new Set(constantEntries
     .filter(({ state }) => state !== "inlined")
     .map(({ name }) => `script:constant.${name}`));
-  assert(runtimeConstantIds.size === 141 &&
+  assert(runtimeConstantIds.size === universalConstantIds.size &&
     JSON.stringify([...runtimeConstantIds].sort()) === JSON.stringify([...universalConstantIds].sort()),
   "Every non-inlined constant must have exactly one generated universal route");
   assert(constantEntries.every((entry) => Number.isInteger(entry.stableId) && entry.stableId > 0 &&
@@ -423,9 +425,9 @@ async function validateRouteProvenance(cleanRoot) {
   const modulesSource = await readFile(path.join(cleanRoot, "packages/sdk/src/generated/script/modules.ts"), "utf8");
   const emittedStableIds = [...modulesSource.matchAll(/callScriptApi\((0x[0-9a-f]{8}), args\)/g)]
     .map((match) => match[1]);
-  assert(emittedStableIds.length === 926,
-    `Generated TypeScript SDK emits ${emittedStableIds.length} calls, expected 926`);
-  assert(new Set(emittedStableIds).size === 926, "Generated TypeScript SDK contains duplicate stable-ID calls");
+  assert(emittedStableIds.length === routeCount,
+    `Generated TypeScript SDK emits ${emittedStableIds.length} calls, expected ${routeCount}`);
+  assert(new Set(emittedStableIds).size === routeCount, "Generated TypeScript SDK contains duplicate stable-ID calls");
   const emittedSet = new Set(emittedStableIds);
   for (const id of irIds) {
     const expectedStableId = `0x${stableBindingId(id).toString(16).padStart(8, "0")}`;

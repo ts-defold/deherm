@@ -174,9 +174,9 @@ test("typed-native bridge exactly realizes the canonical script selection, inclu
   const selection = selectTypedNativeRoutes(generated, universal);
   const planned = generated.units.filter((unit) =>
     unit.identity.surface === "script" && unit.backends.staticHermesCAbi.selection === "emit");
-  assert.equal(planned.filter(({ sourceState }) => sourceState.loweringFamily !== "script-constant").length, 325);
+  assert.equal(planned.filter(({ sourceState }) => sourceState.loweringFamily !== "script-constant").length, 376);
   assert.equal(planned.filter(({ sourceState }) => sourceState.loweringFamily === "script-constant").length, 141);
-  assert.equal(planned.length, 466);
+  assert.equal(planned.length, 517);
   assert.equal(selection.claimed.length, planned.length);
   assert.deepEqual(selection.declined, []);
   assert.equal(selection.maximumArgumentCount, universal.bounds.maximumArguments);
@@ -194,6 +194,19 @@ test("typed-native bridge exactly realizes the canonical script selection, inclu
   drifted.bindings.find(({ id }) => id === "script:bit.band").maximumArgumentCount -= 1;
   assert.throws(() => selectTypedNativeRoutes(generated, drifted),
     /script:bit\.band: variadic bound differs from the universal frame capacity/);
+
+  const missingSameRevision = structuredClone(universal);
+  missingSameRevision.bindings = missingSameRevision.bindings.filter(({ id }) => id !== "script:bit.band");
+  assert.throws(() => selectTypedNativeRoutes(generated, missingSameRevision),
+    /script:bit\.band: canonical typed-native selection has no universal-value frame/);
+
+  const otherRevision = structuredClone(missingSameRevision);
+  otherRevision.defoldRevision = "0123456789abcdef0123456789abcdef01234567";
+  const fallback = selectTypedNativeRoutes(generated, otherRevision);
+  assert.equal(fallback.planRevisionMatched, false);
+  assert.ok(fallback.declined.some(({ id, reason }) =>
+    id === "script:bit.band" && reason === "canonical-route-absent-from-derived-revision"));
+  assert.equal(fallback.claimed.length + fallback.declined.length, planned.length);
 });
 
 test("implementation lane joins fail closed on identity and census drift", () => {

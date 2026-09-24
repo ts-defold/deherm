@@ -61,26 +61,36 @@ function validate(inputs, parsed) {
   if (sha256(inputs.ir) !== shapes.sourceHashes.ir) throw new Error("hash-state ABI-shape provenance drifted");
   if (policy.symbolEvidence.path !== defaults.symbols) throw new Error("hash-state symbol-evidence path drifted");
   const selected = select(shapes, policy);
-  if (selected.length !== policy.candidateSelector.expectedCount) throw new Error(`hash-state census changed: ${selected.length}`);
   const declarations = new Map(ir.declarations.map((entry) => [entry.id, entry]));
   const seen = new Set();
-  const entries = selected.map((row, id) => {
+  const entries = [];
+  const blocked = [];
+  for (const row of selected) {
     const split = operation(row.symbol);
     const declaration = declarations.get(row.id);
     const evidence = symbols.declarations[row.id];
-    if (!split || !declaration || declaration.type !== expectedType(split.operation, split.width)) throw new Error(`hash-state signature drifted for ${row.id}`);
-    if (!policy.candidateSelector.operations.includes(split.operation) || !policy.candidateSelector.widths.includes(split.width)) throw new Error(`hash-state selector admitted ${row.id}`);
-    const cell = `${split.operation}:${split.width}`;
-    if (seen.has(cell)) throw new Error(`duplicate hash-state operation ${cell}`);
-    seen.add(cell);
-    if (!evidence || evidence.name !== row.symbol || evidence.kind !== "function" || evidence.header !== row.header || evidence.linkage !== policy.symbolEvidence.requiredLinkage || evidence.availability !== policy.symbolEvidence.requiredAvailability) throw new Error(`hash-state symbol evidence rejected ${row.id}`);
-    for (const variant of symbols.variants) {
-      if ((evidence.linkedIn?.[variant] ?? []).length !== symbols.targets.length) throw new Error(`hash-state symbol matrix incomplete for ${row.id}:${variant}`);
+    const cell = split ? `${split.operation}:${split.width}` : null;
+    const signatureHolds = split && declaration?.type === expectedType(split.operation, split.width)
+      && policy.candidateSelector.operations.includes(split.operation)
+      && policy.candidateSelector.widths.includes(split.width);
+    const linkageHolds = evidence?.name === row.symbol && evidence.kind === "function" && evidence.header === row.header
+      && evidence.linkage === policy.symbolEvidence.requiredLinkage
+      && evidence.availability === policy.symbolEvidence.requiredAvailability
+      && symbols.variants.every((variant) => (evidence.linkedIn?.[variant] ?? []).length === symbols.targets.length);
+    if (!signatureHolds || !linkageHolds || seen.has(cell)) {
+      blocked.push({
+        ...row,
+        disposition: "blocked",
+        blocker: !signatureHolds ? "hash-state-signature-unverified" : !linkageHolds ? "hash-state-linkage-unverified" : "duplicate-hash-state-operation",
+        universalFallback: "retained",
+        stages: { generated: "universal-fallback-only", compiled: "not-claimed", linked: "not-claimed", runtime: "not-claimed", allocation: "not-claimed" },
+      });
+      continue;
     }
-    return { ...row, denseId: id, operation: split.operation, width: split.width, disposition: "generated", wrapper: row.symbol };
-  });
-  if (seen.size !== policy.candidateSelector.operations.length * policy.candidateSelector.widths.length) throw new Error("hash-state operation matrix incomplete");
-  return entries;
+    seen.add(cell);
+    entries.push({ ...row, denseId: entries.length, operation: split.operation, width: split.width, disposition: "generated", wrapper: row.symbol });
+  }
+  return { entries, blocked, discovered: selected.length };
 }
 
 function renderHeader(entries, policy) {
@@ -108,19 +118,35 @@ function renderExact(entries) {
   return `// Generated exact ABI twin for the dmHash state family. Do not edit.\n#include <dmsdk/dlib/hash.h>\n#include <stdint.h>\nnamespace {uint32_t calls[${entries.length}]{};}\nvoid dmHashInit32(HashState32* s,bool r){++calls[${id("dmHashInit32")}];s->m_Hash=r?32:3;s->m_Tail=0;s->m_Count=0;s->m_Size=0;s->m_ReverseHashEntryIndex=0;}\nvoid dmHashClone32(HashState32* d,const HashState32* s,bool r){++calls[${id("dmHashClone32")}];d->m_Hash=s->m_Hash+(r?7:1);d->m_Tail=s->m_Tail;d->m_Count=s->m_Count;d->m_Size=s->m_Size;d->m_ReverseHashEntryIndex=0;}\nvoid dmHashUpdateBuffer32(HashState32* s,const void* p,uint32_t n){++calls[${id("dmHashUpdateBuffer32")}];const auto* b=(const uint8_t*)p;for(uint32_t i=0;i<n;++i)s->m_Hash+=b[i];}\nuint32_t dmHashFinal32(HashState32* s){++calls[${id("dmHashFinal32")}];return s->m_Hash;}\nvoid dmHashRelease32(HashState32*){++calls[${id("dmHashRelease32")}];}\nvoid dmHashInit64(HashState64* s,bool r){++calls[${id("dmHashInit64")}];s->m_Hash=r?64:6;s->m_Tail=0;s->m_Count=0;s->m_Size=0;s->m_ReverseHashEntryIndex=0;}\nvoid dmHashClone64(HashState64* d,const HashState64* s,bool r){++calls[${id("dmHashClone64")}];d->m_Hash=s->m_Hash+(r?9:1);d->m_Tail=s->m_Tail;d->m_Count=s->m_Count;d->m_Size=s->m_Size;d->m_ReverseHashEntryIndex=0;}\nvoid dmHashUpdateBuffer64(HashState64* s,const void* p,uint32_t n){++calls[${id("dmHashUpdateBuffer64")}];const auto* b=(const uint8_t*)p;for(uint32_t i=0;i<n;++i)s->m_Hash+=b[i];}\nuint64_t dmHashFinal64(HashState64* s){++calls[${id("dmHashFinal64")}];return s->m_Hash;}\nvoid dmHashRelease64(HashState64*){++calls[${id("dmHashRelease64")}];}\nextern \"C\" uint32_t deherm_dmsdk_hash_state_exact_calls(uint16_t id){return id<${entries.length}?calls[id]:0;}\n`;
 }
 
+function renderExactForEntries(entries) {
+  const bodies = entries.map((entry) => {
+    const { denseId: id, operation: op, width } = entry;
+    const state = `HashState${width}`;
+    if (op === "Init") return `void ${entry.symbol}(${state}* s,bool r){++calls[${id}];s->m_Hash=r?${width}:${width === 32 ? 3 : 6};s->m_Tail=0;s->m_Count=0;s->m_Size=0;s->m_ReverseHashEntryIndex=0;}`;
+    if (op === "Clone") return `void ${entry.symbol}(${state}* d,const ${state}* s,bool r){++calls[${id}];d->m_Hash=s->m_Hash+(r?${width === 32 ? 7 : 9}:1);d->m_Tail=s->m_Tail;d->m_Count=s->m_Count;d->m_Size=s->m_Size;d->m_ReverseHashEntryIndex=0;}`;
+    if (op === "UpdateBuffer") return `void ${entry.symbol}(${state}* s,const void* p,uint32_t n){++calls[${id}];const auto* b=(const uint8_t*)p;for(uint32_t i=0;i<n;++i)s->m_Hash+=b[i];}`;
+    if (op === "Final") return `uint${width}_t ${entry.symbol}(${state}* s){++calls[${id}];return s->m_Hash;}`;
+    return `void ${entry.symbol}(${state}*){++calls[${id}];}`;
+  }).join("\n");
+  return `// Generated exact ABI twin for the dmHash state family. Do not edit.\n#include <dmsdk/dlib/hash.h>\n#include <stdint.h>\nnamespace {uint32_t calls[${Math.max(1, entries.length)}]{};}\n${bodies}\nextern "C" uint32_t deherm_dmsdk_hash_state_exact_calls(uint16_t id){return id<${entries.length}?calls[id]:0;}\n`;
+}
+
 async function build(options = {}) {
   const inputs = Object.fromEntries(await Promise.all(Object.keys(defaults).map(async (key) => {
     const value = options[key] ?? path.resolve(root, defaults[key]);
     return [key, typeof value === "string" && value.trimStart().startsWith("{") ? value : await readFile(value, "utf8")];
   })));
   const parsed = Object.fromEntries(Object.entries(inputs).map(([key, value]) => [key, JSON.parse(value)]));
-  const entries = validate(inputs, parsed);
+  const { entries, blocked, discovered } = validate(inputs, parsed);
+  const emittedSymbols = new Set(entries.map(({ symbol }) => symbol));
+  const completeReviewedMatrix = parsed.policy.candidateSelector.operations.every((op) =>
+    parsed.policy.candidateSelector.widths.every((width) => emittedSymbols.has(`dmHash${op}${width}`)));
   const artifacts = new Map([
     [artifactPaths.header, renderHeader(entries, parsed.policy)],
     [artifactPaths.source, renderSource(entries, parsed.policy)],
-    [artifactPaths.exact, renderExact(entries)],
+    [artifactPaths.exact, completeReviewedMatrix ? renderExact(entries) : renderExactForEntries(entries)],
   ]);
-  const report = { schemaVersion: 1, policyVersion: parsed.policy.policyVersion, defoldRevision: parsed.ir.defoldRevision, sources: defaults, sourceHashes: Object.fromEntries(Object.entries(inputs).map(([key, value]) => [key, sha256(value)])), policy: parsed.policy, coverage: { discovered: entries.length, generated: entries.length, registryCapacityPerWidth: parsed.policy.registry.capacityPerWidth, exactFixtureCount: entries.length }, artifacts: [...artifacts.keys()].sort(), artifactHashes: Object.fromEntries([...artifacts].sort().map(([name, value]) => [name, sha256(value)])), declarations: entries };
+  const report = { schemaVersion: 1, policyVersion: parsed.policy.policyVersion, defoldRevision: parsed.ir.defoldRevision, sources: defaults, sourceHashes: Object.fromEntries(Object.entries(inputs).map(([key, value]) => [key, sha256(value)])), policy: parsed.policy, coverage: { discovered, generated: entries.length, blocked: blocked.length, registryCapacityPerWidth: parsed.policy.registry.capacityPerWidth, exactFixtureCount: entries.length }, artifacts: [...artifacts.keys()].sort(), artifactHashes: Object.fromEntries([...artifacts].sort().map(([name, value]) => [name, sha256(value)])), declarations: entries, blockedDeclarations: blocked };
   artifacts.set(artifactPaths.report, `${JSON.stringify(report, null, 2)}\n`);
   return { artifacts, report };
 }

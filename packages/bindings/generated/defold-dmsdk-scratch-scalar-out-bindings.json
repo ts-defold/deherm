@@ -10,8 +10,8 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "projection": "bbe895d62582cc9f1955d619b5b879d75be7bf6b572c38d8553300e7edace0c0",
-    "policy": "917118c229b4ad04eef2b1b5e9604f635a94c6b7eeab5524575884cd2594806c"
+    "projection": "159ebfcb0aafabfa5dca7a88c6ad894e4eb60ab58fe408c16b39b99216ff1c09",
+    "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099"
   },
   "selector": "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
   "policy": {
@@ -29,6 +29,11 @@
     "browser": "direct-Wasm-memory-u64-slots; provider-installation-remains-host-responsibility",
     "typescript": "nominal-borrowed-handles-and-typed-result-output-records",
     "evidenceBoundary": "generated and fake-provider tested; no dmSDK symbol link, real provider, or packaged-engine proof"
+  },
+  "universalFallback": {
+    "preserved": true,
+    "catalog": "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
+    "mutation": "none"
   },
   "abi": {
     "slotBytes": 8,
@@ -105,14 +110,35 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:template:T",
         "parameter-role-direction-unsupported:0:inout:template:T",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:template:T",
         "result-role-unsupported:template:T",
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:template:T",
+          "parameter-role-direction-unsupported:0:inout:template:T",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:template:T",
+          "result-role-unsupported:template:T",
+          "semantic-token-unresolved:receiver-provenance-lifetime",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "template:T(inout:template:T)"
     },
     {
@@ -124,13 +150,33 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:template:dmArray<T>",
         "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:template:dmArray<T>",
+          "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:receiver-provenance-lifetime",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(inout:template:dmArray<T>)"
     },
     {
@@ -144,10 +190,27 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:opaque-pointer-out",
         "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:opaque-pointer-out",
+          "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,out:opaque-pointer-out,out:pointer:scalar:u32)"
     },
     {
@@ -161,10 +224,27 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)"
     },
     {
@@ -178,10 +258,27 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)"
     },
     {
@@ -195,6 +292,8 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:dmConnectionPool::Params",
+        "parameter-kind-unsupported:1:pointer:unknown:HPool",
         "parameter-role-direction-unsupported:0:in:pointer:record:dmConnectionPool::Params",
         "parameter-role-direction-unsupported:1:inout:pointer:unknown:HPool",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -202,6 +301,26 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:dmConnectionPool::Params",
+          "parameter-kind-unsupported:1:pointer:unknown:HPool",
+          "parameter-role-direction-unsupported:0:in:pointer:record:dmConnectionPool::Params",
+          "parameter-role-direction-unsupported:1:inout:pointer:unknown:HPool",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmConnectionPool::Result(in:pointer:record:dmConnectionPool::Params,inout:pointer:unknown:HPool)"
     },
     {
@@ -214,6 +333,9 @@
         "enum-width-domain-validation-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:cstring-in",
+        "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
+        "parameter-kind-unsupported:2:opaque-pointer-out",
         "parameter-role-direction-unsupported:0:in:cstring-in",
         "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
         "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
@@ -222,6 +344,27 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:cstring-in",
+          "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
+          "parameter-kind-unsupported:2:opaque-pointer-out",
+          "parameter-role-direction-unsupported:0:in:cstring-in",
+          "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
+          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmDDF::Result(in:cstring-in,in:pointer:record:dmDDF::Descriptor,out:opaque-pointer-out)"
     },
     {
@@ -234,6 +377,8 @@
         "enum-width-domain-validation-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:dmDDF::Descriptor",
+        "parameter-kind-unsupported:1:opaque-pointer",
         "parameter-role-direction-unsupported:0:in:pointer:record:dmDDF::Descriptor",
         "parameter-role-direction-unsupported:1:inout:opaque-pointer",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -241,6 +386,25 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:dmDDF::Descriptor",
+          "parameter-kind-unsupported:1:opaque-pointer",
+          "parameter-role-direction-unsupported:0:in:pointer:record:dmDDF::Descriptor",
+          "parameter-role-direction-unsupported:1:inout:opaque-pointer",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmDDF::Result(in:pointer:record:dmDDF::Descriptor,inout:opaque-pointer)"
     },
     {
@@ -253,6 +417,9 @@
         "enum-width-domain-validation-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:opaque-pointer",
+        "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
+        "parameter-kind-unsupported:2:template:dmArray<uint8_t>",
         "parameter-role-direction-unsupported:0:in:opaque-pointer",
         "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
         "parameter-role-direction-unsupported:2:inout:template:dmArray<uint8_t>",
@@ -262,6 +429,28 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:opaque-pointer",
+          "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
+          "parameter-kind-unsupported:2:template:dmArray<uint8_t>",
+          "parameter-role-direction-unsupported:0:in:opaque-pointer",
+          "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
+          "parameter-role-direction-unsupported:2:inout:template:dmArray<uint8_t>",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmDDF::Result(in:opaque-pointer,in:pointer:record:dmDDF::Descriptor,inout:template:dmArray<uint8_t>)"
     },
     {
@@ -275,11 +464,31 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:pointer:unknown:HComponent",
+        "parameter-kind-unsupported:4:pointer:unknown:HComponentWorld",
         "parameter-role-direction-unsupported:3:inout:pointer:unknown:HComponent",
         "parameter-role-direction-unsupported:4:out:pointer:unknown:HComponentWorld",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:pointer:unknown:HComponent",
+          "parameter-kind-unsupported:4:pointer:unknown:HComponentWorld",
+          "parameter-role-direction-unsupported:3:inout:pointer:unknown:HComponent",
+          "parameter-role-direction-unsupported:4:out:pointer:unknown:HComponentWorld",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,inout:pointer:scalar:u32,inout:pointer:unknown:HComponent,out:pointer:unknown:HComponentWorld)"
     },
     {
@@ -425,12 +634,31 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Matrix4",
         "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Matrix4",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Matrix4",
+          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Matrix4",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Matrix4)"
     },
     {
@@ -444,12 +672,31 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Quat",
         "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Quat",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Quat",
+          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Quat",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Quat)"
     },
     {
@@ -462,11 +709,28 @@
         "enum-width-domain-validation-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
+        "parameter-kind-unsupported:3:pointer-out:scalar:i8",
         "parameter-role-direction-unsupported:3:in:pointer-out:scalar:i8",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "parameter-kind-unsupported:3:pointer-out:scalar:i8",
+          "parameter-role-direction-unsupported:3:in:pointer-out:scalar:i8",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:pointer-out:scalar:i8)"
     },
     {
@@ -480,12 +744,31 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
         "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
+          "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:record:dmMessage::URL)"
     },
     {
@@ -499,12 +782,31 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector3",
         "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector3",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector3",
+          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector3",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector3)"
     },
     {
@@ -518,12 +820,31 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector4",
         "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector4",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector4",
+          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector4",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector4)"
     },
     {
@@ -603,6 +924,12 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:cstring-in",
+        "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
+        "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
+        "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
+        "parameter-kind-unsupported:7:pointer:unknown:dmGameObject::InstancePropertyContainers",
+        "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::InstanceIdMap",
         "parameter-role-direction-unsupported:3:in:cstring-in",
         "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
         "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
@@ -615,6 +942,35 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:cstring-in",
+          "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
+          "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
+          "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
+          "parameter-kind-unsupported:7:pointer:unknown:dmGameObject::InstancePropertyContainers",
+          "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::InstanceIdMap",
+          "parameter-role-direction-unsupported:3:in:cstring-in",
+          "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
+          "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
+          "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
+          "parameter-role-direction-unsupported:7:inout:pointer:unknown:dmGameObject::InstancePropertyContainers",
+          "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::InstanceIdMap",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionFactoryWorld:opaque,value:handle:dmGameSystem::HCollectionFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,in:cstring-in,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,inout:pointer:unknown:dmGameObject::InstancePropertyContainers,out:pointer:unknown:dmGameObject::InstanceIdMap)"
     },
     {
@@ -628,6 +984,10 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
+        "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
+        "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
+        "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::HInstance",
         "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
         "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
         "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
@@ -637,6 +997,30 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
+          "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
+          "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
+          "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::HInstance",
+          "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
+          "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
+          "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
+          "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::HInstance",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,value:scalar:u64,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,value:handle:dmGameObject::HPropertyContainer:opaque,out:pointer:unknown:dmGameObject::HInstance)"
     },
     {
@@ -649,11 +1033,28 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer:unknown:dmRender::HConstant",
         "parameter-role-direction-unsupported:2:out:pointer:unknown:dmRender::HConstant",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer:unknown:dmRender::HConstant",
+          "parameter-role-direction-unsupported:2:out:pointer:unknown:dmRender::HConstant",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,out:pointer:unknown:dmRender::HConstant)"
     },
     {
@@ -667,6 +1068,8 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::CollectionFactoryResource",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::CollectionFactoryResource",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -674,6 +1077,26 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::CollectionFactoryResource",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::CollectionFactoryResource",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::CollectionFactoryResource)"
     },
     {
@@ -687,6 +1110,8 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::FactoryResource",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::FactoryResource",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -694,6 +1119,26 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::FactoryResource",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::FactoryResource",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::FactoryResource)"
     },
     {
@@ -706,6 +1151,8 @@
         "enum-width-domain-validation-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:dmGameSystem::FontResource",
+        "parameter-kind-unsupported:1:pointer:record:dmGameSystem::FontInfo",
         "parameter-role-direction-unsupported:0:inout:pointer:record:dmGameSystem::FontResource",
         "parameter-role-direction-unsupported:1:inout:pointer:record:dmGameSystem::FontInfo",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -713,6 +1160,25 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:dmGameSystem::FontResource",
+          "parameter-kind-unsupported:1:pointer:record:dmGameSystem::FontInfo",
+          "parameter-role-direction-unsupported:0:inout:pointer:record:dmGameSystem::FontResource",
+          "parameter-role-direction-unsupported:1:inout:pointer:record:dmGameSystem::FontInfo",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,inout:pointer:record:dmGameSystem::FontInfo)"
     },
     {
@@ -729,9 +1195,28 @@
         "parameter-role-direction-unsupported:3:inout:scalar:u32",
         "parameter-role-direction-unsupported:4:inout:scalar:u32",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-role-direction-unsupported:3:inout:scalar:u32",
+          "parameter-role-direction-unsupported:4:inout:scalar:u32",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:enum:dmGraphics::BufferType,inout:scalar:u32,inout:scalar:u32)"
     },
     {
@@ -745,11 +1230,29 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:opaque-pointer-out",
         "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:opaque-pointer-out",
+          "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGraphics::HandleResult(value:handle:dmGraphics::HTexture:u64,out:opaque-pointer-out)"
     },
     {
@@ -763,12 +1266,33 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:unknown:VkDevice",
+        "parameter-kind-unsupported:2:pointer:unknown:VkDescriptorPool",
         "parameter-role-direction-unsupported:0:value:unknown:VkDevice",
         "parameter-role-direction-unsupported:2:out:pointer:unknown:VkDescriptorPool",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "family-requires-target-matrix:platform-gated",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:unknown:VkDevice",
+          "parameter-kind-unsupported:2:pointer:unknown:VkDescriptorPool",
+          "parameter-role-direction-unsupported:0:value:unknown:VkDevice",
+          "parameter-role-direction-unsupported:2:out:pointer:unknown:VkDescriptorPool",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(value:unknown:VkDevice,value:scalar:u16,out:pointer:unknown:VkDescriptorPool)"
     },
     {
@@ -782,12 +1306,31 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:pointer:record:dmGui::CustomProperty",
         "parameter-role-direction-unsupported:3:inout:pointer:record:dmGui::CustomProperty",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:pointer:record:dmGui::CustomProperty",
+          "parameter-role-direction-unsupported:3:inout:pointer:record:dmGui::CustomProperty",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,inout:pointer:record:dmGui::CustomProperty)"
     },
     {
@@ -799,13 +1342,33 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
         "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
+          "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:receiver-provenance-lifetime",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)"
     },
     {
@@ -817,13 +1380,33 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
         "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
+          "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:receiver-provenance-lifetime",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)"
     },
     {
@@ -835,13 +1418,35 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadGuid",
+        "parameter-kind-unsupported:1:cstring-mutable",
         "parameter-role-direction-unsupported:0:in:pointer:record:dmHID::GamepadGuid",
         "parameter-role-direction-unsupported:1:inout:cstring-mutable",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadGuid",
+          "parameter-kind-unsupported:1:cstring-mutable",
+          "parameter-role-direction-unsupported:0:in:pointer:record:dmHID::GamepadGuid",
+          "parameter-role-direction-unsupported:1:inout:cstring-mutable",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(in:pointer:record:dmHID::GamepadGuid,inout:cstring-mutable)"
     },
     {
@@ -854,12 +1459,30 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer:record:dmHID::GamepadGuid",
         "parameter-role-direction-unsupported:2:inout:pointer:record:dmHID::GamepadGuid",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer:record:dmHID::GamepadGuid",
+          "parameter-role-direction-unsupported:2:inout:pointer:record:dmHID::GamepadGuid",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,inout:pointer:record:dmHID::GamepadGuid)"
     },
     {
@@ -871,11 +1494,29 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadPacket",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
         "parameter-role-direction-unsupported:0:inout:pointer:record:dmHID::GamepadPacket",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadPacket",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "parameter-role-direction-unsupported:0:inout:pointer:record:dmHID::GamepadPacket",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(inout:pointer:record:dmHID::GamepadPacket,value:scalar:u32,out:pointer:scalar:u8)"
     },
     {
@@ -888,12 +1529,30 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:pointer:record:dmHID::GamepadPacket",
         "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::GamepadPacket",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:pointer:record:dmHID::GamepadPacket",
+          "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::GamepadPacket",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(value:handle:dmHID::HGamepad:opaque,out:pointer:record:dmHID::GamepadPacket)"
     },
     {
@@ -939,12 +1598,30 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:pointer:record:dmHID::MousePacket",
         "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::MousePacket",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:pointer:record:dmHID::MousePacket",
+          "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::MousePacket",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(value:handle:dmHID::HMouse:opaque,out:pointer:record:dmHID::MousePacket)"
     },
     {
@@ -957,6 +1634,8 @@
         "enum-width-domain-validation-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:cstring-in",
+        "parameter-kind-unsupported:1:pointer:record:dmMessage::StringURL",
         "parameter-role-direction-unsupported:0:in:cstring-in",
         "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::StringURL",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -964,6 +1643,25 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:cstring-in",
+          "parameter-kind-unsupported:1:pointer:record:dmMessage::StringURL",
+          "parameter-role-direction-unsupported:0:in:cstring-in",
+          "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::StringURL",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmMessage::Result(in:cstring-in,out:pointer:record:dmMessage::StringURL)"
     },
     {
@@ -975,13 +1673,33 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:template:T",
         "parameter-role-direction-unsupported:1:inout:template:T",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:template:T",
+          "parameter-role-direction-unsupported:1:inout:template:T",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:receiver-provenance-lifetime",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(value:scalar:u32,inout:template:T)"
     },
     {
@@ -995,10 +1713,27 @@
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:pointer:unknown:dmVMath::Vector4",
         "result-role-unsupported:pointer:unknown:dmVMath::Vector4",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:pointer:unknown:dmVMath::Vector4",
+          "result-role-unsupported:pointer:unknown:dmVMath::Vector4",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "pointer:unknown:dmVMath::Vector4(value:handle:dmRender::HConstant:opaque,inout:pointer:scalar:u32)"
     },
     {
@@ -1011,11 +1746,28 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
         "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
+          "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32)"
     },
     {
@@ -1029,12 +1781,33 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
+        "parameter-kind-unsupported:4:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
         "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
         "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
+          "parameter-kind-unsupported:4:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
+          "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
+          "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
     },
     {
@@ -1048,12 +1821,33 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:opaque-pointer-out",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:opaque-pointer-out",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
     },
     {
@@ -1067,12 +1861,33 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:opaque-pointer-out",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:opaque-pointer-out",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
     },
     {
@@ -1086,11 +1901,29 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:opaque-pointer-out",
         "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:opaque-pointer-out",
+          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
@@ -1104,11 +1937,29 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:opaque-pointer-out",
         "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:opaque-pointer-out",
+          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
@@ -1122,10 +1973,27 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:opaque-pointer",
         "parameter-role-direction-unsupported:1:in:opaque-pointer",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:opaque-pointer",
+          "parameter-role-direction-unsupported:1:in:opaque-pointer",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
     },
     {
@@ -1139,6 +2007,9 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:cstring-in",
+        "parameter-kind-unsupported:3:opaque-pointer-out",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:in:cstring-in",
         "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
@@ -1146,6 +2017,27 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:cstring-in",
+          "parameter-kind-unsupported:3:opaque-pointer-out",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:in:cstring-in",
+          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)"
     },
     {
@@ -1159,11 +2051,29 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:opaque-pointer-out",
         "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:opaque-pointer-out",
+          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
@@ -1175,14 +2085,37 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:unknown:dmRigDDF::Skeleton",
+        "parameter-kind-unsupported:1:template:dmArray<RigBone>",
         "parameter-role-direction-unsupported:0:inout:unknown:dmRigDDF::Skeleton",
         "parameter-role-direction-unsupported:1:inout:template:dmArray<RigBone>",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:unknown:dmRigDDF::Skeleton",
+          "parameter-kind-unsupported:1:template:dmArray<RigBone>",
+          "parameter-role-direction-unsupported:0:inout:unknown:dmRigDDF::Skeleton",
+          "parameter-role-direction-unsupported:1:inout:template:dmArray<RigBone>",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(inout:unknown:dmRigDDF::Skeleton,inout:template:dmArray<RigBone>)"
     },
     {
@@ -1195,15 +2128,42 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer:record:dmRigDDF::Mesh",
+        "parameter-kind-unsupported:3:unknown:dmVMath::Matrix4",
+        "parameter-kind-unsupported:4:pointer:record:dmRig::RigModelVertex",
         "parameter-role-direction-unsupported:2:inout:pointer:record:dmRigDDF::Mesh",
         "parameter-role-direction-unsupported:3:in:unknown:dmVMath::Matrix4",
         "parameter-role-direction-unsupported:4:out:pointer:record:dmRig::RigModelVertex",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:pointer:record:dmRig::RigModelVertex",
         "result-role-unsupported:pointer:record:dmRig::RigModelVertex",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer:record:dmRigDDF::Mesh",
+          "parameter-kind-unsupported:3:unknown:dmVMath::Matrix4",
+          "parameter-kind-unsupported:4:pointer:record:dmRig::RigModelVertex",
+          "parameter-role-direction-unsupported:2:inout:pointer:record:dmRigDDF::Mesh",
+          "parameter-role-direction-unsupported:3:in:unknown:dmVMath::Matrix4",
+          "parameter-role-direction-unsupported:4:out:pointer:record:dmRig::RigModelVertex",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:pointer:record:dmRig::RigModelVertex",
+          "result-role-unsupported:pointer:record:dmRig::RigModelVertex",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)"
     },
     {
@@ -1220,6 +2180,20 @@
         "result-role-unsupported:pointer:scalar:f32",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-role-unsupported:pointer:scalar:f32",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "pointer:scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,out:pointer:scalar:u32)"
     },
     {
@@ -1231,6 +2205,8 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:lua_State",
+        "parameter-kind-unsupported:1:pointer:record:dmMessage::URL",
         "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
         "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::URL",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -1238,6 +2214,24 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:lua_State",
+          "parameter-kind-unsupported:1:pointer:record:dmMessage::URL",
+          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
+          "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::URL",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:bool(inout:pointer:record:lua_State,out:pointer:record:dmMessage::URL)"
     },
     {
@@ -1250,16 +2244,48 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:lua_State",
+        "parameter-kind-unsupported:2:cstring-in",
+        "parameter-kind-unsupported:3:pointer:unknown:dmGameObject::HComponentWorld",
+        "parameter-kind-unsupported:4:pointer:unknown:dmGameObject::HComponent",
+        "parameter-kind-unsupported:5:pointer:record:dmMessage::URL",
         "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
         "parameter-role-direction-unsupported:2:in:cstring-in",
         "parameter-role-direction-unsupported:3:out:pointer:unknown:dmGameObject::HComponentWorld",
         "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmGameObject::HComponent",
         "parameter-role-direction-unsupported:5:inout:pointer:record:dmMessage::URL",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:lua_State",
+          "parameter-kind-unsupported:2:cstring-in",
+          "parameter-kind-unsupported:3:pointer:unknown:dmGameObject::HComponentWorld",
+          "parameter-kind-unsupported:4:pointer:unknown:dmGameObject::HComponent",
+          "parameter-kind-unsupported:5:pointer:record:dmMessage::URL",
+          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
+          "parameter-role-direction-unsupported:2:in:cstring-in",
+          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmGameObject::HComponentWorld",
+          "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmGameObject::HComponent",
+          "parameter-role-direction-unsupported:5:inout:pointer:record:dmMessage::URL",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,out:pointer:unknown:dmGameObject::HComponentWorld,inout:pointer:unknown:dmGameObject::HComponent,inout:pointer:record:dmMessage::URL)"
     },
     {
@@ -1271,6 +2297,9 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:lua_State",
+        "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
+        "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
         "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
         "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
         "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
@@ -1279,6 +2308,26 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:lua_State",
+          "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
+          "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
+          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
+          "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
+          "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,out:pointer:record:dmMessage::URL,out:pointer:record:dmMessage::URL)"
     },
     {
@@ -1291,6 +2340,10 @@
         "enum-width-domain-validation-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer:record:lua_State",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
+        "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
         "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
@@ -1300,6 +2353,29 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer:record:lua_State",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
+          "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
+          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
+          "parameter-role-direction-unsupported:3:inout:pointer:record:dmMessage::URL",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:dmMessage::Result(inout:pointer:record:lua_State,in:cstring-in,out:pointer:record:dmMessage::URL,inout:pointer:record:dmMessage::URL)"
     },
     {
@@ -1311,12 +2387,35 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:cstring-mutable",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:scalar:usize",
         "parameter-role-direction-unsupported:0:out:cstring-mutable",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:usize",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:cstring-mutable",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:scalar:usize",
+          "parameter-role-direction-unsupported:0:out:cstring-mutable",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:usize",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)"
     },
     {
@@ -1328,12 +2427,35 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:cstring-mutable",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:scalar:usize",
         "parameter-role-direction-unsupported:0:out:cstring-mutable",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:usize",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:cstring-mutable",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:scalar:usize",
+          "parameter-role-direction-unsupported:0:out:cstring-mutable",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:usize",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)"
     },
     {
@@ -1345,14 +2467,39 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:cstring-mutable",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:pointer-out:scalar:i8",
         "parameter-role-direction-unsupported:0:inout:cstring-mutable",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:out:pointer-out:scalar:i8",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:cstring-mutable",
         "result-role-unsupported:cstring-mutable",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:cstring-mutable",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:pointer-out:scalar:i8",
+          "parameter-role-direction-unsupported:0:inout:cstring-mutable",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:out:pointer-out:scalar:i8",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:cstring-mutable",
+          "result-role-unsupported:cstring-mutable",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "cstring-mutable(inout:cstring-mutable,in:cstring-in,out:pointer-out:scalar:i8)"
     },
     {
@@ -1364,12 +2511,33 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:cstring-in",
+        "parameter-kind-unsupported:1:cstring-mutable",
         "parameter-role-direction-unsupported:0:in:cstring-in",
         "parameter-role-direction-unsupported:1:out:cstring-mutable",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:cstring-in",
+          "parameter-kind-unsupported:1:cstring-mutable",
+          "parameter-role-direction-unsupported:0:in:cstring-in",
+          "parameter-role-direction-unsupported:1:out:cstring-mutable",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(in:cstring-in,out:cstring-mutable)"
     },
     {
@@ -1380,11 +2548,26 @@
       "blockers": [
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
+        "parameter-kind-unsupported:0:pointer-out:scalar:i8",
         "parameter-role-direction-unsupported:0:in:pointer-out:scalar:i8",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "parameter-kind-unsupported:0:pointer-out:scalar:i8",
+          "parameter-role-direction-unsupported:0:in:pointer-out:scalar:i8",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:u32(in:pointer-out:scalar:i8)"
     },
     {
@@ -1396,11 +2579,27 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-mutable",
         "parameter-role-direction-unsupported:1:inout:cstring-mutable",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-mutable",
+          "parameter-role-direction-unsupported:1:inout:cstring-mutable",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:u32(value:scalar:u16,inout:cstring-mutable)"
     },
     {
@@ -1412,14 +2611,35 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:template:T",
         "parameter-role-direction-unsupported:0:inout:template:T",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:template:T",
         "result-role-unsupported:template:T",
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:template:T",
+          "parameter-role-direction-unsupported:0:inout:template:T",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:template:T",
+          "result-role-unsupported:template:T",
+          "semantic-token-unresolved:receiver-provenance-lifetime",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "template:T(inout:template:T)"
     },
     {
@@ -1433,6 +2653,8 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
+        "parameter-kind-unsupported:3:pointer:record:FontGlyph",
         "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
         "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -1440,6 +2662,26 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
+          "parameter-kind-unsupported:3:pointer:record:FontGlyph",
+          "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
+          "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)"
     },
     {
@@ -1453,6 +2695,8 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
+        "parameter-kind-unsupported:3:pointer:record:FontGlyph",
         "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
         "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
         "pointer-bounds-nullability-lifetime-unresolved",
@@ -1460,6 +2704,26 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
+          "parameter-kind-unsupported:3:pointer:record:FontGlyph",
+          "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
+          "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)"
     },
     {
@@ -1472,12 +2736,30 @@
         "enum-width-domain-validation-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:pointer-out:record:HttpRequest",
         "parameter-role-direction-unsupported:0:out:pointer-out:record:HttpRequest",
         "pointer-bounds-nullability-lifetime-unresolved",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:pointer-out:record:HttpRequest",
+          "parameter-role-direction-unsupported:0:out:pointer-out:record:HttpRequest",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:HttpResult(out:pointer-out:record:HttpRequest)"
     },
     {
@@ -1491,12 +2773,33 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:opaque-pointer-out",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:opaque-pointer-out",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,out:opaque-pointer-out)"
     },
     {
@@ -1510,11 +2813,29 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:opaque-pointer-out",
         "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:opaque-pointer-out",
+          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
@@ -1528,11 +2849,29 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:3:opaque-pointer-out",
         "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:3:opaque-pointer-out",
+          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)"
     },
     {
@@ -1546,10 +2885,27 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:opaque-pointer",
         "parameter-role-direction-unsupported:1:in:opaque-pointer",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:opaque-pointer",
+          "parameter-role-direction-unsupported:1:in:opaque-pointer",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
     },
     {
@@ -1563,12 +2919,33 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:pointer:unknown:HResourceType)"
     },
     {
@@ -1582,11 +2959,29 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
         "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
         "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
+          "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)"
     },
     {
@@ -1600,6 +2995,9 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:cstring-in",
+        "parameter-kind-unsupported:3:opaque-pointer-out",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:in:cstring-in",
         "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
@@ -1607,6 +3005,27 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:cstring-in",
+          "parameter-kind-unsupported:3:opaque-pointer-out",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:in:cstring-in",
+          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)"
     },
     {
@@ -1620,6 +3039,9 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:cstring-in",
+        "parameter-kind-unsupported:2:opaque-pointer",
+        "parameter-kind-unsupported:3:pointer:unknown:HResourceType",
         "parameter-role-direction-unsupported:1:in:cstring-in",
         "parameter-role-direction-unsupported:2:inout:opaque-pointer",
         "parameter-role-direction-unsupported:3:inout:pointer:unknown:HResourceType",
@@ -1627,6 +3049,27 @@
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "enum-width-domain-validation-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:cstring-in",
+          "parameter-kind-unsupported:2:opaque-pointer",
+          "parameter-kind-unsupported:3:pointer:unknown:HResourceType",
+          "parameter-role-direction-unsupported:1:in:cstring-in",
+          "parameter-role-direction-unsupported:2:inout:opaque-pointer",
+          "parameter-role-direction-unsupported:3:inout:pointer:unknown:HResourceType",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:opaque-pointer,inout:pointer:unknown:HResourceType)"
     },
     {
@@ -1638,13 +3081,33 @@
         "call-thread-affinity-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:0:template:dmArray<T>",
         "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:void",
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified",
         "writable-scalar-pointer-required"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:0:template:dmArray<T>",
+          "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:void",
+          "semantic-token-unresolved:receiver-provenance-lifetime",
+          "semantic-token-unresolved:template-specialization-set",
+          "target-feature-symbol-matrix-unverified",
+          "writable-scalar-pointer-required"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:void(inout:template:dmArray<T>)"
     },
     {
@@ -1657,11 +3120,30 @@
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
         "out-storage-initialization-failure-unresolved",
+        "parameter-kind-unsupported:1:pointer:record:TextLayoutObject",
         "parameter-role-direction-unsupported:1:in:pointer:record:TextLayoutObject",
         "pointer-bounds-nullability-lifetime-unresolved",
+        "result-kind-unsupported:scalar:u8",
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "call-thread-affinity-unresolved",
+          "handle-ownership-nullability-lifetime-unresolved",
+          "native-symbol-linkage-unverified",
+          "out-storage-initialization-failure-unresolved",
+          "parameter-kind-unsupported:1:pointer:record:TextLayoutObject",
+          "parameter-role-direction-unsupported:1:in:pointer:record:TextLayoutObject",
+          "pointer-bounds-nullability-lifetime-unresolved",
+          "result-kind-unsupported:scalar:u8",
+          "semantic-token-unresolved:record-layout-alignment-copy",
+          "target-feature-symbol-matrix-unverified"
+        ],
+        "preserved": true
+      },
       "shape": "scalar:u8(value:handle:HTextLayout:opaque,in:pointer:record:TextLayoutObject,value:scalar:f32,value:scalar:f32,value:scalar:f32,inout:pointer:scalar:f32,inout:pointer:scalar:f32)"
     }
   ]

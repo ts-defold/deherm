@@ -58,6 +58,7 @@ import {
   apiPolicyGenerator
 } from "./lib/script-generator-pipeline.mjs";
 import { generatedDmSdkArtifacts } from "./lib/dmsdk-generator-pipeline.mjs";
+import { generatedBundleTargetArtifacts } from "./generate-defold-bundle-targets.mjs";
 import { CARRIED_REVIEW_LEDGER_ENV, DERIVED_REVISION_ENV, isDefoldRevision } from "./lib/reviewed-revision.mjs";
 import { auditReviewedEvidence } from "./lib/reviewed-evidence.mjs";
 
@@ -77,14 +78,32 @@ export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 export const derivationSteps = Object.freeze([
   Object.freeze({ runtime: "python3", script: "scripts/import-defold-sdk.py" }),
   Object.freeze({ runtime: "python3", script: "scripts/import-defold-script-api.py" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-script-sdk.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-sdk-semantics.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-lua-registration-surface.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-defold-resource-schema.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-resource-namespace-classification.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-defold-bundle-targets.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-sdk.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-symbol-evidence.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-runtime.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-script-runtime.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/ensure-binding-lowering-plan.mjs", args: ["--force"] }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-typed-native-bridge.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-script-recording-engine.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs", args: ["--prune"] }),
   Object.freeze({ runtime: "node", script: "scripts/generate-api-policy.mjs", args: ["--check"] })
+]);
+
+/**
+ * Revision-keyed inputs that are not part of the sparse source checkout.
+ *
+ * `track-defold-channels pin` rewrites these URLs and digests before this list
+ * runs. Keep the download in the scratch workspace: the dmSDK importer must
+ * resolve generated DDF and third-party headers from the exact SDK archive for
+ * the revision being derived, never from the repository's pinned revision.
+ */
+export const revisionSupportSteps = Object.freeze([
+  Object.freeze({ runtime: "bash", script: "scripts/bootstrap-upstreams.sh", args: ["defold-sdk"] })
 ]);
 
 /**
@@ -100,6 +119,7 @@ export const enginePaths = Object.freeze([
   "engine",
   "build_tools/sdk.py",
   "share/extender/build_input.yml",
+  "share/extender/variants",
   "com.dynamo.cr/com.dynamo.cr.bob/src",
   "editor/test/resources/test_project/app_manifest",
   "packages"
@@ -114,6 +134,7 @@ export const enginePaths = Object.freeze([
  */
 export const derivedSurfaceRoots = Object.freeze([
   "upstream.lock",
+  "packages/toolchains",
   "packages/bindings/generated",
   "packages/sdk/src/generated",
   "packages/static-hermes/src/generated",
@@ -144,6 +165,7 @@ const generatedDocumentation = Object.freeze([
 export function ownedArtifactPaths() {
   return new Set([
     "upstream.lock",
+    ...generatedBundleTargetArtifacts,
     ...generatedDocumentation,
     ...generatedScriptArtifacts,
     ...generatedDmSdkArtifacts,
@@ -429,6 +451,11 @@ export async function deriveRevision(options) {
   if (upstreamFrom) await reuseEngineSlice({ workspace, revision, from: upstreamFrom });
   else await fetchEngineSlice({ workspace, revision });
   await reuseParseSysroot({ workspace, sourceRoot });
+  for (const step of revisionSupportSteps) {
+    const label = `${step.script} ${step.args.join(" ")}`;
+    onProgress(label);
+    await run(step.runtime, [step.script, ...step.args], { cwd: workspace });
+  }
 
   // Before running anything: does every reviewed input still speak for this
   // revision's sources? Each generator checks its own and stops at the first

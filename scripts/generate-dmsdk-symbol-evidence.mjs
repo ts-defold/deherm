@@ -348,11 +348,23 @@ export async function buildSymbolEvidence(options = {}) {
 
   const members = await archiveMembers(archive);
   const plans = [];
+  const unavailableTargets = [];
   for (const target of targets) {
     const platformContexts = contextChain(platforms, target);
     const directories = archiveDirectories(platformContexts);
-    assert(directories.length > 0,
-      `${target.target}: ${sdkMembers.buildConfig} declares no {{dynamo_home}} library path`);
+    if (directories.length === 0) {
+      // A historical Platform/build_input entry can survive after the
+      // published SDK stops carrying a link plan for it (x86-win32 in 1.13.1
+      // is one concrete example). That is revision evidence, not a reason to
+      // make every other target underivable. Keep it explicit in the report
+      // and exclude it from all-target availability denominators: there is no
+      // engine archive Defold could link for this target at this revision.
+      unavailableTargets.push({
+        target: target.target,
+        reason: `${sdkMembers.buildConfig} declares no {{dynamo_home}} library path`
+      });
+      continue;
+    }
     const byVariant = {};
     for (const variant of variants) {
       const variantContexts = contextChain(variantPlatforms[variant], target);
@@ -376,6 +388,7 @@ export async function buildSymbolEvidence(options = {}) {
     }
     plans.push({ target, directories, byVariant });
   }
+  assert(plans.length > 0, "the published SDK declares no measurable bundle target link plans");
 
   const wanted = new Set(plans.flatMap(({ byVariant }) => Object.values(byVariant).flatMap(({ archives }) => archives)));
   const work = await mkdtemp(path.join(tmpdir(), "deherm-sdk-"));
@@ -519,6 +532,7 @@ export async function buildSymbolEvidence(options = {}) {
         [variant, { member: sdkMembers.variantManifest(variant), sha256: sha256(variantTexts[variant]) }]))
     },
     variants,
+    ...(unavailableTargets.length > 0 ? { unavailableTargets } : {}),
     targets: plans.map(({ target, directories, byVariant }) => ({
       target: target.target,
       group: target.group,

@@ -2,7 +2,8 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { expectReviewedCount } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
+import { declaredDerivation, expectReviewedCount } from "./lib/reviewed-revision.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
@@ -71,16 +72,16 @@ const MODULES = Object.freeze({
   },
 });
 
-const PINNED_SDK_ROOT = "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk";
-
-const BLOCKED_SYMBOLS = Object.freeze({
+function blockedSymbolsForRevision(defoldRevision) {
+  const sdkRoot = `upstream/extender/server/app/sdk/${defoldRevision}/defoldsdk`;
+  return Object.freeze({
   "dmGraphics::Finalize": {
     blocker: "Process-global graphics teardown is owned by the Defold engine lifecycle.",
     category: "engine-lifecycle",
     policy: "lifecycle-capability-required",
     auditEvidence: [
-      [`${PINNED_SDK_ROOT}/sdk/include/dmsdk/graphics/graphics.h`, "void Finalize();"],
-      [`${PINNED_SDK_ROOT}/include/graphics/graphics_ddf.h`, "namespace dmGraphics"],
+      [`${sdkRoot}/sdk/include/dmsdk/graphics/graphics.h`, "void Finalize();"],
+      [`${sdkRoot}/include/graphics/graphics_ddf.h`, "namespace dmGraphics"],
       ["upstream/defold/engine/graphics/src/graphics.cpp", "void Finalize()"],
     ],
   },
@@ -104,7 +105,8 @@ const BLOCKED_SYMBOLS = Object.freeze({
     category: "engine-lifecycle",
     policy: "lifecycle-capability-required",
   },
-});
+  });
+}
 
 const DEFINITION_SPECS = Object.freeze({
   "dmGraphics::Finalize": [
@@ -214,7 +216,7 @@ function moduleForHeader(header) {
 function lineContaining(content, needle) {
   const lines = content.split(/\r?\n/);
   const index = lines.findIndex((line) => line.includes(needle));
-  if (index < 0) throw new Error(`Expected source evidence not found: ${needle}`);
+  if (index < 0) return null;
   return { line: index + 1, text: lines[index].trim() };
 }
 
@@ -235,10 +237,35 @@ function declarationEvidence(content, declaration) {
   return candidate;
 }
 
-async function sourceEvidence(relativePath, needle) {
-  const content = await readFile(resolve(repositoryRoot, relativePath), "utf8");
-  const match = lineContaining(content, needle);
-  return { path: relativePath, ...match, sha256: sha256(content) };
+export function resolveScalarSourceEvidence({ content, relativePath, needle, owner, env = process.env }) {
+  const match = content === null ? null : lineContaining(content, needle);
+  if (match) return { path: relativePath, ...match, sha256: sha256(content) };
+
+  const derived = declaredDerivation(env);
+  if (!derived) {
+    throw new Error(content === null
+      ? `Expected source evidence file not found: ${relativePath}`
+      : `Expected source evidence not found: ${needle}`);
+  }
+  const reason = content === null ? "absent-source" : "source-anchor-moved";
+  recordAudit({
+    input: "scripts/generate-dmsdk-scalar-thunks.mjs",
+    id: `${owner}:${relativePath}:${needle}`,
+    source: relativePath,
+    status: VOID,
+    reason,
+    derived,
+    anchorsLost: [needle]
+  }, env);
+  return { path: relativePath, status: "withdrawn", reason, anchor: needle };
+}
+
+async function sourceEvidence(relativePath, needle, owner, env = process.env) {
+  const content = await readFile(resolve(repositoryRoot, relativePath), "utf8").catch((error) => {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  });
+  return resolveScalarSourceEvidence({ content, relativePath, needle, owner, env });
 }
 
 function abiDeclaration(declaration, name) {
@@ -399,6 +426,7 @@ async function writeOrCheck(outRoot, relativePath, content, check) {
 
 export async function build() {
   const ir = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
+  const blockedSymbols = blockedSymbolsForRevision(ir.defoldRevision);
   const patterns = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json"), "utf8"));
   const scalarIds = new Set(patterns.bindings.filter(({ primaryFamily }) => primaryFamily === "scalar-direct").map(({ id }) => id));
   const declarations = ir.declarations
@@ -424,14 +452,14 @@ export async function build() {
     };
     const definitions = [];
     for (const [path, needle] of DEFINITION_SPECS[declaration.name] ?? []) {
-      definitions.push(await sourceEvidence(path, needle));
+      definitions.push(await sourceEvidence(path, needle, declaration.id));
     }
 
-    const policyBlock = BLOCKED_SYMBOLS[declaration.name];
+    const policyBlock = blockedSymbols[declaration.name];
     if (policyBlock) {
       const auditEvidence = [];
       for (const [path, needle] of policyBlock.auditEvidence ?? []) {
-        auditEvidence.push(await sourceEvidence(path, needle));
+        auditEvidence.push(await sourceEvidence(path, needle, declaration.id));
       }
       reportEntries.push({
         id: declaration.id,

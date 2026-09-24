@@ -7,6 +7,7 @@ import {
   dmSdkPinnedInputs,
   generatedDmSdkArtifacts
 } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
+import { assertDeclaredYamlDependency } from "../scripts/check-dmsdk-clean-room-regeneration.mjs";
 import { runDmSdkGeneration } from "../scripts/generate-dmsdk-runtime.mjs";
 
 function assertUnique(values, label) {
@@ -34,6 +35,7 @@ test("dmSDK generator pipeline has one deterministic ownership registry", () => 
     assertConfined(values, label);
   }
   assert.deepEqual(stepScripts, [
+    "scripts/generate-dmsdk-target-conditionals.mjs",
     "scripts/classify-dmsdk-bindings.mjs",
     "scripts/generate-dmsdk-scalar-thunks.mjs",
     "scripts/generate-dmsdk-abi-shapes.mjs",
@@ -61,6 +63,23 @@ test("dmSDK generator pipeline has one deterministic ownership registry", () => 
     assert.equal(dmSdkGeneratorSources.includes(artifact), false, `artifact is also a generator source: ${artifact}`);
     assert.equal(dmSdkPinnedInputs.includes(artifact), false, `artifact is also a pinned input: ${artifact}`);
   }
+});
+
+test("the dmSDK clean room accepts only the exact lockfile-declared YAML parser", () => {
+  const valid = {
+    rootPackage: { dependencies: { yaml: "2.8.3" } },
+    lockfile: "lockfileVersion: '9.0'\n\npackages:\n\nsnapshots:\n\n  yaml@2.8.3:\n",
+    installedPackage: { name: "yaml", version: "2.8.3" }
+  };
+  assert.equal(assertDeclaredYamlDependency(valid), "2.8.3");
+  assert.throws(() => assertDeclaredYamlDependency({
+    ...valid,
+    installedPackage: { name: "yaml", version: "2.8.2" }
+  }), /does not match package\.json/u);
+  assert.throws(() => assertDeclaredYamlDependency({
+    ...valid,
+    lockfile: "lockfileVersion: '9.0'\n"
+  }), /does not pin yaml@2\.8\.3/u);
 });
 
 test("dmSDK runtime orchestrator consumes the registry in check mode", async () => {

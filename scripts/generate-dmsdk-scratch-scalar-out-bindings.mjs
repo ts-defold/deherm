@@ -109,6 +109,15 @@ function cDirection(direction) {
   return `DEHERM_DMSDK_SCRATCH_${direction.toUpperCase()}`;
 }
 
+function universalFallback(blockers) {
+  return {
+    state: "universal-fallback",
+    family: "universal-recipe",
+    blockers: [...blockers].sort(),
+    preserved: true
+  };
+}
+
 function tsType(value) {
   if (value.kind === "handle") return `ScratchBorrowedHandle<${JSON.stringify(value.handleName)}>`;
   if (value.kind === "bool") return "boolean";
@@ -139,6 +148,26 @@ function nativeType(shapeParameter, projectedParameter) {
   if (shapeParameter.role.startsWith("handle:")) return handleName(shapeParameter.role);
   if (shapeParameter.role.startsWith("enum:") && shapeParameter.direction === "value") return shapeParameter.role.slice("enum:".length);
   return projectedParameter.nativeType;
+}
+
+function specializationBlockers(shape, projected, declaration, policy) {
+  const blockers = [];
+  if (!projected) blockers.push("source-projection-missing");
+  if (!declaration) blockers.push("source-declaration-missing");
+  if (!projected?.signature || !Array.isArray(projected.signature.parameters) ||
+      projected.signature.parameters.length !== shape.parameters.length) {
+    blockers.push("source-signature-parameter-shape-unrecognized");
+  }
+  const structural = structuralBlockers(shape, policy);
+  blockers.push(...structural);
+  if (!cKind(roleKind(shape.result.role))) blockers.push(`result-kind-unsupported:${shape.result.role}`);
+  for (const parameter of shape.parameters) {
+    if (!cKind(roleKind(parameter.role))) blockers.push(`parameter-kind-unsupported:${parameter.position}:${parameter.role}`);
+    if (parameter.role.startsWith("handle:") && !handleName(parameter.role)) {
+      blockers.push(`parameter-handle-kind-unsupported:${parameter.position}:${parameter.role}`);
+    }
+  }
+  return [...new Set(blockers)].sort();
 }
 
 function renderHeader(entries, handleKinds, maxParameters) {
@@ -237,10 +266,10 @@ export async function build(overrides = {}) {
   for (const shape of candidates) {
     const projected = projectionById.get(shape.id);
     const declaration = declarationById.get(shape.id);
-    if (!projected || !declaration) throw new Error(`scratch scalar-out candidate absent from source IR: ${shape.id}`);
-    const blockers = structuralBlockers(shape, policy);
+    const blockers = specializationBlockers(shape, projected, declaration, policy);
     if (blockers.length) {
-      rows.push({ id: shape.id, projectionId: projected.projectionId, symbol: shape.symbol, disposition: "blocked", blockers: [...new Set([...blockers, ...semanticBlockers(projected)])].sort(), shape: shape.shape });
+      const allBlockers = [...new Set([...blockers, ...(projected ? semanticBlockers(projected) : [])])].sort();
+      rows.push({ id: shape.id, projectionId: projected?.projectionId ?? null, symbol: shape.symbol, disposition: "blocked", blockers: allBlockers, universalFallback: universalFallback(allBlockers), shape: shape.shape });
       continue;
     }
     const parameters = shape.parameters.map((parameter, index) => ({ position: index, name: projected.signature.parameters[index].name || `argument${index}`, kind: roleKind(parameter.role), handleName: handleName(parameter.role), nativeRole: parameter.role, direction: parameter.direction }));
@@ -248,21 +277,20 @@ export async function build(overrides = {}) {
     entries.push(entry);
     rows.push({ id: shape.id, projectionId: projected.projectionId, symbol: shape.symbol, disposition: "generated-provider-boundary", bindingId: entry.id, shape: shape.shape, resolvedPolicies: policy.storageContract, engineProviderBlockers: ["call-thread-affinity-unresolved", "enum-domain-to-native-success-policy-unresolved", "handle-provenance-lifetime-unresolved", "native-symbol-linkage-unverified", "target-feature-symbol-matrix-unverified"], stages: { generated: "all-five-target-projections", compiled: "pinned-header-and-adapter-object-tests", linked: "fake-provider-host-bridge-only", runtime: "fake-provider-sanitized-reentrancy-and-warmed", engine: "not-claimed-provider-absent" } });
   }
-  const expected = policy.expectedCoverage;
-  if (candidates.length !== expected.candidates || entries.length !== expected.generated || rows.length - entries.length !== expected.blocked) throw new Error(`scratch scalar-out census changed: ${candidates.length}/${entries.length}/${rows.length - entries.length}`);
   const handleNames = [...new Set(entries.flatMap(({ parameters }) => parameters.map(({ handleName: name }) => name).filter(Boolean)))].sort();
   const handleKinds = new Map(handleNames.map((name, id) => [name, { id, name, representation: candidates.find((row) => row.parameters.some(({ role }) => handleName(role) === name)).parameters.find(({ role }) => handleName(role) === name).role.split(":").at(-1) }]));
-  const maxParameters = Math.max(...entries.map(({ parameters }) => parameters.length));
-  const maxOutputs = Math.max(...entries.map(({ parameters }) => parameters.filter(({ direction }) => direction === "out" || direction === "inout").length));
-  if (handleKinds.size !== expected.handleKinds || maxParameters !== expected.maxParameters || maxOutputs !== expected.maxOutputs) throw new Error("scratch scalar-out storage census changed");
+  const maxParameters = Math.max(0, ...entries.map(({ parameters }) => parameters.length));
+  const maxOutputs = Math.max(0, ...entries.map(({ parameters }) => parameters.filter(({ direction }) => direction === "out" || direction === "inout").length));
+  const observedCoverage = { candidates: candidates.length, generated: entries.length, blocked: rows.length - entries.length };
+  const storageMaxParameters = Math.max(1, maxParameters);
   const names = makeFunctionNames(entries);
   if (new Set(names).size !== names.length) throw new Error("scratch scalar-out TypeScript names collide");
   const generated = new Map();
-  generated.set(artifacts.header, renderHeader(entries, handleKinds, maxParameters));
-  generated.set(artifacts.runtime, renderRuntime(entries, handleKinds, maxParameters));
+  generated.set(artifacts.header, renderHeader(entries, handleKinds, storageMaxParameters));
+  generated.set(artifacts.runtime, renderRuntime(entries, handleKinds, storageMaxParameters));
   generated.set(artifacts.jsiHeader, renderJsiHeader());
-  generated.set(artifacts.jsi, renderJsi(maxParameters));
-  generated.set(artifacts.browser, renderBrowser(entries, handleKinds, maxParameters));
+  generated.set(artifacts.jsi, renderJsi(storageMaxParameters));
+  generated.set(artifacts.browser, renderBrowser(entries, handleKinds, storageMaxParameters));
   generated.set(artifacts.typescript, renderTypeScript(entries, names));
   generated.set(artifacts.staticHermes, renderStaticHermes());
   generated.set(artifacts.headerAudit, renderHeaderAudit(entries));
@@ -273,8 +301,9 @@ export async function build(overrides = {}) {
     sourceHashes: Object.fromEntries(Object.entries(contents).map(([key, content]) => [key, sha256(content)])),
     selector: "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
     policy: { ...policy.storageContract, ...policy.targetPolicy, evidenceBoundary: "generated and fake-provider tested; no dmSDK symbol link, real provider, or packaged-engine proof" },
+    universalFallback: { preserved: true, catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json", mutation: "none" },
     abi: { slotBytes: 8, maxParameters, maxOutputs, handleKindCount: handleKinds.size, parameterStorage: "caller-owned contiguous uint64_t slots", resultStorage: "caller-owned uint64_t slot" },
-    coverage: { candidates: candidates.length, generated: entries.length, blocked: rows.length - entries.length, cAbiGenerated: entries.length, dynamicHermesJsiGenerated: entries.length, staticHermesGenerated: entries.length, browserDirectMemoryGenerated: entries.length, typescriptGenerated: entries.length, pinnedHeaderSignatureCompiled: entries.length, fakeProviderHostRuntimeTested: entries.length, packagedEngineRuntimeVerified: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 },
+    coverage: { ...observedCoverage, cAbiGenerated: entries.length, dynamicHermesJsiGenerated: entries.length, staticHermesGenerated: entries.length, browserDirectMemoryGenerated: entries.length, typescriptGenerated: entries.length, pinnedHeaderSignatureCompiled: entries.length, fakeProviderHostRuntimeTested: entries.length, packagedEngineRuntimeVerified: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 },
     handleKinds: [...handleKinds.values()],
     artifactHashes: Object.fromEntries([...generated].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])),
     artifacts: [...generated.keys()].sort(),

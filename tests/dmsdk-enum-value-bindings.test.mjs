@@ -6,6 +6,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { semanticDeclarationId } from "../scripts/generate-dmsdk-enum-value-bindings.mjs";
+
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json");
 const sdkRoot = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
@@ -24,6 +26,12 @@ function includeArgs() {
     "-DDLIB_LOG_DOMAIN=\"deherm\"",
   ];
 }
+
+test("enum-value policy identity ignores revision-specific source positions", () => {
+  const current = "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99";
+  const moved = "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:97";
+  assert.equal(semanticDeclarationId(current), semanticDeclarationId(moved));
+});
 
 test("enum-value generator is byte deterministic", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-enum-value-"));

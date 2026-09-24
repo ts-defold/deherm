@@ -4461,7 +4461,8 @@
         "bullet-only"
       ],
       "equivalentProfileMask": 1,
-      "detectionCanonicalProfileId": "bullet-only"
+      "detectionCanonicalProfileId": "bullet-only",
+      "detectionCanonicalProfileIndex": 0
     },
     {
       "index": 1,
@@ -4480,7 +4481,8 @@
         "default-legacy-bullet"
       ],
       "equivalentProfileMask": 2,
-      "detectionCanonicalProfileId": "default-legacy-bullet"
+      "detectionCanonicalProfileId": "default-legacy-bullet",
+      "detectionCanonicalProfileIndex": 1
     },
     {
       "index": 2,
@@ -4499,7 +4501,8 @@
         "legacy-no-bullet"
       ],
       "equivalentProfileMask": 4,
-      "detectionCanonicalProfileId": "legacy-no-bullet"
+      "detectionCanonicalProfileId": "legacy-no-bullet",
+      "detectionCanonicalProfileIndex": 2
     },
     {
       "index": 3,
@@ -4518,7 +4521,8 @@
         "no-physics"
       ],
       "equivalentProfileMask": 8,
-      "detectionCanonicalProfileId": "no-physics"
+      "detectionCanonicalProfileId": "no-physics",
+      "detectionCanonicalProfileIndex": 3
     },
     {
       "index": 4,
@@ -4537,7 +4541,8 @@
         "v3-bullet"
       ],
       "equivalentProfileMask": 16,
-      "detectionCanonicalProfileId": "v3-bullet"
+      "detectionCanonicalProfileId": "v3-bullet",
+      "detectionCanonicalProfileIndex": 4
     },
     {
       "index": 5,
@@ -4556,7 +4561,8 @@
         "v3-no-bullet"
       ],
       "equivalentProfileMask": 32,
-      "detectionCanonicalProfileId": "v3-no-bullet"
+      "detectionCanonicalProfileId": "v3-no-bullet",
+      "detectionCanonicalProfileIndex": 5
     }
   ],
   "runtimeProfileEquivalence": [],

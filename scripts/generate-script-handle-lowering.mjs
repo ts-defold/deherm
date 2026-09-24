@@ -55,13 +55,13 @@ function sha256(value) {
 export function assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds) {
   const bySurface = new Map();
   for (const profile of runtimeProfiles) {
-    const group = bySurface.get(profile.adapterSurfaceSha256) ?? [];
+    const group = bySurface.get(profile.registrationSurfaceSha256) ?? [];
     group.push(profile);
-    bySurface.set(profile.adapterSurfaceSha256, group);
+    bySurface.set(profile.registrationSurfaceSha256, group);
   }
   const groups = [...bySurface.entries()]
-    .map(([adapterSurfaceSha256, profiles]) => ({
-      adapterSurfaceSha256,
+    .map(([registrationSurfaceSha256, profiles]) => ({
+      registrationSurfaceSha256,
       profiles: profiles.sort((left, right) => compareCodeUnits(left.id, right.id))
     }))
     .sort((left, right) => compareCodeUnits(left.profiles[0].id, right.profiles[0].id));
@@ -74,6 +74,7 @@ export function assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds) {
       profile.equivalentProfileIds = equivalentProfileIds;
       profile.equivalentProfileMask = equivalentProfileMask;
       profile.detectionCanonicalProfileId = canonicalProfileId;
+      profile.detectionCanonicalProfileIndex = group.profiles[0].index;
     }
     if (group.profiles.length === 1) continue;
     const conservativelyUnavailableHandleKinds = [];
@@ -85,12 +86,12 @@ export function assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds) {
       conservativelyUnavailableHandleKinds.push(kind.id);
     }
     collapsed.push({
-      adapterSurfaceSha256: group.adapterSurfaceSha256,
+      registrationSurfaceSha256: group.registrationSurfaceSha256,
       canonicalProfileId,
       equivalentProfileIds,
       equivalentProfileMask,
       conservativelyUnavailableHandleKinds: conservativelyUnavailableHandleKinds.sort(compareCodeUnits),
-      proof: "identical-generated-router-availability-vector",
+      proof: "identical-exact-function-presence-vector",
       alert: "named-runtime-profiles-observationally-equivalent"
     });
   }
@@ -335,6 +336,8 @@ struct Route {
 struct RuntimeProfile {
   uint8_t index;
   uint8_t mask;
+  uint8_t detectionCanonicalProfileIndex;
+  uint8_t equivalentProfileMask;
   uint32_t capabilityBits;
   uint32_t sourceRouteCount;
   uint16_t adapterExecutableRouteCount;
@@ -503,7 +506,7 @@ function renderSource(report) {
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
   const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.registrationMask}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
   const runtimeProfiles = report.runtimeProfiles.map((profile) =>
-    `  {${profile.index}, ${profile.mask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`).join("\n");
+    `  {${profile.index}, ${profile.mask}, ${profile.detectionCanonicalProfileIndex}, ${profile.equivalentProfileMask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`).join("\n");
   const stableOrder = [...report.routes].sort((left, right) => left.stableId - right.stableId).map(({ index }) => index);
   const profileShapes = report.routes.map((route) => `  ${route.contractShapeIndex},`).join("\n");
   const profileNames = report.routes.map((route) =>
@@ -645,8 +648,16 @@ int protectedDetectRuntimeProfile(lua_State* state) {
     output.profile = match;
     output.status = RuntimeProfileDetectionStatus::kMatched;
   } else if (matches > 1) {
-    output.profile = nullptr;
-    output.status = RuntimeProfileDetectionStatus::kAmbiguous;
+    const uint8_t canonical = match->detectionCanonicalProfileIndex;
+    bool equivalent = true;
+    for (uint8_t index = 0; index < kRuntimeProfileCount; ++index) {
+      if (output.mismatches[index] == 0 && kRuntimeProfiles[index].detectionCanonicalProfileIndex != canonical) {
+        equivalent = false;
+        break;
+      }
+    }
+    output.profile = equivalent ? &kRuntimeProfiles[canonical] : nullptr;
+    output.status = equivalent ? RuntimeProfileDetectionStatus::kMatched : RuntimeProfileDetectionStatus::kAmbiguous;
   } else {
     output.status = RuntimeProfileDetectionStatus::kNoMatch;
   }
@@ -1327,16 +1338,6 @@ export function generateScriptHandleLowering(textInputs) {
       .join("");
     profile.registrationSurfaceSha256 = sha256(registrationSurface);
   }
-  const registrationSurfaceOwners = new Map();
-  for (const profile of runtimeProfiles) {
-    const owner = registrationSurfaceOwners.get(profile.registrationSurfaceSha256);
-    if (owner) {
-      throw new Error(
-        `runtime profiles ${owner} and ${profile.id} have indistinguishable Lua registration surfaces`
-      );
-    }
-    registrationSurfaceOwners.set(profile.registrationSurfaceSha256, profile.id);
-  }
   const runtimeProfileEquivalence = assignRuntimeProfileEquivalence(runtimeProfiles, handleKinds);
   const executableSymbols = routes
     .filter((route) => route.generation.router === "emitted")
@@ -1459,7 +1460,7 @@ export async function run(argv = process.argv.slice(2), root = repositoryRoot) {
   }
   process.stdout.write(`${check ? "Verified" : "Generated"} ${report.coverage.descriptorRowsEmitted} handle descriptors: ${report.coverage.adapterExecutableRoutes} adapter-executable/harness-covered, ${report.coverage.blocked} blocked; JSI/engine/Static/browser runtime evidence remains unverified.\n`);
   if (report.runtimeProfileEquivalence.length > 0) {
-    process.stderr.write(`warning: ${report.runtimeProfileEquivalence.length} runtime profile equivalence class(es) share an identical generated Lua availability vector; deterministic conservative representatives emitted: ${report.runtimeProfileEquivalence.map(({ equivalentProfileIds }) => equivalentProfileIds.join("=")).join(", ")}\n`);
+    process.stderr.write(`warning: ${report.runtimeProfileEquivalence.length} runtime profile equivalence class(es) share an identical exact-function-presence vector; deterministic conservative representatives emitted: ${report.runtimeProfileEquivalence.map(({ equivalentProfileIds }) => equivalentProfileIds.join("=")).join(", ")}\n`);
   }
   return report;
 }

@@ -2,7 +2,7 @@
 
 import { createHash } from "node:crypto";
 import { execFile } from "node:child_process";
-import { copyFile, lstat, mkdir, mkdtemp, readFile, readdir, rm } from "node:fs/promises";
+import { copyFile, cp, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -64,11 +64,55 @@ async function copyRelative(sourceRoot, targetRoot, relativePath) {
   await copyFile(path.join(sourceRoot, safe), target);
 }
 
+export function assertDeclaredYamlDependency({ rootPackage, lockfile, installedPackage }) {
+  const declared = rootPackage?.dependencies?.yaml;
+  assert(/^\d+\.\d+\.\d+$/u.test(declared ?? ""),
+    "the clean-room YAML parser must be declared at one exact package version");
+  assert(installedPackage?.name === "yaml" && installedPackage.version === declared,
+    `installed yaml ${installedPackage?.version ?? "missing"} does not match package.json ${declared}`);
+  const escaped = declared.replaceAll(".", "\\.");
+  assert(new RegExp(`^  yaml@${escaped}:$`, "mu").test(lockfile),
+    `pnpm-lock.yaml does not pin yaml@${declared}`);
+  return declared;
+}
+
+async function copyDeclaredGeneratorDependencies(sourceRoot, targetRoot) {
+  // The target-conditional and symbol-evidence generators parse Defold's own
+  // YAML manifests. An installed npm package has this declared dependency;
+  // the synthetic clean room must provision the same pinned package instead
+  // of accidentally succeeding only because a parent checkout has node_modules.
+  const yamlSource = await realpath(path.join(sourceRoot, "node_modules/yaml"));
+  const [rootPackage, lockfile, installedPackage] = await Promise.all([
+    readFile(path.join(sourceRoot, "package.json"), "utf8").then(JSON.parse),
+    readFile(path.join(sourceRoot, "pnpm-lock.yaml"), "utf8"),
+    readFile(path.join(yamlSource, "package.json"), "utf8").then(JSON.parse)
+  ]);
+  assertDeclaredYamlDependency({ rootPackage, lockfile, installedPackage });
+  await cp(yamlSource, path.join(targetRoot, "node_modules/yaml"), {
+    recursive: true,
+    dereference: true
+  });
+}
+
 async function evidencePaths(repositoryRoot, defoldRevision) {
   const ir = JSON.parse(await readFile(path.join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
+  const inventory = JSON.parse(await readFile(
+    path.join(repositoryRoot, "packages/bindings/generated/defold-sdk-inventory.json"),
+    "utf8"
+  ));
   assert(ir.defoldRevision === defoldRevision,
     `dmSDK IR revision ${ir.defoldRevision} does not match upstream.lock ${defoldRevision}`);
+  assert(inventory.defoldRevision === defoldRevision,
+    `dmSDK inventory revision ${inventory.defoldRevision} does not match upstream.lock ${defoldRevision}`);
   const result = new Set(scalarImplementationEvidence);
+  for (const header of await walk(repositoryRoot, "upstream/defold/engine")) {
+    if (header.split("/").includes("dmsdk") && /\.(?:h|hpp)$/u.test(header)) result.add(header);
+  }
+  for (const declaration of [...(inventory.declarations ?? []), ...(inventory.typeSupportDeclarations ?? [])]) {
+    if (declaration.header?.startsWith("upstream/defold/engine/")) {
+      result.add(confined(declaration.header, `${declaration.id ?? declaration.name}.header`));
+    }
+  }
   for (const declaration of ir.declarations) {
     if (declaration.disposition === "generated-raw-call") result.add(confined(declaration.header, `${declaration.id}.header`));
   }
@@ -133,7 +177,7 @@ async function walk(root, relative = "") {
 export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositoryRootDefault) {
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
-    if (/^defold-dmsdk-(?:binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(file)) {
+    if (/^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(file)) {
       result.add(`packages/bindings/generated/${file}`);
     }
   }
@@ -217,6 +261,50 @@ async function compareArtifacts(cleanRoot, repositoryRoot) {
   return hashes;
 }
 
+function censusIds(rows, key, label) {
+  assert(Array.isArray(rows), `${label} must be an array`);
+  const values = rows.map((row) => row?.[key]);
+  assert(values.every((id) => typeof id === "string" && id.length > 0), `${label} contains an invalid declaration id`);
+  assert(new Set(values).size === values.length, `${label} contains duplicate declaration ids`);
+  return new Set(values);
+}
+
+function equalCensus(left, right, label) {
+  assert(left.size === right.size && [...left].every((id) => right.has(id)), `${label} does not match the source declaration census`);
+}
+
+export function assertDmSdkSourceCensus({ patterns, shapes, projection, universal }) {
+  const patternIds = censusIds(patterns.bindings, "id", "dmSDK binding patterns");
+  const shapeIds = censusIds(shapes.rows, "id", "dmSDK ABI shapes");
+  const projectionIds = censusIds(projection.rows, "id", "dmSDK projection");
+  const universalIds = censusIds(universal.recipes, "declarationId", "dmSDK universal recipes");
+  const runtimePendingCount = patternIds.size;
+  assert(patterns.coverage?.runtimePendingCount === runtimePendingCount && patterns.coverage?.classifiedCount === runtimePendingCount,
+    "dmSDK classifier coverage metadata is stale against its source rows");
+  assert(shapes.coverage?.runtimePending === runtimePendingCount && shapes.coverage?.shaped === runtimePendingCount,
+    "ABI-shape census is stale against the classifier source rows");
+  assert(projection.coverage?.classifiedDeclarations === runtimePendingCount &&
+    projection.coverage?.projectedDeclarations === runtimePendingCount &&
+    projection.coverage?.mechanicallyProjected === runtimePendingCount &&
+    projection.coverage?.unprojectedDeclarations === 0 &&
+    projection.coverage?.projectionGaps === 0 &&
+    projection.coverage?.silentUnknowns === 0,
+  "dmSDK projection census is stale against the classifier source rows");
+  assert(universal.coverage?.declarations === runtimePendingCount &&
+    universal.coverage?.recipes === runtimePendingCount &&
+    universal.coverage?.cAbiDispatchable === runtimePendingCount &&
+    universal.coverage?.dynamicHermesMetadata === runtimePendingCount &&
+    universal.coverage?.staticHermesDeclarations === runtimePendingCount &&
+    universal.coverage?.browserDirectMemoryMetadata === runtimePendingCount &&
+    universal.coverage?.typescriptStableIds === runtimePendingCount &&
+    universal.coverage?.silentlyOmitted === 0,
+  "universal dmSDK coverage is stale against the classifier source rows");
+  equalCensus(shapeIds, patternIds, "ABI-shape declaration IDs");
+  equalCensus(projectionIds, patternIds, "projection declaration IDs");
+  equalCensus(universalIds, patternIds, "universal declaration IDs");
+  return runtimePendingCount;
+}
+
 async function validateReports(root) {
   const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
   const [patterns, scalar, shapes, enumValue, namedScalar, fixedDigest, base64Span, astcProbe, xteaSpan, hashSpan, hashState, arenaSpan, projection, borrowedHandle, scratchScalarOut, cstringValue, universal, readyExact, generatedExact] = await Promise.all([
@@ -240,54 +328,61 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-universal-ready-exact-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-generated-adapter-exact-plan.json")
   ]);
-  assert(patterns.coverage.runtimePendingCount === 1361 && patterns.coverage.classifiedCount === 1361,
-    "dmSDK classifier did not account for all 1,361 runtime-pending declarations");
-  assert(projection.coverage?.classifiedDeclarations === 1361 &&
-    projection.coverage?.projectedDeclarations === 1361 &&
-    projection.coverage?.unprojectedDeclarations === 0 &&
-    projection.coverage?.silentUnknowns === 0 &&
-    projection.coverage?.generatedAdapters === 45 &&
+  const runtimePendingCount = assertDmSdkSourceCensus({ patterns, shapes, projection, universal });
+  assert(projection.coverage?.generatedAdapters === 45 &&
     projection.coverage?.policyBlocked === 69 &&
-    projection.coverage?.mechanicallyProjected === 1361 &&
-      projection.coverage?.projectionGaps === 0 &&
+    projection.coverage?.projectionGaps === 0 &&
       projection.coverage?.loweringPending === 1247,
-  "dmSDK projection IR does not have a complete fail-closed 1,361-declaration projection");
+  "dmSDK projection IR does not retain its fail-closed policy partition");
   assert(scalar.coverage.reviewed === 31 && scalar.coverage.generated === 26 && scalar.coverage.blocked === 5,
     "scalar report does not have the pinned 26/31 disposition");
   // The exact SDK support headers preserve nested enums and platform-native
   // handle aliases that a missing-include Clang recovery had collapsed to int.
-  // That source correction makes eight formerly conflated signatures distinct
-  // while keeping the 1,361-declaration / 15-tranche partition unchanged. See
+  // See
   // `.agents/docs/decisions/target-directed-dmsdk-parse.md`.
-  assert(shapes.coverage.runtimePending === 1361 && shapes.coverage.shaped === 1361 &&
-    shapes.coverage.uniqueShapes === 888 && shapes.coverage.tranches === 15,
-  "ABI-shape report does not have the pinned 1,361/888/15 census");
-  assert(enumValue.coverage.discovered === 10 && enumValue.coverage.emitted === 7 &&
-    enumValue.coverage.blocked === 3 && enumValue.coverage.remainingWithoutGeneratedAdapters === 1328,
+  assert(shapes.coverage.uniqueShapes === new Set(shapes.rows.map(({ shape }) => shape)).size &&
+    shapes.coverage.tranches === new Set(shapes.rows.map(({ tranche }) => tranche)).size,
+  "ABI-shape report does not retain source-derived shape and tranche counts");
+  assert(enumValue.coverage.baselineRuntimePending === runtimePendingCount &&
+    enumValue.coverage.previouslyEmittedScalar === scalar.coverage.generated &&
+    enumValue.coverage.discovered === 10 && enumValue.coverage.emitted === 7 &&
+    enumValue.coverage.blocked === enumValue.coverage.discovered - enumValue.coverage.emitted &&
+    enumValue.coverage.remainingWithoutGeneratedAdapters === runtimePendingCount - scalar.coverage.generated - enumValue.coverage.emitted,
   "enum-value report does not have the pinned 7/10 disposition or 1,328 remainder");
   assert(namedScalar.coverage.reviewed === 21 && namedScalar.coverage.generated === 20 &&
     namedScalar.coverage.policyBlocked === 1 && namedScalar.coverage.exactCallCovered === 20,
   "named-scalar report does not have the pinned 20 generated / 1 symbol-blocked disposition");
-  assert(fixedDigest.coverage.discovered === 4 && fixedDigest.coverage.emitted === 4 &&
-    fixedDigest.coverage.policyBlocked === 0 && fixedDigest.coverage.remainingWithoutGeneratedAdapters === 1324,
+  assert(fixedDigest.coverage.baselineRuntimePending === runtimePendingCount &&
+    fixedDigest.coverage.discovered === 4 && fixedDigest.coverage.emitted === 4 &&
+    fixedDigest.coverage.policyBlocked === fixedDigest.coverage.discovered - fixedDigest.coverage.emitted &&
+    fixedDigest.coverage.remainingWithoutGeneratedAdapters === runtimePendingCount - scalar.coverage.generated - enumValue.coverage.emitted - fixedDigest.coverage.emitted,
   "fixed-digest report does not have the pinned 4/4 disposition or 1,324 remainder");
-  assert(base64Span.coverage.discovered === 2 && base64Span.coverage.emitted === 2 &&
-    base64Span.coverage.policyBlocked === 0 && base64Span.coverage.remainingWithoutGeneratedAdapters === 1322,
+  assert(base64Span.coverage.baselineRuntimePending === runtimePendingCount &&
+    base64Span.coverage.discovered === 2 && base64Span.coverage.emitted === 2 &&
+    base64Span.coverage.policyBlocked === base64Span.coverage.discovered - base64Span.coverage.emitted &&
+    base64Span.coverage.remainingWithoutGeneratedAdapters === fixedDigest.coverage.remainingWithoutGeneratedAdapters - base64Span.coverage.emitted,
   "base64-span report does not have the pinned 2/2 disposition or 1,322 remainder");
-  assert(astcProbe.coverage.discovered === 2 && astcProbe.coverage.emitted === 2 &&
-    astcProbe.coverage.policyBlocked === 0 && astcProbe.coverage.remainingWithoutGeneratedAdapters === 1320,
+  assert(astcProbe.coverage.baselineRuntimePending === runtimePendingCount &&
+    astcProbe.coverage.discovered === 2 && astcProbe.coverage.emitted === 2 &&
+    astcProbe.coverage.policyBlocked === astcProbe.coverage.discovered - astcProbe.coverage.emitted &&
+    astcProbe.coverage.remainingWithoutGeneratedAdapters === base64Span.coverage.remainingWithoutGeneratedAdapters - astcProbe.coverage.emitted,
   "ASTC-probe report does not have the pinned 2/2 disposition or 1,320 remainder");
-  assert(xteaSpan.coverage.discovered === 2 && xteaSpan.coverage.emitted === 2 &&
-    xteaSpan.coverage.policyBlocked === 0 && xteaSpan.coverage.remainingWithoutGeneratedAdapters === 1318,
+  assert(xteaSpan.coverage.baselineRuntimePending === runtimePendingCount &&
+    xteaSpan.coverage.discovered === 2 && xteaSpan.coverage.emitted === 2 &&
+    xteaSpan.coverage.policyBlocked === xteaSpan.coverage.discovered - xteaSpan.coverage.emitted &&
+    xteaSpan.coverage.remainingWithoutGeneratedAdapters === astcProbe.coverage.remainingWithoutGeneratedAdapters - xteaSpan.coverage.emitted,
   "XTEA-span report does not have the pinned 2/2 disposition or 1,318 remainder");
-  assert(hashSpan.coverage.discovered === 2 && hashSpan.coverage.emitted === 2 &&
-    hashSpan.coverage.policyBlocked === 0 && hashSpan.coverage.remainingWithoutGeneratedAdapters === 1316,
+  assert(hashSpan.coverage.baselineRuntimePending === runtimePendingCount &&
+    hashSpan.coverage.discovered === 2 && hashSpan.coverage.emitted === 2 &&
+    hashSpan.coverage.policyBlocked === hashSpan.coverage.discovered - hashSpan.coverage.emitted &&
+    hashSpan.coverage.remainingWithoutGeneratedAdapters === xteaSpan.coverage.remainingWithoutGeneratedAdapters - hashSpan.coverage.emitted,
   "hash-span report does not have the pinned 2/2 disposition or 1,316 remainder");
   assert(hashState.coverage.discovered === 10 && hashState.coverage.generated === 10 &&
     hashState.coverage.exactFixtureCount === 10,
   "hash-state report does not have the pinned 10/10 lifecycle disposition");
-  assert(generatedExact.generatedAdapterCount === 74 && generatedExact.specializationRequiredCount === 721,
-    "generated-adapter exact plan does not have the current 74/721 partition");
+  assert(generatedExact.generatedAdapterCount === 74 &&
+    generatedExact.specializationRequiredCount === runtimePendingCount - generatedExact.generatedAdapterCount - readyExact.universalReadyCount,
+  "generated-adapter exact plan does not have the current 74/721 partition");
   assert(arenaSpan.coverage.arenaSpanCensus === 79 && arenaSpan.coverage.coveredByPriorWaves === 14 &&
     arenaSpan.coverage.generatedCStringArena === 5 && arenaSpan.coverage.blocked === 60 &&
     arenaSpan.coverage.executableAdaptersEmitted === 5 && arenaSpan.coverage.exactCallTwinsEmitted === 5 &&
@@ -324,19 +419,14 @@ async function validateReports(root) {
     cstringValue.coverage.stubAbiLinkedAndRuntimeTested === 0 &&
     cstringValue.coverage.pinnedEngineLinked === 0 && cstringValue.coverage.allTargetConformant === 0,
   "C-string/value report does not preserve its pinned 14 generated + 6 blocked truth boundary");
-  assert(universal.coverage.declarations === 1361 && universal.coverage.recipes === 1361 &&
-    universal.coverage.cAbiDispatchable === 1361 && universal.coverage.dynamicHermesMetadata === 1361 &&
-    universal.coverage.staticHermesDeclarations === 1361 && universal.coverage.browserDirectMemoryMetadata === 1361 &&
-    universal.coverage.typescriptStableIds === 1361 && universal.coverage.silentlyOmitted === 0,
-  "universal dmSDK fallback does not cover every declaration and target");
-  assert(universal.coverage.universalReadyExactVectors === 566 &&
-    readyExact.universalReadyCount === 566 && readyExact.verification.vectorCount === 566 &&
-    readyExact.production.manifest.length === 566 &&
+  assert(universal.coverage.universalReadyExactVectors === readyExact.universalReadyCount &&
+    universal.coverage.universalReadyExactVectors === readyExact.verification.vectorCount &&
+    universal.coverage.universalReadyExactVectors === readyExact.production.manifest.length &&
     readyExact.catalogSha256 === universal.sourceHashes.catalog &&
     readyExact.verification.catalogSha256 === universal.sourceHashes.catalog &&
     /^[0-9a-f]{64}$/.test(readyExact.symbolIndexSha256) &&
     /^[0-9a-f]{64}$/.test(readyExact.corpusSha256),
-  "universal-ready exact corpus does not preserve its authenticated 566-vector plan");
+  "universal-ready exact corpus does not preserve its authenticated source-derived plan");
   const scalarIds = new Set(scalar.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const enumIds = new Set(enumValue.declarations.filter(({ emitted }) => emitted).map(({ id }) => id));
   const fixedDigestIds = new Set(fixedDigest.declarations.map(({ id }) => id));
@@ -500,11 +590,18 @@ export async function runDmSdkCleanRoomRegeneration(options = {}) {
   const lock = parseLock(await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"));
   const sources = await evidencePaths(repositoryRoot, lock.DEFOLD_REV);
   const groundTruth = await validateGroundTruth(repositoryRoot, sources);
-  const inputs = [...dmSdkGeneratorSources, ...dmSdkPinnedInputs, ...sources];
+  const inputs = [...new Set([
+    ...dmSdkGeneratorSources,
+    ...dmSdkPinnedInputs,
+    ...sources,
+    "package.json",
+    "pnpm-lock.yaml"
+  ])];
   const cleanRoot = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-clean-room-"));
   const keep = options.keep ?? process.env.DEHERM_KEEP_CLEAN_ROOM === "1";
   try {
     for (const relative of inputs) await copyRelative(repositoryRoot, cleanRoot, relative);
+    await copyDeclaredGeneratorDependencies(repositoryRoot, cleanRoot);
     for (const relative of generatedDmSdkArtifacts) await mkdir(path.dirname(path.join(cleanRoot, relative)), { recursive: true });
     for (const step of dmSdkGenerationSteps) {
       await execFileAsync(process.execPath, [step.script], { cwd: cleanRoot, maxBuffer: 16 * 1024 * 1024 });

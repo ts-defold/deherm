@@ -91,6 +91,8 @@ struct Route {
 struct RuntimeProfile {
   uint8_t index;
   uint8_t mask;
+  uint8_t detectionCanonicalProfileIndex;
+  uint8_t equivalentProfileMask;
   uint32_t capabilityBits;
   uint32_t sourceRouteCount;
   uint16_t adapterExecutableRouteCount;

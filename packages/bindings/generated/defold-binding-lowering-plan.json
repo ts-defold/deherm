@@ -24,23 +24,23 @@
     "scriptCopiedValueBlockers": "2ab08d7e8c3df184ac1b91940edea5b05b8ff2fc8422f57be595a49a82e7f266",
     "scriptOpaqueRecordBlockers": "e870f511d17dfb4a41e0fae3eadea03a8e06aa8d5efe297c7cfd77b681ef9471",
     "scriptUrlAddress": "72bcd1dc826e69824b4b2b06726ab38537635ad4c4f8661f537b96276d683c53",
-    "scriptHandleLowering": "8b7af8715fd9f3b9eeaa9a74f558d9f74b5aeda84f27650b2e9e0f5a0119cafc",
+    "scriptHandleLowering": "bb668d601fcfd80d88808b42b864bfd4b277630f552833d5d61f66100b7561d5",
     "scriptUniversalValue": "c53f52c74d4bb5d07d6614e1ccace2f3baf7246994df4ed49a38fec9a7c01185",
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "8dd0ca4fc4f2d85a08fc932b4f00044323e6aecaa937e427e1d8cececbca209c",
-    "dmsdkProjection": "bbe895d62582cc9f1955d619b5b879d75be7bf6b572c38d8553300e7edace0c0",
-    "dmsdkUniversal": "c2dd03c45f16898831792fec17459d0358d52fcbd394de0b2c65790cf3087aaa",
+    "dmsdkProjection": "159ebfcb0aafabfa5dca7a88c6ad894e4eb60ab58fe408c16b39b99216ff1c09",
+    "dmsdkUniversal": "0c44cb8eff9d4908b9e0dbe44011688abedf77b6bedef34cb69dd48b535cd529",
     "dmsdkScalarThunks": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
-    "dmsdkEnumValues": "253473866815dd348dd2956960eaf53375e3b2925df23d1ab6423eef17b68555",
+    "dmsdkEnumValues": "2cdec68fb7b117822795b5f8d0bff1f3f4f87b3ab990a49d3b78a491e36b0970",
     "dmsdkNamedScalars": "fd128d866f95e34448d49e5d53e7412ab15bd59f821306b48fddce2dcffb6794",
     "dmsdkFixedDigests": "9a3acb5dfecb7e83a9daf90f43d8d039fe2c21ef995a866e636f0d5ab5ede6c3",
     "dmsdkBase64Spans": "0778f581bf75bc92d2b6346fc5691ba84753b9af7cd342361258ac48a6d3e2cb",
     "dmsdkAstcProbes": "5bbfe57d1e1a9a45bbd157fac78b1b5ab4de8b9514fc7ab29d43b10395a2050d",
     "dmsdkXteaSpans": "bb0c7e48a305af725f13f791dd5134f87db6630e0bd4c3bcbfd9f5a83de26817",
     "dmsdkHashSpans": "d6579d8344996294ac0a75f404991dd543aff76f8c2ca686bad374ef939bf051",
-    "dmsdkArenaSpanBlockers": "5d7e4def887574e34fae8e9ed880a90ebf45ba6c05dfca97552b79ae10f3b845",
-    "dmsdkCStringValue": "e68a58450d6bbc6a242ef1acf6f96269e87a6e709a65d98de2b4ddfc91a41f07",
-    "dmsdkBorrowedHandle": "7459b5c12d36645320a3c8401b7bf02f326c584af86e9ff1bf8329f753510937",
+    "dmsdkArenaSpanBlockers": "6f93462a4e5218e7eb5e934d7d7ba1f3402ebb90c2b468822fb6cae56e356bfd",
+    "dmsdkCStringValue": "78e6bf8b77b95e0635a00ec95912641c2979ecda148aab2b1bbd4fc824b0e2ac",
+    "dmsdkBorrowedHandle": "56b17cccc5c361c7d84c5e75947d323e5364f96380373f14b58b31d152cc9b21",
     "semanticPolicies": "cf28bf3e4ff1eaba22661cbf01f0e74620013a25b920ff092f1297227aaf6ec2",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
     "dynamicHermesJsi": "32be0b54b6bda4396d9c3bacfffa05292de96977cca1e8b17266622906751ee3",
@@ -61,23 +61,23 @@
     "scriptCopiedValueBlockers": "45c591aeb30252d8133620c9f92d5da32970c08885b412dd262d009f24cb2420",
     "scriptOpaqueRecordBlockers": "543e7b8c3ff46305eb6e087b7c50f8306e681daabc07bdf94f5e78142e131ab8",
     "scriptUrlAddress": "0c30abae7994fb4f4ba13e53958732c2f5ec4814e3669afeabe379d6180f258f",
-    "scriptHandleLowering": "ebcb3cf573ad175161c343fbd48d7b6de40449bc6a88d30ad822f342344f6273",
+    "scriptHandleLowering": "072d3231cd6f83764f9f4a79343a2fb20468c66225290ec47fb2060422a0d562",
     "scriptUniversalValue": "12231b04fca1b6fddefa57212ddf921a3b85f812ef0d67f38030d7ce8be5dc6b",
     "scriptConstantLowering": "cf923dc81d26c2d45a21fe9b3691c65d69950adda5fbcb68bbae0331704f4154",
     "defoldValueLayouts": "e7dfbb78eec1c3fbd432080161989576915d554668f0d8b009fe420167325d29",
-    "dmsdkProjection": "368d19f9b9c1fe6cda37a3189ae6de92744c72d100bf5c036f230cb08db001e3",
-    "dmsdkUniversal": "42d2536fd5bf3fc9240fa3d0ef9d1cd357f03b2c2bac055939ac38398792cff6",
+    "dmsdkProjection": "f9468a2b4adcf4e9a3cd9766973bbab03dda471a1a1f7cff7011bc5f1653d542",
+    "dmsdkUniversal": "9a64d6a9f57c7230d14dd1bde5e3deb737ccf26929d47477e656e5a6ee738cf5",
     "dmsdkScalarThunks": "80dcddd4811260d4fede04879b1189cef8c4fdaed0f59128e08421a7f46f5d5d",
-    "dmsdkEnumValues": "50a427a641ddc85ab90df562985dd187dcdb7fd2de16f4cee2bb091ce902a469",
+    "dmsdkEnumValues": "93a8a2c8d53bb1e6dd935cddedd9daa52c9340fc70c9afacb491b5da5ad1886f",
     "dmsdkNamedScalars": "d4fd24c6f833b007af62d6390b0b1beda257c29bdd0f8b480c62c06cfdad1cca",
     "dmsdkFixedDigests": "699237c09b58d510e84a781ecc5ec213bac2c1dc534f4a7bd9c679824bea69ca",
     "dmsdkBase64Spans": "0a7812546dbc23db3adb28fceab27006eb376c62c63b4846942063992f1c3d61",
     "dmsdkAstcProbes": "bc7636f392811e2efafee578289f30fa06681902e0c033e80afc029a9139b4f1",
     "dmsdkXteaSpans": "97ea2754e2e3cba048ac24aae7f937a9815c2f9c53d2b5d42eb9425333969f83",
     "dmsdkHashSpans": "11ef7ba26dc076f717d097af1f3cd27f050f56299cd7016e40383b6a71abe7c3",
-    "dmsdkArenaSpanBlockers": "a158e7cff591debb523c20ac7886aa15997a0f57dea83257c070bfc2244eb1db",
-    "dmsdkCStringValue": "b8f9205e91831214b1fcec6d1d9081d0ba2cd4068208a17beb9cb09bd2047e9d",
-    "dmsdkBorrowedHandle": "ec671a20fc6b9ca6d7a552fb090cb19011e679f958951f18651b85612fdb2cd7",
+    "dmsdkArenaSpanBlockers": "2c6da6e4e4e4b804d5768c49ef773234b7ab3628d3b9c03a90e6bfc0369d192a",
+    "dmsdkCStringValue": "348a66e705d267356507f67d7a7ffcc8bad224429f9339a465e5b1b85cc3064b",
+    "dmsdkBorrowedHandle": "f7b3aa78059956b0f352f3059f33466ef17c33460410e4e7caf612bd72800404",
     "semanticPolicies": "47af97340ecb38ea3744ae2595d41d5b73a1d02986e26a5fa04bdf493b753ae5",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
     "dynamicHermesJsi": "2888cfa7afbc9caf7bfdc3de1771a5dd7639ff3b16a14dfe09adf44b604c7b1a",
@@ -29667,7 +29667,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -29950,7 +29956,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -34180,7 +34192,13 @@
             "result-role-unsupported:enum:FontResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -34835,7 +34853,13 @@
             "result-role-unsupported:enum:FontResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -35145,7 +35169,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -36795,7 +36825,13 @@
             "result-role-unsupported:enum:FontType",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -37913,7 +37949,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -42375,7 +42417,13 @@
             "result-role-unsupported:enum:JobSystemResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -42924,7 +42972,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -43071,7 +43125,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -43355,7 +43415,13 @@
             "result-role-unsupported:enum:JobSystemResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -43527,7 +43593,13 @@
             "result-role-unsupported:enum:JobSystemResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -45721,7 +45793,13 @@
             "result-role-unsupported:enum:ProfileResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -51192,7 +51270,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -51320,7 +51404,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -51860,7 +51950,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -52003,7 +52099,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -53430,7 +53532,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -55149,7 +55257,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -56194,7 +56308,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -56557,7 +56677,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -56701,7 +56827,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -57486,7 +57618,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -59541,7 +59679,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -59841,7 +59985,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -60110,7 +60260,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -60379,7 +60535,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -60511,7 +60673,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -61084,7 +61252,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -61353,7 +61527,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -62577,7 +62757,13 @@
             "parameter-role-unsupported:1:enum:WindowState",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -63173,7 +63359,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -67982,7 +68174,13 @@
             "result-role-unsupported:enum:dmBuffer::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -68705,7 +68903,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -70020,7 +70224,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -70859,7 +71069,13 @@
             "result-role-unsupported:enum:dmBuffer::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -71034,7 +71250,13 @@
             "result-role-unsupported:enum:dmBuffer::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -73786,7 +74008,13 @@
             "parameter-role-unsupported:1:enum:dmSocket::ShutdownType",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -82833,7 +83061,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -83388,7 +83622,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -88053,7 +88293,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -88818,13 +89064,20 @@
             "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmVMath::Point3",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -91584,13 +91837,20 @@
             "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmVMath::Quat",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -91714,13 +91974,20 @@
             "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmVMath::Vector3",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -92104,6 +92371,7 @@
             "shape": "unknown:dmVMath::Matrix4(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -92111,7 +92379,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -92239,13 +92513,20 @@
             "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmVMath::Point3",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -92369,13 +92650,20 @@
             "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmVMath::Quat",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -92499,13 +92787,20 @@
             "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmVMath::Vector3",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -95108,7 +95403,13 @@
             "parameter-role-unsupported:2:pointer:scalar:f32",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -95705,7 +96006,13 @@
             "parameter-role-unsupported:2:pointer:scalar:f32",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -95863,7 +96170,13 @@
             "parameter-role-unsupported:2:pointer:scalar:f32",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -97862,7 +98175,13 @@
             "result-role-unsupported:enum:dmGameObject::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -98104,7 +98423,13 @@
             "result-role-unsupported:enum:dmGameObject::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -98324,13 +98649,20 @@
             "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Point3)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "parameter-role-unsupported:1:unknown:dmVMath::Point3",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -98473,7 +98805,13 @@
             "result-role-unsupported:enum:dmGameObject::PropertyResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -98706,7 +99044,13 @@
             "result-role-unsupported:enum:dmGameObject::PropertyResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -98939,7 +99283,13 @@
             "result-role-unsupported:enum:dmGameObject::PropertyResult",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -99170,6 +99520,7 @@
             "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:unknown:dmVMath::Matrix4)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -99179,7 +99530,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -99419,6 +99776,7 @@
             "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Quat)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -99427,7 +99785,13 @@
             "semantic-token-unresolved:enum-width-domain-validation",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -100097,6 +100461,7 @@
             "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector3)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -100105,7 +100470,13 @@
             "semantic-token-unresolved:enum-width-domain-validation",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -100341,6 +100712,7 @@
             "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector4)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -100349,7 +100721,13 @@
             "semantic-token-unresolved:enum-width-domain-validation",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -100585,13 +100963,20 @@
             "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Quat)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "parameter-role-unsupported:1:unknown:dmVMath::Quat",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -100876,13 +101261,20 @@
             "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Vector3)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "parameter-role-unsupported:1:unknown:dmVMath::Vector3",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -101453,7 +101845,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -103213,7 +103611,13 @@
             "result-role-unsupported:enum:dmGameObject::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -103439,7 +103843,13 @@
             "result-role-unsupported:enum:dmGameObject::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -103665,7 +104075,13 @@
             "result-role-unsupported:enum:dmGameObject::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -103891,7 +104307,13 @@
             "result-role-unsupported:enum:dmGameObject::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -104657,7 +105079,13 @@
             "result-role-unsupported:enum:dmGameObject::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -105177,7 +105605,13 @@
             "result-role-unsupported:enum:dmGameSystem::CompFactoryStatus",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -108549,7 +108983,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -110499,7 +110939,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -111506,7 +111952,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -111925,7 +112377,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -112589,7 +113047,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -112858,7 +113322,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -113571,7 +114041,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -113724,7 +114200,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -113977,7 +114459,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -114417,7 +114905,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -115177,7 +115671,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -116450,7 +116950,13 @@
             "parameter-role-unsupported:3:enum:dmGraphics::Type",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -118265,7 +118771,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::State",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -118924,7 +119436,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::PrimitiveType",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -119117,7 +119635,13 @@
             "parameter-role-unsupported:4:enum:dmGraphics::Type",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -119608,7 +120132,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::State",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -126262,7 +126792,13 @@
             "result-role-unsupported:enum:dmGraphics::TextureType",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -128003,7 +128539,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::IndexBufferFormat",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -128156,7 +128698,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::TextureFormat",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -130554,7 +131102,13 @@
             "parameter-role-unsupported:2:enum:dmGraphics::BlendEquation",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -130760,7 +131314,13 @@
             "parameter-role-unsupported:2:enum:dmGraphics::BlendFactor",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -131048,7 +131608,13 @@
             "parameter-role-unsupported:4:enum:dmGraphics::BlendFactor",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -132047,7 +132613,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::FaceType",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -132203,7 +132775,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::CompareFunc",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -133579,7 +134157,13 @@
             "parameter-role-unsupported:1:enum:dmGraphics::CompareFunc",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -133780,7 +134364,13 @@
             "parameter-role-unsupported:2:enum:dmGraphics::CompareFunc",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -134163,7 +134753,13 @@
             "parameter-role-unsupported:3:enum:dmGraphics::StencilOp",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -134448,7 +135044,13 @@
             "parameter-role-unsupported:4:enum:dmGraphics::StencilOp",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -135110,7 +135712,13 @@
             "parameter-role-unsupported:6:enum:dmGraphics::TextureWrap",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -135476,7 +136084,13 @@
             "parameter-role-unsupported:5:enum:dmGraphics::TextureWrap",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -136776,13 +137390,20 @@
             "shape": "unknown:VkCommandBuffer(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkCommandBuffer",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -136926,13 +137547,20 @@
             "shape": "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkDevice",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -137076,13 +137704,20 @@
             "shape": "unknown:VkQueue(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkQueue",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -137231,7 +137866,13 @@
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -137348,13 +137989,20 @@
             "shape": "unknown:VkImage(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkImage",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -137511,13 +138159,20 @@
             "shape": "unknown:VkImageView(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkImageView",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -137674,13 +138329,20 @@
             "shape": "unknown:VkInstance(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkInstance",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -137824,13 +138486,20 @@
             "shape": "unknown:VkPhysicalDevice(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkPhysicalDevice",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -137974,13 +138643,20 @@
             "shape": "unknown:VkRenderPass(value:handle:dmGraphics::HContext:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "family-requires-target-matrix:platform-gated",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:VkRenderPass",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -138125,7 +138801,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -138254,7 +138936,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -138405,7 +139093,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:opaque-type-abi-contract",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -138663,7 +139357,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:opaque-type-abi-contract",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -138814,7 +139514,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:opaque-type-abi-contract",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -138965,7 +139671,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:opaque-type-abi-contract",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -139116,7 +139828,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:opaque-type-abi-contract",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -139267,7 +139985,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:opaque-type-abi-contract",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -139437,7 +140161,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:opaque-type-abi-contract",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -139606,7 +140336,13 @@
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -139727,7 +140463,13 @@
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -140221,7 +140963,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -141170,6 +141918,7 @@
             "shape": "unknown:dmVMath::Vector4(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -141178,7 +141927,13 @@
             "semantic-token-unresolved:enum-width-domain-validation",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -141561,7 +142316,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -141951,7 +142712,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -142332,7 +143099,13 @@
             "parameter-role-unsupported:2:enum:dmGui::AdjustMode",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -142510,7 +143283,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -143078,7 +143857,13 @@
             "result-role-unsupported:enum:dmGui::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -143295,6 +144080,7 @@
             "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property,in:unknown:dmVMath::Vector4)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -143304,7 +144090,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -143544,7 +144336,13 @@
             "result-role-unsupported:enum:dmGui::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -143753,7 +144551,13 @@
             "result-role-unsupported:enum:dmGui::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -144145,7 +144949,13 @@
             "parameter-role-unsupported:4:enum:dmHID::Phase",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -146395,7 +147205,13 @@
             "parameter-role-unsupported:1:enum:dmHID::Key",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -147055,7 +147871,13 @@
             "parameter-role-unsupported:1:enum:dmHID::MouseButton",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -153198,7 +154020,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -153463,7 +154291,13 @@
             "result-role-unsupported:enum:dmImage::Type",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -158800,7 +159634,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -159206,7 +160046,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -159557,7 +160403,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:receiver-provenance-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -159768,7 +160620,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:receiver-provenance-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -161391,7 +162249,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -161572,7 +162436,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -162800,13 +163670,20 @@
             "shape": "unknown:dmRenderDDF::MaterialDesc::ConstantType(value:handle:dmRender::HConstant:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmRenderDDF::MaterialDesc::ConstantType",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -163707,13 +164584,20 @@
             "shape": "unknown:dmRenderDDF::MaterialDesc::VertexSpace(value:handle:dmRender::HMaterial:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "result-role-unsupported:unknown:dmRenderDDF::MaterialDesc::VertexSpace",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -164345,6 +165229,7 @@
             "shape": "unknown:dmVMath::Matrix4(value:handle:dmRender::HRenderContext:opaque)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -164352,7 +165237,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -165124,7 +166015,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -165625,7 +166522,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -166253,13 +167156,20 @@
             "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
             "parameter-role-unsupported:1:unknown:dmRenderDDF::MaterialDesc::ConstantType",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -166479,7 +167389,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -166679,7 +167595,13 @@
             "parameter-role-unsupported:7:enum:dmGraphics::TextureFilter",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -167055,7 +167977,13 @@
             "parameter-role-unsupported:6:enum:dmGraphics::TextureFilter",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -167556,7 +168484,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -167727,6 +168661,7 @@
             "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -167737,7 +168672,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -168002,6 +168943,7 @@
             "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
           },
           "blockers": [
+            "borrowed-handle-specialization-unverified",
             "call-thread-affinity-unresolved",
             "handle-ownership-nullability-lifetime-unresolved",
             "native-symbol-linkage-unverified",
@@ -168013,7 +168955,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -168331,7 +169279,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -170885,7 +171839,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -171273,7 +172233,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -172088,7 +173054,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -172599,7 +173571,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -173024,7 +174002,13 @@
             "result-role-unsupported:opaque-pointer",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -173672,7 +174656,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -174468,7 +175458,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -176412,7 +177408,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -176555,7 +177557,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -176703,7 +177711,13 @@
             "semantic-token-unresolved:out-storage-initialization-failure",
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -177588,7 +178602,13 @@
             "result-role-unsupported:enum:dmResource::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -177813,7 +178833,13 @@
             "result-role-unsupported:enum:dmRig::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -179238,7 +180264,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -179942,7 +180974,13 @@
             "semantic-token-unresolved:record-layout-alignment-copy",
             "semantic-token-unresolved:template-specialization-set",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -180542,7 +181580,13 @@
             "result-role-unsupported:enum:dmRig::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -181017,7 +182061,13 @@
             "result-role-unsupported:enum:dmRig::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -181428,7 +182478,13 @@
             "result-role-unsupported:enum:dmRig::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -182424,7 +183480,13 @@
             "result-role-unsupported:enum:dmRig::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -182764,7 +183826,13 @@
             "result-role-unsupported:enum:dmRig::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -182929,7 +183997,13 @@
             "result-role-unsupported:enum:dmRig::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -184069,7 +185143,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -187010,7 +188090,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -188786,7 +189872,13 @@
             "semantic-token-unresolved:enum-width-domain-validation",
             "semantic-token-unresolved:receiver-provenance-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -188947,7 +190039,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:receiver-provenance-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -189097,7 +190195,13 @@
             "native-symbol-linkage-unverified",
             "semantic-token-unresolved:receiver-provenance-lifetime",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -196182,7 +197286,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -196355,7 +197465,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -196529,7 +197645,13 @@
             "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
             "semantic-token-unresolved:record-layout-alignment-copy",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -197112,7 +198234,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -197382,7 +198510,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -197652,7 +198786,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -197922,7 +199062,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -198192,7 +199338,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -198462,7 +199614,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -198732,7 +199890,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -199003,7 +200167,13 @@
             "result-role-unsupported:enum:dmSocket::Result",
             "semantic-token-unresolved:enum-width-domain-validation",
             "target-feature-symbol-matrix-unverified"
-          ]
+          ],
+          "evidenceClaims": {
+            "generated": "universal-fallback-retained",
+            "compiled": "not-applicable",
+            "linked": "not-applicable",
+            "runtime": "not-applicable"
+          }
         },
         {
           "lane": "dmsdk-universal",
@@ -515763,5 +516933,5 @@
       }
     }
   ],
-  "planSha256": "8172c8da976b02bcd558d18b14357343c300105342e5ed92c7c93c8d2621662e"
+  "planSha256": "d21d5b52981920d425cc5d00a129dc52c4ea987198c28f42efbbe9a56db663b4"
 }

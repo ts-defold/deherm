@@ -1,6 +1,5 @@
 {
   "schemaVersion": 2,
-  "expectedCoverage": {"candidates": 20, "generated": 14, "blocked": 6},
   "scratchCapacity": 65536,
   "inputContractTokens": {
     "nullability": ["non-null"],

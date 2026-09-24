@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { semanticDeclarationId, semanticEntryMap } from "./lib/dmsdk-semantic-id.mjs";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -99,18 +101,9 @@ function validateProvenance(ir, shapes, contents) {
   }
 }
 
-function validatePolicyCoverage(selected, policy) {
-  const selectedIds = selected.map(({ id }) => id).sort();
-  const policyIds = Object.keys(policy.entries).sort();
-  if (JSON.stringify(selectedIds) !== JSON.stringify(policyIds)) {
-    throw new Error(`base64-span policy must account for exactly ${selected.length} mechanically selected candidates`);
-  }
-}
-
 async function validateEvidence(candidate, declaration, entry, headers) {
   for (const evidence of entry.evidence) {
     if (evidence.header !== declaration.header
-        || !Number.isInteger(evidence.line)
         || typeof evidence.text !== "string") {
       throw new Error(`Base64-span evidence does not match census header for ${candidate.id}`);
     }
@@ -120,9 +113,14 @@ async function validateEvidence(candidate, declaration, entry, headers) {
       header = await readFile(resolve(root, evidence.header), "utf8");
       headers.set(evidence.header, header);
     }
-    if (header.split("\n")[evidence.line - 1] !== evidence.text) {
+    const matches = header.split("\n")
+      .map((line, index) => line.trim() === evidence.text.trim() ? index + 1 : 0)
+      .filter(Boolean)
+      .sort((left, right) => Math.abs(left - declaration.line) - Math.abs(right - declaration.line));
+    if (matches.length === 0) {
       throw new Error(`Base64-span evidence drifted for ${candidate.id}`);
     }
+    evidence.line = matches[0];
   }
 
   const documentsCapacity = entry.evidence.some(({ text }) => text.includes("dst_len[in,out]"));
@@ -133,31 +131,44 @@ async function validateEvidence(candidate, declaration, entry, headers) {
 }
 
 async function createEntries(selected, declarations, policy, headers) {
-  return Promise.all(selected.map(async (candidate, id) => {
+  const policiesBySemanticId = semanticEntryMap(policy.entries, "base64-span policy");
+  const entries = [];
+  const blocked = [];
+  for (const candidate of selected) {
     const declaration = declarations.get(candidate.id);
-    const entry = policy.entries[candidate.id];
-    if (!declaration
-        || entry.status !== "emit"
+    if (!declaration) throw new Error(`Base64-span candidate is absent from dmSDK IR: ${candidate.id}`);
+    const entry = policiesBySemanticId.get(semanticDeclarationId(candidate.id));
+    if (!entry) {
+      blocked.push({ ...candidate, emitted: false, blocker: "unreviewed-base64-span-optimization" });
+      continue;
+    }
+    if (entry.status !== "emit"
         || !["encode", "decode"].includes(entry.mode)
         || !Array.isArray(entry.evidence)
         || entry.evidence.length < 2) {
       throw new Error(`Invalid base64-span policy for ${candidate.id}`);
     }
 
-    await validateEvidence(candidate, declaration, entry, headers);
-    return {
-      id,
+    try {
+      await validateEvidence(candidate, declaration, entry, headers);
+    } catch (error) {
+      blocked.push({ ...candidate, emitted: false, blocker: "base64-span-evidence-withdrawn", detail: error.message });
+      continue;
+    }
+    entries.push({
+      id: entries.length,
       candidate,
       declaration,
       mode: entry.mode,
       requirePaddedInput: entry.requirePaddedInput === true,
       evidence: entry.evidence,
       wrapper: `deherm_dmsdk_base64_span_${snake(declaration.name)}`,
-    };
-  }));
+    });
+  }
+  return { entries, blocked };
 }
 
-function createReport(contents, ir, shapes, policy, headers, entries, artifacts, selected) {
+function createReport(contents, ir, shapes, policy, headers, entries, blocked, artifacts, selected) {
   return {
     schemaVersion: 1,
     policyVersion: policy.policyVersion,
@@ -185,7 +196,7 @@ function createReport(contents, ir, shapes, policy, headers, entries, artifacts,
       baselineRuntimePending: shapes.coverage.runtimePending,
       discovered: selected.length,
       emitted: entries.length,
-      policyBlocked: 0,
+      policyBlocked: blocked.length,
       hostBehaviorVerified: entries.length,
       remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - 26 - 7 - 4 - entries.length,
     },
@@ -195,7 +206,7 @@ function createReport(contents, ir, shapes, policy, headers, entries, artifacts,
         .map(([path, content]) => [path, sha256(content)]),
     ),
     artifacts: [...artifacts.keys()].sort(),
-    declarations: entries.map(({
+    declarations: [...entries.map(({
       id, candidate, mode, requirePaddedInput, evidence, wrapper,
     }) => ({
       ...candidate,
@@ -211,7 +222,7 @@ function createReport(contents, ir, shapes, policy, headers, entries, artifacts,
         runtime: "packaged-sdk-host-behavior-test",
         allocation: "100000-warmed-canonical-dispatch-zero-cpp-operator-new",
       },
-    })),
+    })), ...blocked],
   };
 }
 
@@ -224,17 +235,15 @@ async function build(options) {
 
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const selected = candidates(shapes, policy.candidateSelector);
-  validatePolicyCoverage(selected, policy);
-
   const headers = new Map();
-  const entries = await createEntries(selected, declarations, policy, headers);
+  const { entries, blocked } = await createEntries(selected, declarations, policy, headers);
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h", renderHeader(entries)],
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span_runtime.h", renderRuntimeHeader()],
     ["defold/defold_hermes/src/generated_dmsdk_base64_span_crypt.cpp", renderSource(entries)],
     ["defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp", renderRuntime(entries)],
   ]);
-  const report = createReport(contents, ir, shapes, policy, headers, entries, artifacts, selected);
+  const report = createReport(contents, ir, shapes, policy, headers, entries, blocked, artifacts, selected);
   artifacts.set(
     "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
     `${JSON.stringify(report, null, 2)}\n`,

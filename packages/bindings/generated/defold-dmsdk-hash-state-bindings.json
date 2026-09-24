@@ -12,7 +12,7 @@
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "symbols": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
-    "policy": "a57bd04d8e5cbefaaf354e8fdba7a9a3a43aff35e8636dfbdcd69e6697c864a1"
+    "policy": "2d559cf0a02cc6d8e112ddca31c80281112093ffcf10e9a7469065b713f2718e"
   },
   "policy": {
     "schemaVersion": 1,
@@ -31,8 +31,7 @@
       "widths": [
         32,
         64
-      ],
-      "expectedCount": 10
+      ]
     },
     "registry": {
       "capacityPerWidth": 16,
@@ -55,6 +54,7 @@
   "coverage": {
     "discovered": 10,
     "generated": 10,
+    "blocked": 0,
     "registryCapacityPerWidth": 16,
     "exactFixtureCount": 10
   },
@@ -503,5 +503,6 @@
       "disposition": "generated",
       "wrapper": "dmHashUpdateBuffer64"
     }
-  ]
+  ],
+  "blockedDeclarations": []
 }

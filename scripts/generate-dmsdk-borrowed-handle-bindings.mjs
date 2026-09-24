@@ -22,6 +22,8 @@ const artifacts = Object.freeze({
   headerAudit: "native/generated_dmsdk_borrowed_handle_header_audit.cpp",
   exactCall: "native/generated_dmsdk_borrowed_handle_exact_call.cpp",
 });
+const specializationBlocker = "borrowed-handle-specialization-unverified";
+const specializationBlockerReason = "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.";
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const leaf = (value) => String(value).split("::").at(-1) ?? "";
@@ -52,10 +54,14 @@ function handleName(role) {
 
 function structuralBlockers(shape, policy) {
   const blockers = [];
-  if (!policy.selection.declarationKinds.includes(shape.kind)) blockers.push(`declaration-kind-unsupported:${shape.kind}`);
-  if (!policy.selection.resultRoles.includes(shape.result.role)) blockers.push(`result-role-unsupported:${shape.result.role}`);
-  if (!shape.parameters.some(({ role }) => role.startsWith("handle:"))) blockers.push("handle-parameter-required");
-  for (const parameter of shape.parameters) {
+  if (!policy.selection.declarationKinds.includes(shape.kind)) blockers.push(`declaration-kind-unsupported:${shape.kind ?? "unknown"}`);
+  if (!shape.result || !policy.selection.resultRoles.includes(shape.result.role)) blockers.push(`result-role-unsupported:${shape.result?.role ?? "unknown"}`);
+  if (!Array.isArray(shape.parameters) || !shape.parameters.some(({ role }) => typeof role === "string" && role.startsWith("handle:"))) blockers.push("handle-parameter-required");
+  for (const parameter of Array.isArray(shape.parameters) ? shape.parameters : []) {
+    if (typeof parameter?.role !== "string") {
+      blockers.push(`parameter-role-unsupported:${parameter?.position ?? "unknown"}:unknown`);
+      continue;
+    }
     if (!parameter.role.startsWith(policy.selection.handleRolePrefix) && !policy.selection.parameterRoles.includes(parameter.role)) {
       blockers.push(`parameter-role-unsupported:${parameter.position}:${parameter.role}`);
     }
@@ -64,6 +70,47 @@ function structuralBlockers(shape, policy) {
     if (shape.families.includes(family)) blockers.push(`family-requires-target-matrix:${family}`);
   }
   return [...new Set(blockers)].sort();
+}
+
+function specializationBlockers(shape, policy) {
+  const blockers = [];
+  const recognizedScalarKinds = new Set(policy.selection.resultRoles
+    .filter((role) => role.startsWith("scalar:"))
+    .map((role) => role.slice("scalar:".length)));
+  const resultRole = shape.result?.role;
+  const recognizedResult = typeof resultRole === "string" && (
+    policy.selection.resultRoles.includes(resultRole) ||
+    (resultRole.startsWith("scalar:") && recognizedScalarKinds.has(resultRole.slice("scalar:".length))) ||
+    resultRole.startsWith("enum:") || resultRole === "opaque-pointer" || resultRole.startsWith("pointer:")
+  );
+  if (!recognizedResult) blockers.push(specializationBlocker);
+  if (!Array.isArray(shape.parameters)) {
+    blockers.push(specializationBlocker);
+  } else {
+    for (const parameter of shape.parameters) {
+      const role = parameter?.role;
+      const recognizedScalar = typeof role === "string" && role.startsWith("scalar:") && policy.selection.parameterRoles.includes(role);
+      const recognizedHandle = typeof role === "string" && role.startsWith(policy.selection.handleRolePrefix) && handleName(role);
+      const recognizedOther = typeof role === "string" && (policy.selection.parameterRoles.includes(role) || role.startsWith("pointer:") || role.startsWith("enum:") || role === "opaque-pointer");
+      if (!recognizedScalar && !recognizedHandle && !recognizedOther) blockers.push(specializationBlocker);
+    }
+  }
+  return [...new Set(blockers)];
+}
+
+function blockedRow(shape, projectionId, blockers, extra = {}) {
+  return {
+    id: shape.id,
+    projectionId,
+    symbol: shape.symbol,
+    disposition: "blocked",
+    blockers: [...new Set(blockers)].sort(),
+    universalFallback: "retained",
+    blockerReason: extra.blockerReason ?? specializationBlockerReason,
+    stages: { generated: "universal-fallback-retained", compiled: "not-applicable", linked: "not-applicable", runtime: "not-applicable" },
+    shape: shape.shape,
+    ...extra,
+  };
 }
 
 function semanticBlockers(row) {
@@ -346,10 +393,27 @@ export async function build(inputs = undefined) {
   for (const shape of candidates) {
     const projected = projectionById.get(shape.id);
     const declaration = declarationById.get(shape.id);
-    if (!projected || !declaration) throw new Error(`borrowed-handle candidate is absent from source IR: ${shape.id}`);
+    if (!projected || !declaration) {
+      rows.push(blockedRow(shape, projected?.projectionId, [specializationBlocker], {
+        blockerReason: `${specializationBlockerReason} Source projection or declaration is absent for ${shape.id}.`,
+      }));
+      continue;
+    }
     const blockers = structuralBlockers(shape, policy);
-    if (blockers.length) {
-      rows.push({ id: shape.id, projectionId: projected.projectionId, symbol: shape.symbol, disposition: "blocked", blockers: [...new Set([...blockers, ...semanticBlockers(projected)])].sort(), shape: shape.shape });
+    const specialization = specializationBlockers(shape, policy);
+    if (blockers.length || specialization.length) {
+      const routeBlockers = [...blockers, ...semanticBlockers(projected), ...specialization];
+      rows.push(blockedRow(shape, projected.projectionId, routeBlockers, {
+        blockerReason: routeBlockers.includes(specializationBlocker)
+          ? specializationBlockerReason
+          : undefined,
+      }));
+      continue;
+    }
+    if (!projected.signature || !Array.isArray(projected.signature.parameters) || projected.signature.parameters.length !== shape.parameters.length) {
+      rows.push(blockedRow(shape, projected.projectionId, [specializationBlocker], {
+        blockerReason: `${specializationBlockerReason} Projected signature does not match the source shape for ${shape.id}.`,
+      }));
       continue;
     }
     const parameters = shape.parameters.map((parameter, index) => ({
@@ -364,12 +428,9 @@ export async function build(inputs = undefined) {
     entries.push(entry);
     rows.push({ id: shape.id, projectionId: projected.projectionId, symbol: shape.symbol, disposition: "generated-provider-boundary", preferredLowering: false, bindingId: entry.id, shape: shape.shape, resolvedPolicies: policy.providerContract, engineProviderBlockers: semanticBlockers(projected), stages: { generated: "all-five-target-projections-and-exact-call-twin", compiled: "pinned-header-adapter-and-exact-twin", linked: "generated-exact-provider-host-bridge-only", runtime: "generated-exact-provider-sanitized-and-warmed", engine: "not-claimed-provider-absent" } });
   }
-  const expected = policy.expectedCoverage;
-  if (candidates.length !== expected.candidates || entries.length !== expected.generated || rows.length - entries.length !== expected.blocked) throw new Error(`borrowed-handle census changed: ${candidates.length}/${entries.length}/${rows.length - entries.length}`);
   const handleNames = [...new Set(entries.flatMap(({ parameters }) => parameters.map(({ handleName: name }) => name).filter(Boolean)))].sort();
   const handleKinds = new Map(handleNames.map((name, id) => [name, { id, name, representation: candidates.find((row) => row.parameters.some(({ role }) => handleName(role) === name)).parameters.find(({ role }) => handleName(role) === name).role.split(":").at(-1) }]));
-  const maxArguments = Math.max(...entries.map(({ parameters }) => parameters.length));
-  if (handleKinds.size !== expected.handleKinds || maxArguments !== expected.maxArguments) throw new Error("borrowed-handle storage census changed");
+  const maxArguments = entries.length ? Math.max(...entries.map(({ parameters }) => parameters.length)) : 0;
   const names = makeFunctionNames(entries);
   if (new Set(names).size !== names.length) throw new Error("borrowed-handle TypeScript function names collide");
   const generated = new Map();
@@ -389,6 +450,7 @@ export async function build(inputs = undefined) {
     sourceHashes: Object.fromEntries(Object.entries(contents).map(([key, content]) => [key, sha256(content)])),
     selector: "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",
     policy: { ...policy.providerContract, ...policy.targetPolicy, evidenceBoundary: "generated and exact fake-provider tested; no packaged-engine provider, handle, symbol, or thread proof" },
+    universalFallback: { preserved: true, routeBlocker: specializationBlocker, catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json", mutation: "none" },
     abi: { slotBytes: 8, maxArguments, handleKindCount: handleKinds.size, argumentStorage: "caller-owned contiguous uint64_t slots", resultStorage: "caller-owned uint64_t slot" },
     coverage: { candidates: candidates.length, generated: entries.length, blocked: rows.length - entries.length, cAbiGenerated: entries.length, dynamicHermesJsiGenerated: entries.length, staticHermesGenerated: entries.length, browserDirectMemoryGenerated: entries.length, typescriptGenerated: entries.length, pinnedHeaderSignatureCompiled: entries.length, exactCallTwinsGenerated: entries.length, fakeProviderHostRuntimeTested: entries.length, packagedEngineRuntimeVerified: 0, warmedDispatchIterations: 100000, warmedDispatchObservedCppAllocations: 0 },
     handleKinds: [...handleKinds.values()],

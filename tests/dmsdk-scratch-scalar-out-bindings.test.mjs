@@ -75,7 +75,7 @@ test("scratch scalar-out census is independent, exhaustive, and symbol-agnostic"
   }
 });
 
-test("scratch scalar-out generation is clean-room deterministic and rejects drift", async () => {
+test("scratch scalar-out generation is clean-room deterministic and only rejects provenance drift", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-scratch-scalar-out-generate-"));
   try {
     run(process.execPath, ["scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs", "--output-root", directory]);
@@ -90,12 +90,48 @@ test("scratch scalar-out generation is clean-room deterministic and rejects drif
       policy: await readFile(path.join(root, report.sources.policy), "utf8"),
     };
     const changed = JSON.parse(contents.policy);
-    changed.expectedCoverage.generated += 1;
-    await assert.rejects(() => build({ ...contents, policy: JSON.stringify(changed) }), /census changed/);
+    changed.expectedCoverage = { candidates: 1, generated: 1, blocked: 0, handleKinds: 1, maxParameters: 1, maxOutputs: 1 };
+    const observed = await build({ ...contents, policy: JSON.stringify(changed) });
+    assert.equal(observed.report.coverage.candidates, 79);
+    assert.equal(observed.report.coverage.generated, 7);
+    assert.equal(observed.report.coverage.blocked, 72);
+    assert.deepEqual(observed.report.abi, {
+      slotBytes: 8,
+      maxParameters: 4,
+      maxOutputs: 1,
+      handleKindCount: 4,
+      parameterStorage: "caller-owned contiguous uint64_t slots",
+      resultStorage: "caller-owned uint64_t slot"
+    });
     await assert.rejects(() => build({ ...contents, ir: `${contents.ir}\n` }), /IR provenance mismatch/);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
+});
+
+test("changed scratch specialization blocks only that route and retains universal fallback", async () => {
+  const [ir, shapes, projection, policy] = await Promise.all([
+    readFile(path.join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"),
+    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
+    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-projection-ir.json"), "utf8"),
+    readFile(path.join(root, "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"), "utf8")
+  ]);
+  const changedShapes = JSON.parse(shapes);
+  const policyValue = JSON.parse(policy);
+  const changed = changedShapes.rows.find((row) => row.tranche === "scratch-out-parameters" && selected(row, policyValue));
+  assert.ok(changed);
+  const changedParameter = changed.parameters.at(-1);
+  changedParameter.role = "pointer:unknown-specialization";
+  const result = await build({ ir, shapes: JSON.stringify(changedShapes), projection, policy });
+  const row = result.report.declarations.find(({ id }) => id === changed.id);
+  assert.equal(row.disposition, "blocked");
+  assert.ok(row.blockers.includes(`parameter-role-direction-unsupported:${changedParameter.position}:${changedParameter.direction}:pointer:unknown-specialization`));
+  assert.equal(row.universalFallback.state, "universal-fallback");
+  assert.equal(row.universalFallback.preserved, true);
+  assert.equal(result.report.coverage.candidates, 79);
+  assert.equal(result.report.coverage.generated, 6);
+  assert.equal(result.report.coverage.blocked, 73);
+  assert.equal(result.report.declarations.filter(({ disposition }) => disposition === "generated-provider-boundary").length, 6);
 });
 
 test("all seven selected signatures compile against the pinned SDK projection", async () => {

@@ -36,7 +36,7 @@ test("hash-span generator is deterministic, census-derived, and policy complete"
   } finally { await rm(output, { recursive: true, force: true }); }
 });
 
-test("hash-span generation fails closed on provenance, policy, and evidence drift", async () => {
+test("hash-span generation rejects mixed provenance and withdraws only drifted specialization evidence", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-hash-span-drift-"));
   try {
     const irPath = join(output, "ir.json");
@@ -44,7 +44,12 @@ test("hash-span generation fails closed on provenance, policy, and evidence drif
     assert.throws(() => run(process.execPath, ["scripts/generate-dmsdk-hash-span-bindings.mjs", "--ir", irPath, "--out-root", join(output, "out")]), /IR hash does not match ABI-shape census provenance/);
     const policyPath = join(output, "policy.json");
     await writeFile(policyPath, (await readFile(join(repositoryRoot, "packages/bindings/overrides/dmsdk-hash-span-bindings.json"), "utf8")).replace("Length of buffer", "Length drifted"));
-    assert.throws(() => run(process.execPath, ["scripts/generate-dmsdk-hash-span-bindings.mjs", "--policy", policyPath, "--out-root", join(output, "out")]), /Hash-span evidence drifted/);
+    const driftedRoot = join(output, "drifted");
+    run(process.execPath, ["scripts/generate-dmsdk-hash-span-bindings.mjs", "--policy", policyPath, "--out-root", driftedRoot]);
+    const report = JSON.parse(await readFile(join(driftedRoot, "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json"), "utf8"));
+    assert.equal(report.coverage.emitted, 1);
+    assert.equal(report.coverage.policyBlocked, 1);
+    assert.equal(report.declarations.find(({ emitted }) => emitted === false)?.blocker, "hash-span-evidence-withdrawn");
   } finally { await rm(output, { recursive: true, force: true }); }
 });
 

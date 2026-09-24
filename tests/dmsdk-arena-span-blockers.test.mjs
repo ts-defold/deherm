@@ -158,22 +158,52 @@ test("arena-span blocker generator rejects schema, revision, provenance, and dup
     symbolEvidenceText: withJson(inputs.symbolEvidenceText, (evidence) => { evidence.defoldRevision = "0".repeat(40); })
   }), /symbol evidence is invalid or revision-mismatched/);
   const generatedId = generate(inputs).report.generatedDeclarations[0].id;
-  assert.throws(() => generate({
+  const unavailable = generate({
     ...inputs,
     symbolEvidenceText: withJson(inputs.symbolEvidenceText, (evidence) => {
       evidence.declarations[generatedId].availability = "target-subset";
     })
-  }), /native symbol is not available in every target and build variant/);
+  }).report;
+  assert.equal(unavailable.generatedDeclarations.some(({ id }) => id === generatedId), false);
+  assert.equal(unavailable.declarations.find(({ id }) => id === generatedId)?.blocker,
+    "cstring-arena-specialization-unverified");
+  assert.equal(unavailable.declarations.find(({ id }) => id === generatedId)?.universalFallback, "retained");
 });
 
-test("arena-span blocker policy must exactly name generated prior-wave symbols", async () => {
+test("arena-span historical counts do not gate a new revision", async () => {
   const inputs = await loadInputs();
-  assert.throws(() => generate({
-    ...inputs,
-    policyText: withJson(inputs.policyText, (policy) => { policy.coveredByPriorWaves.pop(); })
-  }), /does not exactly match generated prior-wave symbols/);
   const priorWaveTexts = new Map(inputs.priorWaveTexts);
   const [path, text] = priorWaveTexts.entries().next().value;
-  priorWaveTexts.set(path, withJson(text, (report) => { report.sourceHashes.shapes = "0".repeat(64); }));
-  assert.throws(() => generate({ ...inputs, priorWaveTexts }), /ABI-shape provenance drifted/);
+  priorWaveTexts.set(path, withJson(text, (report) => { report.declarations.pop(); }));
+  const changed = generate({ ...inputs, priorWaveTexts }).report;
+  assert.equal(changed.coverage.coveredByPriorWaves, 13);
+  assert.equal(changed.coverage.unaccounted, 0);
+
+  const corruptPriorWaveTexts = new Map(inputs.priorWaveTexts);
+  corruptPriorWaveTexts.set(path, withJson(text, (report) => { report.sourceHashes.shapes = "0".repeat(64); }));
+  assert.throws(() => generate({ ...inputs, priorWaveTexts: corruptPriorWaveTexts }), /ABI-shape provenance drifted/);
+});
+
+test("arena-span recipes follow semantic evidence when lines move and decline only the specialization when evidence disappears", async () => {
+  const inputs = await loadInputs();
+  const evidenceTexts = new Map(inputs.evidenceTexts);
+  const [path, source] = evidenceTexts.entries().next().value;
+  evidenceTexts.set(path, `// upstream inserted a line\n${source}`);
+  const moved = generate({ ...inputs, evidenceTexts }).report;
+  const movedEvidence = moved.generatedDeclarations.flatMap(({ sourceEvidence }) => sourceEvidence)
+    .filter((evidence) => evidence.path === path);
+  assert.ok(movedEvidence.length > 0);
+  for (const evidence of movedEvidence) {
+    const original = JSON.parse(inputs.policyText).cstringArena.recipes
+      .flatMap(({ sourceEvidence }) => sourceEvidence)
+      .find((candidate) => candidate.path === evidence.path && candidate.text === evidence.text);
+    assert.equal(evidence.line, original.line + 1);
+  }
+
+  const withdrawnTexts = new Map(inputs.evidenceTexts);
+  withdrawnTexts.set(path, source.replace(" * If the size of the buffer is too small, the message will be truncated to fit the buffer.", " * changed upstream wording"));
+  const withdrawn = generate({ ...inputs, evidenceTexts: withdrawnTexts }).report;
+  assert.ok(withdrawn.coverage.generatedCStringArena < 5);
+  assert.ok(withdrawn.declarations.some(({ blocker }) => blocker === "cstring-arena-specialization-unverified"));
+  assert.equal(withdrawn.coverage.unaccounted, 0);
 });

@@ -7,7 +7,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { orderedBlockingReasons } from "../scripts/generate-dmsdk-named-scalar-bindings.mjs";
+import { build, orderedBlockingReasons } from "../scripts/generate-dmsdk-named-scalar-bindings.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json");
@@ -102,13 +102,26 @@ test("named-scalar generation rejects drifted IR and ABI-shape provenance", asyn
     shapes.rows.push({ ...shapes.rows[0] });
     return { irContent, shapesContent: `${JSON.stringify(shapes, null, 2)}\n` };
   }, /ABI-shape report contains duplicate declaration id/));
-  await context.test("named-scalar census drift", () => expectProvenanceFailure("census drift", async ({ irContent, shapesContent }) => {
-    const shapes = JSON.parse(shapesContent);
+});
+
+test("named-scalar source census changes do not require package policy count edits", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-named-scalar-census-"));
+  try {
+    const irPath = join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json");
+    const shapes = JSON.parse(await readFile(join(repositoryRoot,
+      "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"));
     const index = shapes.rows.findIndex(({ tranche }) => tranche === "next-named-scalar-direct");
+    assert.notEqual(index, -1);
     shapes.rows.splice(index, 1);
-    shapes.trancheSummary["next-named-scalar-direct"] = 20;
-    return { irContent, shapesContent: `${JSON.stringify(shapes, null, 2)}\n` };
-  }, /must contain exactly 21/));
+    shapes.trancheSummary["next-named-scalar-direct"] -= 1;
+    const shapesPath = join(directory, "shapes.json");
+    await writeFile(shapesPath, `${JSON.stringify(shapes, null, 2)}\n`);
+    const { report } = await build({ irPath, shapesPath });
+    assert.equal(report.coverage.reviewed, 20);
+    assert.equal(report.coverage.generated + report.coverage.policyBlocked, 20);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
 });
 
 test("empty JSI and TypeScript artifacts make no module, install, or callable claim", async () => {

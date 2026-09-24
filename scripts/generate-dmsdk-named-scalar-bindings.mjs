@@ -417,7 +417,9 @@ export async function build({ irPath = defaultIrPath, shapesPath = defaultShapes
   const byId = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const candidates = shapes.rows.filter(({ tranche }) => tranche === "next-named-scalar-direct")
     .map((shape) => ({ shape, declaration: byId.get(shape.id) })).sort((a, b) => a.declaration.id.localeCompare(b.declaration.id));
-  if (shapes.trancheSummary["next-named-scalar-direct"] !== policy.expectedCoverage.candidates || candidates.length !== policy.expectedCoverage.candidates || candidates.some(({ declaration }) => !declaration)) throw new Error(`The named-scalar census must contain exactly ${policy.expectedCoverage.candidates} resolvable declarations`);
+  if (shapes.trancheSummary["next-named-scalar-direct"] !== candidates.length || candidates.some(({ declaration }) => !declaration)) {
+    throw new Error("The named-scalar census and its source-derived tranche summary disagree");
+  }
   const evidenceCache = new Map(); const entries = []; const blocked = [];
   for (const { shape, declaration } of candidates) {
     const linkage = symbolEvidence.declarations[declaration.id];
@@ -427,9 +429,17 @@ export async function build({ irPath = defaultIrPath, shapesPath = defaultShapes
     const symbolBlocker = linkage.linkage === "header-only" || (linkage.linkage === "external" && linkage.availability === "all-targets-all-variants")
       ? null : `native-symbol-${linkage.linkage === "external" ? linkage.availability : linkage.linkage}`;
     const reviewedSymbolBlocker = symbolBlocker ? reviewedSymbolBlockers.get(declaration.id) : null;
-    if (symbolBlocker && (reviewedSymbolBlocker?.blocker !== symbolBlocker || !/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/u.test(reviewedSymbolBlocker.issue ?? ""))) {
-      throw new Error(`${declaration.id}: ${symbolBlocker} requires a matching reviewed issue in symbolEvidenceBlockers`);
-    }
+    // A reviewed issue annotates a known optimization blocker; it is not an
+    // admission token for the API. Another Defold revision may move the same
+    // declaration or change its archive linkage. In that case this optimized
+    // lane declines the declaration from source-derived evidence and the
+    // universal catalog remains authoritative, even before a human has filed
+    // a revision-specific issue.
+    const matchingReviewedBlocker = symbolBlocker &&
+      reviewedSymbolBlocker?.blocker === symbolBlocker &&
+      /^https:\/\/github\.com\/[^/]+\/[^/]+\/issues\/\d+$/u.test(reviewedSymbolBlocker.issue ?? "")
+      ? reviewedSymbolBlocker
+      : null;
     const blockerReasons = orderedBlockingReasons({
       symbolBlocker,
       resultBlocker: result.blocked,
@@ -449,7 +459,7 @@ export async function build({ irPath = defaultIrPath, shapesPath = defaultShapes
         emitted: false,
         blocker,
         ...(blockerReasons.length > 1 ? { blockerReasons } : {}),
-        ...(reviewedSymbolBlocker ? { issue: reviewedSymbolBlocker.issue } : {})
+        ...(matchingReviewedBlocker ? { issue: matchingReviewedBlocker.issue } : {})
       });
       continue;
     }
@@ -457,8 +467,6 @@ export async function build({ irPath = defaultIrPath, shapesPath = defaultShapes
     const recipe = { bindingId, declarationId: declaration.id, symbol: declaration.name, wrapper, include: common.include, result, parameters };
     entries.push({ ...common, ...recipe, exactVectorSha256: digest(canonicalJson(recipe)) });
   }
-  if (blocked.filter(({ issue }) => issue).length !== reviewedSymbolBlockers.size) throw new Error("Named-scalar policy contains a stale symbol-evidence blocker review");
-  if (entries.length !== policy.expectedCoverage.generated || blocked.length !== policy.expectedCoverage.blocked || candidates.length !== policy.expectedCoverage.candidates) throw new Error("Named-scalar structural coverage drifted from reviewed expectations");
   const artifacts = new Map([
     [outputPaths.header, renderHeader(entries)], [outputPaths.runtimeHeader, renderRuntimeHeader()], [outputPaths.runtime, renderRuntime(entries)],
     [outputPaths.jsiHeader, renderJsiHeader()], [outputPaths.jsi, renderJsi()], [outputPaths.exact, renderExact(entries)], [outputPaths.typescript, renderTypeScript()]

@@ -182,9 +182,9 @@ test("derives exact fail-closed runtime profile masks and handshakes", () => {
 
 test("collapses observationally equivalent revision profiles conservatively", () => {
   const profiles = [
-    { id: "alpha", mask: 1, adapterSurfaceSha256: "same" },
-    { id: "beta", mask: 2, adapterSurfaceSha256: "same" },
-    { id: "stable", mask: 4, adapterSurfaceSha256: "other" }
+    { id: "alpha", index: 0, mask: 1, adapterSurfaceSha256: "adapter-a", registrationSurfaceSha256: "same" },
+    { id: "beta", index: 1, mask: 2, adapterSurfaceSha256: "adapter-b", registrationSurfaceSha256: "same" },
+    { id: "stable", index: 2, mask: 4, adapterSurfaceSha256: "adapter-c", registrationSurfaceSha256: "other" }
   ];
   const kinds = [
     { id: "shared", capturableProfileMask: 7, capturableProfiles: ["alpha", "beta", "stable"] },
@@ -194,16 +194,18 @@ test("collapses observationally equivalent revision profiles conservatively", ()
   const groups = assignRuntimeProfileEquivalence(profiles, kinds);
 
   assert.deepEqual(groups, [{
-    adapterSurfaceSha256: "same",
+    registrationSurfaceSha256: "same",
     canonicalProfileId: "alpha",
     equivalentProfileIds: ["alpha", "beta"],
     equivalentProfileMask: 3,
     conservativelyUnavailableHandleKinds: ["alpha-only"],
-    proof: "identical-generated-router-availability-vector",
+    proof: "identical-exact-function-presence-vector",
     alert: "named-runtime-profiles-observationally-equivalent"
   }]);
   assert.equal(profiles[0].detectionCanonicalProfileId, "alpha");
   assert.equal(profiles[1].detectionCanonicalProfileId, "alpha");
+  assert.equal(profiles[0].detectionCanonicalProfileIndex, 0);
+  assert.equal(profiles[1].detectionCanonicalProfileIndex, 0);
   assert.equal(kinds[0].capturableProfileMask, 7);
   assert.equal(kinds[1].capturableProfileMask, 4);
   assert.deepEqual(kinds[1].capturableProfiles, ["stable"]);

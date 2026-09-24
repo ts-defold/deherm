@@ -10,8 +10,8 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "projection": "bbe895d62582cc9f1955d619b5b879d75be7bf6b572c38d8553300e7edace0c0",
-    "policy": "4fc46dc30fe9deaf150be27552abab867da49c731cfe97d3f16aadb48a8ebb65"
+    "projection": "159ebfcb0aafabfa5dca7a88c6ad894e4eb60ab58fe408c16b39b99216ff1c09",
+    "policy": "48b9913d92f5ccbc39f9136c7cd28430443066f2527d69cbbb3ffecf39198f73"
   },
   "selector": "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",
   "policy": {
@@ -26,6 +26,12 @@
     "browser": "direct-Wasm-memory-uint64-slots; provider installation remains host responsibility",
     "typescript": "nominal BorrowedHandle kind prevents structural cross-kind assignment",
     "evidenceBoundary": "generated and exact fake-provider tested; no packaged-engine provider, handle, symbol, or thread proof"
+  },
+  "universalFallback": {
+    "preserved": true,
+    "routeBlocker": "borrowed-handle-specialization-unverified",
+    "catalog": "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
+    "mutation": "none"
   },
   "abi": {
     "slotBytes": 8,
@@ -313,6 +319,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HContextRegistry:opaque,value:scalar:u64)"
     },
     {
@@ -329,6 +342,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:HContextRegistry:opaque,value:scalar:u64,inout:opaque-pointer)"
     },
     {
@@ -344,6 +364,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:handle:dmBuffer::HBuffer:u32)"
     },
     {
@@ -362,6 +389,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,inout:pointer:scalar:u32)"
     },
     {
@@ -381,6 +415,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:scalar:u64,inout:pointer:enum:dmBuffer::ValueType,inout:pointer:scalar:u32)"
     },
     {
@@ -426,6 +467,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32)"
     },
     {
@@ -441,6 +489,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32)"
     },
     {
@@ -606,6 +661,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:u32(value:handle:dmConnectionPool::HPool:opaque,value:enum:dmSocket::ShutdownType)"
     },
     {
@@ -681,6 +743,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmGameObject::HComponentType:opaque)"
     },
     {
@@ -727,6 +796,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameObject::HComponentType:opaque,inout:opaque-pointer)"
     },
     {
@@ -862,6 +938,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmGameObject::HCollection:opaque,value:scalar:u32)"
     },
     {
@@ -930,6 +1013,7 @@
       "symbol": "dmGameObject::GetPosition",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -937,6 +1021,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -975,6 +1067,7 @@
       "symbol": "dmGameObject::GetRotation",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -982,6 +1075,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -990,6 +1091,7 @@
       "symbol": "dmGameObject::GetScale",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -997,6 +1099,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -1035,6 +1145,7 @@
       "symbol": "dmGameObject::GetWorldMatrix",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1043,6 +1154,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Matrix4(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -1051,6 +1170,7 @@
       "symbol": "dmGameObject::GetWorldPosition",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1058,6 +1178,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Point3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -1066,6 +1194,7 @@
       "symbol": "dmGameObject::GetWorldRotation",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1073,6 +1202,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Quat(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -1081,6 +1218,7 @@
       "symbol": "dmGameObject::GetWorldScale",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1088,6 +1226,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Vector3(value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -1283,6 +1429,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)"
     },
     {
@@ -1298,6 +1451,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)"
     },
     {
@@ -1313,6 +1473,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameObject::HPropertyContainerBuilder:opaque,value:scalar:u64,in:pointer:scalar:f32)"
     },
     {
@@ -1358,6 +1525,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HCollection:opaque,value:handle:dmGameObject::HInstance:opaque,value:scalar:u64)"
     },
     {
@@ -1373,6 +1547,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:handle:dmGameObject::HInstance:opaque)"
     },
     {
@@ -1381,6 +1562,7 @@
       "symbol": "dmGameObject::SetPosition",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1388,6 +1570,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Point3)"
     },
     {
@@ -1403,6 +1593,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:bool)"
     },
     {
@@ -1418,6 +1615,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:f32)"
     },
     {
@@ -1433,6 +1637,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:scalar:u64)"
     },
     {
@@ -1441,6 +1652,7 @@
       "symbol": "dmGameObject::SetPropertyFromMatrix4",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1451,6 +1663,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:unknown:dmVMath::Matrix4)"
     },
     {
@@ -1459,6 +1679,7 @@
       "symbol": "dmGameObject::SetPropertyFromQuat",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1468,6 +1689,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Quat)"
     },
     {
@@ -1476,6 +1705,7 @@
       "symbol": "dmGameObject::SetPropertyFromVector3",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1485,6 +1715,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector3)"
     },
     {
@@ -1493,6 +1731,7 @@
       "symbol": "dmGameObject::SetPropertyFromVector4",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1502,6 +1741,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,value:unknown:dmVMath::Vector4)"
     },
     {
@@ -1510,6 +1757,7 @@
       "symbol": "dmGameObject::SetRotation",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1517,6 +1765,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Quat)"
     },
     {
@@ -1555,6 +1811,7 @@
       "symbol": "dmGameObject::SetScale",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -1562,6 +1819,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque,value:unknown:dmVMath::Vector3)"
     },
     {
@@ -1609,6 +1874,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:bool(value:handle:dmGameObject::HRegister:opaque,inout:pointer:record:dmGameObject::SceneNode)"
     },
     {
@@ -1684,6 +1956,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
     },
     {
@@ -1699,6 +1978,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
     },
     {
@@ -1714,6 +2000,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
     },
     {
@@ -1729,6 +2022,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque)"
     },
     {
@@ -1744,6 +2044,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionProxyWorld:opaque,value:handle:dmGameSystem::HCollectionProxyComponent:opaque,value:scalar:f32,value:scalar:i32)"
     },
     {
@@ -1759,6 +2066,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGameSystem::CompFactoryStatus(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque)"
     },
     {
@@ -1836,6 +2150,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(inout:pointer:record:dmRender::RenderObject,value:handle:dmGameSystem::HComponentRenderConstants:opaque)"
     },
     {
@@ -1883,6 +2204,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque,inout:pointer:record:HashState32)"
     },
     {
@@ -1900,6 +2228,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::CollectionFactoryResource)"
     },
     {
@@ -1917,6 +2252,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FactoryResource)"
     },
     {
@@ -1936,6 +2278,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FontResource,value:scalar:u64)"
     },
     {
@@ -1956,6 +2305,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque,inout:pointer:record:FontGlyph)"
     },
     {
@@ -1973,6 +2329,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:u64(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque)"
     },
     {
@@ -1991,6 +2354,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:dmGameSystem::TTFResource(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque)"
     },
     {
@@ -2008,6 +2378,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:bool(inout:pointer:record:dmGameSystem::FontResource,value:handle:HFont:opaque,value:scalar:u32)"
     },
     {
@@ -2027,6 +2404,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FontResource,value:scalar:u64)"
     },
     {
@@ -2044,6 +2428,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
@@ -2059,6 +2450,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HVertexStreamDeclaration:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::Type,value:scalar:bool)"
     },
     {
@@ -2164,6 +2562,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::State)"
     },
     {
@@ -2269,6 +2674,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::PrimitiveType,value:scalar:u32,value:scalar:u32,value:scalar:u32)"
     },
     {
@@ -2285,6 +2697,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::PrimitiveType,value:scalar:u32,value:scalar:u32,value:enum:dmGraphics::Type,value:handle:dmGraphics::HIndexBuffer:usize,value:scalar:u32)"
     },
     {
@@ -2330,6 +2749,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::State)"
     },
     {
@@ -2915,6 +3341,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGraphics::TextureType(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
@@ -3110,6 +3543,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:bool(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::IndexBufferFormat)"
     },
     {
@@ -3125,6 +3565,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:bool(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::TextureFormat)"
     },
     {
@@ -3141,6 +3588,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendEquation,value:enum:dmGraphics::BlendEquation)"
     },
     {
@@ -3157,6 +3611,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor)"
     },
     {
@@ -3175,6 +3636,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor)"
     },
     {
@@ -3220,6 +3688,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType)"
     },
     {
@@ -3235,6 +3710,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::CompareFunc)"
     },
     {
@@ -3400,6 +3882,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::CompareFunc,value:scalar:u32,value:scalar:u32)"
     },
     {
@@ -3416,6 +3905,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType,value:enum:dmGraphics::CompareFunc,value:scalar:u32,value:scalar:u32)"
     },
     {
@@ -3463,6 +3959,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp)"
     },
     {
@@ -3481,6 +3984,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::FaceType,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp,value:enum:dmGraphics::StencilOp)"
     },
     {
@@ -3500,6 +4010,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:scalar:f32)"
     },
     {
@@ -3518,6 +4035,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:scalar:f32)"
     },
     {
@@ -3556,6 +4080,7 @@
       "symbol": "dmGraphics::VulkanGetCurrentFrameCommandBuffer",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3563,6 +4088,14 @@
         "result-role-unsupported:unknown:VkCommandBuffer",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkCommandBuffer(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3571,6 +4104,7 @@
       "symbol": "dmGraphics::VulkanGetDevice",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3578,6 +4112,14 @@
         "result-role-unsupported:unknown:VkDevice",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3586,6 +4128,7 @@
       "symbol": "dmGraphics::VulkanGetGraphicsQueue",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3593,6 +4136,14 @@
         "result-role-unsupported:unknown:VkQueue",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkQueue(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3607,6 +4158,13 @@
         "native-symbol-linkage-unverified",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:u16(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3615,6 +4173,7 @@
       "symbol": "dmGraphics::VulkanGetImage",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3622,6 +4181,14 @@
         "result-role-unsupported:unknown:VkImage",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkImage(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
@@ -3630,6 +4197,7 @@
       "symbol": "dmGraphics::VulkanGetImageView",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3637,6 +4205,14 @@
         "result-role-unsupported:unknown:VkImageView",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkImageView(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
@@ -3645,6 +4221,7 @@
       "symbol": "dmGraphics::VulkanGetInstance",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3652,6 +4229,14 @@
         "result-role-unsupported:unknown:VkInstance",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkInstance(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3660,6 +4245,7 @@
       "symbol": "dmGraphics::VulkanGetPhysicalDevice",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3667,6 +4253,14 @@
         "result-role-unsupported:unknown:VkPhysicalDevice",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkPhysicalDevice(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3675,6 +4269,7 @@
       "symbol": "dmGraphics::VulkanGetRenderPass",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "family-requires-target-matrix:platform-gated",
         "handle-ownership-nullability-lifetime-unresolved",
@@ -3682,6 +4277,14 @@
         "result-role-unsupported:unknown:VkRenderPass",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:VkRenderPass(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3698,6 +4301,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3714,6 +4324,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmGraphics::HContext:opaque,in:handle:dmGraphics::HTexture:u64)"
     },
     {
@@ -3729,6 +4346,13 @@
         "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3744,6 +4368,13 @@
         "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3759,6 +4390,13 @@
         "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3774,6 +4412,13 @@
         "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3789,6 +4434,13 @@
         "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3804,6 +4456,13 @@
         "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
@@ -3819,6 +4478,13 @@
         "semantic-token-unresolved:opaque-type-abi-contract",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:i32(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HTexture:u64)"
     },
     {
@@ -3833,6 +4499,13 @@
         "native-symbol-linkage-unverified",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3847,6 +4520,13 @@
         "native-symbol-linkage-unverified",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque)"
     },
     {
@@ -3862,6 +4542,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
     },
     {
@@ -3960,6 +4647,7 @@
       "symbol": "dmGui::GetNodeProperty",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -3969,6 +4657,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Vector4(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property)"
     },
     {
@@ -4014,6 +4710,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmGui::HScene:opaque,value:scalar:u64,value:scalar:u64)"
     },
     {
@@ -4031,6 +4734,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(inout:pointer:record:lua_State,value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32)"
     },
     {
@@ -4046,6 +4756,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::AdjustMode)"
     },
     {
@@ -4064,6 +4781,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,in:pointer:record:dmGui::CustomProperty)"
     },
     {
@@ -4139,6 +4863,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:handle:dmGui::HNode:u32,value:scalar:bool)"
     },
     {
@@ -4147,6 +4878,7 @@
       "symbol": "dmGui::SetNodeProperty",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -4157,6 +4889,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::Property,in:unknown:dmVMath::Vector4)"
     },
     {
@@ -4172,6 +4912,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64)"
     },
     {
@@ -4188,6 +4935,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:enum:dmGui::NodeTextureType,value:handle:dmGui::HTextureSource:u64)"
     },
     {
@@ -4233,6 +4987,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmHID::HTouchDevice:opaque,value:scalar:i32,value:scalar:i32,value:scalar:u32,value:enum:dmHID::Phase)"
     },
     {
@@ -4308,6 +5069,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmHID::HKeyboard:opaque,value:enum:dmHID::Key,value:scalar:bool)"
     },
     {
@@ -4323,6 +5091,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmHID::HMouse:opaque,value:enum:dmHID::MouseButton,value:scalar:bool)"
     },
     {
@@ -4398,6 +5173,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmImage::HImage:opaque)"
     },
     {
@@ -4443,6 +5225,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmImage::Type(value:handle:dmImage::HImage:opaque)"
     },
     {
@@ -4550,6 +5339,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(inout:pointer:record:dmMessage::URL,value:handle:dmMessage::HSocket:u64)"
     },
     {
@@ -4565,6 +5361,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmMutex::HMutex:opaque)"
     },
     {
@@ -4610,6 +5413,13 @@
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
     },
     {
@@ -4625,6 +5435,13 @@
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmMutex::HMutex:opaque)"
     },
     {
@@ -4704,6 +5521,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRender::Result(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderObject)"
     },
     {
@@ -4720,6 +5544,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,value:handle:dmRender::HMaterial:opaque,in:pointer:record:dmRender::RenderObject)"
     },
     {
@@ -4848,6 +5679,7 @@
       "symbol": "dmRender::GetConstantType",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -4855,6 +5687,14 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmRenderDDF::MaterialDesc::ConstantType(value:handle:dmRender::HConstant:opaque)"
     },
     {
@@ -4953,6 +5793,7 @@
       "symbol": "dmRender::GetMaterialVertexSpace",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -4960,6 +5801,14 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmRenderDDF::MaterialDesc::VertexSpace(value:handle:dmRender::HMaterial:opaque)"
     },
     {
@@ -4998,6 +5847,7 @@
       "symbol": "dmRender::GetViewMatrix",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -5006,6 +5856,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "unknown:dmVMath::Matrix4(value:handle:dmRender::HRenderContext:opaque)"
     },
     {
@@ -5052,6 +5910,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:dmRender::RenderListEntry(value:handle:dmRender::HRenderContext:opaque,value:scalar:u32)"
     },
     {
@@ -5070,6 +5935,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmRender::HRenderContext:opaque,inout:pointer:record:dmRender::RenderListEntry,inout:pointer:record:dmRender::RenderListEntry)"
     },
     {
@@ -5138,6 +6010,7 @@
       "symbol": "dmRender::SetConstantType",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -5145,6 +6018,14 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmRender::HConstant:opaque,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
     },
     {
@@ -5164,6 +6045,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRender::Result(value:handle:dmRender::HConstant:opaque,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
@@ -5183,6 +6071,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)"
     },
     {
@@ -5201,6 +6096,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:bool(value:handle:dmRender::HMaterial:opaque,value:scalar:u64,value:scalar:u32,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureWrap,value:enum:dmGraphics::TextureFilter,value:enum:dmGraphics::TextureFilter,value:scalar:f32)"
     },
     {
@@ -5218,6 +6120,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32)"
     },
     {
@@ -5226,6 +6135,7 @@
       "symbol": "dmRender::SetNamedConstant",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -5237,6 +6147,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
     },
     {
@@ -5245,6 +6163,7 @@
       "symbol": "dmRender::SetNamedConstantAtIndex",
       "disposition": "blocked",
       "blockers": [
+        "borrowed-handle-specialization-unverified",
         "call-thread-affinity-unresolved",
         "handle-ownership-nullability-lifetime-unresolved",
         "native-symbol-linkage-unverified",
@@ -5257,6 +6176,14 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "blockerReason": "The declaration remains available through the universal dmSDK route, but this revision did not prove the borrowed-handle specialization recipe.",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRender::Result(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,inout:pointer:unknown:dmVMath::Vector4,value:scalar:u32,value:scalar:u32,value:unknown:dmRenderDDF::MaterialDesc::ConstantType)"
     },
     {
@@ -5273,6 +6200,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmRender::HNamedConstantBuffer:opaque,inout:pointer:unknown:HConstant,value:scalar:u32)"
     },
     {
@@ -5288,6 +6222,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HResourceType:opaque)"
     },
     {
@@ -5306,6 +6247,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HDescriptor)"
     },
     {
@@ -5385,6 +6333,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)"
     },
     {
@@ -5400,6 +6355,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)"
     },
     {
@@ -5415,6 +6377,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:dmResource::HDescriptor:opaque)"
     },
     {
@@ -5463,6 +6432,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)"
     },
     {
@@ -5479,6 +6455,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:opaque-pointer)"
     },
     {
@@ -5525,6 +6508,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)"
     },
     {
@@ -5541,6 +6531,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)"
     },
     {
@@ -5557,6 +6554,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmResource::HDescriptor:opaque,inout:opaque-pointer)"
     },
     {
@@ -5602,6 +6606,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmResource::Result(value:handle:HResourceType:opaque)"
     },
     {
@@ -5617,6 +6628,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque)"
     },
     {
@@ -5753,6 +6771,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:dmRig::IKTarget(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)"
     },
     {
@@ -5860,6 +6885,13 @@
         "semantic-token-unresolved:template-specialization-set",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:unknown:dmArray<BonePose>(value:handle:dmRig::HRigInstance:opaque)"
     },
     {
@@ -5935,6 +6967,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque)"
     },
     {
@@ -5981,6 +7020,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,value:enum:dmRig::RigPlayback,value:scalar:f32,value:scalar:f32,value:scalar:f32)"
     },
     {
@@ -6026,6 +7072,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32,value:scalar:bool)"
     },
     {
@@ -6071,6 +7124,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64)"
     },
     {
@@ -6086,6 +7146,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:f32)"
     },
     {
@@ -6101,6 +7168,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigContext:opaque,value:scalar:f32)"
     },
     {
@@ -6117,6 +7191,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:lua_State(value:handle:dmScript::HContext:opaque)"
     },
     {
@@ -6134,6 +7215,13 @@
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmBuffer::HBuffer:u32,value:enum:dmScript::LuaBufferOwnership)"
     },
     {
@@ -6152,6 +7240,13 @@
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmResource::HFactory:opaque,inout:opaque-pointer)"
     },
     {
@@ -6167,6 +7262,13 @@
         "semantic-token-unresolved:receiver-provenance-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:dmBuffer::HBuffer:u32,value:scalar:bool)"
     },
     {
@@ -6216,6 +7318,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)"
     },
     {
@@ -6235,6 +7344,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:bool(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)"
     },
     {
@@ -6254,6 +7370,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(inout:pointer:record:dmSocket::Selector,value:enum:dmSocket::SelectorKind,value:handle:dmSocket::Socket:i32)"
     },
     {
@@ -6269,6 +7392,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
     },
     {
@@ -6284,6 +7414,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
     },
     {
@@ -6299,6 +7436,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
     },
     {
@@ -6314,6 +7458,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
     },
     {
@@ -6329,6 +7480,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:u64)"
     },
     {
@@ -6344,6 +7502,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:bool)"
     },
     {
@@ -6359,6 +7524,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:scalar:u64)"
     },
     {
@@ -6375,6 +7547,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSocket::Socket:i32,value:enum:dmSocket::ShutdownType)"
     },
     {
@@ -6390,6 +7569,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:dmSocket::Result(value:handle:dmSSLSocket::Socket:opaque,value:scalar:u64)"
     },
     {
@@ -6405,6 +7591,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:FontResult(value:handle:HFontCollection:opaque,value:handle:HFont:opaque)"
     },
     {
@@ -6480,6 +7673,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:FontResult(value:handle:HFontCollection:opaque,value:handle:HFont:opaque)"
     },
     {
@@ -6529,6 +7729,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:FontResult(value:handle:HFont:opaque,inout:pointer:record:FontGlyph)"
     },
     {
@@ -6754,6 +7961,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:FontType(value:handle:HFont:opaque)"
     },
     {
@@ -6773,6 +7987,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:HttpResult(inout:pointer:record:HttpService,value:handle:HttpRequestHandle:u32)"
     },
     {
@@ -6788,6 +8009,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
     },
     {
@@ -6833,6 +8061,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
     },
     {
@@ -6848,6 +8083,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
     },
     {
@@ -6893,6 +8135,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64)"
     },
     {
@@ -6908,6 +8157,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:JobSystemResult(value:handle:HJobContext:opaque,value:handle:HJob:u64,value:handle:HJob:u64)"
     },
     {
@@ -6953,6 +8209,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:ProfileResult(value:handle:HProfile:u32)"
     },
     {
@@ -6998,6 +8261,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)"
     },
     {
@@ -7013,6 +8283,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HResourceDescriptor:opaque)"
     },
     {
@@ -7089,6 +8366,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)"
     },
     {
@@ -7105,6 +8389,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:HResourceDescriptor:opaque,inout:opaque-pointer)"
     },
     {
@@ -7153,6 +8444,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceDescriptor)"
     },
     {
@@ -7169,6 +8467,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)"
     },
     {
@@ -7185,6 +8490,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:HResourceFactory:opaque,inout:opaque-pointer)"
     },
     {
@@ -7200,6 +8512,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HResourceTypeContext:opaque,value:scalar:u64)"
     },
     {
@@ -7215,6 +8534,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "opaque-pointer(value:handle:HResourceType:opaque)"
     },
     {
@@ -7351,6 +8677,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:HResourceType:opaque,inout:opaque-pointer)"
     },
     {
@@ -7428,6 +8761,13 @@
         "semantic-token-unresolved:pointer-bounds-nullability-lifetime",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:void(value:handle:HTextLayout:opaque,inout:pointer:scalar:f32,inout:pointer:scalar:f32)"
     },
     {
@@ -7474,6 +8814,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:TextDecoration(value:handle:HTextLayout:opaque)"
     },
     {
@@ -7520,6 +8867,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:TextGlyph(value:handle:HTextLayout:opaque)"
     },
     {
@@ -7566,6 +8920,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:TextLine(value:handle:HTextLayout:opaque)"
     },
     {
@@ -7582,6 +8943,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:TextLayoutObjectAttribute(value:handle:HTextLayout:opaque)"
     },
     {
@@ -7628,6 +8996,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:TextLayoutObject(value:handle:HTextLayout:opaque)"
     },
     {
@@ -7674,6 +9049,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "pointer:record:TextParagraph(value:handle:HTextLayout:opaque)"
     },
     {
@@ -7899,6 +9281,13 @@
         "semantic-token-unresolved:enum-width-domain-validation",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "scalar:u32(value:handle:HWindow:opaque,value:enum:WindowState)"
     },
     {
@@ -7977,6 +9366,13 @@
         "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
+      "universalFallback": "retained",
+      "stages": {
+        "generated": "universal-fallback-retained",
+        "compiled": "not-applicable",
+        "linked": "not-applicable",
+        "runtime": "not-applicable"
+      },
       "shape": "enum:WindowResult(value:handle:HWindow:opaque,in:pointer:record:WindowCreateParams)"
     },
     {

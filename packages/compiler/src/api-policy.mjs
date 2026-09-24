@@ -343,11 +343,6 @@ export function buildPolicy(inputs) {
     const dmsdk = section(bucket(namespaces, namespace), "dmsdk", () => ({ declarations: [] }));
     dmsdk.declarations.push(declaration);
   }
-  if (dmsdkBlockers.length) {
-    const error = new Error(`${dmsdkBlockers.length} dmSDK declarations carry no dmsdk/<namespace>/ header`);
-    error.blockers = dmsdkBlockers;
-    throw error;
-  }
   shared.dmsdk = {
     // What the declaration surface was PARSED under, not a platform this policy
     // is for. The field used to be `platform: "arm64-macos"` - the deriving
@@ -356,7 +351,13 @@ export function buildPolicy(inputs) {
     // target set; which target gets which declaration is a separate answer.
     parseEnvironment: dmsdkIr.parseEnvironment,
     opaqueTypes: normalizePaths(dmsdkIr.opaqueTypes ?? [], repositoryRoot),
-    unresolvedTypes: normalizePaths(dmsdkIr.unresolvedTypes ?? [], repositoryRoot)
+    unresolvedTypes: normalizePaths(dmsdkIr.unresolvedTypes ?? [], repositoryRoot),
+    // A declaration whose header cannot be attributed to a dmsdk namespace is
+    // still source-derived policy data, not a reason to discard every other
+    // namespace. Keep the exact blocker in the shared subtree so consumers can
+    // surface the gap while the remaining declarations remain usable. Omit an
+    // empty field to preserve byte identity for complete policies.
+    ...(dmsdkBlockers.length ? { blockers: dmsdkBlockers } : {})
   };
   shared.script = section(shared, "script", () => ({ functions: [], types: [] }));
   shared.script.unresolvedTypes = scriptIr.unresolvedTypes ?? [];

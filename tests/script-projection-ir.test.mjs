@@ -21,15 +21,13 @@ function replaceJson(text, mutate) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
-test("projects all 926 script APIs exactly once independently of evidence state", () => {
-  assert.equal(generated.routeCount, 926);
-  assert.deepEqual(generated.generationCounts, { projected: 926 });
-  assert.equal(new Set(generated.rows.map(({ id }) => id)).size, 926);
-  assert.deepEqual(generated.accountingCounts, {
-    "component-property-compiler": 8,
-    "executable-stable-id": 915,
-    "separate-module": 3
-  });
+test("projects the source-derived script API census exactly once independently of evidence state", () => {
+  assert.equal(generated.routeCount, inputs.ir ? JSON.parse(inputs.ir).functions.length : 0);
+  assert.deepEqual(generated.generationCounts, { projected: generated.routeCount });
+  assert.equal(new Set(generated.rows.map(({ id }) => id)).size, generated.routeCount);
+  const accountingCounts = {};
+  for (const row of JSON.parse(inputs.accounting).rows) accountingCounts[row.category] = (accountingCounts[row.category] ?? 0) + 1;
+  assert.deepEqual(generated.accountingCounts, Object.fromEntries(Object.entries(accountingCounts).sort()));
   assert.ok(generated.rows.every(({ generation, evidence }) =>
     generation.state === "projected" && typeof evidence.accountingCategory === "string"));
   assert.deepEqual(checked, generated);
@@ -124,15 +122,48 @@ test("rejects omitted, duplicated, foreign, and stale route inputs", () => {
   }));
   assert.throws(() => generateScriptProjectionIr(foreign), /absent from script IR/);
 
-  const stale = structuredClone(inputs);
-  stale.ir = replaceJson(stale.ir, (value) => value.functions.pop());
-  assert.throws(() => generateScriptProjectionIr(stale), /function census (?:drifted|expected 926, found 925)/);
+});
+
+test("derives add/remove route drift from the current IR and accounting inputs", () => {
+  const ir = JSON.parse(inputs.ir);
+  const accounting = JSON.parse(inputs.accounting);
+  const separate = accounting.rows.find(({ category }) => category === "separate-module");
+  assert.ok(separate);
+  const sourceFunction = ir.functions.find(({ id }) => id === separate.id);
+  assert.ok(sourceFunction);
+
+  const removed = structuredClone(inputs);
+  removed.ir = replaceJson(removed.ir, (value) => {
+    value.functions = value.functions.filter(({ id }) => id !== separate.id);
+    value.counts.functions -= 1;
+  });
+  removed.accounting = replaceJson(removed.accounting, (value) => {
+    value.rows = value.rows.filter(({ id }) => id !== separate.id);
+    value.functionCount -= 1;
+  });
+  const removedProjection = generateScriptProjectionIr(removed);
+  assert.equal(removedProjection.routeCount, ir.functions.length - 1);
+  assert.equal(removedProjection.accountingCounts["separate-module"], 2);
+
+  const added = structuredClone(inputs);
+  const syntheticId = `${sourceFunction.id}.synthetic-drift`;
+  added.ir = replaceJson(added.ir, (value) => {
+    value.functions.push({ ...sourceFunction, id: syntheticId, rawName: `${sourceFunction.rawName}.synthetic_drift` });
+    value.counts.functions += 1;
+  });
+  added.accounting = replaceJson(added.accounting, (value) => {
+    value.rows.push({ ...separate, id: syntheticId });
+    value.functionCount += 1;
+  });
+  const addedProjection = generateScriptProjectionIr(added);
+  assert.equal(addedProjection.routeCount, ir.functions.length + 1);
+  assert.ok(addedProjection.rows.some(({ id }) => id === syntheticId));
 });
 
 test("pins every machine-readable input and checks deterministic regeneration", () => {
   assert.deepEqual(Object.keys(generated.inputHashes), Object.keys(inputPaths));
   assert.ok(Object.values(generated.inputHashes).every((hash) => /^[0-9a-f]{64}$/.test(hash)));
-  assert.equal(new Set(generated.rows.map(({ stableId }) => stableId)).size, 926);
+  assert.equal(new Set(generated.rows.map(({ stableId }) => stableId)).size, generated.routeCount);
   execFileSync(process.execPath, ["scripts/generate-script-projection-ir.mjs", "--check"], {
     cwd: root,
     stdio: "pipe"

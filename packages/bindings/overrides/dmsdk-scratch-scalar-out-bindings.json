@@ -1,14 +1,6 @@
 {
   "schemaVersion": 1,
   "family": "scratch-out-parameters",
-  "expectedCoverage": {
-    "candidates": 79,
-    "generated": 7,
-    "blocked": 72,
-    "handleKinds": 4,
-    "maxParameters": 4,
-    "maxOutputs": 1
-  },
   "selection": {
     "resultRolePrefixes": ["scalar:", "enum:"],
     "valueRolePrefixes": ["handle:", "scalar:", "enum:"],

@@ -59,8 +59,11 @@ derivation hit.
 
 `scripts/derive-revision.mjs` copies every tracked and every new non-ignored
 file into a scratch workspace, symlinks `node_modules`, repins the workspace's
-`upstream.lock`, materialises `upstream/` for the revision being derived, and
-runs the unmodified chain there.
+`upstream.lock`, materialises `upstream/` for the revision being derived,
+downloads and digest-verifies that revision's published Defold SDK inside the
+workspace, and runs the unmodified chain there. The SDK step is mandatory: the
+source checkout does not contain generated DDF and third-party headers, and a
+scratch derivation must not accidentally read the repository pin's SDK.
 
 A scratch *output root* was the alternative and is worse. It would mean teaching
 roughly thirty generators, three ownership registries, two clean rooms and a
@@ -78,6 +81,35 @@ is how the engine slice came to omit `packages/`, and with it the vectormath
 archive the dmSDK importer needs. That omission did not fail: the importer
 parsed on without it, so a CI derivation and a local derivation of the *same*
 revision produced different policy roots.
+
+Script SDK generation is deliberately two-pass. The semantic pass reads the
+target revision's reference archive and emits its IR/types without consulting a
+runtime-profile catalog. Source-derived registration, handle classification and
+route availability are then regenerated for that revision; only after that does
+the final SDK pass emit constants and modules. This prevents a previously pinned
+revision's generated availability catalog from bootstrapping the next revision.
+
+The canonical lowering plan is an optimization authority for the revision that
+produced it, not an availability authority for every revision. Until a target
+revision has its own canonical plan, typed-native generation intersects the
+carried plan's selected stable IDs with that revision's generated universal
+frames. Missing routes are recorded as declined and remain callable through the
+baseline JSI bridge; a missing frame under a same-revision plan still fails
+closed as internal drift.
+
+Named build profiles may expose the same exact Lua function-presence vector in
+one Defold revision. Runtime-profile generation groups those profiles by that
+observable vector, emits the lexicographically first profile as the deterministic
+detection representative, and conservatively removes feature-scoped handle
+capture unless every equivalent profile agrees. Truly different matching vectors
+remain an ambiguous, fail-closed runtime result.
+
+The revision workspace regenerates the complete dmSDK binding pipeline, not only
+the TypeScript SDK projection. After both dmSDK and script families exist, it
+force-rebuilds the canonical lowering plan from those revision-local inputs and
+reruns the typed-native and recording consumers before sealing the policy. A
+policy may therefore never combine a new SDK IR with scalar/universal recipes or
+a lowering plan inherited from the checkout's pinned revision.
 
 ## Prove the checkout did not move
 
@@ -169,33 +201,36 @@ read; the third is a real re-review.
 
 # What this establishes, and what it does not
 
-Deriving Defold 1.13.1 (`574678c7`) from the current `dev` pin (`7f0f554f`) now
-runs to a complete, reviewable answer instead of an assertion failure - and the
-answer is that it is **not derivable**: **110 of 125 reviewed claims across 12
-reviewed inputs do not hold**, 15 of them because the file does not exist at
-1.13.1 at all. The whole `bullet3d` physics backend is one of those: it is
-present on `dev` and absent from stable, so six reviewed inputs cite sources
-1.13.1 does not have.
+Deriving Defold 1.13.1 (`574678c7`) from the current `dev` pin (`7f0f554f`) is
+the acceptance test for this decision. It now passes with the unchanged package
+and compiler code. The derivation hydrated the exact historical SDK, ran all 19
+dmSDK and 31 script generator steps, rebuilt the canonical lowering plan and its
+typed-native/recording consumers, and emitted a 19.50 MB content-addressed policy
+with 56 namespaces and 197 subtrees. The historical surface contains 1,336
+dmSDK universal recipes with zero omissions; source drift withdrew specialized
+lanes locally while preserving their universal fallback.
 
-So the structural blocker is fixed and the substantive one is now visible and
-attributed. Deriving a stable release from a `dev` pin is a real engine
-difference requiring real review; deriving a revision whose declared surface did
-not move is what the carry mechanism and the content-addressed store make cheap,
-and is the steady state the nightly was designed for.
+Policy-only materialization of that historical policy then wrote 20 semantic
+documents, all 28 SDK files, and all 118 revision outputs without a Defold tree
+or source archive. A second pass wrote nothing. The 28 SDK files and 118 outputs
+matched the historical source-pipeline tree byte for byte; the 19 non-sentinel
+IR documents were semantically identical after canonical JSON parsing. This is
+the decisive two-revision proof: both the current revision and 1.13.1 are
+derived and realized by one package/compiler implementation.
 
-Those counts were measured under the superseded rule, where any drifted claim -
-including one whose reviewed anchors all survived - counted against derivability.
-Under the rule above the 15 absent sources remain `void` and are withdrawn for
-that revision; the rest are re-classified by whether their anchors survived, and
-only the ones that lost an anchor still withdraw. The `bullet3d` finding is
-unchanged and is the substantive one: that backend is present on `dev` and absent
-from stable, so six reviewed inputs cite sources 1.13.1 does not have, and the
-entries resting on them are withdrawn there rather than guessed at.
+The proof does not promise that every future Defold edit is already understood.
+It establishes the required failure boundary: authoritative declarations are
+always projected through the universal recipe; a specialization whose reviewed
+anchors, signature, linkage, or target support moved is declined and reported
+for that declaration rather than blocking the revision. New ABI shapes may
+require a future compiler capability, which is expressed by the policy's
+minimum-realizer contract rather than by embedding revision facts in the npm
+package.
 
-What is *not* established: nothing here re-reviews anything automatically, and
-nothing here lets a stale review pass. A review whose anchors are gone does not
-quietly carry - its entry is withdrawn and named. What changed is that this is a
-policy difference to review rather than an error that stops the run.
+Nothing here re-reviews anything automatically, and nothing here lets a stale
+optimization claim pass. A review whose anchors are gone does not quietly carry:
+its specialized entry is withdrawn and named. The declaration itself remains in
+the mirrored API unless Defold removed it from the authoritative source.
 
 ## Availability-equivalent profiles are a normal revision result
 

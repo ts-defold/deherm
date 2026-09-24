@@ -20,6 +20,11 @@
     "allocation": "stack-only fixed slots; no glue allocation or ownership transfer",
     "html5": "fail-closed until Wasm BigInt and linked-symbol matrix are validated"
   },
+  "universalFallback": {
+    "preserved": true,
+    "catalog": "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
+    "mutation": "none"
+  },
   "coverage": {
     "baselineRuntimePending": 1361,
     "previouslyEmittedScalar": 26,

@@ -1,13 +1,6 @@
 {
   "schemaVersion": 1,
   "family": "borrowed-handle-consumers",
-  "expectedCoverage": {
-    "candidates": 348,
-    "generated": 158,
-    "blocked": 190,
-    "handleKinds": 45,
-    "maxArguments": 8
-  },
   "selection": {
     "declarationKinds": ["function"],
     "resultRoles": ["scalar:bool", "scalar:f32", "scalar:i32", "scalar:u8", "scalar:u16", "scalar:u32", "scalar:u64", "scalar:void"],

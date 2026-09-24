@@ -29,34 +29,6 @@
       "policyVersion": "hash-state-v1"
     }
   ],
-  "coveredByPriorWaves": [
-    "dmCrypt::HashMd5",
-    "dmCrypt::HashSha1",
-    "dmCrypt::HashSha256",
-    "dmCrypt::HashSha512",
-    "dmCrypt::Base64Encode",
-    "dmCrypt::Base64Decode",
-    "dmImage::GetAstcBlockSize",
-    "dmImage::GetAstcDimensions",
-    "dmCrypt::Encrypt",
-    "dmCrypt::Decrypt",
-    "dmHashBuffer32",
-    "dmHashBuffer64",
-    "dmHashUpdateBuffer32",
-    "dmHashUpdateBuffer64"
-  ],
-  "expectedCoverage": {
-    "arenaSpanCensus": 79,
-    "coveredByPriorWaves": 14,
-    "generatedCStringArena": 5,
-    "blocked": 60
-  },
-  "expectedPartitionSummary": {
-    "handle-provenance-or-engine-context": 33,
-    "opaque-byte-pointee-unit-or-lifetime": 4,
-    "record-layout-or-borrowed-record-lifetime": 17,
-    "template-element-layout-or-specialization": 6
-  },
   "blockerDefinitions": {
     "handle-provenance-or-engine-context": "The ABI consumes or returns an engine handle whose provenance, context, ownership, nullability, or teardown contract is not encoded by the arena.",
     "opaque-byte-pointee-unit-or-lifetime": "The void pointer's pointee unit, mutability, returned lifetime, allocation source, or ownership is not fully represented by the mechanical span shape.",

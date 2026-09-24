@@ -3,6 +3,8 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { semanticDeclarationId, semanticEntryMap } from "./lib/dmsdk-semantic-id.mjs";
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
@@ -99,36 +101,46 @@ function validateProvenance(ir, shapes, irText) {
   }
 }
 
-function validatePolicyCoverage(selected, policy) {
-  const selectedIds = selected.map(({ id }) => id);
-  const policyIds = Object.keys(policy.entries).sort();
-  if (selected.length !== 2 || JSON.stringify(selectedIds) !== JSON.stringify(policyIds)) {
-    throw new Error("xtea policy must exactly cover census candidates");
-  }
-}
-
-async function validateEvidence(selected, policy) {
+async function createEntries(selected, declarations, policy) {
+  const policiesBySemanticId = semanticEntryMap(policy.entries, "XTEA-span policy");
+  const entries = [];
+  const blocked = [];
   for (const candidate of selected) {
-    for (const evidence of policy.entries[candidate.id].evidence) {
-      const header = await readFile(resolve(root, evidence.header), "utf8");
-      if (header.split("\n")[evidence.line - 1] !== evidence.text) {
-        throw new Error(`Xtea evidence drifted for ${candidate.id}`);
-      }
+    const declaration = declarations.get(candidate.id);
+    if (!declaration) throw new Error(`XTEA-span candidate is absent from dmSDK IR: ${candidate.id}`);
+    const policyEntry = policiesBySemanticId.get(semanticDeclarationId(candidate.id));
+    if (!policyEntry) {
+      blocked.push({ ...candidate, emitted: false, blocker: "unreviewed-xtea-span-optimization" });
+      continue;
     }
+    let withdrawn = false;
+    for (const evidence of policyEntry.evidence) {
+      const header = await readFile(resolve(root, evidence.header), "utf8");
+      const hint = evidence.header === declaration.header ? declaration.line : evidence.line;
+      const matches = header.split("\n")
+        .map((line, index) => line.trim() === evidence.text.trim() ? index + 1 : 0)
+        .filter(Boolean)
+        .sort((left, right) => Math.abs(left - hint) - Math.abs(right - hint));
+      if (matches.length === 0) {
+        blocked.push({ ...candidate, emitted: false, blocker: "xtea-span-evidence-withdrawn" });
+        withdrawn = true;
+        break;
+      }
+      evidence.line = matches[0];
+    }
+    if (withdrawn) continue;
+    entries.push({
+      id: entries.length,
+      declaration,
+      candidate,
+      wrapper: `deherm_dmsdk_xtea_span_${snake(candidate.symbol)}`,
+      evidence: policyEntry.evidence,
+    });
   }
+  return { entries, blocked };
 }
 
-function createEntries(selected, declarations, policy) {
-  return selected.map((candidate, id) => ({
-    id,
-    declaration: declarations.get(candidate.id),
-    candidate,
-    wrapper: `deherm_dmsdk_xtea_span_${snake(candidate.symbol)}`,
-    evidence: policy.entries[candidate.id].evidence,
-  }));
-}
-
-function createReport(contents, ir, shapes, policy, entries, artifacts) {
+function createReport(contents, ir, shapes, policy, entries, blocked, artifacts, selected) {
   return {
     schemaVersion: 1,
     policyVersion: policy.policyVersion,
@@ -145,17 +157,17 @@ function createReport(contents, ir, shapes, policy, entries, artifacts) {
     },
     coverage: {
       baselineRuntimePending: shapes.coverage.runtimePending,
-      discovered: 2,
-      emitted: 2,
-      policyBlocked: 0,
-      hostBehaviorVerified: 2,
-      remainingWithoutGeneratedAdapters: 1318,
+      discovered: selected.length,
+      emitted: entries.length,
+      policyBlocked: blocked.length,
+      hostBehaviorVerified: entries.length,
+      remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - 41 - entries.length,
     },
     artifactHashes: Object.fromEntries(
       [...artifacts].map(([path, content]) => [path, sha256(content)]),
     ),
     artifacts: [...artifacts.keys()].sort(),
-    declarations: entries.map(({ id, candidate, wrapper, evidence }) => ({
+    declarations: [...entries.map(({ id, candidate, wrapper, evidence }) => ({
       ...candidate,
       bindingId: id,
       mode: candidate.symbol.endsWith("Encrypt") ? "encrypt" : "decrypt",
@@ -168,7 +180,7 @@ function createReport(contents, ir, shapes, policy, entries, artifacts) {
         runtime: "packaged-sdk-host-behavior-test",
         allocation: "100000-warmed-dispatch-zero-cpp-operator-new",
       },
-    })),
+    })), ...blocked],
   };
 }
 
@@ -200,12 +212,9 @@ export async function run(argv = process.argv.slice(2)) {
 
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const selected = candidates(shapes, policy.candidateSelector);
-  validatePolicyCoverage(selected, policy);
-  await validateEvidence(selected, policy);
-
-  const entries = createEntries(selected, declarations, policy);
+  const { entries, blocked } = await createEntries(selected, declarations, policy);
   const artifacts = renderArtifacts(entries);
-  const report = createReport(contents, ir, shapes, policy, entries, artifacts);
+  const report = createReport(contents, ir, shapes, policy, entries, blocked, artifacts, selected);
   artifacts.set(
     "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
     `${JSON.stringify(report, null, 2)}\n`,
