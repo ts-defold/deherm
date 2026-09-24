@@ -8,6 +8,7 @@ export const scriptGeneratorSources = Object.freeze([
   "scripts/generate-script-sdk.mjs",
   "scripts/generate-component-proxy-contract.mjs",
   "scripts/lib/defold-constant-values.mjs",
+  "packages/generator/src/sdk/script-sdk.mjs",
   "packages/compiler/src/sdk/script-sdk.mjs",
   "scripts/classify-script-bindings.mjs",
   "scripts/generate-script-binding-descriptors.mjs",

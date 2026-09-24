@@ -5,7 +5,7 @@ import test from "node:test";
 import {
   generateModules,
   registrationScopeForConstant
-} from "../packages/compiler/src/sdk/script-sdk.mjs";
+} from "../packages/generator/src/sdk/script-sdk.mjs";
 
 const root = new URL("../", import.meta.url);
 

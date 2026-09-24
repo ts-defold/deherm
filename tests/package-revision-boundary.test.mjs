@@ -6,10 +6,15 @@ import path from "node:path";
 import test from "node:test";
 
 import { emitDmSdkUniversalStaticFrame } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
+import * as dmSdkEmitter from "../packages/compiler/src/sdk/dmsdk-sdk.mjs";
+import * as scriptSdkEmitter from "../packages/compiler/src/sdk/script-sdk.mjs";
 import {
   classifyPackageInventory,
   packageInventoryPaths,
+  packageRuntimeEntrypoints,
   stableGeneratedExceptions,
+  verifyNoPinnedDefoldRevisionBytes,
+  verifyPackedRuntimeImportClosure,
   verifyStableGeneratedExceptionBytes
 } from "../scripts/check-package-revision-boundary.mjs";
 
@@ -28,6 +33,8 @@ test("package revision boundary groups every fixed-revision output family", () =
     { path: "packages/abi/src/generated/layouts.ts" },
     { path: "packages/static-hermes/src/generated/script-vmath.ts" },
     { path: "packages/compiler/src/generated/dmsdk-universal-recipes.mjs" },
+    { path: "packages/generator/src/policy/generate-api-policy.mjs" },
+    { path: "scripts/lib/script-semantic-overrides.mjs" },
     { path: "packages/toolchains/defold-bundle-targets.json" },
     { path: "defold/defold_hermes/include/libhermesvm-config.h" },
     { path: "defold/defold_hermes/lib/arm64-osx/.deherm-artifact.json" },
@@ -52,9 +59,64 @@ test("package revision boundary groups every fixed-revision output family", () =
     "target-native-install-receipt": 1,
     "revision-native-header-output": 1,
     "revision-native-source-output": 1,
-    "revision-web-output": 1
+    "revision-web-output": 1,
+    "repository-policy-producer": 2
   });
-  assert.equal(report.summary.forbiddenFileCount, 16);
+  assert.equal(report.summary.forbiddenFileCount, 18);
+});
+
+test("runtime entrypoints are derived from package exports and binaries", () => {
+  assert.deepEqual(packageRuntimeEntrypoints({
+    bin: { tool: "./bin/tool.mjs" },
+    exports: {
+      ".": { import: "./src/index.mjs", default: "./src/fallback.mjs" },
+      "./feature": "./src/feature.mjs"
+    }
+  }), ["bin/tool.mjs", "src/fallback.mjs", "src/feature.mjs", "src/index.mjs"]);
+});
+
+test("packed runtime import closure fails when a local dependency is omitted", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-package-runtime-graph-test-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await writeFile(path.join(root, "package.json"), `${JSON.stringify({
+    type: "module",
+    exports: { ".": "./index.mjs" }
+  })}\n`);
+  await writeFile(path.join(root, "index.mjs"), 'export { value } from "./omitted.mjs";\n');
+  await writeFile(path.join(root, "omitted.mjs"), "export const value = 1;\n");
+
+  await assert.rejects(
+    verifyPackedRuntimeImportClosure(["package.json", "index.mjs"], root),
+    /not packed: omitted\.mjs/u
+  );
+});
+
+test("packed bytes reject the exact locked Defold revision identity", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-package-revision-byte-test-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const revision = "0123456789abcdef0123456789abcdef01234567";
+  await writeFile(path.join(root, "upstream.lock"), `DEFOLD_REV=${revision}\n`);
+  await writeFile(path.join(root, "package.json"), `${JSON.stringify({ revision })}\n`);
+
+  await assert.rejects(
+    verifyNoPinnedDefoldRevisionBytes(["package.json"], root),
+    new RegExp(`embeds pinned Defold revision ${revision} in: package\\.json \\(full\\+short-12\\)`, "u")
+  );
+});
+
+test("packed bytes reject abbreviated and binary-base64 locked revision identities", async (t) => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-package-revision-forms-test-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const revision = "0123456789abcdef0123456789abcdef01234567";
+  const encoded = Buffer.from(revision, "hex").toString("base64");
+  await writeFile(path.join(root, "upstream.lock"), `DEFOLD_REV=${revision}\n`);
+  await writeFile(path.join(root, "short.txt"), `${revision.slice(0, 12)}\n`);
+  await writeFile(path.join(root, "binary.txt"), `${encoded}\n`);
+
+  await assert.rejects(
+    verifyNoPinnedDefoldRevisionBytes(["short.txt", "binary.txt"], root),
+    /binary\.txt \(binary-base64\), short\.txt \(short-12\)/u
+  );
 });
 
 test("generated-looking exceptions are exact and carry package-side provenance", () => {
@@ -77,6 +139,57 @@ test("generated-looking exceptions are exact and carry package-side provenance",
   }
   assert.deepEqual(report.allowed.groups["compiler-realizer"], ["packages/compiler/src/policy-surface-materializer.mjs"]);
   assert.deepEqual(report.allowed.groups["toolchain-artifact"], ["packages/toolchains/host-compilers.json"]);
+});
+
+test("packed inventory fails closed for every unclassified path", () => {
+  const report = classifyPackageInventory([
+    "packages/compiler/src/policy-surface-materializer.mjs",
+    "scripts/generate-script-sdk.mjs",
+    "scripts/import-defold-sdk.py"
+  ]);
+
+  assert.equal(report.ok, false);
+  assert.deepEqual(report.unclassified, [
+    "scripts/generate-script-sdk.mjs",
+    "scripts/import-defold-sdk.py"
+  ]);
+  assert.equal(report.summary.unclassifiedFileCount, 2);
+});
+
+test("private generator entrypoints are repository policy producers while compiler SDK emitters are stable", () => {
+  const report = classifyPackageInventory([
+    "packages/compiler/src/sdk/script-sdk.mjs",
+    "packages/compiler/src/sdk/dmsdk-sdk.mjs",
+    "packages/generator/src/sdk/script-sdk.mjs",
+    "packages/generator/src/sdk/dmsdk-sdk.mjs"
+  ]);
+
+  assert.equal(report.ok, false);
+  assert.deepEqual(report.forbidden["repository-policy-producer"], [
+    "packages/generator/src/sdk/dmsdk-sdk.mjs",
+    "packages/generator/src/sdk/script-sdk.mjs"
+  ]);
+  assert.deepEqual(report.allowed.groups["sdk-emitter"], [
+    "packages/compiler/src/sdk/dmsdk-sdk.mjs",
+    "packages/compiler/src/sdk/script-sdk.mjs"
+  ]);
+});
+
+test("packed SDK modules expose only deterministic supplied-input emitters", () => {
+  assert.deepEqual(Object.keys(scriptSdkEmitter).sort(), [
+    "buildApiTrees",
+    "createTypeRenderer",
+    "generateIndex",
+    "generateModules",
+    "generateRuntime",
+    "generateTypes"
+  ]);
+  assert.deepEqual(Object.keys(dmSdkEmitter).sort(), [
+    "createTypeRenderer",
+    "dmSdkRuntimeOverloads",
+    "generateRuntime",
+    "generateTypes"
+  ]);
 });
 
 test("compiler-owned static-frame exceptions reproduce from their package emitter", async () => {

@@ -6,6 +6,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { build } from "esbuild";
+
 import { emitDmSdkUniversalStaticFrame } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { renderBuildConfig } from "./assemble-typed-native-extension.mjs";
 
@@ -63,10 +65,16 @@ const forbiddenRules = Object.freeze([
   ["revision-native-source-output", (file) =>
     file.startsWith("defold/defold_hermes/src/generated_")],
   ["revision-web-output", (file) =>
-    file.startsWith("defold/defold_hermes/lib/web/generated_")]
+    file.startsWith("defold/defold_hermes/lib/web/generated_")],
+  ["repository-policy-producer", (file) =>
+    file.startsWith("packages/generator/") || file.startsWith("scripts/lib/")]
 ]);
 
 const stableRules = Object.freeze([
+  ["sdk-emitter", (file) => [
+    "packages/compiler/src/sdk/script-sdk.mjs",
+    "packages/compiler/src/sdk/dmsdk-sdk.mjs"
+  ].includes(file)],
   ["compiler-realizer", (file) => file.startsWith("packages/compiler/")],
   ["cli-cache", (file) => file.startsWith("packages/cli/")],
   ["toolchain-artifact", (file) => [
@@ -83,7 +91,9 @@ const stableRules = Object.freeze([
     file.startsWith("packages/telemetry/")],
   ["typescript-runtime-template", (file) =>
     file.startsWith("packages/sdk/src/") || file.startsWith("packages/static-hermes/src/")],
-  ["native-runtime-template", (file) => file.startsWith("defold/defold_hermes/")]
+  ["native-runtime-template", (file) => file.startsWith("defold/defold_hermes/")],
+  ["package-metadata", (file) => ["LICENSE", "README.md", "package.json"].includes(file)],
+  ["package-binary", (file) => file.startsWith("bin/")]
 ]);
 
 function normalizeInventoryPath(value) {
@@ -155,7 +165,7 @@ export function classifyPackageInventory(inventory, options = {}) {
   return {
     schemaVersion: 1,
     kind: "deherm.package-revision-boundary-report",
-    ok: forbiddenFileCount === 0,
+    ok: forbiddenFileCount === 0 && unclassified.length === 0,
     source: options.source ?? { kind: "injected-inventory" },
     summary: {
       inventoryFileCount: files.length,
@@ -197,6 +207,90 @@ export async function npmPackDryRunInventory(cwd = repositoryRoot) {
   } finally {
     await rm(cache, { recursive: true, force: true });
   }
+}
+
+function packageRuntimeExportTargets(value) {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap(packageRuntimeExportTargets);
+  if (!value || typeof value !== "object") return [];
+  return Object.entries(value).flatMap(([condition, target]) =>
+    condition === "types" ? [] : packageRuntimeExportTargets(target));
+}
+
+export function packageRuntimeEntrypoints(packageJson) {
+  const entrypoints = [
+    ...Object.values(packageJson.bin ?? {}),
+    ...Object.values(packageJson.exports ?? {}).flatMap(packageRuntimeExportTargets)
+  ].filter((value) => typeof value === "string" && value.length > 0)
+    .map((value) => normalizeInventoryPath(value));
+  return [...new Set(entrypoints)].sort();
+}
+
+/**
+ * Parse and traverse every public runtime entry with the package's own JS/TS
+ * bundler. This is a module graph, not a source-text import heuristic: a local
+ * input that npm omitted remains visible in the graph and fails closed.
+ */
+export async function verifyPackedRuntimeImportClosure(inventory, root = repositoryRoot) {
+  const files = new Set(packageInventoryPaths(inventory));
+  const packageJson = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
+  const entrypoints = packageRuntimeEntrypoints(packageJson);
+  const missingEntrypoints = entrypoints.filter((file) => !files.has(file));
+  if (missingEntrypoints.length) {
+    throw new Error(`npm package omits runtime entrypoints: ${missingEntrypoints.join(", ")}`);
+  }
+
+  const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-package-boundary-graph-"));
+  try {
+    const result = await build({
+      absWorkingDir: root,
+      entryPoints: entrypoints,
+      bundle: true,
+      write: false,
+      outdir: outputRoot,
+      metafile: true,
+      platform: "node",
+      format: "esm",
+      packages: "external",
+      logLevel: "silent"
+    });
+    const inputs = Object.keys(result.metafile.inputs).map(normalizeInventoryPath).sort();
+    const omittedInputs = inputs.filter((file) => !files.has(file));
+    const repositoryPolicyInputs = inputs.filter((file) =>
+      file.startsWith("packages/generator/") || file.startsWith("scripts/lib/"));
+    if (omittedInputs.length || repositoryPolicyInputs.length) {
+      const details = [
+        omittedInputs.length ? `not packed: ${omittedInputs.join(", ")}` : null,
+        repositoryPolicyInputs.length ? `repository policy production: ${repositoryPolicyInputs.join(", ")}` : null
+      ].filter(Boolean).join("; ");
+      throw new Error(`packed runtime import graph crosses the package/policy boundary (${details})`);
+    }
+    return { entrypoints, inputs };
+  } finally {
+    await rm(outputRoot, { recursive: true, force: true });
+  }
+}
+
+export async function verifyNoPinnedDefoldRevisionBytes(inventory, root = repositoryRoot) {
+  const lock = await readFile(path.join(root, "upstream.lock"), "utf8");
+  const revision = /^DEFOLD_REV=([0-9a-f]{40})$/mu.exec(lock)?.[1];
+  if (!revision) throw new Error("upstream.lock has no exact DEFOLD_REV identity");
+  const needles = [
+    { form: "full", bytes: Buffer.from(revision) },
+    { form: "short-12", bytes: Buffer.from(revision.slice(0, 12)) },
+    { form: "binary-base64", bytes: Buffer.from(Buffer.from(revision, "hex").toString("base64")) }
+  ];
+  const leaks = [];
+  for (const relative of packageInventoryPaths(inventory)) {
+    const bytes = await readFile(path.join(root, relative));
+    const forms = needles.filter(({ bytes: needle }) => bytes.includes(needle)).map(({ form }) => form);
+    if (forms.length) leaks.push({ path: relative, forms });
+  }
+  if (leaks.length) {
+    throw new Error(`npm package embeds pinned Defold revision ${revision} in: ${leaks
+      .map(({ path: relative, forms }) => `${relative} (${forms.join("+")})`).join(", ")}`);
+  }
+  return { checkedFileCount: packageInventoryPaths(inventory).length };
 }
 
 export async function verifyStableGeneratedExceptionBytes(root = repositoryRoot) {
@@ -252,6 +346,15 @@ export async function main(argv = process.argv) {
       }
     : await npmPackDryRunInventory(options.cwd);
   const report = classifyPackageInventory(loaded.inventory, { source: loaded.source });
+  if (report.ok && !options.inventory) {
+    const runtimeGraph = await verifyPackedRuntimeImportClosure(loaded.inventory, options.cwd);
+    const pinnedRevision = await verifyNoPinnedDefoldRevisionBytes(loaded.inventory, options.cwd);
+    report.runtimeGraph = {
+      entrypointCount: runtimeGraph.entrypoints.length,
+      inputCount: runtimeGraph.inputs.length
+    };
+    report.pinnedDefoldRevision = pinnedRevision;
+  }
   if (!options.quiet || !report.ok) {
     process.stdout.write(`${JSON.stringify(report, null, options.pretty ? 2 : 0)}\n`);
   }

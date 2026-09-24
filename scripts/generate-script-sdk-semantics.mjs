@@ -5,6 +5,6 @@
 // generated and owns constants/modules, which prevents a previous Defold
 // revision's profile catalog from becoming an input to the new revision.
 
-import { runScriptSdkGenerator } from "../packages/compiler/src/sdk/script-sdk.mjs";
+import { runScriptSdkGenerator } from "../packages/generator/src/sdk/script-sdk.mjs";
 
 await runScriptSdkGenerator({ semanticOnly: true });

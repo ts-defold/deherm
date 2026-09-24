@@ -100,6 +100,30 @@ That alias exists only for source-checkout tests and examples. The published
 package export remains the revision-neutral `package.ts`; consumer projects
 receive revision modules through their generated `@deherm/project` surface.
 
+The boundary check also parses the actual public runtime graph with the
+package's JS/TS bundler. Every `exports` target and binary is an entrypoint; a
+relative input that exists in the checkout but is absent from npm's inventory
+is therefore a hard failure, as is any graph edge into `packages/generator/`
+or `scripts/lib/`. The gate reads the exact `DEFOLD_REV` identity from
+`upstream.lock` and rejects that exact byte sequence anywhere in the packed
+files. The same gate rejects the 12-character display form and Base64 of the
+20-byte revision identity, so shortening or binary serialization cannot turn a
+revision-derived fact into package machinery. On 2026-09-24 the measured tarball contained 214 files; its 14 public
+entrypoints reached 87 local runtime inputs, with zero omitted inputs, zero
+repository policy-production inputs, and zero files containing the pinned
+Defold revision.
+
+The script and dmSDK SDK boundaries are physically split as well. The packed
+`packages/compiler/src/sdk/*-sdk.mjs` modules export only deterministic
+IR/model-to-source emitters. Archive parsing, checked-repository paths,
+reviewed overrides, generated-file writes, and generator runners live in the
+private `packages/generator/src/sdk/` modules used by repository command shims.
+The inventory classifier gives those emitters an exact stable class, rejects
+the private generator tree, and now fails when any packed path is unclassified;
+package metadata and binaries are positive classes rather than implicit
+exceptions. The focused export-shape test prevents a repository runner from
+silently returning to the packed emitter modules.
+
 # Current executable cut
 
 The authenticated `@compiler` subtree is now a **67,380-byte manifest**, not a
@@ -113,6 +137,16 @@ The 17,792,680-byte canonical lowering plan is already rebuilt locally from a
 2,689,701-byte authenticated recipe-facts document. Twelve SDK support sources
 and 106 revision-output compatibility sources remain to be replaced by compact
 facts plus package emitters.
+
+Schema-2 materialized surfaces authenticate policy-derived IR descriptor entries
+against the authenticated `@compiler` document manifest and its
+content-addressed object subtree, after separately checking the mutable
+descriptor hash. The two lowering-plan outputs are the explicit derived
+exception: package code regenerates them from the manifest's authenticated
+recipe-facts entry. A route profile whose `defaultProfileId` was changed and
+whose descriptor hash was edited to match is rejected as “not authenticated by
+policy”. The focused materialization/client suite passes 16/16, and
+`pnpm check:knowledge` passes its 15 OKF tests.
 
 `packages/compiler/src/policy-surface-materializer.mjs` owns the public
 realization contract. It restores the selected revision, resolves and validates

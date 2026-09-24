@@ -36,6 +36,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "packages/compiler/src/dmsdk-universal-materializer.mjs",
   "packages/compiler/src/dmsdk-universal-static-frame.mjs",
   "packages/compiler/src/names.mjs",
+  "packages/generator/src/sdk/dmsdk-sdk.mjs",
   "packages/compiler/src/sdk/dmsdk-sdk.mjs",
   "packages/compiler/src/sdk/support-sdk.mjs"
 ]);
