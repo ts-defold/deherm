@@ -188,8 +188,11 @@ canonical `ts-defold/deherm` repository.
 
 `deherm policy` resolves the exact Defold SHA from the project, then consumes
 the website index and verifies every fetched object against its content hash.
-The npm package contains the tested revision as an offline fast path; the
-website is the continuously updated catalogue for every tracked engine.
+The npm package contains the revision-independent realizer and policy-site
+locator, not a pinned revision surface. Authenticated revision objects are read
+from the content-addressed user cache when present and fetched from the website
+otherwise; the website is the continuously updated catalogue for every tracked
+engine.
 
 # Pull-request behavior
 
