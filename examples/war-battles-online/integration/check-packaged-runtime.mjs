@@ -11,19 +11,13 @@ import {
   checkedRequiredMarkers,
   DEFAULT_SETTLE_MS,
   digestEvidenceInputs,
-  REQUIRED_MARKERS,
   runPackagedRuntimeEvidence,
   sha256Artifact,
   sha256DefignoreEvidence,
   sha256Tree,
   transcriptEvidence,
 } from "./packaged-runtime-evidence.mjs";
-import {
-  harvestTranscript,
-  mergeOccurrences,
-  readBugPool,
-  writeBugPool,
-} from "@ts-defold/deherm/dev/bug-pool";
+import { harvestTranscript, mergeOccurrences, readBugPool, writeBugPool } from "@ts-defold/deherm/dev/bug-pool";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
@@ -47,26 +41,37 @@ const sourceFilePaths = [
 ];
 const arguments_ = new Set(process.argv.slice(2));
 for (const argument of arguments_) {
-  if (!["--record-evidence", "--check-evidence", "--check-sources"].includes(argument)) throw new Error(`Unknown argument: ${argument}`);
+  if (!["--record-evidence", "--check-evidence", "--check-sources"].includes(argument))
+    throw new Error(`Unknown argument: ${argument}`);
 }
-if (["--record-evidence", "--check-evidence", "--check-sources"].filter((argument) => arguments_.has(argument)).length > 1) {
+if (
+  ["--record-evidence", "--check-evidence", "--check-sources"].filter((argument) => arguments_.has(argument)).length > 1
+) {
   throw new Error("Runtime evidence modes are mutually exclusive");
 }
 
 const sourceInputs = [
   await sha256Tree(repositoryRoot, "defold/defold_hermes"),
   await sha256Tree(repositoryRoot, "examples/war-battles-online/defold", {
-    exclude: (path) => path === "build" || path.startsWith("build/") ||
+    exclude: (path) =>
+      path === "build" ||
+      path.startsWith("build/") ||
       path === ".defignore" ||
-      path.endsWith(".md") || path === ".vscode" || path.startsWith(".vscode/") ||
-      path === "defold_hermes" || path.startsWith("defold_hermes/") ||
-      path === ".internal" || path.startsWith(".internal/") ||
-      path === ".deherm" || path.startsWith(".deherm/") ||
-      path === "deherm" || path.startsWith("deherm/") ||
+      path.endsWith(".md") ||
+      path === ".vscode" ||
+      path.startsWith(".vscode/") ||
+      path === "defold_hermes" ||
+      path.startsWith("defold_hermes/") ||
+      path === ".internal" ||
+      path.startsWith(".internal/") ||
+      path === ".deherm" ||
+      path.startsWith(".deherm/") ||
+      path === "deherm" ||
+      path.startsWith("deherm/") ||
       path === "deherm.lock",
   }),
   await sha256DefignoreEvidence(repositoryRoot, "examples/war-battles-online/defold/.defignore"),
-  ...await Promise.all(sourceFilePaths.map((path) => sha256Artifact(repositoryRoot, path))),
+  ...(await Promise.all(sourceFilePaths.map((path) => sha256Artifact(repositoryRoot, path)))),
 ];
 
 if (arguments_.has("--check-sources")) {
@@ -146,7 +151,9 @@ const evidence = buildEvidenceDocument({
 console.log(`war-battles-packaged-runtime:ok:${evidence.evidenceKey}`);
 for (const marker of result.markers) console.log(marker);
 for (const marker of result.shutdownMarkers) console.log(marker);
-console.log(`war-battles-packaged-runtime:graceful-exit:port=${result.termination.port}:code=${result.termination.exitCode}`);
+console.log(
+  `war-battles-packaged-runtime:graceful-exit:port=${result.termination.port}:code=${result.termination.exitCode}`,
+);
 if (arguments_.has("--record-evidence")) {
   await writeFile(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
   console.log(`war-battles-packaged-runtime:evidence:${evidencePath}`);

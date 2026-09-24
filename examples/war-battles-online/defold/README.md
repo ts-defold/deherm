@@ -1,24 +1,37 @@
 # War Battles Online — Defold project
 
+This directory is the **Defold project root**, not the Node package root. Open
+[`../war-battles-online.code-workspace`](../war-battles-online.code-workspace)
+or the parent directory in VS Code so `package.json`, `core/`, `server/`, tests,
+and tooling remain visible beside this engine project.
+
+Defold resource paths are project-rooted, and its standard examples conventionally
+place collections, game objects, scripts, GUI scenes, atlases, and tilemaps under
+`main/`; it is not the npm/TypeScript `src/` convention. `defold_hermes/` is the
+managed shared runtime extension installed by `deherm generate`. The project-local
+`defold_hermes_typed_native/` is generated from the reachable TypeScript program
+by `deherm assemble-typed-native`. Bob discovers both through their
+`ext.manifest` files and compiles them; Bob does not generate either directory.
+
 A top-down arena deathmatch built entirely out of déherm TypeScript components.
 Every gameplay entity is an ordinary Defold game object with sprite, factory and
 collision-object components; the HUD is a GUI scene. No Lua is authored here.
 
-| Resource | Contents |
-| --- | --- |
-| `main/main.collection` | level, player, camera, GUI, the arena director, and four tutorial tanks |
-| `main/level.go` | `/main/arena.tilemap` over the generated `/main/arena-tiles.tilesource` |
-| `main/arena.go` | `/main/arena.script` plus the five factories the arena creates objects through |
-| `main/player.go` | tank sprite, rocket factory, `/main/player.script` |
-| `main/arena-tank.go` | tank sprite, `/main/tank.script` — one hull or one turret |
-| `main/arena-shot.go` | projectile sprite, `/main/rocket.script` bound to a simulation slot |
-| `main/arena-pickup.go` | pickup sprite, `/main/pickup.script` |
-| `main/arena-boom.go`, `main/arena-spark.go` | explosion sprites; no script, the director retires them |
-| `main/camera.go` | orthographic `camera` component plus `/main/camera.script` |
-| `main/rocket.go` | `/main/rocket.script`, sprite, kinematic collision, group `rockets`, mask `tanks` |
-| `main/tank.go` | sprite, kinematic collision, group `tanks`, mask `rockets` |
-| `main/ui.gui` | score, status, leaderboard and hint text driven by `/main/ui.gui_script` |
-| `input/game.input_binding` | arrows/WASD, space, shift, `1`-`6` weapons, `7`-`0` chassis |
+| Resource                                    | Contents                                                                          |
+| ------------------------------------------- | --------------------------------------------------------------------------------- |
+| `main/main.collection`                      | level, player, camera, GUI, the arena director, and four tutorial tanks           |
+| `main/level.go`                             | `/main/arena.tilemap` over the generated `/main/arena-tiles.tilesource`           |
+| `main/arena.go`                             | `/main/arena.script` plus the five factories the arena creates objects through    |
+| `main/player.go`                            | tank sprite, rocket factory, `/main/player.script`                                |
+| `main/arena-tank.go`                        | tank sprite, `/main/tank.script` — one hull or one turret                         |
+| `main/arena-shot.go`                        | projectile sprite, `/main/rocket.script` bound to a simulation slot               |
+| `main/arena-pickup.go`                      | pickup sprite, `/main/pickup.script`                                              |
+| `main/arena-boom.go`, `main/arena-spark.go` | explosion sprites; no script, the director retires them                           |
+| `main/camera.go`                            | orthographic `camera` component plus `/main/camera.script`                        |
+| `main/rocket.go`                            | `/main/rocket.script`, sprite, kinematic collision, group `rockets`, mask `tanks` |
+| `main/tank.go`                              | sprite, kinematic collision, group `tanks`, mask `rockets`                        |
+| `main/ui.gui`                               | score, status, leaderboard and hint text driven by `/main/ui.gui_script`          |
+| `input/game.input_binding`                  | arrows/WASD, space, shift, `1`-`6` weapons, `7`-`0` chassis                       |
 
 The authored sources are `main/arena.script.ts`, `main/player.script.ts`,
 `main/tank.script.ts`, `main/rocket.script.ts`, `main/pickup.script.ts`,
@@ -29,13 +42,13 @@ sibling `.script` and `.gui_script` proxies; do not edit them.
 
 Controls:
 
-| Keys | Action |
-| --- | --- |
+| Keys          | Action                                                       |
+| ------------- | ------------------------------------------------------------ |
 | Arrows / WASD | Thrust. The tank has mass: it accelerates, drifts and coasts |
-| Space | Fire |
-| Shift | Boost — a limited, recharging burst of speed |
-| `1`–`6` | Cannon, autocannon, railgun, scatter, mortar, ricochet |
-| `7`–`0` | Purchase/select scout, assault, bulwark, artillery chassis |
+| Space         | Fire                                                         |
+| Shift         | Boost — a limited, recharging burst of speed                 |
+| `1`–`6`       | Cannon, autocannon, railgun, scatter, mortar, ricochet       |
+| `7`–`0`       | Purchase/select scout, assault, bulwark, artillery chassis   |
 
 The turret is a separate object from the hull and slews at its own rate. With a
 keyboard there is no second stick, so the turret tracks the closest enemy the
@@ -53,7 +66,7 @@ Only the **current-instance** shapes of `go.set_position`, `go.set_rotation` and
 component can write another game object's transform. The whole scene is built
 around that: the arena director creates objects and never moves them, and every
 hull, turret, projectile and pickup reads the authoritative slot it was spawned
-for and moves *itself*. That is also why a tank is two game objects - the hull
+for and moves _itself_. That is also why a tank is two game objects - the hull
 and the turret rotate independently, and each has to be the thing that rotates.
 
 ## World, camera, and scale
@@ -72,12 +85,12 @@ browser's responsive scaling cannot put a spawn outside the actual viewport.
 
 This is a deliberate choice among three that Defold makes available:
 
-* the tutorial's stretch projection at 1280x720 shows 80x45 tiles of 16 px art,
+- the tutorial's stretch projection at 1280x720 shows 80x45 tiles of 16 px art,
   which is exactly what made the art read as very small;
-* dropping `display.width`/`display.height` to 640x360 would present the art at
-  the same size but open a 640x360 *window*, because in Defold the display size
+- dropping `display.width`/`display.height` to 640x360 would present the art at
+  the same size but open a 640x360 _window_, because in Defold the display size
   is both the window size and the reference projection;
-* `use_fixed_fit_projection` picks `min(window/reference)` as its zoom, which is
+- `use_fixed_fit_projection` picks `min(window/reference)` as its zoom, which is
   a non-integer factor for any window that is not an exact multiple.
 
 An authored integer zoom on a camera component keeps the window large and the
@@ -94,7 +107,7 @@ screen-space projection, so the score node stays fixed while the world scrolls.
 ### World
 
 `main/arena.tilemap` is **120x90 tiles, 1920x1440 px** — three screens wide and
-four tall. It is not decoration: it is the *picture* of the collision grid in
+four tall. It is not decoration: it is the _picture_ of the collision grid in
 `core/arena.ts`, emitted from the same seed by
 `../tools/generate-arena-tilemap.mjs`, which reads the tile identities out of the
 art manifest so renumbering the tile sheet cannot silently repaint the map. If
@@ -107,13 +120,19 @@ files.
 own origin sits at `(648, 368)` in Defold pixels. `main/main.collection` gives
 the player an inset copy of that rectangle and the camera the rectangle itself.
 
-The arena is **point-symmetric and not destructible**. Symmetric because neither
-half of a deathmatch may be the bad half. Not destructible because the grid is
-derived from a four-byte `mapSeed` rather than stored: a joining client rebuilds
-it exactly, and the authoritative snapshot stays a fixed 17,760 bytes with no
-terrain delta codec. Breakable cover would put 10,800 mutable cells on the wire
-or force an encoder this slice does not have — and Quake's arenas are not
-destructible either; cover you learned stays where you learned it.
+The arena is point-symmetric with a derived static grid plus up to 64
+authoritative reactive cover panels in a fixed-capacity table. Neither half of a deathmatch may be the bad
+half; the grid still rebuilds from the four-byte `mapSeed`, while each crate or
+sandbag panel carries one bounded health byte in the versioned snapshot. When a
+panel reaches zero, collision and line-of-sight open for tanks, projectiles, and
+bots. The presentation scripts only render the bounded damage event; generated
+core mirrors remain owned by `integration/sync-defold-sources.mjs`.
+
+The `decor` layer is generated from the same `ArenaMap` hazard coordinates and
+uses selected Sprite Fusion pixels that have passed through
+`../tools/generate-world-art.mjs`. Pickup pedestals, vents, fissures, and pipe
+motifs are imported into the single Defold arena tilesource; Sprite Fusion does
+not own the map, adjacency rules, layers, or collision data.
 
 ### Camera
 
@@ -149,17 +168,19 @@ same chunky silhouettes and the same 1 px `#2c2839` outline the tutorial sprites
 carry. Four team colours, tank hulls with a two-frame tread animation, separate
 turrets and wrecks, six projectiles, explosion and spark sequences, nine pickup
 icons, and the 17-cell arena tile sheet including a nine-tile blob wall set.
+The sheet now also carries checked pickup-pedestal and hazard roles imported by
+the local world-art projection.
 
 The tutorial's own sprite sheet is not vendored here. `main/tutorial-sprites.atlas`
 maps the tutorial's four animations onto the closest art in `assets/`, and is
 still used by the scripted demonstration rocket:
 
-| Animation | Source | Note |
-| --- | --- | --- |
-| `player-down` | `assets/units/infantry/down` | 22x22 walk cycle, art faces screen-down |
-| `rocket` | `assets/buildings/turret-rocket` | horizontally flipped so frame zero points along +x |
-| `explosion` | `assets/fx/explosion` | nine frames, `PLAYBACK_ONCE_FORWARD`, 122x71 — much larger than the tutorial's |
-| `tank-down` | `assets/units/tank/down` | 48x48 idle |
+| Animation     | Source                           | Note                                                                           |
+| ------------- | -------------------------------- | ------------------------------------------------------------------------------ |
+| `player-down` | `assets/units/infantry/down`     | 22x22 walk cycle, art faces screen-down                                        |
+| `rocket`      | `assets/buildings/turret-rocket` | horizontally flipped so frame zero points along +x                             |
+| `explosion`   | `assets/fx/explosion`            | nine frames, `PLAYBACK_ONCE_FORWARD`, 122x71 — much larger than the tutorial's |
+| `tank-down`   | `assets/units/tank/down`         | 48x48 idle                                                                     |
 
 The generated tank hull points along +x at rotation zero, which is what
 `quat_rotation_z` treats as its own zero, so the port no longer needs the
@@ -313,20 +334,20 @@ another. The set is declared in
 by `pnpm check:war-battles-projections`, which fails by name when a declared
 projection has no evidence.
 
-| Projection | Runtime | Transport | Profile | Gate |
-|---|---|---|---|---|
-| `native-arm64-macos` | `hermes` | `jsi` + `typed-native` | engine-detected | `pnpm --filter @deherm/example-war-battles-online runtime:packaged` |
-| `browser-wasm-web` | `browser` | `direct-memory` | browser | `pnpm test:html5:war-battles` |
-| `native-arm64-macos-typed-native-transport` | `hermes` | `typed-native` + `jsi` | `DEHERM_PROFILE` | `node integration/check-typed-native-transport.mjs --run <slot>` |
-| `native-arm64-macos-static-hermes-reachable` | `hermes` | `typed-native` | release reachable subset | `node scripts/generate-war-battles-static-hermes-projection.mjs` |
-| `browser-webtransport-loopback` | `browser` + `deno` | `webtransport-h3` | loopback P-256 pinned | `pnpm --filter @deherm/example-war-battles-online runtime:webtransport` |
+| Projection                                   | Runtime            | Transport              | Profile                  | Gate                                                                    |
+| -------------------------------------------- | ------------------ | ---------------------- | ------------------------ | ----------------------------------------------------------------------- |
+| `native-arm64-macos`                         | `hermes`           | `jsi` + `typed-native` | engine-detected          | `pnpm --filter @deherm/example-war-battles-online runtime:packaged`     |
+| `browser-wasm-web`                           | `browser`          | `direct-memory`        | browser                  | `pnpm test:html5:war-battles`                                           |
+| `native-arm64-macos-typed-native-transport`  | `hermes`           | `typed-native` + `jsi` | `DEHERM_PROFILE`         | `node integration/check-typed-native-transport.mjs --run <slot>`        |
+| `native-arm64-macos-static-hermes-reachable` | `hermes`           | `typed-native`         | release reachable subset | `node scripts/generate-war-battles-static-hermes-projection.mjs`        |
+| `browser-webtransport-loopback`              | `browser` + `deno` | `webtransport-h3`      | loopback P-256 pinned    | `pnpm --filter @deherm/example-war-battles-online runtime:webtransport` |
 
 None of them claims visual correctness: every one reads markers, engine state,
 or a transport census, and nothing here can inspect a window or a canvas.
 
 The fourth row is intentionally narrower than packaged gameplay. It is the
 strongest current Static Hermes product projection: release typecheck proves a
-dynamic-access-free reachable set of 27 routes, the canonical lowering plan
+dynamic-access-free reachable set of 28 routes, the canonical lowering plan
 selects all 27 with zero reachable blockers, and the canonical exact set is
 517/517. The project-owned gate separately proves compilation, Bob/Extender
 linkage, and engine launch with typed-native unit registration. The packaged

@@ -2,6 +2,8 @@ import {
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
+  COVER_MAX_HEALTH,
+  COVER_SNAPSHOT_BYTES,
   OBJECTIVE_CAPTURE_TICKS,
   PICKUP_SNAPSHOT_BYTES,
   PLAYER_SNAPSHOT_BYTES,
@@ -9,7 +11,14 @@ import {
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
 } from "./constants.ts";
-import { CHASSIS_COUNT, CHASSIS_UNLOCK_MASK, WEAPON_COUNT, WEAPON_UPGRADE_COUNT, chassisUnlockBit, weaponUpgradeById } from "./content.ts";
+import {
+  CHASSIS_COUNT,
+  CHASSIS_UNLOCK_MASK,
+  WEAPON_COUNT,
+  WEAPON_UPGRADE_COUNT,
+  chassisUnlockBit,
+  weaponUpgradeById,
+} from "./content.ts";
 import {
   ENVELOPE_MAGIC,
   MESSAGE_SNAPSHOT,
@@ -22,7 +31,8 @@ import {
 import type { BattleWorld } from "./world.ts";
 
 const SNAPSHOT_MAGIC = 0x57425331;
-const SNAPSHOT_VERSION = 5;
+// Version 7 adds the authoritative tank/on-foot/dead player mode.
+const SNAPSHOT_VERSION = 7;
 
 export interface SnapshotFrameScratch {
   readonly baseline: Uint8Array;
@@ -35,11 +45,7 @@ export interface SnapshotFrameScratch {
  * snapshot, not a framed protocol message. `-1` is never returned here:
  * callers size the fixed frame buffer with `SNAPSHOT_MESSAGE_BYTES`.
  */
-export function writeSnapshotKeyframe(
-  target: Uint8Array,
-  tick: number,
-  source: Uint8Array,
-): number {
+export function writeSnapshotKeyframe(target: Uint8Array, tick: number, source: Uint8Array): number {
   if (source.byteLength < SNAPSHOT_BYTES) throw new RangeError("snapshot keyframe source is truncated");
   requireFrameCapacity(target);
   frameHeader(target, tick, SNAPSHOT_KEYFRAME, 0);
@@ -90,13 +96,11 @@ export function writeSnapshotDelta(
  * Decodes one frame into caller-owned storage. A delta without the exact
  * advertised base tick is rejected; callers must wait for the next keyframe.
  */
-export function readSnapshotFrame(
-  payload: Uint8Array,
-  scratch: SnapshotFrameScratch,
-): number {
+export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScratch): number {
   if (payload.byteLength < SNAPSHOT_FRAME_HEADER_BYTES) throw new Error("snapshot frame is truncated");
   if (readUint16LE(payload, 0) !== ENVELOPE_MAGIC) throw new Error("snapshot frame envelope magic mismatch");
-  if (payload[2] !== PROTOCOL_VERSION || payload[3] !== MESSAGE_SNAPSHOT) throw new Error("snapshot frame envelope mismatch");
+  if (payload[2] !== PROTOCOL_VERSION || payload[3] !== MESSAGE_SNAPSHOT)
+    throw new Error("snapshot frame envelope mismatch");
   const tick = readUint32LE(payload, 4);
   const kind = payload[8]!;
   if (payload[9] !== 0) throw new Error("snapshot frame reserved byte is nonzero");
@@ -106,10 +110,11 @@ export function readSnapshotFrame(
     throw new RangeError("snapshot decode storage is truncated");
   }
   if (kind === SNAPSHOT_KEYFRAME) {
-    if (baseTick !== 0 || runCount !== 0 || payload.byteLength !== SNAPSHOT_MESSAGE_BYTES) throw new Error("invalid snapshot keyframe");
+    if (baseTick !== 0 || runCount !== 0 || payload.byteLength !== SNAPSHOT_MESSAGE_BYTES)
+      throw new Error("invalid snapshot keyframe");
     copyBytes(scratch.decoded, 0, payload, SNAPSHOT_FRAME_HEADER_BYTES, SNAPSHOT_BYTES);
   } else if (kind === SNAPSHOT_DELTA) {
-    if (scratch.baselineTick < 0 || baseTick !== (scratch.baselineTick >>> 0)) {
+    if (scratch.baselineTick < 0 || baseTick !== scratch.baselineTick >>> 0) {
       throw new Error("snapshot delta base is unavailable");
     }
     scratch.decoded.set(scratch.baseline);
@@ -175,11 +180,8 @@ function readUint16LE(source: Uint8Array, offset: number): number {
 function readUint32LE(source: Uint8Array, offset: number): number {
   requireFrameRange(source, offset, 4);
   return (
-    source[offset]!
-    | (source[offset + 1]! << 8)
-    | (source[offset + 2]! << 16)
-    | (source[offset + 3]! << 24)
-  ) >>> 0;
+    (source[offset]! | (source[offset + 1]! << 8) | (source[offset + 2]! << 16) | (source[offset + 3]! << 24)) >>> 0
+  );
 }
 
 function requireFrameRange(bytes: Uint8Array, offset: number, width: number): void {
@@ -268,6 +270,8 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
       view.setUint16(cursor + 82 + weapon * 2, world.playerAmmo[slot * WEAPON_COUNT + weapon]!, true);
     }
+    view.setUint8(cursor + 94, world.playerMode[slot]!);
+    view.setUint8(cursor + 95, 0);
     cursor += PLAYER_SNAPSHOT_BYTES;
   }
 
@@ -299,6 +303,11 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
     cursor += PICKUP_SNAPSHOT_BYTES;
   }
 
+  for (let panel = 0; panel < COVER_SNAPSHOT_BYTES; panel += 1) {
+    view.setUint8(cursor, world.map.coverHealth[panel]!);
+    cursor += 1;
+  }
+
   return byteOffset + SNAPSHOT_BYTES;
 }
 
@@ -312,7 +321,8 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
   if (view.getUint32(28, true) !== world.mapSeed) throw new Error("snapshot arena seed mismatch");
   const objectiveProgress = view.getInt16(18, true);
   const objectiveOwner = view.getUint8(20);
-  if (objectiveProgress < -OBJECTIVE_CAPTURE_TICKS || objectiveProgress > OBJECTIVE_CAPTURE_TICKS) throw new Error("snapshot objective progress is invalid");
+  if (objectiveProgress < -OBJECTIVE_CAPTURE_TICKS || objectiveProgress > OBJECTIVE_CAPTURE_TICKS)
+    throw new Error("snapshot objective progress is invalid");
   if (objectiveOwner > 2 || view.getUint8(21) !== 0 || view.getUint16(26, true) !== 0) {
     throw new Error("snapshot objective header is invalid");
   }
@@ -367,24 +377,30 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     const chassisUnlocks = view.getUint8(cursor + 77);
     const weaponUpgradeUnlocks = view.getUint16(cursor + 78, true);
     const weaponUpgradeSelections = view.getUint16(cursor + 80, true);
-    if (world.playerActive[slot] !== 0 && (chassis < 1 || chassis > CHASSIS_COUNT)) throw new Error("snapshot chassis id is invalid");
+    const mode = view.getUint8(cursor + 94);
+    if (mode > 2 || view.getUint8(cursor + 95) !== 0) throw new Error("snapshot player mode is invalid");
+    if (world.playerActive[slot] !== 0 && (chassis < 1 || chassis > CHASSIS_COUNT))
+      throw new Error("snapshot chassis id is invalid");
     if ((chassisUnlocks & ~CHASSIS_UNLOCK_MASK) !== 0) throw new Error("snapshot chassis unlock mask is invalid");
     if (world.playerActive[slot] !== 0 && (chassisUnlocks & chassisUnlockBit(chassis)) === 0) {
       throw new Error("snapshot active chassis is not unlocked");
     }
-    if ((weaponUpgradeUnlocks & ~((1 << WEAPON_UPGRADE_COUNT) - 1)) !== 0) throw new Error("snapshot weapon upgrade mask is invalid");
+    if ((weaponUpgradeUnlocks & ~((1 << WEAPON_UPGRADE_COUNT) - 1)) !== 0)
+      throw new Error("snapshot weapon upgrade mask is invalid");
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
       const branch = (weaponUpgradeSelections >>> (weapon * 2)) & 3;
       if (branch > 2) throw new Error("snapshot weapon upgrade selection is invalid");
       if (branch !== 0) {
         const upgradeId = weapon * 2 + branch;
-        if ((weaponUpgradeUnlocks & (1 << (upgradeId - 1))) === 0) throw new Error("snapshot selected weapon upgrade is locked");
+        if ((weaponUpgradeUnlocks & (1 << (upgradeId - 1))) === 0)
+          throw new Error("snapshot selected weapon upgrade is locked");
       }
     }
     world.playerChassis[slot] = chassis;
     world.playerChassisUnlocks[slot] = chassisUnlocks;
     world.playerWeaponUpgradeUnlocks[slot] = weaponUpgradeUnlocks;
     world.playerWeaponUpgradeSelections[slot] = weaponUpgradeSelections;
+    world.playerMode[slot] = mode;
     for (let weapon = 0; weapon < WEAPON_COUNT; weapon += 1) {
       world.playerAmmo[slot * WEAPON_COUNT + weapon] = view.getUint16(cursor + 82 + weapon * 2, true);
     }
@@ -422,6 +438,13 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     world.pickupX[index] = view.getInt32(cursor + 4, true);
     world.pickupY[index] = view.getInt32(cursor + 8, true);
     cursor += PICKUP_SNAPSHOT_BYTES;
+  }
+
+  for (let panel = 0; panel < COVER_SNAPSHOT_BYTES; panel += 1) {
+    const health = view.getUint8(cursor);
+    if (health > COVER_MAX_HEALTH) throw new Error("snapshot cover health is invalid");
+    world.map.coverHealth[panel] = health;
+    cursor += 1;
   }
 
   return byteOffset + SNAPSHOT_BYTES;

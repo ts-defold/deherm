@@ -23,6 +23,12 @@ export const EVENT_WEAPON_CHANGED = 9;
 export const EVENT_OBJECTIVE_CAPTURE = 10;
 /** A live tank was damaged by the currently active environmental vent. */
 export const EVENT_HAZARD_DAMAGE = 11;
+/** A projectile damaged a destructible cover panel; b is remaining health. */
+export const EVENT_COVER_CHANGED = 12;
+/** A tank was destroyed but its pilot survived on foot. */
+export const EVENT_EJECT = 13;
+/** An on-foot pilot reached a depot and acquired a replacement tank. */
+export const EVENT_TANK_ACQUIRED = 14;
 
 export const EVENT_CAPACITY = 256;
 

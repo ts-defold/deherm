@@ -25,7 +25,7 @@ import {
   defaultChromeBinary,
   freeLoopbackPort,
   openBundlePage,
-  waitFor
+  waitFor,
 } from "../../../packages/cli/src/dev/browser-host.mjs";
 
 import { projectionEnvelope } from "./projections.mjs";
@@ -35,8 +35,8 @@ export const PROJECTION_ID = "browser-wasm-web";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
-const bundleDirectory = process.env.DEHERM_WAR_BATTLES_WEB_BUNDLE
-  ?? resolve(repositoryRoot, "build/bundle/War Battles");
+const bundleDirectory =
+  process.env.DEHERM_WAR_BATTLES_WEB_BUNDLE ?? resolve(repositoryRoot, "build/bundle/War Battles");
 const bundleResource = resolve(exampleRoot, "defold/deherm/app.dehermc");
 const evidencePath = resolve(exampleRoot, "evidence/browser-runtime-wasm-web.json");
 const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
@@ -46,14 +46,14 @@ const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
 // tutorial's own behaviour.
 export const REQUIRED_ENGINE_MARKERS = Object.freeze([
   "INFO:ENGINE: Defold Engine 1.14.0 (7f0f554)",
-  "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'"
+  "INFO:DEFOLD_HERMES: Loaded TypeScript bundle generation 1 from '/deherm/app.dehermc'",
 ]);
 
 // The generated Lua symbol count grows as the mirrored Defold surface grows;
 // it is runtime evidence, not a fixed identity. Assert the exact profile and a
 // positive measured count without pinning this game gate to yesterday's API.
 export const REQUIRED_ENGINE_MARKER_PATTERNS = Object.freeze([
-  /^INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from [1-9][0-9]* generated Lua symbols$/u
+  /^INFO:DEFOLD_HERMES: Detected Defold runtime profile 'default-legacy-bullet' from [1-9][0-9]* generated Lua symbols$/u,
 ]);
 
 export const REQUIRED_GAME_MARKERS = Object.freeze([
@@ -69,12 +69,12 @@ export const REQUIRED_GAME_MARKERS = Object.freeze([
   // creates the roster, the turrets and the pickup pads. Observing the engage
   // marker is what distinguishes "the tutorial loop ran" from "the game started".
   "war-battles:arena-init:players=8:online=0",
-  "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline"
+  "war-battles:arena-engaged:players=8:skill=2:seed=1463898690:mode=offline",
 ]);
 
 export const REQUIRED_GAME_MARKER_PATTERNS = Object.freeze([
   /^war-battles:camera-init:zoom=([0-9]+(?:\.[0-9]+)?):view=([0-9]+)x([0-9]+):cameras=1$/u,
-  /^war-battles:camera-bounds:x=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]:y=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]$/u
+  /^war-battles:camera-bounds:x=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]:y=\[(-?[0-9]+(?:\.[0-9]+)?),(-?[0-9]+(?:\.[0-9]+)?)\]$/u,
 ]);
 
 /**
@@ -92,14 +92,8 @@ export const EXPECTED_COMPONENT_COUNT = 8;
 
 // Camera samples carry a frame-dependent position, so the gate asserts the
 // scroll behaviour rather than one sampled coordinate.
-export const REQUIRED_GAME_MARKER_PREFIXES = Object.freeze([
-  "war-battles:camera:"
-]);
-export const REQUIRED_GAME_MARKER_SUBSTRINGS = Object.freeze([
-  ":clamped=none",
-  ":clamped=x",
-  ":clamped=xy"
-]);
+export const REQUIRED_GAME_MARKER_PREFIXES = Object.freeze(["war-battles:camera:"]);
+export const REQUIRED_GAME_MARKER_SUBSTRINGS = Object.freeze([":clamped=none", ":clamped=x", ":clamped=xy"]);
 
 const argumentSet = new Set(process.argv.slice(2));
 for (const argument of argumentSet) {
@@ -146,34 +140,50 @@ function cameraGeometry(transcript) {
     minX: Number(bounds[1]),
     maxX: Number(bounds[2]),
     minY: Number(bounds[3]),
-    maxY: Number(bounds[4])
+    maxY: Number(bounds[4]),
   };
   assert.ok(geometry.zoom > 0, "Browser camera zoom must be positive");
-  assert.ok(Math.abs(geometry.viewWidth / geometry.viewHeight - 16 / 9) < 0.01,
-    "Browser camera view must preserve the authored 16:9 aspect ratio");
-  assert.ok(Math.abs(geometry.zoom * geometry.viewWidth - 1280) < 2,
-    "Browser auto-fit width must project the authored 1280-pixel display");
-  assert.ok(Math.abs(geometry.zoom * geometry.viewHeight - 720) < 2,
-    "Browser auto-fit height must project the authored 720-pixel display");
-  assert.ok(Math.abs(geometry.minX - geometry.viewWidth / 2 - (-312)) < 1,
-    "Browser camera minimum X must preserve the authored world bound");
-  assert.ok(Math.abs(geometry.maxX + geometry.viewWidth / 2 - 1608) < 1,
-    "Browser camera maximum X must preserve the authored world bound");
-  assert.ok(Math.abs(geometry.minY - geometry.viewHeight / 2 - (-352)) < 1,
-    "Browser camera minimum Y must preserve the authored world bound");
-  assert.ok(Math.abs(geometry.maxY + geometry.viewHeight / 2 - 1088) < 1,
-    "Browser camera maximum Y must preserve the authored world bound");
+  assert.ok(
+    Math.abs(geometry.viewWidth / geometry.viewHeight - 16 / 9) < 0.01,
+    "Browser camera view must preserve the authored 16:9 aspect ratio",
+  );
+  assert.ok(
+    Math.abs(geometry.zoom * geometry.viewWidth - 1280) < 2,
+    "Browser auto-fit width must project the authored 1280-pixel display",
+  );
+  assert.ok(
+    Math.abs(geometry.zoom * geometry.viewHeight - 720) < 2,
+    "Browser auto-fit height must project the authored 720-pixel display",
+  );
+  assert.ok(
+    Math.abs(geometry.minX - geometry.viewWidth / 2 - -312) < 1,
+    "Browser camera minimum X must preserve the authored world bound",
+  );
+  assert.ok(
+    Math.abs(geometry.maxX + geometry.viewWidth / 2 - 1608) < 1,
+    "Browser camera maximum X must preserve the authored world bound",
+  );
+  assert.ok(
+    Math.abs(geometry.minY - geometry.viewHeight / 2 - -352) < 1,
+    "Browser camera minimum Y must preserve the authored world bound",
+  );
+  assert.ok(
+    Math.abs(geometry.maxY + geometry.viewHeight / 2 - 1088) < 1,
+    "Browser camera maximum Y must preserve the authored world bound",
+  );
   return geometry;
 }
 
 async function run() {
   const bundleBytes = await readFile(bundleResource);
-  const expectedFingerprint = /__DEFOLD_HERMES_BUILD_FINGERPRINT__ = "([0-9a-f]{64})"/
-    .exec(bundleBytes.toString("utf8"))?.[1];
+  const expectedFingerprint = /__DEFOLD_HERMES_BUILD_FINGERPRINT__ = "([0-9a-f]{64})"/.exec(
+    bundleBytes.toString("utf8"),
+  )?.[1];
   assert.ok(expectedFingerprint, `No build fingerprint in ${bundleResource}`);
 
-  const port = Number.parseInt(process.env.DEHERM_WAR_BATTLES_HTTP_PORT ?? "", 10) || await freeLoopbackPort();
-  const debuggingPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_CDP_PORT ?? "", 10) || await freeLoopbackPort();
+  const port = Number.parseInt(process.env.DEHERM_WAR_BATTLES_HTTP_PORT ?? "", 10) || (await freeLoopbackPort());
+  const debuggingPort =
+    Number.parseInt(process.env.DEHERM_WAR_BATTLES_CDP_PORT ?? "", 10) || (await freeLoopbackPort());
 
   const page = await openBundlePage({
     bundleDirectory,
@@ -185,7 +195,7 @@ async function run() {
     // Attach CDP and enable Runtime before the first Defold byte executes so
     // engine/bootstrap console evidence cannot race the observer.
     deferNavigation: true,
-    keepProfile: argumentSet.has("--keep")
+    keepProfile: argumentSet.has("--keep"),
   });
   const { client, pageUrl, profile } = page;
 
@@ -196,12 +206,17 @@ async function run() {
 
     const timeoutMs = Number.parseInt(process.env.DEHERM_WAR_BATTLES_BROWSER_TIMEOUT_MS ?? "45000", 10);
     try {
-      await waitFor(async () => missing(client.transcript).length === 0,
-        { timeoutMs, intervalMs: 250, what: `the required marker set (absent: ${JSON.stringify(missing(client.transcript))})` });
+      await waitFor(async () => missing(client.transcript).length === 0, {
+        timeoutMs,
+        intervalMs: 250,
+        what: `the required marker set (absent: ${JSON.stringify(missing(client.transcript))})`,
+      });
     } catch (error) {
       const head = client.transcript.slice(0, 40);
       const tail = client.transcript.slice(-40);
-      throw new Error(`${error.message}\nTranscript head: ${JSON.stringify(head)}\nTranscript tail: ${JSON.stringify(tail)}\nPage failures: ${JSON.stringify(client.failures)}`);
+      throw new Error(
+        `${error.message}\nTranscript head: ${JSON.stringify(head)}\nTranscript tail: ${JSON.stringify(tail)}\nPage failures: ${JSON.stringify(client.failures)}`,
+      );
     }
 
     const state = await client.send("Runtime.evaluate", {
@@ -216,7 +231,7 @@ async function run() {
         bundleFingerprint: globalThis.__DEFOLD_HERMES_BUILD_FINGERPRINT__ ?? null,
         canvas: (() => { const node = document.querySelector("canvas"); return node ? { width: node.width, height: node.height } : null; })()
       })`,
-      returnByValue: true
+      returnByValue: true,
     });
     const observed = state.result.value;
 
@@ -225,9 +240,16 @@ async function run() {
     assert.equal(observed.hostRuntime, "browser", "Application did not use the browser host adapter");
     assert.equal(observed.scriptBridgeInstalled, true, "Generated browser script bridge was not installed");
     assert.equal(observed.scriptBridgeTarget, "html5-browser-host", "Script bridge reported the wrong target");
-    assert.equal(observed.componentsRegistered, EXPECTED_COMPONENT_COUNT,
-      `Component registry did not install all ${EXPECTED_COMPONENT_COUNT} components`);
-    assert.equal(observed.bundleFingerprint, expectedFingerprint, "Browser bundle fingerprint does not match the source resource");
+    assert.equal(
+      observed.componentsRegistered,
+      EXPECTED_COMPONENT_COUNT,
+      `Component registry did not install all ${EXPECTED_COMPONENT_COUNT} components`,
+    );
+    assert.equal(
+      observed.bundleFingerprint,
+      expectedFingerprint,
+      "Browser bundle fingerprint does not match the source resource",
+    );
     assert.deepEqual(missing(client.transcript), [], "Required browser markers are missing");
     assert.deepEqual(fatal, [], `Browser page errors: ${JSON.stringify(fatal)}`);
 
@@ -244,11 +266,15 @@ async function run() {
       requiredEngineMarkerPatterns: REQUIRED_ENGINE_MARKER_PATTERNS.map((pattern) => pattern.source),
       requiredGameMarkers: [...REQUIRED_GAME_MARKERS],
       requiredGameMarkerPatterns: REQUIRED_GAME_MARKER_PATTERNS.map((pattern) => pattern.source),
-      observedGameMarkers: client.transcript.filter((line) => line.startsWith("war-battles:") && !line.startsWith("war-battles:camera:")),
+      observedGameMarkers: client.transcript.filter(
+        (line) => line.startsWith("war-battles:") && !line.startsWith("war-battles:camera:"),
+      ),
       observedCamera,
       cameraSampleCount: cameraSamples.length,
-      cameraClampStates: [...new Set(cameraSamples.map((line) => line.slice(line.lastIndexOf(":clamped=") + 9)))].sort(),
-      pageErrors: fatal
+      cameraClampStates: [
+        ...new Set(cameraSamples.map((line) => line.slice(line.lastIndexOf(":clamped=") + 9))),
+      ].sort(),
+      pageErrors: fatal,
     };
     console.log(`war-battles-browser-runtime:ok:${expectedFingerprint}`);
     for (const marker of evidence.observedGameMarkers) console.log(marker);
@@ -259,9 +285,16 @@ async function run() {
     if (argumentSet.has("--check-evidence")) {
       const recorded = JSON.parse(await readFile(evidencePath, "utf8"));
       assert.equal(recorded.bundleFingerprint, evidence.bundleFingerprint, "Recorded browser evidence is stale");
-      assert.deepEqual(recorded.requiredGameMarkers, evidence.requiredGameMarkers, "Recorded browser marker set is stale");
-      assert.deepEqual(recorded.requiredGameMarkerPatterns, evidence.requiredGameMarkerPatterns,
-        "Recorded browser semantic marker set is stale");
+      assert.deepEqual(
+        recorded.requiredGameMarkers,
+        evidence.requiredGameMarkers,
+        "Recorded browser marker set is stale",
+      );
+      assert.deepEqual(
+        recorded.requiredGameMarkerPatterns,
+        evidence.requiredGameMarkerPatterns,
+        "Recorded browser semantic marker set is stale",
+      );
       console.log(`war-battles-browser-runtime:evidence-fresh:${recorded.bundleFingerprint}`);
     }
     return evidence;

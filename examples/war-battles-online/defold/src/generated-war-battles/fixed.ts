@@ -101,7 +101,13 @@ export function slewInto(
   const cross = currentX * targetY - currentY * targetX;
   const dot = currentX * targetX + currentY * targetY;
   if (cross === 0 && dot < 0) {
-    if (!normalizeInto(currentX - currentY * rate / DIRECTION_SCALE, currentY + currentX * rate / DIRECTION_SCALE, output)) {
+    if (
+      !normalizeInto(
+        currentX - (currentY * rate) / DIRECTION_SCALE,
+        currentY + (currentX * rate) / DIRECTION_SCALE,
+        output,
+      )
+    ) {
       output.x = currentX;
       output.y = currentY;
     }

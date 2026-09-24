@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/generate-hud-art.mjs",
+  "sources": {
+    "selection": {
+      "path": "art/source/sprite-fusion/selection.json",
+      "keys": [
+        "portrait",
+        "runtimePlan"
+      ],
+      "projectionSha256": "42ad4788782a9f909ae1b918339cbb01e23b640d81743bd8ccc17af1d85b2ca3"
+    },
+    "animation": {
+      "path": "art/source/sprite-fusion/requests/driver-portrait-radio-idle-v1.json",
+      "requestId": "req_134158cf-31d1-41f3-a9ca-c240a7e70f9c",
+      "assetId": "29271c37-5aa0-473e-b76d-a715a7309493",
+      "spritesheetSha256": "d633250d25d207460fb5e1d7c669a412310bf722ce7c3ea84359d47976267994"
+    }
+  },
+  "nativeSize": [
+    64,
+    64
+  ],
+  "atlasCellSize": [
+    68,
+    68
+  ],
+  "padding": 2,
+  "sampling": "nearest",
+  "pixelGridCorrection": {
+    "applied": false,
+    "reason": "SpriteFusion supplied exact 64x64 non-interlaced RGBA frames on the native pixel grid."
+  },
+  "base": {
+    "path": "defold/assets/derived/ui/driver-portrait/base.png",
+    "anchor": [
+      34,
+      64
+    ],
+    "bytes": 6956,
+    "sha256": "ac859b2f6a828d42a4aa3a83e96eb8e58f6ce2637b3cab0b100e43c8b9ec881d"
+  },
+  "animations": {
+    "radio-idle": {
+      "fps": 8,
+      "playback": "loop-forward",
+      "frames": [
+        {
+          "index": 0,
+          "sourceRect": [
+            0,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-00.png",
+          "bytes": 1599,
+          "sha256": "dd3e16942cac17f69dd7d109486da875ad07783bb212e361dccec0e2569a1e3b"
+        },
+        {
+          "index": 1,
+          "sourceRect": [
+            64,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-01.png",
+          "bytes": 1572,
+          "sha256": "4d16aecb0c5c5a5e260b022024fbab8bc597c1db2797c8da85e63b6c476fe10c"
+        },
+        {
+          "index": 2,
+          "sourceRect": [
+            128,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-02.png",
+          "bytes": 1615,
+          "sha256": "81650247664c51cbad1ebe078496e788a52938639333e22b41b3d1d2e9d99eac"
+        },
+        {
+          "index": 3,
+          "sourceRect": [
+            192,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-03.png",
+          "bytes": 1577,
+          "sha256": "8dd1e86de009e0d5a7545c922f685d17de0a4bb563c06cb565812f1ebc3c8ae6"
+        },
+        {
+          "index": 4,
+          "sourceRect": [
+            256,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-04.png",
+          "bytes": 1597,
+          "sha256": "8258332adc0dbf119f90084ade76d43a5f7c076c399f4dc051790c9eca399de4"
+        },
+        {
+          "index": 5,
+          "sourceRect": [
+            320,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-05.png",
+          "bytes": 1594,
+          "sha256": "9e94edafd1fde53e2cdf423cd5452c3734431c801381cfcba285adea42bdbef4"
+        },
+        {
+          "index": 6,
+          "sourceRect": [
+            384,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-06.png",
+          "bytes": 1599,
+          "sha256": "0804fed85851e8b7fae31a712eb65767884e009c236940c3cf84a2f1e2919e11"
+        },
+        {
+          "index": 7,
+          "sourceRect": [
+            448,
+            0,
+            64,
+            64
+          ],
+          "cell": [
+            0,
+            0,
+            68,
+            68
+          ],
+          "anchor": [
+            34,
+            64
+          ],
+          "edgeContact": {
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          },
+          "path": "defold/assets/derived/ui/driver-portrait/radio-idle-07.png",
+          "bytes": 1589,
+          "sha256": "268b07f28c39094e6aad9104ed50323482f22256c0c8bcea60f52a2979808765"
+        }
+      ]
+    }
+  }
+}

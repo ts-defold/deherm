@@ -222,7 +222,7 @@ checks, two-revision derivation, capability/version refusal, offline cache
 reuse, and zero-write second pass are executable gates. Issue #93 remains open
 only for representation and transfer optimization: 12 SDK compatibility
 sources (105,573 materialized bytes), 106 revision-output compatibility sources
-(1,718,286 bytes), and the remaining redundant derived documents in the
+(1,720,303 bytes), and the remaining redundant derived documents in the
 25,078,691-byte reachable policy graph must move behind compact facts and
 package emitters. That work must preserve the existing consumer result rather
 than being treated as an API-availability or clean-realization blocker.
@@ -324,6 +324,14 @@ projection, component authoring/proxy generator, context projects,
 source-derived documentation, and local/dependency extension ingestion are all
 mechanically covered through the public package paths described below.
 
+The public root now composes the policy-derived Defold `defold` module with the
+revision-neutral host contract. Authored code imports one `defold` value from
+`@deherm/project`: `hash`, `hashToHex`, and `pprint` are enumerated from the
+selected policy, while `log`, `now`, `request`, and `runtime` are emitted from
+the package's stable host adapter. The generator rejects name collisions and
+preserves context masks; authored projects never declare or address
+`__defoldHostV1` directly.
+
 1. Preserve contextual `DefoldHash` literals; runtime-hash only dynamic data.
 2. Finish the public `defold` namespace migration and remove leaked `builtins`
    without changing stable ABI identities.
@@ -354,7 +362,7 @@ source-bound checked evidence.
 
 The Static Hermes product seam is recorded separately as the generated
 `native-arm64-macos-static-hermes-reachable` projection. The release usage
-manifest is dynamic-access-free and selects all 27 of the 27 reachable War
+manifest is dynamic-access-free and selects all 28 of the 28 reachable War
 Battles routes for the sound typed-native lane, with zero reachable blockers.
 The project-owned bridge source is pinned at SHA-256
 `d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f`, and

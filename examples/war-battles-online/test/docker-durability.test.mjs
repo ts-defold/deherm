@@ -32,7 +32,14 @@ test("Docker deployment owns durable resume state and readiness", async () => {
   assert.doesNotMatch(initVolumes, /chown\s+-R/u);
   assert.match(initVolumes, /refusing symbolic link in War Battles volume/u);
   assert.match(initVolumes, /\*\.key\|\*\.hex\|\*\.bin\|\*\.tmp\) chmod 0600/u);
-  for (const owned of ["localhost.crt", "localhost.key", "fingerprint.txt", "resume-key.hex", "sessions.bin", "world.bin"]) {
+  for (const owned of [
+    "localhost.crt",
+    "localhost.key",
+    "fingerprint.txt",
+    "resume-key.hex",
+    "sessions.bin",
+    "world.bin",
+  ]) {
     assert.match(initVolumes, new RegExp(owned.replace(".", "\\."), "u"));
   }
   assert.match(entrypoint, /ensure-resume-key\.sh/u);
@@ -50,11 +57,21 @@ test("Docker deployment owns durable resume state and readiness", async () => {
   // When Compose is available, validate the rendered model as well as the
   // source contract. `config` is a read-only operation and needs no daemon.
   const composeBinary = (() => {
-    try { execFileSync("docker", ["compose", "version"], { stdio: "ignore" }); return ["docker", "compose"]; }
-    catch { return ["docker-compose"]; }
+    try {
+      execFileSync("docker", ["compose", "version"], { stdio: "ignore" });
+      return ["docker", "compose"];
+    } catch {
+      return ["docker-compose"];
+    }
   })();
   try {
-    const rendered = JSON.parse(execFileSync(composeBinary[0], [...composeBinary.slice(1), "-f", join(dockerRoot, "compose.yaml"), "config", "--format", "json"], { encoding: "utf8" }));
+    const rendered = JSON.parse(
+      execFileSync(
+        composeBinary[0],
+        [...composeBinary.slice(1), "-f", join(dockerRoot, "compose.yaml"), "config", "--format", "json"],
+        { encoding: "utf8" },
+      ),
+    );
     const service = rendered.services?.["war-battles"];
     assert.ok(service, "Compose must define the war-battles service");
     const mounts = new Map((service.volumes ?? []).map((volume) => [volume.target, volume.source]));
@@ -73,23 +90,38 @@ test("Docker deployment owns durable resume state and readiness", async () => {
 test("durable replacement syncs file bytes and rename metadata in order", async () => {
   const events = [];
   const runtime = {
-    async writeFile(path, bytes, options) { events.push(`write:${path}:${bytes.length}:${options?.mode}`); },
-    async chmod(path, mode) { events.push(`chmod:${path}:${mode}`); },
-    async rename(from, to) { events.push(`rename:${from}:${to}`); },
+    async writeFile(path, bytes, options) {
+      events.push(`write:${path}:${bytes.length}:${options?.mode}`);
+    },
+    async chmod(path, mode) {
+      events.push(`chmod:${path}:${mode}`);
+    },
+    async rename(from, to) {
+      events.push(`rename:${from}:${to}`);
+    },
     async open(path) {
       events.push(`open:${path}`);
       return {
-        async sync() { events.push(`sync:${path}`); },
-        close() { events.push(`close:${path}`); },
+        async sync() {
+          events.push(`sync:${path}`);
+        },
+        close() {
+          events.push(`close:${path}`);
+        },
       };
     },
   };
   await replaceDurably(runtime, "/state/world.bin.tmp", "/state/world.bin", Uint8Array.of(1, 2, 3));
   assert.deepEqual(events, [
-    "write:/state/world.bin.tmp:3:384", "chmod:/state/world.bin.tmp:384",
-    "open:/state/world.bin.tmp", "sync:/state/world.bin.tmp", "close:/state/world.bin.tmp",
+    "write:/state/world.bin.tmp:3:384",
+    "chmod:/state/world.bin.tmp:384",
+    "open:/state/world.bin.tmp",
+    "sync:/state/world.bin.tmp",
+    "close:/state/world.bin.tmp",
     "rename:/state/world.bin.tmp:/state/world.bin",
-    "open:/state", "sync:/state", "close:/state",
+    "open:/state",
+    "sync:/state",
+    "close:/state",
   ]);
 });
 
@@ -98,9 +130,16 @@ test("durable replacement never renames unsynced bytes and tolerates only unsupp
   const unsynced = {
     async writeFile() {},
     async chmod() {},
-    async rename() { renamed = true; },
+    async rename() {
+      renamed = true;
+    },
     async open() {
-      return { async sync() { throw new Error("disk sync failed"); }, close() {} };
+      return {
+        async sync() {
+          throw new Error("disk sync failed");
+        },
+        close() {},
+      };
     },
   };
   await assert.rejects(replaceDurably(unsynced, "/state/a.tmp", "/state/a", Uint8Array.of(1)), /disk sync failed/);
@@ -117,7 +156,9 @@ test("durable replacement never renames unsynced bytes and tolerates only unsupp
         async sync() {
           if (path === "/state") throw Object.assign(new Error("directory sync unavailable"), { code: "ENOTSUP" });
         },
-        close() { opened.push(`closed:${path}`); },
+        close() {
+          opened.push(`closed:${path}`);
+        },
       };
     },
   };

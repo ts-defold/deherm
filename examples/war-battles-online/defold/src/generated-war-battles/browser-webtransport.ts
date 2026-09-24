@@ -55,7 +55,7 @@ export interface WebTransportConnectionOptions {
 }
 
 export interface WebTransportConstructorLike {
-  new(url: string, options?: WebTransportConnectionOptions): WebTransportSessionLike;
+  new (url: string, options?: WebTransportConnectionOptions): WebTransportSessionLike;
 }
 
 /**
@@ -149,10 +149,7 @@ export class BrowserWebTransportClient implements GameTransport {
     return client;
   }
 
-  static adoptServer(
-    session: WebTransportSessionLike,
-    receiver: TransportReceiver,
-  ): BrowserWebTransportClient {
+  static adoptServer(session: WebTransportSessionLike, receiver: TransportReceiver): BrowserWebTransportClient {
     return BrowserWebTransportClient.adopt(session, receiver, "server");
   }
 
@@ -187,7 +184,9 @@ export class BrowserWebTransportClient implements GameTransport {
     const view = new DataView(header.buffer);
     view.setUint8(0, channel);
     view.setUint32(1, ownedPayload.byteLength, true);
-    const abort = (): void => { void writer.abort(signal?.reason); };
+    const abort = (): void => {
+      void writer.abort(signal?.reason);
+    };
     signal?.addEventListener("abort", abort, { once: true });
     try {
       await writer.ready;
@@ -244,19 +243,22 @@ export class BrowserWebTransportClient implements GameTransport {
   }
 
   private async receiveReliableStreams(): Promise<void> {
-    const reader = this.reliableStreamMode === "client"
-      ? this.session.incomingUnidirectionalStreams.getReader()
-      : this.session.incomingBidirectionalStreams.getReader();
+    const reader =
+      this.reliableStreamMode === "client"
+        ? this.session.incomingUnidirectionalStreams.getReader()
+        : this.session.incomingBidirectionalStreams.getReader();
     try {
       while (!this.closed) {
         const next = await reader.read();
         if (next.done) break;
-        const stream = this.reliableStreamMode === "client"
-          ? next.value as ReadableStream<Uint8Array>
-          : (next.value as WebTransportBidirectionalStreamLike).readable;
-        const reverseWritable = this.reliableStreamMode === "server"
-          ? (next.value as WebTransportBidirectionalStreamLike).writable
-          : undefined;
+        const stream =
+          this.reliableStreamMode === "client"
+            ? (next.value as ReadableStream<Uint8Array>)
+            : (next.value as WebTransportBidirectionalStreamLike).readable;
+        const reverseWritable =
+          this.reliableStreamMode === "server"
+            ? (next.value as WebTransportBidirectionalStreamLike).writable
+            : undefined;
         void this.readReliableStream(stream, reverseWritable);
       }
     } catch (error: unknown) {
@@ -464,7 +466,8 @@ export class BrowserWebTransportClient implements GameTransport {
     if (this.closed) return undefined;
     if (this.serverReliableWriter !== undefined) return this.serverReliableWriter;
     if (this.serverReliableWriterPromise === undefined) {
-      this.serverReliableWriterPromise = this.session.createUnidirectionalStream()
+      this.serverReliableWriterPromise = this.session
+        .createUnidirectionalStream()
         .then((writable) => {
           if (this.closed) {
             const writer = writable.getWriter();
@@ -516,7 +519,8 @@ export class BrowserWebTransportClient implements GameTransport {
       this.snapshotFlushActive ||
       (this.pendingServerSnapshot === undefined && this.pendingServerReliable.length === 0) ||
       this.closed
-    ) return;
+    )
+      return;
     this.snapshotFlushScheduled = true;
     queueMicrotask(() => {
       this.snapshotFlushScheduled = false;
@@ -534,7 +538,8 @@ export class BrowserWebTransportClient implements GameTransport {
       this.closed ||
       (this.pendingServerSnapshot === undefined && this.pendingServerReliable.length === 0) ||
       this.serverReliableWrite !== undefined
-    ) return;
+    )
+      return;
     const writer = await this.serverReliableWriterOrClosed();
     if (writer === undefined || this.closed) return;
     if ((writer.desiredSize ?? 0) <= 0) {
@@ -562,7 +567,7 @@ export class BrowserWebTransportClient implements GameTransport {
     if (this.pendingServerSnapshot === undefined) return;
     const frame = this.pendingServerSnapshot;
     this.pendingServerSnapshot = undefined;
-    if (await this.writeServerFrame(writer, frame) === "closed") this.pendingServerSnapshot = undefined;
+    if ((await this.writeServerFrame(writer, frame)) === "closed") this.pendingServerSnapshot = undefined;
   }
 }
 

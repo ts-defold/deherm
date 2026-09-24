@@ -7,15 +7,17 @@ import { runReplay } from "./match.ts";
 import { buildBotReplay, readReplayHeader } from "./replay.ts";
 
 const options = parseArguments(process.argv.slice(2));
-const replay = options.replayIn === undefined
-  ? buildBotReplay({ players: options.players, ticks: options.ticks, seed: options.seed, matchId: options.matchId })
-  : new Uint8Array(await readFile(options.replayIn));
+const replay =
+  options.replayIn === undefined
+    ? buildBotReplay({ players: options.players, ticks: options.ticks, seed: options.seed, matchId: options.matchId })
+    : new Uint8Array(await readFile(options.replayIn));
 const header = readReplayHeader(replay);
 if (options.replayOut !== undefined) await writeFile(options.replayOut, replay);
 
-const rollback = header.ticks >= 120
-  ? { restoreTick: Math.floor(header.ticks / 3), triggerTick: Math.floor(header.ticks / 3) + 60 }
-  : undefined;
+const rollback =
+  header.ticks >= 120
+    ? { restoreTick: Math.floor(header.ticks / 3), triggerTick: Math.floor(header.ticks / 3) + 60 }
+    : undefined;
 const started = performance.now();
 const baseline = runReplay(replay);
 const authoritative = runReplay(replay, rollback);
@@ -24,13 +26,19 @@ if (baseline.stateHash !== authoritative.stateHash) {
   throw new Error(`rollback replay diverged: ${baseline.stateHash} != ${authoritative.stateHash}`);
 }
 
-process.stdout.write(`${JSON.stringify({
-  schemaVersion: 1,
-  replayBytes: replay.byteLength,
-  elapsedMs: Math.round(elapsedMs * 100) / 100,
-  baseline,
-  authoritative,
-}, null, 2)}\n`);
+process.stdout.write(
+  `${JSON.stringify(
+    {
+      schemaVersion: 1,
+      replayBytes: replay.byteLength,
+      elapsedMs: Math.round(elapsedMs * 100) / 100,
+      baseline,
+      authoritative,
+    },
+    null,
+    2,
+  )}\n`,
+);
 
 function parseArguments(argv) {
   const parsed = { players: 32, ticks: 3_600, seed: 0xc0ffee, matchId: 77 };

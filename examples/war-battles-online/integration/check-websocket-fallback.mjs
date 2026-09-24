@@ -40,12 +40,7 @@ function composeCommand() {
 
 function compose(args) {
   const [binary, ...prefix] = composeCommand();
-  execFileSync(binary, [
-    ...prefix,
-    "-p", composeProject,
-    "-f", join(exampleRoot, "docker", "compose.yaml"),
-    ...args,
-  ], {
+  execFileSync(binary, [...prefix, "-p", composeProject, "-f", join(exampleRoot, "docker", "compose.yaml"), ...args], {
     cwd: exampleRoot,
     stdio: "inherit",
   });
@@ -54,11 +49,29 @@ function compose(args) {
 function makeCertificate(directory) {
   const cert = join(directory, "localhost.crt");
   const key = join(directory, "localhost.key");
-  execFileSync("openssl", [
-    "req", "-x509", "-newkey", "ec", "-pkeyopt", "ec_paramgen_curve:prime256v1",
-    "-keyout", key, "-out", cert, "-days", "10", "-nodes", "-subj", "/CN=localhost",
-    "-addext", "subjectAltName=DNS:localhost,IP:127.0.0.1",
-  ], { stdio: "ignore" });
+  execFileSync(
+    "openssl",
+    [
+      "req",
+      "-x509",
+      "-newkey",
+      "ec",
+      "-pkeyopt",
+      "ec_paramgen_curve:prime256v1",
+      "-keyout",
+      key,
+      "-out",
+      cert,
+      "-days",
+      "10",
+      "-nodes",
+      "-subj",
+      "/CN=localhost",
+      "-addext",
+      "subjectAltName=DNS:localhost,IP:127.0.0.1",
+    ],
+    { stdio: "ignore" },
+  );
   return { cert, key };
 }
 
@@ -134,19 +147,40 @@ async function run() {
       dockerStarted = true;
     } else {
       const certificate = makeCertificate(scratch);
-      server = spawn(denoBinary, [
-        "run", "--unstable-net", "--allow-net", "--allow-env", "--allow-read",
-        resolve(exampleRoot, "server/deno-main.ts"),
-        "--hostname", "localhost", "--port", String(quicPort), "--health-port", String(healthPort),
-        "--cert", certificate.cert, "--key", certificate.key, "--roster", "8", "--bot-skill", "2",
-      ], { cwd: exampleRoot, stdio: ["ignore", "pipe", "pipe"] });
+      server = spawn(
+        denoBinary,
+        [
+          "run",
+          "--unstable-net",
+          "--allow-net",
+          "--allow-env",
+          "--allow-read",
+          resolve(exampleRoot, "server/deno-main.ts"),
+          "--hostname",
+          "localhost",
+          "--port",
+          String(quicPort),
+          "--health-port",
+          String(healthPort),
+          "--cert",
+          certificate.cert,
+          "--key",
+          certificate.key,
+          "--roster",
+          "8",
+          "--bot-skill",
+          "2",
+        ],
+        { cwd: exampleRoot, stdio: ["ignore", "pipe", "pipe"] },
+      );
       const append = (chunk) => serverLines.push(...chunk.toString("utf8").split(/\r?\n/u).filter(Boolean));
       server.stdout.on("data", append);
       server.stderr.on("data", append);
     }
     const healthUrl = `http://localhost:${healthPort}/readyz`;
     await waitFor(async () => (await fetch(healthUrl)).ok, {
-      timeoutMs: 15_000, intervalMs: 50,
+      timeoutMs: 15_000,
+      intervalMs: 50,
       what: `${dockerMode ? "Docker" : "Deno"} WebSocket fallback readiness (tail: ${JSON.stringify(serverLines.slice(-8))})`,
     });
 
@@ -157,21 +191,38 @@ async function run() {
         sourcefile: "war-battles-websocket-client.ts",
         loader: "ts",
       },
-      bundle: true, format: "iife", platform: "browser", target: "es2022",
-      outfile: join(scratch, "client.js"), sourcemap: "inline", logLevel: "silent",
+      bundle: true,
+      format: "iife",
+      platform: "browser",
+      target: "es2022",
+      outfile: join(scratch, "client.js"),
+      sourcemap: "inline",
+      logLevel: "silent",
     });
-    await writeFile(join(scratch, "index.html"), "<!doctype html><meta charset=\"utf-8\"><title>War Battles WebSocket fallback</title><script src=\"client.js\"></script>\n");
+    await writeFile(
+      join(scratch, "index.html"),
+      '<!doctype html><meta charset="utf-8"><title>War Battles WebSocket fallback</title><script src="client.js"></script>\n',
+    );
     page = await openBundlePage({
-      bundleDirectory: scratch, port: pagePort, debuggingPort, chromeBinary, retain: true,
+      bundleDirectory: scratch,
+      port: pagePort,
+      debuggingPort,
+      chromeBinary,
+      retain: true,
     });
-    const observed = await waitFor(async () => {
-      const result = await page.client.send("Runtime.evaluate", {
-        expression: "globalThis.__warBattlesWebSocketEvidence ?? null", returnByValue: true,
-      });
-      const value = result.result.value;
-      if (value?.state === "failed" || value?.errors?.length) throw new Error(`fallback failed: ${JSON.stringify(value)}`);
-      return value?.state === "ready" && value.snapshotsApplied >= 3 && value.inputsSent >= 3 ? value : false;
-    }, { timeoutMs: 30_000, intervalMs: 100, what: "real browser WebSocket fallback" });
+    const observed = await waitFor(
+      async () => {
+        const result = await page.client.send("Runtime.evaluate", {
+          expression: "globalThis.__warBattlesWebSocketEvidence ?? null",
+          returnByValue: true,
+        });
+        const value = result.result.value;
+        if (value?.state === "failed" || value?.errors?.length)
+          throw new Error(`fallback failed: ${JSON.stringify(value)}`);
+        return value?.state === "ready" && value.snapshotsApplied >= 3 && value.inputsSent >= 3 ? value : false;
+      },
+      { timeoutMs: 30_000, intervalMs: 100, what: "real browser WebSocket fallback" },
+    );
 
     assert.equal(observed.transport?.protocol, "websocket-tcp");
     assert.equal(observed.transport?.reliableStreams, true);
@@ -188,19 +239,30 @@ async function run() {
       // after a real container restart, not merely join an anonymous slot.
       compose(["restart", "war-battles"]);
       await waitFor(async () => (await fetch(healthUrl)).ok, {
-        timeoutMs: 15_000, intervalMs: 100, what: "Docker readiness after restart",
+        timeoutMs: 15_000,
+        intervalMs: 100,
+        what: "Docker readiness after restart",
       });
       const resumed = await page.client.send("Runtime.evaluate", {
         expression: `globalThis.__warBattlesWebSocketResume(${JSON.stringify(`ws://localhost:${healthPort}/ws`)})`,
-        awaitPromise: true, returnByValue: true,
+        awaitPromise: true,
+        returnByValue: true,
       });
       assert.equal(resumed.result.value?.state, "ready");
-      assert.equal(resumed.result.value?.playerId, observed.playerId, "restart must retain the authenticated player slot");
+      assert.equal(
+        resumed.result.value?.playerId,
+        observed.playerId,
+        "restart must retain the authenticated player slot",
+      );
       assert.equal(resumed.result.value?.transport?.protocol, "websocket-tcp");
     }
-    console.log(`war-battles-websocket-fallback:ok:protocol=${observed.transport.protocol}:inputs=${observed.inputsSent}:snapshots=${observed.snapshotsApplied}${dockerMode ? ":restart-resume=ok" : ""}`);
+    console.log(
+      `war-battles-websocket-fallback:ok:protocol=${observed.transport.protocol}:inputs=${observed.inputsSent}:snapshots=${observed.snapshotsApplied}${dockerMode ? ":restart-resume=ok" : ""}`,
+    );
   } finally {
-    await page?.client.send("Runtime.evaluate", { expression: "globalThis.__warBattlesWebSocketClose?.()" }).catch(() => undefined);
+    await page?.client
+      .send("Runtime.evaluate", { expression: "globalThis.__warBattlesWebSocketClose?.()" })
+      .catch(() => undefined);
     await page?.close().catch(() => undefined);
     if (server !== undefined) {
       if (server.exitCode === null && server.signalCode === null) server.kill("SIGTERM");

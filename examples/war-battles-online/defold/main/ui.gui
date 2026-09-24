@@ -3,10 +3,198 @@ fonts {
   name: "score_font"
   font: "/main/tutorial-text.font"
 }
+textures {
+  name: "hud"
+  texture: "/main/war-battles-hud.atlas"
+}
+textures {
+  name: "presentation"
+  texture: "/main/tutorial-presentation.atlas"
+}
+nodes {
+  position { x: 0.0 y: 0.0 z: 0.7 }
+  size { x: 1280.0 y: 720.0 }
+  type: TYPE_BOX
+  texture: "presentation/battlefield-background"
+  id: "title_back"
+  pivot: PIVOT_SW
+  adjust_mode: ADJUST_MODE_STRETCH
+}
+nodes {
+  position { x: 640.0 y: 552.0 z: 0.8 }
+  size { x: 546.0 y: 190.0 }
+  type: TYPE_BOX
+  texture: "presentation/war-battles-title"
+  id: "title_logo"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 640.0 y: 355.0 z: 0.8 }
+  size { x: 610.0 y: 238.0 }
+  color { x: 0.025 y: 0.045 z: 0.065 w: 0.92 }
+  type: TYPE_BOX
+  texture: "presentation/hud-panel"
+  id: "title_panel"
+  pivot: PIVOT_CENTER
+  size_mode: SIZE_MODE_MANUAL
+  slice9 { x: 16.0 y: 16.0 z: 16.0 w: 16.0 }
+}
+nodes {
+  position { x: 386.0 y: 327.0 z: 0.9 }
+  size { x: 128.0 y: 128.0 }
+  type: TYPE_BOX
+  texture: "hud/driver-portrait-radio-idle"
+  id: "title_portrait"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 730.0 y: 408.0 z: 0.9 }
+  size { x: 480.0 y: 34.0 }
+  color { x: 1.0 y: 0.84 z: 0.2 w: 1.0 }
+  type: TYPE_TEXT
+  text: "ULTIMATE SLOP EDITION"
+  font: "score_font"
+  id: "title_edition"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 730.0 y: 358.0 z: 0.9 }
+  size { x: 480.0 y: 30.0 }
+  color { x: 0.62 y: 0.9 z: 1.0 w: 1.0 }
+  type: TYPE_TEXT
+  text: "32 TANKS  //  6 WEAPONS  //  NO MERCY"
+  font: "score_font"
+  id: "title_feature"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 730.0 y: 285.0 z: 0.9 }
+  size { x: 236.0 y: 76.0 }
+  type: TYPE_BOX
+  texture: "presentation/deploy-button"
+  id: "title_button"
+  pivot: PIVOT_CENTER
+  size_mode: SIZE_MODE_MANUAL
+  slice9 { x: 8.0 y: 7.0 z: 8.0 w: 7.0 }
+}
+nodes {
+  position { x: 730.0 y: 288.0 z: 0.95 }
+  size { x: 220.0 y: 32.0 }
+  color { x: 0.04 y: 0.06 z: 0.08 w: 1.0 }
+  type: TYPE_TEXT
+  text: "DEPLOY"
+  font: "score_font"
+  id: "title_deploy"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 640.0 y: 174.0 z: 0.9 }
+  size { x: 760.0 y: 28.0 }
+  color { x: 0.84 y: 0.88 z: 0.92 w: 1.0 }
+  type: TYPE_TEXT
+  text: "PRESS ANY KEY OR BUTTON TO TAKE COMMAND"
+  font: "score_font"
+  id: "title_prompt"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 640.0 y: 44.0 z: 0.9 }
+  size { x: 900.0 y: 24.0 }
+  color { x: 1.0 y: 0.84 z: 0.2 w: 1.0 }
+  type: TYPE_TEXT
+  text: "PIXEL ART SPONSORED BY SPRITE FUSION"
+  font: "score_font"
+  id: "title_sponsor"
+  pivot: PIVOT_CENTER
+}
+nodes {
+  position { x: 0.0 y: 0.0 z: 0.0 }
+  size { x: 1280.0 y: 130.0 }
+  color { x: 1.0 y: 1.0 z: 1.0 w: 0.96 }
+  type: TYPE_BOX
+  texture: "presentation/hud-panel"
+  id: "hud_back"
+  pivot: PIVOT_SW
+  adjust_mode: ADJUST_MODE_STRETCH
+  size_mode: SIZE_MODE_MANUAL
+  slice9 { x: 16.0 y: 16.0 z: 16.0 w: 16.0 }
+}
+nodes {
+  position { x: 20.0 y: 20.0 z: 0.2 }
+  size { x: 96.0 y: 96.0 }
+  type: TYPE_BOX
+  texture: "hud/driver-portrait-radio-idle"
+  id: "portrait"
+  pivot: PIVOT_SW
+}
+nodes {
+  position { x: 136.0 y: 77.0 z: 0.1 }
+  size { x: 220.0 y: 15.0 }
+  color { x: 0.035 y: 0.055 z: 0.075 w: 0.96 }
+  type: TYPE_BOX
+  id: "health_back"
+  pivot: PIVOT_W
+}
+nodes {
+  position { x: 136.0 y: 77.0 z: 0.2 }
+  size { x: 220.0 y: 11.0 }
+  color { x: 0.92 y: 0.18 z: 0.12 w: 1.0 }
+  type: TYPE_BOX
+  id: "health_fill"
+  pivot: PIVOT_W
+}
+nodes {
+  position { x: 136.0 y: 57.0 z: 0.1 }
+  size { x: 220.0 y: 12.0 }
+  color { x: 0.035 y: 0.055 z: 0.075 w: 0.96 }
+  type: TYPE_BOX
+  id: "armor_back"
+  pivot: PIVOT_W
+}
+nodes {
+  position { x: 136.0 y: 57.0 z: 0.2 }
+  size { x: 110.0 y: 8.0 }
+  color { x: 0.16 y: 0.66 z: 1.0 w: 1.0 }
+  type: TYPE_BOX
+  id: "armor_fill"
+  pivot: PIVOT_W
+}
+nodes {
+  position { x: 1012.0 y: 548.0 z: 0.0 }
+  size { x: 256.0 y: 160.0 }
+  color { x: 0.025 y: 0.045 z: 0.065 w: 0.9 }
+  type: TYPE_BOX
+  texture: "presentation/hud-panel"
+  id: "leaderboard_back"
+  pivot: PIVOT_SW
+  size_mode: SIZE_MODE_MANUAL
+  slice9 { x: 16.0 y: 16.0 z: 16.0 w: 16.0 }
+}
+nodes {
+  position { x: 472.0 y: 668.0 z: 0.0 }
+  size { x: 336.0 y: 42.0 }
+  color { x: 0.025 y: 0.045 z: 0.065 w: 0.92 }
+  type: TYPE_BOX
+  texture: "presentation/hud-panel"
+  id: "leader_back"
+  pivot: PIVOT_SW
+  size_mode: SIZE_MODE_MANUAL
+  slice9 { x: 16.0 y: 16.0 z: 16.0 w: 16.0 }
+}
+nodes {
+  position { x: 640.0 y: 697.0 z: 0.1 }
+  size { x: 320.0 y: 28.0 }
+  color { x: 1.0 y: 0.82 z: 0.16 w: 1.0 }
+  type: TYPE_TEXT
+  text: "LEADER  P1  0"
+  font: "score_font"
+  id: "leader"
+  pivot: PIVOT_N
+}
 nodes {
   position {
     x: 640.0
-    y: 606.0
+    y: 621.0
     z: 0.0
   }
   size {
@@ -28,7 +216,7 @@ nodes {
 nodes {
   position {
     x: 640.0
-    y: 650.0
+    y: 654.0
     z: 0.0
   }
   size {
@@ -71,12 +259,12 @@ nodes {
 }
 nodes {
   position {
-    x: 24.0
-    y: 48.0
+    x: 136.0
+    y: 111.0
     z: 0.0
   }
   size {
-    x: 700.0
+    x: 540.0
     y: 32.0
   }
   color {
@@ -93,12 +281,12 @@ nodes {
 }
 nodes {
   position {
-    x: 1256.0
-    y: 696.0
+    x: 1248.0
+    y: 694.0
     z: 0.0
   }
   size {
-    x: 420.0
+    x: 220.0
     y: 140.0
   }
   color {
@@ -131,11 +319,11 @@ nodes {
     w: 1.0
   }
   type: TYPE_TEXT
-  text: "ARROWS/WASD DRIVE   SPACE FIRE   SHIFT BOOST   1-6 WEAPON"
+  text: "MOVE WASD/ARROWS   FIRE SPACE   BOOST SHIFT   WEAPONS 1-6"
   font: "score_font"
   id: "hint"
   pivot: PIVOT_SW
 }
 material: "/builtins/materials/gui.material"
 adjust_reference: ADJUST_REFERENCE_PARENT
-max_nodes: 16
+max_nodes: 48

@@ -71,15 +71,22 @@ export class SessionLedger {
     validateExpectation(options);
     this.matchId = options.matchId >>> 0;
     this.rosterSize = options.rosterSize;
-    this.restartReservationTicks = options.restartReservationTicks === undefined
-      ? 0
-      : boundedTicks(options.restartReservationTicks, "restartReservationTicks");
+    this.restartReservationTicks =
+      options.restartReservationTicks === undefined
+        ? 0
+        : boundedTicks(options.restartReservationTicks, "restartReservationTicks");
   }
 
-  get isDirty(): boolean { return this.dirty; }
-  get changeRevision(): number { return this.revision; }
+  get isDirty(): boolean {
+    return this.dirty;
+  }
+  get changeRevision(): number {
+    return this.revision;
+  }
   /** Logical tick recorded in the last durable checkpoint. */
-  get persistedCheckpointTick(): number { return this.checkpointTick; }
+  get persistedCheckpointTick(): number {
+    return this.checkpointTick;
+  }
 
   hasCredential(slot: number): boolean {
     this.requireSlot(slot);
@@ -100,7 +107,7 @@ export class SessionLedger {
     unsignedNonzero(generation, "generation");
     unsigned(identityTag, "identityTag");
     const current = this.generation[slot]!;
-    const expected = current === 0 ? 1 : ((current + 1) >>> 0 || 1);
+    const expected = current === 0 ? 1 : (current + 1) >>> 0 || 1;
     if (generation !== expected) throw persistence("generation", "credential generation is not the next rotation");
     this.generation[slot] = generation >>> 0;
     this.expiresAtTick[slot] = 0;
@@ -113,7 +120,8 @@ export class SessionLedger {
   reserveUntil(slot: number, expiresAtTick: number): void {
     this.requireSlot(slot);
     unsigned(expiresAtTick, "expiresAtTick");
-    if (this.generation[slot] === 0) throw new SessionPersistenceError("missing-generation", "cannot reserve an unauthenticated slot");
+    if (this.generation[slot] === 0)
+      throw new SessionPersistenceError("missing-generation", "cannot reserve an unauthenticated slot");
     this.expiresAtTick[slot] = expiresAtTick >>> 0;
     this.dirty = true;
     this.revision += 1;
@@ -197,7 +205,8 @@ export class SessionLedger {
   }
 
   private requireSlot(slot: number): void {
-    if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize) throw new RangeError("session slot is outside the roster");
+    if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize)
+      throw new RangeError("session slot is outside the roster");
   }
 }
 
@@ -230,15 +239,19 @@ export function decodeSessionState(bytes: Uint8Array, expected: SessionStateExpe
   if (bytes.byteLength !== SESSION_STATE_BYTES) throw persistence("length", "session state has an unexpected length");
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   if (view.getUint32(0, true) !== SESSION_STATE_MAGIC) throw persistence("magic", "session state magic mismatch");
-  if (view.getUint16(4, true) !== SESSION_STATE_VERSION) throw persistence("version", "unsupported session state version");
+  if (view.getUint16(4, true) !== SESSION_STATE_VERSION)
+    throw persistence("version", "unsupported session state version");
   if (view.getUint16(6, true) !== SESSION_STATE_HEADER_BYTES || view.getUint16(18, true) !== SESSION_STATE_SLOT_BYTES) {
     throw persistence("layout", "session state layout is not canonical");
   }
-  if (view.getUint32(20, true) !== 0 || view.getUint8(17) !== MAX_PLAYERS) throw persistence("reserved", "session state reserved fields are nonzero");
-  if (view.getUint32(8, true) !== (expected.matchId >>> 0)) throw persistence("match", "session state belongs to another match");
+  if (view.getUint32(20, true) !== 0 || view.getUint8(17) !== MAX_PLAYERS)
+    throw persistence("reserved", "session state reserved fields are nonzero");
+  if (view.getUint32(8, true) !== expected.matchId >>> 0)
+    throw persistence("match", "session state belongs to another match");
   if (view.getUint8(16) !== expected.rosterSize) throw persistence("roster", "session state roster size differs");
   const checksumOffset = SESSION_STATE_BYTES - 4;
-  if (view.getUint32(checksumOffset, true) !== crc32(bytes.subarray(0, checksumOffset))) throw persistence("checksum", "session state checksum mismatch");
+  if (view.getUint32(checksumOffset, true) !== crc32(bytes.subarray(0, checksumOffset)))
+    throw persistence("checksum", "session state checksum mismatch");
   const generation = new Uint32Array(MAX_PLAYERS);
   const expiresAtTick = new Uint32Array(MAX_PLAYERS);
   const identityTag = new Uint32Array(MAX_PLAYERS);
@@ -247,7 +260,10 @@ export function decodeSessionState(bytes: Uint8Array, expected: SessionStateExpe
     generation[slot] = view.getUint32(offset, true);
     expiresAtTick[slot] = view.getUint32(offset + 4, true);
     identityTag[slot] = view.getUint32(offset + 8, true);
-    if (slot >= expected.rosterSize && (generation[slot] !== 0 || expiresAtTick[slot] !== 0 || identityTag[slot] !== 0)) {
+    if (
+      slot >= expected.rosterSize &&
+      (generation[slot] !== 0 || expiresAtTick[slot] !== 0 || identityTag[slot] !== 0)
+    ) {
       throw persistence("capacity", "session state contains a record outside the roster");
     }
     if (generation[slot] === 0 && (expiresAtTick[slot] !== 0 || identityTag[slot] !== 0)) {
@@ -287,7 +303,9 @@ export class DurableSessionPersistence {
   }
 
   /** Whether the most recent storage operation completed successfully. */
-  get isHealthy(): boolean { return this.healthy; }
+  get isHealthy(): boolean {
+    return this.healthy;
+  }
 
   async restore(): Promise<boolean> {
     try {
@@ -346,7 +364,11 @@ function validateExpectation(expected: SessionStateExpectation): void {
 function validateSnapshot(state: SessionStateSnapshot): void {
   validateExpectation(state);
   unsigned(state.checkpointTick, "checkpointTick");
-    if (state.generation.length !== MAX_PLAYERS || state.expiresAtTick.length !== MAX_PLAYERS || state.identityTag.length !== MAX_PLAYERS) {
+  if (
+    state.generation.length !== MAX_PLAYERS ||
+    state.expiresAtTick.length !== MAX_PLAYERS ||
+    state.identityTag.length !== MAX_PLAYERS
+  ) {
     throw persistence("capacity", "session state arrays must equal MAX_PLAYERS");
   }
   for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
@@ -360,7 +382,8 @@ function validateSnapshot(state: SessionStateSnapshot): void {
 }
 
 function unsigned(value: number, field: string): void {
-  if (!Number.isInteger(value) || value < 0 || value > 0xffff_ffff) throw persistence("range", `${field} must fit uint32`);
+  if (!Number.isInteger(value) || value < 0 || value > 0xffff_ffff)
+    throw persistence("range", `${field} must fit uint32`);
 }
 
 function boundedTicks(value: number, field: string): number {

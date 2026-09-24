@@ -32,6 +32,7 @@ const exampleRoot = resolve(here, "..");
 const projectRoot = resolve(exampleRoot, "defold");
 const assetsRoot = resolve(projectRoot, "assets");
 const outputRoot = resolve(assetsRoot, "derived", "arena");
+const worldArtRoot = resolve(assetsRoot, "derived", "world");
 const mainRoot = resolve(projectRoot, "main");
 
 /** Fixed seed keeps every noise field and scatter byte-reproducible. */
@@ -120,12 +121,23 @@ function decodePng(buffer) {
       const c = y > 0 && x >= bytesPerPixel ? lines[prior + x - bytesPerPixel] : 0;
       let out;
       switch (filter) {
-        case 0: out = value; break;
-        case 1: out = value + a; break;
-        case 2: out = value + b; break;
-        case 3: out = value + ((a + b) >> 1); break;
-        case 4: out = value + paeth(a, b, c); break;
-        default: throw new Error(`unsupported PNG filter ${filter}`);
+        case 0:
+          out = value;
+          break;
+        case 1:
+          out = value + a;
+          break;
+        case 2:
+          out = value + b;
+          break;
+        case 3:
+          out = value + ((a + b) >> 1);
+          break;
+        case 4:
+          out = value + paeth(a, b, c);
+          break;
+        default:
+          throw new Error(`unsupported PNG filter ${filter}`);
       }
       lines[row + x] = out & 0xff;
     }
@@ -235,18 +247,14 @@ function tileNoise(x, y, size, cells, seed) {
   const u = smooth(gx - x0);
   const v = smooth(gy - y0);
   const at = (a, b) => hash2(((a % cells) + cells) % cells, ((b % cells) + cells) % cells, seed);
-  return lerp(
-    lerp(at(x0, y0), at(x0 + 1, y0), u),
-    lerp(at(x0, y0 + 1), at(x0 + 1, y0 + 1), u),
-    v,
-  );
+  return lerp(lerp(at(x0, y0), at(x0 + 1, y0), u), lerp(at(x0, y0 + 1), at(x0 + 1, y0 + 1), u), v);
 }
 
 function octaveNoise(x, y, size, seed) {
   // Weighted toward the higher octaves: the tutorial ground is a scatter of
   // 3-6 px patches, not a few large lobes.
   return (
-    0.30 * tileNoise(x, y, size, 2, seed) +
+    0.3 * tileNoise(x, y, size, 2, seed) +
     0.42 * tileNoise(x, y, size, 4, seed + 101) +
     0.28 * tileNoise(x, y, size, 8, seed + 211)
   );
@@ -265,7 +273,12 @@ function dropSmallIslands(canvas, minimumSize) {
       while (stack.length > 0) {
         const [cx, cy] = stack.pop();
         island.push([cx, cy]);
-        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        for (const [dx, dy] of [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ]) {
           const nx = cx + dx;
           const ny = cy + dy;
           if (!canvas.inside(nx, ny) || canvas.alpha(nx, ny) === 0) continue;
@@ -396,7 +409,10 @@ function outline(canvas, color) {
       for (let dy = -1; dy <= 1 && !touches; ++dy) {
         for (let dx = -1; dx <= 1; ++dx) {
           if (dx === 0 && dy === 0) continue;
-          if (before.alpha(x + dx, y + dy) !== 0) { touches = true; break; }
+          if (before.alpha(x + dx, y + dy) !== 0) {
+            touches = true;
+            break;
+          }
         }
       }
       if (touches) canvas.set(x, y, color);
@@ -583,7 +599,7 @@ function hueRotated(sourceHex, targetHue, role) {
 // ---------------------------------------------------------------------------
 
 const C = {
-  outline: sampled("#2c2839"),      // the tutorial sprite border colour
+  outline: sampled("#2c2839"), // the tutorial sprite border colour
   shadowDeep: sampled("#453a4e"),
   metalDark: sampled("#515454"),
   metalMid: sampled("#738485"),
@@ -669,6 +685,55 @@ const TEAM_ORDER = ["blue", "red", "green", "sand"];
 const TILE = 16;
 const SHEET_COLUMNS = 8;
 
+/**
+ * Import the checked Sprite Fusion selections through our local world-art
+ * projection. Defold still owns the final tile sheet and map: the external
+ * service contributes pixels, never map structure, collision, or tile IDs.
+ */
+function loadWorldTiles() {
+  const metadataPath = resolve(worldArtRoot, "refinery-props.json");
+  const atlasPath = resolve(worldArtRoot, "refinery-props.png");
+  let metadata;
+  let atlasBytes;
+  try {
+    metadata = JSON.parse(readFileSync(metadataPath, "utf8"));
+    atlasBytes = readFileSync(atlasPath);
+  } catch (error) {
+    throw new Error(
+      `derived world art is missing or unreadable: ${error.message}\n` + "Run: node tools/generate-world-art.mjs",
+    );
+  }
+  if (metadata?.owner !== "tools/generate-world-art.mjs" || metadata?.schemaVersion !== 1) {
+    throw new Error("derived world-art metadata has an unsupported owner or schema");
+  }
+  if (metadata.atlas?.sha256 !== sha256(atlasBytes)) {
+    throw new Error("derived world-art atlas hash disagrees with its metadata");
+  }
+  const atlas = decodePng(atlasBytes);
+  if (atlas.width !== metadata.atlas.width || atlas.height !== metadata.atlas.height) {
+    throw new Error("derived world-art atlas dimensions disagree with its metadata");
+  }
+  return metadata.roles.map((entry) => {
+    const [sourceX, sourceY, width, height] = entry.cell ?? [];
+    if (width !== TILE || height !== TILE || sourceX < 0 || sourceY < 0) {
+      throw new Error(`world-art role ${entry.role} is not a valid ${TILE}px cell`);
+    }
+    const canvas = new Canvas(TILE, TILE);
+    for (let y = 0; y < TILE; y += 1) {
+      for (let x = 0; x < TILE; x += 1) {
+        const offset = ((sourceY + y) * atlas.width + sourceX + x) * 4;
+        canvas.set(x, y, atlas.data.subarray(offset, offset + 4));
+      }
+    }
+    return {
+      role: `world.${entry.role}`,
+      layer: "decor",
+      canvas,
+      sourceSha256: entry.outputSha256,
+    };
+  });
+}
+
 /** Ground: soft two-tone olive blobs, exactly the tutorial's ground language. */
 function groundTile(variant) {
   const canvas = new Canvas(TILE, TILE);
@@ -710,7 +775,7 @@ function concreteField() {
       const n = octaveNoise(x, y, TILE, SEED + 4242);
       let color = C.metalMid;
       if (n > 0.66) color = C.metalLight;
-      else if (n < 0.30) color = C.shadowDeep;
+      else if (n < 0.3) color = C.shadowDeep;
       else if (n < 0.42) color = C.metalDark;
       field.set(x, y, color);
     }
@@ -796,7 +861,7 @@ function sandbagTile() {
         let color;
         if (j === bagHeight - 1 || local === bagWidth - 1) color = C.woodDark;
         else if (j === 0) {
-          if (local === 0) color = C.woodDark;               // rounded bag corner
+          if (local === 0) color = C.woodDark; // rounded bag corner
           else if (local === 1 || local >= bagWidth - 2) color = C.dustMid;
           else color = C.dustLight;
         } else if (j === 1) color = local === 0 ? C.woodBase : C.dustLight;
@@ -825,7 +890,12 @@ function spawnPadTile() {
       canvas.set(originX + step + 1, 13 - step, C.goldBase);
     }
   }
-  for (const [cx, cy, sx, sy] of [[0, 0, 1, 1], [15, 0, -1, 1], [0, 15, 1, -1], [15, 15, -1, -1]]) {
+  for (const [cx, cy, sx, sy] of [
+    [0, 0, 1, 1],
+    [15, 0, -1, 1],
+    [0, 15, 1, -1],
+    [15, 15, -1, -1],
+  ]) {
     for (let i = 0; i < 3; ++i) {
       canvas.set(cx + i * sx, cy, C.goldDark);
       canvas.set(cx, cy + i * sy, C.goldDark);
@@ -846,7 +916,16 @@ function pickupPadTile() {
       else if (d <= 5.0 && d >= 4.2) canvas.set(x, y, C.seaBlue);
     }
   }
-  for (const [x, y] of [[7, 0], [8, 0], [7, 15], [8, 15], [0, 7], [0, 8], [15, 7], [15, 8]]) {
+  for (const [x, y] of [
+    [7, 0],
+    [8, 0],
+    [7, 15],
+    [8, 15],
+    [0, 7],
+    [0, 8],
+    [15, 7],
+    [15, 8],
+  ]) {
     canvas.set(x, y, C.seaBlue);
   }
   outline(canvas, C.deepBlue);
@@ -876,6 +955,7 @@ function buildTileSheet() {
     { role: "sandbag", layer: "overlay", canvas: sandbagTile() },
     { role: "spawnPad", layer: "overlay", canvas: spawnPadTile() },
     { role: "pickupPad", layer: "overlay", canvas: pickupPadTile() },
+    ...loadWorldTiles(),
   ];
   const rows = Math.ceil(tiles.length / SHEET_COLUMNS);
   const sheet = new Canvas(SHEET_COLUMNS * TILE, rows * TILE);
@@ -935,23 +1015,23 @@ function tankHullBody(team, frame) {
   const phase = frame === 0 ? 0 : 2;
   for (let x = TREAD_X0; x <= TREAD_X1; ++x) {
     if ((x - TREAD_X0 + phase) % 4 !== 0) continue;
-    canvas.vline(x, 6, 8, C.treadDark);  // track link, rolling between frames
+    canvas.vline(x, 6, 8, C.treadDark); // track link, rolling between frames
   }
-  canvas.rect(TREAD_X0, 7, 2, 2, C.treadSheen);       // rear drive sprocket
-  canvas.rect(TREAD_X1 - 1, 7, 2, 2, C.treadSheen);   // front idler
+  canvas.rect(TREAD_X0, 7, 2, 2, C.treadSheen); // rear drive sprocket
+  canvas.rect(TREAD_X1 - 1, 7, 2, 2, C.treadSheen); // front idler
 
   // --- hull body -----------------------------------------------------------
   for (const [y, x0, x1] of HULL_ROWS) {
     canvas.hline(x0, x1, y, ramp.base);
-    canvas.hline(Math.max(22, x0), x1, y, ramp.light);     // sloped glacis
-    canvas.hline(x1 - 2, x1, y, ramp.highlight);           // lit nose edge
-    canvas.hline(x0, x0 + 1, y, ramp.shadow);              // rear plate
+    canvas.hline(Math.max(22, x0), x1, y, ramp.light); // sloped glacis
+    canvas.hline(x1 - 2, x1, y, ramp.highlight); // lit nose edge
+    canvas.hline(x0, x0 + 1, y, ramp.shadow); // rear plate
   }
-  canvas.hline(3, 26, 10, ramp.shadow);                    // fender shadow line
-  canvas.vline(21, 10, 15, ramp.shadow);                   // deck / glacis seam
-  canvas.rect(5, 11, 5, 1, C.metalDark);                   // engine louvres
+  canvas.hline(3, 26, 10, ramp.shadow); // fender shadow line
+  canvas.vline(21, 10, 15, ramp.shadow); // deck / glacis seam
+  canvas.rect(5, 11, 5, 1, C.metalDark); // engine louvres
   canvas.rect(5, 13, 5, 1, C.metalDark);
-  canvas.rect(1, 12, 2, 2, C.metalDark);                   // exhaust stubs
+  canvas.rect(1, 12, 2, 2, C.metalDark); // exhaust stubs
   canvas.rect(1, 12, 2, 1, C.metalMid);
 
   // --- turret well: a shallow ring the turret sprite seats into ------------
@@ -1002,10 +1082,10 @@ function tankTurret(team) {
 
   for (const [y, x0, x1] of TURRET_ROWS) {
     canvas.hline(x0, x1, y, ramp.base);
-    canvas.hline(x0, x0 + 1, y, ramp.shadow);        // rear of the turret
-    canvas.hline(17, x1, y, ramp.light);             // lit front cheeks
+    canvas.hline(x0, x0 + 1, y, ramp.shadow); // rear of the turret
+    canvas.hline(17, x1, y, ramp.light); // lit front cheeks
   }
-  canvas.hline(10, 21, 12, ramp.shadow);             // turret rim
+  canvas.hline(10, 21, 12, ramp.shadow); // turret rim
   canvas.hline(17, 22, 15, ramp.highlight);
   // Commander cupola, sitting at the rear of the ring.
   for (let y = 12; y <= 15; ++y) {
@@ -1015,7 +1095,7 @@ function tankTurret(team) {
       else if (d < 2.1) canvas.set(x, y, ramp.light);
     }
   }
-  canvas.rect(20, 13, 4, 3, C.metalDark);            // mantlet
+  canvas.rect(20, 13, 4, 3, C.metalDark); // mantlet
   canvas.rect(20, 15, 4, 1, C.metalMid);
 
   // --- barrel: a flat 4px tube opening into a 6px muzzle brake -------------
@@ -1040,7 +1120,7 @@ const CHAR_RAMP = (team) => {
   const ramp = TEAMS[team];
   const key = (c) => `${c[0]},${c[1]},${c[2]}`;
   return new Map([
-    [key(ramp.highlight), C.metalLight],   // bare metal where the paint burned
+    [key(ramp.highlight), C.metalLight], // bare metal where the paint burned
     [key(ramp.light), C.metalDark],
     [key(ramp.base), C.shadowDeep],
     [key(ramp.shadow), C.smokeDark],
@@ -1071,17 +1151,17 @@ function tankWreck(team) {
   for (let i = 0; i < 16; ++i) {
     const x = 5 + Math.floor(random() * 22);
     const y = 11 + Math.floor(random() * 5);
-    canvas.set(x, y, random() > 0.80 ? C.emberDeep : C.outline);
+    canvas.set(x, y, random() > 0.8 ? C.emberDeep : C.outline);
   }
-  canvas.rect(13, 12, 6, 4, C.outline);      // blown turret well
+  canvas.rect(13, 12, 6, 4, C.outline); // blown turret well
   canvas.set(14, 13, C.emberDeep);
   canvas.set(16, 14, C.ember);
   canvas.set(17, 12, C.emberDeep);
   canvas.set(15, 15, C.ember);
-  canvas.rect(24, 6, 3, 2, [0, 0, 0, 0]);    // track shot off the front idler
+  canvas.rect(24, 6, 3, 2, [0, 0, 0, 0]); // track shot off the front idler
   canvas.set(23, 8, C.smokeDark);
-  canvas.rect(5, 10, 3, 1, [0, 0, 0, 0]);    // torn rear fender
-  canvas.set(9, 13, C.woodDark);             // rust streaks
+  canvas.rect(5, 10, 3, 1, [0, 0, 0, 0]); // torn rear fender
+  canvas.set(9, 13, C.woodDark); // rust streaks
   canvas.set(22, 15, C.woodDark);
 
   canvas.mirrorTopToBottom();
@@ -1095,7 +1175,12 @@ function tankWreck(team) {
 
 function projCannon() {
   const canvas = new Canvas(10, 10);
-  const rows = [[1, 2, 5], [2, 2, 6], [3, 1, 7], [4, 1, 8]];
+  const rows = [
+    [1, 2, 5],
+    [2, 2, 6],
+    [3, 1, 7],
+    [4, 1, 8],
+  ];
   for (const [y, x0, x1] of rows) {
     for (let x = x0; x <= x1; ++x) {
       let color = C.goldBase;
@@ -1147,7 +1232,13 @@ function projScatter() {
 
 function projMortar() {
   const canvas = new Canvas(12, 12);
-  const rows = [[1, 1, 3], [2, 1, 4], [3, 1, 8], [4, 1, 9], [5, 1, 10]];
+  const rows = [
+    [1, 1, 3],
+    [2, 1, 4],
+    [3, 1, 8],
+    [4, 1, 9],
+    [5, 1, 10],
+  ];
   for (const [y, x0, x1] of rows) {
     for (let x = x0; x <= x1; ++x) {
       let color = C.metalMid;
@@ -1177,7 +1268,12 @@ function projRicochet(frame) {
     canvas.disc(cx, cy, 3.4, C.seaBlue);
     canvas.disc(cx, cy, 2.2, C.skyBlue);
     canvas.disc(cx, cy, 1.0, C.hot);
-    for (const [dx, dy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) {
+    for (const [dx, dy] of [
+      [1, 1],
+      [-1, 1],
+      [1, -1],
+      [-1, -1],
+    ]) {
       canvas.set(Math.round(cx + dx * 4), Math.round(cy + dy * 4), C.skyBlue);
     }
   }
@@ -1196,7 +1292,7 @@ function wobbleField(seed) {
   const p2 = random() * Math.PI * 2;
   const p3 = random() * Math.PI * 2;
   return (angle) =>
-    1 + 0.20 * Math.sin(angle * 3 + p1) + 0.12 * Math.sin(angle * 5 + p2) + 0.07 * Math.sin(angle * 7 + p3);
+    1 + 0.2 * Math.sin(angle * 3 + p1) + 0.12 * Math.sin(angle * 5 + p2) + 0.07 * Math.sin(angle * 7 + p3);
 }
 
 function fillBlob(canvas, cx, cy, radius, wobble, bands) {
@@ -1211,7 +1307,10 @@ function fillBlob(canvas, cx, cy, radius, wobble, bands) {
       if (d > edge) continue;
       const t = edge === 0 ? 0 : d / edge;
       for (const [stop, color] of bands) {
-        if (t <= stop) { canvas.set(x, y, color); break; }
+        if (t <= stop) {
+          canvas.set(x, y, color);
+          break;
+        }
       }
     }
   }
@@ -1231,7 +1330,7 @@ function smokeMass(size, cx, cy, radius, count, puffRadius, seed, rim, core, ero
   const extent = Math.min(cx, cy, size - 1 - cx, size - 1 - cy) - 2;
   for (let i = 0; i < count; ++i) {
     const angle = (i / count) * Math.PI * 2 + random() * 0.5;
-    let distance = radius * (0.42 + random() * 0.30);
+    let distance = radius * (0.42 + random() * 0.3);
     let puff = puffRadius * (0.72 + random() * 0.55);
     if (distance + puff > extent) {
       const scale = extent / (distance + puff);
@@ -1250,7 +1349,10 @@ function smokeMass(size, cx, cy, radius, count, puffRadius, seed, rim, core, ero
       let interior = true;
       for (let dy = -depth; dy <= depth && interior; ++dy) {
         for (let dx = -depth; dx <= depth; ++dx) {
-          if (silhouette.alpha(x + dx, y + dy) === 0) { interior = false; break; }
+          if (silhouette.alpha(x + dx, y + dy) === 0) {
+            interior = false;
+            break;
+          }
         }
       }
       if (interior) canvas.set(x, y, core);
@@ -1299,29 +1401,55 @@ function explosionFrames(size, frameCount, seed) {
 
     if (t < 0.22) {
       fillBlob(canvas, centre, centre, radius, wobble, [
-        [0.46, C.hot], [0.80, C.flame], [1.0, C.ember],
+        [0.46, C.hot],
+        [0.8, C.flame],
+        [1.0, C.ember],
       ]);
     } else if (t < 0.52) {
       fillBlob(canvas, centre, centre, radius, wobble, [
-        [0.30, C.hot], [0.60, C.flame], [0.84, C.ember], [1.0, C.emberDeep],
+        [0.3, C.hot],
+        [0.6, C.flame],
+        [0.84, C.ember],
+        [1.0, C.emberDeep],
       ]);
     } else if (t < 0.74) {
       fillBlob(canvas, centre, centre, radius, wobble, [
-        [0.22, C.flame], [0.48, C.ember], [0.72, C.emberDeep], [1.0, C.smokeLight],
+        [0.22, C.flame],
+        [0.48, C.ember],
+        [0.72, C.emberDeep],
+        [1.0, C.smokeLight],
       ]);
-      canvas.blit(smokeMass(size, centre, centre, radius, 6, radius * 0.34, seed + 17, C.smokeLight, C.smokeDark, 0), 0, 0);
-      fillBlob(canvas, centre, centre, radius * 0.34, wobble, [[0.5, C.flame], [1.0, C.ember]]);
+      canvas.blit(
+        smokeMass(size, centre, centre, radius, 6, radius * 0.34, seed + 17, C.smokeLight, C.smokeDark, 0),
+        0,
+        0,
+      );
+      fillBlob(canvas, centre, centre, radius * 0.34, wobble, [
+        [0.5, C.flame],
+        [1.0, C.ember],
+      ]);
     } else if (t < 0.92) {
-      canvas.blit(smokeMass(size, centre, centre, radius, 7, radius * 0.38, seed + 17, C.smokeLight, C.smokeDark, 0.30), 0, 0);
-      fillBlob(canvas, centre, centre, radius * 0.26, wobble, [[0.55, C.ember], [1.0, C.emberDeep]]);
+      canvas.blit(
+        smokeMass(size, centre, centre, radius, 7, radius * 0.38, seed + 17, C.smokeLight, C.smokeDark, 0.3),
+        0,
+        0,
+      );
+      fillBlob(canvas, centre, centre, radius * 0.26, wobble, [
+        [0.55, C.ember],
+        [1.0, C.emberDeep],
+      ]);
     } else {
       // The last wisp: lighter and thinner, not a darker version of frame 5.
-      canvas.blit(smokeMass(size, centre, centre, radius, 7, radius * 0.38, seed + 17, C.smokeLight, C.smokeDark, 0.36), 0, 0);
+      canvas.blit(
+        smokeMass(size, centre, centre, radius, 7, radius * 0.38, seed + 17, C.smokeLight, C.smokeDark, 0.36),
+        0,
+        0,
+      );
     }
 
     if (size >= 64 && index >= 1 && index <= 2) {
       // A shockwave rim the small explosion does not get.
-      const ringRadius = radius * 1.10;
+      const ringRadius = radius * 1.1;
       for (let y = 0; y < size; ++y) {
         for (let x = 0; x < size; ++x) {
           const dx = x - centre;
@@ -1341,7 +1469,7 @@ function explosionFrames(size, frameCount, seed) {
     // not pick up the smoke border, which would turn it into a 3x3 dark box.
     if (index >= 1 && index <= frameCount - 2) {
       const heat = t < 0.5 ? [C.hot, C.flame] : t < 0.8 ? [C.flame, C.ember] : [C.ember, C.emberDeep];
-      sparkRing(canvas, centre, centre, seed + index, 9, radius * 1.10, heat);
+      sparkRing(canvas, centre, centre, seed + index, 9, radius * 1.1, heat);
     }
     frames.push(canvas);
   }
@@ -1420,7 +1548,12 @@ function sparkFrames() {
       }
     }
     if (index === 3) {
-      for (const [x, y] of [[4, 4], [11, 5], [6, 11]]) canvas.set(x, y, C.smokeLight);
+      for (const [x, y] of [
+        [4, 4],
+        [11, 5],
+        [6, 11],
+      ])
+        canvas.set(x, y, C.smokeLight);
     }
     dropSmallIslands(canvas, 2);
     return canvas;
@@ -1654,7 +1787,13 @@ function hudTick() {
 function buildSprites() {
   const sprites = [];
   const add = (name, canvas, options = {}) => {
-    sprites.push({ name, canvas, outlineColor: options.outlineColor ?? "#2c2839", anchored: !!options.anchored, role: options.role });
+    sprites.push({
+      name,
+      canvas,
+      outlineColor: options.outlineColor ?? "#2c2839",
+      anchored: !!options.anchored,
+      role: options.role,
+    });
   };
 
   for (const team of TEAM_ORDER) {
@@ -1734,10 +1873,26 @@ function buildAnimations() {
   }
   loop("proj-ricochet", ["proj-ricochet-1", "proj-ricochet-2"], 16);
 
-  once("explosion-small", Array.from({ length: 6 }, (_, i) => `explosion-small-${i + 1}`), 18);
-  once("explosion-big", Array.from({ length: 8 }, (_, i) => `explosion-big-${i + 1}`), 16);
-  once("muzzle", Array.from({ length: 3 }, (_, i) => `muzzle-${i + 1}`), 30);
-  once("spark", Array.from({ length: 4 }, (_, i) => `spark-${i + 1}`), 24);
+  once(
+    "explosion-small",
+    Array.from({ length: 6 }, (_, i) => `explosion-small-${i + 1}`),
+    18,
+  );
+  once(
+    "explosion-big",
+    Array.from({ length: 8 }, (_, i) => `explosion-big-${i + 1}`),
+    16,
+  );
+  once(
+    "muzzle",
+    Array.from({ length: 3 }, (_, i) => `muzzle-${i + 1}`),
+    30,
+  );
+  once(
+    "spark",
+    Array.from({ length: 4 }, (_, i) => `spark-${i + 1}`),
+    24,
+  );
 
   for (const name of Object.keys(PICKUP_ICONS)) loop(name, [`${name}-1`, `${name}-2`], 4);
   loop("pickup-pad", ["pickup-pad-1", "pickup-pad-2"], 4);
@@ -1841,9 +1996,11 @@ function verifySprite(sprite, bytes) {
   const round = new Canvas(decoded.width, decoded.height);
   round.data.set(decoded.data);
   const bbox = round.opaqueBbox();
-  check(`${sprite.name}: decodes at ${sprite.canvas.width}x${sprite.canvas.height}`,
+  check(
+    `${sprite.name}: decodes at ${sprite.canvas.width}x${sprite.canvas.height}`,
     decoded.width === sprite.canvas.width && decoded.height === sprite.canvas.height,
-    `${decoded.width}x${decoded.height}`);
+    `${decoded.width}x${decoded.height}`,
+  );
   check(`${sprite.name}: not fully transparent`, bbox !== null);
   if (!bbox) return { bbox: null, centred: null };
   const inBounds = bbox[0] >= 0 && bbox[1] >= 0 && bbox[2] < decoded.width && bbox[3] < decoded.height;
@@ -1878,9 +2035,12 @@ function build() {
   const sheetBytes = encodePng(sheet.width, sheet.height, sheet.data);
   outputs.set(resolve(outputRoot, "arena-tiles.png"), sheetBytes);
   const decodedSheet = decodePng(sheetBytes);
-  check("arena-tiles.png round-trips through the decoder",
-    decodedSheet.width === sheet.width && decodedSheet.height === sheet.height &&
-      Buffer.from(decodedSheet.data).equals(Buffer.from(sheet.data)));
+  check(
+    "arena-tiles.png round-trips through the decoder",
+    decodedSheet.width === sheet.width &&
+      decodedSheet.height === sheet.height &&
+      Buffer.from(decodedSheet.data).equals(Buffer.from(sheet.data)),
+  );
 
   const sprites = buildSprites();
   const spriteRecords = [];
@@ -1928,6 +2088,9 @@ function build() {
     sandbagTileId: tiles.find((t) => t.role === "sandbag").id,
     spawnPadTileId: tiles.find((t) => t.role === "spawnPad").id,
     pickupPadTileId: tiles.find((t) => t.role === "pickupPad").id,
+    worldTileIds: Object.fromEntries(
+      tiles.filter((tile) => tile.role.startsWith("world.")).map((tile) => [tile.role.slice(6), tile.id]),
+    ),
     tiles: tiles.map((tile) => ({
       id: tile.id,
       role: tile.role,
@@ -1981,9 +2144,7 @@ function build() {
           .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))
           .map(([file, count]) => ({ file, count })),
       })),
-      roles: Object.fromEntries(
-        Object.entries(C).map(([role, color]) => [role, hex(color[0], color[1], color[2])]),
-      ),
+      roles: Object.fromEntries(Object.entries(C).map(([role, color]) => [role, hex(color[0], color[1], color[2])])),
     },
     teams: {
       order: TEAM_ORDER,
@@ -2000,7 +2161,10 @@ function build() {
             Object.entries(ramp).map(([slot, color]) => {
               const value = hex(color[0], color[1], color[2]);
               const derivation = DERIVATIONS.find((d) => d.role === `${team}.${slot}`);
-              return [slot, derivation ? { hex: value, origin: "hue-rotated", ...derivation } : { hex: value, origin: "sampled" }];
+              return [
+                slot,
+                derivation ? { hex: value, origin: "hue-rotated", ...derivation } : { hex: value, origin: "sampled" },
+              ];
             }),
           ),
         ]),
@@ -2082,7 +2246,9 @@ function main() {
   const { outputs, manifest } = build();
 
   for (const assertion of assertions) {
-    process.stdout.write(`${assertion.ok ? "ok  " : "FAIL"} ${assertion.label}${assertion.detail ? ` (${assertion.detail})` : ""}\n`);
+    process.stdout.write(
+      `${assertion.ok ? "ok  " : "FAIL"} ${assertion.label}${assertion.detail ? ` (${assertion.detail})` : ""}\n`,
+    );
   }
   if (failures > 0) throw new SystemExitError(`${failures} verification assertion(s) failed`);
 
@@ -2091,7 +2257,9 @@ function main() {
       let current = null;
       try {
         if (statSync(path).isFile()) current = readFileSync(path);
-      } catch { /* missing file falls through to the mismatch below */ }
+      } catch {
+        /* missing file falls through to the mismatch below */
+      }
       if (!current || !current.equals(bytes)) {
         throw new SystemExitError(`stale generated art: ${relative(exampleRoot, path)}`);
       }
@@ -2106,11 +2274,11 @@ function main() {
   }
   process.stdout.write(
     `wrote ${outputs.size} files\n` +
-    `  tile sheet ${manifest.tileSheet.size[0]}x${manifest.tileSheet.size[1]}, ` +
-    `${manifest.tileSheet.cellsUsed}/${manifest.tileSheet.cells} cells used\n` +
-    `  ${manifest.sprites.length} sprite PNGs, ${manifest.atlas.animations.length} atlas animations\n` +
-    `  palette ${manifest.palette.entries.length} sampled colours, ` +
-    `${manifest.teams.derivations.length} hue-rotated team shades\n`,
+      `  tile sheet ${manifest.tileSheet.size[0]}x${manifest.tileSheet.size[1]}, ` +
+      `${manifest.tileSheet.cellsUsed}/${manifest.tileSheet.cells} cells used\n` +
+      `  ${manifest.sprites.length} sprite PNGs, ${manifest.atlas.animations.length} atlas animations\n` +
+      `  palette ${manifest.palette.entries.length} sampled colours, ` +
+      `${manifest.teams.derivations.length} hue-rotated team shades\n`,
   );
 }
 

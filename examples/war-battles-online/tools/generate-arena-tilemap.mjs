@@ -35,7 +35,7 @@ import {
   cellOfX,
   cellOfY,
 } from "../core/arena.ts";
-import { MAP_HEIGHT, MAP_WIDTH, MAX_PICKUPS } from "../core/constants.ts";
+import { MAP_HEIGHT, MAP_WIDTH, MAX_HAZARDS, MAX_PICKUPS } from "../core/constants.ts";
 import { DEFAULT_ARENA_SEED } from "../core/playable.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -60,7 +60,8 @@ try {
 } catch (error) {
   throw new Error(
     `arena art manifest is missing or unreadable (${relative(exampleRoot, manifestPath)}): ${error.message}\n` +
-    "Run: node tools/generate-art.mjs");
+      "Run: node tools/generate-art.mjs",
+  );
 }
 const tiles = manifest?.tileSheet?.map;
 if (!tiles?.groundTileIds || !tiles?.wallTileIds) {
@@ -72,7 +73,21 @@ const wall = tiles.wallTileIds;
 const crateTile = tiles.crateTileId;
 const sandbagTile = tiles.sandbagTileId;
 const spawnPadTile = tiles.spawnPadTileId;
-const pickupPadTile = tiles.pickupPadTileId;
+const worldTiles = tiles.worldTileIds;
+if (
+  !worldTiles ||
+  !Number.isInteger(worldTiles["pickup-pedestal"]) ||
+  !Number.isInteger(worldTiles["thermal-vent"]) ||
+  !Number.isInteger(worldTiles["lava-fissure"]) ||
+  !Number.isInteger(worldTiles["floor-vent"]) ||
+  !Number.isInteger(worldTiles["pipe-junction"]) ||
+  !Number.isInteger(worldTiles["pipe-run"])
+) {
+  throw new Error(
+    `${relative(exampleRoot, manifestPath)} has no complete worldTileIds; regenerate world art, then arena art`,
+  );
+}
+const pickupPadTile = worldTiles["pickup-pedestal"];
 
 const map = new ArenaMap(seed);
 
@@ -124,6 +139,7 @@ function groundTile(cellX, cellY) {
 // opaque, while crates, sandbags and floor markings are transparent overlays
 // that need something drawn underneath them.
 const groundCells = [];
+const decorCells = [];
 const markCells = [];
 const marked = new Set();
 function mark(x, y, tile) {
@@ -131,6 +147,15 @@ function mark(x, y, tile) {
   if (marked.has(key)) return;
   marked.add(key);
   markCells.push({ x, y, tile });
+}
+
+const decorated = new Set();
+function decorate(x, y, tile) {
+  if (x < 0 || y < 0 || x >= MAP_WIDTH || y >= MAP_HEIGHT || map.cellAt(x, y) !== CELL_FLOOR) return;
+  const key = `${x},${y}`;
+  if (decorated.has(key)) return;
+  decorated.add(key);
+  decorCells.push({ x, y, tile });
 }
 
 for (let cellY = 0; cellY < MAP_HEIGHT; cellY += 1) {
@@ -151,6 +176,19 @@ for (let index = 0; index < SPAWN_POINT_COUNT; index += 1) {
 for (let index = 0; index < MAX_PICKUPS; index += 1) {
   mark(cellOfX(map.pickupX[index]), cellOfY(map.pickupY[index]), pickupPadTile);
 }
+for (let index = 0; index < MAX_HAZARDS; index += 1) {
+  const x = cellOfX(map.hazardX[index]);
+  const y = cellOfY(map.hazardY[index]);
+  // Hazard geometry comes from the authoritative ArenaMap; these are purely
+  // visual Defold tile roles, so collision remains owned by the simulation.
+  decorate(x, y, worldTiles["floor-vent"]);
+  decorate(x - 1, y, worldTiles["lava-fissure"]);
+  decorate(x + 1, y, worldTiles["lava-fissure"]);
+  decorate(x, y + 1, worldTiles["thermal-vent"]);
+  decorate(x, y - 1, worldTiles["pipe-junction"]);
+  decorate(x + (index % 2 === 0 ? 2 : -2), y - 1, worldTiles["pipe-run"]);
+}
+decorCells.sort((a, b) => a.y - b.y || a.x - b.x);
 markCells.sort((a, b) => a.y - b.y || a.x - b.x);
 
 function emitLayer(id, z, cells) {
@@ -165,6 +203,7 @@ function emitLayer(id, z, cells) {
 const output = [
   `tile_set: "${TILE_SOURCE}"`,
   emitLayer("ground", "0.0", groundCells),
+  emitLayer("decor", "0.05", decorCells),
   emitLayer("marks", "0.1", markCells),
   `material: "${MATERIAL}"`,
   "",
@@ -182,13 +221,14 @@ if (check) {
     console.error(`war-battles-arena-tilemap:stale:${relative(exampleRoot, targetPath)}`);
     process.exit(1);
   }
-  console.log(`war-battles-arena-tilemap:fresh:${groundCells.length}+${markCells.length} cells`);
+  console.log(`war-battles-arena-tilemap:fresh:${groundCells.length}+${decorCells.length}+${markCells.length} cells`);
 } else {
   writeFileSync(targetPath, output);
   let solid = 0;
   for (let index = 0; index < MAP_WIDTH * MAP_HEIGHT; index += 1) if (map.cells[index] !== CELL_FLOOR) solid += 1;
   process.stdout.write(
     `Wrote ${relative(exampleRoot, targetPath)}\n` +
-    `  arena ${MAP_WIDTH}x${MAP_HEIGHT} tiles (${MAP_WIDTH * 16}x${MAP_HEIGHT * 16} px), seed ${seed}\n` +
-    `  ground cells ${groundCells.length}, solid ${solid} (${(100 * solid / (MAP_WIDTH * MAP_HEIGHT)).toFixed(1)}%), overlay cells ${markCells.length}\n`);
+      `  arena ${MAP_WIDTH}x${MAP_HEIGHT} tiles (${MAP_WIDTH * 16}x${MAP_HEIGHT * 16} px), seed ${seed}\n` +
+      `  ground cells ${groundCells.length}, solid ${solid} (${((100 * solid) / (MAP_WIDTH * MAP_HEIGHT)).toFixed(1)}%), decor cells ${decorCells.length}, overlay cells ${markCells.length}\n`,
+  );
 }

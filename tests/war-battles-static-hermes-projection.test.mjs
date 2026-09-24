@@ -22,7 +22,7 @@ test("War Battles Static Hermes projection records closed release reachability",
   assert.equal(checkedIn.projection.id, PROJECTION_ID);
   assert.equal(checkedIn.reachability.profile, "release");
   assert.equal(checkedIn.reachability.dynamicAccess, false);
-  assert.equal(checkedIn.reachability.reachableRouteCount, 27);
+  assert.equal(checkedIn.reachability.reachableRouteCount, 31);
   assert.equal(
     checkedIn.reachability.staticReachableRouteCount,
     checkedIn.reachability.reachableRouteCount,

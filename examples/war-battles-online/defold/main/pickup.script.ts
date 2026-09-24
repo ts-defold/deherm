@@ -1,11 +1,4 @@
-import {
-  defineComponent,
-  go,
-  hashLiteral,
-  msg,
-  property,
-  type DefoldHash,
-} from "@deherm/project";
+import { defineComponent, go, hashLiteral, msg, property, type DefoldHash } from "@deherm/project";
 
 import {
   PICKUP_ARMOR,

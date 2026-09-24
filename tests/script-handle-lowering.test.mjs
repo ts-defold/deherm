@@ -89,6 +89,29 @@ test("keeps Lua registration profiles distinct from adapter-executable profiles"
   );
 });
 
+test("preserves optional argument arity and nil codecs from projected signatures", () => {
+  const projection = JSON.parse(inputs.projection);
+  for (const route of generated.routes) {
+    const parameters = projection.rows.find(({ id }) => id === route.id).signature.parameters;
+    const minimum = parameters.reduce((count, parameter, index) => parameter.optional ? count : index + 1, 0);
+    assert.equal(route.requiredArgumentCount, minimum, route.id);
+    assert.equal(route.argumentCount, parameters.length, route.id);
+    for (const [index, parameter] of parameters.entries()) {
+      if (parameter.optional) assert.notEqual(generated.argumentCodecs[route.argumentOffset + index].mask & 1, 0, route.id);
+    }
+  }
+  const enabled = generated.routes.find(({ id }) => id === "script:gui.is_enabled");
+  assert.equal(enabled.requiredArgumentCount, 1);
+  assert.equal(enabled.argumentCount, 2);
+  assert.equal(generated.argumentCodecs[enabled.argumentOffset + 1].mask, 3);
+});
+
+test("legacy GUI handles bridge only to the matching semantic node codec", () => {
+  const { header, source } = renderArtifacts(generated);
+  assert.match(header, /LegacyHandleApi legacyHandles = \{\}/);
+  assert.match(source, /value\.handleKind == ScriptHandleKind::kGuiNode && codec\.semanticKind == SemanticHandleKind::kGuiNode && legacyHandles_\.pushGuiNode/);
+});
+
 test("descriptor selection is independent of compile/link/runtime evidence state", () => {
   const promoted = {
     ...inputs,

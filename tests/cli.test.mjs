@@ -894,10 +894,17 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.match(camera, /callExtension\("camera", "start", \[facing\]\)/);
   assert.match(camera, /focusTarget\(target: DefoldAddressLiteral \| DefoldRelativeAddress \| DefoldHash \| DefoldUrl\)/);
   const index = await readFile(path.join(output.root, "sdk", "index.ts"), "utf8");
-  assert.match(index, /export \* from "\.\/generated\/script\/index\.js"/);
+  assert.match(index, /export \{ defold, type DefoldApi \} from "\.\/defold\.js"/);
+  assert.doesNotMatch(index, /export \* from "\.\/generated\/script\/index\.js"/);
   assert.match(index, /export \* from "\.\/generated\/dmsdk\/index\.js"/);
   assert.match(index, /export \* from "\.\/generated\/dmsdk\/scalar\.js"/);
   assert.match(index, /export \{ camera \} from "\.\/modules\/camera\.js"/);
+  const defold = await readFile(path.join(output.root, "sdk", "defold.ts"), "utf8");
+  assert.match(defold, /export type DefoldApi = EngineDefoldApi & DefoldRuntime/);
+  assert.match(defold, /log: hostLog/);
+  assert.match(defold, /hash: engineDefold\.hash/);
+  assert.match(defold, /hashToHex: engineDefold\.hashToHex/);
+  assert.match(defold, /pprint: engineDefold\.pprint/);
   const manifest = JSON.parse(await readFile(path.join(output.root, "manifest.json"), "utf8"));
   assert.equal(manifest.generation.nativeExtensionClang.required, true);
   assert.match(manifest.generation.nativeExtensionClang.versionSha256, /^[0-9a-f]{64}$/);
@@ -1134,7 +1141,7 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
     assert.match(contextSdk, /projectExtensions = \{/);
   }
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "extensions.json"), "utf8")), {
-    recommendations: ["samchon.ttsc", "ts-defold.deherm"]
+    recommendations: ["oxc.oxc-vscode", "samchon.ttsc", "ts-defold.deherm"]
   });
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "launch.json"), "utf8")), {
     version: "0.2.0",
@@ -1299,7 +1306,7 @@ test("project generation merges editor recommendations and never overwrites an a
   assert.equal(generated.created.vscodeExtensionsUpdated, true);
   assert.equal(generated.created.vscodeLaunch, false);
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "extensions.json"), "utf8")), {
-    recommendations: ["publisher.user-tool", "samchon.ttsc", "ts-defold.deherm"],
+    recommendations: ["publisher.user-tool", "oxc.oxc-vscode", "samchon.ttsc", "ts-defold.deherm"],
     unwantedRecommendations: ["publisher.unwanted"]
   });
   assert.deepEqual(JSON.parse(await readFile(path.join(project, ".vscode", "launch.json"), "utf8")), authoredLaunch);

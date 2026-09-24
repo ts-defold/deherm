@@ -19,15 +19,24 @@ test("WebTransport evidence is source-bound and statically fresh", async () => {
   const sourceInputs = await buildWebTransportSourceInputs();
   const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
   assertWebTransportEvidence(evidence, { sourceInputs });
-  assert.deepEqual(sourceInputs.map(({ path: sourcePath }) => sourcePath), [...WEBTRANSPORT_SOURCE_PATHS]);
-  assert.match(execFileSync(process.execPath, [gatePath, "--check-sources"], {
-    cwd: repositoryRoot,
-    encoding: "utf8",
-  }), /war-battles-webtransport-sources:fresh:/u);
-  assert.match(execFileSync(process.execPath, [gatePath, "--check-evidence"], {
-    cwd: repositoryRoot,
-    encoding: "utf8",
-  }), /war-battles-webtransport-evidence:fresh:/u);
+  assert.deepEqual(
+    sourceInputs.map(({ path: sourcePath }) => sourcePath),
+    [...WEBTRANSPORT_SOURCE_PATHS],
+  );
+  assert.match(
+    execFileSync(process.execPath, [gatePath, "--check-sources"], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    }),
+    /war-battles-webtransport-sources:fresh:/u,
+  );
+  assert.match(
+    execFileSync(process.execPath, [gatePath, "--check-evidence"], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    }),
+    /war-battles-webtransport-evidence:fresh:/u,
+  );
 });
 
 test("WebTransport evidence source inventory names every gate input", () => {
@@ -39,7 +48,8 @@ test("WebTransport evidence source inventory names every gate input", () => {
     "examples/war-battles-online/package.json",
     "package.json",
     "pnpm-lock.yaml",
-  ]) assert.ok(WEBTRANSPORT_SOURCE_PATHS.includes(required), required);
+  ])
+    assert.ok(WEBTRANSPORT_SOURCE_PATHS.includes(required), required);
 });
 
 test("WebTransport evidence retains observations and server-side acceptance", async () => {

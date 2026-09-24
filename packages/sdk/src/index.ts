@@ -1,5 +1,6 @@
-export type RuntimeKind = "hermes" | "browser" | "test";
-export type LogLevel = "debug" | "info" | "warn" | "error";
+import type { DefoldApiV1 } from "./host";
+
+export type { DefoldApiV1, DefoldRuntime, LogLevel, RuntimeKind } from "./host";
 export {
   address,
   defoldUrl,
@@ -14,7 +15,7 @@ export {
   type DefoldHashLiteral,
   type DefoldRelativeAddress,
   type DefoldSocketAddress,
-  type DefoldUrl
+  type DefoldUrl,
 } from "./address";
 export { hmrPersistentState, type HmrPersistentCell } from "./hmr-state";
 export type { DefoldModuleMap, ExampleMathSpec, Vec3 } from "./generated/modules";
@@ -22,14 +23,6 @@ export { DEFOLD_HERMES_ABI_VERSION } from "./generated/modules";
 export { DefoldModules, type DefoldModuleRegistry } from "./registry";
 export * from "./generated/script/index";
 export * from "./generated/dmsdk/index";
-
-export interface DefoldApiV1 {
-  readonly version: 1;
-  readonly runtime: RuntimeKind;
-  log(level: LogLevel, message: string): void;
-  now(): number;
-  request(channel: string, payload: string): string;
-}
 
 export interface DefoldAppV1 {
   init?(): void;
@@ -41,8 +34,6 @@ export interface DefoldAppV1 {
 export type DefoldAppFactory = (api: DefoldApiV1) => DefoldAppV1;
 
 declare global {
-  // Installed by the native or browser host before the application bundle runs.
-  var __defoldHostV1: DefoldApiV1 | undefined;
   // Installed by defineDefoldApp and driven by the host.
   var __defoldAppV1: DefoldAppV1 | undefined;
   // Runtime-owned module objects. Native functions are JSI host functions;

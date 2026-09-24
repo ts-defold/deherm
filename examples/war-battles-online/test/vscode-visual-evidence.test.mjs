@@ -4,10 +4,7 @@ import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
-import {
-  EXPECTED_PROPERTIES,
-  verifyVisualEvidence,
-} from "../integration/vscode-visual-evidence.mjs";
+import { EXPECTED_PROPERTIES, verifyVisualEvidence } from "../integration/vscode-visual-evidence.mjs";
 
 const exampleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(exampleRoot, "../..");

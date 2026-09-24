@@ -73,7 +73,9 @@ class ImpairedNetwork {
     this.randomState = config.seed >>> 0;
   }
 
-  time(): number { return this.now; }
+  time(): number {
+    return this.now;
+  }
 
   advanceTo(target: number): void {
     if (!Number.isFinite(target) || target < this.now) throw new RangeError("network time must move forward");
@@ -126,7 +128,9 @@ class ImpairedNetwork {
     this.nextSequence.set(sequenceKey, sequence + 1);
     if (kind === "datagram") {
       this.stats.sentDatagrams += 1;
-      const pending = this.queue.filter((packet) => packet.linkId === linkId && packet.direction === direction && packet.kind === kind).length;
+      const pending = this.queue.filter(
+        (packet) => packet.linkId === linkId && packet.direction === direction && packet.kind === kind,
+      ).length;
       if (pending >= this.config.datagramQueueCapacity) {
         this.stats.backpressuredDatagrams += 1;
         return Promise.resolve("backpressured");
@@ -137,7 +141,13 @@ class ImpairedNetwork {
       }
     } else {
       this.stats.sentReliable += 1;
-      const pending = this.queue.filter((packet) => packet.linkId === linkId && packet.direction === direction && packet.kind === kind && packet.channel === channel).length;
+      const pending = this.queue.filter(
+        (packet) =>
+          packet.linkId === linkId &&
+          packet.direction === direction &&
+          packet.kind === kind &&
+          packet.channel === channel,
+      ).length;
       if (pending >= this.config.reliableQueueCapacity) {
         this.stats.backpressuredReliable += 1;
         return Promise.resolve("backpressured");
@@ -146,13 +156,22 @@ class ImpairedNetwork {
     const jitter = this.nextInteger(-this.config.jitterMilliseconds, this.config.jitterMilliseconds);
     const proposed = this.now + this.config.baseLatencyMilliseconds + jitter;
     const orderedKey = `${linkId}:${direction}:${channel ?? 0}`;
-    const due = kind === "reliable"
-      ? Math.max(proposed, (this.reliableTail.get(orderedKey) ?? this.now) + 0.001)
-      : Math.max(this.now + 1, proposed);
+    const due =
+      kind === "reliable"
+        ? Math.max(proposed, (this.reliableTail.get(orderedKey) ?? this.now) + 0.001)
+        : Math.max(this.now + 1, proposed);
     if (kind === "reliable") this.reliableTail.set(orderedKey, due);
     return new Promise<SendDisposition>((resolve) => {
       const packet: PendingPacket = {
-        id: this.nextPacketId++, linkId, direction, kind, channel, payload: payload.slice(), sequence, due, resolve,
+        id: this.nextPacketId++,
+        linkId,
+        direction,
+        kind,
+        channel,
+        payload: payload.slice(),
+        sequence,
+        due,
+        resolve,
         receiver,
       };
       this.queue.push(packet);
@@ -236,7 +255,9 @@ async function settleInitialAdmissions(
     await Promise.resolve();
   }
   const pending = sessions.reduce((count, session) => count + (session.ready || session.closed ? 0 : 1), 0);
-  throw new Error(`initial session admission did not settle (${pending} pending after ${maximumTurns} event-loop turns)`);
+  throw new Error(
+    `initial session admission did not settle (${pending} pending after ${maximumTurns} event-loop turns)`,
+  );
 }
 
 export interface LoadHarnessEvidence {
@@ -259,10 +280,7 @@ export interface LoadHarnessEvidence {
  */
 export interface AuthoritativeLoadObserver {
   readonly now: () => number;
-  readonly onAuthoritativeStep?: (sample: {
-    readonly tick: number;
-    readonly durationMilliseconds: number;
-  }) => void;
+  readonly onAuthoritativeStep?: (sample: { readonly tick: number; readonly durationMilliseconds: number }) => void;
 }
 
 export async function runAuthoritativeLoadHarness(
@@ -331,7 +349,7 @@ export async function runAuthoritativeLoadHarness(
         moveY: ((tick * 2 + player) % 3) - 1,
         fire: (tick + player) % 7 < 3,
         boost: (tick + player) % 19 === 0,
-        weapon: ((tick + player) % 4) === 0 ? 1 : 0,
+        weapon: (tick + player) % 4 === 0 ? 1 : 0,
       });
       clients[index]!.setAim((player % 2 === 0 ? -1 : 1) * 256, ((tick + player) % 5) - 2);
     }
@@ -366,7 +384,10 @@ export async function runAuthoritativeLoadHarness(
 
   const authoritativeHash = server.world.stateHash();
   const clientRows = clients.map((client, index) => {
-    const converged = client.state === "ready" && client.world?.stateHash() === authoritativeHash && client.world.tick === server.world.tick;
+    const converged =
+      client.state === "ready" &&
+      client.world?.stateHash() === authoritativeHash &&
+      client.world.tick === server.world.tick;
     return {
       index: index + 1,
       state: client.state,
@@ -384,18 +405,32 @@ export async function runAuthoritativeLoadHarness(
   const allConverged = clientRows.every((client) => client.converged);
   const uniquePlayerIds = new Set(clientRows.map((client) => client.playerId));
   const reliableOrderPreserved = network.stats.reliableOrderViolations === 0;
-  const reliableDeliveryComplete = network.stats.backpressuredReliable === 0
-    && network.stats.sentReliable === network.stats.deliveredReliable;
+  const reliableDeliveryComplete =
+    network.stats.backpressuredReliable === 0 && network.stats.sentReliable === network.stats.deliveredReliable;
   const noErrors = serverErrors.length === 0 && clientErrors.every((errors) => errors.length === 0);
   // Capacity is enforced independently for both directions of every link and,
   // for reliable traffic, independently per channel. This is the structural
   // maximum the network seam can retain, not a bound inferred from this run's
   // lower observed high-water mark.
-  const queueBound = config.players * 2 * (config.datagramQueueCapacity + config.reliableQueueCapacity * RELIABLE_CHANNELS.length);
+  const queueBound =
+    config.players * 2 * (config.datagramQueueCapacity + config.reliableQueueCapacity * RELIABLE_CHANNELS.length);
   const boundedQueues = network.stats.peakQueue <= queueBound;
-  const everyClientAttemptedEveryTick = clientRows.every((client) => client.inputsSent + client.inputsDropped === config.ticks);
-  if (!allConverged || uniquePlayerIds.size !== config.players || !reliableOrderPreserved || !reliableDeliveryComplete || !everyClientAttemptedEveryTick || !noErrors || !boundedQueues || network.queue.length !== 0) {
-    throw new Error(`authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, everyClientAttemptedEveryTick, noErrors, pending: network.queue.length, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`);
+  const everyClientAttemptedEveryTick = clientRows.every(
+    (client) => client.inputsSent + client.inputsDropped === config.ticks,
+  );
+  if (
+    !allConverged ||
+    uniquePlayerIds.size !== config.players ||
+    !reliableOrderPreserved ||
+    !reliableDeliveryComplete ||
+    !everyClientAttemptedEveryTick ||
+    !noErrors ||
+    !boundedQueues ||
+    network.queue.length !== 0
+  ) {
+    throw new Error(
+      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, everyClientAttemptedEveryTick, noErrors, pending: network.queue.length, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
+    );
   }
   return Object.freeze({
     schemaVersion: LOAD_HARNESS_SCHEMA_VERSION,

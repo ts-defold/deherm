@@ -5,10 +5,7 @@
  * a process interruption cannot expose a partially written state file.
  */
 
-import {
-  SESSION_STATE_BYTES,
-  type SessionStateStorage,
-} from "../core/session-persistence.ts";
+import { SESSION_STATE_BYTES, type SessionStateStorage } from "../core/session-persistence.ts";
 import { replaceDurably, type DurableFileRuntime } from "./durable-file.ts";
 
 interface DenoFileApi extends DurableFileRuntime {

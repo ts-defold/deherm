@@ -58,8 +58,10 @@ function parentDirectory(path: string): string {
 function isUnsupportedDirectorySync(error: unknown): boolean {
   if (typeof error !== "object" || error === null) return false;
   const candidate = error as { name?: unknown; code?: unknown };
-  return candidate.name === "NotSupported"
-    || candidate.code === "EINVAL"
-    || candidate.code === "ENOTSUP"
-    || candidate.code === "EOPNOTSUPP";
+  return (
+    candidate.name === "NotSupported" ||
+    candidate.code === "EINVAL" ||
+    candidate.code === "ENOTSUP" ||
+    candidate.code === "EOPNOTSUPP"
+  );
 }

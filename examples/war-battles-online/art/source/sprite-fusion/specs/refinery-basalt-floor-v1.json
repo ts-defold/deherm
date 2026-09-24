@@ -1,0 +1,10 @@
+{
+  "name": "refinery-basalt-floor-v1",
+  "operation": "style-reference",
+  "prompt": "One seamless 16x16 top-down terrain tile for a volcanic industrial tank arena. Dark charcoal basalt slabs with restrained cracks, tiny rust mineral flecks, and subtle soot; the north/south and east/west edge pixels must match for perfect repetition. Limited 16-color palette, hard one-pixel clusters, high gameplay readability, no object, wall, border, icon, lettering, UI, perspective, antialiasing, gradient, glow, or transparent pixels. Match the supplied War Battles pixel density but replace grass with cohesive basalt refinery ground.",
+  "size": 16,
+  "inputs": [
+    "defold/assets/derived/arena/arena-tiles.png",
+    "defold/assets/ui/title-screen/background.png"
+  ]
+}

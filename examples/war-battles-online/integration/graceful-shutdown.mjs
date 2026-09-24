@@ -67,7 +67,8 @@ export async function listeningPids(port, { execFile: exec = execFileAsync } = {
     if (error?.code === "ENOENT") {
       throw new Error(
         "lsof is required to prove which process owns the engine service port; " +
-        "without it an exit post cannot be shown to have reached the engine under observation");
+          "without it an exit post cannot be shown to have reached the engine under observation",
+      );
     }
     // `lsof -t` exits 1 when the filter matches nothing and prints nothing.
     if (error?.code === 1 && !String(error.stdout ?? "").trim()) return [];
@@ -94,14 +95,16 @@ export function assertSoleEngineListener({ port, pid, pids }) {
   if (pids.length === 0) {
     throw new Error(
       `No process is listening on engine service port ${port}; the engine under observation ` +
-      `(pid ${pid}) reported it but is not serving it`);
+        `(pid ${pid}) reported it but is not serving it`,
+    );
   }
   if (pids.length > 1 || pids[0] !== pid) {
     throw new Error(
       `Engine service port ${port} is shared by ${pids.length} process(es) [${pids.join(", ")}] ` +
-      `but the engine under observation is pid ${pid}. Defold sets SO_REUSEPORT on its listening ` +
-      "sockets, so an exit post to this port could be absorbed by another engine. Stop the other " +
-      "dmengine process(es) and re-run; this gate will not post into an engine it cannot name.");
+        `but the engine under observation is pid ${pid}. Defold sets SO_REUSEPORT on its listening ` +
+        "sockets, so an exit post to this port could be absorbed by another engine. Stop the other " +
+        "dmengine process(es) and re-run; this gate will not post into an engine it cannot name.",
+    );
   }
   return { port, pid };
 }
@@ -136,7 +139,7 @@ export async function postSystemExit({ port, code = 0, timeoutMs = 2_000, fetch:
     method: "POST",
     headers: { "content-type": "application/octet-stream" },
     body: encodeSystemExit(code),
-    signal: AbortSignal.timeout(timeoutMs)
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!response.ok) {
     throw new Error(`Engine service refused the exit post: ${response.status} ${response.statusText}`);
@@ -155,13 +158,14 @@ export async function requestGracefulShutdown({
   code = 0,
   timeoutMs = 2_000,
   execFile: exec = execFileAsync,
-  fetch: fetchImpl = globalThis.fetch
+  fetch: fetchImpl = globalThis.fetch,
 }) {
   const port = engineServicePort(transcript);
   if (port === null) {
     throw new Error(
       "The engine never reported an engine service port, so a graceful shutdown cannot be addressed. " +
-      "Start it with DM_SERVICE_PORT=dynamic and keep its stdout.");
+        "Start it with DM_SERVICE_PORT=dynamic and keep its stdout.",
+    );
   }
   const pids = await listeningPids(port, { execFile: exec });
   assertSoleEngineListener({ port, pid, pids });

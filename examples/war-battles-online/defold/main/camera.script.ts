@@ -1,5 +1,6 @@
 import {
   camera,
+  defold,
   defineComponent,
   go,
   hashLiteral,
@@ -8,10 +9,6 @@ import {
   vmath,
   type DefoldHash,
 } from "@deherm/project";
-
-declare const __defoldHostV1: {
-  log(level: "info", message: string): void;
-};
 
 /**
  * The follow target reports itself instead of being sampled.
@@ -170,12 +167,12 @@ export default defineComponent({
     self.halfWidth = displayWidth / zoom / 2;
     self.halfHeight = displayHeight / zoom / 2;
     resolveBounds(self);
-    __defoldHostV1.log(
+    defold.log(
       "info",
       `war-battles:camera-init:zoom=${zoom.toFixed(2)}:view=${(self.halfWidth * 2).toFixed(0)}x${(self.halfHeight * 2).toFixed(0)}` +
-      `:cameras=${cameras.length}`,
+        `:cameras=${cameras.length}`,
     );
-    __defoldHostV1.log(
+    defold.log(
       "info",
       `war-battles:camera-bounds:x=[${self.minX.toFixed(1)},${self.maxX.toFixed(1)}]:y=[${self.minY.toFixed(1)},${self.maxY.toFixed(1)}]`,
     );
@@ -268,10 +265,10 @@ export default defineComponent({
     if (self.traceElapsed < self.traceInterval) return;
     self.traceElapsed = 0;
     const clamped = self.clampedX ? (self.clampedY ? "xy" : "x") : self.clampedY ? "y" : "none";
-    __defoldHostV1.log(
+    defold.log(
       "info",
       `war-battles:camera:${self.viewX.toFixed(1)}:${self.viewY.toFixed(1)}` +
-      `:target=${self.targetX.toFixed(1)},${self.targetY.toFixed(1)}:lead=${self.leadX.toFixed(1)},${self.leadY.toFixed(1)}:clamped=${clamped}`,
+        `:target=${self.targetX.toFixed(1)},${self.targetY.toFixed(1)}:lead=${self.leadX.toFixed(1)},${self.leadY.toFixed(1)}:clamped=${clamped}`,
     );
   },
 });

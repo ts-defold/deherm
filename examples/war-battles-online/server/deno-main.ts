@@ -24,10 +24,7 @@ import {
   TICK_MILLISECONDS,
   type MatchServerOptions,
 } from "../core/index.ts";
-import {
-  DenoWebTransportServer,
-  type DenoWebTransportLifecycleEvent,
-} from "../core/deno-webtransport-server.ts";
+import { DenoWebTransportServer, type DenoWebTransportLifecycleEvent } from "../core/deno-webtransport-server.ts";
 import { acceptDenoWebSocket } from "../core/deno-websocket-server.ts";
 import { DenoDurableSessionFile } from "./durable-session-file.ts";
 import { DenoDurableWorldFile } from "./durable-world-file.ts";
@@ -83,30 +80,61 @@ function parseArguments(argv: readonly string[]): Options {
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index]!;
     const value = argv[index + 1];
-    if (argument === "--hostname") { options.hostname = required(value, argument); index += 1; }
-    else if (argument === "--port") { options.port = integer(value, argument); index += 1; }
-    else if (argument === "--health-port") { options.healthPort = integer(value, argument); index += 1; }
-    else if (argument === "--cert") { options.certPath = required(value, argument); index += 1; }
-    else if (argument === "--key") { options.keyPath = required(value, argument); index += 1; }
-    else if (argument === "--roster") { (options as { rosterSize: number }).rosterSize = integer(value, argument); index += 1; }
-    else if (argument === "--bot-skill") { (options as { botSkill: number }).botSkill = integer(value, argument); index += 1; }
-    else if (argument === "--snapshot-interval") { (options as { snapshotIntervalTicks: number }).snapshotIntervalTicks = integer(value, argument); index += 1; }
-    else if (argument === "--teams") { (options as { teams: boolean }).teams = true; }
-    else if (argument === "--resume-key") { options.resumeKeyText = required(value, argument); index += 1; }
-    else if (argument === "--resume-key-file") { options.resumeKeyPath = required(value, argument); index += 1; }
-    else if (argument === "--session-state") { options.sessionStatePath = required(value, argument); index += 1; }
-    else if (argument === "--world-checkpoint") { options.worldCheckpointPath = required(value, argument); index += 1; }
-    else if (argument === "--world-checkpoint-interval") { options.worldCheckpointIntervalTicks = integer(value, argument); index += 1; }
-    else if (argument === "--allowed-origin") { options.allowedOrigins.push(required(value, argument)); index += 1; }
-    else throw new Error(`unknown argument: ${argument}`);
+    if (argument === "--hostname") {
+      options.hostname = required(value, argument);
+      index += 1;
+    } else if (argument === "--port") {
+      options.port = integer(value, argument);
+      index += 1;
+    } else if (argument === "--health-port") {
+      options.healthPort = integer(value, argument);
+      index += 1;
+    } else if (argument === "--cert") {
+      options.certPath = required(value, argument);
+      index += 1;
+    } else if (argument === "--key") {
+      options.keyPath = required(value, argument);
+      index += 1;
+    } else if (argument === "--roster") {
+      (options as { rosterSize: number }).rosterSize = integer(value, argument);
+      index += 1;
+    } else if (argument === "--bot-skill") {
+      (options as { botSkill: number }).botSkill = integer(value, argument);
+      index += 1;
+    } else if (argument === "--snapshot-interval") {
+      (options as { snapshotIntervalTicks: number }).snapshotIntervalTicks = integer(value, argument);
+      index += 1;
+    } else if (argument === "--teams") {
+      (options as { teams: boolean }).teams = true;
+    } else if (argument === "--resume-key") {
+      options.resumeKeyText = required(value, argument);
+      index += 1;
+    } else if (argument === "--resume-key-file") {
+      options.resumeKeyPath = required(value, argument);
+      index += 1;
+    } else if (argument === "--session-state") {
+      options.sessionStatePath = required(value, argument);
+      index += 1;
+    } else if (argument === "--world-checkpoint") {
+      options.worldCheckpointPath = required(value, argument);
+      index += 1;
+    } else if (argument === "--world-checkpoint-interval") {
+      options.worldCheckpointIntervalTicks = integer(value, argument);
+      index += 1;
+    } else if (argument === "--allowed-origin") {
+      options.allowedOrigins.push(required(value, argument));
+      index += 1;
+    } else throw new Error(`unknown argument: ${argument}`);
   }
   return options;
 }
 
 function hexSecret(text: string): Uint8Array {
-  if (!/^[0-9a-fA-F]{64}$/.test(text)) throw new Error("--resume-key/WAR_BATTLES_RESUME_KEY must be exactly 64 hexadecimal characters");
+  if (!/^[0-9a-fA-F]{64}$/.test(text))
+    throw new Error("--resume-key/WAR_BATTLES_RESUME_KEY must be exactly 64 hexadecimal characters");
   const bytes = new Uint8Array(32);
-  for (let index = 0; index < bytes.length; index += 1) bytes[index] = Number.parseInt(text.slice(index * 2, index * 2 + 2), 16);
+  for (let index = 0; index < bytes.length; index += 1)
+    bytes[index] = Number.parseInt(text.slice(index * 2, index * 2 + 2), 16);
   return bytes;
 }
 
@@ -121,8 +149,11 @@ export function configuredResumeKey(text: string | undefined, statePath: string 
 export function websocketOriginAllowed(origin: string | null, configuredOrigins: readonly string[]): boolean {
   if (origin === null) return false;
   let candidate: URL;
-  try { candidate = new URL(origin); }
-  catch { return false; }
+  try {
+    candidate = new URL(origin);
+  } catch {
+    return false;
+  }
   if ((candidate.protocol !== "http:" && candidate.protocol !== "https:") || candidate.origin !== origin) return false;
   if (configuredOrigins.length > 0) {
     return configuredOrigins.includes(candidate.origin);
@@ -140,7 +171,13 @@ function normalizeOrigin(origin: string): string {
 
 function configuredOrigins(cli: readonly string[], environment: string | undefined): readonly string[] {
   const entries = [...cli];
-  if (environment !== undefined) entries.push(...environment.split(",").map((entry) => entry.trim()).filter(Boolean));
+  if (environment !== undefined)
+    entries.push(
+      ...environment
+        .split(",")
+        .map((entry) => entry.trim())
+        .filter(Boolean),
+    );
   return entries.map(normalizeOrigin);
 }
 
@@ -158,9 +195,15 @@ export interface SessionAdmissionGate {
 export function createSessionAdmissionGate(initiallyAllowed = true): SessionAdmissionGate {
   let allowed = initiallyAllowed;
   return {
-    get allowed(): boolean { return allowed; },
-    fail(): void { allowed = false; },
-    recover(): void { allowed = true; },
+    get allowed(): boolean {
+      return allowed;
+    },
+    fail(): void {
+      allowed = false;
+    },
+    recover(): void {
+      allowed = true;
+    },
   };
 }
 
@@ -207,9 +250,7 @@ async function certificateDigest(pem: string): Promise<string> {
 }
 
 function logTransportLifecycle(event: DenoWebTransportLifecycleEvent): void {
-  const detail = event.url === undefined
-    ? `id=${event.connectionId}`
-    : `id=${event.connectionId}:url=${event.url}`;
+  const detail = event.url === undefined ? `id=${event.connectionId}` : `id=${event.connectionId}:url=${event.url}`;
   console.log(`war-battles-server:${event.phase}:${detail}`);
 }
 
@@ -249,7 +290,8 @@ export async function main(argv: readonly string[]): Promise<void> {
     rosterSize,
     restartReservationTicks: options.resumeGraceTicks ?? TICK_RATE * 30,
   });
-  const persistence = statePath === undefined ? undefined : new DurableSessionPersistence(ledger, new DenoDurableSessionFile(statePath));
+  const persistence =
+    statePath === undefined ? undefined : new DurableSessionPersistence(ledger, new DenoDurableSessionFile(statePath));
   if (persistence !== undefined) {
     await persistence.restore();
     console.log(`war-battles-server:session-state:${statePath}`);
@@ -268,26 +310,32 @@ export async function main(argv: readonly string[]): Promise<void> {
     sessionLedger: ledger,
     onSessionStateChange: (_reason, tick) => {
       if (persistence === undefined) return;
-      void persistence.flush(tick).then(() => {
-        sessionPersistenceHealthy = true;
-        recoverAdmission();
-      }).catch((error: unknown) => {
-        console.error("war-battles-server:session-state-write-error:", error);
-        sessionPersistenceHealthy = false;
-        admission.fail();
-        ready = false;
-      });
+      void persistence
+        .flush(tick)
+        .then(() => {
+          sessionPersistenceHealthy = true;
+          recoverAdmission();
+        })
+        .catch((error: unknown) => {
+          console.error("war-battles-server:session-state-write-error:", error);
+          sessionPersistenceHealthy = false;
+          admission.fail();
+          ready = false;
+        });
     },
     onError: (error: unknown) => console.error("war-battles-server:error:", error),
     onLog: (line: string) => console.log(`war-battles-server:${line}`),
   });
-  const worldPersistence = worldPath === undefined ? undefined : new DurableWorldCheckpoint(new DenoDurableWorldFile(worldPath), {
-    matchId,
-    mapSeed: server.world.mapSeed,
-    rosterSize: server.rosterSize,
-    teams: server.teams,
-  });
-  if (worldPersistence !== undefined && await restoreWorldBeforeAdmission(server, worldPersistence)) {
+  const worldPersistence =
+    worldPath === undefined
+      ? undefined
+      : new DurableWorldCheckpoint(new DenoDurableWorldFile(worldPath), {
+          matchId,
+          mapSeed: server.world.mapSeed,
+          rosterSize: server.rosterSize,
+          teams: server.teams,
+        });
+  if (worldPersistence !== undefined && (await restoreWorldBeforeAdmission(server, worldPersistence))) {
     console.log(`war-battles-server:world-checkpoint:${worldPath}:tick=${server.world.tick}`);
   }
 
@@ -336,71 +384,74 @@ export async function main(argv: readonly string[]): Promise<void> {
     console.error("war-battles-server:listener-stopped-unexpectedly");
   });
   let activeWebSocketSessions = 0;
-  const healthServer = Deno.serve({ hostname: options.hostname, port: options.healthPort }, (request: Request): Response => {
-    const path = new URL(request.url).pathname;
-    if (path === "/ws" && request.headers.get("upgrade")?.toLowerCase() === "websocket") {
-      if (!websocketOriginAllowed(request.headers.get("origin"), allowedOrigins)) {
-        return new Response("websocket origin is not allowed\n", { status: 403 });
-      }
-      if (stopping || !ready || !admission.allowed) {
-        return new Response("server is not accepting sessions\n", { status: 503 });
-      }
-      if (activeWebSocketSessions >= 32) {
-        return new Response("websocket session limit reached\n", { status: 503 });
-      }
-      const session = admitNewSession(admission, () => server.createSession());
-      if (session === undefined) {
-        return new Response("session persistence is unavailable\n", { status: 503 });
-      }
-      activeWebSocketSessions += 1;
-      let counted = true;
-      const receiver: TransportReceiver = {
-        onReliable: (channel, payload) => session.onReliable(channel, payload),
-        onDatagram: (payload) => session.onDatagram(payload),
-        onClose: (code, reason) => {
+  const healthServer = Deno.serve(
+    { hostname: options.hostname, port: options.healthPort },
+    (request: Request): Response => {
+      const path = new URL(request.url).pathname;
+      if (path === "/ws" && request.headers.get("upgrade")?.toLowerCase() === "websocket") {
+        if (!websocketOriginAllowed(request.headers.get("origin"), allowedOrigins)) {
+          return new Response("websocket origin is not allowed\n", { status: 403 });
+        }
+        if (stopping || !ready || !admission.allowed) {
+          return new Response("server is not accepting sessions\n", { status: 503 });
+        }
+        if (activeWebSocketSessions >= 32) {
+          return new Response("websocket session limit reached\n", { status: 503 });
+        }
+        const session = admitNewSession(admission, () => server.createSession());
+        if (session === undefined) {
+          return new Response("session persistence is unavailable\n", { status: 503 });
+        }
+        activeWebSocketSessions += 1;
+        let counted = true;
+        const receiver: TransportReceiver = {
+          onReliable: (channel, payload) => session.onReliable(channel, payload),
+          onDatagram: (payload) => session.onDatagram(payload),
+          onClose: (code, reason) => {
+            if (counted) {
+              counted = false;
+              activeWebSocketSessions -= 1;
+              session.onClose(code, reason);
+            }
+          },
+        };
+        try {
+          return acceptDenoWebSocket(request, {
+            receiver,
+            onSession: (transport) => {
+              session.attach(transport);
+              console.log("war-battles-server:session-accepted:websocket-tcp");
+            },
+          });
+        } catch (error: unknown) {
           if (counted) {
             counted = false;
             activeWebSocketSessions -= 1;
-            session.onClose(code, reason);
           }
-        },
-      };
-      try {
-        return acceptDenoWebSocket(request, {
-          receiver,
-          onSession: (transport) => {
-            session.attach(transport);
-            console.log("war-battles-server:session-accepted:websocket-tcp");
-          },
-        });
-      } catch (error: unknown) {
-        if (counted) {
-          counted = false;
-          activeWebSocketSessions -= 1;
+          session.onClose(1_006, "websocket upgrade failed");
+          console.error("war-battles-server:websocket-upgrade-error:", error);
+          return new Response("websocket upgrade failed\n", { status: 500 });
         }
-        session.onClose(1_006, "websocket upgrade failed");
-        console.error("war-battles-server:websocket-upgrade-error:", error);
-        return new Response("websocket upgrade failed\n", { status: 500 });
       }
-    }
-    if (path !== "/healthz" && path !== "/readyz" && path !== "/health") {
-      return new Response("not found\n", { status: 404 });
-    }
-    const payload = {
-      ok: path === "/healthz" || ready,
-      ready,
-      transport: "webtransport-h3",
-      websocketFallback: "websocket-tcp",
-      endpoint: `https://${options.hostname}:${options.port}`,
-      certificateSha256: digest,
-      rosterSize: options.rosterSize,
-      stats: server.stats,
-    };
-    return new Response(JSON.stringify(payload) + "\n", {
-      status: payload.ok ? 200 : 503,
-      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
-    });
-  });
+      if (path !== "/healthz" && path !== "/readyz" && path !== "/health") {
+        return new Response("not found\n", { status: 404 });
+      }
+      const payload = {
+        ok: path === "/healthz" || ready,
+        ready,
+        transport: "webtransport-h3",
+        websocketFallback: "websocket-tcp",
+        endpoint: `https://${options.hostname}:${options.port}`,
+        certificateSha256: digest,
+        rosterSize: options.rosterSize,
+        stats: server.stats,
+      };
+      return new Response(JSON.stringify(payload) + "\n", {
+        status: payload.ok ? 200 : 503,
+        headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store" },
+      });
+    },
+  );
 
   console.log(`war-battles-server:listening:https://${options.hostname}:${options.port}`);
   console.log(`war-battles-server:health:http://${options.hostname}:${options.healthPort}`);
@@ -423,15 +474,18 @@ export async function main(argv: readonly string[]): Promise<void> {
     server.advance(elapsed, 8);
     if (worldPersistence !== undefined && server.world.tick >= nextWorldCheckpointTick) {
       nextWorldCheckpointTick = server.world.tick + Math.max(1, options.worldCheckpointIntervalTicks);
-      void worldPersistence.flush(server.world).then(() => {
-        worldPersistenceHealthy = true;
-        recoverAdmission();
-      }).catch((error: unknown) => {
-        console.error("war-battles-server:world-checkpoint-write-error:", error);
-        worldPersistenceHealthy = false;
-        admission.fail();
-        ready = false;
-      });
+      void worldPersistence
+        .flush(server.world)
+        .then(() => {
+          worldPersistenceHealthy = true;
+          recoverAdmission();
+        })
+        .catch((error: unknown) => {
+          console.error("war-battles-server:world-checkpoint-write-error:", error);
+          worldPersistenceHealthy = false;
+          admission.fail();
+          ready = false;
+        });
     }
     if (!inputMilestoneLogged && server.stats.inputsAccepted >= inputMilestone) {
       inputMilestoneLogged = true;
@@ -448,17 +502,21 @@ export async function main(argv: readonly string[]): Promise<void> {
     server.close(1_001, "server shutting down");
     const sessionFlush = persistence?.flush(server.sessionTick()) ?? Promise.resolve();
     const worldFlush = worldPersistence?.flush(server.world) ?? Promise.resolve();
-    void Promise.allSettled([sessionFlush, worldFlush]).then((results) => {
-      const failed = results.find((result) => result.status === "rejected");
-      if (failed?.status === "rejected") throw failed.reason;
-      return listener.close();
-    }).then(() => healthServer.shutdown()).then(() => {
-      console.log("war-battles-server:stopped");
-      Deno.exit(0);
-    }).catch((error: unknown) => {
-      console.error("war-battles-server:shutdown-error:", error);
-      Deno.exit(1);
-    });
+    void Promise.allSettled([sessionFlush, worldFlush])
+      .then((results) => {
+        const failed = results.find((result) => result.status === "rejected");
+        if (failed?.status === "rejected") throw failed.reason;
+        return listener.close();
+      })
+      .then(() => healthServer.shutdown())
+      .then(() => {
+        console.log("war-battles-server:stopped");
+        Deno.exit(0);
+      })
+      .catch((error: unknown) => {
+        console.error("war-battles-server:shutdown-error:", error);
+        Deno.exit(1);
+      });
   };
   Deno.addSignalListener("SIGINT", stop);
   Deno.addSignalListener("SIGTERM", stop);

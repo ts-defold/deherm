@@ -19,6 +19,9 @@ export const MAX_PROJECTILES = 512;
 export const MAX_PICKUPS = 32;
 /** Fixed environmental hazard vents; their positions are derived from mapSeed. */
 export const MAX_HAZARDS = 4;
+/** Fixed mutable cover panels; the remainder of the derived map stays static. */
+export const MAX_COVER_PANELS = 64;
+export const COVER_MAX_HEALTH = 100;
 export const INPUT_HISTORY_TICKS = 256;
 /** Fixed protocol width of the authenticated session-resume credential. */
 export const SESSION_TOKEN_BYTES = 40;
@@ -68,6 +71,8 @@ export function pixelToWorldY(y: number): number {
 
 /** Tank body radius: 14 px. Projectile base radius: 4 px. */
 export const PLAYER_RADIUS = 14 * UNITS_PER_PIXEL;
+/** On-foot pilots are deliberately small, fast, and extremely fragile. */
+export const INFANTRY_RADIUS = 7 * UNITS_PER_PIXEL;
 export const PROJECTILE_RADIUS = 4 * UNITS_PER_PIXEL;
 /** Muzzle stand-off from the hull centre, 22 px, so a shot clears the tank. */
 export const MUZZLE_OFFSET = 22 * UNITS_PER_PIXEL;
@@ -112,6 +117,20 @@ export const TURRET_SLEW = 26;
 export const BASE_HEALTH = 100;
 export const MAX_HEALTH = 200;
 export const MAX_ARMOR = 100;
+export const PLAYER_MODE_TANK = 0;
+export const PLAYER_MODE_INFANTRY = 1;
+export const PLAYER_MODE_DEAD = 2;
+export const INFANTRY_HEALTH = 24;
+export const INFANTRY_MAX_SPEED = 72 * VELOCITY_SCALE;
+export const INFANTRY_ACCELERATION = 9 * VELOCITY_SCALE;
+export const INFANTRY_DRAG_SHIFT = 3;
+export const INFANTRY_FIRE_DAMAGE = 8;
+export const INFANTRY_FIRE_COOLDOWN_TICKS = 18;
+/** Brief lockout prevents a tank destroyed on a depot from being reclaimed instantly. */
+export const INFANTRY_EJECT_LOCK_TICKS = 45;
+export const TANK_DEPOT_RADIUS = 24 * UNITS_PER_PIXEL;
+/** Any hostile tank touching an on-foot pilot at speed finishes the job. */
+export const INFANTRY_CRUSH_DAMAGE = 0x7fff;
 /** Ticks a tank stays wrecked before it respawns. */
 export const RESPAWN_TICKS = 96;
 /** Ticks of spawn protection: damage taken is halved and kills award nothing. */
@@ -155,9 +174,13 @@ export const DIRECTION_DIAGONAL = 181;
 
 // Four additive bytes carry a per-player weapon-upgrade unlock mask and packed
 // branch selections; the record remains fixed-capacity and ammo stays aligned.
-export const PLAYER_SNAPSHOT_BYTES = 94;
+// Two additive bytes carry player mode plus a reserved byte for aligned future
+// state. The depot itself is derived from the map's existing spawn table.
+export const PLAYER_SNAPSHOT_BYTES = 96;
 export const PROJECTILE_SNAPSHOT_BYTES = 28;
 export const PICKUP_SNAPSHOT_BYTES = 12;
+/** One byte of remaining health per destructible cover panel. */
+export const COVER_SNAPSHOT_BYTES = MAX_COVER_PANELS;
 // The header carries the authoritative central-objective state in addition to
 // the map seed. Keeping it in the fixed header means every rollback/reconnect
 // frame restores the mode without adding per-entity bytes.
@@ -166,4 +189,5 @@ export const SNAPSHOT_BYTES =
   SNAPSHOT_HEADER_BYTES +
   MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES +
   MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES +
-  MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES;
+  MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES +
+  COVER_SNAPSHOT_BYTES;

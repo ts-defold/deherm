@@ -36,7 +36,10 @@ function snapshot(gameplayTick, componentCount = 51, transientPopulation = 0) {
     instanceIds: Array.from({ length: componentCount }, (_, index) => ({ slot: index, generation: 1 })),
     persistentInstanceIds: Array.from({ length: 8 }, (_, index) => ({ slot: index, generation: 1 })),
     arenaInstanceId: { slot: 0, generation: 1 },
-    transientInstanceIds: Array.from({ length: transientPopulation }, (_, index) => ({ slot: 100 + index, generation: 1 })),
+    transientInstanceIds: Array.from({ length: transientPopulation }, (_, index) => ({
+      slot: 100 + index,
+      generation: 1,
+    })),
     transientPopulation,
     frameDtMs: 8,
     heapBytes: 1_000_000,
@@ -84,8 +87,10 @@ test("installed HMR validator accepts repeated compatible transactions", () => {
   assert.equal(result.baseline.componentCount, 51);
   assert.equal(result.baseline.gameplayTick, 10);
   assert.equal(result.baseline.runtimeId, 4);
-  assert.deepEqual(result.baseline.persistentInstanceIds,
-    Array.from({ length: 8 }, (_, index) => `${index}:1`));
+  assert.deepEqual(
+    result.baseline.persistentInstanceIds,
+    Array.from({ length: 8 }, (_, index) => `${index}:1`),
+  );
   assert.equal(result.telemetry.maxComponentCount, 51);
   assert.equal(result.telemetry.maxGameplayTick, 13);
   assert.equal(result.telemetry.transientEvidence.mode, "post-reload-detach");
@@ -97,20 +102,14 @@ test("installed HMR validator rejects monotonic transient identity accumulation"
   invalid.cycles[0].accepted.snapshot = snapshot(11, 52, 1);
   invalid.cycles[1].accepted.snapshot = snapshot(13, 53, 2);
   invalid.cycles[2].accepted.snapshot = snapshot(15, 54, 3);
-  assert.throws(
-    () => validateHmrSoakEvidence(invalid),
-    /never detached after the first accepted HMR generation/,
-  );
+  assert.throws(() => validateHmrSoakEvidence(invalid), /never detached after the first accepted HMR generation/);
 });
 
 test("installed HMR validator rejects the historical 51→95→127 duplication trace", () => {
   const invalid = report(2);
   invalid.cycles[0].accepted.snapshot.componentCount = HISTORICAL_REGRESSION_COUNTS[1];
   invalid.cycles[0].accepted.snapshot.persistentInstanceIds.push({ slot: 95, generation: 1 });
-  assert.throws(
-    () => validateHmrSoakEvidence(invalid),
-    /cycle 0 accepted\.persistentInstanceIds changed across HMR/,
-  );
+  assert.throws(() => validateHmrSoakEvidence(invalid), /cycle 0 accepted\.persistentInstanceIds changed across HMR/);
 });
 
 test("installed HMR validator fails closed when the native state API is absent", () => {
@@ -129,11 +128,21 @@ test("installed HMR validator rejects an activation from a different runtime", (
 
 test("installed HMR validator requires complete runtime and persistent identity evidence", () => {
   for (const mutate of [
-    (invalid) => { delete invalid.baseline.runtimeId; },
-    (invalid) => { delete invalid.baseline.persistentInstanceIds; },
-    (invalid) => { delete invalid.baseline.arenaInstanceId; },
-    (invalid) => { delete invalid.cycles[0].accepted.runtimeId; },
-    (invalid) => { delete invalid.cycles[0].accepted.snapshot.runtimeId; },
+    (invalid) => {
+      delete invalid.baseline.runtimeId;
+    },
+    (invalid) => {
+      delete invalid.baseline.persistentInstanceIds;
+    },
+    (invalid) => {
+      delete invalid.baseline.arenaInstanceId;
+    },
+    (invalid) => {
+      delete invalid.cycles[0].accepted.runtimeId;
+    },
+    (invalid) => {
+      delete invalid.cycles[0].accepted.snapshot.runtimeId;
+    },
   ]) {
     const invalid = report();
     mutate(invalid);
@@ -151,10 +160,29 @@ test("Windows cleanup targets the complete owned process tree", () => {
 
 test("POSIX cleanup treats an existing process group as live after its leader exits", () => {
   const calls = [];
-  assert.equal(ownedPosixGroupAlive(123, (pid, signal) => { calls.push([pid, signal]); }), true);
+  assert.equal(
+    ownedPosixGroupAlive(123, (pid, signal) => {
+      calls.push([pid, signal]);
+    }),
+    true,
+  );
   assert.deepEqual(calls, [[-123, 0]]);
-  assert.equal(ownedPosixGroupAlive(123, () => { const error = new Error("gone"); error.code = "ESRCH"; throw error; }), false);
-  assert.equal(ownedPosixGroupAlive(123, () => { const error = new Error("not permitted"); error.code = "EPERM"; throw error; }), true);
+  assert.equal(
+    ownedPosixGroupAlive(123, () => {
+      const error = new Error("gone");
+      error.code = "ESRCH";
+      throw error;
+    }),
+    false,
+  );
+  assert.equal(
+    ownedPosixGroupAlive(123, () => {
+      const error = new Error("not permitted");
+      error.code = "EPERM";
+      throw error;
+    }),
+    true,
+  );
 });
 
 test("POSIX cleanup signals and escalates the owned group independently of leader state", async () => {
@@ -165,7 +193,10 @@ test("POSIX cleanup signals and escalates the owned group independently of leade
     ownsProcessGroup: true,
     leaderExited: () => true,
     groupAlive: () => groupAlive,
-    signalGroup: (signal) => { signals.push(signal); if (signal === "SIGKILL") groupAlive = false; },
+    signalGroup: (signal) => {
+      signals.push(signal);
+      if (signal === "SIGKILL") groupAlive = false;
+    },
     exited: Promise.resolve({ code: 0, signal: null }),
     shutdownMs: 0,
     sleep: async () => {},
@@ -182,8 +213,13 @@ test("Windows cleanup preserves taskkill tree then forced tree escalation", asyn
     ownsProcessGroup: false,
     leaderExited: () => leaderExited,
     groupAlive: () => !leaderExited,
-    signalGroup: () => { throw new Error("POSIX signal must not run on Windows"); },
-    taskkill: async (force, pid) => { taskkills.push({ force, pid }); leaderExited = true; },
+    signalGroup: () => {
+      throw new Error("POSIX signal must not run on Windows");
+    },
+    taskkill: async (force, pid) => {
+      taskkills.push({ force, pid });
+      leaderExited = true;
+    },
     exited: Promise.resolve({ code: 0, signal: null }),
   });
   assert.deepEqual(taskkills, [{ force: false, pid: 123 }]);
@@ -191,24 +227,40 @@ test("Windows cleanup preserves taskkill tree then forced tree escalation", asyn
 });
 
 test("Windows cleanup fails closed when a vanished leader prevents tree termination", async () => {
-  await assert.rejects(() => stopOwnedProcessTree({
-    pid: 123,
-    ownsProcessGroup: false,
-    leaderExited: () => true,
-    groupAlive: () => false,
-    signalGroup: () => { throw new Error("POSIX signal must not run on Windows"); },
-    taskkill: async () => { throw new Error("process not found"); },
-    exited: Promise.resolve({ code: 0, signal: null }),
-  }), /could not terminate owned Windows HMR process tree/);
+  await assert.rejects(
+    () =>
+      stopOwnedProcessTree({
+        pid: 123,
+        ownsProcessGroup: false,
+        leaderExited: () => true,
+        groupAlive: () => false,
+        signalGroup: () => {
+          throw new Error("POSIX signal must not run on Windows");
+        },
+        taskkill: async () => {
+          throw new Error("process not found");
+        },
+        exited: Promise.resolve({ code: 0, signal: null }),
+      }),
+    /could not terminate owned Windows HMR process tree/,
+  );
 });
 
 test("installed HMR cleanup restores source state even when process cleanup fails", async () => {
   let restored = false;
-  await assert.rejects(() => cleanupOwnedHmrRun({
-    stopOwnedTree: async () => { throw new Error("tree cleanup failed"); },
-    childClosed: Promise.resolve(),
-    restoreOwnedFiles: async () => { restored = true; },
-  }), /tree cleanup failed/);
+  await assert.rejects(
+    () =>
+      cleanupOwnedHmrRun({
+        stopOwnedTree: async () => {
+          throw new Error("tree cleanup failed");
+        },
+        childClosed: Promise.resolve(),
+        restoreOwnedFiles: async () => {
+          restored = true;
+        },
+      }),
+    /tree cleanup failed/,
+  );
   assert.equal(restored, true);
 });
 
@@ -266,20 +318,42 @@ test("native state events can be read from JSON session lines and DEHERM_EVENT l
 
 test("installed driver projects authoritative instance identities and gameplay marker", () => {
   assert.deepEqual(parseReloadMarker("INFO war-battles:hmr-reload:edit=cycle-1:tick=77:entities=12:elapsed=1.283"), {
-    edit: "cycle-1", gameplayTick: 77, worldEntityCount: 12, elapsedSeconds: 1.283
+    edit: "cycle-1",
+    gameplayTick: 77,
+    worldEntityCount: 12,
+    elapsedSeconds: 1.283,
   });
-  const projected = snapshotFromState({ targets: [{
-    id: "local-engine",
-    telemetry: { frameDtMs: 8, componentInstances: 2, callbackRoots: 1, luaRegistryUsed: 3, arenaHighWaterBytes: 9 },
-    componentSnapshot: { runtimeId: 5, sequence: 4 },
-    instanceProjection: { complete: true },
-    instances: [
-      { instanceId: { slot: 2, generation: 1 }, source: "main/arena.script.ts" },
-      { instanceId: { slot: 8, generation: 3 }, source: "main/player.script.ts" },
-    ]
-  }] }, { gameplayTick: 77, worldEntityCount: 12 });
-  assert.deepEqual(projected.instanceIds, [{ slot: 2, generation: 1 }, { slot: 8, generation: 3 }]);
-  assert.deepEqual(projected.persistentInstanceIds, [{ slot: 2, generation: 1 }, { slot: 8, generation: 3 }]);
+  const projected = snapshotFromState(
+    {
+      targets: [
+        {
+          id: "local-engine",
+          telemetry: {
+            frameDtMs: 8,
+            componentInstances: 2,
+            callbackRoots: 1,
+            luaRegistryUsed: 3,
+            arenaHighWaterBytes: 9,
+          },
+          componentSnapshot: { runtimeId: 5, sequence: 4 },
+          instanceProjection: { complete: true },
+          instances: [
+            { instanceId: { slot: 2, generation: 1 }, source: "main/arena.script.ts" },
+            { instanceId: { slot: 8, generation: 3 }, source: "main/player.script.ts" },
+          ],
+        },
+      ],
+    },
+    { gameplayTick: 77, worldEntityCount: 12 },
+  );
+  assert.deepEqual(projected.instanceIds, [
+    { slot: 2, generation: 1 },
+    { slot: 8, generation: 3 },
+  ]);
+  assert.deepEqual(projected.persistentInstanceIds, [
+    { slot: 2, generation: 1 },
+    { slot: 8, generation: 3 },
+  ]);
   assert.equal(projected.runtimeId, 5);
   assert.equal(projected.gameplayTick, 77);
   assert.equal(projected.entityCount, 12);
@@ -293,18 +367,28 @@ test("installed driver captures error logs and rejected activations in each edit
     { type: "log", level: "error", source: "engine", message: "onReload threw" },
   ];
   assert.deepEqual(runtimeErrorFromEvents(events, 1), {
-    type: "log", source: "engine", message: "onReload threw",
+    type: "log",
+    source: "engine",
+    message: "onReload threw",
   });
-  assert.deepEqual(runtimeErrorFromEvents([
-    { type: "runtime-activation-rejected", fingerprint: fingerprint(2), diagnostic: "rejected" },
-  ]), {
-    type: "runtime-activation-rejected", diagnostic: "rejected", fingerprint: fingerprint(2),
-  });
-  assert.deepEqual(runtimeErrorFromEvents([
-    { type: "log", level: "error", source: "stdout-protocol", message: "raw failure" },
-  ]), {
-    type: "log", source: "stdout-protocol", message: "raw failure",
-  });
+  assert.deepEqual(
+    runtimeErrorFromEvents([
+      { type: "runtime-activation-rejected", fingerprint: fingerprint(2), diagnostic: "rejected" },
+    ]),
+    {
+      type: "runtime-activation-rejected",
+      diagnostic: "rejected",
+      fingerprint: fingerprint(2),
+    },
+  );
+  assert.deepEqual(
+    runtimeErrorFromEvents([{ type: "log", level: "error", source: "stdout-protocol", message: "raw failure" }]),
+    {
+      type: "log",
+      source: "stdout-protocol",
+      message: "raw failure",
+    },
+  );
   assert.equal(runtimeErrorFromEvents(events, events.length), undefined);
 });
 
@@ -333,7 +417,8 @@ test("final HMR health sweep rejects errors, rejections, protocol failures, and 
     { type: "log", level: "error", message: "engine" },
     { type: "log", source: "stdout-protocol", message: "raw" },
     { type: "build-failed", message: "compile" },
-  ]) assert.throws(() => validateHmrRuntimeHealth([event]), /native HMR emitted/);
+  ])
+    assert.throws(() => validateHmrRuntimeHealth([event]), /native HMR emitted/);
   assert.throws(() => validateHmrRuntimeHealth([], "native diagnostic"), /stderr/);
 });
 
@@ -348,8 +433,14 @@ test("runHmrStateSoak performs the final full-event health sweep", async () => {
     applyAcceptedComponentBodyReload: async () => {},
     waitForAccepted: async (index) => ({ status: "activated", fingerprint: fingerprint(index + 2), runtimeId: 4 }),
     snapshot: async (label) => snapshot(label === "accepted-0" ? 2 : 3, 51, label === "accepted-0" ? 1 : 0),
-    assertClean: async () => { assert.equal(closed, true); checked = true; validateHmrRuntimeHealth([], ""); },
-    close: async () => { closed = true; },
+    assertClean: async () => {
+      assert.equal(closed, true);
+      checked = true;
+      validateHmrRuntimeHealth([], "");
+    },
+    close: async () => {
+      closed = true;
+    },
   };
   await runHmrStateSoak(adapter, { cycles: 2 });
   assert.equal(checked, true);
@@ -366,7 +457,9 @@ test("runHmrStateSoak requires the native adapter and closes it after a failed v
     waitForAccepted: async () => ({ status: "activated", fingerprint: fingerprint(2), runtimeId: 4 }),
     snapshot: async () => snapshot(1),
     assertClean: async () => {},
-    close: async () => { closed = true; },
+    close: async () => {
+      closed = true;
+    },
   };
   await assert.rejects(() => runHmrStateSoak(adapter, { cycles: 1 }), /did not advance gameplay/);
   assert.equal(closed, true);

@@ -9,10 +9,16 @@
 import { runRuntimeMeasurement } from "./runtime-measurement-harness.ts";
 
 const evidence = await runRuntimeMeasurement();
-console.log(JSON.stringify({
-  ...evidence,
-  owner: "examples/war-battles-online/integration/runtime-measurement-deno.ts",
-  generator: "examples/war-battles-online/integration/runtime-measurement-deno.ts",
-  evidenceBoundary: "Deno-observed wall-clock authoritative step and Deno.memoryUsage snapshots; not comparable to Node samples and not an allocation count.",
-}, null, 2));
-
+console.log(
+  JSON.stringify(
+    {
+      ...evidence,
+      owner: "examples/war-battles-online/integration/runtime-measurement-deno.ts",
+      generator: "examples/war-battles-online/integration/runtime-measurement-deno.ts",
+      evidenceBoundary:
+        "Deno-observed wall-clock authoritative step and Deno.memoryUsage snapshots; not comparable to Node samples and not an allocation count.",
+    },
+    null,
+    2,
+  ),
+);

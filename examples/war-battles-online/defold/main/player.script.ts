@@ -1,4 +1,5 @@
 import {
+  defold,
   defineComponent,
   factory,
   go,
@@ -12,11 +13,12 @@ import {
 } from "@deherm/project";
 
 import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
-import { chassisById } from "../src/generated-war-battles/index";
-
-declare const __defoldHostV1: {
-  log(level: "info", message: string): void;
-};
+import {
+  PLAYER_MODE_DEAD,
+  PLAYER_MODE_INFANTRY,
+  PLAYER_MODE_TANK,
+  chassisById,
+} from "../src/generated-war-battles/index";
 
 const UP = hashLiteral("#up");
 const DOWN = hashLiteral("#down");
@@ -37,6 +39,8 @@ const CHASSIS_4 = hashLiteral("#chassis4");
 const UPGRADE_1 = hashLiteral("#upgrade1");
 const UPGRADE_2 = hashLiteral("#upgrade2");
 const RESTART = hashLiteral("#restart");
+const DEPLOY = hashLiteral("#deploy");
+const UI = "/gui#ui";
 
 /**
  * The camera follows a reported position rather than sampling this object.
@@ -60,6 +64,7 @@ const CHASSIS_ANIMATIONS: readonly DefoldHash[] = [
   hashLiteral("#chassis-blue-artillery"),
 ];
 const WRECK_ANIMATION = hashLiteral("#tank-blue-wreck");
+const HERO_ANIMATION = hashLiteral("#player-down");
 const SPEED = 180;
 
 interface PlayerSelf {
@@ -91,7 +96,32 @@ interface PlayerSelf {
   weapon: number;
   z: number;
   chassis: number;
-  wrecked: boolean;
+  mode: number;
+}
+
+function isMappedPlayerAction(actionId: DefoldHash): boolean {
+  return (
+    actionId === UP ||
+    actionId === DOWN ||
+    actionId === LEFT ||
+    actionId === RIGHT ||
+    actionId === FIRE ||
+    actionId === BOOST ||
+    actionId === DEPLOY ||
+    actionId === RESTART ||
+    actionId === WEAPON_1 ||
+    actionId === WEAPON_2 ||
+    actionId === WEAPON_3 ||
+    actionId === WEAPON_4 ||
+    actionId === WEAPON_5 ||
+    actionId === WEAPON_6 ||
+    actionId === CHASSIS_1 ||
+    actionId === CHASSIS_2 ||
+    actionId === CHASSIS_3 ||
+    actionId === CHASSIS_4 ||
+    actionId === UPGRADE_1 ||
+    actionId === UPGRADE_2
+  );
 }
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -107,18 +137,20 @@ function step(self: PlayerSelf, dt: number): void {
   const position = go.getPosition();
   // The world is larger than one screen, so travel is bounded by the same
   // rectangle the camera clamps against rather than by the screen edge.
-  go.setPosition(vmath.vector3(
-    clamp(position.x + direction.x * self.speed * dt, self.worldMinX, self.worldMaxX),
-    clamp(position.y + direction.y * self.speed * dt, self.worldMinY, self.worldMaxY),
-    position.z,
-  ));
+  go.setPosition(
+    vmath.vector3(
+      clamp(position.x + direction.x * self.speed * dt, self.worldMinX, self.worldMaxX),
+      clamp(position.y + direction.y * self.speed * dt, self.worldMinY, self.worldMaxY),
+      position.z,
+    ),
+  );
   go.setRotation(vmath.quatRotationZ(Math.atan2(direction.y, direction.x) + ART_FACING_OFFSET));
 }
 
 function fire(self: PlayerSelf): void {
   const position = go.getPosition();
   factory.create("#rocketfactory", position, undefined, new Map<string, unknown>([["dir", self.aim]]));
-  __defoldHostV1.log(
+  defold.log(
     "info",
     `war-battles:player-fire:${position.x.toFixed(1)}:${position.y.toFixed(1)}:${self.aim.x.toFixed(2)}:${self.aim.y.toFixed(2)}`,
   );
@@ -173,8 +205,9 @@ export default defineComponent({
     const position = go.getPosition();
     self.z = position.z;
     self.chassis = 0;
-    self.wrecked = false;
-    __defoldHostV1.log("info", `war-battles:player-init:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
+    self.mode = -1;
+    msg.post("#hero", "disable");
+    defold.log("info", `war-battles:player-init:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
   },
 
   final(_self: PlayerSelf): void {
@@ -185,7 +218,7 @@ export default defineComponent({
     // SIGINT reaches `final`, so it takes a graceful `@system/exit` to get
     // here. See `integration/check-graceful-shutdown.mjs`.
     msg.post(".", "release_input_focus");
-    __defoldHostV1.log("info", "war-battles:player-final");
+    defold.log("info", "war-battles:player-final");
   },
 
   update(self: PlayerSelf, dt: number): void {
@@ -202,19 +235,29 @@ export default defineComponent({
       if (chassisChanged) {
         self.chassis = chassis;
       }
-      const dead = world.playerHealth[slot]! <= 0;
-      if (dead !== self.wrecked) {
-        self.wrecked = dead;
-        msg.post("#sprite", "play_animation", {
-          id: dead ? WRECK_ANIMATION : CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]!,
-        });
-      } else if (!dead && chassisChanged) {
+      const mode = world.playerMode[slot]!;
+      const modeChanged = mode !== self.mode;
+      if (modeChanged) {
+        self.mode = mode;
+        if (mode === PLAYER_MODE_INFANTRY) {
+          msg.post("#sprite", "disable");
+          msg.post("#hero", "enable");
+          msg.post("#hero", "play_animation", { id: HERO_ANIMATION });
+        } else {
+          msg.post("#hero", "disable");
+          msg.post("#sprite", "enable");
+          msg.post("#sprite", "play_animation", {
+            id: mode === PLAYER_MODE_DEAD ? WRECK_ANIMATION : CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]!,
+          });
+        }
+      } else if (mode === PLAYER_MODE_TANK && chassisChanged) {
         msg.post("#sprite", "play_animation", { id: CHASSIS_ANIMATIONS[chassisById(chassis).id - 1]! });
       }
       const x = pixelX(world.playerX[slot]!);
       const y = pixelY(world.playerY[slot]!);
       go.setPosition(vmath.vector3(x, y, self.z));
-      go.setRotation(vmath.quatRotationZ(directionRadians(world.playerHullX[slot]!, world.playerHullY[slot]!)));
+      const facing = directionRadians(world.playerHullX[slot]!, world.playerHullY[slot]!);
+      go.setRotation(vmath.quatRotationZ(facing + (mode === PLAYER_MODE_INFANTRY ? Math.PI / 2 : 0)));
       msg.post(CAMERA, "player_at", { x, y });
       return;
     }
@@ -243,7 +286,7 @@ export default defineComponent({
         self.direction = vmath.vector3(0, 0, 0);
         self.demoTurn = 0;
         const position = go.getPosition();
-        __defoldHostV1.log("info", `war-battles:player-moved:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
+        defold.log("info", `war-battles:player-moved:${position.x.toFixed(1)}:${position.y.toFixed(1)}`);
         // The demonstration is over; the match starts on its own so an idle
         // launch still ends up in a playable arena.
         engage(self);
@@ -255,6 +298,14 @@ export default defineComponent({
   },
 
   onInput(self: PlayerSelf, actionId: DefoldHash, action: OnInputAction): boolean {
+    // The scripted tutorial may already be running behind the title. Only a
+    // real player press dismisses that title, so launch evidence and an idle
+    // attract loop do not impersonate user intent.
+    if (action.pressed && isMappedPlayerAction(actionId)) {
+      defold.log("info", `war-battles:user-input:${defold.hashToHex(actionId)}`);
+      msg.post(UI, "deploy");
+    }
+    if (actionId === DEPLOY) return action.pressed === true;
     if (actionId === RESTART) {
       if (action.pressed) {
         engage(self);
@@ -278,18 +329,35 @@ export default defineComponent({
       engage(self);
       return true;
     }
-    const weapon = actionId === WEAPON_1 ? 1
-      : actionId === WEAPON_2 ? 2
-        : actionId === WEAPON_3 ? 3
-          : actionId === WEAPON_4 ? 4
-            : actionId === WEAPON_5 ? 5
-              : actionId === WEAPON_6 ? 6 : 0;
+    const weapon =
+      actionId === WEAPON_1
+        ? 1
+        : actionId === WEAPON_2
+          ? 2
+          : actionId === WEAPON_3
+            ? 3
+            : actionId === WEAPON_4
+              ? 4
+              : actionId === WEAPON_5
+                ? 5
+                : actionId === WEAPON_6
+                  ? 6
+                  : 0;
     if (weapon !== 0) {
       if (action.pressed) self.weapon = weapon;
       engage(self);
       return true;
     }
-    const chassis = actionId === CHASSIS_1 ? 1 : actionId === CHASSIS_2 ? 2 : actionId === CHASSIS_3 ? 3 : actionId === CHASSIS_4 ? 4 : 0;
+    const chassis =
+      actionId === CHASSIS_1
+        ? 1
+        : actionId === CHASSIS_2
+          ? 2
+          : actionId === CHASSIS_3
+            ? 3
+            : actionId === CHASSIS_4
+              ? 4
+              : 0;
     if (chassis !== 0) {
       if (action.pressed) arenaMatch()?.selectChassis(chassis);
       engage(self);

@@ -170,6 +170,7 @@ The official manual and pinned source agree on this behavior:
 | A `.script` resource attached to an existing component | Defold re-executes the script source, replaces lifecycle function references, retains the existing script instance and its `self` table, does not call `init()`, and calls the new `on_reload(self)`. |
 | A required Lua module | The module source is re-executed. Globals can reflect the update, but callers holding a previously returned local table do not automatically receive a replacement table. |
 | A game-object prototype | Defold may finalize/destroy and recreate the game object. Do not generalize script-component state retention to prototype reload. |
+| An `.input_binding` resource | Bob and the resource factory can accept replacement bytes, but an active collection keeps the action table created with its input stack. Déherm classifies the authored resource as restart-required and relaunches the debug engine after the successful Bob build. |
 | A native extension binary | Not a resource-generation swap. It requires a custom-engine rebuild and process restart. |
 
 The script resource reloads its Lua chunk and properties in

@@ -9,11 +9,7 @@
 // Admission authentication and its bounded restart ledger are injected as
 // control-plane seams. They never participate in the fixed-step simulation.
 
-import {
-  MAX_PLAYERS,
-  SNAPSHOT_BYTES,
-  TICK_RATE,
-} from "./constants.ts";
+import { MAX_PLAYERS, SNAPSHOT_BYTES, TICK_RATE } from "./constants.ts";
 import {
   CONTROL_BUY_UPGRADE,
   CONTROL_SET_WEAPON,
@@ -50,10 +46,7 @@ import {
   type PingMessage,
   type WelcomeAckMessage,
 } from "./protocol.ts";
-import {
-  writeSnapshotDelta,
-  writeSnapshotKeyframe,
-} from "./snapshot.ts";
+import { writeSnapshotDelta, writeSnapshotKeyframe } from "./snapshot.ts";
 import { isWeaponId, isWeaponUpgradeId } from "./content.ts";
 import { BotController } from "./bots.ts";
 import { BattleWorld } from "./world.ts";
@@ -135,7 +128,12 @@ export class MatchServer {
   private closed = false;
 
   readonly stats: MatchServerStats = {
-    tick: 0, humans: 0, bots: 0, snapshotsSent: 0, inputsAccepted: 0, inputsRejected: 0,
+    tick: 0,
+    humans: 0,
+    bots: 0,
+    snapshotsSent: 0,
+    inputsAccepted: 0,
+    inputsRejected: 0,
   };
 
   constructor(options: MatchServerOptions = {}) {
@@ -149,14 +147,18 @@ export class MatchServer {
     this.resumeGraceTicks = clampInteger(options.resumeGraceTicks ?? TICK_RATE * 30, 1, MAX_TICK_SPAN);
     this.onError = options.onError ?? (() => {});
     this.onLog = options.onLog ?? (() => {});
-    this.resumeTokenService = options.resumeTokenService ?? new SessionTokenService({
-      keys: [{ id: 1, secret: options.resumeKey ?? localDevelopmentResumeKey(options.resumeSecret) }],
-    });
-    this.sessionLedger = options.sessionLedger ?? new SessionLedger({
-      matchId,
-      rosterSize: this.rosterSize,
-      restartReservationTicks: this.resumeGraceTicks,
-    });
+    this.resumeTokenService =
+      options.resumeTokenService ??
+      new SessionTokenService({
+        keys: [{ id: 1, secret: options.resumeKey ?? localDevelopmentResumeKey(options.resumeSecret) }],
+      });
+    this.sessionLedger =
+      options.sessionLedger ??
+      new SessionLedger({
+        matchId,
+        rosterSize: this.rosterSize,
+        restartReservationTicks: this.resumeGraceTicks,
+      });
     if (this.sessionLedger.matchId !== matchId || this.sessionLedger.rosterSize !== this.rosterSize) {
       throw new Error("session ledger context does not match the match server");
     }
@@ -214,7 +216,7 @@ export class MatchServer {
   close(code = 1000, reason = "server closed"): void {
     if (this.closed) return;
     this.closed = true;
-    for (const session of [...this.sessions]) session.close(code, reason);
+    for (const session of this.sessions) session.close(code, reason);
   }
 
   countHumans(): number {
@@ -254,8 +256,14 @@ export class MatchServer {
       // A non-zero token is an explicit resume request. It must never fall
       // through to a fresh slot: accepting that fallback would turn a stale,
       // foreign, or forged credential into a different authenticated player.
-      if (resumed < 0 || claims === null || this.sessionLedger.generation[resumed] !== claims.generation
-        || this.slotOwner[resumed] !== undefined || !this.sessionLedger.isReserved(resumed, this.sessionTick())) return -1;
+      if (
+        resumed < 0 ||
+        claims === null ||
+        this.sessionLedger.generation[resumed] !== claims.generation ||
+        this.slotOwner[resumed] !== undefined ||
+        !this.sessionLedger.isReserved(resumed, this.sessionTick())
+      )
+        return -1;
       this.slotOwner[resumed] = session;
       session.resumed = true;
       this.refreshStats();
@@ -266,7 +274,8 @@ export class MatchServer {
       // A slot that has already welcomed a human remains reserved through the
       // bounded resume grace period. Fresh anonymous joins may only take a slot
       // that has never authenticated, or one whose reservation has expired.
-      if (this.sessionLedger.generation[slot] !== 0 && this.sessionLedger.isReserved(slot, this.sessionTick())) continue;
+      if (this.sessionLedger.generation[slot] !== 0 && this.sessionLedger.isReserved(slot, this.sessionTick()))
+        continue;
       this.slotOwner[slot] = session;
       // A human takes the slot over exactly as it stands: the bot's score, its
       // position and its ammunition all continue. Nothing is reset mid-round.
@@ -301,12 +310,16 @@ export class MatchServer {
 
   /** @internal Stages a token for a welcome without invalidating the current one. */
   async prepareResumeToken(slot: number, target: Uint8Array): Promise<number> {
-    if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize) throw new RangeError("resume slot is outside the roster");
+    if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize)
+      throw new RangeError("resume slot is outside the roster");
     if (target.byteLength !== RESUME_TOKEN_BYTES) throw new RangeError("resume token target has the wrong size");
     const generation = (this.sessionLedger.generation[slot]! + 1) >>> 0 || 1;
     const token = await this.resumeTokenService.issue({
-      matchId: this.world.matchId, slot, generation,
-      issuedAtTick: this.sessionTick(), expiresAtTick: 0,
+      matchId: this.world.matchId,
+      slot,
+      generation,
+      issuedAtTick: this.sessionTick(),
+      expiresAtTick: 0,
     });
     if (token.byteLength !== RESUME_TOKEN_BYTES) {
       throw new Error(`resume token provider returned ${token.byteLength} bytes; expected ${RESUME_TOKEN_BYTES}`);
@@ -317,7 +330,8 @@ export class MatchServer {
 
   /** @internal Commits the staged token only after the client echoes it. */
   commitResumeToken(slot: number, generation: number, token: Uint8Array): void {
-    if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize) throw new RangeError("resume slot is outside the roster");
+    if (!Number.isInteger(slot) || slot < 0 || slot >= this.rosterSize)
+      throw new RangeError("resume slot is outside the roster");
     if (token.byteLength !== RESUME_TOKEN_BYTES) throw new RangeError("resume token has the wrong size");
     const expected = (this.sessionLedger.generation[slot]! + 1) >>> 0 || 1;
     if (generation !== expected) throw new Error("resume token generation is stale");
@@ -366,7 +380,10 @@ export class ServerSession implements TransportReceiver {
 
   private transport?: GameTransport;
   private readonly hello: HelloMessage = {
-    clientSalt: 0, name: "", resumeToken: new Uint8Array(RESUME_TOKEN_BYTES), preferredTeam: 0,
+    clientSalt: 0,
+    name: "",
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+    preferredTeam: 0,
   };
   private readonly control: ControlMessage = { action: 0, argument: 0 };
   private readonly ping: PingMessage = { clientTime: 0, serverTick: 0 };
@@ -495,13 +512,7 @@ export class ServerSession implements TransportReceiver {
     }
     let length = -1;
     if (!this.forceSnapshotKeyframe && this.snapshotFramesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1) {
-      length = writeSnapshotDelta(
-        this.snapshotFrame,
-        tick,
-        this.snapshotBaselineTick,
-        this.snapshotBaseline,
-        source,
-      );
+      length = writeSnapshotDelta(this.snapshotFrame, tick, this.snapshotBaselineTick, this.snapshotBaseline, source);
     }
     if (length < 0) {
       length = writeSnapshotKeyframe(this.snapshotFrame, tick, source);
@@ -513,33 +524,33 @@ export class ServerSession implements TransportReceiver {
     this.snapshotBaseline.set(source);
     this.snapshotBaselineTick = tick;
     this.snapshotSendBusy = true;
-    void transport.sendReliable(
-      TRANSPORT_CHANNEL_SNAPSHOT,
-      this.snapshotFrame.subarray(0, length),
-    ).then((disposition) => {
-      this.snapshotSendBusy = false;
-      if (disposition === "closed") {
+    void transport.sendReliable(TRANSPORT_CHANNEL_SNAPSHOT, this.snapshotFrame.subarray(0, length)).then(
+      (disposition) => {
+        this.snapshotSendBusy = false;
+        if (disposition === "closed") {
+          this.pendingSnapshotReady = false;
+          this.onClose(1_001, "transport closed");
+          return;
+        }
+        // The browser adapter intentionally keeps only the latest backpressured
+        // snapshot. A delta that was replaced must not become the base for the
+        // next frame, so force a recovery keyframe at the next cadence.
+        if (disposition !== "sent") this.forceSnapshotKeyframe = true;
+        if (this.pendingSnapshotReady) {
+          this.pendingSnapshotReady = false;
+          this.sendSnapshot(this.pendingSnapshotState, this.pendingSnapshotTick);
+        }
+      },
+      (error: unknown) => {
+        this.snapshotSendBusy = false;
+        this.forceSnapshotKeyframe = true;
+        // A rejected send has no delivery ordering we can trust. Drop the
+        // retained latest state rather than replaying it after a later caller
+        // supplies a newer frame; that newer call will be forced to keyframe.
         this.pendingSnapshotReady = false;
-        this.onClose(1_001, "transport closed");
-        return;
-      }
-      // The browser adapter intentionally keeps only the latest backpressured
-      // snapshot. A delta that was replaced must not become the base for the
-      // next frame, so force a recovery keyframe at the next cadence.
-      if (disposition !== "sent") this.forceSnapshotKeyframe = true;
-      if (this.pendingSnapshotReady) {
-        this.pendingSnapshotReady = false;
-        this.sendSnapshot(this.pendingSnapshotState, this.pendingSnapshotTick);
-      }
-    }, (error: unknown) => {
-      this.snapshotSendBusy = false;
-      this.forceSnapshotKeyframe = true;
-      // A rejected send has no delivery ordering we can trust. Drop the
-      // retained latest state rather than replaying it after a later caller
-      // supplies a newer frame; that newer call will be forced to keyframe.
-      this.pendingSnapshotReady = false;
-      this.server.report(error);
-    });
+        this.server.report(error);
+      },
+    );
   }
 
   private async handleSession(payload: Uint8Array): Promise<void> {
@@ -562,9 +573,12 @@ export class ServerSession implements TransportReceiver {
     const slot = await this.server.claimSlot(this, this.hello.resumeToken);
     if (slot < 0) {
       const hasResumeToken = !isZeroToken(this.hello.resumeToken);
-      const length = writeReject(this.rejectBuffer, hasResumeToken
-        ? { code: REJECT_BAD_RESUME, reason: "resume token is invalid, stale, or belongs to another match" }
-        : { code: REJECT_FULL, reason: "match is full" });
+      const length = writeReject(
+        this.rejectBuffer,
+        hasResumeToken
+          ? { code: REJECT_BAD_RESUME, reason: "resume token is invalid, stale, or belongs to another match" }
+          : { code: REJECT_FULL, reason: "match is full" },
+      );
       this.sendReliable(TRANSPORT_CHANNEL_SESSION, this.rejectBuffer.subarray(0, length));
       this.close(hasResumeToken ? 4_005 : 4_004, hasResumeToken ? "resume refused" : "match is full");
       return;
@@ -631,7 +645,8 @@ export class ServerSession implements TransportReceiver {
     } else if (this.control.action === CONTROL_SET_CHASSIS) {
       this.server.world.selectChassis(playerId, this.control.argument);
     } else if (this.control.action === CONTROL_SET_WEAPON_UPGRADE) {
-      if (isWeaponUpgradeId(this.control.argument)) this.server.world.applyWeaponUpgrade(playerId, this.control.argument);
+      if (isWeaponUpgradeId(this.control.argument))
+        this.server.world.applyWeaponUpgrade(playerId, this.control.argument);
     } else if (this.control.action === CONTROL_SUICIDE) {
       this.server.world.playerHealth[this.slot] = 0;
     }
@@ -640,9 +655,9 @@ export class ServerSession implements TransportReceiver {
   private handleInput(payload: Uint8Array): void {
     if (!this.ready) return;
     if (payload.byteLength !== INPUT_PACKET_BYTES) {
-      throw new Error(payload.byteLength < INPUT_PACKET_BYTES
-        ? "input packet is truncated"
-        : "input packet has trailing bytes");
+      throw new Error(
+        payload.byteLength < INPUT_PACKET_BYTES ? "input packet is truncated" : "input packet has trailing bytes",
+      );
     }
     if (this.inputBudget <= 0) {
       // A client flooding the input lane is throttled, not disconnected: the

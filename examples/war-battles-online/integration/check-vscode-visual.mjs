@@ -5,12 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import WebSocket from "ws";
 
-import {
-  buildVisualEvidence,
-  hashFile,
-  sha256,
-  verifyVisualEvidence,
-} from "./vscode-visual-evidence.mjs";
+import { buildVisualEvidence, hashFile, sha256, verifyVisualEvidence } from "./vscode-visual-evidence.mjs";
 
 const exampleRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = path.resolve(exampleRoot, "../..");
@@ -79,11 +74,12 @@ socket.on("message", (raw) => {
   if (message.error) waiter.reject(new Error(JSON.stringify(message.error)));
   else waiter.resolve(message.result);
 });
-const call = (method, params = {}) => new Promise((resolve, reject) => {
-  const id = nextId++;
-  pending.set(id, { resolve, reject });
-  socket.send(JSON.stringify({ id, method, params }));
-});
+const call = (method, params = {}) =>
+  new Promise((resolve, reject) => {
+    const id = nextId++;
+    pending.set(id, { resolve, reject });
+    socket.send(JSON.stringify({ id, method, params }));
+  });
 
 const rendered = await call("Runtime.evaluate", {
   expression: "({text: document.body.innerText, title: document.title, userAgent: navigator.userAgent})",
@@ -105,9 +101,10 @@ const observedArtifact = async (supplied, fallback) => {
   }
   const bytes = await readFile(absolute);
   const relative = path.relative(repositoryRoot, absolute);
-  const label = relative.startsWith("..") || path.isAbsolute(relative)
-    ? path.basename(absolute)
-    : relative.replaceAll(path.sep, "/");
+  const label =
+    relative.startsWith("..") || path.isAbsolute(relative)
+      ? path.basename(absolute)
+      : relative.replaceAll(path.sep, "/");
   return { path: label, bytes: bytes.length, sha256: sha256(bytes) };
 };
 const document = buildVisualEvidence({

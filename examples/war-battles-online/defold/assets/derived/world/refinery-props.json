@@ -1,0 +1,269 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/generate-world-art.mjs",
+  "cellSize": [
+    16,
+    16
+  ],
+  "sampling": "nearest",
+  "atlas": {
+    "path": "defold/assets/derived/world/refinery-props.png",
+    "width": 96,
+    "height": 16,
+    "columns": 6,
+    "rows": 1,
+    "bytes": 3622,
+    "sha256": "f7918d8507d6c09ddb95f060ab4d07b327dab93af6831aa2842bb47bc9dc298a"
+  },
+  "sources": {
+    "selection": {
+      "path": "art/source/sprite-fusion/selection.json",
+      "keys": [
+        "world"
+      ],
+      "projectionSha256": "18b8dc2be7d19a30629246048be2e5cfbcf8e67b42b72c883215bd6e06032ea1"
+    }
+  },
+  "roles": [
+    {
+      "id": "pickup-pedestal",
+      "role": "pickup-pedestal",
+      "request": "refinery-pickup-pedestal-v1",
+      "selectedIndex": 0,
+      "assetId": "5822426e-2bc2-4d35-b90a-fd311cb3843c",
+      "source": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/00.png",
+      "sourceSha256": "7648e32fb4d675b8cdcf3e3df1be39496c8c54a55033ab7349a91fefb9550f68",
+      "requestManifest": "art/source/sprite-fusion/requests/refinery-pickup-pedestal-v1.json",
+      "requestManifestSha256": "22a95c10daaf17382a02c0c7d64a30897fca85aef605505921abd65fc7222c47",
+      "requestSpec": "art/source/sprite-fusion/specs/refinery-pickup-pedestal-v1.json",
+      "requestSpecSha256": "0ecf590add5375e4b1c20592ec74fd00408503148f9aacd5628086f0d5c9a850",
+      "sourceSize": [
+        18,
+        18
+      ],
+      "sourceBounds": [
+        0,
+        0,
+        17,
+        17
+      ],
+      "normalizedBounds": [
+        0,
+        0,
+        15,
+        15
+      ],
+      "anchor": [
+        8,
+        8
+      ],
+      "cell": [
+        0,
+        0,
+        16,
+        16
+      ],
+      "outputSha256": "9da832600065a8b4fd349f7ddfb621f75bad1e767d8a5915401df7cd5fe319e8"
+    },
+    {
+      "id": "thermal-vent",
+      "role": "thermal-vent",
+      "request": "refinery-basalt-floor-v1",
+      "selectedIndex": 1,
+      "assetId": "ff0ffaf3-f92e-46a6-b45a-1499b87697f7",
+      "source": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/01.png",
+      "sourceSha256": "ae0a7e5f5c3d423a4e395d3387b898eb46d8615085ae496bd61a35cddf7843c7",
+      "requestManifest": "art/source/sprite-fusion/requests/refinery-basalt-floor-v1.json",
+      "requestManifestSha256": "27204f9a2f5310c22d15d8de3f313d03c7b0f1d66b5162f57489722a1e758b61",
+      "requestSpec": "art/source/sprite-fusion/specs/refinery-basalt-floor-v1.json",
+      "requestSpecSha256": "c81bba21fa696e018a318e47cd3ee4fc730e81db9aca6e4228678ac2b9955e8d",
+      "sourceSize": [
+        21,
+        21
+      ],
+      "sourceBounds": [
+        0,
+        0,
+        19,
+        20
+      ],
+      "normalizedBounds": [
+        0,
+        0,
+        15,
+        15
+      ],
+      "anchor": [
+        8,
+        8
+      ],
+      "cell": [
+        16,
+        0,
+        16,
+        16
+      ],
+      "outputSha256": "564c1be460afbb2a2f804e3922760ed014136ca4970adefde7ed22b97d5359e7"
+    },
+    {
+      "id": "lava-fissure",
+      "role": "lava-fissure",
+      "request": "refinery-basalt-floor-v1",
+      "selectedIndex": 3,
+      "assetId": "e2cfc42b-1bb8-45d7-8a57-2232291991f7",
+      "source": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/03.png",
+      "sourceSha256": "6dc2be811a28f19d04c4610abd9f648e9a558ef63aee5dcd518c93127a922921",
+      "requestManifest": "art/source/sprite-fusion/requests/refinery-basalt-floor-v1.json",
+      "requestManifestSha256": "27204f9a2f5310c22d15d8de3f313d03c7b0f1d66b5162f57489722a1e758b61",
+      "requestSpec": "art/source/sprite-fusion/specs/refinery-basalt-floor-v1.json",
+      "requestSpecSha256": "c81bba21fa696e018a318e47cd3ee4fc730e81db9aca6e4228678ac2b9955e8d",
+      "sourceSize": [
+        22,
+        22
+      ],
+      "sourceBounds": [
+        0,
+        0,
+        20,
+        21
+      ],
+      "normalizedBounds": [
+        0,
+        0,
+        15,
+        15
+      ],
+      "anchor": [
+        8,
+        8
+      ],
+      "cell": [
+        32,
+        0,
+        16,
+        16
+      ],
+      "outputSha256": "736767727e42eedc0aeb59a6c3dc7d648717a345849df64522d5852103034360"
+    },
+    {
+      "id": "floor-vent",
+      "role": "floor-vent",
+      "request": "refinery-basalt-floor-v1",
+      "selectedIndex": 4,
+      "assetId": "a5f234b6-1460-4918-acac-def08d9f1c85",
+      "source": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/04.png",
+      "sourceSha256": "f8d6f0bfdf01165891102b3ec43f87296e1deffb86a772c656262680c6d3d1da",
+      "requestManifest": "art/source/sprite-fusion/requests/refinery-basalt-floor-v1.json",
+      "requestManifestSha256": "27204f9a2f5310c22d15d8de3f313d03c7b0f1d66b5162f57489722a1e758b61",
+      "requestSpec": "art/source/sprite-fusion/specs/refinery-basalt-floor-v1.json",
+      "requestSpecSha256": "c81bba21fa696e018a318e47cd3ee4fc730e81db9aca6e4228678ac2b9955e8d",
+      "sourceSize": [
+        22,
+        22
+      ],
+      "sourceBounds": [
+        1,
+        0,
+        20,
+        21
+      ],
+      "normalizedBounds": [
+        1,
+        0,
+        15,
+        15
+      ],
+      "anchor": [
+        8,
+        8
+      ],
+      "cell": [
+        48,
+        0,
+        16,
+        16
+      ],
+      "outputSha256": "72f437dbbf6cbe469b65cc1a1e71f370436a6ac2ed4670758c6e95ee4216f1ad"
+    },
+    {
+      "id": "pipe-junction",
+      "role": "pipe-junction",
+      "request": "refinery-basalt-floor-v1",
+      "selectedIndex": 6,
+      "assetId": "b0bb53f0-901e-4257-9151-e1b5cf1c6400",
+      "source": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/06.png",
+      "sourceSha256": "1525c9e57c5eaaf18b8a169982454e7cf9d3e8a03a2e9fabbce9b188541cd964",
+      "requestManifest": "art/source/sprite-fusion/requests/refinery-basalt-floor-v1.json",
+      "requestManifestSha256": "27204f9a2f5310c22d15d8de3f313d03c7b0f1d66b5162f57489722a1e758b61",
+      "requestSpec": "art/source/sprite-fusion/specs/refinery-basalt-floor-v1.json",
+      "requestSpecSha256": "c81bba21fa696e018a318e47cd3ee4fc730e81db9aca6e4228678ac2b9955e8d",
+      "sourceSize": [
+        21,
+        21
+      ],
+      "sourceBounds": [
+        1,
+        0,
+        19,
+        20
+      ],
+      "normalizedBounds": [
+        1,
+        0,
+        15,
+        15
+      ],
+      "anchor": [
+        8,
+        8
+      ],
+      "cell": [
+        64,
+        0,
+        16,
+        16
+      ],
+      "outputSha256": "33b939501a98f43ce94a50582c6a52fdf360424ea16e80f8de097ae1136a39ed"
+    },
+    {
+      "id": "pipe-run",
+      "role": "pipe-run",
+      "request": "refinery-basalt-floor-v1",
+      "selectedIndex": 8,
+      "assetId": "c100cb97-c9fe-4a08-86d1-1203a7b48a94",
+      "source": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/08.png",
+      "sourceSha256": "d98fa033b3df1914b52083d0ee7d32e7016a55375460a1c47aacca61d396a136",
+      "requestManifest": "art/source/sprite-fusion/requests/refinery-basalt-floor-v1.json",
+      "requestManifestSha256": "27204f9a2f5310c22d15d8de3f313d03c7b0f1d66b5162f57489722a1e758b61",
+      "requestSpec": "art/source/sprite-fusion/specs/refinery-basalt-floor-v1.json",
+      "requestSpecSha256": "c81bba21fa696e018a318e47cd3ee4fc730e81db9aca6e4228678ac2b9955e8d",
+      "sourceSize": [
+        23,
+        23
+      ],
+      "sourceBounds": [
+        1,
+        0,
+        21,
+        22
+      ],
+      "normalizedBounds": [
+        1,
+        0,
+        15,
+        15
+      ],
+      "anchor": [
+        8,
+        8
+      ],
+      "cell": [
+        80,
+        0,
+        16,
+        16
+      ],
+      "outputSha256": "e4a6a41217b0a01337d9627feab56e1e5766aa6b3651a9ce6e53f814f85bc617"
+    }
+  ]
+}

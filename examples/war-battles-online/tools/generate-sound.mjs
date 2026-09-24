@@ -67,30 +67,49 @@ const hitNoise = seededNoise(0x48_17_aa);
 const explosionNoise = seededNoise(0xe7_10_de);
 
 const cues = new Map([
-  ["fire.wav", tone(0.11, (time, duration) => {
-    const frequency = 240 - time * 1_450;
-    const body = square(time * frequency * Math.PI * 2) * 0.55;
-    return (body + fireNoise() * 0.28) * envelope(time, duration, 0.002, 0.055);
-  })],
-  ["hit.wav", tone(0.08, (time, duration) => {
-    const ring = Math.sin(time * 880 * Math.PI * 2) * 0.35;
-    return (hitNoise() * 0.72 + ring) * envelope(time, duration, 0.001, 0.06);
-  })],
-  ["explosion.wav", tone(0.38, (time, duration) => {
-    const rumble = Math.sin(time * (72 - time * 55) * Math.PI * 2) * 0.62;
-    const grit = explosionNoise() * (0.55 - time * 0.9);
-    return (rumble + grit) * envelope(time, duration, 0.003, 0.22);
-  })],
-  ["pickup.wav", tone(0.2, (time, duration) => {
-    const frequency = time < 0.065 ? 523.25 : time < 0.13 ? 659.25 : 783.99;
-    return square(time * frequency * Math.PI * 2) * 0.42 * envelope(time, duration, 0.002, 0.04);
-  })],
-  ["round.wav", tone(0.32, (time, duration) => {
-    const step = Math.min(3, Math.floor(time / 0.08));
-    const frequency = [261.63, 329.63, 392, 523.25][step];
-    return square(time * frequency * Math.PI * 2) * 0.38 * envelope(time % 0.08, 0.08, 0.002, 0.025)
-      * envelope(time, duration, 0.002, 0.04);
-  })],
+  [
+    "fire.wav",
+    tone(0.11, (time, duration) => {
+      const frequency = 240 - time * 1_450;
+      const body = square(time * frequency * Math.PI * 2) * 0.55;
+      return (body + fireNoise() * 0.28) * envelope(time, duration, 0.002, 0.055);
+    }),
+  ],
+  [
+    "hit.wav",
+    tone(0.08, (time, duration) => {
+      const ring = Math.sin(time * 880 * Math.PI * 2) * 0.35;
+      return (hitNoise() * 0.72 + ring) * envelope(time, duration, 0.001, 0.06);
+    }),
+  ],
+  [
+    "explosion.wav",
+    tone(0.38, (time, duration) => {
+      const rumble = Math.sin(time * (72 - time * 55) * Math.PI * 2) * 0.62;
+      const grit = explosionNoise() * (0.55 - time * 0.9);
+      return (rumble + grit) * envelope(time, duration, 0.003, 0.22);
+    }),
+  ],
+  [
+    "pickup.wav",
+    tone(0.2, (time, duration) => {
+      const frequency = time < 0.065 ? 523.25 : time < 0.13 ? 659.25 : 783.99;
+      return square(time * frequency * Math.PI * 2) * 0.42 * envelope(time, duration, 0.002, 0.04);
+    }),
+  ],
+  [
+    "round.wav",
+    tone(0.32, (time, duration) => {
+      const step = Math.min(3, Math.floor(time / 0.08));
+      const frequency = [261.63, 329.63, 392, 523.25][step];
+      return (
+        square(time * frequency * Math.PI * 2) *
+        0.38 *
+        envelope(time % 0.08, 0.08, 0.002, 0.025) *
+        envelope(time, duration, 0.002, 0.04)
+      );
+    }),
+  ],
 ]);
 
 await mkdir(outputDirectory, { recursive: true });

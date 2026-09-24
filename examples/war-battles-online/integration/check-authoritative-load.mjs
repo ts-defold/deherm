@@ -14,12 +14,11 @@ import {
 } from "./authoritative-load-evidence.mjs";
 
 const exampleRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
-const repositoryRoot = resolve(exampleRoot, "../..");
 const evidencePath = resolve(exampleRoot, "evidence/authoritative-load-32.json");
 
 const sourceInputs = await buildAuthoritativeLoadSourceInputs();
 const generated = {
-  ...await runAuthoritativeLoadHarness(),
+  ...(await runAuthoritativeLoadHarness()),
   owner: AUTHORITATIVE_LOAD_OWNER,
   generator: AUTHORITATIVE_LOAD_OWNER,
   sourceInputs,

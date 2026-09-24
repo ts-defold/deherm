@@ -18,10 +18,13 @@ test("runtime measurement evidence is source-bound and owner-checkable", async (
   const sourceInputs = await buildRuntimeMeasurementSourceInputs();
   const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
   assertRuntimeMeasurementEvidence(evidence, { sourceInputs });
-  assert.match(execFileSync(process.execPath, [gatePath, "--check-evidence"], {
-    cwd: repositoryRoot,
-    encoding: "utf8",
-  }), /war-battles-runtime-measurement-evidence:fresh:/u);
+  assert.match(
+    execFileSync(process.execPath, [gatePath, "--check-evidence"], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    }),
+    /war-battles-runtime-measurement-evidence:fresh:/u,
+  );
 });
 
 test("runtime observations do not promote memory snapshots to allocation claims", async () => {

@@ -5,6 +5,18 @@ animations {
   }
 }
 animations {
+  id: "war-battles-title"
+  images {
+    image: "/assets/ui/title-screen/title.png"
+  }
+}
+animations {
+  id: "deploy-button"
+  images {
+    image: "/assets/ui/title-screen/title-button.png"
+  }
+}
+animations {
   id: "hud-panel"
   images {
     image: "/assets/ui/hud-panel.png"

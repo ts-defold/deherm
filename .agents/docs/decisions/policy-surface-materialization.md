@@ -271,7 +271,7 @@ all 12 so migration debt cannot change silently. A second pass requires zero
 writes, proving keyed idempotence. The materializer invokes no parser and reads
 no Defold checkout. The same test requires all 118 revision outputs (1,723,658
 bytes) to match the source pipeline byte for byte: 12 package-rendered files
-(5,372 bytes) and 106 authenticated snapshots (1,718,286 bytes).
+(5,372 bytes) and 106 authenticated snapshots (1,720,303 bytes).
 
 The `<5 MB` compiler-object budget is enforced; the current manifest is 67,380
 bytes. This is a structural transfer boundary, not yet a total-size victory.

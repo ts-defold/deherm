@@ -35,17 +35,17 @@ deno run --unstable-net --allow-net --allow-read \
 
 or, from this package, `pnpm serve`.
 
-| Flag | Meaning |
-| --- | --- |
-| `--hostname`, `--port` | QUIC bind address; default `0.0.0.0:4433` |
-| `--health-port` | Plain HTTP liveness/readiness port; default `8080` |
-| `--cert`, `--key` | PEM paths; default `server/certs/localhost.{crt,key}` |
-| `--roster` | Total tanks, humans plus bots. Default 8, maximum 32 |
-| `--bot-skill` | 0 recruit, 1 regular, 2 veteran, 3 nightmare |
-| `--snapshot-interval` | Ticks between authoritative snapshots; 3 is 20 Hz |
-| `--teams` | Two teams instead of a free-for-all |
-| `--world-checkpoint` | Fixed authoritative state file; also `WAR_BATTLES_WORLD_CHECKPOINT` |
-| `--world-checkpoint-interval` | Ticks between control-plane world writes; default 60 |
+| Flag                          | Meaning                                                             |
+| ----------------------------- | ------------------------------------------------------------------- |
+| `--hostname`, `--port`        | QUIC bind address; default `0.0.0.0:4433`                           |
+| `--health-port`               | Plain HTTP liveness/readiness port; default `8080`                  |
+| `--cert`, `--key`             | PEM paths; default `server/certs/localhost.{crt,key}`               |
+| `--roster`                    | Total tanks, humans plus bots. Default 8, maximum 32                |
+| `--bot-skill`                 | 0 recruit, 1 regular, 2 veteran, 3 nightmare                        |
+| `--snapshot-interval`         | Ticks between authoritative snapshots; 3 is 20 Hz                   |
+| `--teams`                     | Two teams instead of a free-for-all                                 |
+| `--world-checkpoint`          | Fixed authoritative state file; also `WAR_BATTLES_WORLD_CHECKPOINT` |
+| `--world-checkpoint-interval` | Ticks between control-plane world writes; default 60                |
 
 It prints its listening address, the certificate digest and the roster, then one
 line per session join and leave.
@@ -156,15 +156,15 @@ dropped rather than queued when backpressured, and never silently promoted into
 the reliable lane. Everything else crosses inside a four-byte reliable envelope
 whose kind fixes the lane it is allowed on:
 
-| Kind | Lane | Direction | Bytes |
-| --- | --- | --- | --- |
-| `hello` | session | client → server | 68 |
-| `welcome` | session | server → client | 61 |
-| `welcome-ack` | session | client → server | 44 |
-| `reject` | session | server → client | ≤ 102 |
-| `ping` / `pong` | session | both | 12 |
-| `control` | control | client → server | 8 |
-| `snapshot` | snapshot | server → client | 17,776 keyframe; compact delta after join |
+| Kind            | Lane     | Direction       | Bytes                                     |
+| --------------- | -------- | --------------- | ----------------------------------------- |
+| `hello`         | session  | client → server | 68                                        |
+| `welcome`       | session  | server → client | 61                                        |
+| `welcome-ack`   | session  | client → server | 44                                        |
+| `reject`        | session  | server → client | ≤ 102                                     |
+| `ping` / `pong` | session  | both            | 12                                        |
+| `control`       | control  | client → server | 8                                         |
+| `snapshot`      | snapshot | server → client | 17,776 keyframe; compact delta after join |
 
 `PROTOCOL_VERSION` is 8: snapshots carry the authoritative command-beacon
 state, while hello/welcome frames carry 40-byte authenticated

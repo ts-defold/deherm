@@ -41,7 +41,7 @@ interface CheckpointWrite {
 
 export function encodeWorldCheckpoint(world: BattleWorld, context: WorldCheckpointContext): Uint8Array {
   validateContext(context);
-  if (world.matchId !== (context.matchId >>> 0) || world.mapSeed !== (context.mapSeed >>> 0)) {
+  if (world.matchId !== context.matchId >>> 0 || world.mapSeed !== context.mapSeed >>> 0) {
     throw checkpoint("identity", "world checkpoint context does not match the world");
   }
   const bytes = new Uint8Array(WORLD_CHECKPOINT_BYTES);
@@ -64,17 +64,24 @@ export function encodeWorldCheckpoint(world: BattleWorld, context: WorldCheckpoi
 
 export function decodeWorldCheckpoint(world: BattleWorld, bytes: Uint8Array, context: WorldCheckpointContext): void {
   validateContext(context);
-  if (bytes.byteLength !== WORLD_CHECKPOINT_BYTES) throw checkpoint("length", "world checkpoint has an unexpected length");
+  if (bytes.byteLength !== WORLD_CHECKPOINT_BYTES)
+    throw checkpoint("length", "world checkpoint has an unexpected length");
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   if (view.getUint32(0, true) !== WORLD_CHECKPOINT_MAGIC) throw checkpoint("magic", "world checkpoint magic mismatch");
-  if (view.getUint16(4, true) !== WORLD_CHECKPOINT_VERSION) throw checkpoint("version", "unsupported world checkpoint version");
-  if (view.getUint16(6, true) !== WORLD_CHECKPOINT_HEADER_BYTES || view.getUint32(8, true) !== SNAPSHOT_BYTES) throw checkpoint("layout", "world checkpoint layout is not canonical");
-  if (view.getUint16(26, true) !== 0 || view.getUint32(28, true) !== 0) throw checkpoint("reserved", "world checkpoint reserved fields are nonzero");
-  if (view.getUint32(12, true) !== world.matchId) throw checkpoint("match", "world checkpoint belongs to another match");
-  if (view.getUint32(16, true) !== world.mapSeed) throw checkpoint("arena", "world checkpoint belongs to another arena");
+  if (view.getUint16(4, true) !== WORLD_CHECKPOINT_VERSION)
+    throw checkpoint("version", "unsupported world checkpoint version");
+  if (view.getUint16(6, true) !== WORLD_CHECKPOINT_HEADER_BYTES || view.getUint32(8, true) !== SNAPSHOT_BYTES)
+    throw checkpoint("layout", "world checkpoint layout is not canonical");
+  if (view.getUint16(26, true) !== 0 || view.getUint32(28, true) !== 0)
+    throw checkpoint("reserved", "world checkpoint reserved fields are nonzero");
+  if (view.getUint32(12, true) !== world.matchId)
+    throw checkpoint("match", "world checkpoint belongs to another match");
+  if (view.getUint32(16, true) !== world.mapSeed)
+    throw checkpoint("arena", "world checkpoint belongs to another arena");
   if (view.getUint8(24) !== context.rosterSize) throw checkpoint("roster", "world checkpoint roster size differs");
   if (view.getUint8(25) !== (context.teams ? 1 : 0)) throw checkpoint("teams", "world checkpoint team mode differs");
-  if (view.getUint32(WORLD_CHECKPOINT_BYTES - 4, true) !== crc32(bytes.subarray(0, WORLD_CHECKPOINT_BYTES - 4))) throw checkpoint("checksum", "world checkpoint checksum mismatch");
+  if (view.getUint32(WORLD_CHECKPOINT_BYTES - 4, true) !== crc32(bytes.subarray(0, WORLD_CHECKPOINT_BYTES - 4)))
+    throw checkpoint("checksum", "world checkpoint checksum mismatch");
   const checkpointTick = view.getUint32(20, true);
   try {
     world.restoreSnapshot(bytes, WORLD_CHECKPOINT_HEADER_BYTES);
@@ -95,7 +102,9 @@ export class DurableWorldCheckpoint {
     this.context = context;
     validateContext(context);
   }
-  get isHealthy(): boolean { return this.healthy; }
+  get isHealthy(): boolean {
+    return this.healthy;
+  }
 
   async restore(world: BattleWorld): Promise<boolean> {
     try {
@@ -152,7 +161,9 @@ function checkpointWrite(bytes: Uint8Array): CheckpointWrite {
 
 export class MemoryWorldCheckpointStorage implements WorldCheckpointStorage {
   private bytes?: Uint8Array;
-  async read(): Promise<Uint8Array | undefined> { return this.bytes === undefined ? undefined : new Uint8Array(this.bytes); }
+  async read(): Promise<Uint8Array | undefined> {
+    return this.bytes === undefined ? undefined : new Uint8Array(this.bytes);
+  }
   async write(bytes: Uint8Array): Promise<void> {
     if (bytes.byteLength !== WORLD_CHECKPOINT_BYTES) throw new RangeError("world checkpoint exceeds fixed capacity");
     this.bytes = new Uint8Array(bytes);
@@ -164,8 +175,11 @@ function checkpoint(code: string, message: string): WorldCheckpointError {
 }
 
 function validateContext(context: WorldCheckpointContext): void {
-  if (!Number.isInteger(context.matchId) || context.matchId < 0 || context.matchId > 0xffff_ffff) throw checkpoint("context", "checkpoint match id is invalid");
-  if (!Number.isInteger(context.mapSeed) || context.mapSeed < 0 || context.mapSeed > 0xffff_ffff) throw checkpoint("context", "checkpoint arena seed is invalid");
-  if (!Number.isInteger(context.rosterSize) || context.rosterSize < 1 || context.rosterSize > 32) throw checkpoint("context", "checkpoint roster size is invalid");
+  if (!Number.isInteger(context.matchId) || context.matchId < 0 || context.matchId > 0xffff_ffff)
+    throw checkpoint("context", "checkpoint match id is invalid");
+  if (!Number.isInteger(context.mapSeed) || context.mapSeed < 0 || context.mapSeed > 0xffff_ffff)
+    throw checkpoint("context", "checkpoint arena seed is invalid");
+  if (!Number.isInteger(context.rosterSize) || context.rosterSize < 1 || context.rosterSize > 32)
+    throw checkpoint("context", "checkpoint roster size is invalid");
   if (typeof context.teams !== "boolean") throw checkpoint("context", "checkpoint team mode is invalid");
 }

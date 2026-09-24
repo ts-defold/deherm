@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "portrait": {
+    "baseRequest": "driver-portrait-base-v1",
+    "selectedIndex": 3,
+    "assetId": "2c537204-68a9-47a8-a8b4-8d05335e912d",
+    "source": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+    "reason": "Closest match to the original goggled driver, clear three-quarter silhouette, transparent edges, and enough facial room for portrait animation."
+  },
+  "runtimePlan": {
+    "nativeSize": [64, 64],
+    "atlasCellSize": [68, 68],
+    "padding": 2,
+    "anchor": [32, 62],
+    "sampling": "nearest",
+    "animations": ["radio-idle", "angry", "hurt", "victory"]
+  },
+  "world": {
+    "pickupPedestal": {
+      "request": "refinery-pickup-pedestal-v1",
+      "selectedIndex": 0,
+      "assetId": "5822426e-2bc2-4d35-b90a-fd311cb3843c",
+      "source": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/00.png",
+      "alternateIndices": [5, 7],
+      "disposition": "approved-source",
+      "reason": "The simplest compact pad has the clearest empty center for deterministic item-icon overlays. More detailed alternatives remain available for depots and rare pickups."
+    },
+    "industrialHazards": {
+      "request": "refinery-basalt-floor-v1",
+      "selectedIndices": [1, 3, 4, 6, 8],
+      "roles": ["thermal-vent", "lava-fissure", "floor-vent", "pipe-junction", "pipe-run"],
+      "disposition": "approved-source-reclassified",
+      "reason": "The request did not produce seamless opaque terrain. It did produce coherent transparent refinery hazards and pipe props, so those outputs are retained only for those roles."
+    },
+    "basaltTerrain": {
+      "request": "refinery-basalt-floor-v1",
+      "disposition": "rejected-for-role",
+      "reason": "None of the outputs is a seamless, opaque, edge-matched floor tile. The Tilemap Editor autotile workflow must own terrain-edge grammar instead."
+    }
+  },
+  "toolingPolicy": {
+    "spriteFusionApi": ["terrain-candidates", "pickups", "depots", "cover", "hazards", "objectives", "items"],
+    "defoldAndLocalGenerators": [
+      "tileset-layout",
+      "autotile-rules",
+      "weighted-variants",
+      "collision-layers",
+      "tilemap",
+      "tilesource"
+    ],
+    "animation": ["drivers", "ejected-infantry", "tank-motion", "effects"],
+    "localGenerators": ["role-metadata", "palette-variants", "atlas-packing", "map-seeds", "freshness-checks"]
+  }
+}

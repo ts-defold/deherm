@@ -10,8 +10,7 @@ import { buildBotReplay, readReplayHeader } from "./replay.ts";
 const headlessRoot = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const repositoryRoot = resolve(headlessRoot, "../..");
 
-export const HEADLESS_SOAK_OWNER =
-  "examples/war-battles-online/headless/record-soak.mjs";
+export const HEADLESS_SOAK_OWNER = "examples/war-battles-online/headless/record-soak.mjs";
 export const HEADLESS_SOAK_CONFIG = Object.freeze({
   players: 32,
   ticks: 36_000,
@@ -59,13 +58,23 @@ async function hashTree(repositoryPath) {
     }
     if (metadata.isSymbolicLink()) {
       const target = Buffer.from(await readlink(absolute));
-      files.push({ path: local, kind: "symlink", bytes: target.byteLength, sha256: createHash("sha256").update(target).digest("hex") });
+      files.push({
+        path: local,
+        kind: "symlink",
+        bytes: target.byteLength,
+        sha256: createHash("sha256").update(target).digest("hex"),
+      });
       bytes += target.byteLength;
       return;
     }
     assert.equal(metadata.isFile(), true, `unsupported headless soak input: ${absolute}`);
     const contents = await readFile(absolute);
-    files.push({ path: local, kind: "file", bytes: contents.byteLength, sha256: createHash("sha256").update(contents).digest("hex") });
+    files.push({
+      path: local,
+      kind: "file",
+      bytes: contents.byteLength,
+      sha256: createHash("sha256").update(contents).digest("hex"),
+    });
     bytes += contents.byteLength;
   }
   await visit(root, "");
@@ -79,8 +88,11 @@ async function hashTree(repositoryPath) {
 }
 
 export async function buildHeadlessSoakSourceInputs() {
-  return Promise.all(HEADLESS_SOAK_SOURCE_PATHS.map((path) =>
-    path === "examples/war-battles-online/core" ? hashTree(path) : hashFile(path)));
+  return Promise.all(
+    HEADLESS_SOAK_SOURCE_PATHS.map((path) =>
+      path === "examples/war-battles-online/core" ? hashTree(path) : hashFile(path),
+    ),
+  );
 }
 
 export function digestHeadlessSoakSourceInputs(sourceInputs) {
@@ -104,7 +116,8 @@ export function buildHeadlessSoakEvidence({ sourceInputs, sourceKey } = {}) {
     generator: HEADLESS_SOAK_OWNER,
     kind: "war-battles.headless-soak",
     scope: "In-process deterministic simulation; no network, engine, renderer, or VM allocation profiling",
-    fixture: "Recorded match: the real BotController drives all 32 tanks, and the replay is the input stream it produced",
+    fixture:
+      "Recorded match: the real BotController drives all 32 tanks, and the replay is the input stream it produced",
     players: header.players,
     ticks: header.ticks,
     tickRate: 60,
@@ -121,7 +134,8 @@ export function buildHeadlessSoakEvidence({ sourceInputs, sourceKey } = {}) {
     rollbackMatchesUninterrupted: true,
     ...(sourceInputs === undefined ? {} : { sourceInputs }),
     ...(sourceKey === undefined ? {} : { sourceKey }),
-    evidenceBoundary: "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence.",
+    evidenceBoundary:
+      "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence.",
   };
   assertHeadlessSoakEvidence(report, { sourceInputs });
   return report;

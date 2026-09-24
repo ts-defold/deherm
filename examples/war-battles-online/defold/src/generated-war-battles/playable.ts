@@ -93,7 +93,7 @@ export class PlayableBattle {
 
   constructor(options: PlayableOptions = {}) {
     this.playerCount = clamp(Math.trunc(options.players ?? 8), 2, MAX_PLAYERS);
-    this.botSkill = clamp(Math.trunc(options.botSkill ?? 2), 0, 3);
+    this.botSkill = clamp(Math.trunc(options.botSkill ?? 1), 0, 3);
     this.teams = options.teams ?? false;
     this.fragLimit = Math.max(1, Math.trunc(options.fragLimit ?? DEFAULT_FRAG_LIMIT));
     this.mapSeed = (options.mapSeed ?? DEFAULT_ARENA_SEED) >>> 0;
@@ -267,7 +267,7 @@ export function visibleAt(point: Readonly<ScreenPoint>, width: number, height: n
 }
 
 export function aimDegrees(x: number, y: number): number {
-  return Math.atan2(y, x) * 180 / Math.PI;
+  return (Math.atan2(y, x) * 180) / Math.PI;
 }
 
 /** The arena's long edge, in simulation units. */

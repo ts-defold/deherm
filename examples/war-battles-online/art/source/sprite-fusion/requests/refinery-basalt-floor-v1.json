@@ -1,0 +1,141 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_a03fafda-0811-425e-b600-aae8196880e6",
+  "operation": "style-reference",
+  "prompt": "One seamless 16x16 top-down terrain tile for a volcanic industrial tank arena. Dark charcoal basalt slabs with restrained cracks, tiny rust mineral flecks, and subtle soot; the north/south and east/west edge pixels must match for perfect repetition. Limited 16-color palette, hard one-pixel clusters, high gameplay readability, no object, wall, border, icon, lettering, UI, perspective, antialiasing, gradient, glow, or transparent pixels. Match the supplied War Battles pixel density but replace grass with cohesive basalt refinery ground.",
+  "size": 16,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/arena-tiles.png",
+      "bytes": 1225,
+      "sha256": "d9a9d6aefbce7ae1fd98cfaf2388678595919c6750f7db6d32b642ebee079222"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/title-screen/background.png",
+      "bytes": 13506,
+      "sha256": "c9cdd49acd276ef29f8bab59ea73794886678af4c9cbfd76972515385ed46b42"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/refinery-basalt-floor-v1.json",
+    "sha256": "c81bba21fa696e018a318e47cd3ee4fc730e81db9aca6e4228678ac2b9955e8d"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "ce304237-8b15-4bce-94fe-a3702ffb6565",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 21,
+      "height": 21,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ce304237-8b15-4bce-94fe-a3702ffb6565/image.png?v=1790269999825",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/00.png",
+      "bytes": 1084,
+      "sha256": "bbba84196456f54ef70bc5f2bf5b9f1a00c131c710596efd0daa8477d8e489e5"
+    },
+    {
+      "index": 1,
+      "assetId": "ff0ffaf3-f92e-46a6-b45a-1499b87697f7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 21,
+      "height": 21,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ff0ffaf3-f92e-46a6-b45a-1499b87697f7/image.png?v=1790270000546",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/01.png",
+      "bytes": 1084,
+      "sha256": "ae0a7e5f5c3d423a4e395d3387b898eb46d8615085ae496bd61a35cddf7843c7"
+    },
+    {
+      "index": 2,
+      "assetId": "30c23c14-3ffb-4578-8876-883402b66a8f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 22,
+      "height": 22,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/30c23c14-3ffb-4578-8876-883402b66a8f/image.png?v=1790270001335",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/02.png",
+      "bytes": 1304,
+      "sha256": "6e5e36b618d28e36f2c747f876abb00060d8751d8d63080f5c16acd481fbc7c1"
+    },
+    {
+      "index": 3,
+      "assetId": "e2cfc42b-1bb8-45d7-8a57-2232291991f7",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 22,
+      "height": 22,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e2cfc42b-1bb8-45d7-8a57-2232291991f7/image.png?v=1790270002085",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/03.png",
+      "bytes": 1268,
+      "sha256": "6dc2be811a28f19d04c4610abd9f648e9a558ef63aee5dcd518c93127a922921"
+    },
+    {
+      "index": 4,
+      "assetId": "a5f234b6-1460-4918-acac-def08d9f1c85",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 22,
+      "height": 22,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a5f234b6-1460-4918-acac-def08d9f1c85/image.png?v=1790270002929",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/04.png",
+      "bytes": 1179,
+      "sha256": "f8d6f0bfdf01165891102b3ec43f87296e1deffb86a772c656262680c6d3d1da"
+    },
+    {
+      "index": 5,
+      "assetId": "36d71655-3f39-4fe5-9eb6-aad89417b824",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 22,
+      "height": 22,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/36d71655-3f39-4fe5-9eb6-aad89417b824/image.png?v=1790270003668",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/05.png",
+      "bytes": 1118,
+      "sha256": "e2fe870ed3c86e685717b0b60619f111e50322d88551e7b16d3599a8ea4abb12"
+    },
+    {
+      "index": 6,
+      "assetId": "b0bb53f0-901e-4257-9151-e1b5cf1c6400",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 21,
+      "height": 21,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/b0bb53f0-901e-4257-9151-e1b5cf1c6400/image.png?v=1790270004330",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/06.png",
+      "bytes": 1164,
+      "sha256": "1525c9e57c5eaaf18b8a169982454e7cf9d3e8a03a2e9fabbce9b188541cd964"
+    },
+    {
+      "index": 7,
+      "assetId": "34e14db9-ed87-43e5-a794-bf64c3075b0b",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 23,
+      "height": 23,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/34e14db9-ed87-43e5-a794-bf64c3075b0b/image.png?v=1790270005093",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/07.png",
+      "bytes": 1121,
+      "sha256": "c44faf23d13f6b701a0ead306c10821b6ea9ddd033c90392a47b65fce515b21b"
+    },
+    {
+      "index": 8,
+      "assetId": "c100cb97-c9fe-4a08-86d1-1203a7b48a94",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 23,
+      "height": 23,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/c100cb97-c9fe-4a08-86d1-1203a7b48a94/image.png?v=1790270005923",
+      "path": "art/source/sprite-fusion/outputs/refinery-basalt-floor-v1/08.png",
+      "bytes": 1385,
+      "sha256": "d98fa033b3df1914b52083d0ee7d32e7016a55375460a1c47aacca61d396a136"
+    }
+  ],
+  "credits": {
+    "remaining": 3255
+  }
+}

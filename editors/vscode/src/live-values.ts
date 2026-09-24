@@ -27,6 +27,10 @@ export interface LiveValueHint {
   readonly tooltip: string;
 }
 
+export interface PropertyDefaultHint extends LiveValueHint {
+  readonly line: number;
+}
+
 export interface PropertyDeclarationAnchor {
   readonly propertyName: string;
   readonly line: number;
@@ -99,31 +103,47 @@ function loopbackStateUrl(value: unknown): string | undefined {
   } catch {
     return undefined;
   }
-  if (parsed.protocol !== "http:" ||
-      !["127.0.0.1", "localhost", "[::1]"].includes(parsed.hostname) ||
-      parsed.pathname !== "/deherm/dev/v1/snapshot" || parsed.search || parsed.hash ||
-      parsed.username || parsed.password) return undefined;
+  if (
+    parsed.protocol !== "http:" ||
+    !["127.0.0.1", "localhost", "[::1]"].includes(parsed.hostname) ||
+    parsed.pathname !== "/deherm/dev/v1/snapshot" ||
+    parsed.search ||
+    parsed.hash ||
+    parsed.username ||
+    parsed.password
+  )
+    return undefined;
   return parsed.href;
 }
 
-export function parseInspectorStateDescriptor(value: unknown, projectRoot: string): InspectorStateDescriptor | undefined {
-  if (!object(value) || value.schemaVersion !== 1 || value.kind !== "deherm-inspector-session" ||
-      typeof value.sessionId !== "string" || typeof value.projectRoot !== "string" ||
-      path.resolve(value.projectRoot) !== path.resolve(projectRoot) ||
-      typeof value.authToken !== "string" || !/^[A-Za-z0-9_-]{43,}$/u.test(value.authToken)) return undefined;
+export function parseInspectorStateDescriptor(
+  value: unknown,
+  projectRoot: string,
+): InspectorStateDescriptor | undefined {
+  if (
+    !object(value) ||
+    value.schemaVersion !== 1 ||
+    value.kind !== "deherm-inspector-session" ||
+    typeof value.sessionId !== "string" ||
+    typeof value.projectRoot !== "string" ||
+    path.resolve(value.projectRoot) !== path.resolve(projectRoot) ||
+    typeof value.authToken !== "string" ||
+    !/^[A-Za-z0-9_-]{43,}$/u.test(value.authToken)
+  )
+    return undefined;
   const stateUrl = loopbackStateUrl(value.stateUrl);
   if (!stateUrl) return undefined;
   return {
     sessionId: value.sessionId,
     projectRoot: path.resolve(value.projectRoot),
     stateUrl,
-    authToken: value.authToken
+    authToken: value.authToken,
   };
 }
 
 export async function readInspectorStateDescriptor(
   projectRoot: string,
-  readText: (file: string) => Promise<string> = (file) => readFile(file, "utf8")
+  readText: (file: string) => Promise<string> = (file) => readFile(file, "utf8"),
 ): Promise<InspectorStateDescriptor | undefined> {
   try {
     const parsed: unknown = JSON.parse(await readText(path.join(projectRoot, inspectorDescriptorRelativePath)));
@@ -134,8 +154,15 @@ export async function readInspectorStateDescriptor(
 }
 
 function parseDevState(value: unknown): DevState | undefined {
-  if (!object(value) || value.schemaVersion !== 1 || value.kind !== "deherm-dev-state" ||
-      !Number.isSafeInteger(value.modelVersion) || Number(value.modelVersion) < 0 || !Array.isArray(value.targets)) return undefined;
+  if (
+    !object(value) ||
+    value.schemaVersion !== 1 ||
+    value.kind !== "deherm-dev-state" ||
+    !Number.isSafeInteger(value.modelVersion) ||
+    Number(value.modelVersion) < 0 ||
+    !Array.isArray(value.targets)
+  )
+    return undefined;
   return value as unknown as DevState;
 }
 
@@ -143,7 +170,7 @@ export async function pollInspectorState({
   descriptor,
   etag,
   fetchState = globalThis.fetch,
-  signal
+  signal,
 }: {
   descriptor: InspectorStateDescriptor;
   etag?: string;
@@ -154,11 +181,11 @@ export async function pollInspectorState({
     method: "GET",
     headers: {
       authorization: `Bearer ${descriptor.authToken}`,
-      ...(etag ? { "if-none-match": etag } : {})
+      ...(etag ? { "if-none-match": etag } : {}),
     },
     cache: "no-store",
     redirect: "error",
-    signal
+    signal,
   });
   const nextEtag = response.headers.get("etag") ?? undefined;
   if (response.status === 304) return { kind: "unchanged", etag: nextEtag ?? etag };
@@ -197,28 +224,35 @@ function finiteNumber(value: unknown): string | undefined {
 export function formatSnapshotValue(value: SnapshotValue | undefined): string {
   if (!value || typeof value.kind !== "string") return "unavailable";
   switch (value.kind) {
-    case "nil": return "nil";
-    case "boolean": return typeof value.value === "boolean" ? String(value.value) : "unavailable";
-    case "number": return finiteNumber(value.value) ?? "unavailable";
+    case "nil":
+      return "nil";
+    case "boolean":
+      return typeof value.value === "boolean" ? String(value.value) : "unavailable";
+    case "number":
+      return finiteNumber(value.value) ?? "unavailable";
     case "string": {
       if (typeof value.value !== "string") return "unavailable";
       const compact = value.value.replaceAll("\r", "\\r").replaceAll("\n", "\\n");
       const clipped = compact.length > 48 ? `${compact.slice(0, 47)}…` : compact;
       return JSON.stringify(clipped);
     }
-    case "hash": return typeof value.value === "string" ? `#${value.value}` : "unavailable";
+    case "hash":
+      return typeof value.value === "string" ? `#${value.value}` : "unavailable";
     case "vector3":
     case "vector4":
     case "quaternion": {
-      if (!Array.isArray(value.value) || value.value.some((lane) => finiteNumber(lane) === undefined)) return "unavailable";
+      if (!Array.isArray(value.value) || value.value.some((lane) => finiteNumber(lane) === undefined))
+        return "unavailable";
       return `(${value.value.map(String).join(", ")})`;
     }
     case "url": {
       const lanes = [value.socket, value.reserved, value.path, value.fragment];
       return lanes.every((lane) => typeof lane === "string") ? `url(${lanes.join(":")})` : "unavailable";
     }
-    case "unavailable": return typeof value.reason === "string" ? `‹${value.reason}›` : "unavailable";
-    default: return "unavailable";
+    case "unavailable":
+      return typeof value.reason === "string" ? `‹${value.reason}›` : "unavailable";
+    default:
+      return "unavailable";
   }
 }
 
@@ -229,14 +263,18 @@ function instanceIdentity(instance: EnrichedInstance): string {
 }
 
 function label(value: unknown, maximum = 48): string {
-  const singleLine = String(value).replace(/[\u0000-\u001f\u007f]/gu, "�");
+  const singleLine = String(value).replace(/\p{Cc}/gu, "�");
   return singleLine.length > maximum ? `${singleLine.slice(0, maximum - 1)}…` : singleLine;
 }
 
 function instanceTitle(targetId: string, instance: EnrichedInstance): string {
   const properties = Array.isArray(instance.properties) ? instance.properties : [];
-  const rendered = properties.slice(0, 3).map((property) =>
-    `${typeof property.name === "string" ? label(property.name, 32) : "?"}=${formatSnapshotValue(property.value)}`);
+  const rendered = properties
+    .slice(0, 3)
+    .map(
+      (property) =>
+        `${typeof property.name === "string" ? label(property.name, 32) : "?"}=${formatSnapshotValue(property.value)}`,
+    );
   if (properties.length > 3) rendered.push(`+${properties.length - 3}`);
   const componentId = label(instance.componentId);
   return `$(pulse) ${label(targetId)} · ${componentId}${instanceIdentity(instance)}${rendered.length ? ` · ${rendered.join(", ")}` : ""}`;
@@ -247,7 +285,7 @@ function liveInstances({
   projectRoot,
   documentPath,
   now,
-  maximumAgeMs
+  maximumAgeMs,
 }: {
   state: DevState | undefined;
   projectRoot: string;
@@ -258,17 +296,32 @@ function liveInstances({
   if (!state || !/\.(?:script|gui|render)\.ts$/u.test(documentPath)) return [];
   const matches: Array<{ targetId: string; instance: CurrentEnrichedInstance }> = [];
   for (const target of state.targets) {
-    if (typeof target.id !== "string" || target.status === "disconnected" ||
-        !Number.isSafeInteger(target.connectionEpoch) || !target.componentSnapshot) continue;
+    if (
+      typeof target.id !== "string" ||
+      target.status === "disconnected" ||
+      !Number.isSafeInteger(target.connectionEpoch) ||
+      !target.componentSnapshot
+    )
+      continue;
     const sampledAt = target.componentSnapshot.sampledAt;
-    if (typeof sampledAt !== "number" || !Number.isFinite(sampledAt) ||
-        sampledAt > now + maximumAgeMs || now - sampledAt > maximumAgeMs) continue;
+    if (
+      typeof sampledAt !== "number" ||
+      !Number.isFinite(sampledAt) ||
+      sampledAt > now + maximumAgeMs ||
+      now - sampledAt > maximumAgeMs
+    )
+      continue;
     const instances = Array.isArray(target.instances) ? target.instances : [];
     for (const instance of instances) {
       // Source ownership and schema status are server-enriched fields. Their
       // absence is not guessed from component ids or filenames here.
-      if (!instance || instance.schemaStatus !== "current" || typeof instance.componentId !== "string" ||
-          !sameSource(projectRoot, instance.source, documentPath)) continue;
+      if (
+        !instance ||
+        instance.schemaStatus !== "current" ||
+        typeof instance.componentId !== "string" ||
+        !sameSource(projectRoot, instance.source, documentPath)
+      )
+        continue;
       matches.push({ targetId: target.id, instance: instance as CurrentEnrichedInstance });
     }
   }
@@ -278,7 +331,7 @@ function liveInstances({
 /** Locate authored Defold property declarations without trusting runtime coordinates. */
 export function findPropertyDeclarationAnchors(
   sourceText: string,
-  propertyNames: ReadonlySet<string>
+  propertyNames: ReadonlySet<string>,
 ): PropertyDeclarationAnchor[] {
   let masked = "";
   let state: "code" | "line-comment" | "block-comment" | "single" | "double" | "template" = "code";
@@ -333,9 +386,12 @@ export function findPropertyDeclarationAnchors(
       escaped = true;
       continue;
     }
-    if ((state === "single" && current === "'") ||
-        (state === "double" && current === '"') ||
-        (state === "template" && current === "`")) state = "code";
+    if (
+      (state === "single" && current === "'") ||
+      (state === "double" && current === '"') ||
+      (state === "template" && current === "`")
+    )
+      state = "code";
   }
 
   const anchors: PropertyDeclarationAnchor[] = [];
@@ -359,13 +415,107 @@ export function findPropertyDeclarationAnchors(
   return anchors;
 }
 
+function literalArguments(source: string): string[] | undefined {
+  const values: string[] = [];
+  let start = 0;
+  let quote: "'" | '"' | undefined;
+  let escaped = false;
+  for (let index = 0; index <= source.length; index += 1) {
+    const current = source[index];
+    if (quote) {
+      if (escaped) escaped = false;
+      else if (current === "\\") escaped = true;
+      else if (current === quote) quote = undefined;
+      continue;
+    }
+    if (current === "'" || current === '"') {
+      quote = current;
+      continue;
+    }
+    if (current === "," || index === source.length) {
+      values.push(source.slice(start, index).trim());
+      start = index + 1;
+    }
+  }
+  return quote ? undefined : values;
+}
+
+function stringLiteral(source: string): string | undefined {
+  if (source.length < 2) return undefined;
+  const quote = source[0];
+  if ((quote !== '"' && quote !== "'") || source.at(-1) !== quote) return undefined;
+  if (quote === '"') {
+    try {
+      const parsed: unknown = JSON.parse(source);
+      return typeof parsed === "string" ? parsed : undefined;
+    } catch {
+      return undefined;
+    }
+  }
+  const body = source.slice(1, -1);
+  if (/\\(?!['\\bfnrtv0])/u.test(body)) return undefined;
+  return body.replace(/\\'/gu, "'").replace(/\\\\/gu, "\\");
+}
+
+function numberLiteral(source: string): string | undefined {
+  if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/u.test(source)) return undefined;
+  const value = Number(source);
+  return Number.isFinite(value) ? String(value) : undefined;
+}
+
+function propertyDefaultLabel(kind: string, source: string): string | undefined {
+  const args = literalArguments(source);
+  if (!args) return undefined;
+  if (kind === "number" && args.length === 1) return numberLiteral(args[0]);
+  if (kind === "boolean" && args.length === 1 && /^(?:true|false)$/u.test(args[0])) return args[0];
+  if (kind === "string" && args.length === 1) {
+    const value = stringLiteral(args[0]);
+    return value === undefined ? undefined : JSON.stringify(value);
+  }
+  if ((kind === "hash" || kind === "url") && args.length === 1) {
+    const value = stringLiteral(args[0]);
+    return value === undefined ? undefined : kind === "hash" ? value : JSON.stringify(value);
+  }
+  const lanes = kind === "vector3" ? 3 : kind === "vector4" || kind === "quaternion" ? 4 : 0;
+  if (lanes && args.length === lanes) {
+    const numbers = args.map(numberLiteral);
+    if (numbers.every((value): value is string => value !== undefined)) return `(${numbers.join(", ")})`;
+  }
+  return undefined;
+}
+
+/**
+ * Project compile-time property defaults beside their declarations.
+ *
+ * Only literal factory calls are displayed. Dynamic expressions are left
+ * alone instead of being evaluated or guessed by the editor extension.
+ */
+export function propertyDefaultHints(sourceText: string): PropertyDefaultHint[] {
+  const hints: PropertyDefaultHint[] = [];
+  const declaration =
+    /^[\t ]*([A-Za-z_$][\w$]*)[\t ]*:[\t ]*property[\t ]*\.[\t ]*(number|boolean|string|hash|url|vector3|vector4|quaternion)[\t ]*\(([^)\r\n]*)\)/gmu;
+  for (const match of sourceText.matchAll(declaration)) {
+    if (match.index === undefined) continue;
+    const value = propertyDefaultLabel(match[2], match[3]);
+    if (value === undefined) continue;
+    const line = sourceText.slice(0, match.index).split("\n").length - 1;
+    hints.push({
+      propertyName: match[1],
+      line,
+      label: `= ${value}`,
+      tooltip: `Default value from property.${match[2]}(...)`,
+    });
+  }
+  return hints;
+}
+
 export function liveValueHints({
   state,
   projectRoot,
   documentPath,
   now = Date.now(),
   maximumAgeMs = liveValuesMaximumAgeMs,
-  maximumHints = 24
+  maximumHints = 24,
 }: {
   state: DevState | undefined;
   projectRoot: string;
@@ -391,12 +541,16 @@ export function liveValueHints({
         targetId: label(targetId),
         componentId: label(instance.componentId),
         identity,
-        value: formatSnapshotValue(property.value)
+        value: formatSnapshotValue(property.value),
       });
     }
   }
-  values.sort((left, right) => left.propertyName.localeCompare(right.propertyName) ||
-      left.targetId.localeCompare(right.targetId) || left.componentId.localeCompare(right.componentId));
+  values.sort(
+    (left, right) =>
+      left.propertyName.localeCompare(right.propertyName) ||
+      left.targetId.localeCompare(right.targetId) ||
+      left.componentId.localeCompare(right.componentId),
+  );
   const grouped = new Map<string, typeof values>();
   for (const value of values) {
     const group = grouped.get(value.propertyName) ?? [];
@@ -406,13 +560,17 @@ export function liveValueHints({
   return [...grouped.entries()].slice(0, Math.max(0, maximumHints)).map(([propertyName, entries]) => {
     const visible = entries.slice(0, 3).map((entry) => entry.value);
     if (entries.length > 3) visible.push(` · +${entries.length - 3}`);
-    const tooltipEntries = entries.slice(0, 16).map((entry) =>
-      `${entry.targetId} · ${entry.componentId}${entry.identity} · ${label(propertyName, 32)}=${entry.value}`);
+    const tooltipEntries = entries
+      .slice(0, 16)
+      .map(
+        (entry) =>
+          `${entry.targetId} · ${entry.componentId}${entry.identity} · ${label(propertyName, 32)}=${entry.value}`,
+      );
     if (entries.length > 16) tooltipEntries.push(`+${entries.length - 16} more live instances`);
     return {
       propertyName,
       label: `= ${visible.join(" · ")}`,
-      tooltip: tooltipEntries.join("\n")
+      tooltip: tooltipEntries.join("\n"),
     };
   });
 }
@@ -423,7 +581,7 @@ export function liveValueLenses({
   documentPath,
   now = Date.now(),
   maximumAgeMs = liveValuesMaximumAgeMs,
-  maximumLenses = 6
+  maximumLenses = 6,
 }: {
   state: DevState | undefined;
   projectRoot: string;
@@ -440,8 +598,8 @@ export function liveValueLenses({
       title: instanceTitle(targetId, instance),
       navigation: {
         projectRoot: path.resolve(projectRoot),
-        documentPath: path.resolve(documentPath)
-      }
+        documentPath: path.resolve(documentPath),
+      },
     });
   }
   return lenses

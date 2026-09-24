@@ -16,12 +16,25 @@ import {
   createInMemoryTransportPair,
   tickDeadline,
 } from "../core/index.ts";
-import { admitNewSession, configuredResumeKey, createSessionAdmissionGate, websocketOriginAllowed } from "../server/deno-main.ts";
+import {
+  admitNewSession,
+  configuredResumeKey,
+  createSessionAdmissionGate,
+  websocketOriginAllowed,
+} from "../server/deno-main.ts";
 
 async function settle() {
   for (let turn = 0; turn < 12; turn += 1) {
     await new Promise((resolve) => setImmediate(resolve));
   }
+}
+
+async function settleUntil(predicate, maximumTurns = 64) {
+  for (let turn = 0; turn < maximumTurns; turn += 1) {
+    if (predicate()) return true;
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+  return predicate();
 }
 
 test("session tokens are authenticated, scoped, expiring, and key-rotatable", async () => {
@@ -44,19 +57,28 @@ test("session tokens are authenticated, scoped, expiring, and key-rotatable", as
   assert.equal(await service.verify(forged, { matchId: 77, nowTick: 100, rosterSize: 8 }), null);
 
   const rotated = new SessionTokenService({
-    keys: [{ id: 8, secret: new Uint8Array(32).fill(0x52) }, { id: 7, secret: new Uint8Array(32).fill(0x41) }],
+    keys: [
+      { id: 8, secret: new Uint8Array(32).fill(0x52) },
+      { id: 7, secret: new Uint8Array(32).fill(0x41) },
+    ],
     activeKeyId: 8,
   });
   assert.deepEqual(await rotated.verify(token, { matchId: 77, nowTick: 100, rosterSize: 8 }), claims);
   const next = await rotated.issue({ ...claims, generation: 10 });
-  assert.deepEqual(await rotated.verify(next, { matchId: 77, nowTick: 100, rosterSize: 8 }), { ...claims, generation: 10 });
+  assert.deepEqual(await rotated.verify(next, { matchId: 77, nowTick: 100, rosterSize: 8 }), {
+    ...claims,
+    generation: 10,
+  });
 });
 
 test("credential expiry and ledger reservations remain ordered across uint32 wrap", async () => {
   const service = new SessionTokenService({ keys: [{ id: 1, secret: new Uint8Array(32).fill(0x55) }] });
   const token = await service.issue({
-    matchId: 77, slot: 0, generation: 1,
-    issuedAtTick: 0xffff_fffe, expiresAtTick: 1,
+    matchId: 77,
+    slot: 0,
+    generation: 1,
+    issuedAtTick: 0xffff_fffe,
+    expiresAtTick: 1,
   });
   assert.notEqual(await service.verify(token, { matchId: 77, nowTick: 0, rosterSize: 1 }), null);
   assert.notEqual(await service.verify(token, { matchId: 77, nowTick: 1, rosterSize: 1 }), null);
@@ -120,15 +142,21 @@ test("durable session state fails closed on corruption and foreign context", () 
   const bytes = ledger.encode(10);
   const corrupt = new Uint8Array(bytes);
   corrupt[35] ^= 0x80;
-  assert.throws(() => decodeSessionState(corrupt, { matchId: 77, rosterSize: 4 }), (error) => {
-    assert.ok(error instanceof SessionPersistenceError);
-    assert.equal(error.code, "session-state-checksum");
-    return true;
-  });
+  assert.throws(
+    () => decodeSessionState(corrupt, { matchId: 77, rosterSize: 4 }),
+    (error) => {
+      assert.ok(error instanceof SessionPersistenceError);
+      assert.equal(error.code, "session-state-checksum");
+      return true;
+    },
+  );
   assert.throws(() => decodeSessionState(bytes, { matchId: 78, rosterSize: 4 }), /another match/);
   const badVersion = new Uint8Array(bytes);
   badVersion[4] = 2;
-  assert.throws(() => decodeSessionState(badVersion, { matchId: 77, rosterSize: 4 }), /unsupported session state version/);
+  assert.throws(
+    () => decodeSessionState(badVersion, { matchId: 77, rosterSize: 4 }),
+    /unsupported session state version/,
+  );
   assert.deepEqual([...encodeSessionState(ledger.snapshot(10))], [...bytes]);
 });
 
@@ -170,7 +198,10 @@ test("durable server state requires an explicitly configured resume key", () => 
 test("persistence admission gate rejects new sessions until a write recovers", () => {
   const admission = createSessionAdmissionGate();
   let created = 0;
-  const create = () => { created += 1; return created; };
+  const create = () => {
+    created += 1;
+    return created;
+  };
   assert.equal(admitNewSession(admission, create), 1);
   assert.equal(created, 1);
   assert.equal(admission.allowed, true);
@@ -201,8 +232,13 @@ test("a configured token and ledger resume after new server construction", async
   const storage = new MemorySessionStateStorage();
   const ledgerA = new SessionLedger({ matchId: 77, rosterSize: 2 });
   const persistenceA = new DurableSessionPersistence(ledgerA, storage);
-  const serverA = new MatchServer({ matchId: 77, rosterSize: 2, resumeTokenService: service, sessionLedger: ledgerA,
-    onSessionStateChange: (_reason, tick) => void persistenceA.flush(tick) });
+  const serverA = new MatchServer({
+    matchId: 77,
+    rosterSize: 2,
+    resumeTokenService: service,
+    sessionLedger: ledgerA,
+    onSessionStateChange: (_reason, tick) => void persistenceA.flush(tick),
+  });
   for (let tick = 0; tick < 120; tick += 1) serverA.step();
   const first = new BattleClient({ name: "first" });
   const firstSession = serverA.createSession();
@@ -218,15 +254,20 @@ test("a configured token and ledger resume after new server construction", async
   const ledgerB = new SessionLedger({ matchId: 77, rosterSize: 2 });
   const persistenceB = new DurableSessionPersistence(ledgerB, storage);
   assert.equal(await persistenceB.restore(), true);
-  const serverB = new MatchServer({ matchId: 77, rosterSize: 2, resumeTokenService: service, sessionLedger: ledgerB,
-    onSessionStateChange: (_reason, tick) => void persistenceB.flush(tick) });
+  const serverB = new MatchServer({
+    matchId: 77,
+    rosterSize: 2,
+    resumeTokenService: service,
+    sessionLedger: ledgerB,
+    onSessionStateChange: (_reason, tick) => void persistenceB.flush(tick),
+  });
   const resumed = new BattleClient({ name: "resumed" });
   resumed.resumeToken.set(token);
   const resumedSession = serverB.createSession();
   const [resumedClientTransport, resumedServerTransport] = createInMemoryTransportPair(resumed, resumedSession);
   resumedSession.attach(resumedServerTransport);
   resumed.attach(resumedClientTransport);
-  await settle();
+  assert.equal(await settleUntil(() => resumed.state !== "connecting"), true, "resume handshake did not settle");
   assert.equal(resumed.state, "ready");
   assert.equal(resumed.playerId, playerId);
   serverA.close();
@@ -237,9 +278,14 @@ test("async admission closes fail closed during verify and issue", async () => {
   const key = new Uint8Array(32).fill(0x3c);
   const real = new SessionTokenService({ keys: [{ id: 1, secret: key }] });
   let releaseVerify;
-  const verifyGate = new Promise((resolve) => { releaseVerify = resolve; });
+  const verifyGate = new Promise((resolve) => {
+    releaseVerify = resolve;
+  });
   const delayedVerify = {
-    verify: async () => { await verifyGate; return null; },
+    verify: async () => {
+      await verifyGate;
+      return null;
+    },
     issue: (claims) => real.issue(claims),
   };
   const verifyServer = new MatchServer({ rosterSize: 1, resumeTokenService: delayedVerify });
@@ -257,10 +303,15 @@ test("async admission closes fail closed during verify and issue", async () => {
   assert.equal(verifyServer.sessionLedger.generation[0], 0);
 
   let releaseIssue;
-  const issueGate = new Promise((resolve) => { releaseIssue = resolve; });
+  const issueGate = new Promise((resolve) => {
+    releaseIssue = resolve;
+  });
   const delayedIssue = {
     verify: async () => null,
-    issue: async (claims) => { await issueGate; return real.issue(claims); },
+    issue: async (claims) => {
+      await issueGate;
+      return real.issue(claims);
+    },
   };
   const issueServer = new MatchServer({ rosterSize: 1, resumeTokenService: delayedIssue });
   const issueClient = new BattleClient({});

@@ -1,4 +1,5 @@
 import {
+  defold,
   defineComponent,
   factory,
   go,
@@ -7,6 +8,7 @@ import {
   property,
   sound,
   sys,
+  tilemap,
   vmath,
   type DefoldHash,
 } from "@deherm/project";
@@ -17,28 +19,25 @@ import {
   BrowserWebTransportClient,
   EVENT_EXPLOSION,
   EVENT_FIRE,
+  EVENT_COVER_CHANGED,
+  EVENT_HAZARD_DAMAGE,
   EVENT_HIT,
   EVENT_KILL,
   EVENT_PICKUP_TAKEN,
+  CELL_CRATE,
+  CELL_SANDBAG,
   MAX_PICKUPS,
   MAX_PROJECTILES,
+  MAX_COVER_PANELS,
+  cellOfX,
+  cellOfY,
   WEAPON_MORTAR,
   createBattleEvent,
   type BattleEvent,
   type GameTransport,
   type TransportReceiver,
 } from "../src/generated-war-battles/index";
-import {
-  MAX_VISIBLE_PROJECTILES,
-  pixelX,
-  pixelY,
-  startArena,
-  type ArenaMatch,
-} from "../src/arena-match";
-
-declare const __defoldHostV1: {
-  log(level: "info", message: string): void;
-};
+import { MAX_VISIBLE_PROJECTILES, pixelX, pixelY, startArena, type ArenaMatch } from "../src/arena-match";
 
 interface WarBattlesRuntimeConfig {
   /** Browser-only development override; game.project remains authoritative. */
@@ -88,6 +87,12 @@ const ENGAGE = hashLiteral("#engage");
 const RESTART = hashLiteral("#restart");
 const CAMERA = "/camera#follow";
 const CAMERA_IMPACT = "camera_impact";
+const ARENA_TILEMAP = "/level#tilemap";
+const ARENA_MARKS_LAYER = "marks";
+// Stable IDs emitted by tools/generate-art.mjs and checked against the art
+// manifest by the integration suite. Defold's set_tile API uses one-based IDs.
+const CRATE_TILE = 14;
+const SANDBAG_TILE = 15;
 
 const SFX_FIRE = "#sfx_fire";
 const SFX_HIT = "#sfx_hit";
@@ -138,6 +143,8 @@ interface ArenaSelf {
   eventCursor: number;
   spawnedProjectile: Uint16Array;
   spawnedPickup: Uint8Array;
+  /** 0 intact, 1 destroyed; fixed-width visual cache avoids engine calls on steady frames. */
+  coverVisualDestroyed?: Uint8Array;
   visibleProjectiles: number;
   effectIds: DefoldHash[];
   effectTicks: number[];
@@ -189,15 +196,18 @@ function attachOnlineTransport(
   // A dial can settle after a newer fallback has won, or after the match has
   // already detached its connecting client for offline play. Close that
   // transport without ever handing it to the detached client.
-  if (attempts.detached || self.match.client !== client || self.match.mode !== "offline"
-    || !claimOnlineTransport(attempts, generation)) {
+  if (
+    attempts.detached ||
+    self.match.client !== client ||
+    self.match.mode !== "offline" ||
+    !claimOnlineTransport(attempts, generation)
+  ) {
     transport.close(1000, "stale connection attempt");
     return;
   }
   const protocol = transport.capabilities.protocol;
-  self.telemetry.transport = protocol === "webtransport-h3"
-    ? "webtransport-h3-quic"
-    : protocol === "websocket-tcp" ? "websocket-tcp" : null;
+  self.telemetry.transport =
+    protocol === "webtransport-h3" ? "webtransport-h3-quic" : protocol === "websocket-tcp" ? "websocket-tcp" : null;
   self.telemetry.inputLane = transport.capabilities.datagrams ? "datagram" : "reliable-fallback";
   client.attach(transport);
 }
@@ -232,9 +242,10 @@ function attemptReceiver(
   attempts: OnlineConnectionAttempts,
   generation: number,
 ): TransportReceiver {
-  const current = (): boolean => !attempts.detached
-    && attempts.generation === generation
-    && (attempts.winner === 0 || attempts.winner === generation);
+  const current = (): boolean =>
+    !attempts.detached &&
+    attempts.generation === generation &&
+    (attempts.winner === 0 || attempts.winner === generation);
   return {
     onReliable: (channel, payload) => {
       if (current()) client.onReliable(channel, payload);
@@ -256,7 +267,7 @@ function logHmrState(self: ArenaSelf, edit: string): void {
     for (const active of world.projectileActive) entities += active;
     for (const active of world.pickupActive) entities += active;
   }
-  __defoldHostV1.log(
+  defold.log(
     "info",
     `war-battles:hmr-reload:edit=${edit}:tick=${self.match.ticksStepped}:entities=${entities}:elapsed=${self.elapsed.toFixed(3)}`,
   );
@@ -271,7 +282,7 @@ function playSfx(
   sound.play(url);
   if ((self.sfxMask & bit) !== 0) return;
   self.sfxMask |= bit;
-  __defoldHostV1.log("info", `war-battles:sfx:${name}`);
+  defold.log("info", `war-battles:sfx:${name}`);
 }
 
 function spawnTankParts(self: ArenaSelf): void {
@@ -283,15 +294,25 @@ function spawnTankParts(self: ArenaSelf): void {
     // The local hull is the authored `player` game object, so only its turret
     // is spawned here; every other tank gets both parts.
     if (slot !== localSlot) {
-      factory.create("#tankfactory", position, undefined, new Map<string, unknown>([
-        ["slot", slot],
-        ["part", PART_HULL],
-      ]));
+      factory.create(
+        "#tankfactory",
+        position,
+        undefined,
+        new Map<string, unknown>([
+          ["slot", slot],
+          ["part", PART_HULL],
+        ]),
+      );
     }
-    factory.create("#tankfactory", vmath.vector3(position.x, position.y, 0.3), undefined, new Map<string, unknown>([
-      ["slot", slot],
-      ["part", PART_TURRET],
-    ]));
+    factory.create(
+      "#tankfactory",
+      vmath.vector3(position.x, position.y, 0.3),
+      undefined,
+      new Map<string, unknown>([
+        ["slot", slot],
+        ["part", PART_TURRET],
+      ]),
+    );
   }
 }
 
@@ -312,7 +333,10 @@ function syncPickups(self: ArenaSelf): void {
       "#pickupfactory",
       vmath.vector3(pixelX(world.pickupX[index]!), pixelY(world.pickupY[index]!), 0.1),
       undefined,
-      new Map<string, unknown>([["index", index], ["kind", world.pickupKind[index]!]]),
+      new Map<string, unknown>([
+        ["index", index],
+        ["kind", world.pickupKind[index]!],
+      ]),
     );
   }
 }
@@ -348,6 +372,25 @@ function syncProjectiles(self: ArenaSelf): void {
     );
   }
   self.visibleProjectiles = visible;
+}
+
+function syncCoverTiles(self: ArenaSelf): void {
+  const world = self.match.world;
+  if (world === undefined) return;
+  // A compatible hot reload preserves `self`; initialize this newly-added
+  // field once for instances created by an older generation.
+  if (self.coverVisualDestroyed === undefined) self.coverVisualDestroyed = new Uint8Array(MAX_COVER_PANELS);
+  const visualDestroyed = self.coverVisualDestroyed;
+  for (let panel = 0; panel < world.map.coverPanelCount; panel += 1) {
+    const destroyed = world.map.coverHealth[panel] === 0 ? 1 : 0;
+    if (visualDestroyed[panel] === destroyed) continue;
+    const cellX = cellOfX(world.map.coverX[panel]!);
+    const cellY = cellOfY(world.map.coverY[panel]!);
+    const cell = world.map.cellAt(cellX, cellY);
+    const tile = destroyed === 1 ? 0 : cell === CELL_CRATE ? CRATE_TILE : cell === CELL_SANDBAG ? SANDBAG_TILE : 0;
+    tilemap.setTile(ARENA_TILEMAP, ARENA_MARKS_LAYER, cellX + 1, cellY + 1, tile);
+    visualDestroyed[panel] = destroyed;
+  }
 }
 
 function spawnEffect(self: ArenaSelf, big: boolean, x: number, y: number): void {
@@ -401,6 +444,12 @@ function drainEvents(self: ArenaSelf): void {
     if (kind === EVENT_EXPLOSION) {
       requestCameraImpact(self, CAMERA_IMPACT_EXPLOSION, self.event.x, self.event.y);
       spawnEffect(self, true, self.event.x, self.event.y);
+    } else if (kind === EVENT_COVER_CHANGED) {
+      // Cover damage is authoritative; this bounded spark is presentation-only.
+      spawnEffect(self, false, self.event.x, self.event.y);
+    } else if (kind === EVENT_HAZARD_DAMAGE) {
+      spawnEffect(self, false, self.event.x, self.event.y);
+      if (self.event.a === localPlayerId) playSfx(self, SFX_HIT_BIT, SFX_HIT, "hazard");
     } else if (kind === EVENT_KILL) {
       requestCameraImpact(self, CAMERA_IMPACT_KILL, self.event.x, self.event.y);
       spawnEffect(self, true, self.event.x, self.event.y);
@@ -450,16 +499,16 @@ function engage(self: ArenaSelf): void {
   spawnTankParts(self);
   syncPickups(self);
   const world = self.match.world;
-  __defoldHostV1.log(
+  defold.log(
     "info",
     `war-battles:arena-engaged:players=${self.players}:skill=${Math.trunc(self.botSkill)}` +
-    `:seed=${world === undefined ? 0 : world.mapSeed}:mode=${self.match.mode}`,
+      `:seed=${world === undefined ? 0 : world.mapSeed}:mode=${self.match.mode}`,
   );
 }
 
 function restart(self: ArenaSelf): void {
   if (!self.match.restart()) {
-    __defoldHostV1.log("info", "war-battles:arena-restart-denied:online");
+    defold.log("info", "war-battles:arena-restart-denied:online");
     return;
   }
   self.eventCursor = 0;
@@ -470,7 +519,7 @@ function restart(self: ArenaSelf): void {
   self.effectTicks.length = 0;
   syncPickups(self);
   playSfx(self, SFX_ROUND_BIT, SFX_ROUND, "round");
-  __defoldHostV1.log("info", `war-battles:arena-restart:round=${self.match.battle.round}`);
+  defold.log("info", `war-battles:arena-restart:round=${self.match.battle.round}`);
 }
 
 /**
@@ -481,12 +530,14 @@ function restart(self: ArenaSelf): void {
 function connectOnline(self: ArenaSelf): boolean {
   const runtimeConfig = browserGlobals().__warBattlesConfigV1;
   if (runtimeConfig?.server !== undefined && typeof runtimeConfig.server !== "string") {
-    __defoldHostV1.log("info", "war-battles:arena-online-fallback:config-server:invalid");
+    defold.log("info", "war-battles:arena-online-fallback:config-server:invalid");
     return false;
   }
-  if (runtimeConfig?.serverCertificateSha256 !== undefined
-    && typeof runtimeConfig.serverCertificateSha256 !== "string") {
-    __defoldHostV1.log("info", "war-battles:arena-online-fallback:config-certificate-sha256:invalid");
+  if (
+    runtimeConfig?.serverCertificateSha256 !== undefined &&
+    typeof runtimeConfig.serverCertificateSha256 !== "string"
+  ) {
+    defold.log("info", "war-battles:arena-online-fallback:config-certificate-sha256:invalid");
     return false;
   }
   const url = runtimeConfig?.server ?? sys.getConfigString("war_battles.server", "") ?? "";
@@ -503,7 +554,7 @@ function connectOnline(self: ArenaSelf): boolean {
     invalidateOnlineAttempts(attempts);
     self.match.fallbackToOffline();
     self.online = false;
-    __defoldHostV1.log("info", `war-battles:arena-online-fallback:${reason}`);
+    defold.log("info", `war-battles:arena-online-fallback:${reason}`);
     engage(self);
   };
   const dialWebSocket = (reason: string): void => {
@@ -518,14 +569,14 @@ function connectOnline(self: ArenaSelf): boolean {
       fallbackOffline(`${reason}:websocket-url-invalid`);
       return;
     }
-    __defoldHostV1.log("info", `war-battles:arena-online-fallback:${reason}:websocket-tcp`);
+    defold.log("info", `war-battles:arena-online-fallback:${reason}:websocket-tcp`);
     void BrowserWebSocketClient.connect(websocketUrl, attemptReceiver(client, attempts, generation)).then(
       (transport) => {
         if (attempts.detached || attempts.generation !== generation) {
           transport.close(1000, "stale connection attempt");
           return;
         }
-        __defoldHostV1.log("info", "war-battles:net:transport=websocket-tcp");
+        defold.log("info", "war-battles:net:transport=websocket-tcp");
         // The owner call is guarded by the generation/winner arguments below:
         // attachOnlineTransport(self, client, transport)
         attachOnlineTransport(self, client, transport, attempts, generation);
@@ -543,8 +594,8 @@ function connectOnline(self: ArenaSelf): boolean {
   };
   client = new BattleClient({
     name: "defold",
-    onLog: (line: string) => __defoldHostV1.log("info", `war-battles:net:${line}`),
-    onError: (error: unknown) => __defoldHostV1.log("info", `war-battles:net-error:${String(error)}`),
+    onLog: (line: string) => defold.log("info", `war-battles:net:${line}`),
+    onError: (error: unknown) => defold.log("info", `war-battles:net-error:${String(error)}`),
     onReject: (reject) => fallback(`reject:${reject.code}:${reject.reason}`),
     onClose: (close) => {
       if (!close.welcomed) fallback(`close:${close.code}:${close.reason}`);
@@ -555,17 +606,14 @@ function connectOnline(self: ArenaSelf): boolean {
     },
   });
   self.match.client = client;
-  const configuredHash = runtimeConfig?.serverCertificateSha256
-    ?? sys.getConfigString("war_battles.server_certificate_sha256", "")
-    ?? "";
+  const configuredHash =
+    runtimeConfig?.serverCertificateSha256 ?? sys.getConfigString("war_battles.server_certificate_sha256", "") ?? "";
   const hash = configuredHash === "" ? undefined : certificateHash(configuredHash);
   if (configuredHash !== "" && hash === undefined) {
     fallback("certificate-sha256:invalid");
     return false;
   }
-  const options = hash === undefined
-    ? undefined
-    : { serverCertificateHashes: [{ algorithm: "sha-256", value: hash }] };
+  const options = hash === undefined ? undefined : { serverCertificateHashes: [{ algorithm: "sha-256", value: hash }] };
   const generation = beginOnlineAttempt(attempts);
   void BrowserWebTransportClient.connect(url, attemptReceiver(client, attempts, generation), undefined, options).then(
     (transport) => {
@@ -573,23 +621,21 @@ function connectOnline(self: ArenaSelf): boolean {
         transport.close(1000, "stale connection attempt");
         return;
       }
-      __defoldHostV1.log("info", "war-battles:net:transport=webtransport-h3-quic");
+      defold.log("info", "war-battles:net:transport=webtransport-h3-quic");
       attachOnlineTransport(self, client, transport, attempts, generation);
     },
     (error: unknown) => {
       if (attempts.detached || attempts.generation !== generation) return;
-      __defoldHostV1.log("info", `war-battles:net-error:${String(error)}`);
+      defold.log("info", `war-battles:net-error:${String(error)}`);
       fallback(`dial:${String(error)}`, generation);
     },
   );
-  __defoldHostV1.log("info", `war-battles:arena-online-dialing:${url}`);
+  defold.log("info", `war-battles:arena-online-dialing:${url}`);
   return true;
 }
 
 function fallbackWebSocketUrl(httpUrl: string, config: WarBattlesRuntimeConfig | undefined): string | undefined {
-  const configured = config?.serverWebSocket
-    ?? sys.getConfigString("war_battles.server_websocket", "")
-    ?? "";
+  const configured = config?.serverWebSocket ?? sys.getConfigString("war_battles.server_websocket", "") ?? "";
   try {
     const parsed = new URL(configured === "" ? httpUrl : configured);
     if (configured === "") {
@@ -610,7 +656,7 @@ function fallbackWebSocketUrl(httpUrl: string, config: WarBattlesRuntimeConfig |
 export default defineComponent({
   properties: {
     players: property.number(8),
-    botSkill: property.number(2),
+    botSkill: property.number(1),
     mapSeed: property.number(0),
     autoEngageSeconds: property.number(0),
   },
@@ -622,6 +668,7 @@ export default defineComponent({
     self.event = createBattleEvent();
     self.spawnedProjectile = new Uint16Array(MAX_PROJECTILES);
     self.spawnedPickup = new Uint8Array(MAX_PICKUPS);
+    self.coverVisualDestroyed = new Uint8Array(MAX_COVER_PANELS);
     self.visibleProjectiles = 0;
     self.effectIds = [];
     self.effectTicks = [];
@@ -650,7 +697,7 @@ export default defineComponent({
     });
     self.online = connectOnline(self);
     updateTelemetry(self);
-    __defoldHostV1.log("info", `war-battles:arena-init:players=${players}:online=${self.online ? 1 : 0}`);
+    defold.log("info", `war-battles:arena-init:players=${players}:online=${self.online ? 1 : 0}`);
     logHmrState(self, "initial");
   },
 
@@ -678,6 +725,7 @@ export default defineComponent({
     }
     syncProjectiles(self);
     syncPickups(self);
+    syncCoverTiles(self);
     drainEvents(self);
     ageEffects(self);
     updateTelemetry(self);
@@ -690,6 +738,6 @@ export default defineComponent({
     if (self.onlineAttempts !== undefined) invalidateOnlineAttempts(self.onlineAttempts);
     self.match.client?.close(1000, "scene teardown");
     browserGlobals().__warBattlesTelemetryV1 = undefined;
-    __defoldHostV1.log("info", "war-battles:arena-final");
+    defold.log("info", "war-battles:arena-final");
   },
 });

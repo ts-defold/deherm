@@ -1,9 +1,4 @@
-import {
-  BattleWorld,
-  UPGRADE_ARMOR,
-  UPGRADE_DAMAGE,
-  UPGRADE_MOBILITY,
-} from "../core/index.ts";
+import { BattleWorld, UPGRADE_ARMOR, UPGRADE_DAMAGE, UPGRADE_MOBILITY } from "../core/index.ts";
 
 /**
  * The one definition of the soak fixture's starting world.

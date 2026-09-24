@@ -1,21 +1,16 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
 import { runReplay } from "../headless/match.ts";
 import { buildBotReplay, readReplayHeader } from "../headless/replay.ts";
-import {
-  CURRENT_TRANSPORT_EVIDENCE,
-  TransportSelectionMachine,
-} from "../integration/transport-selection.ts";
+import { CURRENT_TRANSPORT_EVIDENCE, TransportSelectionMachine } from "../integration/transport-selection.ts";
 import { evaluateEngineAttachment } from "../integration/runtime-capability.ts";
 import { EXPECTED_COMPONENT_COUNT } from "../integration/check-browser-runtime.mjs";
-import {
-  COMPONENT_PROXY_CAPABILITY,
-  WAR_BATTLES_ENGINE_CAPABILITY,
-} from "../defold/src/capability-snapshot.ts";
+import { COMPONENT_PROXY_CAPABILITY, WAR_BATTLES_ENGINE_CAPABILITY } from "../defold/src/capability-snapshot.ts";
 
 const exampleRoot = path.resolve(import.meta.dirname, "..");
 const repositoryRoot = path.resolve(exampleRoot, "../..");
@@ -52,10 +47,7 @@ test("32-player ten-minute simulated soak remains deterministic across rollback"
   assert.equal(rolledBack.rollbackCount, 1);
   assert.equal(baseline.players, 32);
   assert.equal(baseline.ticks, 36_000);
-  const evidence = JSON.parse(await readFile(
-    fromExample("evidence/headless-soak.json"),
-    "utf8",
-  ));
+  const evidence = JSON.parse(await readFile(fromExample("evidence/headless-soak.json"), "utf8"));
   assert.equal(evidence.stateHash, baseline.stateHash);
   assert.equal(evidence.replayBodyHash, baseline.replayBodyHash);
   assert.equal(evidence.replayBytes, replay.byteLength);
@@ -87,15 +79,15 @@ test("transport selection exhausts honestly when every fallback is disabled", ()
 });
 
 test("Defold attachment consumes generated proxy evidence and the independent engine gate", async () => {
-  const fixtureManifest = JSON.parse(await readFile(
-    fromRepository("tests/fixtures/war-battles/.deherm/generated/components/manifest.json"),
-    "utf8",
-  ));
-  const runtimeGate = JSON.parse(await readFile(fromRepository(".agents/docs/data/war-battles-runtime-gate.json"), "utf8"));
-  const exampleManifest = JSON.parse(await readFile(
-    fromExample("defold/.deherm/generated/components/manifest.json"),
-    "utf8",
-  ));
+  const fixtureManifest = JSON.parse(
+    await readFile(fromRepository("tests/fixtures/war-battles/.deherm/generated/components/manifest.json"), "utf8"),
+  );
+  const runtimeGate = JSON.parse(
+    await readFile(fromRepository(".agents/docs/data/war-battles-runtime-gate.json"), "utf8"),
+  );
+  const exampleManifest = JSON.parse(
+    await readFile(fromExample("defold/.deherm/generated/components/manifest.json"), "utf8"),
+  );
   const staleFixtureDecision = evaluateEngineAttachment(fixtureManifest, runtimeGate);
   assert.equal(staleFixtureDecision.allowed, false);
   assert.match(staleFixtureDecision.blockers.join("\n"), /packaged-engine gameplay execution has not been observed/);
@@ -104,24 +96,15 @@ test("Defold attachment consumes generated proxy evidence and the independent en
   assert.equal(decision.allowed, false);
   assert.match(decision.blockers.join("\n"), /gameplay execution has not been observed/);
   assert.equal(COMPONENT_PROXY_CAPABILITY.state, exampleManifest.proxyRuntimeCapability.state);
-  assert.equal(
-    COMPONENT_PROXY_CAPABILITY.runtimeConformant,
-    exampleManifest.proxyRuntimeCapability.runtimeConformant,
-  );
+  assert.equal(COMPONENT_PROXY_CAPABILITY.runtimeConformant, exampleManifest.proxyRuntimeCapability.runtimeConformant);
   assert.equal(WAR_BATTLES_ENGINE_CAPABILITY.status, runtimeGate.status);
-  assert.equal(
-    WAR_BATTLES_ENGINE_CAPABILITY.gameplayExecutionObserved,
-    runtimeGate.gameplayExecutionObserved,
-  );
+  assert.equal(WAR_BATTLES_ENGINE_CAPABILITY.gameplayExecutionObserved, runtimeGate.gameplayExecutionObserved);
   assert.equal(
     WAR_BATTLES_ENGINE_CAPABILITY.requirementsEngineVerified,
     runtimeGate.requirements.every((requirement) => requirement.engineContextVerified === true),
   );
   assert.equal(exampleManifest.proxyRuntimeCapability.runtimeConformant, false);
-  assert.equal(
-    exampleManifest.proxyRuntimeCapability.state,
-    "native-dynamic-hermes-harness-executable",
-  );
+  assert.equal(exampleManifest.proxyRuntimeCapability.state, "native-dynamic-hermes-harness-executable");
   const bySource = new Map(exampleManifest.components.map((component) => [component.source, component]));
   assert.deepEqual([...bySource.keys()].sort(), [
     // The director owns the match and every factory in the scene.
@@ -148,7 +131,12 @@ test("Defold attachment consumes generated proxy evidence and the independent en
   assert.equal(bySource.get("main/rocket.script.ts").proxy, "main/rocket.script");
   assert.deepEqual(
     bySource.get("main/rocket.script.ts").properties.map((property) => [property.name, property.kind]),
-    [["dir", "vector3"], ["slot", "number"], ["generation", "number"], ["weapon", "number"]],
+    [
+      ["dir", "vector3"],
+      ["slot", "number"],
+      ["generation", "number"],
+      ["weapon", "number"],
+    ],
   );
   assert.deepEqual(
     bySource.get("main/tank.script.ts").properties.map((property) => property.name),
@@ -160,15 +148,13 @@ test("Defold attachment consumes generated proxy evidence and the independent en
 });
 
 test("checked bundle evidence is reproducible from the measurement command", async () => {
-  const observed = JSON.parse(execFileSync(
-    process.execPath,
-    [fromExample("headless/measure-bundles.mjs")],
-    { cwd: repositoryRoot, encoding: "utf8" },
-  ));
-  const checked = JSON.parse(await readFile(
-    fromExample("evidence/bundle-size.json"),
-    "utf8",
-  ));
+  const observed = JSON.parse(
+    execFileSync(process.execPath, [fromExample("headless/measure-bundles.mjs")], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    }),
+  );
+  const checked = JSON.parse(await readFile(fromExample("evidence/bundle-size.json"), "utf8"));
   assert.deepEqual(observed, checked);
 });
 
@@ -191,34 +177,47 @@ test("packaged runtime evidence remains bound to current extension and project s
 });
 
 test("Defold-local deterministic sources are fresh copies of the canonical core", () => {
-  const result = execFileSync(
-    process.execPath,
-    [fromExample("integration/sync-defold-sources.mjs"), "--check"],
-    { cwd: repositoryRoot, encoding: "utf8" },
-  );
+  const result = execFileSync(process.execPath, [fromExample("integration/sync-defold-sources.mjs"), "--check"], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  });
   assert.match(result, /16 generated Defold sources are fresh/);
 });
 
 test("the built project is the arena, and the mockup stays out of the build", async () => {
-  const [collection, playerObject, rocketObject, tankObject, arenaObject, levelObject, scene,
-    cameraObject, playerSource, rocketSource, arenaSource, uiSource, cameraSource, inputBinding, blockers] =
-    await Promise.all([
-      readFile(fromExample("defold/main/main.collection"), "utf8"),
-      readFile(fromExample("defold/main/player.go"), "utf8"),
-      readFile(fromExample("defold/main/rocket.go"), "utf8"),
-      readFile(fromExample("defold/main/tank.go"), "utf8"),
-      readFile(fromExample("defold/main/arena.go"), "utf8"),
-      readFile(fromExample("defold/main/level.go"), "utf8"),
-      readFile(fromExample("defold/main/ui.gui"), "utf8"),
-      readFile(fromExample("defold/main/camera.go"), "utf8"),
-      readFile(fromExample("defold/main/player.script.ts"), "utf8"),
-      readFile(fromExample("defold/main/rocket.script.ts"), "utf8"),
-      readFile(fromExample("defold/main/arena.script.ts"), "utf8"),
-      readFile(fromExample("defold/main/ui.gui.ts"), "utf8"),
-      readFile(fromExample("defold/main/camera.script.ts"), "utf8"),
-      readFile(fromExample("defold/input/game.input_binding"), "utf8"),
-      readFile(fromExample("defold/PLAYABLE-BLOCKERS.md"), "utf8"),
-    ]);
+  const [
+    collection,
+    playerObject,
+    rocketObject,
+    tankObject,
+    arenaObject,
+    levelObject,
+    scene,
+    cameraObject,
+    playerSource,
+    rocketSource,
+    arenaSource,
+    uiSource,
+    cameraSource,
+    inputBinding,
+    blockers,
+  ] = await Promise.all([
+    readFile(fromExample("defold/main/main.collection"), "utf8"),
+    readFile(fromExample("defold/main/player.go"), "utf8"),
+    readFile(fromExample("defold/main/rocket.go"), "utf8"),
+    readFile(fromExample("defold/main/tank.go"), "utf8"),
+    readFile(fromExample("defold/main/arena.go"), "utf8"),
+    readFile(fromExample("defold/main/level.go"), "utf8"),
+    readFile(fromExample("defold/main/ui.gui"), "utf8"),
+    readFile(fromExample("defold/main/camera.go"), "utf8"),
+    readFile(fromExample("defold/main/player.script.ts"), "utf8"),
+    readFile(fromExample("defold/main/rocket.script.ts"), "utf8"),
+    readFile(fromExample("defold/main/arena.script.ts"), "utf8"),
+    readFile(fromExample("defold/main/ui.gui.ts"), "utf8"),
+    readFile(fromExample("defold/main/camera.script.ts"), "utf8"),
+    readFile(fromExample("defold/input/game.input_binding"), "utf8"),
+    readFile(fromExample("defold/PLAYABLE-BLOCKERS.md"), "utf8"),
+  ]);
 
   assert.match(collection, /prototype: "\/main\/level\.go"/);
   assert.match(collection, /prototype: "\/main\/player\.go"/);
@@ -241,7 +240,14 @@ test("the built project is the arena, and the mockup stays out of the build", as
 
   // Every object the arena creates is created through the director's own
   // relative factory URLs.
-  for (const factoryId of ["tankfactory", "pickupfactory", "shotfactory", "boomfactory", "sparkfactory", "muzzlefactory"]) {
+  for (const factoryId of [
+    "tankfactory",
+    "pickupfactory",
+    "shotfactory",
+    "boomfactory",
+    "sparkfactory",
+    "muzzlefactory",
+  ]) {
     assert.match(arenaObject, new RegExp(`id: "${factoryId}"`), `arena.go is missing ${factoryId}`);
     assert.match(arenaSource, new RegExp(`"#${factoryId}"`), `arena.script.ts never uses ${factoryId}`);
   }
@@ -250,10 +256,18 @@ test("the built project is the arena, and the mockup stays out of the build", as
     assert.match(arenaSource, new RegExp(`"#${soundId}"`), `arena.script.ts never plays ${soundId}`);
   }
   assert.match(inputBinding, /input: KEY_R[\s\S]*action: "restart"/);
+  assert.match(inputBinding, /input: MOUSE_BUTTON_1[\s\S]*action: "deploy"/);
+  assert.match(playerSource, /actionId === DEPLOY/);
+  assert.match(playerSource, /msg\.post\(UI, "deploy"\)/);
   assert.match(playerSource, /msg\.post\(ARENA, "restart"\)/);
   assert.match(arenaSource, /war-battles:arena-restart:round=/);
   assert.match(arenaSource, /sound\.play\(url\)/);
   assert.match(arenaSource, /spawnMuzzle\(self/);
+  assert.match(arenaSource, /EVENT_COVER_CHANGED/);
+  assert.match(arenaSource, /tilemap\.setTile\(ARENA_TILEMAP, ARENA_MARKS_LAYER/);
+  assert.match(arenaSource, /coverVisualDestroyed/);
+  assert.match(arenaSource, /EVENT_HAZARD_DAMAGE/);
+  assert.match(arenaSource, /spawnEffect\(self, false, self\.event\.x, self\.event\.y\)/);
   assert.match(arenaSource, /msg\.post\(CAMERA, CAMERA_IMPACT, self\.impact\)/);
   assert.match(arenaSource, /self\.impact\.strength = 0/);
   assert.equal((arenaSource.match(/msg\.post\(CAMERA, CAMERA_IMPACT/g) ?? []).length, 1);
@@ -273,7 +287,11 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(cameraSource, /Clamp after applying the impulse/);
 
   assert.match(scene, /script: "\/main\/ui\.gui_script"/);
-  assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 6);
+  assert.equal((scene.match(/type: TYPE_TEXT/g) ?? []).length, 12);
+  for (const id of ["title_back", "title_logo", "title_panel", "title_portrait", "title_deploy", "title_sponsor"]) {
+    assert.match(scene, new RegExp(`id: "${id}"`));
+  }
+  assert.match(scene, /id: "title_panel"[\s\S]*?slice9 \{ x: 16\.0 y: 16\.0 z: 16\.0 w: 16\.0 \}/);
   assert.match(scene, /id: "score"/);
   assert.match(scene, /id: "status"/);
   assert.match(scene, /id: "announcement"/);
@@ -281,6 +299,8 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(uiSource, /EVENT_KILL/);
   assert.match(uiSource, /EVENT_OBJECTIVE_CAPTURE/);
   assert.match(uiSource, /EVENT_HAZARD_DAMAGE/);
+  assert.match(uiSource, /EVENT_COVER_CHANGED/);
+  assert.match(uiSource, /COVER PANEL \$\{self\.event\.a \+ 1\} DESTROYED/);
   assert.match(uiSource, /VENT \$\{hazard \+ 1\} LIVE/);
   assert.match(uiSource, /COMMAND BEACON/);
   assert.match(uiSource, /gui\.setEnabled\(self\.announcement, false\)/);
@@ -290,6 +310,8 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(uiSource, /P\$\{attacker\} DESTROYED YOU/);
   assert.match(uiSource, /VENT DESTROYED YOU/);
   assert.match(uiSource, /ROUND \$\{round\}/);
+  assert.match(uiSource, /titleVisible: boolean/);
+  assert.match(uiSource, /if \(self\.titleVisible\) return/);
 
   // The scripted demonstration the runtime gates observe is still exactly what
   // it was, and still reaches the same markers.
@@ -303,44 +325,67 @@ test("the built project is the arena, and the mockup stays out of the build", as
 });
 
 test("the arena tilemap is the picture of the arena the simulation collides with", () => {
-  const result = execFileSync(
-    process.execPath,
-    [fromExample("tools/generate-arena-tilemap.mjs"), "--check"],
-    { cwd: repositoryRoot, encoding: "utf8" },
-  );
+  const result = execFileSync(process.execPath, [fromExample("tools/generate-arena-tilemap.mjs"), "--check"], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  });
   assert.match(result, /war-battles-arena-tilemap:fresh/);
+  const tilemap = readFileSync(fromExample("defold/main/arena.tilemap"), "utf8");
+  assert.match(tilemap, /id: "decor"/);
+  assert.match(tilemap, /z: 0\.05/);
 });
 
 test("the generated arena art is fresh and its tile map is machine-readable", async () => {
-  const result = execFileSync(
-    process.execPath,
-    [fromExample("tools/generate-art.mjs"), "--check"],
-    { cwd: repositoryRoot, encoding: "utf8" },
-  );
+  const result = execFileSync(process.execPath, [fromExample("tools/generate-art.mjs"), "--check"], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  });
   assert.match(result, /war-battles-art:fresh/);
-  const manifest = JSON.parse(await readFile(
-    fromExample("defold/assets/derived/arena/arena-art.json"),
-    "utf8",
-  ));
+  const manifest = JSON.parse(await readFile(fromExample("defold/assets/derived/arena/arena-art.json"), "utf8"));
   const map = manifest.tileSheet.map;
   assert.equal(map.groundTileIds.length, 4);
-  assert.deepEqual(
-    Object.keys(map.wallTileIds).sort(),
-    ["centre", "e", "n", "ne", "nw", "s", "se", "sw", "w"],
-  );
+  assert.deepEqual(Object.keys(map.wallTileIds).sort(), ["centre", "e", "n", "ne", "nw", "s", "se", "sw", "w"]);
   for (const key of ["crateTileId", "sandbagTileId", "spawnPadTileId", "pickupPadTileId"]) {
     assert.equal(Number.isInteger(map[key]), true, `${key} must be a tile id`);
   }
+  assert.deepEqual(Object.keys(map.worldTileIds).sort(), [
+    "floor-vent",
+    "lava-fissure",
+    "pickup-pedestal",
+    "pipe-junction",
+    "pipe-run",
+    "thermal-vent",
+  ]);
+  assert.equal(map.worldTileIds["pickup-pedestal"] > map.pickupPadTileId, true);
+  const arenaSource = await readFile(fromExample("defold/main/arena.script.ts"), "utf8");
+  assert.match(arenaSource, new RegExp(`const CRATE_TILE = ${map.crateTileId};`));
+  assert.match(arenaSource, new RegExp(`const SANDBAG_TILE = ${map.sandbagTileId};`));
   // The atlas the components address by name has to actually declare them.
   const atlas = await readFile(fromExample("defold/main/arena-sprites.atlas"), "utf8");
   for (const animation of [
-    "tank-blue-hull", "tank-blue-turret", "tank-blue-wreck",
-    "tank-red-hull", "tank-green-hull", "tank-sand-hull",
-    "proj-cannon", "proj-machinegun", "proj-railgun", "proj-scatter", "proj-mortar", "proj-ricochet",
-    "explosion-big", "explosion-small",
+    "tank-blue-hull",
+    "tank-blue-turret",
+    "tank-blue-wreck",
+    "tank-red-hull",
+    "tank-green-hull",
+    "tank-sand-hull",
+    "proj-cannon",
+    "proj-machinegun",
+    "proj-railgun",
+    "proj-scatter",
+    "proj-mortar",
+    "proj-ricochet",
+    "explosion-big",
+    "explosion-small",
     "muzzle",
-    "pickup-health", "pickup-armor", "pickup-overdrive",
-    "pickup-machinegun", "pickup-railgun", "pickup-scatter", "pickup-mortar", "pickup-ricochet",
+    "pickup-health",
+    "pickup-armor",
+    "pickup-overdrive",
+    "pickup-machinegun",
+    "pickup-railgun",
+    "pickup-scatter",
+    "pickup-mortar",
+    "pickup-ricochet",
   ]) {
     assert.match(atlas, new RegExp(`id: "${animation}"`), `arena-sprites.atlas is missing ${animation}`);
   }
@@ -348,23 +393,31 @@ test("the generated arena art is fresh and its tile map is machine-readable", as
   const chassisKinds = ["scout", "assault", "bulwark", "artillery"];
   for (const team of chassisTeams) {
     for (const kind of chassisKinds) {
-      assert.match(atlas, new RegExp(`id: "chassis-${team}-${kind}"`),
-        `arena-sprites.atlas is missing ${team} ${kind} chassis art`);
+      assert.match(
+        atlas,
+        new RegExp(`id: "chassis-${team}-${kind}"`),
+        `arena-sprites.atlas is missing ${team} ${kind} chassis art`,
+      );
     }
   }
   const chassisSprites = manifest.sprites.filter(({ role }) => role.startsWith("chassis."));
-  assert.equal(chassisSprites.length, chassisTeams.length * chassisKinds.length * 2,
-    "every team/chassis animation must retain two generated frames");
-  assert.equal(new Set(chassisSprites.map(({ role }) => role)).size, chassisTeams.length * chassisKinds.length,
-    "chassis manifest roles must cover each team/chassis pair");
+  assert.equal(
+    chassisSprites.length,
+    chassisTeams.length * chassisKinds.length * 2,
+    "every team/chassis animation must retain two generated frames",
+  );
+  assert.equal(
+    new Set(chassisSprites.map(({ role }) => role)).size,
+    chassisTeams.length * chassisKinds.length,
+    "chassis manifest roles must cover each team/chassis pair",
+  );
 });
 
 test("the generated 8-bit sound cues are fresh and valid PCM WAV resources", async () => {
-  const result = execFileSync(
-    process.execPath,
-    [fromExample("tools/generate-sound.mjs"), "--check"],
-    { cwd: repositoryRoot, encoding: "utf8" },
-  );
+  const result = execFileSync(process.execPath, [fromExample("tools/generate-sound.mjs"), "--check"], {
+    cwd: repositoryRoot,
+    encoding: "utf8",
+  });
   assert.match(result, /war-battles-sound:fresh:5/);
   for (const cue of ["fire", "hit", "explosion", "pickup", "round"]) {
     const bytes = await readFile(fromExample(`defold/assets/derived/audio/${cue}.wav`));

@@ -75,15 +75,16 @@ setTimeout(() => { server.close(); process.exit(0); }, ${lifetimeMs});
 `;
 }
 
-const driveDouble = (options, overrides = {}) => runPackagedRuntimeEvidence({
-  command: process.execPath,
-  args: ["-e", engineDouble(options)],
-  cwd: process.cwd(),
-  timeoutMs: 4_000,
-  settleMs: 40,
-  terminationGraceMs: 2_000,
-  ...overrides,
-});
+const driveDouble = (options, overrides = {}) =>
+  runPackagedRuntimeEvidence({
+    command: process.execPath,
+    args: ["-e", engineDouble(options)],
+    cwd: process.cwd(),
+    timeoutMs: 4_000,
+    settleMs: 40,
+    terminationGraceMs: 2_000,
+    ...overrides,
+  });
 
 test("packaged runtime gate observes every marker, settles, and exits gracefully", async () => {
   const result = await driveDouble();
@@ -107,14 +108,17 @@ test("runtime profile evidence keeps the final positive symbol count without pin
     `${RUNTIME_PROFILE_MARKER_PREFIX}315 generated Lua symbols`,
   );
   assert.equal(
-    observedRequiredMarkers(`${RUNTIME_PROFILE_MARKER_PREFIX}0 generated Lua symbols`, [RUNTIME_PROFILE_MARKER_PREFIX])[0],
+    observedRequiredMarkers(`${RUNTIME_PROFILE_MARKER_PREFIX}0 generated Lua symbols`, [
+      RUNTIME_PROFILE_MARKER_PREFIX,
+    ])[0],
     null,
   );
   const recorded = [...REQUIRED_MARKERS];
   recorded[recorded.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] += "315 generated Lua symbols";
   assert.deepEqual(checkedRequiredMarkers(recorded), recorded);
   const zero = [...recorded];
-  zero[REQUIRED_MARKERS.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] = `${RUNTIME_PROFILE_MARKER_PREFIX}0 generated Lua symbols`;
+  zero[REQUIRED_MARKERS.indexOf(RUNTIME_PROFILE_MARKER_PREFIX)] =
+    `${RUNTIME_PROFILE_MARKER_PREFIX}0 generated Lua symbols`;
   assert.throws(() => checkedRequiredMarkers(zero), /positive generated Lua symbol count/);
   assert.throws(() => checkedRequiredMarkers(recorded.slice(1)), /required marker count/);
   const altered = [...recorded];
@@ -124,10 +128,7 @@ test("runtime profile evidence keeps the final positive symbol count without pin
 
 test("checked evidence pins component teardown and the canonical settle window", () => {
   assert.deepEqual(checkedShutdownMarkers(REQUIRED_SHUTDOWN_MARKERS), [...REQUIRED_SHUTDOWN_MARKERS]);
-  assert.throws(
-    () => checkedShutdownMarkers([REQUIRED_MARKERS[0]]),
-    /required component-teardown marker set/,
-  );
+  assert.throws(() => checkedShutdownMarkers([REQUIRED_MARKERS[0]]), /required component-teardown marker set/);
   assert.throws(() => checkedShutdownMarkers([]), /required component-teardown marker set/);
   assert.equal(checkedSettleMs(DEFAULT_SETTLE_MS), DEFAULT_SETTLE_MS);
   assert.throws(() => checkedSettleMs(0), /must be 1500ms/);
@@ -147,10 +148,7 @@ test("runtime source evidence removes only package-managed defignore rules", () 
     normalizedDefignoreText("/defold_hermes_typed_native\n/defold_hermes_typed_native\n/reference\n\n"),
     "/reference\n",
   );
-  assert.equal(
-    normalizedDefignoreText("/defold_hermes_typed-native\n"),
-    "/defold_hermes_typed-native\n",
-  );
+  assert.equal(normalizedDefignoreText("/defold_hermes_typed-native\n"), "/defold_hermes_typed-native\n");
 });
 
 test("packaged runtime gate fails closed on known diagnostics", async () => {
@@ -158,7 +156,10 @@ test("packaged runtime gate fails closed on known diagnostics", async () => {
     driveDouble({ suffix: `process.stderr.write("ERROR:SCRIPT: RESULT_SCRIPT_ERROR\\n");` }),
     /rejected diagnostic 'error-severity'/,
   );
-  assert.equal(firstRejectedDiagnostic("main.gui_script: attempt to index global '_deherm_' (a nil value)")?.id, "missing-lua-provider");
+  assert.equal(
+    firstRejectedDiagnostic("main.gui_script: attempt to index global '_deherm_' (a nil value)")?.id,
+    "missing-lua-provider",
+  );
 });
 
 test("packaged runtime gate fails closed when a required marker is absent", async () => {
@@ -178,10 +179,7 @@ test("packaged runtime gate fails closed when component teardown never ran", asy
 });
 
 test("packaged runtime gate refuses to address an engine that never named its service port", async () => {
-  await assert.rejects(
-    driveDouble({ announcePort: false }),
-    /never reported an engine service port/,
-  );
+  await assert.rejects(driveDouble({ announcePort: false }), /never reported an engine service port/);
 });
 
 test("packaged runtime gate fails loudly when the engine ignores a graceful exit", async () => {
@@ -206,10 +204,7 @@ test("a shared engine service port is refused by name rather than posted into", 
     () => assertSoleEngineListener({ port: 8001, pid: 42, pids: [42, 4242] }),
     /port 8001 is shared by 2 process\(es\) \[42, 4242\].*pid 42.*SO_REUSEPORT/s,
   );
-  assert.throws(
-    () => assertSoleEngineListener({ port: 8001, pid: 42, pids: [4242] }),
-    /shared by 1 process/,
-  );
+  assert.throws(() => assertSoleEngineListener({ port: 8001, pid: 42, pids: [4242] }), /shared by 1 process/);
   assert.throws(
     () => assertSoleEngineListener({ port: 8001, pid: 42, pids: [] }),
     /No process is listening on engine service port 8001/,
@@ -219,11 +214,22 @@ test("a shared engine service port is refused by name rather than posted into", 
 test("a port census that cannot be taken is not a census that found one listener", async () => {
   const missingTool = Object.assign(new Error("spawn lsof ENOENT"), { code: "ENOENT" });
   await assert.rejects(
-    listeningPids(8001, { execFile: async () => { throw missingTool; } }),
+    listeningPids(8001, {
+      execFile: async () => {
+        throw missingTool;
+      },
+    }),
     /lsof is required/,
   );
   const noMatch = Object.assign(new Error("lsof exited 1"), { code: 1, stdout: "" });
-  assert.deepEqual(await listeningPids(8001, { execFile: async () => { throw noMatch; } }), []);
+  assert.deepEqual(
+    await listeningPids(8001, {
+      execFile: async () => {
+        throw noMatch;
+      },
+    }),
+    [],
+  );
   assert.deepEqual(await listeningPids(8001, { execFile: async () => ({ stdout: "17\n4\n17\n" }) }), [4, 17]);
 });
 
@@ -258,10 +264,7 @@ test("evidence is deterministic and keyed only to artifact identities and observ
     () => buildEvidenceDocument({ ...document, termination: { method: "sigterm", exitCode: null, signal: "SIGTERM" } }),
     /clean @system\/exit shutdown/,
   );
-  assert.throws(
-    () => buildEvidenceDocument({ ...document, shutdownMarkers: [] }),
-    /component-teardown markers/,
-  );
+  assert.throws(() => buildEvidenceDocument({ ...document, shutdownMarkers: [] }), /component-teardown markers/);
 });
 
 test("canonical transcript digest removes only known dynamic ports and host identity", () => {
@@ -284,7 +287,10 @@ test("canonical transcript digest removes only known dynamic ports and host iden
 
 test("packaged runtime gate preserves the original observation failure after forced cleanup", async () => {
   await assert.rejects(
-    driveDouble({ markers: REQUIRED_MARKERS.slice(0, -1), honourExit: false }, { timeoutMs: 400, terminationGraceMs: 200 }),
+    driveDouble(
+      { markers: REQUIRED_MARKERS.slice(0, -1), honourExit: false },
+      { timeoutMs: 400, terminationGraceMs: 200 },
+    ),
     /missing markers: INFO:DEFOLD_HERMES: Extension update entered/,
   );
 });

@@ -8,8 +8,7 @@ const integrationRoot = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const exampleRoot = resolve(integrationRoot, "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 
-export const PERFORMANCE_OWNER =
-  "examples/war-battles-online/integration/check-performance.mjs";
+export const PERFORMANCE_OWNER = "examples/war-battles-online/integration/check-performance.mjs";
 
 export const PERFORMANCE_SOURCE_PATHS = Object.freeze([
   "examples/war-battles-online/core",
@@ -38,21 +37,39 @@ async function hashTree(path) {
     }
     if (metadata.isSymbolicLink()) {
       const target = Buffer.from(await readlink(absolute));
-      files.push({ path: local, kind: "symlink", bytes: target.byteLength, sha256: createHash("sha256").update(target).digest("hex") });
+      files.push({
+        path: local,
+        kind: "symlink",
+        bytes: target.byteLength,
+        sha256: createHash("sha256").update(target).digest("hex"),
+      });
       bytes += target.byteLength;
       return;
     }
     assert.equal(metadata.isFile(), true, `unsupported performance evidence input: ${absolute}`);
     const contents = await readFile(absolute);
-    files.push({ path: local, kind: "file", bytes: contents.byteLength, sha256: createHash("sha256").update(contents).digest("hex") });
+    files.push({
+      path: local,
+      kind: "file",
+      bytes: contents.byteLength,
+      sha256: createHash("sha256").update(contents).digest("hex"),
+    });
     bytes += contents.byteLength;
   }
   await visit(root, "");
-  return { path, kind: "tree", fileCount: files.length, bytes, sha256: createHash("sha256").update(JSON.stringify(files)).digest("hex") };
+  return {
+    path,
+    kind: "tree",
+    fileCount: files.length,
+    bytes,
+    sha256: createHash("sha256").update(JSON.stringify(files)).digest("hex"),
+  };
 }
 
 export async function buildPerformanceSourceInputs() {
-  return Promise.all(PERFORMANCE_SOURCE_PATHS.map((path) => path.endsWith("/core") ? hashTree(path) : hashFile(path)));
+  return Promise.all(
+    PERFORMANCE_SOURCE_PATHS.map((path) => (path.endsWith("/core") ? hashTree(path) : hashFile(path))),
+  );
 }
 
 export function digestPerformanceSourceInputs(sourceInputs) {
@@ -76,14 +93,20 @@ export function assertPerformanceEvidence(document, { sourceInputs } = {}) {
   }
   assert.ok(document.snapshotBandwidth.frames > 0);
   assert.equal(document.snapshotBandwidth.totalBytes > 0, true);
-  assert.equal(document.snapshotBandwidth.keyframes + document.snapshotBandwidth.deltas, document.snapshotBandwidth.frames);
+  assert.equal(
+    document.snapshotBandwidth.keyframes + document.snapshotBandwidth.deltas,
+    document.snapshotBandwidth.frames,
+  );
   assert.ok(document.reconciliation.samples > 0);
   assert.equal(document.reconciliation.postRestoreError, 0);
   assert.ok(document.reconciliation.correctedSnapshots > 0);
   assert.equal(document.fixedPools.players.highWater, 32);
   assert.ok(document.fixedPools.projectiles.highWater <= document.fixedPools.projectiles.capacity);
   assert.ok(document.fixedPools.presentationEvents.highWater <= document.fixedPools.presentationEvents.capacity);
-  assert.equal(document.fixedPools.presentationEvents.failures, document.fixedPools.presentationEvents.droppedByOverflow);
+  assert.equal(
+    document.fixedPools.presentationEvents.failures,
+    document.fixedPools.presentationEvents.droppedByOverflow,
+  );
   assert.equal(document.fixedPools.snapshotFrame.failures, 0);
   assert.equal(document.fixedPools.arena.observable, false);
   assert.equal(document.fixedPools.arena.failures, null);

@@ -29,9 +29,9 @@
   },
   "target": "arm64-macos",
   "status": "observed-clean",
-  "artifactKey": "27edefda261215111e05b0cbfea4fa662faaf286bb3b3fb9c4bb4f80dd8b198b",
-  "sourceKey": "634b0d2802796357665fa065f3b4715a7e286d21e75051e0bdf1e490a06b9296",
-  "evidenceKey": "fd15420650d87dd6519bbc3c3f9a3d1434779a592dafb448de3370a0a06bc7d9",
+  "artifactKey": "e6229ded6d0114fb815acb0a3b867071833e15fa13ce06bbc40df463d9338d36",
+  "sourceKey": "e020f3b51e80980f651009cefec7d02ff6dc4928d945412f8e704a36d2a4b505",
+  "evidenceKey": "78c9ecc77666bc19566c71e440d1f7d3a4d62c8039da6b12247f83660f76f50e",
   "artifacts": [
     {
       "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
@@ -40,18 +40,18 @@
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.arcd",
-      "bytes": 617798,
-      "sha256": "1ca158ee2383c656439fff968e6a2c987e7523a385f7a56208bebebbc7adc772"
+      "bytes": 630507,
+      "sha256": "40198af0da99b37150740627efecd4c0be24dfde9a19e74820dcc2408c4981f5"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.arci",
       "bytes": 6368,
-      "sha256": "caa1a2d1adb711a08171befcbb8eb27335ea145991d2ddfaa523e1d688502dde"
+      "sha256": "5e963f7cb4237149e5596e277ff3f8eb8bb20f60728fc7299b1643c015b2b940"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.dmanifest",
       "bytes": 6159,
-      "sha256": "5590ff1e01502c629a597c2020741d0bc063ff87c8d5fa82fb249d6090a4c2e5"
+      "sha256": "23ceae724d0c6c3c00e7d163e937311971c461930443ca411f27450b379d974c"
     },
     {
       "path": "examples/war-battles-online/defold/build/default/game.projectc",
@@ -60,8 +60,8 @@
     },
     {
       "path": "examples/war-battles-online/defold/build/default/deherm/app.dehermc",
-      "bytes": 274836,
-      "sha256": "74d16f32e6abb963fccf359771c9486f6bfb1de0e526786cbb5b387ce300378d"
+      "bytes": 292164,
+      "sha256": "b7123ee83f9ab815d7d6d7fb5d0ab4817629c4b59e2c88dbc922e5e842472fa2"
     }
   ],
   "sourceInputs": [
@@ -76,13 +76,13 @@
       "path": "examples/war-battles-online/defold",
       "kind": "tree",
       "fileCount": 719,
-      "bytes": 4580543,
-      "sha256": "12129337ff19bfd3a979a2d595af01a75d2ac71c9cdc740c5bf095b69e78f995"
+      "bytes": 4597601,
+      "sha256": "edd9adc3acee4b185fd4c132f73a2a412d489f4166450b9d6c7dfde2c8bca0a7"
     },
     {
       "path": "examples/war-battles-online/defold/.defignore#authored-rules",
-      "bytes": 0,
-      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      "bytes": 935,
+      "sha256": "1c316de66ad43b6da4dc681d41fa9a2a07e85da2b8c0bb73d9d847f4ec2f5a24"
     },
     {
       "path": "upstream.lock",
@@ -91,8 +91,8 @@
     },
     {
       "path": "examples/war-battles-online/defold/deherm.lock",
-      "bytes": 28419,
-      "sha256": "6dc72966de4b8af37322b90d90d3d10436204c5652a8eddbc1e2af09c92bf163"
+      "bytes": 28653,
+      "sha256": "c690402c8ece8f82b97d6518708423d18bd596cc23d03c4286d0cac39d5c4efa"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/ir/binding-lowering-plan.sentinel.json",
@@ -102,7 +102,7 @@
     {
       "path": "examples/war-battles-online/defold/.deherm/generated/components/manifest.json",
       "bytes": 20096,
-      "sha256": "f7c7842836486a8d11aaf14750e11615e0ea940dd3802e4fe1ceb9be291ffbeb"
+      "sha256": "0b96250736394631d20478774618bd5457d0788a1c72f4f6a804bafac197525c"
     }
   ],
   "observation": {
@@ -142,11 +142,11 @@
       "method": "system-exit",
       "exitCode": 0,
       "signal": null,
-      "port": 50964
+      "port": 50851
     },
     "transcript": {
       "canonicalLineCount": 62,
-      "canonicalSha256": "26394f738aed55ac2ff24cd402be850d1ba5ab4449b846decab0265db1355d96"
+      "canonicalSha256": "18502a05672764be19f3344e33441030b2b909a93a5102614f0063ebcd6458ae"
     }
   }
 }

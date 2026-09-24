@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "eslint/no-debugger": "error",
+    "eslint/no-duplicate-imports": "error",
+    "eslint/no-eval": "error"
+  },
+  "ignorePatterns": [
+    ".agents/**",
+    ".deherm/**",
+    "build/**",
+    "dist/**",
+    "upstream/**",
+    "**/evidence/**",
+    "**/fixtures/**",
+    "**/generated/**",
+    "**/generated-*/*",
+    "defold/defold_hermes/lib/web/**",
+    "examples/*/defold/defold_hermes/**",
+    "examples/*/defold/defold_hermes_typed_native/**"
+  ]
+}

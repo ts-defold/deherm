@@ -4,13 +4,13 @@ import path from "node:path";
 
 import {
   componentAuthoringConventions,
-  generateComponentProxies
+  generateComponentProxies,
 } from "../../../compiler/src/component-proxy-generator.mjs";
 import { recordBundleBuild } from "../build-artifacts.mjs";
 import {
   writeProjectDmSdkCallSymbolIndex,
   writeProjectResourceSymbols,
-  writeProjectRouteSymbolIndex
+  writeProjectRouteSymbolIndex,
 } from "../resource-symbols.mjs";
 import { readReleaseReachability } from "./release-reachability.mjs";
 import { createBugPoolRecorder, defaultBugPoolFile } from "./bug-pool.mjs";
@@ -36,13 +36,7 @@ async function exists(file) {
 }
 
 const componentSourceSuffixes = componentAuthoringConventions.map(({ suffix }) => suffix);
-const ignoredEntryDirectories = new Set([
-  ".deherm",
-  ".git",
-  "build",
-  "defold_hermes",
-  "node_modules"
-]);
+const ignoredEntryDirectories = new Set([".deherm", ".git", "build", "defold_hermes", "node_modules"]);
 
 function isComponentSource(file) {
   return componentSourceSuffixes.some((suffix) => file.endsWith(suffix));
@@ -50,10 +44,7 @@ function isComponentSource(file) {
 
 async function resolveEntry(projectRoot, requested) {
   if (requested) return path.isAbsolute(requested) ? requested : path.resolve(projectRoot, requested);
-  const candidates = [
-    path.join(projectRoot, "src", "main.ts"),
-    path.join(projectRoot, "src", "main.script.ts")
-  ];
+  const candidates = [path.join(projectRoot, "src", "main.ts"), path.join(projectRoot, "src", "main.script.ts")];
   for (const candidate of candidates) if (await exists(candidate)) return candidate;
   let componentEntries = [];
   try {
@@ -70,7 +61,9 @@ async function resolveEntry(projectRoot, requested) {
   }
   if (componentEntries.length === 1) return componentEntries[0];
   if (componentEntries.length > 1) return componentEntries[0];
-  throw new Error(`deherm dev needs --entry <file>; no conventional entry or authored ${componentSourceSuffixes.join(", ")} component was found`);
+  throw new Error(
+    `deherm dev needs --entry <file>; no conventional entry or authored ${componentSourceSuffixes.join(", ")} component was found`,
+  );
 }
 
 function containedPath(root, relative, label) {
@@ -111,7 +104,7 @@ async function entryTsconfig(projectRoot, entryPoint) {
   const generated = path.join(projectRoot, `tsconfig.deherm.${context}.json`);
   if (await exists(generated)) return generated;
   const conventional = path.join(projectRoot, "tsconfig.json");
-  return await exists(conventional) ? conventional : undefined;
+  return (await exists(conventional)) ? conventional : undefined;
 }
 
 export function createDevWatchOptions({
@@ -121,26 +114,25 @@ export function createDevWatchOptions({
   buildMirror,
   lockFile,
   generatedRoot,
-  generatedProxyPaths = new Set()
+  generatedProxyPaths = new Set(),
 }) {
-  const toolchainOutputs = projectRoot ? [
-    path.join(projectRoot, ".defignore"),
-    path.join(projectRoot, "defold_hermes", "include", "libhermesvm-config.h"),
-    path.join(projectRoot, "defold_hermes", "include", "defold_hermes", "generated_runtime_variant.h"),
-    path.join(projectRoot, "defold_hermes", "lib")
-  ] : [];
+  const toolchainOutputs = projectRoot
+    ? [
+        path.join(projectRoot, ".defignore"),
+        path.join(projectRoot, "defold_hermes", "include", "libhermesvm-config.h"),
+        path.join(projectRoot, "defold_hermes", "include", "defold_hermes", "generated_runtime_variant.h"),
+        path.join(projectRoot, "defold_hermes", "lib"),
+      ]
+    : [];
   return {
-    ignoredPaths: [outputFile, sourceMirror, buildMirror].flatMap((file) => [
-      file,
-      `${file}.map`,
-      `${file}.hbc`,
-      `${file}.hbc.map`
-    ]).concat(lockFile ? [lockFile] : [])
+    ignoredPaths: [outputFile, sourceMirror, buildMirror]
+      .flatMap((file) => [file, `${file}.map`, `${file}.hbc`, `${file}.hbc.map`])
+      .concat(lockFile ? [lockFile] : [])
       .concat(generatedRoot ? [generatedRoot] : [])
       .concat(toolchainOutputs),
     // The watcher already drops every atomic-write scratch name, including
     // `.deherm-tmp-*`; this only hides the proxies the session itself writes.
-    shouldIgnore: (_file, relative) => generatedProxyPaths.has(relative)
+    shouldIgnore: (_file, relative) => generatedProxyPaths.has(relative),
   };
 }
 
@@ -151,8 +143,10 @@ const documentationSuffixes = [".md", ".markdown", ".mdx", ".mdc", ".txt", ".rst
 
 export function isDocumentationOnlyChange(file) {
   const name = file.toLowerCase();
-  return documentationSuffixes.some((suffix) => name.endsWith(suffix)) ||
-    ["license", "licence", "notice", "authors", "changelog"].includes(name.split("/").at(-1));
+  return (
+    documentationSuffixes.some((suffix) => name.endsWith(suffix)) ||
+    ["license", "licence", "notice", "authors", "changelog"].includes(name.split("/").at(-1))
+  );
 }
 
 export function buildRelevantChanges(files) {
@@ -166,20 +160,20 @@ async function refreshProjectSymbolIndexes(projectRoot, generatedRoot) {
       name: "resource",
       inputs: ["defold-resource-declaration-schema.json", "defold-script-resource-namespaces.json"],
       output: "resource-symbols.json",
-      write: () => writeProjectResourceSymbols(projectRoot, generatedRoot)
+      write: () => writeProjectResourceSymbols(projectRoot, generatedRoot),
     },
     {
       name: "script-route",
       inputs: ["script-api.json", "binding-lowering-plan.json"],
       output: "script-route-symbol-index.json",
-      write: () => writeProjectRouteSymbolIndex(generatedRoot)
+      write: () => writeProjectRouteSymbolIndex(generatedRoot),
     },
     {
       name: "dmsdk-call",
       inputs: ["dmsdk.json", "dmsdk-universal-bindings.json"],
       output: "dmsdk-call-symbol-index.json",
-      write: () => writeProjectDmSdkCallSymbolIndex(generatedRoot)
-    }
+      write: () => writeProjectDmSdkCallSymbolIndex(generatedRoot),
+    },
   ];
   const written = [];
   const unavailable = [];
@@ -196,8 +190,9 @@ async function refreshProjectSymbolIndexes(projectRoot, generatedRoot) {
 }
 
 function needsDefoldBuild(files, componentProxyChanged = false) {
-  return files.some((file) => !/\.[cm]?[jt]sx?$/.test(file)) ||
-    (componentProxyChanged && files.some(isComponentSource));
+  return (
+    files.some((file) => !/\.[cm]?[jt]sx?$/.test(file)) || (componentProxyChanged && files.some(isComponentSource))
+  );
 }
 
 export function resourcesForBobReload(resources, compilerResources, compilerReloadSignalled) {
@@ -206,14 +201,48 @@ export function resourcesForBobReload(resources, compilerResources, compilerRelo
   return resources.filter((resource) => !compilerArtifacts.has(resource));
 }
 
+/**
+ * Source resources whose compiled form cannot be installed into the already
+ * running engine with Defold's resource reload endpoint.
+ *
+ * Input bindings are read when the collection input stack is created. Bob can
+ * rebuild an `.input_binding`, but reloading its compiled resource does not
+ * replace the action table held by an existing input focus. Treating that as a
+ * successful hot reload leaves the TUI green while the game still uses the old
+ * controls, so these changes must take the explicit restart lane.
+ */
+export function restartRequiredDefoldChanges(files) {
+  return files.filter(
+    (file) =>
+      file === "game.project" ||
+      file.startsWith("defold_hermes/") ||
+      file.endsWith("/ext.manifest") ||
+      file === "ext.manifest" ||
+      file.endsWith(".input_binding"),
+  );
+}
+
+/**
+ * Changes that can affect the JavaScript bundle compiled by deherm.
+ *
+ * `.input_binding` is deliberately excluded. It is a Defold resource, not a
+ * JavaScript input, and the running engine cannot install its rebuilt action
+ * table. Compiling and signalling the unchanged bundle before the required
+ * engine restart would report an HMR generation that did not apply the edit.
+ */
+export function compilerRelevantChanges(files) {
+  return files.filter((file) => !file.endsWith(".input_binding"));
+}
+
 function needsEngineRestart(files) {
-  return files.some((file) => file === "game.project" || file.startsWith("defold_hermes/") || file.endsWith("/ext.manifest") || file === "ext.manifest");
+  return restartRequiredDefoldChanges(files).length > 0;
 }
 
 export function sessionLogEvent(event) {
   if (event.type !== "component-snapshot") return event;
   let propertyCount = 0;
-  for (const instance of event.instances ?? []) propertyCount += Array.isArray(instance?.properties) ? instance.properties.length : 0;
+  for (const instance of event.instances ?? [])
+    propertyCount += Array.isArray(instance?.properties) ? instance.properties.length : 0;
   return {
     schemaVersion: event.schemaVersion,
     type: event.type,
@@ -225,7 +254,7 @@ export function sessionLogEvent(event) {
     complete: event.complete,
     omitted: event.omitted ? { ...event.omitted } : undefined,
     instanceCount: event.instances?.length ?? 0,
-    propertyCount
+    propertyCount,
   };
 }
 
@@ -245,23 +274,25 @@ export function devStateSnapshot(model) {
       instanceProjection: {
         complete: true,
         totalInstances: target.instances?.length ?? 0,
-        omittedInstances: 0
+        omittedInstances: 0,
       },
       // `instances` above is the authoritative server-enriched projection.
       // Keep only snapshot freshness/identity metadata here: returning the raw
       // instances as well would duplicate up to 512 KiB per target and could
       // push an otherwise valid native+browser response past the editor's
       // bounded 2 MiB intake.
-      componentSnapshot: target.componentSnapshot ? {
-        schemaVersion: target.componentSnapshot.schemaVersion,
-        type: target.componentSnapshot.type,
-        runtimeId: target.componentSnapshot.runtimeId,
-        sequence: target.componentSnapshot.sequence,
-        sampledAt: target.componentSnapshot.sampledAt,
-        complete: target.componentSnapshot.complete,
-        omitted: target.componentSnapshot.omitted
-      } : null
-    }))
+      componentSnapshot: target.componentSnapshot
+        ? {
+            schemaVersion: target.componentSnapshot.schemaVersion,
+            type: target.componentSnapshot.type,
+            runtimeId: target.componentSnapshot.runtimeId,
+            sequence: target.componentSnapshot.sequence,
+            sampledAt: target.componentSnapshot.sampledAt,
+            complete: target.componentSnapshot.complete,
+            omitted: target.componentSnapshot.omitted,
+          }
+        : null,
+    })),
   };
   // The editor intake is deliberately bounded at 2 MiB. Generated source and
   // proxy paths are server-enriched onto every runtime row and can be much
@@ -271,8 +302,10 @@ export function devStateSnapshot(model) {
   const maximumBytes = 2 * 1024 * 1024;
   const envelopeReserve = 32 * 1024;
   const baseBytes = Buffer.byteLength(JSON.stringify(result));
-  const targetBudget = Math.max(0, Math.floor(
-    (maximumBytes - envelopeReserve - baseBytes) / Math.max(1, result.targets.length)));
+  const targetBudget = Math.max(
+    0,
+    Math.floor((maximumBytes - envelopeReserve - baseBytes) / Math.max(1, result.targets.length)),
+  );
   for (let targetIndex = 0; targetIndex < result.targets.length; ++targetIndex) {
     const sourceInstances = snapshot.targets[targetIndex].instances ?? [];
     const projected = result.targets[targetIndex];
@@ -297,7 +330,7 @@ export async function prepareDebugWebBundle(builder, options = {}) {
     platform: "wasm-web",
     variant: "debug",
     ...(webBundle ? { bundleOutput: path.dirname(webBundle) } : {}),
-    reason: options.reason ?? "development browser launch"
+    reason: options.reason ?? "development browser launch",
   });
 }
 
@@ -305,10 +338,9 @@ export async function runDevSession(options = {}) {
   const services = options.services ?? {};
   const projectRoot = path.resolve(options.project ?? process.cwd());
   const generatedRoot = path.resolve(options.generatedRoot ?? path.join(projectRoot, options.outDir ?? ".deherm"));
-  const componentPolicy = JSON.parse(await readFile(
-    path.join(generatedRoot, "ir", "defold-component-proxy-contract.json"),
-    "utf8"
-  ));
+  const componentPolicy = JSON.parse(
+    await readFile(path.join(generatedRoot, "ir", "defold-component-proxy-contract.json"), "utf8"),
+  );
   const entryPoint = await resolveEntry(projectRoot, options.entry);
   const outputFile = path.resolve(options.outputFile ?? path.join(projectRoot, ".deherm", "dev", "app.dehermc"));
   const sessionLogFile = path.resolve(options.sessionLog ?? path.join(projectRoot, ".deherm", "dev", "session.log"));
@@ -316,7 +348,9 @@ export async function runDevSession(options = {}) {
   const sessionLog = createWriteStream(sessionLogFile, { flags: "w" });
   let sessionLogFailed = false;
   let sessionLogClosed = false;
-  sessionLog.on("error", () => { sessionLogFailed = true; });
+  sessionLog.on("error", () => {
+    sessionLogFailed = true;
+  });
   const closeSessionLog = async () => {
     if (sessionLogClosed) return;
     sessionLogClosed = true;
@@ -335,10 +369,15 @@ export async function runDevSession(options = {}) {
   // happen and accumulated into a pool that survives across sessions. The pool
   // records this software's own runtime behaviour; it is never conformance
   // evidence and must not reach a completion-matrix row.
-  const bugPool = options.bugPool === false ? undefined : createBugPoolRecorder({
-    file: path.resolve(options.bugPoolFile ?? defaultBugPoolFile(projectRoot)),
-    onError: () => { /* Harvesting must never interrupt a development session. */ }
-  });
+  const bugPool =
+    options.bugPool === false
+      ? undefined
+      : createBugPoolRecorder({
+          file: path.resolve(options.bugPoolFile ?? defaultBugPoolFile(projectRoot)),
+          onError: () => {
+            /* Harvesting must never interrupt a development session. */
+          },
+        });
   const model = createDevModel({ bugPoolFile: bugPool?.file });
   const lineOutput = options.headless || (!options.json && (!process.stdin.isTTY || !process.stdout.isTTY));
   let compilerGeneration = 0;
@@ -347,17 +386,21 @@ export async function runDevSession(options = {}) {
     if (event.type === "build-succeeded") {
       compilerGeneration = event.generation;
       compilerReloadSignalled = false;
-    } else if (event.type === "reload-signalled" &&
-        event.id === "local-engine" && event.generation === compilerGeneration) {
+    } else if (
+      event.type === "reload-signalled" &&
+      event.id === "local-engine" &&
+      event.generation === compilerGeneration
+    ) {
       compilerReloadSignalled = true;
     }
     applyDevEvent(model, event);
     bugPool?.record(event);
     if (!sessionLogFailed && !sessionLog.destroyed) {
       const timestamp = new Date(event.at ?? Date.now()).toISOString();
-      const line = event.type === "log"
-        ? `${timestamp} [${String(event.level ?? "info").toUpperCase()}] ${event.source ?? "deherm"} ${event.message}`
-        : `${timestamp} [EVENT] ${event.type} ${JSON.stringify(sessionLogEvent(event))}`;
+      const line =
+        event.type === "log"
+          ? `${timestamp} [${String(event.level ?? "info").toUpperCase()}] ${event.source ?? "deherm"} ${event.message}`
+          : `${timestamp} [EVENT] ${event.type} ${JSON.stringify(sessionLogEvent(event))}`;
       sessionLog.write(`${line}\n`);
     }
     if (options.json) process.stdout.write(`${JSON.stringify({ schemaVersion: 1, event })}\n`);
@@ -368,19 +411,26 @@ export async function runDevSession(options = {}) {
     for (const listener of listeners) listener(event);
     services.onEvent?.(event);
   };
-  emit({ type: "log", source: "dev", message: `session log: ${path.relative(projectRoot, sessionLogFile).split(path.sep).join("/")}` });
-  const targets = new Map((options.targets ?? []).map((url, index) => {
-    const id = `target-${index + 1}`;
-    const name = new URL(url).host;
-    emit({ type: "target-configured", id, name, url });
-    return [id, { url, name }];
-  }));
+  emit({
+    type: "log",
+    source: "dev",
+    message: `session log: ${path.relative(projectRoot, sessionLogFile).split(path.sep).join("/")}`,
+  });
+  const targets = new Map(
+    (options.targets ?? []).map((url, index) => {
+      const id = `target-${index + 1}`;
+      const name = new URL(url).host;
+      emit({ type: "target-configured", id, name, url });
+      return [id, { url, name }];
+    }),
+  );
   if (targets.size) {
     emit({
       type: "log",
       level: "warn",
       source: "reload",
-      message: "Defold HTTP 200 acknowledges enqueue only; the target remains awaiting activation until runtime telemetry confirms a committed generation"
+      message:
+        "Defold HTTP 200 acknowledges enqueue only; the target remains awaiting activation until runtime telemetry confirms a committed generation",
     });
   }
   let generatedComponents = false;
@@ -411,62 +461,72 @@ export async function runDevSession(options = {}) {
     // relation between the artifact on Bob's input path and the sources it came
     // from is recorded at the moment it is true rather than inferred later.
     // Recording hashes the files the bundler just read; it never recompiles.
-    afterRebuild: options.recordBuildArtifacts === false ? undefined : async (build) => {
-      // Reporting only. The development extension keeps the complete linked
-      // surface whatever this says, so a new API call never forces a relink.
-      try {
-        const reachability = await readReleaseReachability(projectRoot);
-        if (reachability) emit({ type: "reachability", reachability });
-      } catch {
-        // A console that cannot read the manifest simply shows nothing.
-      }
-      try {
-        await recordBundleBuild({ projectRoot, build });
-      } catch (error) {
-        // Reported once: a project whose lock cannot be written fails every
-        // rebuild the same way, and the edit loop is not the place to repeat it.
-        if (reportedArtifactRecordingFailure) return;
-        reportedArtifactRecordingFailure = true;
-        emit({
-          type: "log",
-          level: "warn",
-          source: "dev",
-          message: `could not record the bundle freshness binding in deherm.lock: ${error instanceof Error ? error.message : String(error)}`
-        });
-      }
-    },
-    beforeRebuild: options.components === false ? undefined : async (changedSources) => {
-      if (generatedComponents && !changedSources.some(isComponentSource)) return;
-      const components = await generateComponentProxies({ projectRoot, outputRoot: projectRoot, componentPolicy });
-      generatedProxyPaths.clear();
-      for (const component of components.manifest.components) generatedProxyPaths.add(component.proxy);
-      emit({
-        type: "component-catalog",
-        components: components.manifest.components.map((component) => ({
-          componentId: component.componentId,
-          schemaFingerprint: component.schemaFingerprint,
-          source: component.source,
-          proxy: component.proxy,
-          contextKind: component.contextKind,
-          properties: component.properties.map(({ name, slot, kind }) => ({ name, slot, kind }))
-        }))
-      });
-      // Sticky until the watcher batch consumes it. A forced/manual build may
-      // join the coordinator loop after this build and must not erase the fact
-      // that the component batch changed a Defold resource.
-      componentProxyChanged ||= components.defoldResourceStale.length > 0;
-      const indexes = await refreshProjectSymbolIndexes(projectRoot, generatedRoot);
-      if (indexes.unavailable.length && !reportedMissingSymbolIndexes) {
-        reportedMissingSymbolIndexes = true;
-        emit({
-          type: "log",
-          level: "warn",
-          source: "compiler",
-          message: `some project API IR inputs are absent; ${indexes.unavailable.join(", ")} compile-time indexes are disabled (run 'deherm generate' to enable them)`
-        });
-      }
-      generatedComponents = true;
-    }
+    afterRebuild:
+      options.recordBuildArtifacts === false
+        ? undefined
+        : async (build) => {
+            // Reporting only. The development extension keeps the complete linked
+            // surface whatever this says, so a new API call never forces a relink.
+            try {
+              const reachability = await readReleaseReachability(projectRoot);
+              if (reachability) emit({ type: "reachability", reachability });
+            } catch {
+              // A console that cannot read the manifest simply shows nothing.
+            }
+            try {
+              await recordBundleBuild({ projectRoot, build });
+            } catch (error) {
+              // Reported once: a project whose lock cannot be written fails every
+              // rebuild the same way, and the edit loop is not the place to repeat it.
+              if (reportedArtifactRecordingFailure) return;
+              reportedArtifactRecordingFailure = true;
+              emit({
+                type: "log",
+                level: "warn",
+                source: "dev",
+                message: `could not record the bundle freshness binding in deherm.lock: ${error instanceof Error ? error.message : String(error)}`,
+              });
+            }
+          },
+    beforeRebuild:
+      options.components === false
+        ? undefined
+        : async (changedSources) => {
+            if (generatedComponents && !changedSources.some(isComponentSource)) return;
+            const components = await generateComponentProxies({
+              projectRoot,
+              outputRoot: projectRoot,
+              componentPolicy,
+            });
+            generatedProxyPaths.clear();
+            for (const component of components.manifest.components) generatedProxyPaths.add(component.proxy);
+            emit({
+              type: "component-catalog",
+              components: components.manifest.components.map((component) => ({
+                componentId: component.componentId,
+                schemaFingerprint: component.schemaFingerprint,
+                source: component.source,
+                proxy: component.proxy,
+                contextKind: component.contextKind,
+                properties: component.properties.map(({ name, slot, kind }) => ({ name, slot, kind })),
+              })),
+            });
+            // Sticky until the watcher batch consumes it. A forced/manual build may
+            // join the coordinator loop after this build and must not erase the fact
+            // that the component batch changed a Defold resource.
+            componentProxyChanged ||= components.defoldResourceStale.length > 0;
+            const indexes = await refreshProjectSymbolIndexes(projectRoot, generatedRoot);
+            if (indexes.unavailable.length && !reportedMissingSymbolIndexes) {
+              reportedMissingSymbolIndexes = true;
+              emit({
+                type: "log",
+                level: "warn",
+                source: "compiler",
+                message: `some project API IR inputs are absent; ${indexes.unavailable.join(", ")} compile-time indexes are disabled (run 'deherm generate' to enable them)`,
+              });
+            }
+            generatedComponents = true;
+          },
   });
   const coordinator = services.createCoordinator
     ? services.createCoordinator({ compiler, targets, emit })
@@ -489,7 +549,7 @@ export async function runDevSession(options = {}) {
         getDevState: () => devStateSnapshot(model),
         sessionFile: path.resolve(options.inspectorSession ?? defaultInspectorSessionFile(projectRoot)),
         bundleUrl: `deherm://${resourcePath}`,
-        sourceMapFile: `${outputFile}.map`
+        sourceMapFile: `${outputFile}.map`,
       });
   // The resource server starts later in this function, so the engine resolves
   // its content root lazily at launch time.
@@ -500,7 +560,7 @@ export async function runDevSession(options = {}) {
     targetId: "local-engine",
     resourceUri: () => resourceServer?.baseUrl,
     inspectorPort: inspectorBridge?.enginePort,
-    env: { DM_SERVICE_PORT: String(servicePort) }
+    env: { DM_SERVICE_PORT: String(servicePort) },
   });
   // The HTML5 target of the same session. It is a peer of the native engine,
   // not a mode of it: both can run at once, each reports its own generation and
@@ -518,7 +578,7 @@ export async function runDevSession(options = {}) {
     allowNestedBundleDirectory: !options.webBundle,
     chromeBinary: options.chrome,
     headless: options.browserHeadless,
-    telemetryIntervalMs: options.telemetryIntervalMs
+    telemetryIntervalMs: options.telemetryIntervalMs,
   });
   // A build the browser target is running must reach the page, and only a
   // build that succeeded may be pushed. This is the browser's equivalent of the
@@ -526,14 +586,18 @@ export async function runDevSession(options = {}) {
   // is a different transport with a different acknowledgement path.
   listeners.add((event) => {
     if (event.type !== "build-succeeded" || !browser.running()) return;
-    void browser.activate(event.generation).catch((error) => emit({
-      type: "log",
-      level: "error",
-      source: "browser",
-      message: `pushing bundle generation ${event.generation} into the page failed: ${error instanceof Error ? error.message : String(error)}`
-    }));
+    void browser.activate(event.generation).catch((error) =>
+      emit({
+        type: "log",
+        level: "error",
+        source: "browser",
+        message: `pushing bundle generation ${event.generation} into the page failed: ${error instanceof Error ? error.message : String(error)}`,
+      }),
+    );
   });
-  await coordinator.requestBuild([path.relative(projectRoot, entryPoint).split(path.sep).join("/") || path.basename(entryPoint)]);
+  await coordinator.requestBuild([
+    path.relative(projectRoot, entryPoint).split(path.sep).join("/") || path.basename(entryPoint),
+  ]);
   // Startup generation is followed by the explicit initial Bob build below;
   // only watcher-driven component changes participate in the incremental gate.
   componentProxyChanged = false;
@@ -544,7 +608,6 @@ export async function runDevSession(options = {}) {
     await closeSessionLog();
     return snapshotDevModel(model);
   }
-
 
   if (![...targets.values()].some(({ url }) => url === localTargetUrl)) {
     targets.set("local-engine", { url: localTargetUrl, name: `local:${servicePort}` });
@@ -558,15 +621,19 @@ export async function runDevSession(options = {}) {
   // A rejected promise must not be cached: a transient failure (a busy port, a
   // temporary filesystem error) would otherwise make every later build and
   // launch rethrow the same stale error for the lifetime of the session.
-  const ensureBuilder = () => builderPromise ??= (services.createDefoldBuilder ?? createDefoldBuilder)({
-    projectRoot,
-    outputRoot: buildRoot,
-    buildServer: options.buildServer,
-    emit
-  }).then((value) => (builder = value), (error) => {
-    builderPromise = undefined;
-    throw error;
-  });
+  const ensureBuilder = () =>
+    (builderPromise ??= (services.createDefoldBuilder ?? createDefoldBuilder)({
+      projectRoot,
+      outputRoot: buildRoot,
+      buildServer: options.buildServer,
+      emit,
+    }).then(
+      (value) => (builder = value),
+      (error) => {
+        builderPromise = undefined;
+        throw error;
+      },
+    ));
   const ensureDebugBrowserBundle = async (reason) => {
     if (browserBundleReady) return;
     const activeBuilder = await ensureBuilder();
@@ -578,56 +645,68 @@ export async function runDevSession(options = {}) {
     developmentLoop = current.catch(() => {});
     return current;
   };
-  const buildDefoldAndMaybeLaunch = (
-      reason,
-      restart = false,
-      launch = options.autoLaunch !== false) => enqueue(async () => {
-    const activeBuilder = await ensureBuilder();
-    const result = await activeBuilder.build(reason);
-    if (restart && engine.running()) await engine.stop();
-    if (launch && !engine.running()) await engine.launch();
-    else if (engine.running() && result.resources.length) await coordinator.reloadResources(result.resources);
-    return result;
-  });
-  const launchBuiltGame = () => enqueue(async () => {
-    if (model.defoldBuild.status !== "ready") {
+  const buildDefoldAndMaybeLaunch = (reason, restart = false, launch = options.autoLaunch !== false) =>
+    enqueue(async () => {
       const activeBuilder = await ensureBuilder();
-      await activeBuilder.build("manual launch");
-    }
-    if (!engine.running()) await engine.launch();
-  });
-  const processChanges = (batch) => enqueue(async () => {
-    const files = buildRelevantChanges(batch);
-    if (!files.length) return;
-    await coordinator.requestBuild(files);
-    const requiresDefoldBuild = needsDefoldBuild(files, componentProxyChanged);
-    componentProxyChanged = false;
-    if (!requiresDefoldBuild) return;
-    const activeBuilder = await ensureBuilder();
-    const result = await activeBuilder.build(`changed ${files.length} file(s)`);
-    if (needsEngineRestart(files)) {
-      const wasRunning = engine.running();
-      if (wasRunning) await engine.stop();
-      if (wasRunning || options.autoLaunch !== false) await engine.launch();
-    } else if (engine.running() && result.resources.length) {
-      const resources = resourcesForBobReload(result.resources, [resourcePath], compilerReloadSignalled);
-      if (resources.length) await coordinator.reloadResources(resources);
-    }
-  });
+      const result = await activeBuilder.build(reason);
+      if (restart && engine.running()) await engine.stop();
+      if (launch && !engine.running()) await engine.launch();
+      else if (engine.running() && result.resources.length) await coordinator.reloadResources(result.resources);
+      return result;
+    });
+  const launchBuiltGame = () =>
+    enqueue(async () => {
+      if (model.defoldBuild.status !== "ready") {
+        const activeBuilder = await ensureBuilder();
+        await activeBuilder.build("manual launch");
+      }
+      if (!engine.running()) await engine.launch();
+    });
+  const processChanges = (batch) =>
+    enqueue(async () => {
+      const files = buildRelevantChanges(batch);
+      if (!files.length) return;
+      const compilerFiles = compilerRelevantChanges(files);
+      if (compilerFiles.length) await coordinator.requestBuild(compilerFiles);
+      const requiresDefoldBuild = needsDefoldBuild(files, componentProxyChanged);
+      componentProxyChanged = false;
+      if (!requiresDefoldBuild) return;
+      const activeBuilder = await ensureBuilder();
+      const result = await activeBuilder.build(`changed ${files.length} file(s)`);
+      if (needsEngineRestart(files)) {
+        const restartSources = restartRequiredDefoldChanges(files);
+        const wasRunning = engine.running();
+        emit({
+          type: "log",
+          source: "engine",
+          message: `restarting for non-reloadable Defold resource${restartSources.length === 1 ? "" : "s"}: ${restartSources.join(", ")}`,
+        });
+        if (wasRunning) await engine.stop();
+        if (wasRunning || options.autoLaunch !== false) await engine.launch();
+      } else if (engine.running() && result.resources.length) {
+        const resources = resourcesForBobReload(result.resources, [resourcePath], compilerReloadSignalled);
+        if (resources.length) await coordinator.reloadResources(resources);
+      }
+    });
 
   await mkdir(buildRoot, { recursive: true });
-  resourceServer = options.serve === false ? undefined : await (services.startResourceServer ?? startResourceServer)({
-    root: buildRoot,
-    host: options.serveHost,
-    port: options.servePort,
-    onError: (error) => emit({ type: "log", level: "error", source: "resource-server", message: error.message })
-  });
+  resourceServer =
+    options.serve === false
+      ? undefined
+      : await (services.startResourceServer ?? startResourceServer)({
+          root: buildRoot,
+          host: options.serveHost,
+          port: options.servePort,
+          onError: (error) => emit({ type: "log", level: "error", source: "resource-server", message: error.message }),
+        });
   if (resourceServer) {
     emit({ type: "log", source: "resource-server", message: `serving ${buildRoot} at ${resourceServer.baseUrl}` });
   }
   const watcher = await (services.watchProject ?? watchProject)({
     root: options.watchRoot
-      ? (path.isAbsolute(options.watchRoot) ? options.watchRoot : path.resolve(projectRoot, options.watchRoot))
+      ? path.isAbsolute(options.watchRoot)
+        ? options.watchRoot
+        : path.resolve(projectRoot, options.watchRoot)
       : projectRoot,
     debounceMs: options.debounceMs,
     ...createDevWatchOptions({
@@ -637,31 +716,36 @@ export async function runDevSession(options = {}) {
       buildMirror,
       lockFile: path.join(projectRoot, "deherm.lock"),
       generatedRoot,
-      generatedProxyPaths
+      generatedProxyPaths,
     }),
     onBatch: (files) => processChanges(files),
-    onError: (error) => emit({ type: "log", level: "error", source: "watcher", message: error.message })
+    onError: (error) => emit({ type: "log", level: "error", source: "watcher", message: error.message }),
   });
-  const startup = buildDefoldAndMaybeLaunch("initial dev startup", false).catch((error) => emit({
-    type: "log",
-    level: "error",
-    source: "dev",
-    message: `automatic Defold build/launch failed: ${error instanceof Error ? error.message : String(error)}`
-  }));
+  const startup = buildDefoldAndMaybeLaunch("initial dev startup", false).catch((error) =>
+    emit({
+      type: "log",
+      level: "error",
+      source: "dev",
+      message: `automatic Defold build/launch failed: ${error instanceof Error ? error.message : String(error)}`,
+    }),
+  );
   // The HTML5 target is opt-in at startup and always available on the `w`
   // intent. Launching it here is what lets a non-interactive session drive the
   // browser edit loop, and it waits for the first bundle so the page is pushed
   // a generation that exists.
   const webStartup = options.web
-    ? startup.then(() => ensureDebugBrowserBundle("initial development browser launch"))
-      .then(() => browser.launch())
-      .then((started) => started && browser.activate(model.lastSuccessfulGeneration || undefined))
-      .catch((error) => emit({
-        type: "log",
-        level: "error",
-        source: "browser",
-        message: `HTML5 target could not start: ${error instanceof Error ? error.message : String(error)}`
-      }))
+    ? startup
+        .then(() => ensureDebugBrowserBundle("initial development browser launch"))
+        .then(() => browser.launch())
+        .then((started) => started && browser.activate(model.lastSuccessfulGeneration || undefined))
+        .catch((error) =>
+          emit({
+            type: "log",
+            level: "error",
+            source: "browser",
+            message: `HTML5 target could not start: ${error instanceof Error ? error.message : String(error)}`,
+          }),
+        )
     : Promise.resolve();
   const close = async () => {
     watcher.close();
@@ -684,14 +768,15 @@ export async function runDevSession(options = {}) {
         snapshot: () => snapshotDevModel(model),
         onIntent(intent) {
           if (intent.type === "reload") {
-            void coordinator.requestBuild([]).catch((error) => emit({
-              type: "log",
-              level: "error",
-              source: "coordinator",
-              message: error.message
-            }));
-          }
-          else if (intent.type === "rebuild") {
+            void coordinator.requestBuild([]).catch((error) =>
+              emit({
+                type: "log",
+                level: "error",
+                source: "coordinator",
+                message: error.message,
+              }),
+            );
+          } else if (intent.type === "rebuild") {
             void enqueue(async () => {
               await coordinator.requestBuild([]);
               const activeBuilder = await ensureBuilder();
@@ -699,14 +784,15 @@ export async function runDevSession(options = {}) {
               const wasRunning = engine.running();
               if (wasRunning) await engine.stop();
               if (wasRunning || options.autoLaunch !== false) await engine.launch();
-            }).catch((error) => emit({
-              type: "log",
-              level: "error",
-              source: "coordinator",
-              message: error instanceof Error ? error.message : String(error)
-            }));
-          }
-          else if (intent.type === "web") {
+            }).catch((error) =>
+              emit({
+                type: "log",
+                level: "error",
+                source: "coordinator",
+                message: error instanceof Error ? error.message : String(error),
+              }),
+            );
+          } else if (intent.type === "web") {
             // Launching serves the packaged wasm-web bundle on a scoped
             // loopback port, opens it in a dedicated headless Chrome profile,
             // and pushes the current bundle in. Stopping releases all three.
@@ -719,7 +805,11 @@ export async function runDevSession(options = {}) {
             // native extensions through an Extender - so it is announced.
             const launchBrowser = async () => {
               if (!browserBundleReady) {
-                emit({ type: "log", source: "browser", message: "preparing a debug wasm-web bundle (this resolves native extensions and takes a while)" });
+                emit({
+                  type: "log",
+                  source: "browser",
+                  message: "preparing a debug wasm-web bundle (this resolves native extensions and takes a while)",
+                });
                 await ensureDebugBrowserBundle("manual development browser launch");
               }
               return await browser.launch();
@@ -727,30 +817,31 @@ export async function runDevSession(options = {}) {
             const action = browser.running()
               ? browser.stop()
               : launchBrowser().then(async (started) => {
-                if (started) await browser.activate(model.lastSuccessfulGeneration || undefined);
-                return started;
-              });
-            void action.catch((error) => emit({
-              type: "log",
-              level: "error",
-              source: "browser",
-              message: error instanceof Error ? error.message : String(error)
-            }));
-          }
-          else if (intent.type === "play") {
-            const action = engine.running()
-              ? engine.stop()
-              : launchBuiltGame();
-            void action.catch((error) => emit({
-              type: "engine-failed",
-              diagnostic: error instanceof Error ? error.message : String(error)
-            }));
+                  if (started) await browser.activate(model.lastSuccessfulGeneration || undefined);
+                  return started;
+                });
+            void action.catch((error) =>
+              emit({
+                type: "log",
+                level: "error",
+                source: "browser",
+                message: error instanceof Error ? error.message : String(error),
+              }),
+            );
+          } else if (intent.type === "play") {
+            const action = engine.running() ? engine.stop() : launchBuiltGame();
+            void action.catch((error) =>
+              emit({
+                type: "engine-failed",
+                diagnostic: error instanceof Error ? error.message : String(error),
+              }),
+            );
           }
           // Targets, generations, instances, the palette, and help are console
           // views over this session's own snapshot; they need no session work.
           // Anything else reaching here is a console/session contract drift.
           else emit({ type: "log", level: "warn", source: "tui", message: `unhandled console intent: ${intent.type}` });
-        }
+        },
       });
     } finally {
       await close();

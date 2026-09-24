@@ -13,15 +13,17 @@ const project = resolve(runtimeRoot, "game.projectc");
 try {
   await Promise.all([access(engine), access(project)]);
 } catch {
-  throw new Error([
-    "War Battles has not been built for arm64-macOS.",
-    "Build the custom engine and resources first with the pinned Bob/local Extender flow documented in defold/README.md."
-  ].join(" "));
+  throw new Error(
+    [
+      "War Battles has not been built for arm64-macOS.",
+      "Build the custom engine and resources first with the pinned Bob/local Extender flow documented in defold/README.md.",
+    ].join(" "),
+  );
 }
 
 const child = spawn(engine, process.argv.slice(2), {
   cwd: runtimeRoot,
-  stdio: "inherit"
+  stdio: "inherit",
 });
 
 const result = await new Promise((resolveExit, reject) => {

@@ -1,0 +1,13 @@
+{
+  "name": "driver-portrait-base-v1",
+  "operation": "style-reference",
+  "prompt": "A square communications portrait of the same elderly tank driver archetype: huge white moustache and beard, brown leather tanker cap, silver goggles on his forehead, green military collar, determined three-quarter expression facing right. Match the supplied War Battles portrait palette, outline weight, facial proportions, and chunky military arcade pixel-art rendering. The head and shoulders fill the frame with breathing room at the edges. No frame, text, icon, weapon, background scene, or extra character.",
+  "size": 64,
+  "inputs": [
+    "defold/assets/ui/faces/driver/angry.png",
+    "defold/assets/ui/faces/driver/happy.png",
+    "defold/assets/ui/faces/driver/sad.png",
+    "defold/assets/ui/faces/captain/angry.png",
+    "defold/assets/ui/hud-panel.png"
+  ]
+}

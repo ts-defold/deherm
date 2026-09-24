@@ -29,6 +29,7 @@
   "source": {
     "releaseConfig": "examples/war-battles-online/defold/tsconfig.deherm.release.json",
     "authoredFiles": [
+      ".deherm/sdk/defold.ts",
       "main/arena.script.ts",
       "main/camera.script.ts",
       "main/pickup.script.ts",
@@ -38,11 +39,11 @@
       "main/ui.gui.ts",
       "reference/battle.gui.ts"
     ],
-    "authoredSourceTreeSha256": "a2af0ff4f79f217b5a604574a61e70a5ecea6e3373bf566a0a28a39fb6b7b3e0",
+    "authoredSourceTreeSha256": "9bda72add29936426ce5568960028a9a66b6c7678df0e3b2a8d3fb897f888e38",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
-    "loweringPlanSha256": "d61c2004c39054ab8da2eba1bbc988969ca5f1b872cff4936987ce20e7536712",
+    "loweringPlanSha256": "5d4b93e60d6393840da5b02271ba42978d685a59c59464eea234fd592f837195",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
-    "typedNativeBridgeSha256": "222d7b9c0dec214fa70cada3335dbd6f0f278b665b7ffa9de854f28bff948a5b",
+    "typedNativeBridgeSha256": "1f217203d3355f110dee044d4dd3ac4bf1293131a9d1e79434387f5779eba30b",
     "typedNativeSource": "examples/war-battles-online/defold/.deherm/static-hermes/generated/script-typed-native-bridge.ts",
     "typedNativeSourceSha256": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f",
     "adapterEvidence": "examples/war-battles-online/evidence/packaged-typed-native-transport-arm64-macos.json",
@@ -51,7 +52,7 @@
   "reachability": {
     "profile": "release",
     "dynamicAccess": false,
-    "reachableRouteCount": 27,
+    "reachableRouteCount": 31,
     "reachableRouteIds": [
       "script:camera.get_cameras",
       "script:camera.get_orthographic_auto_zoom",
@@ -70,10 +71,14 @@
       "script:gui.set_size",
       "script:gui.set_text",
       "script:gui.set_texture",
+      "script:hash",
+      "script:hash_to_hex",
       "script:msg.post",
+      "script:pprint",
       "script:sound.play",
       "script:sys.get_config_number",
       "script:sys.get_config_string",
+      "script:tilemap.set_tile",
       "script:vmath.length",
       "script:vmath.normalize",
       "script:vmath.quat",
@@ -81,7 +86,7 @@
       "script:vmath.vector3",
       "script:vmath.vector4"
     ],
-    "staticReachableRouteCount": 27,
+    "staticReachableRouteCount": 31,
     "staticReachableRouteIds": [
       "script:camera.get_cameras",
       "script:camera.get_orthographic_auto_zoom",
@@ -100,10 +105,14 @@
       "script:gui.set_size",
       "script:gui.set_text",
       "script:gui.set_texture",
+      "script:hash",
+      "script:hash_to_hex",
       "script:msg.post",
+      "script:pprint",
       "script:sound.play",
       "script:sys.get_config_number",
       "script:sys.get_config_string",
+      "script:tilemap.set_tile",
       "script:vmath.length",
       "script:vmath.normalize",
       "script:vmath.quat",
@@ -214,8 +223,12 @@
       "script:gui.set_size",
       "script:gui.set_text",
       "script:gui.set_texture",
+      "script:hash",
+      "script:hash_to_hex",
+      "script:pprint",
       "script:sound.play",
       "script:sys.get_config_string",
+      "script:tilemap.set_tile",
       "script:vmath.vector4"
     ]
   },
@@ -228,5 +241,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "f519bf7ec184c8d8f01754500397e67f49c2e3713fd9d4583b3defdd318e63bc"
+  "recordSha256": "33f08fdf8eda5d2138c1694d8ef88cad738def830b13b7364586797d7b291e75"
 }

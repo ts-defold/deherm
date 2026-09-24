@@ -48,7 +48,7 @@ export async function stopOwnedProcessTree({
   shutdownMs = shutdownTimeoutMs,
   sleep = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds)),
 }) {
-  const treeAlive = () => ownsProcessGroup ? groupAlive() : !leaderExited();
+  const treeAlive = () => (ownsProcessGroup ? groupAlive() : !leaderExited());
   const waitForTreeExit = async () => {
     const deadline = Date.now() + shutdownMs;
     for (;;) {
@@ -101,7 +101,8 @@ export async function cleanupOwnedHmrRun({ stopOwnedTree, childClosed, restoreOw
     failures.push(error);
   }
   if (failures.length === 1) throw failures[0];
-  if (failures.length > 1) throw new AggregateError(failures, "installed HMR cleanup and source restoration both failed");
+  if (failures.length > 1)
+    throw new AggregateError(failures, "installed HMR cleanup and source restoration both failed");
 }
 
 export async function installedPackageTreeSha256(packageRoot) {
@@ -109,13 +110,17 @@ export async function installedPackageTreeSha256(packageRoot) {
   const visit = async (directory, prefix = "") => {
     const entries = (await readdir(directory, { withFileTypes: true }))
       .filter((entry) => entry.name !== "node_modules")
-      .sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0);
+      .sort((left, right) => (left.name < right.name ? -1 : left.name > right.name ? 1 : 0));
     for (const entry of entries) {
       const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
       const absolute = path.join(directory, entry.name);
       if (entry.isDirectory()) await visit(absolute, relative);
       else if (entry.isFile()) {
-        hash.update(relative).update("\0").update(await readFile(absolute)).update("\0");
+        hash
+          .update(relative)
+          .update("\0")
+          .update(await readFile(absolute))
+          .update("\0");
       } else throw new Error(`installed package contains unsupported entry: ${relative}`);
     }
   };
@@ -131,17 +136,24 @@ export function assertInstalledPackageTreeSha256(recordedTreeSha256, currentTree
     throw new Error("current installed package treeSha256 is invalid");
   }
   if (recordedTreeSha256 !== currentTreeSha256) {
-    throw new Error([
-      "recorded installed package treeSha256 does not match the current packed package",
-      `recorded=${recordedTreeSha256}`,
-      `current=${currentTreeSha256}`,
-    ].join("; "));
+    throw new Error(
+      [
+        "recorded installed package treeSha256 does not match the current packed package",
+        `recorded=${recordedTreeSha256}`,
+        `current=${currentTreeSha256}`,
+      ].join("; "),
+    );
   }
   return true;
 }
 
 async function exists(file) {
-  try { await access(file); return true; } catch { return false; }
+  try {
+    await access(file);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 async function packPackageTree(repositoryRoot) {
@@ -152,7 +164,11 @@ async function packPackageTree(repositoryRoot) {
     if (!archive) throw new Error("pnpm pack did not produce a public package archive");
     await execFile("tar", ["-xzf", path.join(stage, archive), "-C", stage], { maxBuffer: 1 * 1024 * 1024 });
     const packageRoot = path.join(stage, "package");
-    if (!(await exists(path.join(packageRoot, "bin/deherm.mjs"))) || !(await exists(path.join(packageRoot, "package.json")))) throw new Error("packed package has no public deherm bin");
+    if (
+      !(await exists(path.join(packageRoot, "bin/deherm.mjs"))) ||
+      !(await exists(path.join(packageRoot, "package.json")))
+    )
+      throw new Error("packed package has no public deherm bin");
     const treeSha256 = await installedPackageTreeSha256(packageRoot);
     return { packageRoot, stage, treeSha256 };
   } catch (error) {
@@ -194,19 +210,30 @@ async function makePackedBoundary(repositoryRoot) {
 }
 
 function stateTarget(state) {
-  return state?.targets?.find((target) => target.id === "local-engine") ?? state?.targets?.find((target) => target.runtime === "hermes");
+  return (
+    state?.targets?.find((target) => target.id === "local-engine") ??
+    state?.targets?.find((target) => target.runtime === "hermes")
+  );
 }
 
 export function parseReloadMarker(message) {
   const match = markerPattern.exec(String(message ?? ""));
   if (!match) return undefined;
-  return { edit: match[1], gameplayTick: Number(match[2]), worldEntityCount: Number(match[3]), elapsedSeconds: Number(match[4]) };
+  return {
+    edit: match[1],
+    gameplayTick: Number(match[2]),
+    worldEntityCount: Number(match[3]),
+    elapsedSeconds: Number(match[4]),
+  };
 }
 
 export function runtimeErrorFromEvents(events, start = 0) {
-  const event = events.slice(start).find((candidate) =>
-    candidate?.type === "runtime-activation-rejected" ||
-    (candidate?.type === "log" && candidate.level === "error"));
+  const event = events
+    .slice(start)
+    .find(
+      (candidate) =>
+        candidate?.type === "runtime-activation-rejected" || (candidate?.type === "log" && candidate.level === "error"),
+    );
   if (!event) return undefined;
   return {
     type: event.type,
@@ -238,21 +265,29 @@ export function snapshotFromState(state, gameplay = {}) {
   const target = stateTarget(state);
   const component = target?.componentSnapshot;
   const instances = target?.instances;
-  if (!target || !component || !Array.isArray(instances) || instances.length < 1) throw new Error("native inspector state has no complete component snapshot");
-  if (target.instanceProjection?.complete === false) throw new Error("native inspector state component projection is incomplete");
+  if (!target || !component || !Array.isArray(instances) || instances.length < 1)
+    throw new Error("native inspector state has no complete component snapshot");
+  if (target.instanceProjection?.complete === false)
+    throw new Error("native inspector state component projection is incomplete");
   const telemetry = target.telemetry ?? {};
   if (telemetry.componentInstances !== undefined && telemetry.componentInstances !== instances.length) {
-    throw new Error(`native component snapshot count ${instances.length} disagrees with telemetry ${telemetry.componentInstances}`);
+    throw new Error(
+      `native component snapshot count ${instances.length} disagrees with telemetry ${telemetry.componentInstances}`,
+    );
   }
   if (telemetry.runtimeId !== undefined && telemetry.runtimeId !== component.runtimeId) {
-    throw new Error(`native component snapshot runtime ${component.runtimeId} disagrees with telemetry ${telemetry.runtimeId}`);
+    throw new Error(
+      `native component snapshot runtime ${component.runtimeId} disagrees with telemetry ${telemetry.runtimeId}`,
+    );
   }
   const transientSources = new Set(["main/rocket.script.ts", "main/pickup.script.ts"]);
   const persistentInstances = instances.filter((instance) => !transientSources.has(instance.source));
   const transientInstances = instances.filter((instance) => transientSources.has(instance.source));
   const arenaInstances = instances.filter((instance) => instance.source === "main/arena.script.ts");
   if (persistentInstances.length < 1 || arenaInstances.length !== 1) {
-    throw new Error(`native component snapshot has ${persistentInstances.length} persistent instances and ${arenaInstances.length} arena anchors`);
+    throw new Error(
+      `native component snapshot has ${persistentInstances.length} persistent instances and ${arenaInstances.length} arena anchors`,
+    );
   }
   return {
     entityCount: Number.isSafeInteger(gameplay.worldEntityCount) ? gameplay.worldEntityCount : 1,
@@ -277,11 +312,13 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
   const projectRoot = path.join(exampleRoot, "defold");
   const sourceFile = path.join(projectRoot, "main/arena.script.ts");
   const originalSource = await readFile(sourceFile, "utf8");
-  if (!originalSource.includes('logHmrState(self, "baseline")')) throw new Error("arena.script.ts is missing the production HMR marker");
+  if (!originalSource.includes('logHmrState(self, "baseline")'))
+    throw new Error("arena.script.ts is missing the production HMR marker");
   let packageBoundary;
   if (installedPackageRoot) {
     const packageRoot = path.resolve(installedPackageRoot);
-    if (!(await exists(path.join(packageRoot, "bin/deherm.mjs")))) throw new Error(`installed package has no public bin: ${packageRoot}`);
+    if (!(await exists(path.join(packageRoot, "bin/deherm.mjs"))))
+      throw new Error(`installed package has no public bin: ${packageRoot}`);
     packageBoundary = {
       packageRoot,
       source: "provided-installed-package",
@@ -291,20 +328,31 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
   } else packageBoundary = await makePackedBoundary(repositoryRoot);
 
   const ownsProcessGroup = process.platform !== "win32";
-  const child = spawn(process.execPath, [
-    path.join(packageBoundary.packageRoot, "bin/deherm.mjs"), "dev",
-    "--project", projectRoot, "--entry", "main/arena.script.ts", "--watch", projectRoot,
-    "--headless", "--json",
-    ...(process.env.DEHERM_BUILD_SERVER ? ["--build-server", process.env.DEHERM_BUILD_SERVER] : []),
-  ], {
-    cwd: packageBoundary.packageRoot,
-    env: { ...process.env, DEHERM_OFFLINE: process.env.DEHERM_OFFLINE ?? "1" },
-    stdio: ["ignore", "pipe", "pipe"],
-    // A failed soak must not leave the CLI, Bob, or dmengine writing the next
-    // run's source and session log. POSIX gives this installed boundary its own
-    // process group so escalation can terminate the complete owned tree.
-    detached: ownsProcessGroup,
-  });
+  const child = spawn(
+    process.execPath,
+    [
+      path.join(packageBoundary.packageRoot, "bin/deherm.mjs"),
+      "dev",
+      "--project",
+      projectRoot,
+      "--entry",
+      "main/arena.script.ts",
+      "--watch",
+      projectRoot,
+      "--headless",
+      "--json",
+      ...(process.env.DEHERM_BUILD_SERVER ? ["--build-server", process.env.DEHERM_BUILD_SERVER] : []),
+    ],
+    {
+      cwd: packageBoundary.packageRoot,
+      env: { ...process.env, DEHERM_OFFLINE: process.env.DEHERM_OFFLINE ?? "1" },
+      stdio: ["ignore", "pipe", "pipe"],
+      // A failed soak must not leave the CLI, Bob, or dmengine writing the next
+      // run's source and session log. POSIX gives this installed boundary its own
+      // process group so escalation can terminate the complete owned tree.
+      detached: ownsProcessGroup,
+    },
+  );
   const events = [];
   const markers = [];
   let pending = "";
@@ -332,7 +380,9 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
     }
   });
   child.stderr.setEncoding("utf8");
-  child.stderr.on("data", (chunk) => { stderr += chunk; });
+  child.stderr.on("data", (chunk) => {
+    stderr += chunk;
+  });
   const exited = new Promise((resolve) => child.once("exit", (code, signal) => resolve({ code, signal })));
   const childClosed = new Promise((resolve) => child.once("close", (code, signal) => resolve({ code, signal })));
   const signalOwnedPosixTree = (signal) => {
@@ -382,7 +432,10 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
 
   async function readState() {
     if (!session) session = JSON.parse(await readFile(sessionFile, "utf8"));
-    const response = await fetch(session.stateUrl, { headers: { authorization: `Bearer ${session.authToken}` }, signal: AbortSignal.timeout(5_000) });
+    const response = await fetch(session.stateUrl, {
+      headers: { authorization: `Bearer ${session.authToken}` },
+      signal: AbortSignal.timeout(5_000),
+    });
     if (!response.ok) throw new Error(`native inspector state failed: HTTP ${response.status}`);
     return response.json();
   }
@@ -391,10 +444,14 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
     const component = target?.componentSnapshot;
     const instances = target?.instances;
     const telemetry = target?.telemetry ?? {};
-    if (!component || !Array.isArray(instances) || instances.length < 1 ||
-        target.instanceProjection?.complete === false) return false;
-    if (telemetry.componentInstances !== instances.length ||
-        telemetry.runtimeId !== component.runtimeId) return false;
+    if (
+      !component ||
+      !Array.isArray(instances) ||
+      instances.length < 1 ||
+      target.instanceProjection?.complete === false
+    )
+      return false;
+    if (telemetry.componentInstances !== instances.length || telemetry.runtimeId !== component.runtimeId) return false;
     if (fingerprint !== undefined && telemetry.bundleFingerprint !== fingerprint) return false;
     return true;
   }
@@ -419,10 +476,13 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
       try {
         session = JSON.parse(await readFile(sessionFile, "utf8"));
         return session.pid === child.pid && session.stateUrl && session.authToken ? true : undefined;
-      } catch { return undefined; }
+      } catch {
+        return undefined;
+      }
     }, "inspector session");
     const unauthorized = await fetch(session.stateUrl, { signal: AbortSignal.timeout(5_000) });
-    if (unauthorized.status !== 401) throw new Error(`native inspector state endpoint did not require Bearer auth (HTTP ${unauthorized.status})`);
+    if (unauthorized.status !== 401)
+      throw new Error(`native inspector state endpoint did not require Bearer auth (HTTP ${unauthorized.status})`);
   }
   try {
     await ensureSession();
@@ -436,34 +496,36 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
   }
 
   const baselineSnapshot = async () => {
-    await waitFor(() => events.some((event) => event?.type === "log" && /war-battles:arena-engaged/u.test(event.message)), "War Battles gameplay start");
+    await waitFor(
+      () => events.some((event) => event?.type === "log" && /war-battles:arena-engaged/u.test(event.message)),
+      "War Battles gameplay start",
+    );
     // Let the arena's factories finish attaching their component instances so
     // the baseline is the live match, not the tutorial scene's pre-engagement
     // population.
     await new Promise((resolve) => setTimeout(resolve, 500));
     const baselineState = await waitForCoherentState("native component snapshot baseline");
-    const initial = await waitFor(() => markers.find(({ marker }) => marker.edit === "initial")?.marker,
-      "initial War Battles gameplay state marker");
+    const initial = await waitFor(
+      () => markers.find(({ marker }) => marker.edit === "initial")?.marker,
+      "initial War Battles gameplay state marker",
+    );
     lastGameplayTick = initial.gameplayTick;
     lastGameplay = initial;
     markerCursor = markers.length;
     return snapshotFromState(baselineState, initial);
   };
-  const activeFingerprint = async () => stateTarget(
-    await waitForCoherentState("initial bundle activation"),
-  ).telemetry.bundleFingerprint;
+  const activeFingerprint = async () =>
+    stateTarget(await waitForCoherentState("initial bundle activation")).telemetry.bundleFingerprint;
   const applyAcceptedComponentBodyReload = async (index) => {
     const token = `cycle-${index}-${Date.now().toString(36)}`;
     const current = await readFile(sourceFile, "utf8");
-    if (current !== lastWrittenSource) throw new Error("arena.script.ts changed outside the installed HMR driver; refusing to overwrite it");
+    if (current !== lastWrittenSource)
+      throw new Error("arena.script.ts changed outside the installed HMR driver; refusing to overwrite it");
     // Ignore startup builds/markers; this edit's build and activation are the
     // only events that may satisfy the next cycle.
     eventCursor = events.length;
     markerCursor = markers.length;
-    const next = current.replace(
-      `logHmrState(self, "${currentEdit}")`,
-      `logHmrState(self, "${token}")`,
-    );
+    const next = current.replace(`logHmrState(self, "${currentEdit}")`, `logHmrState(self, "${token}")`);
     if (next === current) throw new Error("could not prepare an implementation-only arena marker edit");
     await writeFile(sourceFile, next);
     lastWrittenSource = next;
@@ -480,7 +542,13 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
       }
       return undefined;
     }, `accepted cycle ${index} build`);
-    const activation = await waitFor(() => events.slice(eventCursor).find((event) => event?.type === "runtime-activation-observed" && event.fingerprint === build.fingerprint), `accepted cycle ${index} activation`);
+    const activation = await waitFor(
+      () =>
+        events
+          .slice(eventCursor)
+          .find((event) => event?.type === "runtime-activation-observed" && event.fingerprint === build.fingerprint),
+      `accepted cycle ${index} activation`,
+    );
     eventCursor = events.indexOf(activation) + 1;
     const marker = await waitFor(() => {
       for (; markerCursor < markers.length; markerCursor += 1) {
@@ -492,8 +560,7 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
     lastGameplayTick = marker.gameplayTick;
     lastGameplay = marker;
     pendingEdit = undefined;
-    const state = await waitForCoherentState(
-      `accepted cycle ${index} coherent state fingerprint`, build.fingerprint);
+    const state = await waitForCoherentState(`accepted cycle ${index} coherent state fingerprint`, build.fingerprint);
     const runtimeError = runtimeErrorFromEvents(events, cycleStart);
     return {
       status: "activated",
@@ -505,8 +572,8 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
       ...(runtimeError ? { runtimeError } : {}),
     };
   };
-  const snapshot = async () => snapshotFromState(
-    await waitForCoherentState("accepted reload state snapshot"), lastGameplay);
+  const snapshot = async () =>
+    snapshotFromState(await waitForCoherentState("accepted reload state snapshot"), lastGameplay);
   const close = async () => {
     if (closed) return;
     closed = true;
@@ -527,6 +594,12 @@ export async function createWarBattlesHmrDriver({ repositoryRoot, exampleRoot, i
       target: "native",
       endpoint: "/deherm/dev/v1/snapshot",
     },
-    baselineSnapshot, activeFingerprint, applyAcceptedComponentBodyReload, waitForAccepted, snapshot, assertClean, close,
+    baselineSnapshot,
+    activeFingerprint,
+    applyAcceptedComponentBodyReload,
+    waitForAccepted,
+    snapshot,
+    assertClean,
+    close,
   };
 }

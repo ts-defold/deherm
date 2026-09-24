@@ -4,13 +4,12 @@ import { lstat, readFile, readdir, readlink } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { assertProjectionEnvelope, projectionEnvelope } from "./projections.mjs";
+import { assertProjectionEnvelope } from "./projections.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 
-export const WEBTRANSPORT_OWNER =
-  "examples/war-battles-online/integration/check-real-webtransport.mjs";
+export const WEBTRANSPORT_OWNER = "examples/war-battles-online/integration/check-real-webtransport.mjs";
 
 // Keep the input roots explicit, but hash the complete core tree mechanically.
 // A future imported core module therefore invalidates evidence without someone
@@ -53,13 +52,23 @@ async function sha256Tree(repositoryPath) {
     if (metadata.isSymbolicLink()) {
       const target = await readlink(absolute);
       const encoded = Buffer.from(target);
-      files.push({ path: local, kind: "symlink", bytes: encoded.byteLength, sha256: createHash("sha256").update(encoded).digest("hex") });
+      files.push({
+        path: local,
+        kind: "symlink",
+        bytes: encoded.byteLength,
+        sha256: createHash("sha256").update(encoded).digest("hex"),
+      });
       bytes += encoded.byteLength;
       return;
     }
     assert.equal(metadata.isFile(), true, `unsupported WebTransport evidence input: ${absolute}`);
     const contents = await readFile(absolute);
-    files.push({ path: local, kind: "file", bytes: contents.byteLength, sha256: createHash("sha256").update(contents).digest("hex") });
+    files.push({
+      path: local,
+      kind: "file",
+      bytes: contents.byteLength,
+      sha256: createHash("sha256").update(contents).digest("hex"),
+    });
     bytes += contents.byteLength;
   }
   await visit(absoluteRoot, "");
@@ -74,8 +83,11 @@ async function sha256Tree(repositoryPath) {
 }
 
 export async function buildWebTransportSourceInputs() {
-  return Promise.all(WEBTRANSPORT_SOURCE_PATHS.map((path) =>
-    path === "examples/war-battles-online/core" ? sha256Tree(path) : sha256File(path)));
+  return Promise.all(
+    WEBTRANSPORT_SOURCE_PATHS.map((path) =>
+      path === "examples/war-battles-online/core" ? sha256Tree(path) : sha256File(path),
+    ),
+  );
 }
 
 export function digestWebTransportSourceInputs(sourceInputs) {
@@ -111,17 +123,19 @@ export function assertWebTransportEvidence(document, { sourceInputs } = {}) {
   assert.ok(Number.isInteger(document.playerId) && document.playerId >= 1 && document.playerId <= 32);
   assert.ok(Number.isInteger(document.minimumSnapshotsApplied) && document.minimumSnapshotsApplied >= 3);
   assert.ok(Number.isInteger(document.minimumInputsSent) && document.minimumInputsSent >= 3);
-  assert.ok(Number.isInteger(document.observedSnapshotsApplied) &&
-    document.observedSnapshotsApplied >= document.minimumSnapshotsApplied);
-  assert.ok(Number.isInteger(document.observedInputsSent) &&
-    document.observedInputsSent >= document.minimumInputsSent);
+  assert.ok(
+    Number.isInteger(document.observedSnapshotsApplied) &&
+      document.observedSnapshotsApplied >= document.minimumSnapshotsApplied,
+  );
+  assert.ok(Number.isInteger(document.observedInputsSent) && document.observedInputsSent >= document.minimumInputsSent);
   assert.ok(Number.isInteger(document.lastServerTick) && document.lastServerTick >= 0);
   assert.ok(Number.isInteger(document.lastLocalTick) && document.lastLocalTick >= 0);
   assert.deepEqual(document.input, { moveX: 1, moveY: 0, fire: false, boost: false, weapon: 0 });
   assert.ok(document.server?.inputsAcceptedAtLeast >= document.minimumInputsSent);
-  assert.ok(Array.isArray(document.server?.markers) && document.server.markers.includes(
-    `war-battles-server:stats:inputs-accepted:count=${document.minimumInputsSent}`,
-  ));
+  assert.ok(
+    Array.isArray(document.server?.markers) &&
+      document.server.markers.includes(`war-battles-server:stats:inputs-accepted:count=${document.minimumInputsSent}`),
+  );
   assert.equal(document.inputsDropped, 0);
   assert.ok(typeof document.runtime?.deno === "string" && typeof document.runtime?.chrome === "string");
   assert.ok(typeof document.evidenceBoundary === "string" && !document.evidenceBoundary.includes("persistent"));

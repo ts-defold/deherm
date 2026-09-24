@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_134158cf-31d1-41f3-a9ca-c240a7e70f9c",
+  "operation": "animate",
+  "prompt": "A subtle alert communications-portrait idle loop. The driver keeps his shoulders and silhouette steady while his eyes scan left, then right, his brows tighten, his moustache shifts with one brief radio mutter, and he returns seamlessly to the starting pose. Restrained readable facial motion only; no camera movement, body turn, zoom, added objects, background, frame, or text.",
+  "size": null,
+  "outputFrames": 8,
+  "colors": 32,
+  "inputs": [
+    {
+      "kind": "asset",
+      "assetId": "2c537204-68a9-47a8-a8b4-8d05335e912d"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/driver-portrait-radio-idle-v1.json",
+    "sha256": "f803e2fda218516d0e9ab4189ed8e4e03bf4df4ae58efbe57d4c098dbea443eb"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "29271c37-5aa0-473e-b76d-a715a7309493",
+      "type": "animation",
+      "contentType": "image/webp",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/29271c37-5aa0-473e-b76d-a715a7309493/animation.webp?v=1790268565771",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-radio-idle-v1/00.webp",
+      "bytes": 8358,
+      "sha256": "3aa994e219805f54038f426ad68d4fd1d23dfb55a33f9b7a72c3a6f8fd1abfea",
+      "spritesheet": {
+        "url": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/29271c37-5aa0-473e-b76d-a715a7309493/spritesheet.png?v=1790268565771",
+        "path": "art/source/sprite-fusion/outputs/driver-portrait-radio-idle-v1/00-sheet.png",
+        "bytes": 6297,
+        "sha256": "d633250d25d207460fb5e1d7c669a412310bf722ce7c3ea84359d47976267994"
+      },
+      "frameCount": 8,
+      "fps": 8
+    }
+  ],
+  "credits": {
+    "remaining": 3270
+  }
+}

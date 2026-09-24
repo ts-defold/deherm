@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import {
-  BattleClient,
-  MatchServer,
-  createInMemoryTransportPair,
-} from "../core/index.ts";
+import { BattleClient, MatchServer, createInMemoryTransportPair } from "../core/index.ts";
 import { restoreWorldBeforeAdmission } from "../server/deno-main.ts";
 import {
   DurableWorldCheckpoint,
@@ -23,8 +19,11 @@ async function settle() {
 }
 
 function reseal(bytes) {
-  new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength)
-    .setUint32(bytes.byteLength - 4, crc32(bytes.subarray(0, bytes.byteLength - 4)), true);
+  new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).setUint32(
+    bytes.byteLength - 4,
+    crc32(bytes.subarray(0, bytes.byteLength - 4)),
+    true,
+  );
   return bytes;
 }
 
@@ -52,11 +51,18 @@ test("authoritative world checkpoint round-trips the complete fixed state across
   const restarted = new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 2, teams: true });
   restarted.sessionLedger.markCheckpoint(first.world.tick);
   assert.notEqual(restarted.world.stateHash(), expectedHash);
-  assert.equal(await restoreWorldBeforeAdmission(restarted, new DurableWorldCheckpoint(storage, checkpointContext(restarted))), true);
+  assert.equal(
+    await restoreWorldBeforeAdmission(restarted, new DurableWorldCheckpoint(storage, checkpointContext(restarted))),
+    true,
+  );
   assert.equal(restarted.world.tick, first.world.tick);
   assert.equal(restarted.world.stateHash(), expectedHash);
   assert.equal(restarted.stats.tick, first.world.tick, "readiness stats must reflect the restored tick");
-  assert.equal(restarted.sessionTick(), first.world.tick, "restoring world and ledger ticks must not double-count the world tick");
+  assert.equal(
+    restarted.sessionTick(),
+    first.world.tick,
+    "restoring world and ledger ticks must not double-count the world tick",
+  );
 
   // Admission happens after restore: the first welcomed client receives the
   // restored state rather than a constructor-default world.
@@ -86,7 +92,9 @@ test("world checkpoints fail closed on truncation, corruption, identity, configu
     write: async () => {},
   };
   await assert.rejects(
-    new DurableWorldCheckpoint(truncated, checkpointContext(source)).restore(new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world),
+    new DurableWorldCheckpoint(truncated, checkpointContext(source)).restore(
+      new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world,
+    ),
     (error) => error instanceof WorldCheckpointError && error.code === "world-checkpoint-length",
   );
 
@@ -97,24 +105,34 @@ test("world checkpoints fail closed on truncation, corruption, identity, configu
     write: async () => {},
   };
   await assert.rejects(
-    new DurableWorldCheckpoint(corrupted, checkpointContext(source)).restore(new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world),
+    new DurableWorldCheckpoint(corrupted, checkpointContext(source)).restore(
+      new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world,
+    ),
     (error) => error instanceof WorldCheckpointError && error.code === "world-checkpoint-checksum",
   );
 
   await assert.rejects(
-    new DurableWorldCheckpoint(encoded.storage, checkpointContext(new MatchServer({ matchId: 78, mapSeed: 0x1234, rosterSize: 1 }))).restore(new MatchServer({ matchId: 78, mapSeed: 0x1234, rosterSize: 1 }).world),
+    new DurableWorldCheckpoint(
+      encoded.storage,
+      checkpointContext(new MatchServer({ matchId: 78, mapSeed: 0x1234, rosterSize: 1 })),
+    ).restore(new MatchServer({ matchId: 78, mapSeed: 0x1234, rosterSize: 1 }).world),
     /another match/,
   );
   await assert.rejects(
-    new DurableWorldCheckpoint(encoded.storage, checkpointContext(new MatchServer({ matchId: 77, mapSeed: 0x5678, rosterSize: 1 }))).restore(new MatchServer({ matchId: 77, mapSeed: 0x5678, rosterSize: 1 }).world),
+    new DurableWorldCheckpoint(
+      encoded.storage,
+      checkpointContext(new MatchServer({ matchId: 77, mapSeed: 0x5678, rosterSize: 1 })),
+    ).restore(new MatchServer({ matchId: 77, mapSeed: 0x5678, rosterSize: 1 }).world),
     /another arena/,
   );
 
   const wrongVersion = encodeWorldCheckpoint(source.world, checkpointContext(source));
   new DataView(wrongVersion.buffer).setUint16(4, WORLD_CHECKPOINT_VERSION + 1, true);
   await assert.rejects(
-    new DurableWorldCheckpoint({ read: async () => wrongVersion, write: async () => {} }, checkpointContext(source))
-      .restore(new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world),
+    new DurableWorldCheckpoint(
+      { read: async () => wrongVersion, write: async () => {} },
+      checkpointContext(source),
+    ).restore(new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world),
     (error) => error instanceof WorldCheckpointError && error.code === "world-checkpoint-version",
   );
 
@@ -122,15 +140,20 @@ test("world checkpoints fail closed on truncation, corruption, identity, configu
   new DataView(mismatchedTick.buffer).setUint32(20, source.world.tick + 1, true);
   reseal(mismatchedTick);
   await assert.rejects(
-    new DurableWorldCheckpoint({ read: async () => mismatchedTick, write: async () => {} }, checkpointContext(source))
-      .restore(new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world),
+    new DurableWorldCheckpoint(
+      { read: async () => mismatchedTick, write: async () => {} },
+      checkpointContext(source),
+    ).restore(new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world),
     (error) => error instanceof WorldCheckpointError && error.code === "world-checkpoint-tick",
   );
 
   const invalidPayload = encodeWorldCheckpoint(source.world, checkpointContext(source));
   new DataView(invalidPayload.buffer).setUint32(WORLD_CHECKPOINT_HEADER_BYTES, 0, true);
   reseal(invalidPayload);
-  const invalidPersistence = new DurableWorldCheckpoint({ read: async () => invalidPayload, write: async () => {} }, checkpointContext(source));
+  const invalidPersistence = new DurableWorldCheckpoint(
+    { read: async () => invalidPayload, write: async () => {} },
+    checkpointContext(source),
+  );
   await assert.rejects(
     invalidPersistence.restore(new MatchServer({ matchId: 77, mapSeed: 0x1234, rosterSize: 1 }).world),
     (error) => error instanceof WorldCheckpointError && error.code === "world-checkpoint-payload",
@@ -200,7 +223,9 @@ test("a failed active checkpoint does not poison the bounded latest retry", asyn
       writes.push(new Uint8Array(bytes));
       attempt += 1;
       if (attempt === 1) {
-        await new Promise((resolve) => { releaseFirst = resolve; });
+        await new Promise((resolve) => {
+          releaseFirst = resolve;
+        });
         throw new Error("simulated storage failure");
       }
     },

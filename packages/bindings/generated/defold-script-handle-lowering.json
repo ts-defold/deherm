@@ -691,7 +691,7 @@
       "capturableProfileMask": 63
     }
   ],
-  "contractShapeCount": 151,
+  "contractShapeCount": 152,
   "contractShapes": [
     "()->(handle:box2d-world)",
     "()->(handle:bullet-world)",
@@ -800,6 +800,7 @@
     "(handle:bullet-object,integer)->()",
     "(handle:bullet-object,integer)->(boolean)",
     "(handle:bullet-object,integer)->(handle:bullet-shape)",
+    "(handle:bullet-object,nil|boolean)->()",
     "(handle:bullet-object,number)->()",
     "(handle:bullet-object,number,number)->()",
     "(handle:bullet-object,number,vector3)->()",
@@ -830,12 +831,12 @@
     "(handle:gui-node)->(string)",
     "(handle:gui-node)->(vector3)",
     "(handle:gui-node)->(vector4)",
-    "(handle:gui-node,boolean)->(boolean)",
     "(handle:gui-node,handle:gui-node)->()",
+    "(handle:gui-node,nil|boolean)->(boolean)",
     "(handle:gui-node,nil|string|hash)->()",
     "(handle:gui-node,number,number)->(boolean)",
     "(handle:gui-node,vector3)->(vector3)",
-    "(number|string|hash,handle:graphics-texture,integer)->()",
+    "(number|string|hash,handle:graphics-texture,nil|integer)->()",
     "(string)->(handle:buffer-data)",
     "(string|hash)->(handle:buffer-data)",
     "(string|hash,handle:buffer-data)->()",
@@ -2165,7 +2166,7 @@
       "semanticKind": "bullet-object"
     },
     {
-      "mask": 2,
+      "mask": 3,
       "semanticKind": null
     },
     {
@@ -3285,7 +3286,7 @@
       "semanticKind": "gui-node"
     },
     {
-      "mask": 2,
+      "mask": 3,
       "semanticKind": null
     },
     {
@@ -3377,7 +3378,7 @@
       "semanticKind": "graphics-texture"
     },
     {
-      "mask": 4,
+      "mask": 5,
       "semanticKind": null
     },
     {
@@ -4638,6 +4639,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 0,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -4731,6 +4733,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 2,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 0,
       "resultCount": 0,
@@ -4824,6 +4827,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 5,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -4917,6 +4921,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 7,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5002,6 +5007,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 10,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5095,6 +5101,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 12,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5180,6 +5187,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 14,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5265,6 +5273,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 16,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5350,6 +5359,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 18,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5435,6 +5445,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 19,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5520,6 +5531,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 21,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5605,6 +5617,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 23,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 0,
       "resultCount": 0,
@@ -5698,6 +5711,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 25,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 0,
       "resultCount": 1,
@@ -5791,6 +5805,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 26,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 1,
       "resultCount": 1,
@@ -5884,6 +5899,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 27,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 2,
       "resultCount": 1,
@@ -5977,6 +5993,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 28,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 3,
       "resultCount": 1,
@@ -6070,6 +6087,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 29,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 4,
       "resultCount": 1,
@@ -6163,6 +6181,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 30,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 5,
       "resultCount": 1,
@@ -6256,6 +6275,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 31,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 6,
       "resultCount": 1,
@@ -6349,6 +6369,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 32,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 7,
       "resultCount": 1,
@@ -6442,6 +6463,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 33,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 8,
       "resultCount": 1,
@@ -6535,6 +6557,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 35,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 9,
       "resultCount": 1,
@@ -6628,6 +6651,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 37,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 10,
       "resultCount": 1,
@@ -6713,6 +6737,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 38,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 11,
       "resultCount": 1,
@@ -6806,6 +6831,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 39,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 12,
       "resultCount": 1,
@@ -6899,6 +6925,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 41,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 13,
       "resultCount": 1,
@@ -6992,6 +7019,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 43,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 14,
       "resultCount": 1,
@@ -7077,6 +7105,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 44,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 15,
       "resultCount": 1,
@@ -7164,6 +7193,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 45,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 16,
       "resultCount": 1,
@@ -7257,6 +7287,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 46,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 17,
       "resultCount": 1,
@@ -7342,6 +7373,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 47,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 18,
       "resultCount": 1,
@@ -7427,6 +7459,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 48,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 19,
       "resultCount": 1,
@@ -7520,6 +7553,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 49,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 20,
       "resultCount": 1,
@@ -7597,6 +7631,7 @@
         "runtimeMask": 0
       },
       "argumentOffset": 50,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 21,
       "resultCount": 1,
@@ -7690,6 +7725,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 51,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 22,
       "resultCount": 1,
@@ -7783,6 +7819,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 52,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 23,
       "resultCount": 1,
@@ -7868,6 +7905,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 53,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 24,
       "resultCount": 1,
@@ -7961,6 +7999,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 54,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 25,
       "resultCount": 1,
@@ -8054,6 +8093,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 56,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 26,
       "resultCount": 1,
@@ -8147,6 +8187,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 58,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 27,
       "resultCount": 1,
@@ -8240,6 +8281,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 59,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 28,
       "resultCount": 1,
@@ -8333,6 +8375,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 60,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 29,
       "resultCount": 1,
@@ -8426,6 +8469,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 61,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 30,
       "resultCount": 1,
@@ -8519,6 +8563,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 62,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 31,
       "resultCount": 1,
@@ -8604,6 +8649,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 63,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 32,
       "resultCount": 1,
@@ -8689,6 +8735,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 64,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 33,
       "resultCount": 1,
@@ -8782,6 +8829,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 65,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 34,
       "resultCount": 0,
@@ -8875,6 +8923,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 66,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -8968,6 +9017,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 68,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9061,6 +9111,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 70,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9154,6 +9205,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 72,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9247,6 +9299,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 74,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9340,6 +9393,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 76,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9433,6 +9487,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 78,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9526,6 +9581,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 80,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9619,6 +9675,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 82,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9704,6 +9761,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 84,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9789,6 +9847,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 86,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9882,6 +9941,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 88,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -9967,6 +10027,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 90,
+      "requiredArgumentCount": 4,
       "argumentCount": 4,
       "resultOffset": 34,
       "resultCount": 0,
@@ -10060,6 +10121,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 94,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 34,
       "resultCount": 0,
@@ -10153,6 +10215,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 97,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -10230,6 +10293,7 @@
         "runtimeMask": 0
       },
       "argumentOffset": 99,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 34,
       "resultCount": 0,
@@ -10315,6 +10379,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 101,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 34,
       "resultCount": 0,
@@ -10402,6 +10467,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 102,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 34,
       "resultCount": 1,
@@ -10487,6 +10553,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 103,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 35,
       "resultCount": 1,
@@ -10572,6 +10639,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 104,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 36,
       "resultCount": 1,
@@ -10657,6 +10725,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 105,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 37,
       "resultCount": 1,
@@ -10742,6 +10811,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 106,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 38,
       "resultCount": 1,
@@ -10829,6 +10899,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 107,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 39,
       "resultCount": 1,
@@ -10914,6 +10985,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 108,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 40,
       "resultCount": 1,
@@ -10999,6 +11071,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 109,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 41,
       "resultCount": 0,
@@ -11084,6 +11157,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 111,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 41,
       "resultCount": 0,
@@ -11169,6 +11243,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 113,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 41,
       "resultCount": 0,
@@ -11254,6 +11329,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 115,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 41,
       "resultCount": 1,
@@ -11339,6 +11415,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 117,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 42,
       "resultCount": 1,
@@ -11424,6 +11501,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 119,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 43,
       "resultCount": 1,
@@ -11509,6 +11587,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 121,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 44,
       "resultCount": 1,
@@ -11594,6 +11673,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 123,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 45,
       "resultCount": 1,
@@ -11679,6 +11759,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 125,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 46,
       "resultCount": 0,
@@ -11764,6 +11845,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 128,
+      "requiredArgumentCount": 4,
       "argumentCount": 4,
       "resultOffset": 46,
       "resultCount": 0,
@@ -11849,6 +11931,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 132,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 46,
       "resultCount": 0,
@@ -11934,6 +12017,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 135,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 46,
       "resultCount": 0,
@@ -12019,6 +12103,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 138,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 46,
       "resultCount": 0,
@@ -12104,6 +12189,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 141,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 46,
       "resultCount": 1,
@@ -12196,6 +12282,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 144,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 47,
       "resultCount": 1,
@@ -12216,7 +12303,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 146
+      "contractShapeIndex": 147
     },
     {
       "index": 86,
@@ -12286,6 +12373,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 145,
+      "requiredArgumentCount": 0,
       "argumentCount": 0,
       "resultOffset": 48,
       "resultCount": 1,
@@ -12379,6 +12467,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 145,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 49,
       "resultCount": 0,
@@ -12472,6 +12561,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 146,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 49,
       "resultCount": 0,
@@ -12565,6 +12655,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 148,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 49,
       "resultCount": 0,
@@ -12650,6 +12741,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 150,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 49,
       "resultCount": 0,
@@ -12743,6 +12835,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 152,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 49,
       "resultCount": 1,
@@ -12836,6 +12929,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 153,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 50,
       "resultCount": 1,
@@ -12921,6 +13015,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 154,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 51,
       "resultCount": 1,
@@ -13006,6 +13101,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 155,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 52,
       "resultCount": 1,
@@ -13091,6 +13187,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 156,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 53,
       "resultCount": 1,
@@ -13186,6 +13283,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 157,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 54,
       "resultCount": 1,
@@ -13281,6 +13379,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 158,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 55,
       "resultCount": 1,
@@ -13374,6 +13473,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 159,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 56,
       "resultCount": 1,
@@ -13459,6 +13559,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 160,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 57,
       "resultCount": 1,
@@ -13544,6 +13645,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 161,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 58,
       "resultCount": 1,
@@ -13637,6 +13739,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 162,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 59,
       "resultCount": 1,
@@ -13730,6 +13833,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 163,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 60,
       "resultCount": 1,
@@ -13815,6 +13919,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 164,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 61,
       "resultCount": 1,
@@ -13900,6 +14005,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 165,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 62,
       "resultCount": 1,
@@ -13993,6 +14099,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 166,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 63,
       "resultCount": 1,
@@ -14080,6 +14187,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 167,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 64,
       "resultCount": 1,
@@ -14167,6 +14275,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 168,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 65,
       "resultCount": 1,
@@ -14260,6 +14369,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 169,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 66,
       "resultCount": 1,
@@ -14353,6 +14463,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 170,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 67,
       "resultCount": 1,
@@ -14446,6 +14557,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 171,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 68,
       "resultCount": 1,
@@ -14539,6 +14651,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 172,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 69,
       "resultCount": 1,
@@ -14624,6 +14737,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 173,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 70,
       "resultCount": 1,
@@ -14709,6 +14823,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 174,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 71,
       "resultCount": 1,
@@ -14794,6 +14909,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 175,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 72,
       "resultCount": 1,
@@ -14879,6 +14995,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 176,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 73,
       "resultCount": 1,
@@ -14964,6 +15081,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 177,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 74,
       "resultCount": 1,
@@ -15049,6 +15167,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 178,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 75,
       "resultCount": 1,
@@ -15142,6 +15261,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 179,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 76,
       "resultCount": 1,
@@ -15235,6 +15355,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 180,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 77,
       "resultCount": 1,
@@ -15320,6 +15441,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 181,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 78,
       "resultCount": 1,
@@ -15413,6 +15535,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 182,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 79,
       "resultCount": 1,
@@ -15506,6 +15629,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 183,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 80,
       "resultCount": 1,
@@ -15599,6 +15723,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 184,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 81,
       "resultCount": 1,
@@ -15692,6 +15817,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 185,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 82,
       "resultCount": 1,
@@ -15785,6 +15911,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 186,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 83,
       "resultCount": 1,
@@ -15878,6 +16005,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 187,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 84,
       "resultCount": 1,
@@ -15963,6 +16091,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 188,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 85,
       "resultCount": 1,
@@ -16056,6 +16185,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 189,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 86,
       "resultCount": 1,
@@ -16149,6 +16279,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 190,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 87,
       "resultCount": 1,
@@ -16234,6 +16365,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 191,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 88,
       "resultCount": 1,
@@ -16327,6 +16459,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 192,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 89,
       "resultCount": 1,
@@ -16420,6 +16553,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 193,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 90,
       "resultCount": 1,
@@ -16505,6 +16639,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 194,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 91,
       "resultCount": 1,
@@ -16598,6 +16733,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 195,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 92,
       "resultCount": 1,
@@ -16691,6 +16827,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 196,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 93,
       "resultCount": 1,
@@ -16778,6 +16915,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 197,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 94,
       "resultCount": 1,
@@ -16863,6 +17001,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 198,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 95,
       "resultCount": 1,
@@ -16956,6 +17095,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 199,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 96,
       "resultCount": 1,
@@ -17049,6 +17189,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 200,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 97,
       "resultCount": 1,
@@ -17134,6 +17275,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 201,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 98,
       "resultCount": 1,
@@ -17219,6 +17361,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 202,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 99,
       "resultCount": 1,
@@ -17304,6 +17447,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 203,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -17389,6 +17533,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 205,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -17474,6 +17619,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 207,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -17559,6 +17705,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 209,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -17644,6 +17791,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 211,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -17737,6 +17885,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 213,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -17830,6 +17979,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 215,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -17923,6 +18073,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 217,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18016,6 +18167,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 219,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18101,6 +18253,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 221,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18194,6 +18347,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 224,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18279,6 +18433,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 227,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18364,6 +18519,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 229,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18449,6 +18605,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 231,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18542,6 +18699,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 233,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18635,6 +18793,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 235,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18728,6 +18887,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 237,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18821,6 +18981,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 239,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18914,6 +19075,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 241,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -18999,6 +19161,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 243,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19092,6 +19255,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 245,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19185,6 +19349,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 247,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19270,6 +19435,7 @@
         "runtimeMask": 6
       },
       "argumentOffset": 249,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19355,6 +19521,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 251,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19448,6 +19615,7 @@
         "runtimeMask": 54
       },
       "argumentOffset": 253,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19533,6 +19701,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 255,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19618,6 +19787,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 257,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 100,
       "resultCount": 0,
@@ -19703,6 +19873,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 258,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 100,
       "resultCount": 1,
@@ -19788,6 +19959,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 259,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 101,
       "resultCount": 1,
@@ -19873,6 +20045,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 260,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 102,
       "resultCount": 1,
@@ -19958,6 +20131,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 261,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 103,
       "resultCount": 1,
@@ -20043,6 +20217,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 262,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 104,
       "resultCount": 0,
@@ -20128,6 +20303,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 264,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 104,
       "resultCount": 0,
@@ -20213,6 +20389,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 266,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 104,
       "resultCount": 0,
@@ -20298,6 +20475,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 268,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 104,
       "resultCount": 0,
@@ -20385,6 +20563,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 270,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 104,
       "resultCount": 1,
@@ -20470,6 +20649,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 271,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 105,
       "resultCount": 1,
@@ -20555,6 +20735,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 273,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 106,
       "resultCount": 1,
@@ -20640,6 +20821,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 274,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 107,
       "resultCount": 1,
@@ -20725,6 +20907,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 275,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 108,
       "resultCount": 1,
@@ -20812,6 +20995,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 276,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 109,
       "resultCount": 1,
@@ -20897,6 +21081,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 277,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 110,
       "resultCount": 1,
@@ -20982,6 +21167,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 278,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 111,
       "resultCount": 0,
@@ -21067,6 +21253,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 280,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 111,
       "resultCount": 0,
@@ -21152,6 +21339,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 282,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 111,
       "resultCount": 0,
@@ -21237,6 +21425,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 284,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 111,
       "resultCount": 0,
@@ -21322,6 +21511,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 286,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 111,
       "resultCount": 0,
@@ -21407,6 +21597,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 288,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 111,
       "resultCount": 1,
@@ -21492,6 +21683,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 289,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 112,
       "resultCount": 1,
@@ -21577,6 +21769,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 290,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 113,
       "resultCount": 1,
@@ -21662,6 +21855,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 291,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 114,
       "resultCount": 1,
@@ -21747,6 +21941,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 292,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 115,
       "resultCount": 1,
@@ -21832,6 +22027,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 293,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 116,
       "resultCount": 1,
@@ -21917,6 +22113,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 294,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 117,
       "resultCount": 1,
@@ -22002,6 +22199,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 295,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 118,
       "resultCount": 1,
@@ -22087,6 +22285,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 296,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 119,
       "resultCount": 1,
@@ -22172,6 +22371,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 297,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 120,
       "resultCount": 1,
@@ -22257,6 +22457,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 298,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22342,6 +22543,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 299,
+      "requiredArgumentCount": 4,
       "argumentCount": 4,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22427,6 +22629,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 303,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22512,6 +22715,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 305,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22597,6 +22801,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 307,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22682,6 +22887,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 310,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22767,6 +22973,7 @@
         "runtimeMask": 48
       },
       "argumentOffset": 312,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22863,6 +23070,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 314,
+      "requiredArgumentCount": 5,
       "argumentCount": 5,
       "resultOffset": 121,
       "resultCount": 0,
@@ -22959,6 +23167,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 319,
+      "requiredArgumentCount": 5,
       "argumentCount": 5,
       "resultOffset": 121,
       "resultCount": 0,
@@ -23055,6 +23264,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 324,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 121,
       "resultCount": 1,
@@ -23153,6 +23363,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 326,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 122,
       "resultCount": 1,
@@ -23179,7 +23390,7 @@
       "index": 210,
       "id": "script:bullet3d.collision_object.activate",
       "stableId": 3024397388,
-      "contractShape": "(handle:bullet-object,boolean)->()",
+      "contractShape": "(handle:bullet-object,nil|boolean)->()",
       "modulePath": [
         "bullet3d",
         "collision_object"
@@ -23241,6 +23452,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 328,
+      "requiredArgumentCount": 1,
       "argumentCount": 2,
       "resultOffset": 123,
       "resultCount": 0,
@@ -23261,7 +23473,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 103
+      "contractShapeIndex": 107
     },
     {
       "index": 211,
@@ -23329,6 +23541,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 330,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 123,
       "resultCount": 0,
@@ -23417,6 +23630,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 332,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 123,
       "resultCount": 1,
@@ -23505,6 +23719,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 333,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 124,
       "resultCount": 1,
@@ -23593,6 +23808,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 334,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 125,
       "resultCount": 1,
@@ -23681,6 +23897,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 335,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 126,
       "resultCount": 1,
@@ -23769,6 +23986,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 336,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 127,
       "resultCount": 1,
@@ -23857,6 +24075,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 337,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 128,
       "resultCount": 1,
@@ -23945,6 +24164,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 338,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 129,
       "resultCount": 1,
@@ -24033,6 +24253,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 339,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 130,
       "resultCount": 1,
@@ -24121,6 +24342,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 340,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 131,
       "resultCount": 1,
@@ -24209,6 +24431,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 341,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 132,
       "resultCount": 1,
@@ -24297,6 +24520,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 342,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 133,
       "resultCount": 1,
@@ -24385,6 +24609,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 343,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 134,
       "resultCount": 1,
@@ -24473,6 +24698,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 344,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 135,
       "resultCount": 1,
@@ -24563,6 +24789,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 345,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 136,
       "resultCount": 1,
@@ -24651,6 +24878,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 347,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 137,
       "resultCount": 1,
@@ -24739,6 +24967,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 348,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 138,
       "resultCount": 1,
@@ -24827,6 +25056,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 350,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 139,
       "resultCount": 1,
@@ -24915,6 +25145,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 351,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 140,
       "resultCount": 1,
@@ -25003,6 +25234,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 352,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 141,
       "resultCount": 1,
@@ -25091,6 +25323,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 353,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 142,
       "resultCount": 1,
@@ -25179,6 +25412,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 354,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 143,
       "resultCount": 1,
@@ -25267,6 +25501,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 355,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 144,
       "resultCount": 1,
@@ -25355,6 +25590,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 356,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 145,
       "resultCount": 1,
@@ -25443,6 +25679,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 357,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 146,
       "resultCount": 1,
@@ -25531,6 +25768,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 358,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 147,
       "resultCount": 1,
@@ -25619,6 +25857,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 359,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -25707,6 +25946,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 361,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -25795,6 +26035,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 363,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -25815,7 +26056,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 240,
@@ -25883,6 +26124,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 365,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -25903,7 +26145,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 241,
@@ -25971,6 +26213,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 367,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -25991,7 +26234,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 242,
@@ -26059,6 +26302,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 369,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26079,7 +26323,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 243,
@@ -26147,6 +26391,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 371,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26167,7 +26412,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 244,
@@ -26235,6 +26480,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 373,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26255,7 +26501,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 245,
@@ -26323,6 +26569,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 375,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26343,7 +26590,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 246,
@@ -26411,6 +26658,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 377,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26431,7 +26679,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 110
+      "contractShapeIndex": 111
     },
     {
       "index": 247,
@@ -26499,6 +26747,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 379,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26519,7 +26768,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 113
+      "contractShapeIndex": 114
     },
     {
       "index": 248,
@@ -26587,6 +26836,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 382,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26675,6 +26925,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 383,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26763,6 +27014,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 385,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 148,
       "resultCount": 0,
@@ -26851,6 +27103,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 388,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 148,
       "resultCount": 1,
@@ -26939,6 +27192,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 390,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 149,
       "resultCount": 1,
@@ -27027,6 +27281,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 392,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 150,
       "resultCount": 1,
@@ -27117,6 +27372,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 394,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 151,
       "resultCount": 1,
@@ -27207,6 +27463,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 395,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 152,
       "resultCount": 1,
@@ -27295,6 +27552,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 396,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 153,
       "resultCount": 1,
@@ -27383,6 +27641,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 397,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 154,
       "resultCount": 1,
@@ -27471,6 +27730,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 398,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 155,
       "resultCount": 1,
@@ -27559,6 +27819,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 399,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 156,
       "resultCount": 1,
@@ -27647,6 +27908,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 400,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 157,
       "resultCount": 1,
@@ -27735,6 +27997,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 401,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 158,
       "resultCount": 1,
@@ -27823,6 +28086,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 402,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 159,
       "resultCount": 1,
@@ -27913,6 +28177,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 403,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 160,
       "resultCount": 1,
@@ -28001,6 +28266,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 404,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 161,
       "resultCount": 1,
@@ -28089,6 +28355,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 405,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 162,
       "resultCount": 1,
@@ -28177,6 +28444,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 406,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 163,
       "resultCount": 1,
@@ -28265,6 +28533,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 408,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 164,
       "resultCount": 1,
@@ -28353,6 +28622,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 409,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 165,
       "resultCount": 1,
@@ -28441,6 +28711,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 410,
+      "requiredArgumentCount": 5,
       "argumentCount": 6,
       "resultOffset": 166,
       "resultCount": 0,
@@ -28529,6 +28800,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 416,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 166,
       "resultCount": 0,
@@ -28617,6 +28889,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 418,
+      "requiredArgumentCount": 4,
       "argumentCount": 7,
       "resultOffset": 166,
       "resultCount": 0,
@@ -28705,6 +28978,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 425,
+      "requiredArgumentCount": 2,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -28793,6 +29067,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 428,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -28881,6 +29156,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 431,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -28969,6 +29245,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 434,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29057,6 +29334,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 436,
+      "requiredArgumentCount": 3,
       "argumentCount": 5,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29145,6 +29423,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 441,
+      "requiredArgumentCount": 4,
       "argumentCount": 4,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29233,6 +29512,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 445,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29321,6 +29601,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 448,
+      "requiredArgumentCount": 4,
       "argumentCount": 4,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29409,6 +29690,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 452,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29497,6 +29779,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 455,
+      "requiredArgumentCount": 5,
       "argumentCount": 5,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29585,6 +29868,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 460,
+      "requiredArgumentCount": 5,
       "argumentCount": 5,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29673,6 +29957,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 465,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29761,6 +30046,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 468,
+      "requiredArgumentCount": 1,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29849,6 +30135,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 471,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 166,
       "resultCount": 0,
@@ -29936,6 +30223,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 474,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 166,
       "resultCount": 1,
@@ -29956,7 +30244,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 147
+      "contractShapeIndex": 148
     },
     {
       "index": 287,
@@ -30023,6 +30311,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 475,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 167,
       "resultCount": 1,
@@ -30043,7 +30332,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 147
+      "contractShapeIndex": 148
     },
     {
       "index": 288,
@@ -30110,6 +30399,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 476,
+      "requiredArgumentCount": 0,
       "argumentCount": 0,
       "resultOffset": 168,
       "resultCount": 1,
@@ -30198,6 +30488,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 476,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30218,7 +30509,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 290,
@@ -30286,6 +30577,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 478,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30306,7 +30598,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 291,
@@ -30374,6 +30666,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 480,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30394,7 +30687,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 114
+      "contractShapeIndex": 115
     },
     {
       "index": 292,
@@ -30462,6 +30755,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 483,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30482,7 +30776,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 114
+      "contractShapeIndex": 115
     },
     {
       "index": 293,
@@ -30550,6 +30844,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 486,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30570,7 +30865,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 114
+      "contractShapeIndex": 115
     },
     {
       "index": 294,
@@ -30638,6 +30933,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 489,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30658,7 +30954,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 114
+      "contractShapeIndex": 115
     },
     {
       "index": 295,
@@ -30726,6 +31022,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 492,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30746,7 +31043,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 296,
@@ -30814,6 +31111,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 494,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30834,7 +31132,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 297,
@@ -30902,6 +31200,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 496,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 169,
       "resultCount": 0,
@@ -30990,6 +31289,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 497,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 169,
       "resultCount": 1,
@@ -31078,6 +31378,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 498,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 170,
       "resultCount": 1,
@@ -31166,6 +31467,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 499,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 171,
       "resultCount": 1,
@@ -31254,6 +31556,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 500,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 172,
       "resultCount": 1,
@@ -31342,6 +31645,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 501,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 173,
       "resultCount": 1,
@@ -31430,6 +31734,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 502,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 174,
       "resultCount": 1,
@@ -31518,6 +31823,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 503,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 175,
       "resultCount": 1,
@@ -31606,6 +31912,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 504,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 176,
       "resultCount": 1,
@@ -31694,6 +32001,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 505,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 177,
       "resultCount": 1,
@@ -31782,6 +32090,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 506,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 178,
       "resultCount": 1,
@@ -31870,6 +32179,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 507,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 179,
       "resultCount": 1,
@@ -31958,6 +32268,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 508,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 180,
       "resultCount": 1,
@@ -32046,6 +32357,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 509,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 181,
       "resultCount": 1,
@@ -32066,7 +32378,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 112
+      "contractShapeIndex": 113
     },
     {
       "index": 311,
@@ -32134,6 +32446,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 511,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 182,
       "resultCount": 1,
@@ -32154,7 +32467,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 112
+      "contractShapeIndex": 113
     },
     {
       "index": 312,
@@ -32222,6 +32535,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 513,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 183,
       "resultCount": 1,
@@ -32310,6 +32624,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 514,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 184,
       "resultCount": 1,
@@ -32398,6 +32713,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 515,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 185,
       "resultCount": 1,
@@ -32486,6 +32802,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 516,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 186,
       "resultCount": 1,
@@ -32574,6 +32891,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 517,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 187,
       "resultCount": 1,
@@ -32594,7 +32912,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 112
+      "contractShapeIndex": 113
     },
     {
       "index": 317,
@@ -32664,6 +32982,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 519,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 188,
       "resultCount": 1,
@@ -32752,6 +33071,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 520,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 189,
       "resultCount": 1,
@@ -32840,6 +33160,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 522,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 190,
       "resultCount": 1,
@@ -32928,6 +33249,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 523,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -32948,7 +33270,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 321,
@@ -33016,6 +33338,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 525,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33036,7 +33359,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 322,
@@ -33104,6 +33427,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 527,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33124,7 +33448,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 323,
@@ -33192,6 +33516,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 529,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33212,7 +33537,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 108
+      "contractShapeIndex": 109
     },
     {
       "index": 324,
@@ -33280,6 +33605,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 532,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33368,6 +33694,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 534,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33388,7 +33715,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 326,
@@ -33456,6 +33783,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 536,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33476,7 +33804,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 327,
@@ -33544,6 +33872,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 538,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33564,7 +33893,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 328,
@@ -33632,6 +33961,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 540,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33652,7 +33982,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 111
+      "contractShapeIndex": 112
     },
     {
       "index": 329,
@@ -33720,6 +34050,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 542,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33740,7 +34071,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 107
+      "contractShapeIndex": 108
     },
     {
       "index": 330,
@@ -33808,6 +34139,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 544,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33828,7 +34160,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 109
+      "contractShapeIndex": 110
     },
     {
       "index": 331,
@@ -33896,6 +34228,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 547,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 191,
       "resultCount": 0,
@@ -33916,7 +34249,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 108
+      "contractShapeIndex": 109
     },
     {
       "index": 332,
@@ -33986,6 +34319,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 550,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 191,
       "resultCount": 1,
@@ -34006,7 +34340,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 116
+      "contractShapeIndex": 117
     },
     {
       "index": 333,
@@ -34074,6 +34408,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 551,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 192,
       "resultCount": 1,
@@ -34094,7 +34429,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 117
+      "contractShapeIndex": 118
     },
     {
       "index": 334,
@@ -34162,6 +34497,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 552,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 193,
       "resultCount": 1,
@@ -34182,7 +34518,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 117
+      "contractShapeIndex": 118
     },
     {
       "index": 335,
@@ -34250,6 +34586,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 553,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 194,
       "resultCount": 1,
@@ -34270,7 +34607,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 115
+      "contractShapeIndex": 116
     },
     {
       "index": 336,
@@ -34338,6 +34675,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 554,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 195,
       "resultCount": 0,
@@ -34358,7 +34696,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 118
+      "contractShapeIndex": 119
     },
     {
       "index": 337,
@@ -34426,6 +34764,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 557,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 195,
       "resultCount": 1,
@@ -34446,7 +34785,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 120
+      "contractShapeIndex": 121
     },
     {
       "index": 338,
@@ -34514,6 +34853,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 558,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 196,
       "resultCount": 1,
@@ -34534,7 +34874,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 121
+      "contractShapeIndex": 122
     },
     {
       "index": 339,
@@ -34602,6 +34942,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 559,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 197,
       "resultCount": 1,
@@ -34622,7 +34963,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 119
+      "contractShapeIndex": 120
     },
     {
       "index": 340,
@@ -34690,6 +35031,7 @@
         "runtimeMask": 19
       },
       "argumentOffset": 560,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 198,
       "resultCount": 0,
@@ -34710,7 +35052,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 122
+      "contractShapeIndex": 123
     },
     {
       "index": 341,
@@ -34779,6 +35121,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 562,
+      "requiredArgumentCount": 1,
       "argumentCount": 2,
       "resultOffset": 198,
       "resultCount": 0,
@@ -34799,7 +35142,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 139
+      "contractShapeIndex": 140
     },
     {
       "index": 342,
@@ -34868,6 +35211,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 564,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 198,
       "resultCount": 0,
@@ -34888,7 +35232,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 127
+      "contractShapeIndex": 128
     },
     {
       "index": 343,
@@ -34959,6 +35303,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 565,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 198,
       "resultCount": 1,
@@ -34979,7 +35324,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 129
+      "contractShapeIndex": 130
     },
     {
       "index": 344,
@@ -35048,6 +35393,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 566,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 199,
       "resultCount": 0,
@@ -35068,7 +35414,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 127
+      "contractShapeIndex": 128
     },
     {
       "index": 345,
@@ -35137,6 +35483,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 567,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 199,
       "resultCount": 1,
@@ -35157,7 +35504,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 346,
@@ -35226,6 +35573,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 568,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 200,
       "resultCount": 1,
@@ -35246,7 +35594,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 347,
@@ -35315,6 +35663,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 569,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 201,
       "resultCount": 1,
@@ -35335,7 +35684,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 348,
@@ -35404,6 +35753,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 570,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 202,
       "resultCount": 1,
@@ -35424,7 +35774,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 128
+      "contractShapeIndex": 129
     },
     {
       "index": 349,
@@ -35493,6 +35843,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 571,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 203,
       "resultCount": 1,
@@ -35513,7 +35864,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 350,
@@ -35582,6 +35933,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 572,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 204,
       "resultCount": 1,
@@ -35602,7 +35954,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 128
+      "contractShapeIndex": 129
     },
     {
       "index": 351,
@@ -35671,6 +36023,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 573,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 205,
       "resultCount": 1,
@@ -35691,7 +36044,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 136
+      "contractShapeIndex": 137
     },
     {
       "index": 352,
@@ -35760,6 +36113,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 574,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 206,
       "resultCount": 1,
@@ -35780,7 +36134,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 135
+      "contractShapeIndex": 136
     },
     {
       "index": 353,
@@ -35849,6 +36203,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 575,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 207,
       "resultCount": 1,
@@ -35869,7 +36224,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 354,
@@ -35938,6 +36293,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 576,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 208,
       "resultCount": 1,
@@ -35958,7 +36314,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 130
+      "contractShapeIndex": 131
     },
     {
       "index": 355,
@@ -36027,6 +36383,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 577,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 209,
       "resultCount": 1,
@@ -36047,7 +36404,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 356,
@@ -36116,6 +36473,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 578,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 210,
       "resultCount": 1,
@@ -36136,7 +36494,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 357,
@@ -36205,6 +36563,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 579,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 211,
       "resultCount": 1,
@@ -36225,7 +36584,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 130
+      "contractShapeIndex": 131
     },
     {
       "index": 358,
@@ -36294,6 +36653,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 580,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 212,
       "resultCount": 1,
@@ -36314,7 +36674,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 130
+      "contractShapeIndex": 131
     },
     {
       "index": 359,
@@ -36383,6 +36743,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 581,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 213,
       "resultCount": 1,
@@ -36403,7 +36764,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 360,
@@ -36472,6 +36833,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 582,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 214,
       "resultCount": 1,
@@ -36492,7 +36854,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 128
+      "contractShapeIndex": 129
     },
     {
       "index": 361,
@@ -36561,6 +36923,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 583,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 215,
       "resultCount": 1,
@@ -36581,7 +36944,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 362,
@@ -36650,6 +37013,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 584,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 216,
       "resultCount": 1,
@@ -36670,7 +37034,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 130
+      "contractShapeIndex": 131
     },
     {
       "index": 363,
@@ -36739,6 +37103,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 585,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 217,
       "resultCount": 1,
@@ -36759,7 +37124,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 364,
@@ -36828,6 +37193,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 586,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 218,
       "resultCount": 1,
@@ -36848,7 +37214,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 128
+      "contractShapeIndex": 129
     },
     {
       "index": 365,
@@ -36917,6 +37283,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 587,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 219,
       "resultCount": 1,
@@ -36937,7 +37304,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 130
+      "contractShapeIndex": 131
     },
     {
       "index": 366,
@@ -37006,6 +37373,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 588,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 220,
       "resultCount": 1,
@@ -37026,7 +37394,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 367,
@@ -37095,6 +37463,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 589,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 221,
       "resultCount": 1,
@@ -37115,7 +37484,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 136
+      "contractShapeIndex": 137
     },
     {
       "index": 368,
@@ -37186,6 +37555,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 590,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 222,
       "resultCount": 1,
@@ -37206,7 +37576,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 129
+      "contractShapeIndex": 130
     },
     {
       "index": 369,
@@ -37275,6 +37645,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 591,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 223,
       "resultCount": 1,
@@ -37295,7 +37666,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 130
+      "contractShapeIndex": 131
     },
     {
       "index": 370,
@@ -37364,6 +37735,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 592,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 224,
       "resultCount": 1,
@@ -37384,7 +37756,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 371,
@@ -37453,6 +37825,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 593,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 225,
       "resultCount": 1,
@@ -37473,7 +37846,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 372,
@@ -37542,6 +37915,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 594,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 226,
       "resultCount": 1,
@@ -37562,7 +37936,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 135
+      "contractShapeIndex": 136
     },
     {
       "index": 373,
@@ -37631,6 +38005,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 595,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 227,
       "resultCount": 1,
@@ -37651,7 +38026,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 133
+      "contractShapeIndex": 134
     },
     {
       "index": 374,
@@ -37720,6 +38095,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 596,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 228,
       "resultCount": 1,
@@ -37740,7 +38116,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 135
+      "contractShapeIndex": 136
     },
     {
       "index": 375,
@@ -37809,6 +38185,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 597,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 229,
       "resultCount": 1,
@@ -37829,7 +38206,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 135
+      "contractShapeIndex": 136
     },
     {
       "index": 376,
@@ -37898,6 +38275,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 598,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 230,
       "resultCount": 1,
@@ -37918,7 +38296,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 136
+      "contractShapeIndex": 137
     },
     {
       "index": 377,
@@ -37987,6 +38365,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 599,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 231,
       "resultCount": 1,
@@ -38007,7 +38386,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 135
+      "contractShapeIndex": 136
     },
     {
       "index": 378,
@@ -38076,6 +38455,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 600,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 232,
       "resultCount": 1,
@@ -38096,7 +38476,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 379,
@@ -38165,6 +38545,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 601,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 233,
       "resultCount": 1,
@@ -38185,7 +38566,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 136
+      "contractShapeIndex": 137
     },
     {
       "index": 380,
@@ -38254,6 +38635,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 602,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 234,
       "resultCount": 1,
@@ -38274,7 +38656,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 134
+      "contractShapeIndex": 135
     },
     {
       "index": 381,
@@ -38343,6 +38725,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 603,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 235,
       "resultCount": 1,
@@ -38363,7 +38746,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 130
+      "contractShapeIndex": 131
     },
     {
       "index": 382,
@@ -38432,6 +38815,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 604,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 236,
       "resultCount": 1,
@@ -38452,7 +38836,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 132
+      "contractShapeIndex": 133
     },
     {
       "index": 383,
@@ -38521,6 +38905,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 605,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 237,
       "resultCount": 1,
@@ -38541,7 +38926,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 128
+      "contractShapeIndex": 129
     },
     {
       "index": 384,
@@ -38610,6 +38995,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 606,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 238,
       "resultCount": 1,
@@ -38630,7 +39016,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 385,
@@ -38699,6 +39085,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 607,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 239,
       "resultCount": 1,
@@ -38719,13 +39106,13 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 131
+      "contractShapeIndex": 132
     },
     {
       "index": 386,
       "id": "script:gui.is_enabled",
       "stableId": 689995381,
-      "contractShape": "(handle:gui-node,boolean)->(boolean)",
+      "contractShape": "(handle:gui-node,nil|boolean)->(boolean)",
       "modulePath": [
         "gui"
       ],
@@ -38788,6 +39175,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 608,
+      "requiredArgumentCount": 1,
       "argumentCount": 2,
       "resultOffset": 240,
       "resultCount": 1,
@@ -38808,7 +39196,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 137
+      "contractShapeIndex": 139
     },
     {
       "index": 387,
@@ -38877,6 +39265,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 610,
+      "requiredArgumentCount": 1,
       "argumentCount": 2,
       "resultOffset": 241,
       "resultCount": 0,
@@ -38966,6 +39355,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 612,
+      "requiredArgumentCount": 1,
       "argumentCount": 2,
       "resultOffset": 241,
       "resultCount": 0,
@@ -39055,6 +39445,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 614,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 241,
       "resultCount": 1,
@@ -39075,7 +39466,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 150
+      "contractShapeIndex": 151
     },
     {
       "index": 390,
@@ -39144,6 +39535,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 616,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 242,
       "resultCount": 1,
@@ -39164,7 +39556,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 149
+      "contractShapeIndex": 150
     },
     {
       "index": 391,
@@ -39233,6 +39625,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 618,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 243,
       "resultCount": 1,
@@ -39253,7 +39646,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 150
+      "contractShapeIndex": 151
     },
     {
       "index": 392,
@@ -39322,6 +39715,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 620,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 244,
       "resultCount": 1,
@@ -39342,7 +39736,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 148
+      "contractShapeIndex": 149
     },
     {
       "index": 393,
@@ -39411,6 +39805,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 622,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 245,
       "resultCount": 1,
@@ -39431,7 +39826,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 140
+      "contractShapeIndex": 141
     },
     {
       "index": 394,
@@ -39500,6 +39895,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 625,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 246,
       "resultCount": 0,
@@ -39520,7 +39916,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 127
+      "contractShapeIndex": 128
     },
     {
       "index": 395,
@@ -39589,6 +39985,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 626,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 246,
       "resultCount": 1,
@@ -39609,7 +40006,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 141
+      "contractShapeIndex": 142
     },
     {
       "index": 396,
@@ -39678,6 +40075,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 628,
+      "requiredArgumentCount": 0,
       "argumentCount": 0,
       "resultOffset": 247,
       "resultCount": 1,
@@ -39767,6 +40165,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 628,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 248,
       "resultCount": 0,
@@ -39787,7 +40186,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 123
+      "contractShapeIndex": 124
     },
     {
       "index": 398,
@@ -39856,6 +40255,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 629,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 248,
       "resultCount": 0,
@@ -39876,13 +40276,13 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 126
+      "contractShapeIndex": 127
     },
     {
       "index": 399,
       "id": "script:render.enable_texture",
       "stableId": 97040005,
-      "contractShape": "(number|string|hash,handle:graphics-texture,integer)->()",
+      "contractShape": "(number|string|hash,handle:graphics-texture,nil|integer)->()",
       "modulePath": [
         "render"
       ],
@@ -39945,6 +40345,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 630,
+      "requiredArgumentCount": 2,
       "argumentCount": 3,
       "resultOffset": 248,
       "resultCount": 0,
@@ -39965,7 +40366,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 142
+      "contractShapeIndex": 143
     },
     {
       "index": 400,
@@ -40034,6 +40435,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 633,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 248,
       "resultCount": 1,
@@ -40054,7 +40456,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 124
+      "contractShapeIndex": 125
     },
     {
       "index": 401,
@@ -40123,6 +40525,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 635,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 249,
       "resultCount": 1,
@@ -40143,7 +40546,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 124
+      "contractShapeIndex": 125
     },
     {
       "index": 402,
@@ -40212,6 +40615,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 637,
+      "requiredArgumentCount": 3,
       "argumentCount": 3,
       "resultOffset": 250,
       "resultCount": 0,
@@ -40232,7 +40636,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 125
+      "contractShapeIndex": 126
     },
     {
       "index": 403,
@@ -40308,6 +40712,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 640,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 250,
       "resultCount": 1,
@@ -40328,7 +40733,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 144
+      "contractShapeIndex": 145
     },
     {
       "index": 404,
@@ -40404,6 +40809,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 641,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 251,
       "resultCount": 1,
@@ -40424,7 +40830,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 143
+      "contractShapeIndex": 144
     },
     {
       "index": 405,
@@ -40500,6 +40906,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 642,
+      "requiredArgumentCount": 2,
       "argumentCount": 2,
       "resultOffset": 252,
       "resultCount": 0,
@@ -40520,7 +40927,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 145
+      "contractShapeIndex": 146
     },
     {
       "index": 406,
@@ -40596,6 +41003,7 @@
         "runtimeMask": 63
       },
       "argumentOffset": 644,
+      "requiredArgumentCount": 1,
       "argumentCount": 1,
       "resultOffset": 252,
       "resultCount": 1,
@@ -40616,7 +41024,7 @@
         "html5BrowserHost": "unverified",
         "allocationPerRoute": "unverified"
       },
-      "contractShapeIndex": 143
+      "contractShapeIndex": 144
     }
   ],
   "semanticPolicyHoles": {
@@ -40627,7 +41035,7 @@
     "profileSymbolUnavailable": 2
   },
   "generated": {
-    "report": "{\"routeCount\":407,\"hash\":\"a73d97bce8688c8ef8b30e65a4ecf4cdd2c60a1c8b22ef663707ce1f7217d0b3\"}",
+    "report": "{\"routeCount\":407,\"hash\":\"166ca1b1724eb1227bbfcdad0c9dd8e0a27242baa60d2f77fa9a082ba3672d40\"}",
     "artifacts": [
       "packages/bindings/generated/defold-script-handle-lowering.json",
       "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp",

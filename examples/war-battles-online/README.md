@@ -9,6 +9,8 @@ server-authoritative online mode over the WebTransport/QUIC boundary in `core/`.
 No Lua is authored anywhere in this example. Every component is a `.script.ts`
 or `.gui.ts` compiled through déherm.
 
+Pixel-art production for the showcase is sponsored by [Sprite Fusion](https://www.spritefusion.com/). The title screen carries the same sponsorship in-game; generated source requests, immutable outputs, selections, and deterministic runtime derivatives live under `art/source/sprite-fusion/` and `defold/assets/derived/ui/`.
+
 ```
 core/        the engine-independent simulation, protocol, transport, server, client
 server/      a runnable Deno HTTP/3 server                    (server/README.md)
@@ -29,14 +31,24 @@ pnpm check                        # generated state, art, tilemap, types, focuse
 pnpm play                         # the built arm64-macOS engine
 ```
 
-| Keys | Action |
-| --- | --- |
-| Arrows / WASD | Thrust. The tank has mass: it accelerates, drifts and coasts |
-| Space | Fire |
-| Shift | Boost — a limited, recharging burst |
-| `1`–`6` | Cannon, autocannon, railgun, scatter, mortar, ricochet |
-| `7`–`0` | Purchase/select scout, assault, bulwark, artillery chassis |
-| `Q` / `E` | Purchase/select branch 1 / 2 for the held weapon (selection is free after purchase) |
+Open `war-battles-online.code-workspace` (or this directory) in VS Code. Do not
+open `defold/` as the developer workspace: it is the nested Defold engine
+project, while this directory owns `package.json`, the simulation, server,
+tests, generated-art tools, and editor configuration.
+
+`pnpm play` launches the already-built game in offline authoritative mode; bots
+fill every slot not occupied by a human. `pnpm dev` builds, launches, watches,
+and hot-reloads through the TUI by default. `pnpm serve` is separate and is only
+needed for networked WebTransport/QUIC play.
+
+| Keys          | Action                                                                              |
+| ------------- | ----------------------------------------------------------------------------------- |
+| Arrows / WASD | Thrust. The tank has mass: it accelerates, drifts and coasts                        |
+| Space         | Fire                                                                                |
+| Shift         | Boost — a limited, recharging burst                                                 |
+| `1`–`6`       | Cannon, autocannon, railgun, scatter, mortar, ricochet                              |
+| `7`–`0`       | Purchase/select scout, assault, bulwark, artillery chassis                          |
+| `Q` / `E`     | Purchase/select branch 1 / 2 for the held weapon (selection is free after purchase) |
 
 The scene opens on the tutorial's scripted demonstration, which is what the
 packaged runtime gates observe; **any key starts the match immediately**, and it
@@ -53,7 +65,7 @@ pnpm soak                         # 32 bots, ten minutes, with a rollback check
 ## The game
 
 **Tanks have mass.** A tank thrusts, drags and coasts; it is not repositioned.
-The drive speed is enforced by refusing thrust that would exceed it, *not* by
+The drive speed is enforced by refusing thrust that would exceed it, _not_ by
 clamping the velocity vector, so an explosion can still throw a tank well past
 its own top speed — which is what makes splash knockback and rocket-jumping real
 rather than cancelled on the next tick. The hull chases the direction of travel
@@ -88,14 +100,14 @@ data-driven branches: the first selection purchases that branch once with
 credits, while switching between already-unlocked branches is free. Q/E exposes
 the current weapon's branch choice without adding a per-frame control route.
 
-| Weapon | Shape of the fight |
-| --- | --- |
-| Cannon | The floor. 30 damage, slow, always available |
-| Autocannon | 9 damage every 5 ticks with a little spread: suppression, not duels |
-| Railgun | 72 damage at 512 units a tick, pierces two tanks, 1.5 s between shots |
-| Scatter | Seven pellets in a fan, lethal in your face and useless across the map |
-| Mortar | 58 on impact plus 46 of falling-off splash, and enough knockback to ride |
-| Ricochet | 21 damage, four wall bounces, 2.5 s of life: shoot round the corner |
+| Weapon     | Shape of the fight                                                       |
+| ---------- | ------------------------------------------------------------------------ |
+| Cannon     | The floor. 30 damage, slow, always available                             |
+| Autocannon | 9 damage every 5 ticks with a little spread: suppression, not duels      |
+| Railgun    | 72 damage at 512 units a tick, pierces two tanks, 1.5 s between shots    |
+| Scatter    | Seven pellets in a fan, lethal in your face and useless across the map   |
+| Mortar     | 58 on impact plus 46 of falling-off splash, and enough knockback to ride |
+| Ricochet   | 21 damage, four wall bounces, 2.5 s of life: shoot round the corner      |
 
 **Pickups, on Quake timers.** Thirty-two pads, placed symmetrically, each with
 its own respawn clock: 12 s for the autocannon, 25 s for the railgun and the
@@ -107,14 +119,13 @@ damage until it is gone; overdrive doubles what you deal for ten seconds.
 **An arena, not a field.** 120x90 tiles of point-symmetric cover: bunkers with a
 doorway, long walls, crate clusters and sandbag lines, on a 15-tile lattice that
 guarantees at least eight tiles of corridor between any two blocks. Every open
-cell is reachable — the test suite floods the map to prove it. Cover is
-**not destructible**, on purpose: the grid is derived from a four-byte seed
-rather than stored, so a joining client rebuilds it exactly and the raw world
-state stays a fixed 17,760 bytes. Network snapshots use a 17,776-byte keyframe
-only for join/recovery and a bounded changed-byte delta thereafter; a 32-player
-bot trace measured 1,869–3,201-byte normal deltas (p50 2,438) over 200 frames,
-versus the former fixed 17,640-byte message. The codec sends a keyframe at least
-every 20 snapshots.
+cell is reachable — the test suite floods the map to prove it. The derived grid
+exposes up to 64 crate/sandbag cells in a fixed-capacity reactive-panel table.
+Projectile damage changes one authoritative health byte per panel; destroying a
+panel opens collision and sightlines for players, projectiles, and bots. Static
+terrain still comes from the four-byte seed, while the 64 health bytes are
+versioned in rollback, reconnect, and checkpoint snapshots. The codec keeps a
+bounded changed-byte delta and sends a keyframe at least every 20 snapshots.
 
 **Bots that are worth fighting.** A bot is a client, not a special case: it reads
 the world and emits the same 32-byte input packet a keyboard does, which is why
@@ -153,14 +164,16 @@ projectile and pad reads the slot it was spawned for and moves itself. A tank is
 two game objects because the hull and the turret rotate independently and each
 has to be the thing that rotates.
 
-**Art is generated**, by `tools/generate-art.mjs`, from a palette histogrammed
-out of the pinned tutorial PNGs — the generator throws if asked for a colour that
-is not in that histogram. Same 16 px tiles, same chunky silhouettes, same 1 px
-`#2c2839` outline the tutorial sprites carry. It writes 70 files plus the atlas
-and the tilesource, is byte-reproducible, and has a `--check` mode wired into
-`pnpm check`. `tools/generate-arena-tilemap.mjs` then emits the tilemap from the
-*same* arena seed and the art manifest's tile ids, so the picture and the
-collision grid cannot drift apart.
+**Art is generated.** `tools/generate-world-art.mjs` validates the immutable
+Sprite Fusion selections and projects approved items and props onto the 16 px
+gameplay grid. `tools/generate-art.mjs` then combines those cells with art drawn
+from a palette histogrammed out of the pinned tutorial PNGs. Finally,
+`tools/generate-arena-tilemap.mjs` emits Defold's native `.tilemap` from the
+_same_ arena seed and the art manifest's tile ids, including visual hazard and
+pickup roles derived from the authoritative `ArenaMap`. Sprite Fusion supplies
+pixels; Defold and our checked-in generators own tile IDs, layers, collision,
+map structure, and reproducibility. Every stage is byte-reproducible and has a
+`--check` mode wired into `pnpm check`.
 
 ## Online
 
@@ -223,8 +236,8 @@ session ledger, preventing the restored world tick from being counted twice.
 Docker mounts this beside the resume ledger as `server/state/world.bin`.
 
 The compact snapshot unit test independently proves the codec against a full
-32-player world: the former 17,640-byte frame is now a 17,776-byte keyframe,
-while the measured 20 Hz bot trace uses 1,869–3,201-byte deltas (p50 2,438).
+32-player world: the fixed world image is 17,824 bytes and its keyframe is
+17,840 bytes, while the measured 20 Hz bot trace uses bounded deltas.
 The test also proves keyframe reconstruction, exact-base enforcement, sorted
 run bounds, and rejection of a delta without its baseline. This is protocol and
 in-process evidence; it is not a WAN compression, packet-loss, or allocation
@@ -282,21 +295,21 @@ manifest so the two cannot drift.
 
 ## Commands
 
-| Command | What it does |
-| --- | --- |
-| `pnpm generate` | Project SDK, component proxies, synced `core/` sources |
-| `pnpm check` | Generated state, art and tilemap freshness, types, tests |
-| `pnpm art` / `pnpm art:check` | Regenerate or verify the pixel art |
-| `pnpm tilemap` / `pnpm tilemap:check` | Regenerate or verify the arena tilemap |
-| `pnpm play` | Launch the built native engine |
-| `pnpm play:headless`, `pnpm soak` | Deterministic matches with no engine |
-| `pnpm serve` | The Deno HTTP/3 match server |
-| `pnpm dev` | Compiler, watcher and hot-reload control plane |
-| `pnpm runtime:packaged`, `pnpm runtime:browser` | The two packaged runtime gates |
+| Command                                                               | What it does                                                              |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `pnpm generate`                                                       | Project SDK, component proxies, synced `core/` sources                    |
+| `pnpm check`                                                          | Generated state, art and tilemap freshness, types, tests                  |
+| `pnpm art` / `pnpm art:check`                                         | Regenerate or verify the pixel art                                        |
+| `pnpm tilemap` / `pnpm tilemap:check`                                 | Regenerate or verify the arena tilemap                                    |
+| `pnpm play`                                                           | Launch the built native engine                                            |
+| `pnpm play:headless`, `pnpm soak`                                     | Deterministic matches with no engine                                      |
+| `pnpm serve`                                                          | The Deno HTTP/3 match server                                              |
+| `pnpm dev`                                                            | Compiler, watcher and hot-reload control plane                            |
+| `pnpm runtime:packaged`, `pnpm runtime:browser`                       | The two packaged runtime gates                                            |
 | `pnpm runtime:browser:online`, `pnpm runtime:browser:online:fallback` | Packaged online WebTransport/QUIC and forced WebSocket/TCP fallback gates |
-| `pnpm test:websocket`, `pnpm runtime:websocket` | Deterministic and real-browser WebSocket/TCP fallback gates |
-| `pnpm runtime:projections` | The projection-set gate |
-| `pnpm bundle:size`, `pnpm bundle:size:update` | Bundle measurement |
+| `pnpm test:websocket`, `pnpm runtime:websocket`                       | Deterministic and real-browser WebSocket/TCP fallback gates               |
+| `pnpm runtime:projections`                                            | The projection-set gate                                                   |
+| `pnpm bundle:size`, `pnpm bundle:size:update`                         | Bundle measurement                                                        |
 
 The headless runner also accepts `--replay-out PATH` and `--replay-in PATH`.
 Writing and reading the same replay reproduces the same state and body hashes;
@@ -355,14 +368,14 @@ but delta encoding itself is not in this slice.
 
 ## Server/runtime decision matrix (validated 2026-09-18)
 
-| Candidate | Actual transport semantics | 32-player/server fit | Defold/native and TypeScript fit | Status here |
-| --- | --- | --- | --- | --- |
-| Deno `QuicEndpoint` + `upgradeWebTransport` | Genuine HTTP/3 WebTransport over QUIC. Official example shows server and client, streams, datagrams, TLS, and `--unstable-net`. | Direct authoritative loop in TypeScript; easiest low-level way to share this pure TS core. Must build admission, scheduling, metrics, persistence, and abuse controls. | Browser client is direct. Native Defold still needs a WebTransport extension/binding. | **Lower-level TypeScript alternative** if Colyseus H3 fails its browser/WAN gate or its framework contract is too restrictive. The server API is explicitly unstable. |
-| moq-dev `web-transport` over Quinn | Genuine WebTransport with reliable ordered flow-controlled streams and unreliable unordered congestion-controlled datagrams; native and WASM crates plus UniFFI. | Strong low-level Rust foundation and explicit transport semantics, but room/session services are application work. | Less TS reuse on the server. UniFFI covers Python/Kotlin/Swift, not Defold; a dmSDK binding or sidecar is still required. | **Production/hardened alternative** after measuring Deno; no adapter linked yet. |
-| Colyseus `@colyseus/h3-transport` | Genuine HTTP/3/WebTransport, reliable lane plus QUIC datagrams. Official docs call it experimental and not battle tested. | Best room/schema/reconnect/server ergonomics of these candidates. H3 issue #946 documented room-path and fragmented-read failures in old 0.16.x packages; 0.17.11 release notes confirm the stream/datagram frame-reassembly fix, while room-path behavior still needs a current real-browser test. | Client-side H3 is currently JS/TS only. Official `colyseus-defold` uses `extension-websocket`; that path is WebSocket, not H3. Our protocol remains independent of Colyseus schema. | **Default self-hosted server candidate**, gated by the pinned Docker browser/WAN probe and 32-client soak before gameplay integration. |
-| Bun PR #40027 | The open PR adds server WebTransport **datagrams only** to experimental Bun HTTP/3. It explicitly refuses peer streams. | Attractive API and reported tests, but cannot carry this design's reliable session/control/snapshot lanes by itself. | TypeScript-friendly; no Defold H3 client. PR was still open and Linux x64 runtime-tested, with macOS/Windows compile-only, when checked. | **Not selected** until merged, streams exist, and target runtime tests pass. |
-| WebRTC data channels | SCTP over DTLS over ICE (normally UDP; TURN may relay via UDP/TCP/TLS), not raw UDP and not QUIC. Separate ordered/reliable and unordered `maxRetransmits: 0` channels can provide reliable and UDP-like application lanes. SCTP streams reduce ordering coupling, but congestion, buffering, message interleaving, and one association still need measurement. | An authoritative Node server can use `node-datachannel`/libdatachannel, but every player needs a peer connection plus signaling, ICE credentials, STUN, and usually TURN capacity. | The community `extension-webrtc` reports WASM/Windows/Linux support but no stable release and heavy development. The Poki extension is HTML5-only, peer-to-peer, and alpha. Neither is a proven all-target authoritative client. | **Fallback research path**, not the default. Promote only after native target, TURN, signaling, loss and load tests. |
-| Colyseus Defold over WebSocket | Reliable ordered WebSocket/TCP only; official H3 docs say WebSockets have no real unreliable channel. | Mature room and state tooling. | Existing Defold SDK and native WebSocket extension are the easiest current engine path. | **Compatibility fallback only** and always labeled WebSocket, never QUIC. |
+| Candidate                                   | Actual transport semantics                                                                                                                                                                                                                                                                                                                                      | 32-player/server fit                                                                                                                                                                                                                                                                                | Defold/native and TypeScript fit                                                                                                                                                                                                 | Status here                                                                                                                                                           |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deno `QuicEndpoint` + `upgradeWebTransport` | Genuine HTTP/3 WebTransport over QUIC. Official example shows server and client, streams, datagrams, TLS, and `--unstable-net`.                                                                                                                                                                                                                                 | Direct authoritative loop in TypeScript; easiest low-level way to share this pure TS core. Must build admission, scheduling, metrics, persistence, and abuse controls.                                                                                                                              | Browser client is direct. Native Defold still needs a WebTransport extension/binding.                                                                                                                                            | **Lower-level TypeScript alternative** if Colyseus H3 fails its browser/WAN gate or its framework contract is too restrictive. The server API is explicitly unstable. |
+| moq-dev `web-transport` over Quinn          | Genuine WebTransport with reliable ordered flow-controlled streams and unreliable unordered congestion-controlled datagrams; native and WASM crates plus UniFFI.                                                                                                                                                                                                | Strong low-level Rust foundation and explicit transport semantics, but room/session services are application work.                                                                                                                                                                                  | Less TS reuse on the server. UniFFI covers Python/Kotlin/Swift, not Defold; a dmSDK binding or sidecar is still required.                                                                                                        | **Production/hardened alternative** after measuring Deno; no adapter linked yet.                                                                                      |
+| Colyseus `@colyseus/h3-transport`           | Genuine HTTP/3/WebTransport, reliable lane plus QUIC datagrams. Official docs call it experimental and not battle tested.                                                                                                                                                                                                                                       | Best room/schema/reconnect/server ergonomics of these candidates. H3 issue #946 documented room-path and fragmented-read failures in old 0.16.x packages; 0.17.11 release notes confirm the stream/datagram frame-reassembly fix, while room-path behavior still needs a current real-browser test. | Client-side H3 is currently JS/TS only. Official `colyseus-defold` uses `extension-websocket`; that path is WebSocket, not H3. Our protocol remains independent of Colyseus schema.                                              | **Default self-hosted server candidate**, gated by the pinned Docker browser/WAN probe and 32-client soak before gameplay integration.                                |
+| Bun PR #40027                               | The open PR adds server WebTransport **datagrams only** to experimental Bun HTTP/3. It explicitly refuses peer streams.                                                                                                                                                                                                                                         | Attractive API and reported tests, but cannot carry this design's reliable session/control/snapshot lanes by itself.                                                                                                                                                                                | TypeScript-friendly; no Defold H3 client. PR was still open and Linux x64 runtime-tested, with macOS/Windows compile-only, when checked.                                                                                         | **Not selected** until merged, streams exist, and target runtime tests pass.                                                                                          |
+| WebRTC data channels                        | SCTP over DTLS over ICE (normally UDP; TURN may relay via UDP/TCP/TLS), not raw UDP and not QUIC. Separate ordered/reliable and unordered `maxRetransmits: 0` channels can provide reliable and UDP-like application lanes. SCTP streams reduce ordering coupling, but congestion, buffering, message interleaving, and one association still need measurement. | An authoritative Node server can use `node-datachannel`/libdatachannel, but every player needs a peer connection plus signaling, ICE credentials, STUN, and usually TURN capacity.                                                                                                                  | The community `extension-webrtc` reports WASM/Windows/Linux support but no stable release and heavy development. The Poki extension is HTML5-only, peer-to-peer, and alpha. Neither is a proven all-target authoritative client. | **Fallback research path**, not the default. Promote only after native target, TURN, signaling, loss and load tests.                                                  |
+| Colyseus Defold over WebSocket              | Reliable ordered WebSocket/TCP only; official H3 docs say WebSockets have no real unreliable channel.                                                                                                                                                                                                                                                           | Mature room and state tooling.                                                                                                                                                                                                                                                                      | Existing Defold SDK and native WebSocket extension are the easiest current engine path.                                                                                                                                          | **Compatibility fallback only** and always labeled WebSocket, never QUIC.                                                                                             |
 
 Primary evidence:
 

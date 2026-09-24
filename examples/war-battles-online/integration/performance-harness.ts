@@ -54,7 +54,7 @@ function percentile(values: Float64Array, quantile: number): number {
 function summarize(values: Float64Array): Record<string, number> {
   return {
     samples: values.length,
-    p50: percentile(values, 0.50),
+    p50: percentile(values, 0.5),
     p95: percentile(values, 0.95),
     p99: percentile(values, 0.99),
     maximum: Math.max(...values),
@@ -84,8 +84,9 @@ function setInput(
   command.moveY = ((tick * 2 + playerId + phase) % 3) - 1;
   command.aimX = playerId % 2 === 0 ? -127 : 127;
   command.aimY = ((tick + playerId + phase) % 5) - 2;
-  command.buttons = ((tick + playerId + phase) % 7 < 3 ? INPUT_BUTTON_FIRE : 0)
-    | ((tick + playerId + phase) % 19 === 0 ? INPUT_BUTTON_BOOST : 0);
+  command.buttons =
+    ((tick + playerId + phase) % 7 < 3 ? INPUT_BUTTON_FIRE : 0) |
+    ((tick + playerId + phase) % 19 === 0 ? INPUT_BUTTON_BOOST : 0);
   command.weaponRequest = (tick + playerId + phase) % 11 === 0 ? 1 : 0;
   command.fireSubtick = 255;
   command.latestSnapshotTick = 0;
@@ -192,8 +193,9 @@ export function runPerformanceHarness(
 
       let positionError = 0;
       for (let slot = 0; slot < config.players; slot += 1) {
-        positionError += Math.abs(authoritative.playerX[slot]! - predicted.playerX[slot]!)
-          + Math.abs(authoritative.playerY[slot]! - predicted.playerY[slot]!);
+        positionError +=
+          Math.abs(authoritative.playerX[slot]! - predicted.playerX[slot]!) +
+          Math.abs(authoritative.playerY[slot]! - predicted.playerY[slot]!);
       }
       reconciliationSamples[reconciliationSampleCount++] = positionError;
       maxReconciliationError = Math.max(maxReconciliationError, positionError);
@@ -226,7 +228,8 @@ export function runPerformanceHarness(
       wallClockObserved: false,
       simulation: summarize(measuredSimulation),
       frame: summarize(measuredFrame),
-      evidenceBoundary: "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings.",
+      evidenceBoundary:
+        "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings.",
     },
     snapshotBandwidth: {
       intervalTicks: config.snapshotIntervalTicks,
@@ -258,7 +261,11 @@ export function runPerformanceHarness(
         droppedByOverflow: eventDrops,
         overflowPolicy: "drop-oldest",
       },
-      snapshotFrame: { capacity: fixedFrameCapacity, highWater: Math.max(...measuredSnapshotSizes), failures: snapshotBufferFailures },
+      snapshotFrame: {
+        capacity: fixedFrameCapacity,
+        highWater: Math.max(...measuredSnapshotSizes),
+        failures: snapshotBufferFailures,
+      },
       arena: { observable: false, failures: null, reason: "This pure TypeScript harness enters no native/VM arena." },
     },
     allocationShape: {
@@ -276,7 +283,12 @@ export function runPerformanceHarness(
         transientDataViewsPerSnapshot: 2,
         limit: "fixed snapshot buffers; DataView construction is observable source shape, not a VM allocation count",
       },
-      excluded: ["Hermes/JS VM allocations", "Defold engine allocations", "native heap allocations", "browser transport queues"],
+      excluded: [
+        "Hermes/JS VM allocations",
+        "Defold engine allocations",
+        "native heap allocations",
+        "browser transport queues",
+      ],
     },
   });
 }

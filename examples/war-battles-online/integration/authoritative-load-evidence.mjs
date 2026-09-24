@@ -8,8 +8,7 @@ const integrationRoot = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const exampleRoot = resolve(integrationRoot, "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 
-export const AUTHORITATIVE_LOAD_OWNER =
-  "examples/war-battles-online/integration/check-authoritative-load.mjs";
+export const AUTHORITATIVE_LOAD_OWNER = "examples/war-battles-online/integration/check-authoritative-load.mjs";
 
 export const AUTHORITATIVE_LOAD_SOURCE_PATHS = Object.freeze([
   "examples/war-battles-online/core",
@@ -41,21 +40,39 @@ async function treeInput(path) {
     }
     if (metadata.isSymbolicLink()) {
       const target = Buffer.from(await readlink(absolute));
-      files.push({ path: local, kind: "symlink", bytes: target.byteLength, sha256: createHash("sha256").update(target).digest("hex") });
+      files.push({
+        path: local,
+        kind: "symlink",
+        bytes: target.byteLength,
+        sha256: createHash("sha256").update(target).digest("hex"),
+      });
       bytes += target.byteLength;
       return;
     }
     assert.equal(metadata.isFile(), true, `unsupported authoritative load input: ${absolute}`);
     const contents = await readFile(absolute);
-    files.push({ path: local, kind: "file", bytes: contents.byteLength, sha256: createHash("sha256").update(contents).digest("hex") });
+    files.push({
+      path: local,
+      kind: "file",
+      bytes: contents.byteLength,
+      sha256: createHash("sha256").update(contents).digest("hex"),
+    });
     bytes += contents.byteLength;
   }
   await visit(root, "");
-  return { path, kind: "tree", fileCount: files.length, bytes, sha256: createHash("sha256").update(JSON.stringify(files)).digest("hex") };
+  return {
+    path,
+    kind: "tree",
+    fileCount: files.length,
+    bytes,
+    sha256: createHash("sha256").update(JSON.stringify(files)).digest("hex"),
+  };
 }
 
 export async function buildAuthoritativeLoadSourceInputs() {
-  return Promise.all(AUTHORITATIVE_LOAD_SOURCE_PATHS.map((path) => path.endsWith("/core") ? treeInput(path) : fileInput(path)));
+  return Promise.all(
+    AUTHORITATIVE_LOAD_SOURCE_PATHS.map((path) => (path.endsWith("/core") ? treeInput(path) : fileInput(path))),
+  );
 }
 
 export function digestAuthoritativeLoadSourceInputs(sourceInputs) {
@@ -69,7 +86,11 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.equal(document?.generator, AUTHORITATIVE_LOAD_OWNER);
   if (sourceInputs !== undefined) {
     assert.deepEqual(document.sourceInputs, sourceInputs, "authoritative load evidence source inventory is stale");
-    assert.equal(document.sourceKey, digestAuthoritativeLoadSourceInputs(sourceInputs), "authoritative load source key is stale");
+    assert.equal(
+      document.sourceKey,
+      digestAuthoritativeLoadSourceInputs(sourceInputs),
+      "authoritative load source key is stale",
+    );
   }
   assert.equal(document.config?.players, 32);
   assert.equal(document.server?.rosterSize, 32);
@@ -90,7 +111,10 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.ok(document.transport?.observed?.droppedDatagrams > 0);
   assert.ok(document.transport?.observed?.backpressuredDatagrams > 0);
   assert.ok(document.transport?.observed?.reorderedDatagrams > 0);
-  assert.ok(Number.isInteger(document.transport?.queueBound) && document.transport.observed.peakQueue <= document.transport.queueBound);
+  assert.ok(
+    Number.isInteger(document.transport?.queueBound) &&
+      document.transport.observed.peakQueue <= document.transport.queueBound,
+  );
   for (const row of document.clients.rows) {
     assert.equal(row.state, "ready");
     assert.equal(row.converged, true);

@@ -1,0 +1,8 @@
+{
+  "name": "driver-portrait-radio-idle-v1",
+  "operation": "animate",
+  "prompt": "A subtle alert communications-portrait idle loop. The driver keeps his shoulders and silhouette steady while his eyes scan left, then right, his brows tighten, his moustache shifts with one brief radio mutter, and he returns seamlessly to the starting pose. Restrained readable facial motion only; no camera movement, body turn, zoom, added objects, background, frame, or text.",
+  "inputs": ["asset:2c537204-68a9-47a8-a8b4-8d05335e912d"],
+  "outputFrames": 8,
+  "colors": 32
+}

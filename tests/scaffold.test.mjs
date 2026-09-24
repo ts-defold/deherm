@@ -8,7 +8,7 @@ import { createDefoldProject } from "../packages/cli/src/scaffold.mjs";
 import {
   BOB_MANAGED_IGNORE_BEGIN,
   BOB_MANAGED_IGNORE_END,
-  BOB_TOOLING_IGNORE_ENTRIES
+  BOB_TOOLING_IGNORE_ENTRIES,
 } from "../packages/cli/src/bob-project-boundary.mjs";
 
 const revision = "a".repeat(40);
@@ -25,7 +25,7 @@ const locator = {
   base: {},
   channels: ["stable", "beta"],
   channelInfoUrl: "https://example.invalid/{channel}/info.json",
-  entries: []
+  entries: [],
 };
 
 test("scaffold resolves its default from Defold's moving stable channel, not a packaged revision", async (t) => {
@@ -40,7 +40,7 @@ test("scaffold resolves its default from Defold's moving stable channel, not a p
     fetchImpl: async (url) => {
       requests.push(url);
       return { ok: true, json: async () => ({ sha1: revision, version: "1.11.0" }) };
-    }
+    },
   });
 
   assert.equal(created.defoldRevision, revision);
@@ -50,6 +50,18 @@ test("scaffold resolves its default from Defold's moving stable channel, not a p
   assert.equal(defignore[0], BOB_MANAGED_IGNORE_BEGIN);
   assert.equal(defignore.at(-1), BOB_MANAGED_IGNORE_END);
   assert.deepEqual(defignore.slice(1, -1), [...BOB_TOOLING_IGNORE_ENTRIES, "/src/main.script.ts"]);
+  const manifest = JSON.parse(await readFile(path.join(projectRoot, "package.json"), "utf8"));
+  assert.equal(manifest.scripts.lint, "oxlint .");
+  assert.equal(manifest.scripts["format:check"], "oxfmt --check .");
+  assert.equal(manifest.scripts.check, "pnpm lint && pnpm format:check && pnpm typecheck && pnpm verify");
+  assert.equal(manifest.devDependencies.oxlint, "^1.85.0");
+  assert.equal(manifest.devDependencies.oxfmt, "^0.70.0");
+  const lint = JSON.parse(await readFile(path.join(projectRoot, ".oxlintrc.json"), "utf8"));
+  const format = JSON.parse(await readFile(path.join(projectRoot, ".oxfmtrc.json"), "utf8"));
+  assert.equal(lint.categories.correctness, "error");
+  assert.equal(lint.options.denyWarnings, true);
+  assert.equal(format.printWidth, 120);
+  assert.equal(format.sortPackageJson, false);
 });
 
 test("an explicit scaffold revision is authoritative and requires no channel lookup", async (t) => {
@@ -61,7 +73,10 @@ test("an explicit scaffold revision is authoritative and requires no channel loo
     directory: projectRoot,
     defoldRevision: revision,
     policyLocator: locator,
-    fetchImpl: async () => { fetched = true; throw new Error("must not fetch"); }
+    fetchImpl: async () => {
+      fetched = true;
+      throw new Error("must not fetch");
+    },
   });
 
   assert.equal(created.defoldRevision, revision);

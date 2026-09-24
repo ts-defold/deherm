@@ -72,7 +72,5 @@ for (const [relative, expected] of generated) {
 }
 
 console.log(
-  check
-    ? `${generated.size} generated Defold sources are fresh`
-    : `wrote ${generated.size} generated Defold sources`,
+  check ? `${generated.size} generated Defold sources are fresh` : `wrote ${generated.size} generated Defold sources`,
 );

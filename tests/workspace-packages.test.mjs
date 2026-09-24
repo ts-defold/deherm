@@ -21,11 +21,7 @@ test("every internal workspace package maps to canonical raw source", async () =
     const manifest = JSON.parse(await readFile(path.join(packageRoot, "package.json"), "utf8"));
     assert.equal(manifest.private, true, `${packageName} must remain internal to the unified npm artifact`);
     assert.equal(manifest.name, `@deherm/${packageName}`);
-    assert.equal(
-      codeNames.has(manifest.name) || dataNames.has(manifest.name),
-      false,
-      `${manifest.name} is duplicated`
-    );
+    assert.equal(codeNames.has(manifest.name) || dataNames.has(manifest.name), false, `${manifest.name} is duplicated`);
     assert.ok(manifest.exports, `${packageName} declares no exports`);
 
     if (typeof manifest.source === "string") {
@@ -40,7 +36,7 @@ test("every internal workspace package maps to canonical raw source", async () =
     assert.equal(
       Object.hasOwn(manifest.exports, "."),
       false,
-      `${packageName} declares no raw source, so it must not publish a root export`
+      `${packageName} declares no raw source, so it must not publish a root export`,
     );
     const subpaths = Object.entries(manifest.exports);
     assert.ok(subpaths.length > 0, `${packageName} declares no exported data files`);
@@ -62,7 +58,7 @@ test("every internal workspace package maps to canonical raw source", async () =
     assert.equal(
       Object.hasOwn(paths, workspaceName),
       false,
-      `${workspaceName} publishes no raw source and must not be a TypeScript path alias`
+      `${workspaceName} publishes no raw source and must not be a TypeScript path alias`,
     );
   }
   // The repository's examples intentionally exercise the revision-derived SDK
@@ -84,6 +80,7 @@ test("the public package ships directory boundaries instead of enumerated genera
     "packages/polyfills/",
     "packages/sdk/src/address.ts",
     "packages/sdk/src/component.ts",
+    "packages/sdk/src/host.ts",
     "packages/sdk/src/hmr-state.ts",
     "packages/sdk/src/package.ts",
     "packages/static-hermes/src/globals.d.ts",
@@ -111,7 +108,7 @@ test("the public package ships directory boundaries instead of enumerated genera
     "!defold/defold_hermes/lib/web/generated*",
     "!packages/**/package.json",
     "!packages/**/*.type-test.ts",
-    "README.md"
+    "README.md",
   ]);
 });
 
@@ -123,7 +120,9 @@ test("every first-level example is a private workspace consumer", async () => {
   assert.deepEqual(exampleNames, ["runtime-smoke", "war-battles-online"]);
 
   for (const exampleName of exampleNames) {
-    const manifest = JSON.parse(await readFile(path.join(repositoryRoot, "examples", exampleName, "package.json"), "utf8"));
+    const manifest = JSON.parse(
+      await readFile(path.join(repositoryRoot, "examples", exampleName, "package.json"), "utf8"),
+    );
     assert.equal(manifest.name, `@deherm/example-${exampleName}`);
     assert.equal(manifest.private, true);
     assert.equal(manifest.dependencies?.["@ts-defold/deherm"], "workspace:*");
@@ -132,13 +131,13 @@ test("every first-level example is a private workspace consumer", async () => {
     assert.ok(manifest.exports && Object.hasOwn(manifest.exports, "."));
   }
 
-  const runtimeSmokeTsconfig = JSON.parse(await readFile(path.join(
-    repositoryRoot, "examples", "runtime-smoke", "tsconfig.json"
-  ), "utf8"));
+  const runtimeSmokeTsconfig = JSON.parse(
+    await readFile(path.join(repositoryRoot, "examples", "runtime-smoke", "tsconfig.json"), "utf8"),
+  );
   assert.equal(
     runtimeSmokeTsconfig.extends,
     "../../tsconfig.json",
-    "the runtime smoke must inherit the repository's revision-derived public SDK aliases"
+    "the runtime smoke must inherit the repository's revision-derived public SDK aliases",
   );
 
   const workspace = await readFile(path.join(repositoryRoot, "pnpm-workspace.yaml"), "utf8");

@@ -32,7 +32,7 @@ export interface WebSocketLike {
 }
 
 export interface WebSocketConstructorLike {
-  new(url: string, protocols?: string | readonly string[]): WebSocketLike;
+  new (url: string, protocols?: string | readonly string[]): WebSocketLike;
 }
 
 /**
@@ -97,11 +97,7 @@ export class BrowserWebSocketClient implements GameTransport {
     return new BrowserWebSocketClient(socket, receiver);
   }
 
-  async sendReliable(
-    channel: ReliableChannel,
-    payload: Uint8Array,
-    signal?: AbortSignal,
-  ): Promise<SendDisposition> {
+  async sendReliable(channel: ReliableChannel, payload: Uint8Array, signal?: AbortSignal): Promise<SendDisposition> {
     if (this.closed || signal?.aborted === true || this.socket.readyState !== WEBSOCKET_OPEN) return "closed";
     validateReliableChannel(channel);
     if (payload.byteLength > MAX_RELIABLE_MESSAGE_BYTES) return "too-large";
@@ -181,7 +177,11 @@ export class BrowserWebSocketClient implements GameTransport {
     if (this.closed) return;
     this.closed = true;
     if (requestSocketClose) {
-      try { this.socket.close(code, reason); } catch { /* already closed */ }
+      try {
+        this.socket.close(code, reason);
+      } catch {
+        /* already closed */
+      }
     }
     if (this.closeNotified) return;
     this.closeNotified = true;

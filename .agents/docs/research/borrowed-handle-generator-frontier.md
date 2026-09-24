@@ -139,3 +139,30 @@ The sample project carries the exact generated profile handshake. The CLI still
 needs to project those fields automatically into arbitrary generated Defold
 projects; until then, the runtime correctly rejects a project whose handshake
 was not installed.
+
+## Optional arguments and GUI producer-consumer compatibility
+
+The handle generator preserves the projection's optional parameter flag in
+both the nil codec and a required-argument boundary. The maximum remains the
+declared parameter count; the minimum is the position after the last required
+parameter. Dispatch pushes only the arguments actually supplied, preserving
+Lua's omitted-argument semantics. This covers eleven selected routes, including
+`gui.is_enabled(node)` and `gui.cancel_animations(node)`, without route overrides.
+
+The specialized `gui.get_node` binding still returns a generation-checked
+`kGuiNode` token owned by `ScriptAdapter`'s legacy pool. Handle-lowered GUI
+consumers accept that representation only when their generated semantic codec
+is `gui-node`. An injected push callback resolves it in its owning pool, with
+the existing type, runtime generation, slot generation, and Lua-state checks,
+inside the router's protected dispatch. It creates no replacement root and does
+not reinterpret the token as a semantic-registry identity. Other semantic kinds
+and anonymous userdata remain rejected.
+
+The focused Lua 5.1 harness now passes a node returned by the real generated
+lookup binding into `gui.get_id` and both arities of `gui.is_enabled`, using
+mock engine functions that check the received userdata identity. It also covers
+explicit undefined, invalid optional values and arities, wrong semantic kinds,
+released tokens, and runtime-generation mismatches. The warmed bridge performs
+1,024 queries with zero C++ `new` calls. The same native harness passes with
+AddressSanitizer and UndefinedBehaviorSanitizer enabled. These are adapter observations, not
+packaged Defold, visual, Lua-allocation, or gameplay evidence.

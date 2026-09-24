@@ -329,6 +329,7 @@ struct Route {
   Disposition html5BrowserHost;
   uint16_t argumentOffset;
   uint16_t resultOffset;
+  uint8_t requiredArgumentCount;
   uint8_t argumentCount;
   uint8_t resultCount;
 };
@@ -405,12 +406,19 @@ const char* profileRouteName(uint16_t routeIndex) noexcept;
 const char* profileContractShapeName(uint16_t shapeId) noexcept;
 #endif
 
+/** The owning adapter resolves legacy GUI tokens in its separate handle pool. */
+struct LegacyHandleApi {
+  void* context = nullptr;
+  bool (*pushGuiNode)(void*, const ScriptValue&, char*, size_t) noexcept = nullptr;
+};
+
 /** One fixed-capacity captured-Lua executor shared by every emitted handle route. */
 class CapturedLuaRouter {
  public:
   CapturedLuaRouter(lua_State* state, lua_bridge::LuaValueRegistry& registry,
       const RuntimeProfile& activeProfile,
-      lua_bridge::scalar::InstanceApi instanceApi = {}) noexcept;
+      lua_bridge::scalar::InstanceApi instanceApi = {},
+      LegacyHandleApi legacyHandles = {}) noexcept;
   ~CapturedLuaRouter();
   CapturedLuaRouter(const CapturedLuaRouter&) = delete;
   CapturedLuaRouter& operator=(const CapturedLuaRouter&) = delete;
@@ -445,6 +453,7 @@ class CapturedLuaRouter {
   lua_bridge::LuaValueRegistry* registry_ = nullptr;
   const RuntimeProfile* activeProfile_ = nullptr;
   lua_bridge::scalar::InstanceApi instanceApi_{};
+  LegacyHandleApi legacyHandles_{};
   int instanceRef_ = -2;
   int captureInstanceTrampolineRef_ = -2;
   int captureHandleTrampolineRef_ = -2;
@@ -504,7 +513,7 @@ function renderSource(report) {
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
   const results = report.resultCodecs.map((codec) =>
     `  {${codec.mask}, SemanticHandleKind::k${codec.semanticKind ? report.kindById[codec.semanticKind].enumName : "None"}},`).join("\n");
-  const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.registrationMask}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
+  const routes = report.routes.map((route) => `  {${route.index}, ${route.stableId}u, ${cppString(route.id)}, ${cppString(route.modulePath.join("."))}, ${cppString(route.member)}, ${operationCpp[route.operationClass]}, ${contextCpp[route.context]}, Invalidation::k${pascal(route.invalidation)}, ${cppString(route.ownership.projectionToken)}, ${cppString(route.lifetime.projectionToken)}, ${cppString(route.profiles.token)}, ${route.profiles.runtimeAvailable}, ${route.profiles.registrationMask}, ${route.profiles.runtimeMask}, ${route.generation.router === "emitted"}, ${dispositionCpp[route.targets.nativeDynamicHermes]}, ${dispositionCpp[route.targets.nativeStaticHermes]}, ${dispositionCpp[route.targets.html5BrowserHost]}, ${route.argumentOffset}, ${route.resultOffset}, ${route.requiredArgumentCount}, ${route.argumentCount}, ${route.resultCount}},`).join("\n");
   const runtimeProfiles = report.runtimeProfiles.map((profile) =>
     `  {${profile.index}, ${profile.mask}, ${profile.detectionCanonicalProfileIndex}, ${profile.equivalentProfileMask}, ${profile.capabilityBits}u, ${profile.sourceRouteCount}u, ${profile.adapterExecutableRouteCount}, ${cppString(profile.id)}, ${cppString(profile.schema)}, ${cppString(profile.defoldRevision)}, ${cppString(profile.routeSetSha256)}, ${cppString(profile.catalogSha256)}},`).join("\n");
   const stableOrder = [...report.routes].sort((left, right) => left.stableId - right.stableId).map(({ index }) => index);
@@ -581,7 +590,7 @@ uint16_t valueMask(const ScriptValue& value) noexcept {
     case ScriptValueTag::kHandle:
       if (value.handleKind == ScriptHandleKind::kHash) return kHash;
       if (value.handleKind == ScriptHandleKind::kUrl) return kUrl;
-      if (value.handleKind == ScriptHandleKind::kLuaSemanticHandle) return kHandle;
+      if (value.handleKind == ScriptHandleKind::kLuaSemanticHandle || value.handleKind == ScriptHandleKind::kGuiNode) return kHandle;
       return 0;
     case ScriptValueTag::kDefoldValue:
       if (value.defoldKind == ScriptDefoldValueKind::kVector3) return kVector3;
@@ -804,8 +813,9 @@ struct CapturedLuaRouter::CaptureContext {
 };
 
 CapturedLuaRouter::CapturedLuaRouter(lua_State* state, lua_bridge::LuaValueRegistry& registry,
-    const RuntimeProfile& activeProfile, lua_bridge::scalar::InstanceApi instanceApi) noexcept
-    : state_(state), registry_(&registry), activeProfile_(&activeProfile), instanceApi_(instanceApi) {
+    const RuntimeProfile& activeProfile, lua_bridge::scalar::InstanceApi instanceApi,
+    LegacyHandleApi legacyHandles) noexcept
+    : state_(state), registry_(&registry), activeProfile_(&activeProfile), instanceApi_(instanceApi), legacyHandles_(legacyHandles) {
   functionRefs_.fill(LUA_NOREF);
   if (state_) {
     const int top = lua_gettop(state_);
@@ -935,6 +945,9 @@ bool CapturedLuaRouter::push(const ScriptValue& value, const ValueCodec& codec, 
     case ScriptValueTag::kHandle:
       if (value.handleKind == ScriptHandleKind::kHash) { dmScript::PushHash(state_, value.payload); return true; }
       if (value.handleKind == ScriptHandleKind::kUrl) { dmMessage::URL url{}; if (!frame || !frame->urlArena || !frame->urlArena->copyForPushUrl(value, frame->urlArena->runtimeToken(), &url)) { fail(error, capacity, "handle URL is stale"); return false; } dmScript::PushURL(state_, url); return true; }
+      if (value.handleKind == ScriptHandleKind::kGuiNode && codec.semanticKind == SemanticHandleKind::kGuiNode && legacyHandles_.pushGuiNode) {
+        return legacyHandles_.pushGuiNode(legacyHandles_.context, value, error, capacity);
+      }
       if (value.handleKind == ScriptHandleKind::kLuaSemanticHandle && codec.semanticKind != SemanticHandleKind::kNone && registry_->push(unpack(value),
           {lua_bridge::LuaValueKind::kUserdata, lua_bridge::LuaValuePolicy::kBorrowed, static_cast<uint16_t>(codec.semanticKind)})) return true;
       fail(error, capacity, "semantic handle is stale, cross-runtime, or wrong-kind"); return false;
@@ -1017,11 +1030,11 @@ bool CapturedLuaRouter::dispatchUnsafe(DispatchContext& context) {
   }
   const int callBase = lua_gettop(state_);
   lua_rawgeti(state_, LUA_REGISTRYINDEX, functionRefs_[route.index]);
-  for (uint8_t index = 0; index < route.argumentCount; ++index) {
+  for (uint8_t index = 0; index < frame->argumentCount; ++index) {
     if (!push(frame->arguments[index], kArguments[route.argumentOffset + index], frame,
         context.error, context.errorCapacity)) return false;
   }
-  lua_call(state_, route.argumentCount, LUA_MULTRET);
+  lua_call(state_, frame->argumentCount, LUA_MULTRET);
   const int actual = lua_gettop(state_) - callBase;
   if (actual != route.resultCount) { fail(context.error, context.errorCapacity, "handle Lua result count mismatch"); return false; }
   for (uint8_t index = 0; index < route.resultCount; ++index) {
@@ -1043,7 +1056,7 @@ bool CapturedLuaRouter::dispatch(ScriptCallFrame* frame, char* error, size_t cap
       kRouteContractShapes[route->index], kRouteProfileNames[route->index]);
   if(!route->nativeAdapterHarness){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route is blocked in the native adapter harness");return false;}
   if(!activeProfile_||!routeAvailableInProfile(*route,*activeProfile_)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle route is unavailable in the active runtime profile");return false;}
-  if(frame->argumentCount!=route->argumentCount||(frame->argumentCount&&!frame->arguments)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle argument count mismatch");return false;}
+  if(frame->argumentCount<route->requiredArgumentCount||frame->argumentCount>route->argumentCount||(frame->argumentCount&&!frame->arguments)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle argument count mismatch");return false;}
   if(route->resultCount&&(!frame->results||frame->resultCapacity<route->resultCount)){DEHERM_PROFILE_SCOPE_FAILED();fail(error,capacity,"handle result storage is exhausted");return false;}
   if(!state_||!registry_){DEHERM_PROFILE_SCOPE_FAILED();return false;}
   const bool scoped=route->context==Context::kGameObjectInstance||route->context==Context::kGuiScene||route->context==Context::kRenderScriptAndGraphics;
@@ -1185,7 +1198,12 @@ export function generateScriptHandleLowering(textInputs) {
   const routes = selected.map((row, index) => {
     const classified = classificationById.get(row.id);
     const argumentOffset = argumentCodecs.length;
-    const arguments_ = row.signature.parameters.map(({ value, sourceType }) => semanticKindsForValue(value, sourceType, rawTypeToKind));
+    const arguments_ = row.signature.parameters.map(({ value, sourceType, optional }) => {
+      const codec = semanticKindsForValue(value, sourceType, rawTypeToKind);
+      return { ...codec, mask: codec.mask | (optional ? codecBits.nil : 0) };
+    });
+    const requiredArgumentCount = row.signature.parameters.reduce(
+      (count, parameter, index) => parameter.optional ? count : index + 1, 0);
     const results = row.signature.returns.map(({ value, sourceType }) => semanticKindsForValue(value, sourceType, rawTypeToKind));
     argumentCodecs.push(...arguments_);
     resultCodecs.push(...results);
@@ -1287,6 +1305,7 @@ export function generateScriptHandleLowering(textInputs) {
         runtimeMask
       },
       argumentOffset,
+      requiredArgumentCount,
       argumentCount: arguments_.length,
       resultOffset: resultCodecs.length - results.length,
       resultCount: results.length,

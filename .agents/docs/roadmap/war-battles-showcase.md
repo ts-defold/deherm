@@ -251,8 +251,8 @@ separate runtime scenario.
 ## Bounded compact snapshot tranche
 
 Authoritative snapshots now use a session-local fixed-capacity baseline. A
-joining or recovering session receives a complete 17,576-byte keyframe (the
-16-byte protocol/codec header plus the 17,560-byte raw world image). Established
+joining or recovering session receives a complete 17,840-byte keyframe (the
+16-byte protocol/codec header plus the 17,824-byte raw world image). Established
 sessions receive sorted, non-overlapping changed-byte runs against their last
 sent baseline, with a keyframe at least every 20 snapshot frames. The browser
 transport's latest-only backpressure path forces the next frame to be a
@@ -402,10 +402,10 @@ the same authoritative world path using a stable tick/slot hash. Defold exposes
 branch one/two as Q/E and keeps the active branch in the compact HUD status.
 Focused tests cover data rows, meaningful fire-time effects, one-time purchase,
 free reselection, invalid IDs, reliable control, and snapshot restoration. The
-raw world image is now 17,760 bytes and the keyframe is 17,776 bytes; the
-updated 200-frame trace measures 1,869–3,201-byte normal deltas (p50 2,438).
-This tranche does not claim persistent destructible spaces, final
-accessibility, or a VM allocation benchmark.
+raw world image is now 17,824 bytes and the keyframe is 17,840 bytes after
+the fixed cover-health extension. Persistent destructible cover is documented
+in the bounded tranche below; this content tranche does not claim final
+accessibility or a VM allocation benchmark.
 
 ## Bounded Stage-3 command-beacon objective tranche
 
@@ -425,7 +425,7 @@ and consumes the authoritative capture event for a bounded announcement;
 free-for-all matches remain inert because team-zero players never contribute.
 Focused core coverage proves capture, event emission, snapshot restore, and
 state-hash equality; integration coverage proves the authored HUD resource and
-generated source path. This tranche does not claim destructible terrain,
+generated source path. This tranche does not claim arbitrary terrain editing,
 network matchmaking, or human visual-quality review.
 
 ## Bounded Stage-3 rotating hazard tranche
@@ -444,8 +444,112 @@ movement command, while the HUD reports the live vent/cooldown and hit/death
 announcements. Focused core coverage proves symmetric open
 vent placement, authoritative pulse damage, event delivery, and cycle handoff;
 the 32-player replay/rollback and owned headless evidence are refreshed against
-the new content. This remains a reactive hazard slice, not destructible terrain
-or a WAN visual-quality claim.
+the new content. This remains a reactive hazard slice; persistent cover is
+covered by the bounded tranche below, not by the vent schedule itself.
+
+## Bounded Stage-3 destructible-cover tranche
+
+The arena now layers up to 64 deterministic crate/sandbag panels over the
+generated grid in a 64-entry fixed-capacity table. Each occupied panel has one
+health byte (100 at match start), so
+projectile impacts can authoritatively damage and destroy cover without putting
+the 10,800-cell map on the wire. A destroyed panel becomes open to collision and
+line-of-sight; bots already consume the same `solidAt`/LOS queries, so their
+movement and target choices adapt to intact versus destroyed cover without a
+second AI map.
+
+Cover health is serialized in the versioned world snapshot (`SNAPSHOT_VERSION`
+6), included in state hashes, rollback/reconnect, and durable checkpoint restore.
+Older frames fail closed on the version/size check. The bounded event ring emits
+`EVENT_COVER_CHANGED` for presentation; Defold renders a bounded impact effect
+and announces panel destruction, while generated mirrors are refreshed only by
+`integration/sync-defold-sources.mjs`. Focused tests prove fixed panel count,
+deterministic damage, collision opening, snapshot state-hash equality, event
+delivery, HUD/source integration, and the existing 32-player replay/rollback
+coverage. This tranche does not claim arbitrary terrain editing or a WAN visual
+quality review.
+
+## Bounded Stage-3 pilot last-chance tranche
+
+Tank destruction now transitions the authoritative player record from `tank`
+to `infantry` instead of immediately awarding a kill. The on-foot pilot has a
+smaller collision body, 24 health, a bounded pistol, no tank pickups or boost,
+and a short post-ejection depot lock. A hostile moving tank may crush the pilot,
+projectile splash remains lethal, and only terminal pilot death increments the
+victim's deaths and the attacker's score. Existing arena spawn pads are the
+deterministic replacement-tank depots; the HUD points toward the nearest depot
+and reports its distance and lock countdown. Reaching one restores the selected
+chassis through the ordinary spawn path.
+
+Player mode is fixed-width authoritative state in snapshot version 7 and is
+therefore covered by rollback, resume, state hashing, and deterministic bot
+simulation. Bots use the same input contract as human players, walk toward a
+depot while on foot, and now sample target position only at their configured
+reaction cadence. Recruit and regular defaults carry larger persistent aim
+error and lower trigger rates; the simulation no longer grants every bot a
+perfect authoritative aim update each tick. Focused tests cover ejection before
+scoring, terminal scoring, snapshot preservation, depot reacquisition, hostile
+tank crushing, bot difficulty ordering, and the changed 32-player snapshot
+trace. This is deterministic simulation and source-integration evidence, not a
+human visual-quality or final balance claim.
+
+## Stage-3 production-art pass
+
+The tutorial-derived presentation is a functional integration fixture, not the
+final showcase art. The production pass covers the entire visible game rather
+than stopping at the HUD:
+
+* one coherent pixel grammar for terrain, walls, destructible cover, tank
+  depots, spawn pads, command beacons, thermal hazards, props, decals, tracks,
+  craters, and wreckage;
+* four readable chassis families with separate turrets, four player-brand
+  palettes, weapon-specific projectiles, pickups, muzzle flashes, impacts,
+  explosions, smoke, and wreck states;
+* four reusable driver variants for the 32 deterministic player identities.
+  A driver remains attached to its player slot across tank, ejected-infantry,
+  death, and replacement-tank states; repeated character art is intentional,
+  while callsign and player-brand colour distinguish the slot;
+* authored title, loadout, combat HUD, leader board, objective display, kill
+  feed, minimap, and last-chance/depot guidance with no debug-text wall; and
+* at least three visual arena themes which share the authoritative collision
+  and gameplay grammar, so presentation variety does not fork simulation rules.
+
+`design/mockups/gameplay-world-v1.png`, `gameplay-hud-v1.png`, and
+`title-loadout-v1.png` are zero-runtime-evidence art-direction targets. Runtime
+assets must remain mechanically reproducible: immutable source generations and
+request manifests live under `art/source/`, while deterministic slicing,
+padding, anchors, atlases, tilesources, and freshness metadata live under
+`defold/assets/derived/` and their owning tools. Sprite Fusion is the sponsored
+pixel-art production service and must be credited on the shipped title screen.
+The first approved portrait family and eight-frame idle animation cost 30
+credits; no concept-only pass may consume API credits.
+
+Sprite Fusion's documented direct API owns source-art generation: terrain
+candidates, pickups, depots, cover, hazards, objectives, items, drivers,
+ejected infantry, tank motion, and effects. Its browser Tilemap Editor has no
+documented automation API and is therefore not a build dependency. Checked-in
+local generators and Defold's native formats own tileset layout, adjacency
+rules, weighted variants, collision layers, `.tilemap`, `.tilesource`,
+gameplay-role metadata, palette variants, atlas packing, seeded arena
+realization, and freshness checks. Defold's editor remains the native visual
+inspection and optional authoring surface.
+
+The first world-art experiment is intentionally classified rather than silently
+promoted. `refinery-pickup-pedestal-v1` produced a useful prop family and its
+compact first candidate is approved as the common pickup base. The request named
+`refinery-basalt-floor-v1` did not produce seamless opaque floor tiles; selected
+outputs are retained only as vents, fissures, and pipe props. Basalt terrain
+remains unresolved until the checked-in tileset generator emits an explicit
+edge grammar and its edge-continuity checks pass.
+
+The approved prop subset is now wired through that boundary. The checked
+`generate-world-art.mjs` projection validates the immutable request, asset,
+hash, dimension, and selection records and emits six normalized 16 px cells.
+`generate-art.mjs` imports those cells into the one Defold arena tilesource, and
+`generate-arena-tilemap.mjs` places the pickup-pedestal and hazard motifs on
+`marks`/`decor` layers from the authoritative `ArenaMap`. This is runtime map
+input, not proof that the still-unresolved basalt terrain family tiles
+seamlessly.
 
 ## Bounded performance and operability evidence tranche
 
@@ -454,7 +558,7 @@ fixture over the real `BattleWorld` and snapshot codec. It records p50/p95/p99
 simulation and frame operation-cost percentiles after a 60-tick warm-up, plus
 keyframe/delta counts, total and per-simulated-second snapshot bytes, and
 reconciliation drift immediately before authoritative restore. The current
-record contains 540 measured ticks, 200 snapshot frames (one 17,776-byte
+record contains 540 measured ticks, 200 snapshot frames (one 17,840-byte
 keyframe followed by 199 deltas), 440,267 total snapshot bytes, and a maximum
 42 fixed-point-unit pre-restore error; post-restore error is zero.
 

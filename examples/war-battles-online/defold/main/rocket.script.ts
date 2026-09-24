@@ -1,4 +1,5 @@
 import {
+  defold,
   defineComponent,
   type ComponentDefinition,
   go,
@@ -12,10 +13,6 @@ import {
 
 import { MAX_PROJECTILES } from "../src/generated-war-battles/index";
 import { arenaMatch, directionRadians, pixelX, pixelY } from "../src/arena-match";
-
-declare const __defoldHostV1: {
-  log(level: "info", message: string): void;
-};
 
 /**
  * A projectile, in either of the two shapes this scene needs.
@@ -88,7 +85,7 @@ export default defineComponent<ComponentDefinition>({
       return;
     }
     go.setRotation(vmath.quatRotationZ(Math.atan2(self.dir.y, self.dir.x)));
-    __defoldHostV1.log("info", `war-battles:rocket-init:${self.dir.x.toFixed(2)}:${self.dir.y.toFixed(2)}`);
+    defold.log("info", `war-battles:rocket-init:${self.dir.x.toFixed(2)}:${self.dir.y.toFixed(2)}`);
   },
 
   update(self: RocketSelf, dt: number): void {
@@ -96,31 +93,32 @@ export default defineComponent<ComponentDefinition>({
       const world = arenaMatch()?.world;
       if (world === undefined) return;
       const slot = Math.trunc(self.slot);
-      if (slot >= MAX_PROJECTILES
-        || world.projectileActive[slot] === 0
-        || world.projectileGeneration[slot] !== Math.trunc(self.generation)) {
+      if (
+        slot >= MAX_PROJECTILES ||
+        world.projectileActive[slot] === 0 ||
+        world.projectileGeneration[slot] !== Math.trunc(self.generation)
+      ) {
         go.delete();
         return;
       }
       go.setPosition(vmath.vector3(pixelX(world.projectileX[slot]!), pixelY(world.projectileY[slot]!), self.z));
-      go.setRotation(vmath.quatRotationZ(
-        directionRadians(world.projectileDirectionX[slot]!, world.projectileDirectionY[slot]!)));
+      go.setRotation(
+        vmath.quatRotationZ(directionRadians(world.projectileDirectionX[slot]!, world.projectileDirectionY[slot]!)),
+      );
       return;
     }
 
     if (self.exploded) return;
     self.life -= dt;
     if (self.life <= 0) {
-      __defoldHostV1.log("info", "war-battles:rocket-expired");
+      defold.log("info", "war-battles:rocket-expired");
       go.delete();
       return;
     }
     const position = go.getPosition();
-    go.setPosition(vmath.vector3(
-      position.x + self.dir.x * self.speed * dt,
-      position.y + self.dir.y * self.speed * dt,
-      position.z,
-    ));
+    go.setPosition(
+      vmath.vector3(position.x + self.dir.x * self.speed * dt, position.y + self.dir.y * self.speed * dt, position.z),
+    );
   },
 
   onMessage(self: RocketSelf, messageId: DefoldHash, message: { readonly other_id: DefoldHash }): void {
@@ -132,9 +130,9 @@ export default defineComponent<ComponentDefinition>({
       msg.post("/gui#ui", "add_score", { score: 100 });
       msg.post("#sprite", "play_animation", { id: EXPLOSION });
       go.setRotation(vmath.quat(0, 0, 0, 1));
-      __defoldHostV1.log("info", "war-battles:rocket-hit");
+      defold.log("info", "war-battles:rocket-hit");
     } else if (messageId === ANIMATION_DONE) {
-      __defoldHostV1.log("info", "war-battles:rocket-explosion-done");
+      defold.log("info", "war-battles:rocket-explosion-done");
       go.delete();
     }
   },

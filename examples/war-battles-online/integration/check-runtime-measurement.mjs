@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
@@ -13,17 +12,13 @@ import {
   digestRuntimeMeasurementSourceInputs,
   RUNTIME_MEASUREMENT_OWNER,
 } from "./runtime-measurement-evidence.mjs";
-import {
-  defaultChromeBinary,
-  freeLoopbackPort,
-  openBundlePage,
-} from "../../../packages/cli/src/dev/browser-host.mjs";
+import { defaultChromeBinary, freeLoopbackPort, openBundlePage } from "../../../packages/cli/src/dev/browser-host.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 const evidencePath = resolve(exampleRoot, "evidence/runtime-measurement.json");
-const bundleDirectory = process.env.DEHERM_WAR_BATTLES_WEB_BUNDLE
-  ?? resolve(repositoryRoot, "build/bundle/War Battles");
+const bundleDirectory =
+  process.env.DEHERM_WAR_BATTLES_WEB_BUNDLE ?? resolve(repositoryRoot, "build/bundle/War Battles");
 const arguments_ = new Set(process.argv.slice(2));
 for (const argument of arguments_) {
   if (!["--record-evidence", "--check-evidence", "--check-sources", "--json", "--browser"].includes(argument)) {
@@ -48,8 +43,8 @@ async function runBrowserMeasurement() {
   let debuggingPort;
   let page;
   try {
-    port = Number.parseInt(process.env.DEHERM_WAR_BATTLES_HTTP_PORT ?? "", 10) || await freeLoopbackPort();
-    debuggingPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_CDP_PORT ?? "", 10) || await freeLoopbackPort();
+    port = Number.parseInt(process.env.DEHERM_WAR_BATTLES_HTTP_PORT ?? "", 10) || (await freeLoopbackPort());
+    debuggingPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_CDP_PORT ?? "", 10) || (await freeLoopbackPort());
     page = await openBundlePage({
       bundleDirectory,
       port,
@@ -82,17 +77,24 @@ async function runBrowserMeasurement() {
       returnByValue: true,
     });
     const observed = state.result?.value ?? {};
-    const browserMemory = observed.memory === null
-      ? { observed: false, jsHeapUsedBytes: null, jsHeapSizeBytes: null, jsHeapLimitBytes: null, unavailable: "Chrome did not expose performance.memory." }
-      : { observed: true, ...observed.memory, unavailable: null };
+    const browserMemory =
+      observed.memory === null
+        ? {
+            observed: false,
+            jsHeapUsedBytes: null,
+            jsHeapSizeBytes: null,
+            jsHeapLimitBytes: null,
+            unavailable: "Chrome did not expose performance.memory.",
+          }
+        : { observed: true, ...observed.memory, unavailable: null };
     return {
       observed: true,
       timing: {
         clock: "performance.now",
         unit: "milliseconds",
         navigationWallClockMs,
-        navigationDurationMs: typeof observed.navigationDurationMs === "number"
-          ? observed.navigationDurationMs : navigationWallClockMs,
+        navigationDurationMs:
+          typeof observed.navigationDurationMs === "number" ? observed.navigationDurationMs : navigationWallClockMs,
         domContentLoadedMs: observed.domContentLoadedMs,
         loadEventEndMs: observed.loadEventEndMs,
         pageNowMs: observed.nowMs,
@@ -101,7 +103,9 @@ async function runBrowserMeasurement() {
       unavailable: null,
     };
   } catch (error) {
-    return unavailableBrowser(`Browser measurement unavailable: ${error instanceof Error ? error.message : String(error)}`);
+    return unavailableBrowser(
+      `Browser measurement unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    );
   } finally {
     await page?.close();
   }
@@ -119,13 +123,18 @@ const generated = {
   generator: RUNTIME_MEASUREMENT_OWNER,
   sourceInputs,
   sourceKey: digestRuntimeMeasurementSourceInputs(sourceInputs),
-  evidenceBoundary: "Owner-observed host wall-clock and memory snapshots; deterministic work units remain in performance-operability.json; no allocation-free or cross-runtime equivalence claim.",
+  evidenceBoundary:
+    "Owner-observed host wall-clock and memory snapshots; deterministic work units remain in performance-operability.json; no allocation-free or cross-runtime equivalence claim.",
 };
 assertRuntimeMeasurementEvidence(generated, { sourceInputs });
 const serialized = `${JSON.stringify(generated, null, 2)}\n`;
-const mode = arguments_.has("--record-evidence") ? "--record-evidence"
-  : arguments_.has("--check-evidence") ? "--check-evidence"
-    : arguments_.has("--check-sources") ? "--check-sources" : "--json";
+const mode = arguments_.has("--record-evidence")
+  ? "--record-evidence"
+  : arguments_.has("--check-evidence")
+    ? "--check-evidence"
+    : arguments_.has("--check-sources")
+      ? "--check-sources"
+      : "--json";
 if (mode === "--record-evidence") {
   await writeFile(evidencePath, serialized);
   process.stdout.write(`war-battles-runtime-measurement:recorded:${evidencePath}\n`);

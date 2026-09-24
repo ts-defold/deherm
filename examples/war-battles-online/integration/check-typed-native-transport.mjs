@@ -32,11 +32,7 @@ import { createHash } from "node:crypto";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  REQUIRED_MARKERS,
-  runPackagedRuntimeEvidence,
-  sha256Artifact,
-} from "./packaged-runtime-evidence.mjs";
+import { REQUIRED_MARKERS, runPackagedRuntimeEvidence, sha256Artifact } from "./packaged-runtime-evidence.mjs";
 import { projectionEnvelope } from "./projections.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -55,8 +51,10 @@ const RUN_SLOTS = Object.freeze({
   control: "controlWithoutAssembledExtension",
 });
 
-const CENSUS_BEGIN = /^INFO:DEFOLD_HERMES: DEHERM_EVENT transport-census-begin reason=(\S+) routes=(\d+) produced=(\d+) dropped=(\d+) overflow=(\d+)$/;
-const CENSUS_SPAN = /^INFO:DEFOLD_HERMES: DEHERM_EVENT transport-span transport=(\S+) stable_id=0x([0-9a-f]{8}) calls=(\d+) total_ns=(\d+) mean_ns=(\d+) failures=(\d+)$/;
+const CENSUS_BEGIN =
+  /^INFO:DEFOLD_HERMES: DEHERM_EVENT transport-census-begin reason=(\S+) routes=(\d+) produced=(\d+) dropped=(\d+) overflow=(\d+)$/;
+const CENSUS_SPAN =
+  /^INFO:DEFOLD_HERMES: DEHERM_EVENT transport-span transport=(\S+) stable_id=0x([0-9a-f]{8}) calls=(\d+) total_ns=(\d+) mean_ns=(\d+) failures=(\d+)$/;
 const CENSUS_END = /^INFO:DEFOLD_HERMES: DEHERM_EVENT transport-census-end reason=(\S+)$/;
 const UNIT_REGISTERED = /^INFO:DEFOLD_HERMES_TYPED_NATIVE: DEHERM_EVENT typed-native-unit-registered unit=(\S+)$/m;
 const STATIC_UNITS = /^INFO:DEFOLD_HERMES: DEHERM_EVENT static-units-evaluated count=(\d+) runtime_id=\d+$/m;
@@ -161,8 +159,9 @@ export async function recordRun(slotKey) {
   if (!census) {
     throw new Error(
       "The packaged engine reported no transport census, so this binary is not the instrumented one. " +
-      "Re-assemble with:\n  node scripts/assemble-typed-native-extension.mjs --project examples/war-battles-online/defold --profile\n" +
-      "then rebuild it through the pinned local Extender.");
+        "Re-assemble with:\n  node scripts/assemble-typed-native-extension.mjs --project examples/war-battles-online/defold --profile\n" +
+        "then rebuild it through the pinned local Extender.",
+    );
   }
   if (census.reason !== "finalize") {
     throw new Error(`Expected the finalize census after a graceful shutdown, got reason=${census.reason}`);
@@ -171,12 +170,20 @@ export async function recordRun(slotKey) {
   const names = await routeNames();
   const rows = census.spans
     .map((span) => ({ routeId: names.get(span.stableId) ?? null, ...span }))
-    .sort((left, right) => (left.transport === right.transport
-      ? (left.routeId ?? "") < (right.routeId ?? "") ? -1 : 1
-      : left.transport < right.transport ? -1 : 1));
+    .sort((left, right) =>
+      left.transport === right.transport
+        ? (left.routeId ?? "") < (right.routeId ?? "")
+          ? -1
+          : 1
+        : left.transport < right.transport
+          ? -1
+          : 1,
+    );
   const unresolved = rows.filter((row) => row.routeId === null);
   if (unresolved.length) {
-    throw new Error(`Census reported stable IDs the canonical plan does not name: ${unresolved.map((row) => row.stableId).join(", ")}`);
+    throw new Error(
+      `Census reported stable IDs the canonical plan does not name: ${unresolved.map((row) => row.stableId).join(", ")}`,
+    );
   }
   const transportCounts = {};
   for (const row of rows) transportCounts[row.transport] = (transportCounts[row.transport] ?? 0) + 1;
@@ -191,7 +198,9 @@ export async function recordRun(slotKey) {
     censusOverflow: census.censusOverflow,
     typedNativeUnitRegistered: Boolean(unitRegistered),
     staticUnitsEvaluated: staticUnits ? Number.parseInt(staticUnits[1], 10) : 0,
-    transportCounts: Object.fromEntries(Object.entries(transportCounts).sort(([left], [right]) => (left < right ? -1 : 1))),
+    transportCounts: Object.fromEntries(
+      Object.entries(transportCounts).sort(([left], [right]) => (left < right ? -1 : 1)),
+    ),
     rows,
   };
 
@@ -210,9 +219,12 @@ export async function recordRun(slotKey) {
   if (run.typedNativeUnitRegistered !== expectedUnit) {
     throw new Error(
       `Run '${slotKey}' ${run.typedNativeUnitRegistered ? "registered" : "did not register"} the typed-native unit, ` +
-      `which is the opposite of what this slot records. ${expectedUnit
-        ? "Assemble the extension into the project and rebuild."
-        : "Remove <project>/defold_hermes_typed_native and rebuild before recording the control."}`);
+        `which is the opposite of what this slot records. ${
+          expectedUnit
+            ? "Assemble the extension into the project and rebuild."
+            : "Remove <project>/defold_hermes_typed_native and rebuild before recording the control."
+        }`,
+    );
   }
   return { slot, run };
 }
@@ -230,7 +242,7 @@ async function mergeEvidence({ slot, run }) {
   const engineRevision = /^DEFOLD_REV=([0-9a-f]{40})$/m.exec(lock)?.[1];
   if (!engineRevision) throw new Error("upstream.lock does not pin a Defold revision");
 
-  const runs = { ...(document.runs ?? {}), [slot]: run };
+  const runs = { ...document.runs, [slot]: run };
   const merged = {
     schemaVersion: 2,
     projection: projectionEnvelope(PROJECTION_ID),
@@ -241,9 +253,11 @@ async function mergeEvidence({ slot, run }) {
     telemetry: {
       switch: "DEHERM_PROFILE",
       materialisedBy: "node scripts/assemble-typed-native-extension.mjs --project <dir> --profile",
-      recordedBy: "node examples/war-battles-online/integration/check-typed-native-transport.mjs --run <with-typed-native|control>",
+      recordedBy:
+        "node examples/war-battles-online/integration/check-typed-native-transport.mjs --run <with-typed-native|control>",
       spanSites: {
-        "typed-native": "defold/defold_hermes/src/generated_script_universal_value_capi.cpp: deherm_script_universal_dispatch, reachable in this binary only from the extern_c static frame",
+        "typed-native":
+          "defold/defold_hermes/src/generated_script_universal_value_capi.cpp: deherm_script_universal_dispatch, reachable in this binary only from the extern_c static frame",
         jsi: "defold/defold_hermes/src/script_jsi_bridge.cpp: the JSI host function the generated SDK's callScriptApi calls",
       },
     },
@@ -255,12 +269,17 @@ async function mergeEvidence({ slot, run }) {
     },
     runs,
   };
-  if (Object.hasOwn(runs, "withAssembledTypedNativeExtension") && Object.hasOwn(runs, "controlWithoutAssembledExtension")) {
+  if (
+    Object.hasOwn(runs, "withAssembledTypedNativeExtension") &&
+    Object.hasOwn(runs, "controlWithoutAssembledExtension")
+  ) {
     merged.split = {
       typedNativeRoutes: runs.withAssembledTypedNativeExtension.rows
-        .filter((row) => row.transport === "typed-native").map((row) => row.routeId),
+        .filter((row) => row.transport === "typed-native")
+        .map((row) => row.routeId),
       jsiRoutesWithExtension: runs.withAssembledTypedNativeExtension.rows
-        .filter((row) => row.transport === "jsi").map((row) => row.routeId),
+        .filter((row) => row.transport === "jsi")
+        .map((row) => row.routeId),
       controlIsAllJsi: Object.keys(runs.controlWithoutAssembledExtension.transportCounts).join(",") === "jsi",
     };
   }
@@ -274,16 +293,23 @@ if (invoked) {
   const argv = process.argv.slice(2);
   const runIndex = argv.indexOf("--run");
   if (runIndex < 0 || !argv[runIndex + 1]) {
-    console.error(`usage: check-typed-native-transport.mjs --run <${Object.keys(RUN_SLOTS).join("|")}> [--record-evidence]`);
+    console.error(
+      `usage: check-typed-native-transport.mjs --run <${Object.keys(RUN_SLOTS).join("|")}> [--record-evidence]`,
+    );
     process.exitCode = 2;
   } else {
     const recorded = await recordRun(argv[runIndex + 1]);
     console.log(
       `war-battles-typed-native-transport:${argv[runIndex + 1]}:` +
-      `${Object.entries(recorded.run.transportCounts).map(([name, count]) => `${name}=${count}`).join(":")}` +
-      `:dropped=${recorded.run.spansDropped}`);
+        `${Object.entries(recorded.run.transportCounts)
+          .map(([name, count]) => `${name}=${count}`)
+          .join(":")}` +
+        `:dropped=${recorded.run.spansDropped}`,
+    );
     for (const row of recorded.run.rows) {
-      console.log(`  ${row.transport.padEnd(13)} ${row.routeId} calls=${row.calls} mean_ns=${row.meanNanoseconds} failures=${row.failures}`);
+      console.log(
+        `  ${row.transport.padEnd(13)} ${row.routeId} calls=${row.calls} mean_ns=${row.meanNanoseconds} failures=${row.failures}`,
+      );
     }
     if (argv.includes("--record-evidence")) {
       await mergeEvidence(recorded);

@@ -18,15 +18,8 @@ import { readFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  assertProjectionEnvelope,
-  projectionKey,
-  WAR_BATTLES_PROJECTIONS,
-} from "./projections.mjs";
-import {
-  assertWebTransportEvidence,
-  buildWebTransportSourceInputs,
-} from "./webtransport-evidence.mjs";
+import { assertProjectionEnvelope, projectionKey, WAR_BATTLES_PROJECTIONS } from "./projections.mjs";
+import { assertWebTransportEvidence, buildWebTransportSourceInputs } from "./webtransport-evidence.mjs";
 import {
   buildWarBattlesStaticHermesProjection,
   assertWarBattlesStaticHermesProjection,
@@ -49,7 +42,8 @@ export async function checkProjectionEvidence() {
       failures.push(
         error.code === "ENOENT"
           ? `projection '${id}' has no evidence: ${displayPath} is missing. Produce it with:\n    ${declaration.producer}`
-          : `projection '${id}' evidence is unreadable (${displayPath}): ${error.message}`);
+          : `projection '${id}' evidence is unreadable (${displayPath}): ${error.message}`,
+      );
       continue;
     }
     try {
@@ -63,7 +57,8 @@ export async function checkProjectionEvidence() {
     if (collision) {
       failures.push(
         `projections '${collision}' and '${id}' select the same runtime, transport, reachable set ` +
-        "and profile, so one of them is not a projection of its own");
+          "and profile, so one of them is not a projection of its own",
+      );
       continue;
     }
     seenKeys.set(key, id);
@@ -82,10 +77,9 @@ export async function checkProjectionEvidence() {
   // browser observation cannot hide behind a valid-looking classification.
   try {
     const webtransportDeclaration = WAR_BATTLES_PROJECTIONS["browser-webtransport-loopback"];
-    const webtransportEvidence = JSON.parse(await readFile(
-      resolve(exampleRoot, webtransportDeclaration.evidence),
-      "utf8",
-    ));
+    const webtransportEvidence = JSON.parse(
+      await readFile(resolve(exampleRoot, webtransportDeclaration.evidence), "utf8"),
+    );
     assertWebTransportEvidence(webtransportEvidence, {
       sourceInputs: await buildWebTransportSourceInputs(),
     });
@@ -119,7 +113,8 @@ if (invoked) {
     for (const row of rows) {
       console.log(
         `  ${row.id}: runtime=${row.runtime} transport=${row.transport.join("+")} ` +
-        `reachable=${row.reachableSet} profile=${row.profile} -> ${row.evidence}`);
+          `reachable=${row.reachableSet} profile=${row.profile} -> ${row.evidence}`,
+      );
     }
   } catch (error) {
     console.error(error.message);

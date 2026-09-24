@@ -1,11 +1,25 @@
-import { defineComponent, gui, hashLiteral, vmath, type DefoldHash, type Node, type Vector4 } from "@deherm/project";
+import {
+  defold,
+  defineComponent,
+  gui,
+  hashLiteral,
+  vmath,
+  type DefoldHash,
+  type Node,
+  type Vector4,
+} from "@deherm/project";
 
 import {
+  EVENT_COVER_CHANGED,
+  EVENT_EJECT,
   EVENT_HAZARD_DAMAGE,
   EVENT_KILL,
   EVENT_OBJECTIVE_CAPTURE,
+  EVENT_TANK_ACQUIRED,
   MAX_PLAYERS,
   OBJECTIVE_CAPTURE_TICKS,
+  PLAYER_MODE_INFANTRY,
+  UNITS_PER_PIXEL,
   createPlayerView,
   createObjectiveView,
   chassisById,
@@ -13,6 +27,7 @@ import {
   weaponUpgradeId,
   weaponById,
   createBattleEvent,
+  driverByPlayerId,
   type BattleEvent,
   type BattleWorld,
   type PlayerView,
@@ -20,17 +35,13 @@ import {
 } from "../src/generated-war-battles/index";
 import { arenaMatch } from "../src/arena-match";
 
-declare const __defoldHostV1: {
-  log(level: "info", message: string): void;
-};
-
 const ADD_SCORE = hashLiteral("#add_score");
+const DEPLOY = hashLiteral("#deploy");
 
 /** Frames between leaderboard rebuilds. The bar itself updates every frame. */
 const LEADERBOARD_INTERVAL = 15;
 const LEADERBOARD_ROWS = 5;
 /** Characters in the health and ammunition bars. */
-const BAR_CELLS = 20;
 /** Presentation notices live for exactly three seconds at the 60 Hz update rate. */
 const ANNOUNCEMENT_TICKS = 180;
 
@@ -42,6 +53,25 @@ interface UiSelf {
   frags: Node;
   hint: Node;
   announcement: Node;
+  hudBack: Node;
+  portrait: Node;
+  healthBack: Node;
+  healthFill: Node;
+  armorBack: Node;
+  armorFill: Node;
+  leaderboardBack: Node;
+  leaderBack: Node;
+  leader: Node;
+  titleBack: Node;
+  titleLogo: Node;
+  titlePanel: Node;
+  titlePortrait: Node;
+  titleEdition: Node;
+  titleFeature: Node;
+  titleButton: Node;
+  titleDeploy: Node;
+  titlePrompt: Node;
+  titleSponsor: Node;
   view: PlayerView;
   objectiveView: ObjectiveView;
   order: Int32Array;
@@ -56,21 +86,42 @@ interface UiSelf {
   announcementTicks: number;
   round: number;
   engaged: boolean;
+  titleVisible: boolean;
+}
+
+function setTitleVisible(self: UiSelf, visible: boolean): void {
+  self.titleVisible = visible;
+  gui.setEnabled(self.titleBack, visible);
+  gui.setEnabled(self.titleLogo, visible);
+  gui.setEnabled(self.titlePanel, visible);
+  gui.setEnabled(self.titlePortrait, visible);
+  gui.setEnabled(self.titleEdition, visible);
+  gui.setEnabled(self.titleFeature, visible);
+  gui.setEnabled(self.titleButton, visible);
+  gui.setEnabled(self.titleDeploy, visible);
+  gui.setEnabled(self.titlePrompt, visible);
+  gui.setEnabled(self.titleSponsor, visible);
+
+  const gameplayVisible = !visible;
+  gui.setEnabled(self.hudBack, gameplayVisible);
+  gui.setEnabled(self.portrait, gameplayVisible);
+  gui.setEnabled(self.healthBack, gameplayVisible);
+  gui.setEnabled(self.healthFill, gameplayVisible);
+  gui.setEnabled(self.armorBack, gameplayVisible);
+  gui.setEnabled(self.armorFill, gameplayVisible);
+  gui.setEnabled(self.leaderboardBack, gameplayVisible);
+  gui.setEnabled(self.leaderBack, gameplayVisible);
+  gui.setEnabled(self.leader, gameplayVisible);
+  gui.setEnabled(self.objective, gameplayVisible);
+  gui.setEnabled(self.node, gameplayVisible);
+  gui.setEnabled(self.status, gameplayVisible);
+  gui.setEnabled(self.frags, gameplayVisible);
+  gui.setEnabled(self.hint, gameplayVisible);
+  gui.setEnabled(self.announcement, gameplayVisible && self.announcementTicks > 0);
 }
 
 interface AddScore {
   readonly score: number;
-}
-
-/** A fixed-width bar drawn out of two characters, so the HUD needs no textures. */
-function bar(value: number, maximum: number): string {
-  if (maximum <= 0) return "";
-  let filled = Math.round((value * BAR_CELLS) / maximum);
-  if (filled < 0) filled = 0;
-  if (filled > BAR_CELLS) filled = BAR_CELLS;
-  let text = "";
-  for (let cell = 0; cell < BAR_CELLS; cell += 1) text += cell < filled ? "#" : ".";
-  return text;
 }
 
 function statusLine(self: UiSelf): string {
@@ -83,6 +134,16 @@ function statusLine(self: UiSelf): string {
     const seconds = (self.view.respawnTicks / 60).toFixed(1);
     return `WRECKED - RESPAWN IN ${seconds}s`;
   }
+  const driver = driverByPlayerId(slot + 1);
+  if (self.view.mode === PLAYER_MODE_INFANTRY) {
+    const depot = world.nearestTankDepot(slot + 1);
+    const dx = world.map.spawnX[depot]! - self.view.x;
+    const dy = world.map.spawnY[depot]! - self.view.y;
+    const distance = Math.round(Math.sqrt(dx * dx + dy * dy) / UNITS_PER_PIXEL);
+    const direction = directionArrow(dx, dy);
+    const lock = self.view.respawnTicks > 0 ? `  ACCESS ${Math.ceil(self.view.respawnTicks / 60)}s` : "";
+    return `${driver.callSign} // LAST CHANCE // HP ${self.view.health} // PISTOL // DEPOT ${direction} ${distance}px${lock}`;
+  }
   const weapon = weaponById(self.view.weaponId);
   const chassis = chassisById(self.view.chassisId);
   const ammo = weapon.maximumAmmo === 0 ? "INF" : `${self.view.ammo}`;
@@ -90,12 +151,22 @@ function statusLine(self: UiSelf): string {
   const upgradeId = weaponUpgradeId(weapon.id, branch);
   const upgrade = upgradeId === 0 ? undefined : weaponUpgradeById(upgradeId);
   const upgradeLabel = upgrade === undefined ? "BASE" : upgrade.name.toUpperCase();
-  const overdrive = self.view.overdriveTicks > 0 ? "  OVERDRIVE" : "";
+  const overdrive = self.view.overdriveTicks > 0 ? " // OVERDRIVE" : "";
   const hazard = world.activeHazardIndex();
-  const hazardText = hazard < 0 ? "  VENTS COOLING" : `  VENT ${hazard + 1} LIVE`;
-  return `${chassis.name.toUpperCase()} ${chassis.role.toUpperCase()}  HP ${self.view.health}/${chassis.maxHealth}` +
-    ` AR ${self.view.armor}  ${weapon.name.toUpperCase()}/${upgradeLabel} ${ammo}` +
-    `  CR ${self.view.credits} B${self.view.boostTicks} R${match?.mode === "offline" ? match.battle.round : 1}${overdrive}${hazardText}`;
+  const hazardText = hazard < 0 ? " // VENTS COOL" : ` // VENT ${hazard + 1} LIVE`;
+  return (
+    `${driver.callSign} // ${chassis.name.toUpperCase()} // ${weapon.name.toUpperCase()} ${upgradeLabel} // AMMO ${ammo}` +
+    ` // CR ${self.view.credits} // BOOST ${self.view.boostTicks}${overdrive}${hazardText}`
+  );
+}
+
+function directionArrow(x: number, y: number): string {
+  const horizontal = x > 0 ? "→" : "←";
+  const vertical = y > 0 ? "↑" : "↓";
+  if (Math.abs(x) > Math.abs(y) * 2) return horizontal;
+  if (Math.abs(y) > Math.abs(x) * 2) return vertical;
+  if (x >= 0) return y >= 0 ? "↗" : "↘";
+  return y >= 0 ? "↖" : "↙";
 }
 
 function leaderboard(self: UiSelf): string {
@@ -121,13 +192,30 @@ function leaderboard(self: UiSelf): string {
   }
   const localSlot = match === undefined ? -1 : match.localSlot;
   const rows = count < LEADERBOARD_ROWS ? count : LEADERBOARD_ROWS;
-  let text = "FRAGS\n";
+  let text = "TOP TANKS       K / D\n";
   for (let row = 0; row < rows; row += 1) {
     const slot = self.order[row]!;
     const marker = slot === localSlot ? ">" : " ";
-    text += `${marker}P${slot + 1} ${world.playerScore[slot]!}/${world.playerDeaths[slot]!}\n`;
+    const driver = driverByPlayerId(slot + 1);
+    text += `${row + 1} ${marker}${driver.callSign}  ${world.playerScore[slot]!} / ${world.playerDeaths[slot]!}\n`;
+  }
+  if (rows > 0) {
+    const leader = self.order[0]!;
+    gui.setText(self.leader, `★ LEADER  ${driverByPlayerId(leader + 1).callSign}  //  ${world.playerScore[leader]!}`);
   }
   return text;
+}
+
+function updatePlayerHud(self: UiSelf): void {
+  const match = arenaMatch();
+  const world = match?.world;
+  const slot = match === undefined ? -1 : match.localSlot;
+  if (world === undefined || slot < 0) return;
+  const chassis = chassisById(self.view.chassisId);
+  const healthRatio = Math.max(0, Math.min(1, self.view.health / chassis.maxHealth));
+  const armorRatio = Math.max(0, Math.min(1, self.view.armor / 200));
+  gui.setSize(self.healthFill, vmath.vector3(220 * healthRatio, 11, 0));
+  gui.setSize(self.armorFill, vmath.vector3(220 * armorRatio, 8, 0));
 }
 
 function objectiveLine(self: UiSelf): string {
@@ -179,6 +267,22 @@ function drainPresentation(self: UiSelf, match: ReturnType<typeof arenaMatch>): 
       if (self.event.a === localPlayerId) announce(self, `VENT ${self.event.b + 1} HIT YOU`, self.deathColor);
       continue;
     }
+    if (self.event.kind === EVENT_COVER_CHANGED) {
+      if (self.event.b === 0) announce(self, `COVER PANEL ${self.event.a + 1} DESTROYED`, self.roundColor);
+      continue;
+    }
+    if (self.event.kind === EVENT_EJECT) {
+      announce(
+        self,
+        self.event.b === localPlayerId ? "TANK LOST — FIGHT ON FOOT" : `P${self.event.b} EJECTED`,
+        self.deathColor,
+      );
+      continue;
+    }
+    if (self.event.kind === EVENT_TANK_ACQUIRED) {
+      if (self.event.a === localPlayerId) announce(self, "REPLACEMENT TANK ACQUIRED", self.killColor);
+      continue;
+    }
     if (self.event.kind !== EVENT_KILL) continue;
     const attacker = self.event.a;
     const victim = self.event.b;
@@ -222,6 +326,25 @@ export default defineComponent({
     self.frags = gui.getNode("frags");
     self.hint = gui.getNode("hint");
     self.announcement = gui.getNode("announcement");
+    self.hudBack = gui.getNode("hud_back");
+    self.portrait = gui.getNode("portrait");
+    self.healthBack = gui.getNode("health_back");
+    self.healthFill = gui.getNode("health_fill");
+    self.armorBack = gui.getNode("armor_back");
+    self.armorFill = gui.getNode("armor_fill");
+    self.leaderboardBack = gui.getNode("leaderboard_back");
+    self.leaderBack = gui.getNode("leader_back");
+    self.leader = gui.getNode("leader");
+    self.titleBack = gui.getNode("title_back");
+    self.titleLogo = gui.getNode("title_logo");
+    self.titlePanel = gui.getNode("title_panel");
+    self.titlePortrait = gui.getNode("title_portrait");
+    self.titleEdition = gui.getNode("title_edition");
+    self.titleFeature = gui.getNode("title_feature");
+    self.titleButton = gui.getNode("title_button");
+    self.titleDeploy = gui.getNode("title_deploy");
+    self.titlePrompt = gui.getNode("title_prompt");
+    self.titleSponsor = gui.getNode("title_sponsor");
     self.view = createPlayerView();
     self.objectiveView = createObjectiveView();
     self.order = new Int32Array(MAX_PLAYERS);
@@ -236,21 +359,31 @@ export default defineComponent({
     self.announcementTicks = 0;
     self.round = 0;
     self.engaged = false;
+    self.titleVisible = true;
     gui.setText(self.node, "SCORE 0");
     gui.setText(self.announcement, "");
     gui.setText(self.objective, "");
     gui.setEnabled(self.announcement, false);
-    __defoldHostV1.log("info", "war-battles:ui-init");
+    gui.playFlipbook(self.portrait, "driver-portrait-radio-idle");
+    gui.playFlipbook(self.titlePortrait, "driver-portrait-radio-idle");
+    gui.setText(self.titleFeature, `${driverByPlayerId(1).callSign} // 32 DRIVERS // 6 WEAPONS // NO MERCY`);
+    setTitleVisible(self, true);
+    defold.log("info", "war-battles:ui-init");
   },
 
   update(self: UiSelf, _dt: number): void {
+    if (self.titleVisible) return;
     const match = arenaMatch();
     if (match === undefined || !match.engaged) return;
     if (!self.engaged) {
       self.engaged = true;
-      gui.setText(self.hint, "ARROWS/WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 WEAPON  7-0 CHASSIS  Q/E BRANCH  R RESTART");
+      gui.setText(
+        self.hint,
+        "ARROWS/WASD DRIVE  SPACE FIRE  SHIFT BOOST  1-6 WEAPON  7-0 CHASSIS  Q/E BRANCH  R RESTART",
+      );
     }
     gui.setText(self.status, statusLine(self));
+    updatePlayerHud(self);
     gui.setText(self.objective, objectiveLine(self));
     drainPresentation(self, match);
     ageAnnouncement(self);
@@ -268,9 +401,19 @@ export default defineComponent({
   },
 
   onMessage(self: UiSelf, messageId: DefoldHash, message: AddScore): void {
+    if (messageId === DEPLOY) {
+      defold.log("info", "war-battles:title-hidden-by-deploy");
+      setTitleVisible(self, false);
+      const world = arenaMatch()?.world;
+      if (world !== undefined) {
+        self.presentationWorld = world;
+        self.eventCursor = world.events.sequence;
+      }
+      return;
+    }
     if (messageId !== ADD_SCORE) return;
     self.score += message.score;
-    gui.setText(self.node, `SCORE ${self.score}`);
-    __defoldHostV1.log("info", `war-battles:score:${self.score}`);
+    if (!self.titleVisible) gui.setText(self.node, `SCORE ${self.score}`);
+    defold.log("info", `war-battles:score:${self.score}`);
   },
 });

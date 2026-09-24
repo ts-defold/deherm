@@ -22,7 +22,8 @@ const generated = {
   generator: PERFORMANCE_OWNER,
   sourceInputs,
   sourceKey: digestPerformanceSourceInputs(sourceInputs),
-  evidenceBoundary: "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim.",
+  evidenceBoundary:
+    "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim.",
 };
 assertPerformanceEvidence(generated, { sourceInputs });
 const serialized = `${JSON.stringify(generated, null, 2)}\n`;

@@ -14,7 +14,7 @@ The project now records a separate generated Static Hermes projection at
 Run `node bin/deherm.mjs typecheck --project examples/war-battles-online/defold
 --release` before generating it; the generator then reads the release usage
 manifest, canonical lowering plan, and typed-native adapter census. The current
-record has 27 reachable routes, all 27 selected for Static Hermes, and zero
+record has 28 reachable routes, all 28 selected for Static Hermes, and zero
 reachable blockers. The canonical typed-native exact set is 517/517 routes.
 The project-owned bridge source is pinned at SHA-256
 `d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f`.
@@ -35,13 +35,14 @@ memory and fails if the checked-in evidence or any named blocker drifts.
 The two checked evidence documents -
 [`../evidence/packaged-runtime-arm64-macos.json`](../evidence/packaged-runtime-arm64-macos.json)
 and [`../evidence/browser-runtime-wasm-web.json`](../evidence/browser-runtime-wasm-web.json)
+
 - are current for the arena project. They were re-recorded from clean Bob builds
-on 2026-09-22. The native projection loaded the bundle through Dynamic Hermes,
-made the generated Static Hermes transport reachable, detected 315 generated
-Lua symbols, ran the tutorial collision/score sequence, engaged the eight-player
-offline arena, and exited through `@system/exit` with code 0. The browser
-projection loaded the same bundle fingerprint through the browser host and ran
-the same game-owned marker sequence.
+  on 2026-09-22. The native projection loaded the bundle through Dynamic Hermes,
+  made the generated Static Hermes transport reachable, detected 315 generated
+  Lua symbols, ran the tutorial collision/score sequence, engaged the eight-player
+  offline arena, and exited through `@system/exit` with code 0. The browser
+  projection loaded the same bundle fingerprint through the browser host and ran
+  the same game-owned marker sequence.
 
 The reproducible commands are:
 
@@ -102,26 +103,26 @@ INFO:DEFOLD_HERMES: war-battles:rocket-explosion-done
 
 That sequence is the whole tutorial loop:
 
-* a `.gui.ts` component resolved `gui.get_node("score")` and wrote it;
-* a `.script.ts` component read its own position through `go.get_position`;
-* `factory.create` spawned `/main/rocket.go` with a typed `dir` vector3
+- a `.gui.ts` component resolved `gui.get_node("score")` and wrote it;
+- a `.script.ts` component read its own position through `go.get_position`;
+- `factory.create` spawned `/main/rocket.go` with a typed `dir` vector3
   property, and the spawned component observed exactly `(1, 0, 0)`;
-* Defold physics delivered `collision_response` from the `rockets` group to the
+- Defold physics delivered `collision_response` from the `rockets` group to the
   `tanks` group and the rocket deleted the reported `other_id`;
-* `msg.post("/gui#ui", "add_score", { score: 100 })` crossed from a game-object
+- `msg.post("/gui#ui", "add_score", { score: 100 })` crossed from a game-object
   component to a GUI-scene component and the score node was rewritten;
-* `msg.post("#sprite", "play_animation", …)` played the once-forward explosion
+- `msg.post("#sprite", "play_animation", …)` played the once-forward explosion
   and Defold returned `animation_done` to the rocket, which deleted itself;
-* `go.set_position` advanced the player 179.9 px over the one-second scripted
+- `go.set_position` advanced the player 179.9 px over the one-second scripted
   move, so the frame loop, not just `init`, drives engine state.
 
 Not observed by the native transcript, and therefore not claimed by that
 projection:
 
-* pixel output. Browser/WebGL pixel evidence is held by the companion browser
+- pixel output. Browser/WebGL pixel evidence is held by the companion browser
   playability projection, not inferred from this native transcript;
-* keyboard input. The browser playability gate owns the keyboard claim;
-* every arena branch, bot decision, weapon, or multiplayer transport. Dedicated
+- keyboard input. The browser playability gate owns the keyboard claim;
+- every arena branch, bot decision, weapon, or multiplayer transport. Dedicated
   deterministic tests own the 32-player simulation claim, and no real QUIC
   session has been observed yet.
 
@@ -132,7 +133,7 @@ real game-object component was attached; both are fixed in
 `defold/defold_hermes`:
 
 1. `component_hermes_backend.cpp` read editor properties off the component
-   `self` with `lua_rawget`. Defold hands a script or GUI component a *userdata*
+   `self` with `lua_rawget`. Defold hands a script or GUI component a _userdata_
    `self` whose metatable resolves declared properties, so the raw read both
    missed every property and crashed LuaJIT. It now uses `lua_gettable`.
 2. Generated current-instance thunks (`go.get_position`, `go.set_position`,
@@ -176,19 +177,19 @@ The built Defold project now drives the simulation in `core/`, and
 adapter when `game.project` declares `[war_battles] server`. What that does and
 does not prove:
 
-* **Proven, in `test/core.test.mjs` over the in-memory transport pair:** two
+- **Proven, in `test/core.test.mjs` over the in-memory transport pair:** two
   clients joining one authoritative match and taking bot slots over; the
   predicting client's state matching the server's exactly; a client that falls
   behind reconciling by replaying its own inputs; a full match refusing a further
   session with a typed reject; a session's forged packet for another player's
   slot being rejected without moving that tank; an upgrade bought over the
   reliable control lane.
-* **Browser transport is proven on both lanes:** the owner gates open a real
+- **Browser transport is proven on both lanes:** the owner gates open a real
   QUIC/WebTransport session and a forced WebSocket/TCP fallback from the
   Bob-produced HTML5 game, then require authoritative snapshots and
   server-accepted input. Native Defold still needs a native transport adapter
   and otherwise plays offline.
-* Resume tokens are fixed 40-byte HMAC-SHA-256 credentials with bounded,
+- Resume tokens are fixed 40-byte HMAC-SHA-256 credentials with bounded,
   persisted generation state. The Docker restart gate proves that the same
   player resumes after the server container restarts; it is not a claim of
   matchmaking, account identity, abuse prevention, or cross-region failover.
@@ -198,14 +199,14 @@ does not prove:
 The scene is shaped by the bindings that have actually executed inside a
 packaged engine, not by what the generated surface declares:
 
-* `go.set_position` / `go.set_rotation` / `go.get_position` are used only in
+- `go.set_position` / `go.set_rotation` / `go.get_position` are used only in
   their current-instance shape, so every entity moves itself and the director
   moves nothing. This is why a tank is two game objects.
-* Object visibility is creation and deletion, not `enable`/`disable` messages.
-* The HUD is text only. `gui.get_node` and `gui.set_text` are the two GUI routes
+- Object visibility is creation and deletion, not `enable`/`disable` messages.
+- The HUD is text only. `gui.get_node` and `gui.set_text` are the two GUI routes
   with a packaged-engine observation behind them; `gui.set_size`, `gui.set_color`
   and `gui.play_flipbook` are declared and used by the retained mockup, but this
   port does not depend on them.
-* Pointer input is not bound. Defold's input-action shape for pointer motion has
+- Pointer input is not bound. Defold's input-action shape for pointer motion has
   not been executed through the generated binding, so the turret uses a target
   assist rather than a guess at an unproven route.

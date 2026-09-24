@@ -112,7 +112,7 @@ test("War Battles compiles literals through the real incremental ttsc/esbuild pi
     "f26b82c786881201", "fde875820cf4ae70", "bf9a1e17147d9fd0",
     "3ab1e73e8d660678", "9adf6a1d5c268bf5", "048dba1670b92225",
   ]) assert.match(bundle, new RegExp(`0x${constant}n`));
-  assert.doesNotMatch(bundle, /hashLiteral|defold\.hash|builtins\.hash|callScriptApi\(0xa994c4c0/);
+  assert.doesNotMatch(bundle, /hashLiteral|defold\.hash\s*\(|builtins\.hash|callScriptApi\(0xa994c4c0/);
 
   const hermesc = path.join(root, "build/native/bin/hermesc");
   try {

@@ -1,7 +1,4 @@
-import {
-  adoptServerWebTransportSession,
-  type WebTransportSessionLike,
-} from "./browser-webtransport.ts";
+import { adoptServerWebTransportSession, type WebTransportSessionLike } from "./browser-webtransport.ts";
 import type { GameTransport, TransportReceiver } from "./transport.ts";
 
 export interface DenoQuicIncomingLike {
@@ -16,7 +13,7 @@ export interface DenoQuicEndpointLike {
 }
 
 export interface DenoQuicRuntimeLike {
-  readonly QuicEndpoint: new(options: { hostname: string; port: number }) => DenoQuicEndpointLike;
+  readonly QuicEndpoint: new (options: { hostname: string; port: number }) => DenoQuicEndpointLike;
   upgradeWebTransport(connection: unknown): Promise<WebTransportSessionLike & { readonly url: string }>;
 }
 
@@ -25,11 +22,7 @@ export interface DenoQuicRuntimeLike {
  * the trace useful when several handshakes are in flight at once, while the
  * URL is only available after the WebTransport upgrade.
  */
-export type DenoWebTransportLifecyclePhase =
-  | "incoming"
-  | "quic-accepted"
-  | "webtransport-upgraded"
-  | "session-ready";
+export type DenoWebTransportLifecyclePhase = "incoming" | "quic-accepted" | "webtransport-upgraded" | "session-ready";
 
 export interface DenoWebTransportLifecycleEvent {
   readonly phase: DenoWebTransportLifecyclePhase;

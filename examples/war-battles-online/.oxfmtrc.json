@@ -1,0 +1,25 @@
+{
+  "$schema": "../../node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 120,
+  "tabWidth": 2,
+  "useTabs": false,
+  "semi": true,
+  "singleQuote": false,
+  "trailingComma": "all",
+  "proseWrap": "preserve",
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "art/source/sprite-fusion/**",
+    "defold/.deherm/**",
+    "defold/.internal/**",
+    "defold/build/**",
+    "defold/assets/derived/**",
+    "defold/defold_hermes/**",
+    "defold/defold_hermes_typed_native/**",
+    "defold/src/generated-war-battles/**",
+    "defold/tsconfig.deherm.*.json",
+    "evidence/**",
+    "test/fixtures/**",
+    "verification/generated/**"
+  ]
+}

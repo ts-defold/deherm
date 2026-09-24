@@ -94,3 +94,7 @@ key_trigger {
   input: KEY_R
   action: "restart"
 }
+mouse_trigger {
+  input: MOUSE_BUTTON_1
+  action: "deploy"
+}

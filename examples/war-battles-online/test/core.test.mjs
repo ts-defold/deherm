@@ -17,6 +17,9 @@ import {
   CONTROL_SET_CHASSIS,
   CONTROL_SET_WEAPON_UPGRADE,
   EVENT_KILL,
+  EVENT_EJECT,
+  EVENT_TANK_ACQUIRED,
+  EVENT_COVER_CHANGED,
   EVENT_HAZARD_DAMAGE,
   EVENT_OBJECTIVE_CAPTURE,
   EVENT_PICKUP_TAKEN,
@@ -28,6 +31,8 @@ import {
   MAP_WIDTH,
   MAX_PICKUPS,
   MAX_HAZARDS,
+  MAX_COVER_PANELS,
+  COVER_MAX_HEALTH,
   MAX_PLAYERS,
   MatchServer,
   PICKUP_HEALTH,
@@ -40,6 +45,7 @@ import {
   SNAPSHOT_KEYFRAME_INTERVAL,
   SNAPSHOT_MESSAGE_BYTES,
   TICK_MILLISECONDS,
+  TILE_UNITS,
   TRANSPORT_CHANNEL_CONTROL,
   TRANSPORT_CHANNEL_SESSION,
   TRANSPORT_CHANNEL_SNAPSHOT,
@@ -59,8 +65,12 @@ import {
   createObjectiveView,
   createPlayerView,
   OBJECTIVE_CAPTURE_TICKS,
+  PLAYER_MODE_DEAD,
+  PLAYER_MODE_INFANTRY,
+  PLAYER_MODE_TANK,
   HAZARD_ACTIVE_TICKS,
   HAZARD_CYCLE_TICKS,
+  HAZARD_PULSE_TICKS,
   HAZARD_RADIUS,
   isqrt,
   readHello,
@@ -80,10 +90,29 @@ import {
   CHASSIS_ARTILLERY,
   CHASSIS_BULWARK,
   CHASSIS_SCOUT,
+  DRIVER_COUNT,
   chassisById,
   chassisUnlockBit,
+  driverByPlayerId,
   UPGRADE_MOBILITY,
 } from "../core/content.ts";
+
+test("every authoritative tank slot has one stable driver identity", () => {
+  const callSigns = new Set();
+  const variants = new Set();
+  for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
+    const driver = driverByPlayerId(playerId);
+    assert.equal(driver.id, playerId);
+    assert.ok(driver.callSign.length > 0);
+    callSigns.add(driver.callSign);
+    variants.add(driver.variant);
+  }
+  assert.equal(DRIVER_COUNT, MAX_PLAYERS);
+  assert.equal(callSigns.size, MAX_PLAYERS);
+  assert.deepEqual([...variants], [0, 1, 2, 3]);
+  assert.throws(() => driverByPlayerId(0), /unknown driver player id/);
+  assert.throws(() => driverByPlayerId(MAX_PLAYERS + 1), /unknown driver player id/);
+});
 
 function command(playerId, tick, overrides = {}) {
   return {
@@ -144,10 +173,29 @@ test("session messages round-trip and reject a foreign kind", () => {
 
   const welcome = new Uint8Array(WELCOME_BYTES);
   writeWelcome(welcome, {
-    matchId: 77, playerId: 3, team: 1, maximumPlayers: 8, botCount: 5,
-    mapSeed: 0x1234_5678, serverTick: 4_321, tickRate: 60, snapshotIntervalTicks: 6, resumeToken: token,
+    matchId: 77,
+    playerId: 3,
+    team: 1,
+    maximumPlayers: 8,
+    botCount: 5,
+    mapSeed: 0x1234_5678,
+    serverTick: 4_321,
+    tickRate: 60,
+    snapshotIntervalTicks: 6,
+    resumeToken: token,
   });
-  const observedWelcome = { matchId: 0, playerId: 0, team: 0, maximumPlayers: 0, botCount: 0, mapSeed: 0, serverTick: 0, tickRate: 0, snapshotIntervalTicks: 0, resumeToken: new Uint8Array(RESUME_TOKEN_BYTES) };
+  const observedWelcome = {
+    matchId: 0,
+    playerId: 0,
+    team: 0,
+    maximumPlayers: 0,
+    botCount: 0,
+    mapSeed: 0,
+    serverTick: 0,
+    tickRate: 0,
+    snapshotIntervalTicks: 0,
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+  };
   readWelcome(welcome, observedWelcome);
   assert.equal(observedWelcome.playerId, 3);
   assert.equal(observedWelcome.mapSeed, 0x1234_5678);
@@ -209,7 +257,10 @@ test("32-player snapshot deltas are compact and keyframes recover the baseline",
   const keyframeLength = writeSnapshotKeyframe(frame, world.tick, first);
   const deltaLength = writeSnapshotDelta(frame, world.tick, 0, first, second);
   assert.equal(keyframeLength, SNAPSHOT_MESSAGE_BYTES);
-  assert.ok(deltaLength > 0 && deltaLength < keyframeLength, `delta ${deltaLength} must beat keyframe ${keyframeLength}`);
+  assert.ok(
+    deltaLength > 0 && deltaLength < keyframeLength,
+    `delta ${deltaLength} must beat keyframe ${keyframeLength}`,
+  );
 
   const scratch = {
     baseline: new Uint8Array(SNAPSHOT_BYTES),
@@ -281,12 +332,12 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   }
   lengths.sort((left, right) => left - right);
   assert.equal(lengths.length, 200);
-  assert.equal(lengths[0], 2_041);
+  assert.equal(lengths[0], 1_872);
   assert.equal(lengths.at(-1), SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_539);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_642);
   assert.equal(lengths.filter((length) => length === SNAPSHOT_MESSAGE_BYTES).length, 10);
   const normal = lengths.filter((length) => length !== SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(normal.at(-1), 3_255);
+  assert.equal(normal.at(-1), 3_270);
 });
 
 test("a replaced in-flight snapshot forces a recovery keyframe", async () => {
@@ -298,7 +349,10 @@ test("a replaced in-flight snapshot forces a recovery keyframe", async () => {
     capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
     sendReliable(_channel, payload) {
       frames.push(payload.slice());
-      if (releaseFirst === undefined) return new Promise((resolve) => { releaseFirst = resolve; });
+      if (releaseFirst === undefined)
+        return new Promise((resolve) => {
+          releaseFirst = resolve;
+        });
       return Promise.resolve("sent");
     },
     trySendDatagram: async () => "closed",
@@ -357,9 +411,8 @@ test("a closed snapshot send releases the server session", async () => {
   const session = server.createSession();
   const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
   const sendReliable = serverTransport.sendReliable.bind(serverTransport);
-  serverTransport.sendReliable = (channel, payload, signal) => channel === TRANSPORT_CHANNEL_SNAPSHOT
-    ? Promise.resolve("closed")
-    : sendReliable(channel, payload, signal);
+  serverTransport.sendReliable = (channel, payload, signal) =>
+    channel === TRANSPORT_CHANNEL_SNAPSHOT ? Promise.resolve("closed") : sendReliable(channel, payload, signal);
   session.attach(serverTransport);
   client.attach(clientTransport);
   await settle();
@@ -388,7 +441,8 @@ test("the arena is reproducible from its seed, point-symmetric and fully connect
       assert.equal(
         first.cellAt(cellX, cellY),
         first.cellAt(MAP_WIDTH - 1 - cellX, MAP_HEIGHT - 1 - cellY),
-        `arena is not point-symmetric at ${cellX},${cellY}`);
+        `arena is not point-symmetric at ${cellX},${cellY}`,
+      );
     }
   }
 
@@ -469,16 +523,84 @@ test("rotating hazard vents are deterministic, open, and authoritative", () => {
   lethal.playerSpawnProtectTicks[0] = 0;
   lethal.playerArmor[0] = 0;
   lethal.playerHealth[0] = 8;
-  for (let tick = 1; tick <= HAZARD_CYCLE_TICKS / 20; tick += 1) lethal.step();
+  for (let tick = 1; tick <= HAZARD_PULSE_TICKS * 4; tick += 1) lethal.step();
   let sawKill = false;
-  let sawPostKillHit = false;
+  let killTick = -1;
+  const hazardHitTicks = new Set();
   for (let sequence = lethal.events.oldest(); sequence < lethal.events.sequence; sequence += 1) {
     if (!lethal.events.read(sequence, event)) continue;
-    if (event.kind === EVENT_KILL) sawKill = true;
-    if (event.kind === EVENT_HAZARD_DAMAGE) sawPostKillHit = true;
+    if (event.kind === EVENT_KILL) {
+      sawKill = true;
+      killTick = event.tick;
+    }
+    if (event.kind === EVENT_HAZARD_DAMAGE) hazardHitTicks.add(event.tick);
   }
-  assert.equal(sawKill, true, "lethal hazard damage must emit the terminal kill event");
-  assert.equal(sawPostKillHit, false, "a lethal pulse must not overwrite its kill presentation with a hit event");
+  assert.equal(sawKill, true, "the vent must eject the pilot and then emit a terminal kill event");
+  assert.equal(
+    hazardHitTicks.has(killTick),
+    false,
+    "the terminal pulse must not overwrite its kill presentation with a hit event",
+  );
+});
+
+test("destructible cover is fixed-capacity, authoritative, and snapshot-safe", () => {
+  const world = new BattleWorld(77, 0x57_41_52_42);
+  const panel = 0;
+  assert.equal(world.map.coverHealth.length, MAX_COVER_PANELS);
+  assert.ok(world.map.coverPanelCount > 0 && world.map.coverPanelCount <= MAX_COVER_PANELS);
+  assert.equal(world.map.coverPanelCount % 2, 0, "bounded cover must be selected in symmetric pairs");
+  for (let index = 0; index < world.map.coverPanelCount; index += 1) {
+    const mirrorX = -world.map.coverX[index];
+    const mirrorY = -world.map.coverY[index];
+    assert.ok(
+      world.map.coverPanelAtWorld(mirrorX, mirrorY) >= 0,
+      "every destructible panel must include its point mirror",
+    );
+  }
+  assert.equal(world.map.coverHealth[panel], COVER_MAX_HEALTH);
+  const x = world.map.coverX[panel];
+  const y = world.map.coverY[panel];
+  assert.ok(world.map.solidAtWorld(x, y), "an intact panel must remain collision-solid");
+  // Drive a real authoritative projectile into the panel from its open west
+  // neighbour; the event and health mutation must come from stepProjectiles.
+  world.projectileActive[0] = 1;
+  world.projectileX[0] = x - TILE_UNITS;
+  world.projectileY[0] = y;
+  world.projectileDirectionX[0] = 256;
+  world.projectileDirectionY[0] = 0;
+  world.projectileWeapon[0] = WEAPON_CANNON;
+  world.projectileSpeed[0] = 232;
+  world.projectileLife[0] = 8;
+  world.projectileDamage[0] = 25;
+  world.projectileBounces[0] = 0;
+  world.step();
+  assert.equal(world.map.coverHealth[panel], 75, "projectile damage must be authoritative");
+  const coverEvent = createBattleEvent();
+  let sawCoverEvent = false;
+  for (let sequence = world.events.oldest(); sequence < world.events.sequence; sequence += 1) {
+    if (world.events.read(sequence, coverEvent) && coverEvent.kind === EVENT_COVER_CHANGED) sawCoverEvent = true;
+  }
+  assert.equal(sawCoverEvent, true, "cover damage must reach the bounded event ring");
+  assert.equal(world.map.damageCoverAtWorld(x, y, 74), 1);
+  assert.ok(world.map.solidAtWorld(x, y), "partial damage must preserve cover collision");
+  assert.equal(world.map.damageCoverAtWorld(x, y, 1), 0);
+  assert.equal(world.map.solidAtWorld(x, y), false, "destroyed cover must open collision and sightlines");
+
+  const snapshot = new Uint8Array(SNAPSHOT_BYTES);
+  world.writeSnapshot(snapshot);
+  const restored = new BattleWorld(77, 0x57_41_52_42);
+  restored.restoreSnapshot(snapshot);
+  assert.equal(restored.map.coverHealth[panel], 0);
+  assert.equal(restored.map.solidAtWorld(x, y), false);
+  assert.equal(restored.stateHash(), world.stateHash(), "cover health belongs to authoritative rollback state");
+
+  const event = createBattleEvent();
+  const before = world.events.sequence;
+  world.events.push(EVENT_COVER_CHANGED, panel, 0, x, y, world.tick);
+  assert.equal(world.events.read(before, event), true);
+  assert.equal(event.kind, EVENT_COVER_CHANGED);
+  assert.equal(event.a, panel);
+  assert.equal(event.b, 0);
 });
 
 test("integer square root is exact at and around perfect squares", () => {
@@ -499,13 +621,14 @@ test("32-player results are stable across input arrival order", () => {
     descending.addPlayer(playerId, (playerId % 4) + 1);
   }
   for (let tick = 1; tick <= 360; tick += 1) {
-    const make = (playerId) => command(playerId, tick, {
-      moveX: ((playerId + tick) % 3) - 1,
-      moveY: ((playerId * 3 + tick) % 3) - 1,
-      aimX: playerId % 2 === 0 ? -127 : 127,
-      aimY: playerId % 3 === 0 ? 127 : 0,
-      buttons: tick % 31 === playerId % 31 ? INPUT_BUTTON_FIRE : 0,
-    });
+    const make = (playerId) =>
+      command(playerId, tick, {
+        moveX: ((playerId + tick) % 3) - 1,
+        moveY: ((playerId * 3 + tick) % 3) - 1,
+        aimX: playerId % 2 === 0 ? -127 : 127,
+        aimY: playerId % 3 === 0 ? 127 : 0,
+        buttons: tick % 31 === playerId % 31 ? INPUT_BUTTON_FIRE : 0,
+      });
     for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
       assert.equal(ascending.submitInput(make(playerId)), true);
     }
@@ -540,7 +663,7 @@ test("a tank carries momentum rather than teleporting, and cover stops it", () =
   assert.equal(world.map.solidAtWorld(view.x, view.y), false, "a tank must never end inside cover");
 });
 
-test("armour absorbs damage, a kill scores, and the wreck respawns clear of the killer", () => {
+test("armour absorbs damage, tank destruction ejects the pilot, and the terminal kill scores", () => {
   const world = new BattleWorld(77);
   world.addPlayer(1, 1, -2_000, 0);
   world.addPlayer(2, 2, 400, 0);
@@ -550,13 +673,16 @@ test("armour absorbs damage, a kill scores, and the wreck respawns clear of the 
 
   const shooter = playerView();
   const target = playerView();
+  let ejected = false;
   let killed = false;
-  for (let tick = 1; tick <= 900 && !killed; tick += 1) {
+  for (let tick = 1; tick <= 1_800 && !killed; tick += 1) {
     world.submitInput(command(1, tick, { buttons: INPUT_BUTTON_FIRE, aimX: 127, aimY: 0 }));
     world.step();
     world.readPlayer(2, target);
-    killed = target.respawnTicks > 0;
+    ejected ||= target.mode === PLAYER_MODE_INFANTRY;
+    killed = target.mode === PLAYER_MODE_DEAD;
   }
+  assert.equal(ejected, true, "destroying the tank must give its pilot a last chance on foot");
   assert.equal(killed, true, "the shooter should land a kill");
   world.readPlayer(1, shooter);
   assert.equal(shooter.score, 1);
@@ -564,16 +690,74 @@ test("armour absorbs damage, a kill scores, and the wreck respawns clear of the 
   assert.equal(target.deaths, 1);
 
   const event = createBattleEvent();
+  let sawEject = false;
   let sawKill = false;
   for (let sequence = world.events.oldest(); sequence < world.events.sequence; sequence += 1) {
-    if (world.events.read(sequence, event) && event.kind === EVENT_KILL) sawKill = true;
+    if (!world.events.read(sequence, event)) continue;
+    if (event.kind === EVENT_EJECT) sawEject = true;
+    if (event.kind === EVENT_KILL) sawKill = true;
   }
+  assert.equal(sawEject, true, "tank destruction must reach the presentation event ring");
   assert.equal(sawKill, true, "a kill must reach the presentation event ring");
 
   run(world, 200);
   world.readPlayer(2, target);
   assert.equal(target.alive, true, "a wreck must come back");
   assert.ok(target.spawnProtectTicks >= 0);
+});
+
+test("an on-foot pilot acquires a replacement tank at a depot and snapshots preserve the mode", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1);
+  const slot = 0;
+  const depot = world.nearestTankDepot(1);
+  world.playerMode[slot] = PLAYER_MODE_INFANTRY;
+  world.playerHealth[slot] = 24;
+  world.playerArmor[slot] = 0;
+  world.playerRespawnTicks[slot] = 0;
+  world.playerX[slot] = world.map.spawnX[depot];
+  world.playerY[slot] = world.map.spawnY[depot];
+
+  const snapshot = new Uint8Array(SNAPSHOT_BYTES);
+  world.writeSnapshot(snapshot);
+  world.playerMode[slot] = PLAYER_MODE_TANK;
+  world.restoreSnapshot(snapshot);
+  assert.equal(world.playerMode[slot], PLAYER_MODE_INFANTRY);
+
+  world.step();
+  assert.equal(world.playerMode[slot], PLAYER_MODE_TANK);
+  assert.equal(world.playerHealth[slot], 100);
+  const event = createBattleEvent();
+  let acquired = false;
+  for (let sequence = world.events.oldest(); sequence < world.events.sequence; sequence += 1) {
+    if (world.events.read(sequence, event) && event.kind === EVENT_TANK_ACQUIRED) acquired = true;
+  }
+  assert.equal(acquired, true);
+});
+
+test("a moving hostile tank can run over an on-foot pilot", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1, 1);
+  world.addPlayer(2, 2);
+  const centre = { x: 0, y: 0 };
+  world.map.nearestOpen(0, 0, centre);
+  const centreCellX = cellOfX(centre.x);
+  const centreCellY = cellOfY(centre.y);
+  for (let y = -2; y <= 2; y += 1) {
+    for (let x = -2; x <= 2; x += 1) world.map.cells[world.map.index(centreCellX + x, centreCellY + y)] = CELL_FLOOR;
+  }
+  world.playerMode[1] = PLAYER_MODE_INFANTRY;
+  world.playerHealth[1] = 24;
+  world.playerArmor[1] = 0;
+  world.playerRespawnTicks[1] = 10;
+  world.playerX[0] = centre.x;
+  world.playerY[0] = centre.y;
+  world.playerX[1] = centre.x;
+  world.playerY[1] = centre.y;
+  world.playerVelocityX[0] = 5 * 256;
+  world.step();
+  assert.equal(world.playerMode[1], PLAYER_MODE_DEAD);
+  assert.equal(world.playerScore[0], 1);
 });
 
 test("splash damage reaches past a miss, hurts the shooter, and throws both", () => {
@@ -608,9 +792,15 @@ test("splash damage reaches past a miss, hurts the shooter, and throws both", ()
   // round to +x, then pull the trigger.
   run(world, 40, (tick) => world.submitInput(command(1, tick, { aimX: 127, aimY: 0 })));
   assert.ok(world.playerTurretX[0] > 250, "the turret should have come round by now");
-  run(world, 14, (tick) => world.submitInput(command(1, tick + 40, {
-    buttons: tick === 1 ? INPUT_BUTTON_FIRE : 0, aimX: 127, aimY: 0,
-  })));
+  run(world, 14, (tick) =>
+    world.submitInput(
+      command(1, tick + 40, {
+        buttons: tick === 1 ? INPUT_BUTTON_FIRE : 0,
+        aimX: 127,
+        aimY: 0,
+      }),
+    ),
+  );
   world.readPlayer(1, shooter);
   world.readPlayer(2, bystander);
   // The shell never touched either tank: it detonated on the wall between them.
@@ -665,7 +855,10 @@ test("pickups are taken, respawn on their own timer, and change the loadout", ()
   // Stand on the first weapon pad.
   let pad = -1;
   for (let index = 0; index < MAX_PICKUPS; index += 1) {
-    if (world.pickupKind[index] === WEAPON_AUTOCANNON) { pad = index; break; }
+    if (world.pickupKind[index] === WEAPON_AUTOCANNON) {
+      pad = index;
+      break;
+    }
   }
   assert.ok(pad >= 0, "the arena must place an autocannon pad");
   world.addPlayer(1, 0, world.pickupX[pad], world.pickupY[pad]);
@@ -696,7 +889,10 @@ test("a health pad is left alone by a tank that does not need it", () => {
   const world = new BattleWorld(77);
   let pad = -1;
   for (let index = 0; index < MAX_PICKUPS; index += 1) {
-    if (world.pickupKind[index] === PICKUP_HEALTH) { pad = index; break; }
+    if (world.pickupKind[index] === PICKUP_HEALTH) {
+      pad = index;
+      break;
+    }
   }
   assert.ok(pad >= 0);
   world.addPlayer(1, 0, world.pickupX[pad], world.pickupY[pad]);
@@ -711,21 +907,29 @@ test("a full snapshot restores and deterministically replays queued inputs", () 
   world.addPlayer(2, 2, 2_000, 0);
   world.setWeapon(1, WEAPON_AUTOCANNON);
   const stage = (tick) => {
-    world.submitInput(command(1, tick, {
-      moveX: tick < 20 ? 1 : 0,
-      buttons: tick % 7 === 1 ? INPUT_BUTTON_FIRE : 0,
-    }));
+    world.submitInput(
+      command(1, tick, {
+        moveX: tick < 20 ? 1 : 0,
+        buttons: tick % 7 === 1 ? INPUT_BUTTON_FIRE : 0,
+      }),
+    );
     world.submitInput(command(2, tick, { moveX: tick < 20 ? -1 : 0, aimX: -127 }));
   };
   run(world, 30, stage);
   const snapshot = new Uint8Array(SNAPSHOT_BYTES);
   assert.equal(world.writeSnapshot(snapshot), SNAPSHOT_BYTES);
-  for (let tick = 31; tick <= 80; tick += 1) { stage(tick); world.step(); }
+  for (let tick = 31; tick <= 80; tick += 1) {
+    stage(tick);
+    world.step();
+  }
   const expectedHash = world.stateHash();
   world.restoreSnapshot(snapshot);
   // Snapshots contain authoritative simulation state, not the external replay log.
   // Re-submit the recorded inputs that followed the rollback point.
-  for (let tick = 31; tick <= 80; tick += 1) { stage(tick); world.step(); }
+  for (let tick = 31; tick <= 80; tick += 1) {
+    stage(tick);
+    world.step();
+  }
   assert.equal(world.stateHash(), expectedHash);
 });
 
@@ -767,10 +971,12 @@ test("fixed stores retain identity through a sustained 32-player run", () => {
   }
   run(world, 2_000, (tick) => {
     for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
-      world.submitInput(command(playerId, tick, {
-        moveX: playerId % 2 === 0 ? 1 : -1,
-        buttons: tick % 20 === playerId % 20 ? INPUT_BUTTON_FIRE : 0,
-      }));
+      world.submitInput(
+        command(playerId, tick, {
+          moveX: playerId % 2 === 0 ? 1 : -1,
+          buttons: tick % 20 === playerId % 20 ? INPUT_BUTTON_FIRE : 0,
+        }),
+      );
     }
   });
   assert.equal(world.playerX, playerX);
@@ -804,7 +1010,11 @@ test("data-driven chassis stats, weapon slots, purchase selection and snapshots 
   world.setChassis(1, CHASSIS_SCOUT);
   world.restoreSnapshot(snapshot);
   assert.equal(world.playerChassis[0], CHASSIS_BULWARK, "rollback must restore the selected chassis");
-  assert.notEqual(world.playerChassisUnlocks[0] & chassisUnlockBit(CHASSIS_BULWARK), 0, "rollback must restore unlocks");
+  assert.notEqual(
+    world.playerChassisUnlocks[0] & chassisUnlockBit(CHASSIS_BULWARK),
+    0,
+    "rollback must restore unlocks",
+  );
 });
 
 test("chassis weapon masks and handling affect authoritative simulation", () => {
@@ -821,7 +1031,10 @@ test("chassis weapon masks and handling affect authoritative simulation", () => 
   scout.step();
   bulwark.step();
   assert.notEqual(scout.playerWeapon[0], WEAPON_MORTAR, "a weapon outside the chassis mask is rejected");
-  assert.ok(Math.abs(scout.playerVelocityX[0]) > Math.abs(bulwark.playerVelocityX[0]), "the scout accelerates faster under identical input");
+  assert.ok(
+    Math.abs(scout.playerVelocityX[0]) > Math.abs(bulwark.playerVelocityX[0]),
+    "the scout accelerates faster under identical input",
+  );
 });
 
 test("weapon branches are data-driven, purchased once, selected for free, and survive rollback", () => {
@@ -881,7 +1094,7 @@ test("bots use selected branch splash safety instead of base weapon tactics", ()
     }
     const bots = new BotController();
     bots.goalTarget[0] = 1;
-    bots.decideAt[0] = 0x7fff_ffff;
+    bots.decideAt[0] = 0;
     const staged = createInputCommand(77, 1);
     bots.stage(world, staged, 1, 1);
     return staged.buttons;
@@ -987,7 +1200,10 @@ test("playable orchestration is deterministic and supports restart and upgrades"
   first.restart();
   assert.equal(first.round, priorRound + 1);
   assert.equal(first.world.tick, 0);
-  assert.equal(first.world.playerActive.reduce((sum, value) => sum + value, 0), 8);
+  assert.equal(
+    first.world.playerActive.reduce((sum, value) => sum + value, 0),
+    8,
+  );
 });
 
 // --- server and client ------------------------------------------------------
@@ -1100,13 +1316,17 @@ test("a welcomed player resumes its slot and the new stream starts from a keyfra
   await settle();
   assert.equal(resumed.state, "ready");
   assert.equal(resumed.playerId, playerId, "resume must restore the authenticated player slot");
-  assert.deepEqual([
-    server.world.playerScore[playerId - 1],
-    server.world.playerCredits[playerId - 1],
-    server.world.playerHealth[playerId - 1],
-    server.world.playerChassis[playerId - 1],
-    server.world.playerChassisUnlocks[playerId - 1],
-  ], stateBeforeDisconnect, "resume must not reset authoritative player state");
+  assert.deepEqual(
+    [
+      server.world.playerScore[playerId - 1],
+      server.world.playerCredits[playerId - 1],
+      server.world.playerHealth[playerId - 1],
+      server.world.playerChassis[playerId - 1],
+      server.world.playerChassisUnlocks[playerId - 1],
+    ],
+    stateBeforeDisconnect,
+    "resume must not reset authoritative player state",
+  );
 
   server.step();
   server.step();
@@ -1175,7 +1395,11 @@ test("non-zero invalid, stale, and foreign resume tokens fail closed", async () 
   const otherServer = new MatchServer({ rosterSize: 2 });
   const foreign = join(otherServer, "foreign", errors);
   await settle();
-  assert.notDeepEqual([...foreign.resumeToken], [...resumed.resumeToken], "same-match servers need distinct bearer secrets");
+  assert.notDeepEqual(
+    [...foreign.resumeToken],
+    [...resumed.resumeToken],
+    "same-match servers need distinct bearer secrets",
+  );
   const foreignRejected = [];
   const foreignAttempt = join(server, "foreign-attempt", errors, {
     resumeToken: foreign.resumeToken,
@@ -1516,7 +1740,12 @@ test("remote presentation uses bounded 20 Hz interpolation while local stays pre
 
 test("remote interpolation follows a six-tick cadence after snapshot coalescing", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2, botSkill: 1, snapshotIntervalTicks: 6, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    botSkill: 1,
+    snapshotIntervalTicks: 6,
+    onError: (error) => errors.push(error),
+  });
   const client = join(server, "six-tick-presenter", errors);
   await settle();
 
@@ -1652,9 +1881,15 @@ test("the in-memory transport preserves reliable messages and models datagram lo
   const leftEvents = [];
   const rightEvents = [];
   const receiver = (events) => ({
-    onReliable(channel, payload) { events.push(["reliable", channel, [...payload]]); },
-    onDatagram(payload) { events.push(["datagram", [...payload]]); },
-    onClose(code, reason) { events.push(["close", code, reason]); },
+    onReliable(channel, payload) {
+      events.push(["reliable", channel, [...payload]]);
+    },
+    onDatagram(payload) {
+      events.push(["datagram", [...payload]]);
+    },
+    onClose(code, reason) {
+      events.push(["close", code, reason]);
+    },
   });
   const [left, right] = createInMemoryTransportPair(receiver(leftEvents), receiver(rightEvents), {
     maxDatagramBytes: 4,
@@ -1702,7 +1937,9 @@ test("tick input never disguises a reliable fallback as a datagram", async () =>
     async sendReliable() {
       throw new Error("backpressure must not silently reroute stale input");
     },
-    async trySendDatagram() { return "backpressured"; },
+    async trySendDatagram() {
+      return "backpressured";
+    },
   };
   assert.deepEqual(await sendTickInput(congestedDatagram, Uint8Array.of(9)), {
     route: "datagram",
@@ -1719,21 +1956,31 @@ test("Deno WebTransport readiness failure closes and releases the pending receiv
     url: "https://war.invalid/failed",
     ready: Promise.reject(new Error("handshake rejected")),
     closed: Promise.resolve({}),
-    close(options) { closeOptions = options; },
+    close(options) {
+      closeOptions = options;
+    },
   };
   const incoming = { accept: async () => ({}) };
   const listener = {
-    async *[Symbol.asyncIterator]() { yield incoming; },
+    async *[Symbol.asyncIterator]() {
+      yield incoming;
+    },
   };
   const endpoint = {
-    listen() { return listener; },
+    listen() {
+      return listener;
+    },
     close() {},
   };
   const runtime = {
     QuicEndpoint: class {
-      constructor() { return endpoint; }
+      constructor() {
+        return endpoint;
+      }
     },
-    async upgradeWebTransport() { return session; },
+    async upgradeWebTransport() {
+      return session;
+    },
   };
   const matchServer = new MatchServer();
   const receiver = matchServer.createSession();
@@ -1748,12 +1995,16 @@ test("Deno WebTransport readiness failure closes and releases the pending receiv
       pending.set(receiver, receiver);
       return receiver;
     },
-    onSession() { sessionAccepted = true; },
+    onSession() {
+      sessionAccepted = true;
+    },
     onSessionError(url, failedReceiver) {
       assert.equal(url, session.url);
       pending.delete(failedReceiver);
     },
-    onError(error) { errors.push(error); },
+    onError(error) {
+      errors.push(error);
+    },
   });
   await server.completed;
   await settle();
@@ -1787,9 +2038,18 @@ test("Deno WebTransport rejects a max-session connection without awaiting readin
       yield incomingAtCapacity;
     },
   };
-  const endpoint = { listen() { return listener; }, close() {} };
+  const endpoint = {
+    listen() {
+      return listener;
+    },
+    close() {},
+  };
   const runtime = {
-    QuicEndpoint: class { constructor() { return endpoint; } },
+    QuicEndpoint: class {
+      constructor() {
+        return endpoint;
+      }
+    },
     async upgradeWebTransport(connection) {
       assert.equal(connection.id, 2);
       return failedSession;
@@ -1802,9 +2062,15 @@ test("Deno WebTransport rejects a max-session connection without awaiting readin
     key: "key",
     maximumSessions: 1,
     runtime,
-    receiverForSession() { throw new Error("max-session path must not create a receiver"); },
-    onSession() { throw new Error("max-session path must not adopt a session"); },
-    onError(error) { errors.push(error); },
+    receiverForSession() {
+      throw new Error("max-session path must not create a receiver");
+    },
+    onSession() {
+      throw new Error("max-session path must not adopt a session");
+    },
+    onError(error) {
+      errors.push(error);
+    },
   });
   await server.completed;
   await settle();
@@ -1824,28 +2090,39 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
     incomingController;
     incomingBidirectionalController;
     datagramController;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     incomingUnidirectionalStreams = new ReadableStream({
-      start: (controller) => { this.incomingController = controller; },
+      start: (controller) => {
+        this.incomingController = controller;
+      },
     });
     incomingBidirectionalStreams = new ReadableStream({
-      start: (controller) => { this.incomingBidirectionalController = controller; },
+      start: (controller) => {
+        this.incomingBidirectionalController = controller;
+      },
     });
     datagrams = {
       maxDatagramSize: 8,
       readable: new ReadableStream({
-        start: (controller) => { this.datagramController = controller; },
+        start: (controller) => {
+          this.datagramController = controller;
+        },
       }),
       writable: new WritableStream({
-        write: (chunk) => { this.outgoingDatagrams.push([...chunk]); },
+        write: (chunk) => {
+          this.outgoingDatagrams.push([...chunk]);
+        },
       }),
     };
     async createUnidirectionalStream() {
-      const session = this;
       const chunks = [];
       this.outgoingStreams.push(chunks);
       return new WritableStream({
-        write(chunk) { chunks.push(chunk.slice()); },
+        write(chunk) {
+          chunks.push(chunk.slice());
+        },
       });
     }
     async createBidirectionalStream() {
@@ -1853,8 +2130,12 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
       return {
         readable: new ReadableStream(),
         writable: new WritableStream({
-          write(chunk) { chunks.push(chunk.slice()); },
-          close: () => { this.outgoingBidirectionalStreams.push(chunks); },
+          write(chunk) {
+            chunks.push(chunk.slice());
+          },
+          close: () => {
+            this.outgoingBidirectionalStreams.push(chunks);
+          },
         }),
       };
     }
@@ -1893,13 +2174,27 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
     }
   }
   const session = new FakeSession();
-  class FakeConstructor { constructor() { return session; } }
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
   const events = [];
-  const client = await BrowserWebTransportClient.connect("https://example.invalid", {
-    onReliable(channel, payload) { events.push(["reliable", channel, [...payload]]); },
-    onDatagram(payload) { events.push(["datagram", [...payload]]); },
-    onClose(code, reason) { events.push(["close", code, reason]); },
-  }, FakeConstructor);
+  const client = await BrowserWebTransportClient.connect(
+    "https://example.invalid",
+    {
+      onReliable(channel, payload) {
+        events.push(["reliable", channel, [...payload]]);
+      },
+      onDatagram(payload) {
+        events.push(["datagram", [...payload]]);
+      },
+      onClose(code, reason) {
+        events.push(["close", code, reason]);
+      },
+    },
+    FakeConstructor,
+  );
   const reusedPayload = Uint8Array.of(8, 9);
   const sendPromise = client.sendReliable(TRANSPORT_CHANNEL_SESSION, reusedPayload);
   reusedPayload[0] = 99;
@@ -1923,9 +2218,15 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
   const serverSession = new FakeSession();
   const serverEvents = [];
   const serverTransport = await adoptServerWebTransportSession(serverSession, {
-    onReliable(channel, payload) { serverEvents.push(["reliable", channel, [...payload]]); },
-    onDatagram(payload) { serverEvents.push(["datagram", [...payload]]); },
-    onClose(code, reason) { serverEvents.push(["close", code, reason]); },
+    onReliable(channel, payload) {
+      serverEvents.push(["reliable", channel, [...payload]]);
+    },
+    onDatagram(payload) {
+      serverEvents.push(["datagram", [...payload]]);
+    },
+    onClose(code, reason) {
+      serverEvents.push(["close", code, reason]);
+    },
   });
   assert.equal(await serverTransport.sendReliable(TRANSPORT_CHANNEL_SESSION, Uint8Array.of(3, 4)), "sent");
   assert.equal(serverSession.outgoingStreams.length, 1);
@@ -1946,7 +2247,9 @@ test("datagram staging owns caller bytes and has fixed in-flight capacity", asyn
     incomingUnidirectionalStreams = new ReadableStream();
     incomingBidirectionalStreams = new ReadableStream();
     closeResolve;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     writes = [];
     writeResolves = [];
     datagramAbortCalls = 0;
@@ -1955,28 +2258,48 @@ test("datagram staging owns caller bytes and has fixed in-flight capacity", asyn
       desiredSize: 1,
       write: (chunk) => {
         this.writes.push(chunk);
-        return new Promise((resolve) => { this.writeResolves.push(resolve); });
+        return new Promise((resolve) => {
+          this.writeResolves.push(resolve);
+        });
       },
-      abort: async () => { this.datagramAbortCalls += 1; },
-      releaseLock: () => { this.datagramReleaseCalls += 1; },
+      abort: async () => {
+        this.datagramAbortCalls += 1;
+      },
+      releaseLock: () => {
+        this.datagramReleaseCalls += 1;
+      },
     };
     datagrams = {
       maxDatagramSize: 8,
       readable: new ReadableStream(),
       writable: { getWriter: () => this.writer },
     };
-    createUnidirectionalStream() { throw new Error("not used"); }
-    createBidirectionalStream() { throw new Error("not used"); }
-    close(options = {}) { this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    close(options = {}) {
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
   }
 
   const session = new DelayedDatagramSession();
-  class FakeConstructor { constructor() { return session; } }
-  const client = await BrowserWebTransportClient.connect("https://example.invalid", {
-    onReliable() {},
-    onDatagram() {},
-    onClose() {},
-  }, FakeConstructor);
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
+  const client = await BrowserWebTransportClient.connect(
+    "https://example.invalid",
+    {
+      onReliable() {},
+      onDatagram() {},
+      onClose() {},
+    },
+    FakeConstructor,
+  );
 
   const sends = [];
   for (let index = 0; index < 4; index += 1) {
@@ -2009,23 +2332,41 @@ test("repeated client reliable streams cancel their unused reverse directions", 
     incomingBidirectionalStreams = new ReadableStream();
     datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
     closeResolve;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     reverseCancels = 0;
-    close(options = {}) { this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
-    createUnidirectionalStream() { throw new Error("not used"); }
+    close(options = {}) {
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
     createBidirectionalStream() {
       const session = this;
-      const readable = new ReadableStream({ cancel() { session.reverseCancels += 1; } });
+      const readable = new ReadableStream({
+        cancel() {
+          session.reverseCancels += 1;
+        },
+      });
       return { readable, writable: new WritableStream() };
     }
   }
   const session = new RepeatedBidiSession();
-  class FakeConstructor { constructor() { return session; } }
-  const client = await BrowserWebTransportClient.connect("https://example.invalid", {
-    onReliable() {},
-    onDatagram() {},
-    onClose() {},
-  }, FakeConstructor);
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
+  const client = await BrowserWebTransportClient.connect(
+    "https://example.invalid",
+    {
+      onReliable() {},
+      onDatagram() {},
+      onClose() {},
+    },
+    FakeConstructor,
+  );
   for (let index = 0; index < 8; index += 1) {
     assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(index)), "sent");
   }
@@ -2038,11 +2379,17 @@ test("server reliable streams close reverse writers without escalating peer rese
   class RepeatedServerSession {
     ready = Promise.resolve();
     incomingController;
-    incomingBidirectionalStreams = new ReadableStream({ start: (controller) => { this.incomingController = controller; } });
+    incomingBidirectionalStreams = new ReadableStream({
+      start: (controller) => {
+        this.incomingController = controller;
+      },
+    });
     incomingUnidirectionalStreams = new ReadableStream();
     datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
     closeResolve;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     closeCalls = 0;
     reverseCloses = 0;
     reverseReleases = 0;
@@ -2050,7 +2397,10 @@ test("server reliable streams close reverse writers without escalating peer rese
       const session = this;
       const bytes = Uint8Array.of(channel, 1, 0, 0, 0, value);
       const readable = new ReadableStream({
-        start(controller) { controller.enqueue(bytes); controller.close(); },
+        start(controller) {
+          controller.enqueue(bytes);
+          controller.close();
+        },
       });
       const writable = {
         getWriter() {
@@ -2059,14 +2409,20 @@ test("server reliable streams close reverse writers without escalating peer rese
               session.reverseCloses += 1;
               return rejectClose ? Promise.reject(new Error("peer reset")) : Promise.resolve();
             },
-            releaseLock() { session.reverseReleases += 1; },
+            releaseLock() {
+              session.reverseReleases += 1;
+            },
           };
         },
       };
       this.incomingController.enqueue({ readable, writable });
     }
-    createUnidirectionalStream() { throw new Error("not used"); }
-    createBidirectionalStream() { throw new Error("not used"); }
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
     close(options = {}) {
       this.closeCalls += 1;
       this.incomingController.close();
@@ -2076,9 +2432,13 @@ test("server reliable streams close reverse writers without escalating peer rese
   const session = new RepeatedServerSession();
   const events = [];
   const transport = await adoptServerWebTransportSession(session, {
-    onReliable(channel, payload) { events.push([channel, payload[0]]); },
+    onReliable(channel, payload) {
+      events.push([channel, payload[0]]);
+    },
     onDatagram() {},
-    onClose(code, reason) { events.push(["close", code, reason]); },
+    onClose(code, reason) {
+      events.push(["close", code, reason]);
+    },
   });
   for (let index = 0; index < 7; index += 1) session.push(TRANSPORT_CHANNEL_CONTROL, index, index === 6);
   await new Promise((resolve) => setImmediate(resolve));
@@ -2103,21 +2463,31 @@ test("the persistent reliable decoder handles coalesced frames and rejects overs
     incomingController;
     datagramController;
     closeResolve;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     closeCalls = 0;
     incomingUnidirectionalStreams = new ReadableStream({
-      start: (controller) => { this.incomingController = controller; },
+      start: (controller) => {
+        this.incomingController = controller;
+      },
     });
     incomingBidirectionalStreams = new ReadableStream();
     datagrams = {
       maxDatagramSize: 8,
       readable: new ReadableStream({
-        start: (controller) => { this.datagramController = controller; },
+        start: (controller) => {
+          this.datagramController = controller;
+        },
       }),
       writable: new WritableStream(),
     };
-    createUnidirectionalStream() { throw new Error("not used"); }
-    createBidirectionalStream() { throw new Error("not used"); }
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
     close(options = {}) {
       this.closeCalls += 1;
       this.incomingController.close();
@@ -2125,25 +2495,53 @@ test("the persistent reliable decoder handles coalesced frames and rejects overs
       this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
     }
     pushBytes(bytes) {
-      this.incomingController.enqueue(new ReadableStream({
-        start: (controller) => {
-          controller.enqueue(bytes.subarray(0, 1));
-          controller.enqueue(bytes.subarray(1, 8));
-          controller.enqueue(bytes.subarray(8));
-          controller.close();
-        },
-      }));
+      this.incomingController.enqueue(
+        new ReadableStream({
+          start: (controller) => {
+            controller.enqueue(bytes.subarray(0, 1));
+            controller.enqueue(bytes.subarray(1, 8));
+            controller.enqueue(bytes.subarray(8));
+            controller.close();
+          },
+        }),
+      );
     }
   }
   const session = new DecoderSession();
-  class FakeConstructor { constructor() { return session; } }
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
   const events = [];
-  const client = await BrowserWebTransportClient.connect("https://example.invalid", {
-    onReliable(channel, payload) { events.push(["reliable", channel, [...payload]]); },
-    onDatagram() {},
-    onClose(code, reason) { events.push(["close", code, reason]); },
-  }, FakeConstructor);
-  const frames = new Uint8Array([TRANSPORT_CHANNEL_CONTROL, 2, 0, 0, 0, 9, 8, TRANSPORT_CHANNEL_SESSION, 1, 0, 0, 0, 7]);
+  const client = await BrowserWebTransportClient.connect(
+    "https://example.invalid",
+    {
+      onReliable(channel, payload) {
+        events.push(["reliable", channel, [...payload]]);
+      },
+      onDatagram() {},
+      onClose(code, reason) {
+        events.push(["close", code, reason]);
+      },
+    },
+    FakeConstructor,
+  );
+  const frames = new Uint8Array([
+    TRANSPORT_CHANNEL_CONTROL,
+    2,
+    0,
+    0,
+    0,
+    9,
+    8,
+    TRANSPORT_CHANNEL_SESSION,
+    1,
+    0,
+    0,
+    0,
+    7,
+  ]);
   session.pushBytes(frames);
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(events, [
@@ -2169,19 +2567,37 @@ test("a remote WebTransport close is observed without issuing a second close", a
     datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
     closeCalls = 0;
     closedResolve;
-    closed = new Promise((resolve) => { this.closedResolve = resolve; });
-    createUnidirectionalStream() { throw new Error("not used"); }
-    createBidirectionalStream() { throw new Error("not used"); }
-    close() { this.closeCalls += 1; }
+    closed = new Promise((resolve) => {
+      this.closedResolve = resolve;
+    });
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    close() {
+      this.closeCalls += 1;
+    }
   }
   const session = new RemotelyClosedSession();
-  class FakeConstructor { constructor() { return session; } }
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
   const events = [];
-  await BrowserWebTransportClient.connect("https://example.invalid", {
-    onReliable() {},
-    onDatagram() {},
-    onClose(code, reason) { events.push([code, reason]); },
-  }, FakeConstructor);
+  await BrowserWebTransportClient.connect(
+    "https://example.invalid",
+    {
+      onReliable() {},
+      onDatagram() {},
+      onClose(code, reason) {
+        events.push([code, reason]);
+      },
+    },
+    FakeConstructor,
+  );
   session.closedResolve({ closeCode: 7, reason: "peer closed" });
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(session.closeCalls, 0);
@@ -2196,7 +2612,9 @@ test("server snapshots coalesce to one bounded pending frame under stream backpr
     incomingUnidirectionalStreams = new ReadableStream();
     datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
     closeResolve;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     closeCalls = 0;
     capacity = 0;
     readyResolve;
@@ -2204,19 +2622,40 @@ test("server snapshots coalesce to one bounded pending frame under stream backpr
     async createUnidirectionalStream() {
       const chunks = [];
       this.outgoingStreams.push(chunks);
-      let ready = new Promise((resolve) => { this.readyResolve = resolve; });
+      let ready = new Promise((resolve) => {
+        this.readyResolve = resolve;
+      });
       const writer = {
-        get desiredSize() { return session.capacity; },
-        get ready() { session.readyWaiters += 1; return ready; },
-        write: async (chunk) => { chunks.push(chunk.slice()); this.capacity = 0; ready = new Promise((resolve) => { this.readyResolve = resolve; }); },
+        get desiredSize() {
+          return session.capacity;
+        },
+        get ready() {
+          session.readyWaiters += 1;
+          return ready;
+        },
+        write: async (chunk) => {
+          chunks.push(chunk.slice());
+          this.capacity = 0;
+          ready = new Promise((resolve) => {
+            this.readyResolve = resolve;
+          });
+        },
         abort: async () => {},
         releaseLock() {},
       };
       return { getWriter: () => writer };
     }
-    createBidirectionalStream() { throw new Error("not used"); }
-    releaseCapacity() { this.capacity = 1; this.readyResolve?.(); }
-    close(options = {}) { this.closeCalls += 1; this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    releaseCapacity() {
+      this.capacity = 1;
+      this.readyResolve?.();
+    }
+    close(options = {}) {
+      this.closeCalls += 1;
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
   }
   const session = new BackpressuredSession();
   const transport = await adoptServerWebTransportSession(session, {
@@ -2252,7 +2691,9 @@ test("server control backpressure has one bounded FIFO and fails closed on overf
     incomingUnidirectionalStreams = new ReadableStream();
     datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
     closeResolve;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     closeCalls = 0;
     capacity = 0;
     readyResolve;
@@ -2260,23 +2701,37 @@ test("server control backpressure has one bounded FIFO and fails closed on overf
     async createUnidirectionalStream() {
       const chunks = [];
       this.outgoingStreams.push(chunks);
-      let ready = new Promise((resolve) => { this.readyResolve = resolve; });
+      let ready = new Promise((resolve) => {
+        this.readyResolve = resolve;
+      });
       const session = this;
       const writer = {
-        get desiredSize() { return session.capacity; },
-        get ready() { session.readyWaiters += 1; return ready; },
+        get desiredSize() {
+          return session.capacity;
+        },
+        get ready() {
+          session.readyWaiters += 1;
+          return ready;
+        },
         write: async (chunk) => {
           chunks.push(chunk.slice());
           this.capacity = 0;
-          ready = new Promise((resolve) => { this.readyResolve = resolve; });
+          ready = new Promise((resolve) => {
+            this.readyResolve = resolve;
+          });
         },
         abort: async () => {},
         releaseLock() {},
       };
       return { getWriter: () => writer };
     }
-    createBidirectionalStream() { throw new Error("not used"); }
-    close(options = {}) { this.closeCalls += 1; this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    close(options = {}) {
+      this.closeCalls += 1;
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
   }
 
   const session = new BackpressuredSession();
@@ -2293,7 +2748,10 @@ test("server control backpressure has one bounded FIFO and fails closed on overf
   for (let index = 2; index <= 40; index += 1) {
     queued.push(transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(index)));
   }
-  assert.deepEqual(await Promise.all(queued), queued.map(() => "closed"));
+  assert.deepEqual(
+    await Promise.all(queued),
+    queued.map(() => "closed"),
+  );
   assert.equal(session.closeCalls, 1, "queue overflow closes the session once");
   assert.equal(session.readyWaiters, 1, "overflow does not add writer.ready waiters");
 });
@@ -2305,7 +2763,9 @@ test("server reliable admission is bounded while stream creation is pending", as
     incomingUnidirectionalStreams = new ReadableStream();
     datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
     closeResolve;
-    closed = new Promise((resolve) => { this.closeResolve = resolve; });
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
     closeCalls = 0;
     createCalls = 0;
     resolveCreate;
@@ -2315,8 +2775,13 @@ test("server reliable admission is bounded while stream creation is pending", as
         this.resolveCreate = () => resolve(new WritableStream());
       });
     }
-    createBidirectionalStream() { throw new Error("not used"); }
-    close(options = {}) { this.closeCalls += 1; this.closeResolve({ closeCode: options.closeCode, reason: options.reason }); }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    close(options = {}) {
+      this.closeCalls += 1;
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
   }
 
   const session = new DelayedStreamSession();
@@ -2332,7 +2797,10 @@ test("server reliable admission is bounded while stream creation is pending", as
   for (let index = 1; index < 40; index += 1) {
     sends.push(transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(index)));
   }
-  assert.deepEqual(await Promise.all(sends), sends.map(() => "closed"));
+  assert.deepEqual(
+    await Promise.all(sends),
+    sends.map(() => "closed"),
+  );
   assert.equal(session.closeCalls, 1, "pending-create overflow closes once");
   session.resolveCreate?.();
   void transport;

@@ -10,12 +10,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import {
-  DEFAULT_HMR_SOAK_CYCLES,
-  HMR_STATE_API,
-  runHmrStateSoak,
-  validateHmrSoakEvidence,
-} from "./hmr-state-soak.mjs";
+import { DEFAULT_HMR_SOAK_CYCLES, HMR_STATE_API, runHmrStateSoak, validateHmrSoakEvidence } from "./hmr-state-soak.mjs";
 import {
   assertInstalledPackageTreeSha256,
   createWarBattlesHmrDriver,
@@ -32,7 +27,10 @@ function option(name, fallback) {
   return index === -1 ? fallback : process.argv[index + 1];
 }
 
-const cycles = Number.parseInt(option("--cycles", process.env.DEHERM_WAR_BATTLES_HMR_CYCLES ?? String(DEFAULT_HMR_SOAK_CYCLES)), 10);
+const cycles = Number.parseInt(
+  option("--cycles", process.env.DEHERM_WAR_BATTLES_HMR_CYCLES ?? String(DEFAULT_HMR_SOAK_CYCLES)),
+  10,
+);
 if (!Number.isSafeInteger(cycles) || cycles < 1) throw new Error("--cycles must be a positive integer");
 const evidencePath = resolve(option("--evidence", process.env.DEHERM_WAR_BATTLES_HMR_EVIDENCE ?? defaultEvidencePath));
 const installedPackageRoot = process.env.DEHERM_INSTALLED_PACKAGE_ROOT
@@ -52,14 +50,21 @@ async function main() {
     const adapter = await loadDriver();
     evidence = await runHmrStateSoak(adapter, { cycles });
     if (args.has("--record-evidence")) {
-      await writeFile(evidencePath, `${JSON.stringify({
-        schemaVersion: 1,
-        title: "War Battles installed native HMR state-preservation soak",
-        installedPackage: evidence.installedPackage,
-        runtimeApi: evidence.runtimeApi,
-        cyclesRequired: cycles,
-        ...evidence,
-      }, null, 2)}\n`);
+      await writeFile(
+        evidencePath,
+        `${JSON.stringify(
+          {
+            schemaVersion: 1,
+            title: "War Battles installed native HMR state-preservation soak",
+            installedPackage: evidence.installedPackage,
+            runtimeApi: evidence.runtimeApi,
+            cyclesRequired: cycles,
+            ...evidence,
+          },
+          null,
+          2,
+        )}\n`,
+      );
       console.log(`war-battles-installed-hmr:evidence:${evidencePath}`);
     }
   } else {
@@ -70,11 +75,13 @@ async function main() {
       recorded = await readFile(evidencePath, "utf8");
     } catch (error) {
       if (error?.code === "ENOENT") {
-        throw new Error([
-          `native runtime state API ${HMR_STATE_API} is required`,
-          `no recorded evidence exists at ${evidencePath}`,
-          "run the live command to capture installed native evidence",
-        ].join("; "));
+        throw new Error(
+          [
+            `native runtime state API ${HMR_STATE_API} is required`,
+            `no recorded evidence exists at ${evidencePath}`,
+            "run the live command to capture installed native evidence",
+          ].join("; "),
+        );
       }
       throw error;
     }
@@ -87,8 +94,12 @@ async function main() {
     validateHmrSoakEvidence(evidence, { cycles });
   }
   console.log(`war-battles-installed-hmr:ok:cycles=${evidence.cyclesRequired ?? cycles}`);
-  console.log(`war-battles-installed-hmr:baseline:entities=${evidence.baseline.entityCount}:components=${evidence.baseline.componentCount}`);
-  console.log(`war-battles-installed-hmr:telemetry:samples=${evidence.telemetry.samples}:max-components=${evidence.telemetry.maxComponentCount}`);
+  console.log(
+    `war-battles-installed-hmr:baseline:entities=${evidence.baseline.entityCount}:components=${evidence.baseline.componentCount}`,
+  );
+  console.log(
+    `war-battles-installed-hmr:telemetry:samples=${evidence.telemetry.samples}:max-components=${evidence.telemetry.maxComponentCount}`,
+  );
 }
 
 main().catch((error) => {

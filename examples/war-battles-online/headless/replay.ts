@@ -97,7 +97,8 @@ export function readReplayCommand(
   output: InputCommand,
 ): void {
   if (!Number.isInteger(tick) || tick < 1 || tick > header.ticks) throw new RangeError("replay tick is out of range");
-  if (!Number.isInteger(playerId) || playerId < 1 || playerId > header.players) throw new RangeError("replay player is out of range");
+  if (!Number.isInteger(playerId) || playerId < 1 || playerId > header.players)
+    throw new RangeError("replay player is out of range");
   const packet = (tick - 1) * header.players + playerId - 1;
   readInputPacket(replay, REPLAY_HEADER_BYTES + packet * INPUT_PACKET_BYTES, output);
 }

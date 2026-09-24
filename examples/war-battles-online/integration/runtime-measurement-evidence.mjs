@@ -8,8 +8,7 @@ const integrationRoot = resolve(fileURLToPath(new URL(".", import.meta.url)));
 const exampleRoot = resolve(integrationRoot, "..");
 const repositoryRoot = resolve(exampleRoot, "../..");
 
-export const RUNTIME_MEASUREMENT_OWNER =
-  "examples/war-battles-online/integration/check-runtime-measurement.mjs";
+export const RUNTIME_MEASUREMENT_OWNER = "examples/war-battles-online/integration/check-runtime-measurement.mjs";
 
 export const RUNTIME_MEASUREMENT_SOURCE_PATHS = Object.freeze([
   "examples/war-battles-online/core",
@@ -40,21 +39,39 @@ async function hashTree(path) {
     }
     if (metadata.isSymbolicLink()) {
       const target = Buffer.from(await readlink(absolute));
-      files.push({ path: local, kind: "symlink", bytes: target.byteLength, sha256: createHash("sha256").update(target).digest("hex") });
+      files.push({
+        path: local,
+        kind: "symlink",
+        bytes: target.byteLength,
+        sha256: createHash("sha256").update(target).digest("hex"),
+      });
       bytes += target.byteLength;
       return;
     }
     assert.equal(metadata.isFile(), true, `unsupported runtime measurement input: ${absolute}`);
     const contents = await readFile(absolute);
-    files.push({ path: local, kind: "file", bytes: contents.byteLength, sha256: createHash("sha256").update(contents).digest("hex") });
+    files.push({
+      path: local,
+      kind: "file",
+      bytes: contents.byteLength,
+      sha256: createHash("sha256").update(contents).digest("hex"),
+    });
     bytes += contents.byteLength;
   }
   await visit(root, "");
-  return { path, kind: "tree", fileCount: files.length, bytes, sha256: createHash("sha256").update(JSON.stringify(files)).digest("hex") };
+  return {
+    path,
+    kind: "tree",
+    fileCount: files.length,
+    bytes,
+    sha256: createHash("sha256").update(JSON.stringify(files)).digest("hex"),
+  };
 }
 
 export async function buildRuntimeMeasurementSourceInputs() {
-  return Promise.all(RUNTIME_MEASUREMENT_SOURCE_PATHS.map((path) => path.endsWith("/core") ? hashTree(path) : hashFile(path)));
+  return Promise.all(
+    RUNTIME_MEASUREMENT_SOURCE_PATHS.map((path) => (path.endsWith("/core") ? hashTree(path) : hashFile(path))),
+  );
 }
 
 export function digestRuntimeMeasurementSourceInputs(sourceInputs) {
@@ -68,10 +85,10 @@ function assertSummary(summary, label) {
     assert.ok(summary[field] >= 0, `${label}.${field} must be non-negative`);
   }
   assert.ok(
-    summary.minimum <= summary.p50
-      && summary.p50 <= summary.p95
-      && summary.p95 <= summary.p99
-      && summary.p99 <= summary.maximum,
+    summary.minimum <= summary.p50 &&
+      summary.p50 <= summary.p95 &&
+      summary.p95 <= summary.p99 &&
+      summary.p99 <= summary.maximum,
     `${label} percentile order is invalid`,
   );
 }
@@ -111,7 +128,11 @@ export function assertRuntimeMeasurementEvidence(document, { sourceInputs } = {}
   }
   if (sourceInputs !== undefined) {
     assert.deepEqual(document.sourceInputs, sourceInputs, "runtime measurement source inventory is stale");
-    assert.equal(document.sourceKey, digestRuntimeMeasurementSourceInputs(sourceInputs), "runtime measurement source key is stale");
+    assert.equal(
+      document.sourceKey,
+      digestRuntimeMeasurementSourceInputs(sourceInputs),
+      "runtime measurement source key is stale",
+    );
   }
   return document;
 }

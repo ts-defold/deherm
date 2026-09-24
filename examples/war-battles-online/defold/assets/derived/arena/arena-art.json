@@ -1755,11 +1755,11 @@
     "columns": 8,
     "rows": 3,
     "cells": 24,
-    "cellsUsed": 17,
-    "cellsPadded": 7,
+    "cellsUsed": 23,
+    "cellsPadded": 1,
     "padding": "trailing cells are fully transparent",
     "defoldTileSource": "/main/arena-tiles.tilesource",
-    "sha256": "d9a9d6aefbce7ae1fd98cfaf2388678595919c6750f7db6d32b642ebee079222",
+    "sha256": "8896888fbbe8b552b380b2293c34264411f0cc20b6f8f58266de861cf84fde2b",
     "size": [
       128,
       48
@@ -1787,6 +1787,14 @@
       "sandbagTileId": 15,
       "spawnPadTileId": 16,
       "pickupPadTileId": 17,
+      "worldTileIds": {
+        "pickup-pedestal": 18,
+        "thermal-vent": 19,
+        "lava-fissure": 20,
+        "floor-vent": 21,
+        "pipe-junction": 22,
+        "pipe-run": 23
+      },
       "tiles": [
         {
           "id": 1,
@@ -2038,6 +2046,96 @@
           ],
           "pixelRect": [
             0,
+            32,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 18,
+          "role": "world.pickup-pedestal",
+          "layer": "decor",
+          "cell": [
+            1,
+            2
+          ],
+          "pixelRect": [
+            16,
+            32,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 19,
+          "role": "world.thermal-vent",
+          "layer": "decor",
+          "cell": [
+            2,
+            2
+          ],
+          "pixelRect": [
+            32,
+            32,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 20,
+          "role": "world.lava-fissure",
+          "layer": "decor",
+          "cell": [
+            3,
+            2
+          ],
+          "pixelRect": [
+            48,
+            32,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 21,
+          "role": "world.floor-vent",
+          "layer": "decor",
+          "cell": [
+            4,
+            2
+          ],
+          "pixelRect": [
+            64,
+            32,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 22,
+          "role": "world.pipe-junction",
+          "layer": "decor",
+          "cell": [
+            5,
+            2
+          ],
+          "pixelRect": [
+            80,
+            32,
+            16,
+            16
+          ]
+        },
+        {
+          "id": 23,
+          "role": "world.pipe-run",
+          "layer": "decor",
+          "cell": [
+            6,
+            2
+          ],
+          "pixelRect": [
+            96,
             32,
             16,
             16

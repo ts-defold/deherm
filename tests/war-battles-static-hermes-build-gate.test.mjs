@@ -183,7 +183,8 @@ test("Static product gate rejects an authored source tree newer than its locked 
       await mkdir(path.dirname(destination), { recursive: true });
       await writeFile(destination, await readFile(path.join(sourceRoot, relative)));
     }
-    await writeFile(path.join(project, projection.source.authoredFiles[0]), "// source drift\n");
+    assert.ok(projection.source.authoredFiles.includes("main/arena.script.ts"));
+    await writeFile(path.join(project, "main/arena.script.ts"), "// source drift\n");
     const report = await buildGate({
       project,
       output: path.join(output, "gate"),

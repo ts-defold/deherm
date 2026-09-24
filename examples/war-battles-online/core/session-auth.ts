@@ -86,11 +86,13 @@ export class SessionTokenService implements SessionTokenProvider {
         throw new SessionTokenConfigurationError("token key id must fit uint16");
       }
       if (this.keys.has(key.id)) throw new SessionTokenConfigurationError("token key ids must be unique");
-      if (key.secret.byteLength < 16) throw new SessionTokenConfigurationError("token secrets must be at least 16 bytes");
+      if (key.secret.byteLength < 16)
+        throw new SessionTokenConfigurationError("token secrets must be at least 16 bytes");
       this.keys.set(key.id, new Uint8Array(key.secret));
     }
     this.activeKeyId = options.activeKeyId ?? options.keys[0]!.id;
-    if (!this.keys.has(this.activeKeyId)) throw new SessionTokenConfigurationError("active token key is not configured");
+    if (!this.keys.has(this.activeKeyId))
+      throw new SessionTokenConfigurationError("active token key is not configured");
   }
 
   /** Mints a credential. This is control-plane work and intentionally async. */
@@ -98,11 +100,7 @@ export class SessionTokenService implements SessionTokenProvider {
     validateClaims(claims);
     const body = encodeBody(this.activeKeyId, claims);
     const key = await this.cryptoKey(this.activeKeyId);
-    const signature = new Uint8Array(await globalThis.crypto.subtle.sign(
-      "HMAC",
-      key,
-      body as unknown as BufferSource,
-    ));
+    const signature = new Uint8Array(await globalThis.crypto.subtle.sign("HMAC", key, body as unknown as BufferSource));
     const token = new Uint8Array(SESSION_TOKEN_BYTES);
     token.set(body, 0);
     token.set(signature.subarray(0, SESSION_TOKEN_TAG_BYTES), SESSION_TOKEN_HEADER_BYTES);
@@ -132,20 +130,22 @@ export class SessionTokenService implements SessionTokenProvider {
       };
       if (claims.matchId !== expected.matchId || claims.generation === 0) return null;
       if (claims.slot >= MAX_PLAYERS) return null;
-      if (expected.rosterSize !== undefined && (!Number.isInteger(expected.rosterSize) || claims.slot >= expected.rosterSize)) return null;
+      if (
+        expected.rosterSize !== undefined &&
+        (!Number.isInteger(expected.rosterSize) || claims.slot >= expected.rosterSize)
+      )
+        return null;
       if (tickAfter(claims.issuedAtTick, expected.nowTick)) return null;
       if (claims.expiresAtTick !== 0 && tickAfter(expected.nowTick, claims.expiresAtTick)) return null;
       validateClaims(claims);
       const body = token.subarray(0, SESSION_TOKEN_HEADER_BYTES);
       const key = await this.cryptoKey(keyId);
-      const signature = new Uint8Array(await globalThis.crypto.subtle.sign(
-        "HMAC",
-        key,
-        body as unknown as BufferSource,
-      ));
+      const signature = new Uint8Array(
+        await globalThis.crypto.subtle.sign("HMAC", key, body as unknown as BufferSource),
+      );
       if (!constantTimeEqual(signature, token.subarray(SESSION_TOKEN_HEADER_BYTES))) return null;
       return claims;
-    } catch (_error: unknown) {
+    } catch {
       // A crypto/provider failure is an authentication failure at this seam.
       return null;
     }

@@ -7,7 +7,7 @@ export const VISUAL_EVIDENCE_SCHEMA_VERSION = 2;
 export const ARENA_SOURCE = "main/arena.script.ts";
 export const EXPECTED_PROPERTIES = Object.freeze({
   players: 8,
-  botSkill: 2,
+  botSkill: 1,
   mapSeed: 0,
   autoEngageSeconds: 0,
 });
@@ -29,10 +29,7 @@ export function readPngSize(bytes) {
 }
 
 export function propertyRecord(instance) {
-  return Object.fromEntries((instance.properties ?? []).map((property) => [
-    property.name,
-    property.value?.value,
-  ]));
+  return Object.fromEntries((instance.properties ?? []).map((property) => [property.name, property.value?.value]));
 }
 
 export function requireArenaInstance(state) {
@@ -137,8 +134,12 @@ export async function verifyVisualEvidence(document, repositoryRoot) {
   const screenshotPath = path.join(repositoryRoot, document.screenshot.path);
   const screenshotBytes = await readFile(screenshotPath);
   const png = readPngSize(screenshotBytes);
-  if (sha256(screenshotBytes) !== document.screenshot.sha256 || screenshotBytes.length !== document.screenshot.bytes ||
-      png.width !== document.screenshot.width || png.height !== document.screenshot.height) {
+  if (
+    sha256(screenshotBytes) !== document.screenshot.sha256 ||
+    screenshotBytes.length !== document.screenshot.bytes ||
+    png.width !== document.screenshot.width ||
+    png.height !== document.screenshot.height
+  ) {
     throw new Error("VS Code screenshot bytes do not match the recorded evidence");
   }
   for (const input of document.sourceInputs ?? []) {

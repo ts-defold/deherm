@@ -18,10 +18,13 @@ test("authoritative 32-player load evidence is source-bound and fresh", async ()
   const sourceInputs = await buildAuthoritativeLoadSourceInputs();
   const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
   assertAuthoritativeLoadEvidence(evidence, { sourceInputs });
-  assert.match(execFileSync(process.execPath, [gatePath, "--check-evidence"], {
-    cwd: repositoryRoot,
-    encoding: "utf8",
-  }), /war-battles-authoritative-load-evidence:fresh:/u);
+  assert.match(
+    execFileSync(process.execPath, [gatePath, "--check-evidence"], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    }),
+    /war-battles-authoritative-load-evidence:fresh:/u,
+  );
 });
 
 test("impaired load records loss, reordering, bounded queues, and all-client convergence", async () => {
@@ -36,6 +39,12 @@ test("impaired load records loss, reordering, bounded queues, and all-client con
   assert.equal(evidence.transport.pendingQueue, 0);
   assert.equal(evidence.convergence.allClientsConverged, true);
   assert.ok(evidence.server.inputsAccepted > 0);
-  assert.equal(evidence.clients.rows.every((row) => row.inputsSent + row.inputsDropped === evidence.config.ticks), true);
-  assert.equal(evidence.clients.rows.every((row) => row.inputsSent > 0 && row.snapshotsApplied > 0), true);
+  assert.equal(
+    evidence.clients.rows.every((row) => row.inputsSent + row.inputsDropped === evidence.config.ticks),
+    true,
+  );
+  assert.equal(
+    evidence.clients.rows.every((row) => row.inputsSent > 0 && row.snapshotsApplied > 0),
+    true,
+  );
 });

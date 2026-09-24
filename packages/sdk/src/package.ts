@@ -4,8 +4,9 @@
 // runtime adapters live in the selected project's `@deherm/project` surface.
 // This package entry deliberately exposes only stable authoring/runtime
 // primitives whose meaning does not depend on a Defold revision.
-export type RuntimeKind = "hermes" | "browser" | "test";
-export type LogLevel = "debug" | "info" | "warn" | "error";
+import type { DefoldApiV1 } from "./host";
+
+export type { DefoldApiV1, DefoldRuntime, LogLevel, RuntimeKind } from "./host";
 
 export {
   address,
@@ -21,17 +22,9 @@ export {
   type DefoldHashLiteral,
   type DefoldRelativeAddress,
   type DefoldSocketAddress,
-  type DefoldUrl
+  type DefoldUrl,
 } from "./address";
 export { hmrPersistentState, type HmrPersistentCell } from "./hmr-state";
-
-export interface DefoldApiV1 {
-  readonly version: 1;
-  readonly runtime: RuntimeKind;
-  log(level: LogLevel, message: string): void;
-  now(): number;
-  request(channel: string, payload: string): string;
-}
 
 export interface DefoldAppV1 {
   init?(): void;
@@ -43,7 +36,6 @@ export interface DefoldAppV1 {
 export type DefoldAppFactory = (api: DefoldApiV1) => DefoldAppV1;
 
 declare global {
-  var __defoldHostV1: DefoldApiV1 | undefined;
   var __defoldAppV1: DefoldAppV1 | undefined;
   var __defoldModulesV1: Record<string, object> | undefined;
 }

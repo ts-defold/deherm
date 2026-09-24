@@ -7,10 +7,7 @@ import { join, relative, resolve } from "node:path";
 // development loop, this packaged harness, and the runtime bug-pool harvester
 // all classify engine output the same way.
 import { REJECTED_DIAGNOSTICS, firstRejectedDiagnostic } from "@ts-defold/deherm/dev/runtime-diagnostics";
-import {
-  BOB_TOOLING_IGNORE_ENTRIES,
-  TYPED_NATIVE_IGNORE_ENTRY
-} from "@ts-defold/deherm/dev/typed-native";
+import { BOB_TOOLING_IGNORE_ENTRIES, TYPED_NATIVE_IGNORE_ENTRY } from "@ts-defold/deherm/dev/typed-native";
 
 import { DYNAMIC_SERVICE_PORT_ENV, requestGracefulShutdown } from "./graceful-shutdown.mjs";
 import { projectionEnvelope } from "./projections.mjs";
@@ -55,12 +52,13 @@ export const REQUIRED_MARKERS = Object.freeze([
 // when the engine tears its collections down, which a signal never does, so
 // this line is observable evidence that teardown ran and that a structured Lua
 // call from `final` still found its captured script instance.
-export const REQUIRED_SHUTDOWN_MARKERS = Object.freeze([
-  "INFO:DEFOLD_HERMES: war-battles:player-final",
-]);
+export const REQUIRED_SHUTDOWN_MARKERS = Object.freeze(["INFO:DEFOLD_HERMES: war-battles:player-final"]);
 
 export function observedRequiredMarkers(transcript, requiredMarkers = REQUIRED_MARKERS) {
-  const lines = transcript.replaceAll("\r", "").split("\n").map((line) => line.trimEnd());
+  const lines = transcript
+    .replaceAll("\r", "")
+    .split("\n")
+    .map((line) => line.trimEnd());
   return requiredMarkers.map((marker) => {
     if (marker !== RUNTIME_PROFILE_MARKER_PREFIX) return lines.find((line) => line === marker) ?? null;
     for (let index = lines.length - 1; index >= 0; index -= 1) {
@@ -85,8 +83,11 @@ export function checkedRequiredMarkers(recorded, requiredMarkers = REQUIRED_MARK
   const expected = requiredMarkers.map((marker, index) => {
     if (marker !== RUNTIME_PROFILE_MARKER_PREFIX) return marker;
     const candidate = recorded[index];
-    if (typeof candidate !== "string" || !candidate.startsWith(marker) ||
-        !/^[1-9][0-9]* generated Lua symbols$/u.test(candidate.slice(marker.length))) {
+    if (
+      typeof candidate !== "string" ||
+      !candidate.startsWith(marker) ||
+      !/^[1-9][0-9]* generated Lua symbols$/u.test(candidate.slice(marker.length))
+    ) {
       throw new Error("Recorded runtime profile marker must carry a positive generated Lua symbol count");
     }
     return candidate;
@@ -148,7 +149,8 @@ async function terminateGracefully(child, transcript, graceMs) {
     await forceKill(child, graceMs);
     throw new Error(
       `Packaged runtime did not exit within ${graceMs}ms of a graceful @system/exit posted to ` +
-      `port ${addressed.port} (pid ${addressed.pid})`);
+        `port ${addressed.port} (pid ${addressed.pid})`,
+    );
   }
   return { ...exited, port: addressed.port };
 }
@@ -174,7 +176,11 @@ export async function runPackagedRuntimeEvidence({
     if (!Number.isSafeInteger(value) || value <= 0) throw new Error(`${name} must be a positive integer`);
   }
   if (settleMs >= timeoutMs) throw new Error("settleMs must be less than timeoutMs");
-  if (!Array.isArray(requiredMarkers) || requiredMarkers.length === 0 || new Set(requiredMarkers).size !== requiredMarkers.length) {
+  if (
+    !Array.isArray(requiredMarkers) ||
+    requiredMarkers.length === 0 ||
+    new Set(requiredMarkers).size !== requiredMarkers.length
+  ) {
     throw new Error("requiredMarkers must be a non-empty list of unique strings");
   }
   if (!Array.isArray(shutdownMarkers) || new Set(shutdownMarkers).size !== shutdownMarkers.length) {
@@ -192,7 +198,9 @@ export async function runPackagedRuntimeEvidence({
   let transcript = "";
   let markerObservedAt = null;
   let settled = false;
-  const append = (chunk) => { transcript += chunk.toString("utf8").replaceAll("\r", ""); };
+  const append = (chunk) => {
+    transcript += chunk.toString("utf8").replaceAll("\r", "");
+  };
   child.stdout.on("data", append);
   child.stderr.on("data", append);
 
@@ -205,7 +213,11 @@ export async function runPackagedRuntimeEvidence({
         const diagnostic = firstRejectedDiagnostic(transcript);
         if (diagnostic) {
           clearInterval(timer);
-          rejectObservation(new Error(`Packaged runtime emitted rejected diagnostic '${diagnostic.id}': ${diagnostic.text}\n${transcript}`));
+          rejectObservation(
+            new Error(
+              `Packaged runtime emitted rejected diagnostic '${diagnostic.id}': ${diagnostic.text}\n${transcript}`,
+            ),
+          );
           return;
         }
         const observed = observedRequiredMarkers(transcript, requiredMarkers);
@@ -219,7 +231,9 @@ export async function runPackagedRuntimeEvidence({
         if (Date.now() - startedAt >= timeoutMs) {
           clearInterval(timer);
           const missing = requiredMarkers.filter((_, index) => !observed[index]);
-          rejectObservation(new Error(`Packaged runtime timed out; missing markers: ${missing.join(" | ")}\n${transcript}`));
+          rejectObservation(
+            new Error(`Packaged runtime timed out; missing markers: ${missing.join(" | ")}\n${transcript}`),
+          );
         }
       }, 20);
       child.once("error", (error) => {
@@ -229,7 +243,11 @@ export async function runPackagedRuntimeEvidence({
       child.once("exit", (exitCode, signal) => {
         if (settled) return;
         clearInterval(timer);
-        rejectObservation(new Error(`Packaged runtime exited before the observation window completed (code=${exitCode}, signal=${signal}):\n${transcript}`));
+        rejectObservation(
+          new Error(
+            `Packaged runtime exited before the observation window completed (code=${exitCode}, signal=${signal}):\n${transcript}`,
+          ),
+        );
       });
     });
   } catch (error) {
@@ -248,7 +266,9 @@ export async function runPackagedRuntimeEvidence({
 
   const diagnostic = firstRejectedDiagnostic(transcript);
   if (diagnostic) {
-    throw new Error(`Packaged runtime emitted rejected diagnostic '${diagnostic.id}' during shutdown: ${diagnostic.text}\n${transcript}`);
+    throw new Error(
+      `Packaged runtime emitted rejected diagnostic '${diagnostic.id}' during shutdown: ${diagnostic.text}\n${transcript}`,
+    );
   }
   // A graceful shutdown is the claim; a non-zero code or a signal means the
   // engine did not shut down the way a game does, whatever else the transcript
@@ -276,17 +296,27 @@ export async function runPackagedRuntimeEvidence({
 }
 
 export function canonicalizeRuntimeTranscript(transcript) {
-  return transcript
-    .replaceAll("\r", "")
-    .split("\n")
-    .map((line) => line.trimEnd())
-    .filter(Boolean)
-    .map((line) => line
-      .replace(/Log server started on port \d+/, "Log server started on port <dynamic>")
-      .replace(/Engine service started on port \d+/, "Engine service started on port <dynamic>")
-      .replace(/Initialized Remotery \(ws:\/\/127\.0\.0\.1:\d+\/rmt\)/, "Initialized Remotery (ws://127.0.0.1:<dynamic>/rmt)")
-      .replace(/Target listening with name: .* - (?:\d{1,3}\.){3}\d{1,3} - Darwin/, "Target listening with name: <host> - <address> - Darwin"))
-    .join("\n") + "\n";
+  return (
+    transcript
+      .replaceAll("\r", "")
+      .split("\n")
+      .map((line) => line.trimEnd())
+      .filter(Boolean)
+      .map((line) =>
+        line
+          .replace(/Log server started on port \d+/, "Log server started on port <dynamic>")
+          .replace(/Engine service started on port \d+/, "Engine service started on port <dynamic>")
+          .replace(
+            /Initialized Remotery \(ws:\/\/127\.0\.0\.1:\d+\/rmt\)/,
+            "Initialized Remotery (ws://127.0.0.1:<dynamic>/rmt)",
+          )
+          .replace(
+            /Target listening with name: .* - (?:\d{1,3}\.){3}\d{1,3} - Darwin/,
+            "Target listening with name: <host> - <address> - Darwin",
+          ),
+      )
+      .join("\n") + "\n"
+  );
 }
 
 export function transcriptEvidence(transcript) {
@@ -321,10 +351,13 @@ export async function sha256Artifact(repositoryRoot, path) {
  */
 export function normalizedDefignoreText(
   text = "",
-  managedEntries = [...BOB_TOOLING_IGNORE_ENTRIES, TYPED_NATIVE_IGNORE_ENTRY]
+  managedEntries = [...BOB_TOOLING_IGNORE_ENTRIES, TYPED_NATIVE_IGNORE_ENTRY],
 ) {
   const managed = new Set(Array.isArray(managedEntries) ? managedEntries : [managedEntries]);
-  const lines = text.replaceAll("\r\n", "\n").replaceAll("\r", "\n").split("\n")
+  const lines = text
+    .replaceAll("\r\n", "\n")
+    .replaceAll("\r", "\n")
+    .split("\n")
     .filter((line) => !managed.has(line.trim()));
   while (lines.length > 0 && lines.at(-1) === "") lines.pop();
   return lines.length === 0 ? "" : `${lines.join("\n")}\n`;
@@ -355,20 +388,32 @@ export async function sha256Tree(repositoryRoot, path, { exclude = () => false }
     const metadata = await lstat(absolute);
     if (metadata.isDirectory()) {
       const entries = await readdir(absolute, { withFileTypes: true });
-      for (const entry of entries.sort((left, right) => left.name < right.name ? -1 : left.name > right.name ? 1 : 0)) {
+      for (const entry of entries.sort((left, right) =>
+        left.name < right.name ? -1 : left.name > right.name ? 1 : 0,
+      )) {
         await visit(join(absolute, entry.name), local ? `${local}/${entry.name}` : entry.name);
       }
       return;
     }
     if (metadata.isSymbolicLink()) {
       const target = await readlink(absolute);
-      records.push({ path: local, kind: "symlink", bytes: Buffer.byteLength(target), sha256: createHash("sha256").update(target).digest("hex") });
+      records.push({
+        path: local,
+        kind: "symlink",
+        bytes: Buffer.byteLength(target),
+        sha256: createHash("sha256").update(target).digest("hex"),
+      });
       bytes += Buffer.byteLength(target);
       return;
     }
     if (!metadata.isFile()) throw new Error(`Unsupported runtime evidence tree entry: ${absolute}`);
     const contents = await readFile(absolute);
-    records.push({ path: local, kind: "file", bytes: metadata.size, sha256: createHash("sha256").update(contents).digest("hex") });
+    records.push({
+      path: local,
+      kind: "file",
+      bytes: metadata.size,
+      sha256: createHash("sha256").update(contents).digest("hex"),
+    });
     bytes += metadata.size;
   }
   await visit(absoluteRoot, "");
@@ -400,20 +445,33 @@ export function buildEvidenceDocument({
   const artifactKey = digestEvidenceInputs(artifacts);
   const sourceKey = digestEvidenceInputs(sourceInputs);
   const transcriptRecord = transcript;
-  if (!transcriptRecord || !Number.isSafeInteger(transcriptRecord.canonicalLineCount) || transcriptRecord.canonicalLineCount <= 0 ||
-      !/^[0-9a-f]{64}$/.test(transcriptRecord.canonicalSha256)) {
+  if (
+    !transcriptRecord ||
+    !Number.isSafeInteger(transcriptRecord.canonicalLineCount) ||
+    transcriptRecord.canonicalLineCount <= 0 ||
+    !/^[0-9a-f]{64}$/.test(transcriptRecord.canonicalSha256)
+  ) {
     throw new Error("Transcript evidence must contain a positive canonical line count and SHA-256 digest");
   }
   // Only a graceful shutdown runs component `final()`, so only a graceful
   // shutdown can be recorded here. A signal-terminated run is a different
   // observation and must not be written into this document's shape.
-  const terminationIsGraceful = termination?.method === "system-exit" &&
-    termination.exitCode === 0 && termination.signal === null &&
-    Number.isSafeInteger(termination.port) && termination.port > 0;
+  const terminationIsGraceful =
+    termination?.method === "system-exit" &&
+    termination.exitCode === 0 &&
+    termination.signal === null &&
+    Number.isSafeInteger(termination.port) &&
+    termination.port > 0;
   if (!terminationIsGraceful) {
-    throw new Error("Transcript evidence must record a clean @system/exit shutdown with the engine service port it was addressed to");
+    throw new Error(
+      "Transcript evidence must record a clean @system/exit shutdown with the engine service port it was addressed to",
+    );
   }
-  if (!Array.isArray(shutdownMarkers) || shutdownMarkers.length === 0 || shutdownMarkers.some((marker) => typeof marker !== "string")) {
+  if (
+    !Array.isArray(shutdownMarkers) ||
+    shutdownMarkers.length === 0 ||
+    shutdownMarkers.some((marker) => typeof marker !== "string")
+  ) {
     throw new Error("Transcript evidence must record the observed component-teardown markers");
   }
   const evidenceKey = createHash("sha256")

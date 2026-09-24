@@ -75,11 +75,7 @@ export function validateInputCommand(command: Readonly<InputCommand>): void {
   unsigned(command.snapshotAckBits, 0xffff_ffff, "snapshotAckBits");
 }
 
-export function writeInputPacket(
-  target: Uint8Array,
-  byteOffset: number,
-  command: Readonly<InputCommand>,
-): number {
+export function writeInputPacket(target: Uint8Array, byteOffset: number, command: Readonly<InputCommand>): number {
   validateInputCommand(command);
   requirePacketRange(target, byteOffset);
   const view = new DataView(target.buffer, target.byteOffset + byteOffset, INPUT_PACKET_BYTES);
@@ -103,17 +99,14 @@ export function writeInputPacket(
   return byteOffset + INPUT_PACKET_BYTES;
 }
 
-export function readInputPacket(
-  source: Uint8Array,
-  byteOffset: number,
-  output: InputCommand,
-): number {
+export function readInputPacket(source: Uint8Array, byteOffset: number, output: InputCommand): number {
   requirePacketRange(source, byteOffset);
   const view = new DataView(source.buffer, source.byteOffset + byteOffset, INPUT_PACKET_BYTES);
   if (view.getUint16(0, true) !== PACKET_MAGIC) throw new Error("input packet magic mismatch");
   if (view.getUint8(2) !== PROTOCOL_VERSION) throw new Error("input packet version mismatch");
   if (view.getUint8(3) !== PACKET_KIND_INPUT) throw new Error("packet is not an input command");
-  if (view.getUint16(30, true) !== packetChecksum(source, byteOffset, 30)) throw new Error("input packet checksum mismatch");
+  if (view.getUint16(30, true) !== packetChecksum(source, byteOffset, 30))
+    throw new Error("input packet checksum mismatch");
   output.matchId = view.getUint32(4, true);
   output.playerId = view.getUint8(8);
   output.buttons = view.getUint8(9);

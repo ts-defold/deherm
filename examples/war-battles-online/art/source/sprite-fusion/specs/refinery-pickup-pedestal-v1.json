@@ -1,0 +1,13 @@
+{
+  "name": "refinery-pickup-pedestal-v1",
+  "operation": "style-reference",
+  "prompt": "One neutral 16x16 top-down pickup pedestal for a volcanic industrial tank arena. Compact dark metal base, four readable corner clamps, empty recessed center reserved for a generated item icon, one-pixel hard outline, charcoal steel and rust palette. Transparent outside the pedestal silhouette. No item symbol, weapon, cross, shield, letters, numbers, character, scene background, perspective, antialiasing, gradient, or soft glow. Match the supplied War Battles pickup footprint while making it feel like one cohesive military refinery prop.",
+  "size": 16,
+  "inputs": [
+    "defold/assets/derived/arena/pickup-pad-1.png",
+    "defold/assets/derived/arena/pickup-health-1.png",
+    "defold/assets/derived/arena/pickup-armor-1.png",
+    "defold/assets/derived/arena/pickup-railgun-1.png",
+    "defold/assets/derived/arena/pickup-overdrive-1.png"
+  ]
+}

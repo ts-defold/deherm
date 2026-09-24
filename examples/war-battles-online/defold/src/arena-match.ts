@@ -53,9 +53,10 @@ export class ArenaMatch {
   private readonly controls: PlayControls = { moveX: 0, moveY: 0, fire: false, boost: false, weapon: 0 };
 
   constructor(options: ArenaOptions) {
-    this.battle = options.mapSeed === undefined || options.mapSeed === 0
-      ? new PlayableBattle({ players: options.players, botSkill: options.botSkill })
-      : new PlayableBattle({ players: options.players, botSkill: options.botSkill, mapSeed: options.mapSeed });
+    this.battle =
+      options.mapSeed === undefined || options.mapSeed === 0
+        ? new PlayableBattle({ players: options.players, botSkill: options.botSkill })
+        : new PlayableBattle({ players: options.players, botSkill: options.botSkill, mapSeed: options.mapSeed });
   }
 
   get world(): BattleWorld | undefined {
@@ -163,7 +164,9 @@ export class ArenaMatch {
   }
 }
 
-const persistent = hmrPersistentState("war-battles/arena-match", () => ({ current: undefined as ArenaMatch | undefined }));
+const persistent = hmrPersistentState("war-battles/arena-match", () => ({
+  current: undefined as ArenaMatch | undefined,
+}));
 
 export function arenaMatch(): ArenaMatch | undefined {
   return persistent.value.current;

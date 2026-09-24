@@ -8,41 +8,66 @@ import {
   liveValueLenses,
   parseInspectorStateDescriptor,
   pollInspectorState,
+  propertyDefaultHints,
   type DevState,
-  type InspectorStateDescriptor
+  type InspectorStateDescriptor,
 } from "../src/live-values.ts";
 
 const descriptor: InspectorStateDescriptor = {
   sessionId: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
   projectRoot: "/work/game",
   stateUrl: "http://127.0.0.1:9333/deherm/dev/v1/snapshot",
-  authToken: "a".repeat(43)
+  authToken: "a".repeat(43),
 };
 
 test("inspector state discovery accepts only the matching project and authenticated loopback endpoint", () => {
-  assert.deepEqual(parseInspectorStateDescriptor({
-    schemaVersion: 1,
-    kind: "deherm-inspector-session",
-    ...descriptor
-  }, "/work/game"), descriptor);
-  assert.equal(parseInspectorStateDescriptor({
-    schemaVersion: 1,
-    kind: "deherm-inspector-session",
-    ...descriptor,
-    stateUrl: "https://example.com/deherm/dev/v1/snapshot"
-  }, "/work/game"), undefined);
-  assert.equal(parseInspectorStateDescriptor({
-    schemaVersion: 1,
-    kind: "deherm-inspector-session",
-    ...descriptor,
-    projectRoot: "/work/other"
-  }, "/work/game"), undefined);
-  assert.equal(parseInspectorStateDescriptor({
-    schemaVersion: 1,
-    kind: "deherm-inspector-session",
-    ...descriptor,
-    authToken: "weak"
-  }, "/work/game"), undefined);
+  assert.deepEqual(
+    parseInspectorStateDescriptor(
+      {
+        schemaVersion: 1,
+        kind: "deherm-inspector-session",
+        ...descriptor,
+      },
+      "/work/game",
+    ),
+    descriptor,
+  );
+  assert.equal(
+    parseInspectorStateDescriptor(
+      {
+        schemaVersion: 1,
+        kind: "deherm-inspector-session",
+        ...descriptor,
+        stateUrl: "https://example.com/deherm/dev/v1/snapshot",
+      },
+      "/work/game",
+    ),
+    undefined,
+  );
+  assert.equal(
+    parseInspectorStateDescriptor(
+      {
+        schemaVersion: 1,
+        kind: "deherm-inspector-session",
+        ...descriptor,
+        projectRoot: "/work/other",
+      },
+      "/work/game",
+    ),
+    undefined,
+  );
+  assert.equal(
+    parseInspectorStateDescriptor(
+      {
+        schemaVersion: 1,
+        kind: "deherm-inspector-session",
+        ...descriptor,
+        authToken: "weak",
+      },
+      "/work/game",
+    ),
+    undefined,
+  );
 });
 
 test("state polling sends bearer and ETag headers without caching", async () => {
@@ -55,9 +80,9 @@ test("state polling sends bearer and ETag headers without caching", async () => 
       calls.push({ input: String(input), init });
       return new Response(JSON.stringify(state), {
         status: 200,
-        headers: { "content-type": "application/json", etag: '"new"' }
+        headers: { "content-type": "application/json", etag: '"new"' },
       });
-    }
+    },
   });
   assert.deepEqual(updated, { kind: "updated", state, etag: '"new"' });
   assert.equal(calls[0].input, descriptor.stateUrl);
@@ -66,19 +91,27 @@ test("state polling sends bearer and ETag headers without caching", async () => 
   assert.equal(calls[0].init?.cache, "no-store");
   assert.equal(calls[0].init?.redirect, "error");
 
-  assert.deepEqual(await pollInspectorState({
-    descriptor,
-    etag: '"new"',
-    fetchState: async () => new Response(null, { status: 304, headers: { etag: '"new"' } })
-  }), { kind: "unchanged", etag: '"new"' });
+  assert.deepEqual(
+    await pollInspectorState({
+      descriptor,
+      etag: '"new"',
+      fetchState: async () => new Response(null, { status: 304, headers: { etag: '"new"' } }),
+    }),
+    { kind: "unchanged", etag: '"new"' },
+  );
 
-  await assert.rejects(() => pollInspectorState({
-    descriptor,
-    fetchState: async () => new Response("{}", {
-      status: 200,
-      headers: { "content-length": String(2 * 1024 * 1024 + 1) }
-    })
-  }), /exceeds the 2 MiB limit/u);
+  await assert.rejects(
+    () =>
+      pollInspectorState({
+        descriptor,
+        fetchState: async () =>
+          new Response("{}", {
+            status: 200,
+            headers: { "content-length": String(2 * 1024 * 1024 + 1) },
+          }),
+      }),
+    /exceeds the 2 MiB limit/u,
+  );
 });
 
 function fixtureState(sampledAt = 10_000): DevState {
@@ -86,76 +119,101 @@ function fixtureState(sampledAt = 10_000): DevState {
     schemaVersion: 1,
     kind: "deherm-dev-state",
     modelVersion: 7,
-    targets: [{
-      id: "local-engine",
-      status: "connected",
-      connectionEpoch: 2,
-      componentSnapshot: { sampledAt, instances: [{
-        componentId: "raw-must-not-render",
-        properties: []
-      }] },
-      instances: [{
-        instanceId: { slot: 3, generation: 1 },
-        componentId: "player",
-        source: "main/player.script.ts",
-        schemaStatus: "current",
-        properties: [
-          { name: "health", value: { kind: "number", value: 100 } },
-          { name: "label", value: { kind: "string", value: "ready" } }
-        ]
-      }, {
-        componentId: "old-player",
-        source: "main/player.script.ts",
-        schemaStatus: "stale",
-        properties: [{ name: "health", value: { kind: "number", value: -1 } }]
-      }, {
-        componentId: "other",
-        source: "main/other.script.ts",
-        schemaStatus: "current",
-        properties: []
-      }]
-    }]
+    targets: [
+      {
+        id: "local-engine",
+        status: "connected",
+        connectionEpoch: 2,
+        componentSnapshot: {
+          sampledAt,
+          instances: [
+            {
+              componentId: "raw-must-not-render",
+              properties: [],
+            },
+          ],
+        },
+        instances: [
+          {
+            instanceId: { slot: 3, generation: 1 },
+            componentId: "player",
+            source: "main/player.script.ts",
+            schemaStatus: "current",
+            properties: [
+              { name: "health", value: { kind: "number", value: 100 } },
+              { name: "label", value: { kind: "string", value: "ready" } },
+            ],
+          },
+          {
+            componentId: "old-player",
+            source: "main/player.script.ts",
+            schemaStatus: "stale",
+            properties: [{ name: "health", value: { kind: "number", value: -1 } }],
+          },
+          {
+            componentId: "other",
+            source: "main/other.script.ts",
+            schemaStatus: "current",
+            properties: [],
+          },
+        ],
+      },
+    ],
   };
 }
 
 test("live lenses consume only server-enriched current schemas for the exact authored source", () => {
-  assert.deepEqual(liveValueLenses({
-    state: fixtureState(),
-    projectRoot: "/work/game",
-    documentPath: "/work/game/main/player.script.ts",
-    now: 10_500
-  }), [{
-    targetId: "local-engine",
-    componentId: "player",
-    title: "$(pulse) local-engine · player [3:1] · health=100, label=\"ready\"",
-    navigation: {
+  assert.deepEqual(
+    liveValueLenses({
+      state: fixtureState(),
       projectRoot: "/work/game",
-      documentPath: "/work/game/main/player.script.ts"
-    }
-  }]);
-  assert.deepEqual(liveValueLenses({
-    state: fixtureState(),
-    projectRoot: "/work/game",
-    documentPath: "/work/game/main/player.ts",
-    now: 10_500
-  }), []);
+      documentPath: "/work/game/main/player.script.ts",
+      now: 10_500,
+    }),
+    [
+      {
+        targetId: "local-engine",
+        componentId: "player",
+        title: '$(pulse) local-engine · player [3:1] · health=100, label="ready"',
+        navigation: {
+          projectRoot: "/work/game",
+          documentPath: "/work/game/main/player.script.ts",
+        },
+      },
+    ],
+  );
+  assert.deepEqual(
+    liveValueLenses({
+      state: fixtureState(),
+      projectRoot: "/work/game",
+      documentPath: "/work/game/main/player.ts",
+      now: 10_500,
+    }),
+    [],
+  );
 });
 
 test("live hints project each authenticated runtime value onto its authored property", () => {
-  assert.deepEqual(liveValueHints({
-    state: fixtureState(),
-    projectRoot: "/work/game",
-    documentPath: "/work/game/main/player.script.ts",
-    now: 10_500
-  }), [{
-    propertyName: "health",
-    label: "= 100",
-    tooltip: "local-engine · player [3:1] · health=100"
-  }, {
-    propertyName: "label",
-    label: "= \"ready\"",
-    tooltip: "local-engine · player [3:1] · label=\"ready\""
-  }]);
+  assert.deepEqual(
+    liveValueHints({
+      state: fixtureState(),
+      projectRoot: "/work/game",
+      documentPath: "/work/game/main/player.script.ts",
+      now: 10_500,
+    }),
+    [
+      {
+        propertyName: "health",
+        label: "= 100",
+        tooltip: "local-engine · player [3:1] · health=100",
+      },
+      {
+        propertyName: "label",
+        label: '= "ready"',
+        tooltip: 'local-engine · player [3:1] · label="ready"',
+      },
+    ],
+  );
 });
 
 test("property anchors match property factory declarations and ignore comments, strings, and type fields", () => {
@@ -168,13 +226,61 @@ test("property anchors match property factory declarations and ignore comments, 
     "  properties: {",
     "    health: property.number(100),",
     "    label:",
-    "      property.string(\"ready\"),",
+    '      property.string("ready"),',
     "  },",
-    "});"
+    "});",
   ].join("\n");
   assert.deepEqual(findPropertyDeclarationAnchors(source, new Set(["health", "label"])), [
     { propertyName: "health", line: 6 },
-    { propertyName: "label", line: 7 }
+    { propertyName: "label", line: 7 },
+  ]);
+});
+
+test("literal property defaults are always available without a running engine", () => {
+  const source = [
+    "// ignored: property.number(99)",
+    "export default defineComponent({",
+    "  properties: {",
+    "    players: property.number(8),",
+    "    enabled: property.boolean(true),",
+    '    title: property.string("War Battles"),',
+    '    fire: property.hash("#fire"),',
+    "    origin: property.vector3(0, -1, 2.5),",
+    "    dynamic: property.number(getDefault()),",
+    "  },",
+    "});",
+  ].join("\n");
+  assert.deepEqual(propertyDefaultHints(source), [
+    {
+      propertyName: "players",
+      line: 3,
+      label: "= 8",
+      tooltip: "Default value from property.number(...)",
+    },
+    {
+      propertyName: "enabled",
+      line: 4,
+      label: "= true",
+      tooltip: "Default value from property.boolean(...)",
+    },
+    {
+      propertyName: "title",
+      line: 5,
+      label: '= "War Battles"',
+      tooltip: "Default value from property.string(...)",
+    },
+    {
+      propertyName: "fire",
+      line: 6,
+      label: "= #fire",
+      tooltip: "Default value from property.hash(...)",
+    },
+    {
+      propertyName: "origin",
+      line: 7,
+      label: "= (0, -1, 2.5)",
+      tooltip: "Default value from property.vector3(...)",
+    },
   ]);
 });
 
@@ -185,47 +291,61 @@ test("raw component snapshot rows are never joined locally even if they mimic en
     componentSnapshot: { instances: unknown[] };
   };
   target.instances = undefined;
-  target.componentSnapshot.instances = [{
-    componentId: "forged",
-    source: "main/player.script.ts",
-    schemaStatus: "current",
-    properties: [{ name: "health", value: { kind: "number", value: 999 } }]
-  }];
-  assert.deepEqual(liveValueLenses({
-    state,
-    projectRoot: "/work/game",
-    documentPath: "/work/game/main/player.script.ts",
-    now: 10_500
-  }), []);
+  target.componentSnapshot.instances = [
+    {
+      componentId: "forged",
+      source: "main/player.script.ts",
+      schemaStatus: "current",
+      properties: [{ name: "health", value: { kind: "number", value: 999 } }],
+    },
+  ];
+  assert.deepEqual(
+    liveValueLenses({
+      state,
+      projectRoot: "/work/game",
+      documentPath: "/work/game/main/player.script.ts",
+      now: 10_500,
+    }),
+    [],
+  );
 });
 
 test("live lenses clear disconnected and aged snapshots instead of retaining stale values", () => {
   const disconnected = fixtureState();
   (disconnected.targets[0] as { status: string }).status = "disconnected";
-  assert.deepEqual(liveValueLenses({
-    state: disconnected,
-    projectRoot: "/work/game",
-    documentPath: "/work/game/main/player.script.ts",
-    now: 10_500
-  }), []);
-  assert.deepEqual(liveValueLenses({
-    state: fixtureState(),
-    projectRoot: "/work/game",
-    documentPath: "/work/game/main/player.script.ts",
-    now: 20_000
-  }), []);
+  assert.deepEqual(
+    liveValueLenses({
+      state: disconnected,
+      projectRoot: "/work/game",
+      documentPath: "/work/game/main/player.script.ts",
+      now: 10_500,
+    }),
+    [],
+  );
+  assert.deepEqual(
+    liveValueLenses({
+      state: fixtureState(),
+      projectRoot: "/work/game",
+      documentPath: "/work/game/main/player.script.ts",
+      now: 20_000,
+    }),
+    [],
+  );
 });
 
 test("snapshot values render bounded scalar, vector, URL, and unavailable forms", () => {
   assert.equal(formatSnapshotValue({ kind: "nil" }), "nil");
   assert.equal(formatSnapshotValue({ kind: "vector3", value: [1, 2, 3] }), "(1, 2, 3)");
-  assert.equal(formatSnapshotValue({
-    kind: "url",
-    socket: "01",
-    reserved: "00",
-    path: "02",
-    fragment: "03"
-  }), "url(01:00:02:03)");
+  assert.equal(
+    formatSnapshotValue({
+      kind: "url",
+      socket: "01",
+      reserved: "00",
+      path: "02",
+      fragment: "03",
+    }),
+    "url(01:00:02:03)",
+  );
   assert.equal(formatSnapshotValue({ kind: "unavailable", reason: "accessor-property" }), "‹accessor-property›");
   assert.equal(formatSnapshotValue({ kind: "string", value: `${"x".repeat(60)}\nsecret` }), `"${"x".repeat(47)}…"`);
 });

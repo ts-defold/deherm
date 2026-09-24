@@ -85,27 +85,44 @@ function linesFrom(child, target) {
 async function terminate(child) {
   if (child === undefined || child.exitCode !== null || child.signalCode !== null) return;
   child.kill("SIGTERM");
-  await Promise.race([
-    new Promise((done) => child.once("exit", done)),
-    new Promise((done) => setTimeout(done, 2_000)),
-  ]);
+  await Promise.race([new Promise((done) => child.once("exit", done)), new Promise((done) => setTimeout(done, 2_000))]);
   if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
 }
 
 function makeCertificate(directory) {
   const cert = join(directory, "localhost.crt");
   const key = join(directory, "localhost.key");
-  execFileSync("openssl", [
-    // Chromium's custom WebTransport certificate verifier accepts short-lived
-    // P-256 certificates pinned by DER SHA-256 without modifying trust state.
-    "req", "-x509", "-newkey", "ec", "-pkeyopt", "ec_paramgen_curve:prime256v1",
-    "-keyout", key, "-out", cert,
-    "-days", "10", "-nodes", "-subj", "/CN=localhost",
-    "-addext", "subjectAltName=DNS:localhost,IP:127.0.0.1",
-    "-addext", "basicConstraints=critical,CA:FALSE",
-    "-addext", "keyUsage=critical,digitalSignature",
-    "-addext", "extendedKeyUsage=serverAuth",
-  ], { stdio: "ignore" });
+  execFileSync(
+    "openssl",
+    [
+      // Chromium's custom WebTransport certificate verifier accepts short-lived
+      // P-256 certificates pinned by DER SHA-256 without modifying trust state.
+      "req",
+      "-x509",
+      "-newkey",
+      "ec",
+      "-pkeyopt",
+      "ec_paramgen_curve:prime256v1",
+      "-keyout",
+      key,
+      "-out",
+      cert,
+      "-days",
+      "10",
+      "-nodes",
+      "-subj",
+      "/CN=localhost",
+      "-addext",
+      "subjectAltName=DNS:localhost,IP:127.0.0.1",
+      "-addext",
+      "basicConstraints=critical,CA:FALSE",
+      "-addext",
+      "keyUsage=critical,digitalSignature",
+      "-addext",
+      "extendedKeyUsage=serverAuth",
+    ],
+    { stdio: "ignore" },
+  );
   const der = execFileSync("openssl", ["x509", "-in", cert, "-outform", "der"]);
   return { cert, key, digest: createHash("sha256").update(der).digest() };
 }
@@ -179,7 +196,7 @@ async function run() {
   let page;
   try {
     const { cert, key, digest } = makeCertificate(scratch);
-    const quicPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_QUIC_PORT ?? "", 10) || await freeLoopbackPort();
+    const quicPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_QUIC_PORT ?? "", 10) || (await freeLoopbackPort());
     const pagePort = await freeLoopbackPort();
     const debuggingPort = await freeLoopbackPort();
     // Deno's unstable upgrade API currently expects the root WebTransport URL;
@@ -203,19 +220,33 @@ async function run() {
     });
     await writeFile(
       join(scratch, "index.html"),
-      "<!doctype html><meta charset=\"utf-8\"><link rel=\"icon\" href=\"data:,\"><title>War Battles QUIC gate</title><script src=\"client.js\"></script>\n",
+      '<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,"><title>War Battles QUIC gate</title><script src="client.js"></script>\n',
     );
 
-    server = spawn(denoBinary, [
-      "run", "--unstable-net", "--allow-net", "--allow-read", "--allow-env",
-      resolve(exampleRoot, "server/deno-main.ts"),
-      "--hostname", "localhost",
-      "--port", String(quicPort),
-      "--cert", cert,
-      "--key", key,
-      "--roster", "32",
-      "--bot-skill", "2",
-    ], { cwd: exampleRoot, stdio: ["ignore", "pipe", "pipe"] });
+    server = spawn(
+      denoBinary,
+      [
+        "run",
+        "--unstable-net",
+        "--allow-net",
+        "--allow-read",
+        "--allow-env",
+        resolve(exampleRoot, "server/deno-main.ts"),
+        "--hostname",
+        "localhost",
+        "--port",
+        String(quicPort),
+        "--cert",
+        cert,
+        "--key",
+        key,
+        "--roster",
+        "32",
+        "--bot-skill",
+        "2",
+      ],
+      { cwd: exampleRoot, stdio: ["ignore", "pipe", "pipe"] },
+    );
     linesFrom(server, serverLines);
     await waitFor(() => serverLines.some((line) => line.includes("war-battles-server:listening:")), {
       timeoutMs: 15_000,
@@ -235,19 +266,29 @@ async function run() {
         ? [`--log-net-log=${join(scratch, "chrome-netlog.json")}`, "--net-log-capture-mode=Everything"]
         : [],
     });
-    const observed = await waitFor(async () => {
-      const result = await page.client.send("Runtime.evaluate", {
-        expression: "globalThis.__warBattlesQuicEvidence ?? null",
-        returnByValue: true,
-      });
-      const value = result.result.value;
-      if (value?.state === "failed" || value?.state === "closed" || value?.state === "rejected" || value?.errors?.length) {
-        const error = new Error(`WebTransport client failed: ${JSON.stringify(value)}; server=${JSON.stringify(serverLines.slice(-20))}`);
-        error.fatal = true;
-        throw error;
-      }
-      return value?.ok ? value : false;
-    }, { timeoutMs: 30_000, intervalMs: 100, what: "a real authoritative QUIC session" });
+    const observed = await waitFor(
+      async () => {
+        const result = await page.client.send("Runtime.evaluate", {
+          expression: "globalThis.__warBattlesQuicEvidence ?? null",
+          returnByValue: true,
+        });
+        const value = result.result.value;
+        if (
+          value?.state === "failed" ||
+          value?.state === "closed" ||
+          value?.state === "rejected" ||
+          value?.errors?.length
+        ) {
+          const error = new Error(
+            `WebTransport client failed: ${JSON.stringify(value)}; server=${JSON.stringify(serverLines.slice(-20))}`,
+          );
+          error.fatal = true;
+          throw error;
+        }
+        return value?.ok ? value : false;
+      },
+      { timeoutMs: 30_000, intervalMs: 100, what: "a real authoritative QUIC session" },
+    );
 
     assert.equal(observed.transport?.protocol, "webtransport-h3");
     assert.equal(observed.transport?.reliableStreams, true);
@@ -260,10 +301,11 @@ async function run() {
     assert.ok(serverLines.some((line) => line.includes("war-battles-server:session-accepted:")));
     assert.ok(serverLines.some((line) => line.includes("war-battles-server:session-joined:chrome-quic-gate:slot=")));
     const acceptedInputMarker = `war-battles-server:stats:inputs-accepted:count=${minimumInputsSent}`;
-    await waitFor(
-      () => serverLines.includes(acceptedInputMarker),
-      { timeoutMs: 5_000, intervalMs: 25, what: "the Deno MatchServer input-acceptance marker" },
-    );
+    await waitFor(() => serverLines.includes(acceptedInputMarker), {
+      timeoutMs: 5_000,
+      intervalMs: 25,
+      what: "the Deno MatchServer input-acceptance marker",
+    });
     assert.deepEqual(observed.errors, []);
 
     const evidence = {
@@ -286,8 +328,8 @@ async function run() {
       server: {
         inputsAcceptedAtLeast: minimumInputsSent,
         markers: serverLines
-        .filter((line) => line.startsWith("war-battles-server:") && !line.includes("certificate-sha256"))
-        .map((line) => line.replaceAll(`https://localhost:${quicPort}`, "https://localhost:<port>")),
+          .filter((line) => line.startsWith("war-battles-server:") && !line.includes("certificate-sha256"))
+          .map((line) => line.replaceAll(`https://localhost:${quicPort}`, "https://localhost:<port>")),
       },
       runtime: {
         deno: execFileSync(denoBinary, ["--version"], { encoding: "utf8" }).split(/\r?\n/u)[0],
@@ -295,11 +337,14 @@ async function run() {
       },
       sourceInputs,
       sourceKey,
-      evidenceBoundary: "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence.",
+      evidenceBoundary:
+        "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence.",
     };
     assertWebTransportEvidence(evidence, { sourceInputs });
     await page.client.send("Runtime.evaluate", { expression: "globalThis.__warBattlesQuicClose?.()" });
-    console.log(`war-battles-webtransport:ok:player=${evidence.playerId}:snapshots=${observed.snapshotsApplied}:inputs=${observed.inputsSent}`);
+    console.log(
+      `war-battles-webtransport:ok:player=${evidence.playerId}:snapshots=${observed.snapshotsApplied}:inputs=${observed.inputsSent}`,
+    );
     if (argumentSet.has("--record-evidence")) {
       await writeFile(evidencePath, `${JSON.stringify(evidence, null, 2)}\n`);
       console.log(`war-battles-webtransport:evidence:${evidencePath}`);
@@ -314,11 +359,15 @@ async function run() {
           returnByValue: true,
         });
         browserEvidence = result?.result.value ?? null;
-      } catch { /* the page may already be gone */ }
+      } catch {
+        /* the page may already be gone */
+      }
       console.error(`war-battles-webtransport:debug:${scratch}`);
       const serverErrors = serverLines.filter((line) => line.includes("war-battles-server:error:")).length;
       console.error(`war-battles-webtransport:server-errors:${serverErrors}`);
-      console.error(`war-battles-webtransport:server:${JSON.stringify([...serverLines.slice(0, 14), ...serverLines.slice(-20)])}`);
+      console.error(
+        `war-battles-webtransport:server:${JSON.stringify([...serverLines.slice(0, 14), ...serverLines.slice(-20)])}`,
+      );
       console.error(`war-battles-webtransport:evidence:${JSON.stringify(browserEvidence)}`);
       console.error(`war-battles-webtransport:browser:${JSON.stringify(page?.client.transcript ?? [])}`);
       console.error(`war-battles-webtransport:failures:${JSON.stringify(page?.client.failures ?? [])}`);

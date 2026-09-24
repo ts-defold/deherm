@@ -18,10 +18,7 @@ export interface DenoWebSocketUpgradeOptions {
  * preserved; tick input is intentionally handled by channel 4 because TCP
  * WebSocket has no datagram equivalent.
  */
-export function acceptDenoWebSocket(
-  request: Request,
-  options: DenoWebSocketUpgradeOptions,
-): Response {
+export function acceptDenoWebSocket(request: Request, options: DenoWebSocketUpgradeOptions): Response {
   const runtime = options.runtime ?? denoWebSocketRuntime();
   const upgraded = runtime.upgradeWebSocket(request);
   const transport = BrowserWebSocketClient.adopt(upgraded.socket, options.receiver);

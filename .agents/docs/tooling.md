@@ -511,9 +511,15 @@ the Live Logs panel rather than written over the terminal UI. A missing Bob
 build fails inside that panel with the expected artifact path. `--no-launch`
 suppresses only the automatic startup launch: the local reload target remains
 configured, `p` still performs a build and launch, and later project/extension
-changes restart an engine that the operator launched manually. The watcher
-excludes `.internal`, `.deherm`, build outputs, and generated proxies so editor
-cache churn and self-authored outputs do not form rebuild loops.
+changes restart an engine that the operator launched manually. Authored
+`.input_binding` changes take the same restart lane because Defold's active
+collection retains the input action table created with its input stack even
+after the compiled resource reload succeeds. The TUI logs the exact
+restart-required sources instead of presenting the resource acknowledgement as
+an HMR activation, and input-binding-only batches bypass the TypeScript
+compiler so an unchanged bundle is not signalled as a new generation. The
+watcher excludes `.internal`, `.deherm`, build outputs, and generated proxies so
+editor cache churn and self-authored outputs do not form rebuild loops.
 
 `deherm language-server --stdio --project <game.project>` is the installed,
 editor-neutral Defold semantic server. It consumes

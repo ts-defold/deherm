@@ -20,6 +20,7 @@ import {
   INPUT_BUTTON_FIRE,
   MAX_PICKUPS,
   MAX_PLAYERS,
+  PLAYER_MODE_INFANTRY,
   TILE_UNITS,
   VELOCITY_SCALE,
 } from "./constants";
@@ -65,10 +66,54 @@ export interface BotDifficulty {
 const difficulty = (row: BotDifficulty): BotDifficulty => Object.freeze(row);
 
 export const BOT_DIFFICULTIES: readonly BotDifficulty[] = Object.freeze([
-  difficulty({ id: 0, name: "recruit", reactionTicks: 24, aimError: 46, leadAccuracy: 10, retreatHealth: 25, trigger: 90, fireCone: 200, strafe: 60, greed: 20 }),
-  difficulty({ id: 1, name: "regular", reactionTicks: 16, aimError: 26, leadAccuracy: 45, retreatHealth: 35, trigger: 150, fireCone: 228, strafe: 130, greed: 60 }),
-  difficulty({ id: 2, name: "veteran", reactionTicks: 10, aimError: 13, leadAccuracy: 80, retreatHealth: 45, trigger: 210, fireCone: 244, strafe: 190, greed: 110 }),
-  difficulty({ id: 3, name: "nightmare", reactionTicks: 5, aimError: 5, leadAccuracy: 100, retreatHealth: 55, trigger: 250, fireCone: 250, strafe: 240, greed: 170 }),
+  difficulty({
+    id: 0,
+    name: "recruit",
+    reactionTicks: 36,
+    aimError: 120,
+    leadAccuracy: 0,
+    retreatHealth: 25,
+    trigger: 48,
+    fireCone: 176,
+    strafe: 60,
+    greed: 20,
+  }),
+  difficulty({
+    id: 1,
+    name: "regular",
+    reactionTicks: 24,
+    aimError: 70,
+    leadAccuracy: 35,
+    retreatHealth: 35,
+    trigger: 105,
+    fireCone: 210,
+    strafe: 130,
+    greed: 60,
+  }),
+  difficulty({
+    id: 2,
+    name: "veteran",
+    reactionTicks: 15,
+    aimError: 38,
+    leadAccuracy: 70,
+    retreatHealth: 45,
+    trigger: 165,
+    fireCone: 234,
+    strafe: 190,
+    greed: 110,
+  }),
+  difficulty({
+    id: 3,
+    name: "nightmare",
+    reactionTicks: 8,
+    aimError: 16,
+    leadAccuracy: 95,
+    retreatHealth: 55,
+    trigger: 225,
+    fireCone: 246,
+    strafe: 240,
+    greed: 170,
+  }),
 ]);
 
 export function botDifficulty(id: number): BotDifficulty {
@@ -79,6 +124,7 @@ const GOAL_FIGHT = 0;
 const GOAL_PICKUP = 1;
 const GOAL_HUNT = 2;
 const GOAL_OBJECTIVE = 3;
+const GOAL_DEPOT = 4;
 
 /**
  * Per-bot memory. Kept outside `BattleWorld` on purpose: it is not authoritative
@@ -90,6 +136,8 @@ export class BotController {
   private readonly goalTarget = new Int16Array(MAX_PLAYERS);
   private readonly goalX = new Int32Array(MAX_PLAYERS);
   private readonly goalY = new Int32Array(MAX_PLAYERS);
+  private readonly aimTargetX = new Int32Array(MAX_PLAYERS);
+  private readonly aimTargetY = new Int32Array(MAX_PLAYERS);
   private readonly decideAt = new Int32Array(MAX_PLAYERS);
   private readonly strafeSign = new Int8Array(MAX_PLAYERS);
   private readonly avoidSign = new Int8Array(MAX_PLAYERS);
@@ -153,30 +201,33 @@ export class BotController {
       const weapon = weaponById(world.playerWeapon[slot]!);
       const branch = world.weaponUpgradeSelected(slot + 1, weapon.id);
       const selectedUpgradeId = weaponUpgradeId(weapon.id, branch);
-      const upgrade = selectedUpgradeId !== 0 && world.weaponUpgradeUnlocked(slot + 1, selectedUpgradeId)
-        ? weaponUpgradeById(selectedUpgradeId)
-        : undefined;
+      const upgrade =
+        selectedUpgradeId !== 0 && world.weaponUpgradeUnlocked(slot + 1, selectedUpgradeId)
+          ? weaponUpgradeById(selectedUpgradeId)
+          : undefined;
       const projectileSpeed = Math.max(1, weapon.projectileSpeed + (upgrade?.projectileSpeedDelta ?? 0));
       const lifetimeTicks = Math.max(1, weapon.lifetimeTicks + (upgrade?.lifetimeDelta ?? 0));
       const splashRadius = Math.max(0, weapon.splashRadius + (upgrade?.splashRadiusDelta ?? 0));
       const bounces = Math.max(0, weapon.bounces + (upgrade?.bouncesDelta ?? 0));
-      const rawX = world.playerX[enemy]! - selfX;
-      const rawY = world.playerY[enemy]! - selfY;
+      // Perception is sampled only on a reaction tick. Between decisions a bot
+      // aims at stale information like a person tracking a moving target, rather
+      // than reading the authoritative position perfectly every frame.
+      const rawX = this.aimTargetX[slot]! - selfX;
+      const rawY = this.aimTargetY[slot]! - selfY;
       const distance = length(rawX, rawY);
-      // Lead by the flight time, scaled by how good this bot is supposed to be.
-      const flightTicks = Math.trunc(distance / projectileSpeed);
-      const leadScale = Math.trunc((flightTicks * skill.leadAccuracy) / 100);
-      const leadX = rawX + Math.trunc((world.playerVelocityX[enemy]! * leadScale) / VELOCITY_SCALE);
-      const leadY = rawY + Math.trunc((world.playerVelocityY[enemy]! * leadScale) / VELOCITY_SCALE);
-      if (normalizeInto(leadX, leadY, this.aim)) {
-        const error = mixSigned(tick, (slot + 1) * 0x9e37, skill.aimError);
+      if (normalizeInto(rawX, rawY, this.aim)) {
+        // The bias is persistent for this reaction window. Easy bots commit to
+        // a bad shot instead of receiving a fresh roll that converges on target.
+        const error = mixSigned(this.decideAt[slot]!, (slot + 1) * 0x9e37, skill.aimError);
         // Nudge the aim sideways by the error, then renormalise: an integer
         // approximation of a small rotation, with no trigonometry.
-        if (!normalizeInto(
-          this.aim.x * DIRECTION_SCALE - this.aim.y * error,
-          this.aim.y * DIRECTION_SCALE + this.aim.x * error,
-          this.aim,
-        )) {
+        if (
+          !normalizeInto(
+            this.aim.x * DIRECTION_SCALE - this.aim.y * error,
+            this.aim.y * DIRECTION_SCALE + this.aim.x * error,
+            this.aim,
+          )
+        ) {
           this.aim.x = DIRECTION_SCALE;
           this.aim.y = 0;
         }
@@ -185,7 +236,8 @@ export class BotController {
       }
       const inRange = distance < projectileSpeed * lifetimeTicks;
       const alignment = Math.trunc(
-        (world.playerTurretX[slot]! * aimX + world.playerTurretY[slot]! * aimY) / DIRECTION_SCALE);
+        (world.playerTurretX[slot]! * aimX + world.playerTurretY[slot]! * aimY) / DIRECTION_SCALE,
+      );
       const sighted = bounces > 0 || world.map.lineOfSight(selfX, selfY, world.playerX[enemy]!, world.playerY[enemy]!);
       // A mortar fired into a wall two metres away kills its owner, so splash
       // weapons hold fire at point-blank range.
@@ -208,7 +260,8 @@ export class BotController {
   }
 
   private detectStuck(world: BattleWorld, slot: number): void {
-    const moved = Math.abs(world.playerX[slot]! - this.lastX[slot]!) + Math.abs(world.playerY[slot]! - this.lastY[slot]!);
+    const moved =
+      Math.abs(world.playerX[slot]! - this.lastX[slot]!) + Math.abs(world.playerY[slot]! - this.lastY[slot]!);
     this.lastX[slot] = world.playerX[slot]!;
     this.lastY[slot] = world.playerY[slot]!;
     if (moved < TILE_UNITS / 8) {
@@ -226,6 +279,16 @@ export class BotController {
   }
 
   private decide(world: BattleWorld, slot: number, skill: BotDifficulty, tick: number): void {
+    const enemy = nearestEnemy(world, slot);
+    this.goalTarget[slot] = enemy;
+    this.sampleAim(world, slot, enemy, skill);
+    if (world.playerMode[slot] === PLAYER_MODE_INFANTRY) {
+      const depot = world.nearestTankDepot(slot + 1);
+      this.goal[slot] = GOAL_DEPOT;
+      this.goalX[slot] = world.map.spawnX[depot]!;
+      this.goalY[slot] = world.map.spawnY[depot]!;
+      return;
+    }
     // Chassis purchases use the same authoritative credit path as a human
     // control message. The hash keeps the upgrade cadence deterministic while
     // the fixed roster assignment still gives a match four roles immediately.
@@ -242,8 +305,6 @@ export class BotController {
     if (world.playerCredits[slot]! >= weaponUpgrade.cost || world.weaponUpgradeUnlocked(slot + 1, weaponUpgrade.id)) {
       world.applyWeaponUpgrade(slot + 1, weaponUpgrade.id);
     }
-    const enemy = nearestEnemy(world, slot);
-    this.goalTarget[slot] = enemy;
     const vitality = world.playerHealth[slot]! + world.playerArmor[slot]!;
     const hurt = vitality * 100 < skill.retreatHealth * 200;
     const weakWeapon = world.playerWeapon[slot] === SPAWN_WEAPON;
@@ -259,8 +320,11 @@ export class BotController {
     // Team bots periodically contest the central beacon. They still fight on
     // sight, but this stable cadence makes team matches produce real pushes and
     // counter-pushes instead of collapsing into free-for-all behaviour.
-    if (world.playerTeam[slot] !== 0 && (hash(tick, slot * 19 + 31) & 0xff) < 96
-      && (world.objectiveOwner !== world.playerTeam[slot] || Math.abs(world.objectiveProgress) < 120)) {
+    if (
+      world.playerTeam[slot] !== 0 &&
+      (hash(tick, slot * 19 + 31) & 0xff) < 96 &&
+      (world.objectiveOwner !== world.playerTeam[slot] || Math.abs(world.objectiveProgress) < 120)
+    ) {
       this.goal[slot] = GOAL_OBJECTIVE;
       this.goalX[slot] = 0;
       this.goalY[slot] = 0;
@@ -272,11 +336,33 @@ export class BotController {
       this.goalY[slot] = world.pickupY[(slot * 3) % MAX_PICKUPS]!;
       return;
     }
-    const sighted = world.map.lineOfSight(world.playerX[slot]!, world.playerY[slot]!, world.playerX[enemy]!, world.playerY[enemy]!);
+    const sighted = world.map.lineOfSight(
+      world.playerX[slot]!,
+      world.playerY[slot]!,
+      world.playerX[enemy]!,
+      world.playerY[enemy]!,
+    );
     this.goal[slot] = sighted ? GOAL_FIGHT : GOAL_HUNT;
     this.goalX[slot] = world.playerX[enemy]!;
     this.goalY[slot] = world.playerY[enemy]!;
     if ((hash(tick, slot * 11 + 5) & 0x3f) === 0) this.strafeSign[slot] = this.strafeSign[slot]! > 0 ? -1 : 1;
+  }
+
+  private sampleAim(world: BattleWorld, slot: number, enemy: number, skill: BotDifficulty): void {
+    if (enemy < 0) {
+      this.aimTargetX[slot] = world.playerX[slot]! + world.playerTurretX[slot]! * TILE_UNITS;
+      this.aimTargetY[slot] = world.playerY[slot]! + world.playerTurretY[slot]! * TILE_UNITS;
+      return;
+    }
+    const weapon = weaponById(world.playerWeapon[slot]!);
+    const dx = world.playerX[enemy]! - world.playerX[slot]!;
+    const dy = world.playerY[enemy]! - world.playerY[slot]!;
+    const flightTicks = Math.trunc(length(dx, dy) / Math.max(1, weapon.projectileSpeed));
+    const leadTicks = Math.trunc((flightTicks * skill.leadAccuracy) / 100);
+    this.aimTargetX[slot] =
+      world.playerX[enemy]! + Math.trunc((world.playerVelocityX[enemy]! * leadTicks) / VELOCITY_SCALE);
+    this.aimTargetY[slot] =
+      world.playerY[enemy]! + Math.trunc((world.playerVelocityY[enemy]! * leadTicks) / VELOCITY_SCALE);
   }
 
   /** The nearest live pad worth walking to, or -1. */
@@ -388,6 +474,7 @@ export class BotController {
   }
 
   private bestWeapon(world: BattleWorld, slot: number): number {
+    if (world.playerMode[slot] === PLAYER_MODE_INFANTRY) return SPAWN_WEAPON;
     let best = SPAWN_WEAPON;
     let bestPreference = weaponById(SPAWN_WEAPON).botPreference;
     for (let weaponId = 1; weaponId <= WEAPON_COUNT; weaponId += 1) {

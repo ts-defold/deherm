@@ -31,6 +31,8 @@ test("all generated native handle routes cross the pinned Lua 5.1 router", { tim
   assert.match(output, /script-handle-router:allocation-failure-retry:ok/);
   assert.match(output, /script-handle-router:attachment-lifecycle:roots-stale-reuse:ok/);
   assert.match(output, /script-handle-router:attachment-lifecycle-allocations:0/);
+  assert.match(output, /script-handle-router:gui-producer-consumer:optional-stale-kind:ok/);
+  assert.match(output, /script-handle-router:gui-bridge-allocations:0/);
   assert.match(output, /script-handle-router:reentrant-blocked:ok/);
   assert.match(output, /script-handle-router:allocations:0/);
 });

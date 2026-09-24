@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_7a8f3f14-a08d-4ccc-8ec5-7d067ad1a89e",
+  "operation": "style-reference",
+  "prompt": "A square communications portrait of the same elderly tank driver archetype: huge white moustache and beard, brown leather tanker cap, silver goggles on his forehead, green military collar, determined three-quarter expression facing right. Match the supplied War Battles portrait palette, outline weight, facial proportions, and chunky military arcade pixel-art rendering. The head and shoulders fill the frame with breathing room at the edges. No frame, text, icon, weapon, background scene, or extra character.",
+  "size": 64,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/faces/driver/angry.png",
+      "bytes": 2045,
+      "sha256": "876c5643fdcffdb2a597fef7d5532222cd7d94627d73f400b0684622b83436f5"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/faces/driver/happy.png",
+      "bytes": 2013,
+      "sha256": "e0fa47e74b24d0233532b52da8ca21de69c831b71a466d2716a3eb1b9ef34bb8"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/faces/driver/sad.png",
+      "bytes": 1993,
+      "sha256": "01fb87733397ce26a60cd3afbcc54b8a526f9024165f8470d39efd83294b16b8"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/faces/captain/angry.png",
+      "bytes": 1453,
+      "sha256": "5f4a96d75a3408ba1e27a880e00166ec15a357445082e5646d77b986c9e0642d"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/ui/hud-panel.png",
+      "bytes": 2587,
+      "sha256": "b173aa2d9a718ef33c78c27aa0d6d1256f8067ef7fd797e9328c54c3b1f2f2c9"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/driver-portrait-base-v1.json",
+    "sha256": "bf71846e46a36a301c73930786fef4ed3956850767745d0e90d9323d398eae64"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "3439f9ae-ec65-4bb4-9536-4b0603173446",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3439f9ae-ec65-4bb4-9536-4b0603173446/image.png?v=1790268411321",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/00.png",
+      "bytes": 6687,
+      "sha256": "363f1857101efe23ccbaaea0dd6e0405779395eeb0df1a7b840e9bbf4b4b5537"
+    },
+    {
+      "index": 1,
+      "assetId": "683061e6-bcec-452c-96b6-da0c39f87143",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/683061e6-bcec-452c-96b6-da0c39f87143/image.png?v=1790268412048",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/01.png",
+      "bytes": 5614,
+      "sha256": "96003faa722cfbc4d07ecaff5f08ebf4f6bd8580addd7a7e3a1c02e041794f9e"
+    },
+    {
+      "index": 2,
+      "assetId": "ea4a320e-37a0-42aa-a84b-d57ca301a834",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ea4a320e-37a0-42aa-a84b-d57ca301a834/image.png?v=1790268412800",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/02.png",
+      "bytes": 6086,
+      "sha256": "4c477724a35a016910f06f535aa5e55131feb4c5ee3268224b2e8c27af577e3c"
+    },
+    {
+      "index": 3,
+      "assetId": "2c537204-68a9-47a8-a8b4-8d05335e912d",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/2c537204-68a9-47a8-a8b4-8d05335e912d/image.png?v=1790268413425",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/03.png",
+      "bytes": 6988,
+      "sha256": "e7ba1ca42b3c55dcddd426d2bbb0051eb2f4aa35732538ba05a85663e21cec7e"
+    },
+    {
+      "index": 4,
+      "assetId": "73c43e53-939b-41ff-a886-47effa0ac697",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/73c43e53-939b-41ff-a886-47effa0ac697/image.png?v=1790268414078",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/04.png",
+      "bytes": 5951,
+      "sha256": "bba9fee9c4362a6e6c3ae7572567c7f558cd022c4dfe2eae5b325623ccc79040"
+    },
+    {
+      "index": 5,
+      "assetId": "ebde0a6c-16e4-4346-86ba-98447d93fd9e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/ebde0a6c-16e4-4346-86ba-98447d93fd9e/image.png?v=1790268414794",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/05.png",
+      "bytes": 6607,
+      "sha256": "ec9f8f5cff5970aa6cb1c7f6cce0ce43d9d9ee6ec4b021c4f688257289a6ea47"
+    },
+    {
+      "index": 6,
+      "assetId": "5d6db9a0-77b7-4c54-8d71-4e36bbbebc1a",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5d6db9a0-77b7-4c54-8d71-4e36bbbebc1a/image.png?v=1790268415525",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/06.png",
+      "bytes": 5848,
+      "sha256": "26745290a44bdcf89e33b725b815bb11beff2f4f6c7dab22361d84d0baffa5fe"
+    },
+    {
+      "index": 7,
+      "assetId": "15cafe9b-0d5b-41d2-b4ae-ef667d39492f",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/15cafe9b-0d5b-41d2-b4ae-ef667d39492f/image.png?v=1790268416241",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/07.png",
+      "bytes": 6193,
+      "sha256": "33eac0f57b15c1c72f0c171186f1d9942a62e18c2087cef997fa3fa0bc974052"
+    },
+    {
+      "index": 8,
+      "assetId": "3a424327-57c3-4bb5-92f0-6fb82b3a2908",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 64,
+      "height": 64,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/3a424327-57c3-4bb5-92f0-6fb82b3a2908/image.png?v=1790268416974",
+      "path": "art/source/sprite-fusion/outputs/driver-portrait-base-v1/08.png",
+      "bytes": 6127,
+      "sha256": "ff742c57bf117679ef6680538d08b319517fb19960f9d7bbf5e82cb5c213f696"
+    }
+  ],
+  "credits": {
+    "remaining": 3285
+  }
+}

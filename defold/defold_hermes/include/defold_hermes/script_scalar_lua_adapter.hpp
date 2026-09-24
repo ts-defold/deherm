@@ -78,6 +78,8 @@ class ScriptAdapter {
       size_t errorCapacity) noexcept;
   static void RetainLuaClosure(void* context) noexcept;
   static void ReleaseLuaClosure(void* context) noexcept;
+  static bool PushLegacyGuiNodeThunk(
+      void* context, const ScriptValue& value, char* error, size_t errorCapacity) noexcept;
   static value_binding::DispatchStatus StructuredInvokeThunk(
       void* context,
       const value_binding::StructuredLuaOperation& operation,

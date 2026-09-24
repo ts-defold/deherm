@@ -75,9 +75,7 @@
       },
       "invocation": {
         "capture": "createdId",
-        "arguments": [
-          { "kind": "literal", "value": "#probe_factory" }
-        ]
+        "arguments": [{ "kind": "literal", "value": "#probe_factory" }]
       },
       "assertions": [
         "factory-child-init-runs-with-child-context",
@@ -101,14 +99,9 @@
         "async": true
       },
       "invocation": {
-        "arguments": [
-          { "kind": "capture", "name": "createdId" }
-        ]
+        "arguments": [{ "kind": "capture", "name": "createdId" }]
       },
-      "assertions": [
-        "created-object-remains-live-until-end-of-frame",
-        "created-object-is-deleted-after-end-of-frame"
-      ],
+      "assertions": ["created-object-remains-live-until-end-of-frame", "created-object-is-deleted-after-end-of-frame"],
       "assertionHarnessState": "planned"
     },
     {
@@ -128,9 +121,7 @@
       },
       "invocation": {
         "capture": "statusNode",
-        "arguments": [
-          { "kind": "literal", "value": "status" }
-        ]
+        "arguments": [{ "kind": "literal", "value": "status" }]
       },
       "assertions": [
         "active-gui-scene-token-required",

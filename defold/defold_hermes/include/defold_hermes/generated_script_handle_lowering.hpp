@@ -84,6 +84,7 @@ struct Route {
   Disposition html5BrowserHost;
   uint16_t argumentOffset;
   uint16_t resultOffset;
+  uint8_t requiredArgumentCount;
   uint8_t argumentCount;
   uint8_t resultCount;
 };
@@ -151,7 +152,7 @@ bool handleKindCapturableInProfile(SemanticHandleKind kind, const RuntimeProfile
 /** Generated telemetry identity for the lua-stack transport. Declared only when
  *  DEHERM_PROFILE is on; with the switch off neither the declarations nor the
  *  tables behind them exist. */
-inline constexpr uint16_t kContractShapeCount = 151;
+inline constexpr uint16_t kContractShapeCount = 152;
 /** Dense contract-shape id for a route, indexed by Route::index. */
 uint16_t profileContractShape(uint16_t routeIndex) noexcept;
 /** Cold dmProfile scope name for a route, indexed by Route::index. */
@@ -160,12 +161,19 @@ const char* profileRouteName(uint16_t routeIndex) noexcept;
 const char* profileContractShapeName(uint16_t shapeId) noexcept;
 #endif
 
+/** The owning adapter resolves legacy GUI tokens in its separate handle pool. */
+struct LegacyHandleApi {
+  void* context = nullptr;
+  bool (*pushGuiNode)(void*, const ScriptValue&, char*, size_t) noexcept = nullptr;
+};
+
 /** One fixed-capacity captured-Lua executor shared by every emitted handle route. */
 class CapturedLuaRouter {
  public:
   CapturedLuaRouter(lua_State* state, lua_bridge::LuaValueRegistry& registry,
       const RuntimeProfile& activeProfile,
-      lua_bridge::scalar::InstanceApi instanceApi = {}) noexcept;
+      lua_bridge::scalar::InstanceApi instanceApi = {},
+      LegacyHandleApi legacyHandles = {}) noexcept;
   ~CapturedLuaRouter();
   CapturedLuaRouter(const CapturedLuaRouter&) = delete;
   CapturedLuaRouter& operator=(const CapturedLuaRouter&) = delete;
@@ -200,6 +208,7 @@ class CapturedLuaRouter {
   lua_bridge::LuaValueRegistry* registry_ = nullptr;
   const RuntimeProfile* activeProfile_ = nullptr;
   lua_bridge::scalar::InstanceApi instanceApi_{};
+  LegacyHandleApi legacyHandles_{};
   int instanceRef_ = -2;
   int captureInstanceTrampolineRef_ = -2;
   int captureHandleTrampolineRef_ = -2;

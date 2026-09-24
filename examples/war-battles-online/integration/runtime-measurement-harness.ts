@@ -41,9 +41,11 @@ function monotonicNow(): () => number {
 }
 
 function readMemory(): RuntimeMemory | null {
-  const denoLike = (globalThis as unknown as {
-    Deno?: { memoryUsage?: () => Record<string, number> };
-  }).Deno;
+  const denoLike = (
+    globalThis as unknown as {
+      Deno?: { memoryUsage?: () => Record<string, number> };
+    }
+  ).Deno;
   if (typeof denoLike?.memoryUsage === "function") {
     const value = denoLike.memoryUsage();
     return {
@@ -54,9 +56,11 @@ function readMemory(): RuntimeMemory | null {
       arrayBuffersBytes: value.arrayBuffers,
     };
   }
-  const processLike = (globalThis as unknown as {
-    process?: { memoryUsage?: () => Record<string, number> };
-  }).process;
+  const processLike = (
+    globalThis as unknown as {
+      process?: { memoryUsage?: () => Record<string, number> };
+    }
+  ).process;
   if (typeof processLike?.memoryUsage === "function") {
     const value = processLike.memoryUsage();
     return {
@@ -89,7 +93,7 @@ function summarize(values: readonly number[]): Record<string, number | null> {
     samples: measured.length,
     minimum: Math.min(...measured),
     mean: measured.reduce((sum, value) => sum + value, 0) / measured.length,
-    p50: percentile(measured, 0.50),
+    p50: percentile(measured, 0.5),
     p95: percentile(measured, 0.95),
     p99: percentile(measured, 0.99),
     maximum: Math.max(...measured),
@@ -175,7 +179,8 @@ export async function runRuntimeMeasurement(): Promise<RuntimeMeasurementEvidenc
       measured: false,
       perTick: null,
       zeroClaim: false,
-      reason: "Runtime memory snapshots show resident/heap state only; they do not count allocations or prove allocation-free execution.",
+      reason:
+        "Runtime memory snapshots show resident/heap state only; they do not count allocations or prove allocation-free execution.",
     },
   });
 }

@@ -168,7 +168,8 @@ bool ScriptAdapter::initialize(lua_State* state, InstanceApi instanceApi,
   semanticHandleRegistry_ = std::make_unique<::defold_hermes::lua_bridge::LuaValueRegistry>(
       state_, runtimeGeneration_, kLuaHandleCapacity, kLuaHandleCapacity, semanticRegistryApi_);
   handleRouter_ = std::make_unique<::defold_hermes::script_handle_lowering::CapturedLuaRouter>(
-      state_, *semanticHandleRegistry_, *runtimeProfile_, instanceApi_);
+      state_, *semanticHandleRegistry_, *runtimeProfile_, instanceApi_,
+      ::defold_hermes::script_handle_lowering::LegacyHandleApi{this, PushLegacyGuiNodeThunk});
   structuredFunctionRefs_.fill(LUA_NOREF);
   fixedTupleFunctionRefs_.fill(LUA_NOREF);
   urlFunctionRefs_.fill(LUA_NOREF);
@@ -827,6 +828,21 @@ bool ScriptAdapter::InvokeLuaClosure(
   if (!ok) return reject(adapter->lastError());
   adapter->adapterError_[0] = '\0';
   return true;
+}
+
+bool ScriptAdapter::PushLegacyGuiNodeThunk(
+    void* context, const ScriptValue& value, char* error, size_t errorCapacity) noexcept {
+  auto* adapter = static_cast<ScriptAdapter*>(context);
+  if (value.tag != ScriptValueTag::kHandle || value.handleKind != ScriptHandleKind::kGuiNode) {
+    writeError(error, errorCapacity, "Legacy GUI bridge requires a GUI node handle");
+    return false;
+  }
+  // Keep resolution with the pool that captured the token. The generated
+  // router has already checked the expected semantic kind, and calls this
+  // inside ProtectedDispatch; no second registry root or wrapper is created.
+  if (adapter->pushStructuredValue(value, nullptr)) return true;
+  if (error != adapter->adapterError_) writeError(error, errorCapacity, adapter->lastError());
+  return false;
 }
 
 value_binding::DispatchStatus ScriptAdapter::StructuredInvokeThunk(

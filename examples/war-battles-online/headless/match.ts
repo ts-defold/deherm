@@ -1,9 +1,4 @@
-import {
-  MAX_PLAYERS,
-  SNAPSHOT_BYTES,
-  createPlayerView,
-  type PlayerView,
-} from "../core/index.ts";
+import { MAX_PLAYERS, SNAPSHOT_BYTES, createPlayerView, type PlayerView } from "../core/index.ts";
 import { initializeFixtureWorld } from "./fixture.ts";
 import { emptyCommand, readReplayCommand, readReplayHeader } from "./replay.ts";
 
@@ -88,7 +83,8 @@ function validateRollback(rollback: Readonly<RollbackPlan> | undefined, ticks: n
     rollback.restoreTick < 1 ||
     rollback.triggerTick <= rollback.restoreTick ||
     rollback.triggerTick > ticks
-  ) throw new RangeError("rollback plan must satisfy 1 <= restoreTick < triggerTick <= ticks");
+  )
+    throw new RangeError("rollback plan must satisfy 1 <= restoreTick < triggerTick <= ticks");
 }
 
 function emptyPlayerView(): PlayerView {

@@ -8,22 +8,30 @@
     ".": "./core/index.ts"
   },
   "scripts": {
+    "lint": "oxlint .",
+    "format": "oxfmt --write \"**/*.{js,mjs,cjs,ts,tsx,json,jsonc,md}\"",
+    "format:check": "oxfmt --check \"**/*.{js,mjs,cjs,ts,tsx,json,jsonc,md}\"",
     "sound": "node tools/generate-sound.mjs",
     "sound:check": "node tools/generate-sound.mjs --check",
     "art": "node tools/generate-art.mjs",
     "art:check": "node tools/generate-art.mjs --check",
+    "art:spritefusion": "node tools/sprite-fusion.mjs --spec",
+    "world-art": "node tools/generate-world-art.mjs",
+    "world-art:check": "node tools/generate-world-art.mjs --check",
+    "hud-art": "node tools/generate-hud-art.mjs",
+    "hud-art:check": "node tools/generate-hud-art.mjs --check",
     "tilemap": "node tools/generate-arena-tilemap.mjs",
     "tilemap:check": "node tools/generate-arena-tilemap.mjs --check",
     "sync": "node integration/sync-defold-sources.mjs",
     "sync:check": "node integration/sync-defold-sources.mjs --check",
-    "generate": "deherm generate --project defold && pnpm sync && node integration/generate-capability-snapshot.mjs",
-    "verify:generated": "deherm verify-generated --project defold && pnpm sync:check && pnpm art:check && pnpm sound:check && pnpm tilemap:check && node integration/generate-capability-snapshot.mjs --check",
+    "generate": "deherm generate --project defold && pnpm sync && pnpm world-art && pnpm art && pnpm hud-art && pnpm sound && pnpm tilemap && node integration/generate-capability-snapshot.mjs",
+    "verify:generated": "deherm verify-generated --project defold && pnpm sync:check && pnpm world-art:check && pnpm art:check && pnpm hud-art:check && pnpm sound:check && pnpm tilemap:check && node integration/generate-capability-snapshot.mjs --check",
     "check:typed-native-bridge": "pnpm --dir ../.. check:war-battles-static-hermes-typed-native-bridge",
     "gate:typed-native-bridge": "pnpm --dir ../.. gate:war-battles-static-hermes-typed-native-bridge",
     "typecheck": "tsc -p tsconfig.json --noEmit && deherm typecheck --project defold",
-    "test": "node --test test/core.test.mjs test/integration.test.mjs test/docker-durability.test.mjs test/session-durable.test.mjs test/world-checkpoint.test.mjs test/websocket-fallback.test.mjs test/packaged-online-fallback.test.mjs test/hmr-state-soak.test.mjs test/packaged-runtime-evidence.test.mjs test/webtransport-evidence.test.mjs test/authoritative-load.test.mjs test/performance-evidence.test.mjs test/runtime-measurement.test.mjs test/vscode-visual-evidence.test.mjs",
+    "test": "node --test test/core.test.mjs test/integration.test.mjs test/world-art.test.mjs test/docker-durability.test.mjs test/session-durable.test.mjs test/world-checkpoint.test.mjs test/websocket-fallback.test.mjs test/packaged-online-fallback.test.mjs test/hmr-state-soak.test.mjs test/packaged-runtime-evidence.test.mjs test/webtransport-evidence.test.mjs test/authoritative-load.test.mjs test/performance-evidence.test.mjs test/runtime-measurement.test.mjs test/vscode-visual-evidence.test.mjs",
     "test:websocket": "node --test test/websocket-fallback.test.mjs",
-    "check": "pnpm verify:generated && pnpm check:typed-native-bridge && pnpm typecheck && pnpm test",
+    "check": "pnpm lint && pnpm format:check && pnpm verify:generated && pnpm check:typed-native-bridge && pnpm typecheck && pnpm test",
     "serve": "deno run --unstable-net --allow-net --allow-read --allow-write --allow-env server/deno-main.ts",
     "server:cert": "./server/make-cert.sh",
     "runtime:multiplayer": "node integration/check-local-multiplayer.mjs",
@@ -83,6 +91,8 @@
   },
   "devDependencies": {
     "esbuild": "0.25.10",
+    "oxfmt": "0.70.0",
+    "oxlint": "1.85.0",
     "typescript": "7.0.2"
   }
 }

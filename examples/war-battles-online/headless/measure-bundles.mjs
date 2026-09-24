@@ -83,15 +83,13 @@ async function walk(directory, output) {
     // presence changes with the requested Bob target and belongs to that same
     // generated build state rather than the authored source census.
     if (entry.isFile() && entry.name === ".defignore") continue;
-    if (entry.isDirectory() && [
-      ".deherm",
-      ".internal",
-      ".vscode",
-      "build",
-      "deherm",
-      "defold_hermes",
-      "defold_hermes_typed_native"
-    ].includes(entry.name)) continue;
+    if (
+      entry.isDirectory() &&
+      [".deherm", ".internal", ".vscode", "build", "deherm", "defold_hermes", "defold_hermes_typed_native"].includes(
+        entry.name,
+      )
+    )
+      continue;
     const path = join(directory, entry.name);
     if (entry.isDirectory()) await walk(path, output);
     else if (entry.isSymbolicLink()) continue;

@@ -4,10 +4,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import test from "node:test";
 
-import {
-  assertPerformanceEvidence,
-  buildPerformanceSourceInputs,
-} from "../integration/performance-evidence.mjs";
+import { assertPerformanceEvidence, buildPerformanceSourceInputs } from "../integration/performance-evidence.mjs";
 
 const exampleRoot = path.resolve(import.meta.dirname, "..");
 const repositoryRoot = path.resolve(exampleRoot, "../..");
@@ -18,10 +15,13 @@ test("performance/operability evidence is source-bound and fresh", async () => {
   const sourceInputs = await buildPerformanceSourceInputs();
   const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
   assertPerformanceEvidence(evidence, { sourceInputs });
-  assert.match(execFileSync(process.execPath, [gatePath, "--check-evidence"], {
-    cwd: repositoryRoot,
-    encoding: "utf8",
-  }), /war-battles-performance-evidence:fresh:/u);
+  assert.match(
+    execFileSync(process.execPath, [gatePath, "--check-evidence"], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+    }),
+    /war-battles-performance-evidence:fresh:/u,
+  );
 });
 
 test("performance evidence keeps observable and unobservable boundaries explicit", async () => {

@@ -25,12 +25,7 @@
 import { createHash } from "node:crypto";
 
 /** The four parameters that select a projection, in their canonical order. */
-export const PROJECTION_PARAMETERS = Object.freeze([
-  "runtime",
-  "transport",
-  "reachableSet",
-  "profile",
-]);
+export const PROJECTION_PARAMETERS = Object.freeze(["runtime", "transport", "reachableSet", "profile"]);
 
 /** Keys every projection envelope carries, in their canonical order. */
 export const PROJECTION_ENVELOPE_KEYS = Object.freeze([
@@ -42,12 +37,13 @@ export const PROJECTION_ENVELOPE_KEYS = Object.freeze([
   "excluded",
 ]);
 
-const declare = (declaration) => Object.freeze({
-  ...declaration,
-  transport: Object.freeze([...declaration.transport]),
-  observed: Object.freeze([...declaration.observed]),
-  excluded: Object.freeze([...declaration.excluded]),
-});
+const declare = (declaration) =>
+  Object.freeze({
+    ...declaration,
+    transport: Object.freeze([...declaration.transport]),
+    observed: Object.freeze([...declaration.observed]),
+    excluded: Object.freeze([...declaration.excluded]),
+  });
 
 export const WAR_BATTLES_PROJECTIONS = Object.freeze({
   "native-arm64-macos": declare({
@@ -115,7 +111,8 @@ export const WAR_BATTLES_PROJECTIONS = Object.freeze({
     profile: "DEHERM_PROFILE",
     stage: "packaged-engine-runtime",
     evidence: "evidence/packaged-typed-native-transport-arm64-macos.json",
-    producer: "node scripts/assemble-typed-native-extension.mjs --project examples/war-battles-online/defold --profile, then a packaged run whose census is recorded by hand",
+    producer:
+      "node scripts/assemble-typed-native-extension.mjs --project examples/war-battles-online/defold --profile, then a packaged run whose census is recorded by hand",
     observed: [
       "An engine assembled with transport telemetry on reported, per route, which transport each binding crossing actually took, with the span durations its producer ring recorded.",
       "The AOT `extern_c` unit and the bytecode bundle evaluated into one Hermes runtime, and the unit installed itself over the script bridge.",
@@ -142,19 +139,20 @@ export const WAR_BATTLES_PROJECTIONS = Object.freeze({
     observed: [
       "Release TypeScript reachability is dynamic-access-free and selects a named reachable route set for the War Battles project.",
       "The canonical lowering plan selects the Static Hermes C ABI for the retained routes and preserves any blocked reachable routes as explicit blockers.",
-      "The packaged typed-native census provides adapter evidence for the subset of retained routes that the real Dynamic Hermes game crossed over the generated typed-native adapter."
+      "The packaged typed-native census provides adapter evidence for the subset of retained routes that the real Dynamic Hermes game crossed over the generated typed-native adapter.",
     ],
     excluded: [
       "full Static Hermes gameplay: no packaged War Battles application has executed entirely as a Static Hermes application",
       "Static Hermes compilation and linkage: those remain separate shermes and Extender build gates",
       "Defold implementation semantics, visual correctness, allocation, and performance",
       "routes blocked by the canonical lowering plan, which remain listed rather than silently falling back",
-      "the complete generated script or dmSDK surface"
-    ]
+      "the complete generated script or dmSDK surface",
+    ],
   }),
   "browser-webtransport-loopback": declare({
     id: "browser-webtransport-loopback",
-    title: "Production browser client and Deno server exchanging War Battles protocol traffic over loopback HTTP/3/WebTransport",
+    title:
+      "Production browser client and Deno server exchanging War Battles protocol traffic over loopback HTTP/3/WebTransport",
     runtime: "browser+deno",
     transport: ["webtransport-h3"],
     reachableSet: "complete",
@@ -211,12 +209,14 @@ export function assertProjectionEnvelope(id, document, { source = "evidence docu
   if (JSON.stringify(actualKeys) !== JSON.stringify([...PROJECTION_ENVELOPE_KEYS])) {
     throw new Error(
       `${source} projection envelope keys are ${JSON.stringify(actualKeys)}; ` +
-      `expected ${JSON.stringify([...PROJECTION_ENVELOPE_KEYS])}`);
+        `expected ${JSON.stringify([...PROJECTION_ENVELOPE_KEYS])}`,
+    );
   }
   if (JSON.stringify(actual) !== JSON.stringify(expected)) {
     throw new Error(
       `${source} projection envelope does not match the declaration of '${id}' in ` +
-      "examples/war-battles-online/integration/projections.mjs");
+        "examples/war-battles-online/integration/projections.mjs",
+    );
   }
   return expected;
 }

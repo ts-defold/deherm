@@ -233,4 +233,95 @@ void runAttachmentLifecycle(){const auto* profile=handle::findRuntimeProfile("de
   lua_newuserdata(state,16);expect(adapter.captureInstance(-1),adapter.lastError());lua_pop(state,1);lua_newuserdata(state,16);ScriptValue fresh{};expect(adapter.captureSemanticHandle(-1,kind,&fresh),adapter.lastError());lua_pop(state,1);expect(fresh.length!=stale.length,"reattachment reused the stale semantic runtime generation");expect(fresh.payload!=stale.payload,"reattachment reused the stale semantic slot generation");handles[static_cast<size_t>(kind)]=fresh;expect(callRoute(adapter,*route,handles),adapter.lastError());
   adapter.detachInstance();lua_newuserdata(state,16);expect(adapter.captureInstance(-1),adapter.lastError());lua_pop(state,1);adapter.detachInstance();const uint64_t before=gAllocations.load();gTrack=true;gFailAllocationCountdown=0;for(size_t iteration=0;iteration<1024;++iteration){lua_newuserdata(state,16);expect(adapter.captureInstance(-1),adapter.lastError());lua_pop(state,1);adapter.detachInstance();}gFailAllocationCountdown=-1;gTrack=false;expect(gAllocations.load()==before,"warmed attachment churn allocated through C++ new");luaL_unref(state,LUA_REGISTRYINDEX,weak);adapter.shutdown();expect(lua_gettop(state)==0,"attachment lifecycle leaked Lua stack");lua_close(state);std::puts("script-handle-router:attachment-lifecycle:roots-stale-reuse:ok");std::puts("script-handle-router:attachment-lifecycle-allocations:0");}
 
-int main(){std::array<bool,handle::kRouteCount> unionCovered{};for(uint8_t index=0;index<handle::kRuntimeProfileCount;++index){const auto& profile=handle::runtimeProfiles()[index];runProfile(profile,std::strcmp(profile.id,"default-legacy-bullet")==0,unionCovered);}size_t unionCount=0;for(size_t index=0;index<handle::kRouteCount;++index)if(unionCovered[index])++unionCount;expect(unionCount==handle::kAdapterExecutableCount,"profile union did not cover every adapter route");runProfileDetectionNegatives();runProtectedFailureStages();runAdapterAllocationFailureRetry();runAttachmentLifecycle();std::printf("script-handle-router:routes:%zu:ok\n",unionCount);std::puts("script-handle-router:profiles:6:ok");std::puts("script-handle-router:reentrant-blocked:ok");std::puts("script-handle-router:allocations:0");}
+namespace {
+void* gGuiNode = nullptr;
+int LookupGuiNode(lua_State* state) {
+  expect(lua_gettop(state) == 1 && lua_type(state, 1) == LUA_TSTRING, "GUI lookup input drifted");
+  gGuiNode = lua_newuserdata(state, 16);
+  return 1;
+}
+int ReadGuiId(lua_State* state) {
+  expect(lua_gettop(state) == 1 && lua_touserdata(state, 1) == gGuiNode, "GUI consumer received a different registry identity");
+  dmScript::PushHash(state, 123);
+  return 1;
+}
+int ReadGuiEnabled(lua_State* state) {
+  expect(lua_gettop(state) >= 1 && lua_gettop(state) <= 2, "GUI optional arity was not preserved");
+  expect(lua_touserdata(state, 1) == gGuiNode, "GUI optional consumer received a different node");
+  expect(lua_gettop(state) == 1 || lua_isnil(state, 2) || lua_type(state, 2) == LUA_TBOOLEAN, "GUI optional codec was not preserved");
+  lua_pushboolean(state, 1);
+  return 1;
+}
+}
+
+void runGuiProducerConsumer() {
+  const auto* profile = handle::findRuntimeProfile("default-legacy-bullet");
+  expect(profile, "GUI producer-consumer profile missing");
+  lua_State* state = luaL_newstate();
+  expect(state, "GUI producer-consumer state missing");
+  installRoutes(state, *profile);
+  ensureModule(state, "gui");
+  lua_pushcfunction(state, LookupGuiNode); lua_setfield(state, -2, "get_node");
+  lua_pushcfunction(state, ReadGuiId); lua_setfield(state, -2, "get_id");
+  lua_pushcfunction(state, ReadGuiEnabled); lua_setfield(state, -2, "is_enabled");
+  lua_pop(state, 1);
+  int instance = 0;
+  gExpectedInstance = &instance;
+  lua_pushlightuserdata(state, gExpectedInstance); SetInstance(state);
+  scalar::ScriptAdapter adapter;
+  expect(adapter.initialize(state, {GetInstance, SetInstance}, handle::runtimeProfileHandshake(*profile)), adapter.lastError());
+  lua_pushlightuserdata(state, gExpectedInstance);
+  expect(adapter.captureGuiInstance(-1), adapter.lastError()); lua_pop(state, 1);
+  const auto guiContext = scalar::ScriptAdapter::ComponentContext::kGui;
+  expect(adapter.pushComponentContext(guiContext), adapter.lastError());
+
+  ScriptValue name{}; name.tag = ScriptValueTag::kString; name.data = "fixture"; name.length = 7;
+  ScriptValue node{};
+  ScriptCallFrame lookup{}; lookup.stableId = 509983822u; lookup.arguments = &name; lookup.argumentCount = 1;
+  lookup.results = &node; lookup.resultCapacity = 1;
+  expect(adapter.dispatch(&lookup), adapter.lastError());
+  expect(node.handleKind == ScriptHandleKind::kGuiNode, "GUI producer no longer exercises the legacy pool");
+  std::array<ScriptValue, 3> arguments{}; arguments[0] = node;
+  ScriptValue result{};
+  ScriptCallFrame query{}; query.arguments = arguments.data(); query.argumentCount = 1;
+  query.results = &result; query.resultCapacity = 1;
+  query.stableId = routeById("script:gui.get_id").stableId;
+  expect(adapter.dispatch(&query), adapter.lastError());
+  expect(result.handleKind == ScriptHandleKind::kHash && result.payload == 123, "GUI id result changed");
+  query.stableId = routeById("script:gui.is_enabled").stableId;
+  expect(adapter.dispatch(&query), adapter.lastError());
+  query.argumentCount = 2;
+  arguments[1].tag = ScriptValueTag::kBoolean; arguments[1].number = 0;
+  expect(adapter.dispatch(&query), adapter.lastError());
+  arguments[1].tag = ScriptValueTag::kUndefined;
+  expect(adapter.dispatch(&query), adapter.lastError());
+  arguments[1].tag = ScriptValueTag::kString;
+  expect(!adapter.dispatch(&query), "GUI optional boolean accepted a string");
+  query.argumentCount = 0;
+  expect(!adapter.dispatch(&query), "GUI required node was omitted");
+  query.argumentCount = 3;
+  expect(!adapter.dispatch(&query), "GUI extra arguments were accepted");
+  query.argumentCount = 1;
+  arguments[0].length += 1;
+  expect(!adapter.dispatch(&query), "GUI token from a different runtime generation was accepted");
+  arguments[0] = node; arguments[0].handleKind = ScriptHandleKind::kLuaUserdata;
+  expect(!adapter.dispatch(&query), "GUI consumer accepted an untyped userdata token");
+  arguments[0] = node;
+  const auto otherKind = routeById("script:b2d.body.get_mass");
+  std::array<ScriptValue, handle::kHandleKindCount + 1> handles{};
+  expect(!callWithSemanticOverride(adapter, otherKind, handles, node), "GUI token satisfied a non-GUI semantic kind");
+  expect(adapter.dispatch(&query), adapter.lastError());
+  const uint64_t before = gAllocations.load();
+  gTrack = true;
+  for (size_t index = 0; index < 1024; ++index) expect(adapter.dispatch(&query), adapter.lastError());
+  gTrack = false;
+  expect(gAllocations.load() == before, "GUI bridge allocated through C++ new");
+  auto api = adapter.api(); api.releaseHandle(api.context, node.handleKind, node.length, node.payload);
+  expect(!adapter.dispatch(&query), "released legacy GUI token was accepted");
+  expect(lua_gettop(state) == 0 && hasExpectedInstance(state), "GUI bridge leaked Lua stack or instance");
+  adapter.popComponentContext(); adapter.shutdown(); lua_close(state);
+  std::puts("script-handle-router:gui-producer-consumer:optional-stale-kind:ok");
+  std::puts("script-handle-router:gui-bridge-allocations:0");
+}
+
+int main(){std::array<bool,handle::kRouteCount> unionCovered{};for(uint8_t index=0;index<handle::kRuntimeProfileCount;++index){const auto& profile=handle::runtimeProfiles()[index];runProfile(profile,std::strcmp(profile.id,"default-legacy-bullet")==0,unionCovered);}size_t unionCount=0;for(size_t index=0;index<handle::kRouteCount;++index)if(unionCovered[index])++unionCount;expect(unionCount==handle::kAdapterExecutableCount,"profile union did not cover every adapter route");runProfileDetectionNegatives();runProtectedFailureStages();runAdapterAllocationFailureRetry();runAttachmentLifecycle();runGuiProducerConsumer();std::printf("script-handle-router:routes:%zu:ok\n",unionCount);std::puts("script-handle-router:profiles:6:ok");std::puts("script-handle-router:reentrant-blocked:ok");std::puts("script-handle-router:allocations:0");}

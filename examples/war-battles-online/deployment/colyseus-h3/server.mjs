@@ -19,8 +19,12 @@ const certificatePath = join(certificateDirectory, "localhost.crt");
 const privateKeyPath = join(certificateDirectory, "localhost.key");
 
 if (
-  !Number.isInteger(port) || port < 1 || port > 65535 ||
-  !Number.isInteger(probePort) || probePort < 1 || probePort > 65535
+  !Number.isInteger(port) ||
+  port < 1 ||
+  port > 65535 ||
+  !Number.isInteger(probePort) ||
+  probePort < 1 ||
+  probePort > 65535
 ) {
   throw new Error(`invalid PORT/PROBE_PORT: ${process.env.PORT}/${process.env.PROBE_PORT}`);
 }
@@ -50,20 +54,33 @@ class BattleProbeRoom extends Room {
 }
 
 await mkdir(certificateDirectory, { recursive: true });
-execFileSync("openssl", [
-  "req", "-x509", "-newkey", "ec", "-pkeyopt", "ec_paramgen_curve:prime256v1",
-  "-nodes", "-sha256",
-  "-days", "10",
-  "-subj", "/CN=localhost",
-  "-addext", "subjectAltName=DNS:localhost,IP:127.0.0.1",
-  "-keyout", privateKeyPath,
-  "-out", certificatePath,
-], { stdio: "ignore" });
+execFileSync(
+  "openssl",
+  [
+    "req",
+    "-x509",
+    "-newkey",
+    "ec",
+    "-pkeyopt",
+    "ec_paramgen_curve:prime256v1",
+    "-nodes",
+    "-sha256",
+    "-days",
+    "10",
+    "-subj",
+    "/CN=localhost",
+    "-addext",
+    "subjectAltName=DNS:localhost,IP:127.0.0.1",
+    "-keyout",
+    privateKeyPath,
+    "-out",
+    certificatePath,
+  ],
+  { stdio: "ignore" },
+);
 const certificate = await readFile(certificatePath);
 const privateKey = await readFile(privateKeyPath);
-const fingerprint = Array.from(
-  Buffer.from(new X509Certificate(certificate).fingerprint256.replaceAll(":", ""), "hex"),
-);
+const fingerprint = Array.from(Buffer.from(new X509Certificate(certificate).fingerprint256.replaceAll(":", ""), "hex"));
 
 const app = express();
 app.get("/health", (_request, response) => {
@@ -111,30 +128,33 @@ probeApp.get("/", async (_request, response, next) => {
 probeApp.use("/sdk", express.static(join(here, "node_modules", "@colyseus", "sdk", "dist")));
 probeApp.post("/reservation", express.raw({ type: "application/json", limit: "4kb" }), (request, response) => {
   const body = request.body?.byteLength ? request.body : Buffer.from("{}");
-  const upstream = httpsRequest({
-    hostname: "127.0.0.1",
-    port,
-    path: "/matchmake/joinOrCreate/battle_probe",
-    method: "POST",
-    rejectUnauthorized: false,
-    headers: {
-      accept: "application/json",
-      "content-type": "application/json",
-      "content-length": body.byteLength,
+  const upstream = httpsRequest(
+    {
+      hostname: "127.0.0.1",
+      port,
+      path: "/matchmake/joinOrCreate/battle_probe",
+      method: "POST",
+      rejectUnauthorized: false,
+      headers: {
+        accept: "application/json",
+        "content-type": "application/json",
+        "content-length": body.byteLength,
+      },
     },
-  }, (upstreamResponse) => {
-    const chunks = [];
-    upstreamResponse.on("data", (chunk) => chunks.push(chunk));
-    upstreamResponse.on("end", () => {
-      try {
-        const reservation = JSON.parse(Buffer.concat(chunks).toString("utf8"));
-        reservation.fingerprint = fingerprint;
-        response.status(upstreamResponse.statusCode ?? 502).json(reservation);
-      } catch (error) {
-        response.status(502).json({ error: `invalid matchmaking response: ${error.message}` });
-      }
-    });
-  });
+    (upstreamResponse) => {
+      const chunks = [];
+      upstreamResponse.on("data", (chunk) => chunks.push(chunk));
+      upstreamResponse.on("end", () => {
+        try {
+          const reservation = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+          reservation.fingerprint = fingerprint;
+          response.status(upstreamResponse.statusCode ?? 502).json(reservation);
+        } catch (error) {
+          response.status(502).json({ error: `invalid matchmaking response: ${error.message}` });
+        }
+      });
+    },
+  );
   upstream.on("error", (error) => {
     response.status(502).json({ error: error.message });
   });

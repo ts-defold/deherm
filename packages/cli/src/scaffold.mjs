@@ -15,7 +15,9 @@ function projectSlug(value) {
 }
 
 function projectTitle(value) {
-  const title = String(value).trim().replace(/[\r\n]+/g, " ");
+  const title = String(value)
+    .trim()
+    .replace(/[\r\n]+/g, " ");
   return title || "My déherm Game";
 }
 
@@ -24,30 +26,104 @@ function templateFiles({ name, packageVersion, defoldRevision }) {
   const packageName = projectSlug(title);
   const dependency = packageVersion === "0.0.0" ? "latest" : `^${packageVersion}`;
   return new Map([
-    ["game.project", `[project]\ntitle = ${title}\nversion = 0.1.0\ncustom_resources = /deherm\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 1\n\n[library]\ninclude_dirs = defold_hermes\n\n[defold_hermes]\napp = /deherm/app.dehermc\ndefold_sdk = ${defoldRevision}\n`],
+    [
+      "game.project",
+      `[project]\ntitle = ${title}\nversion = 0.1.0\ncustom_resources = /deherm\n\n[bootstrap]\nmain_collection = /main/main.collectionc\n\n[display]\nwidth = 960\nheight = 540\nhigh_dpi = 1\n\n[script]\nshared_state = 1\n\n[library]\ninclude_dirs = defold_hermes\n\n[defold_hermes]\napp = /deherm/app.dehermc\ndefold_sdk = ${defoldRevision}\n`,
+    ],
     ["main/main.collection", `name: "main"\ninstances {\n  id: "controller"\n  prototype: "/main/controller.go"\n}\n`],
     ["main/controller.go", `components {\n  id: "script"\n  component: "/src/main.script"\n}\n`],
     // Defold's project schema supplies this resource as the default input
     // binding even when game.project has no [input] section. Bob validates the
     // resolved default, so a complete zero-config scaffold must materialise it.
     ["input/game.input_binding", ""],
-    ["src/main.script.ts", `import { defineComponent } from "@deherm/project";\n\nexport default defineComponent({\n  init(): void {\n    console.log("${title.replaceAll("\\", "\\\\").replaceAll('"', '\\"')} is running with déherm");\n  },\n\n  update(_self, _dt: number): void {\n    // Game logic lives here. This file generates /src/main.script.\n  },\n});\n`],
-    ["package.json", `${JSON.stringify({
-      name: packageName,
-      version: "0.1.0",
-      private: true,
-      type: "module",
-      scripts: {
-        dev: "deherm dev",
-        generate: "deherm generate",
-        typecheck: "deherm typecheck",
-        verify: "deherm verify-generated"
-      },
-      devDependencies: { "@ts-defold/deherm": dependency }
-    }, null, 2)}\n`],
+    [
+      "src/main.script.ts",
+      `import { defold, defineComponent } from "@deherm/project";\n\nexport default defineComponent({\n  init(): void {\n    defold.log("info", "${title.replaceAll("\\", "\\\\").replaceAll('"', '\\"')} is running with déherm");\n  },\n\n  update(_self, _dt: number): void {\n    // Game logic lives here. This file generates /src/main.script.\n  },\n});\n`,
+    ],
+    [
+      "package.json",
+      `${JSON.stringify(
+        {
+          name: packageName,
+          version: "0.1.0",
+          private: true,
+          type: "module",
+          scripts: {
+            dev: "deherm dev",
+            generate: "deherm generate",
+            lint: "oxlint .",
+            format: "oxfmt --write .",
+            "format:check": "oxfmt --check .",
+            check: "pnpm lint && pnpm format:check && pnpm typecheck && pnpm verify",
+            typecheck: "deherm typecheck",
+            verify: "deherm verify-generated",
+          },
+          devDependencies: {
+            "@ts-defold/deherm": dependency,
+            oxfmt: "^0.70.0",
+            oxlint: "^1.85.0",
+          },
+        },
+        null,
+        2,
+      )}\n`,
+    ],
+    [
+      ".oxlintrc.json",
+      `${JSON.stringify(
+        {
+          $schema: "./node_modules/oxlint/configuration_schema.json",
+          categories: { correctness: "error", suspicious: "error", perf: "warn" },
+          rules: {
+            "eslint/no-console": "off",
+            "eslint/no-debugger": "error",
+            "eslint/no-duplicate-imports": "error",
+            "eslint/no-eval": "error",
+          },
+          options: { denyWarnings: true },
+          ignorePatterns: [
+            ".deherm/**",
+            ".internal/**",
+            "build/**",
+            "defold_hermes/**",
+            "defold_hermes_typed_native/**",
+          ],
+        },
+        null,
+        2,
+      )}\n`,
+    ],
+    [
+      ".oxfmtrc.json",
+      `${JSON.stringify(
+        {
+          $schema: "./node_modules/oxfmt/configuration_schema.json",
+          printWidth: 120,
+          tabWidth: 2,
+          useTabs: false,
+          semi: true,
+          singleQuote: false,
+          trailingComma: "all",
+          proseWrap: "preserve",
+          sortPackageJson: false,
+          ignorePatterns: [
+            ".deherm/**",
+            ".internal/**",
+            "build/**",
+            "defold_hermes/**",
+            "defold_hermes_typed_native/**",
+          ],
+        },
+        null,
+        2,
+      )}\n`,
+    ],
     [".defignore", `${renderBobManagedIgnoreBlock([...BOB_TOOLING_IGNORE_ENTRIES, "/src/main.script.ts"])}\n`],
     [".gitignore", ".deherm/\n.internal/\nbuild/\nnode_modules/\n"],
-    ["README.md", `# ${title}\n\nGenerated by \`deherm create\`.\n\n\`\`\`sh\npnpm install\npnpm dev\n\`\`\`\n`]
+    [
+      "README.md",
+      `# ${title}\n\nGenerated by \`deherm create\`. Open this directory—the one containing both \`package.json\` and \`game.project\`—as the editor workspace.\n\n\`\`\`sh\npnpm install\npnpm dev\n\`\`\`\n`,
+    ],
   ]);
 }
 
@@ -61,10 +137,12 @@ export async function createDefoldProject(options = {}) {
   const name = projectTitle(options.name ?? path.basename(target));
   const defoldRevision = options.defoldRevision
     ? normalizeDefoldRevision(options.defoldRevision, "createDefoldProject defoldRevision")
-    : (await resolveDefoldChannelRevision(options.channel ?? "stable", {
-        fetchImpl: options.fetchImpl,
-        locator: options.policyLocator
-      })).revision;
+    : (
+        await resolveDefoldChannelRevision(options.channel ?? "stable", {
+          fetchImpl: options.fetchImpl,
+          locator: options.policyLocator,
+        })
+      ).revision;
   const files = templateFiles({ name, packageVersion: options.packageVersion ?? "0.0.0", defoldRevision });
   for (const [relative, source] of files) {
     const output = path.join(target, relative);

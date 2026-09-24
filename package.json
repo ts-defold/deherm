@@ -73,6 +73,7 @@
     "packages/polyfills/",
     "packages/sdk/src/address.ts",
     "packages/sdk/src/component.ts",
+    "packages/sdk/src/host.ts",
     "packages/sdk/src/hmr-state.ts",
     "packages/sdk/src/package.ts",
     "packages/static-hermes/src/globals.d.ts",
@@ -123,6 +124,10 @@
     "deherm-language-server": "bin/deherm-language-server.mjs"
   },
   "scripts": {
+    "lint": "oxlint packages/sdk/src/host.ts packages/sdk/src/index.ts packages/sdk/src/package.ts packages/cli/src/dev/session.mjs packages/cli/src/scaffold.mjs editors/vscode/src/extension.ts editors/vscode/src/live-values.ts editors/vscode/test/live-values.test.ts tests/dev-core.test.mjs tests/host-facade.test.mjs tests/scaffold.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs && pnpm --dir examples/war-battles-online lint",
+    "format": "oxfmt --write packages/sdk/src/host.ts packages/sdk/src/index.ts packages/sdk/src/package.ts packages/cli/src/dev/session.mjs packages/cli/src/scaffold.mjs editors/vscode/src/extension.ts editors/vscode/src/live-values.ts editors/vscode/test/live-values.test.ts tests/dev-core.test.mjs tests/host-facade.test.mjs tests/scaffold.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs && pnpm --dir examples/war-battles-online format",
+    "format:check": "oxfmt --check packages/sdk/src/host.ts packages/sdk/src/index.ts packages/sdk/src/package.ts packages/cli/src/dev/session.mjs packages/cli/src/scaffold.mjs editors/vscode/src/extension.ts editors/vscode/src/live-values.ts editors/vscode/test/live-values.test.ts tests/dev-core.test.mjs tests/host-facade.test.mjs tests/scaffold.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs && pnpm --dir examples/war-battles-online format:check",
+    "check:style": "pnpm lint && pnpm format:check",
     "prepack": "node scripts/stage-hermes-public-headers.mjs && node scripts/check-package-revision-boundary.mjs --quiet",
     "bootstrap": "pnpm bootstrap:upstreams && pnpm bootstrap:bob",
     "bootstrap:upstreams": "./scripts/bootstrap-upstreams.sh",
@@ -374,7 +379,7 @@
     "test:headless-conformance:runtime": "pnpm configure:native && node scripts/check-headless-conformance.mjs",
     "test:native-defold:hot-reload": "node --test tests/native-hot-reload-fixture.test.mjs && node scripts/check-native-defold-hot-reload.mjs",
     "test:extension-retention": "node --test tests/dmsdk-scalar-extension-retention.test.mjs",
-    "test:cli": "node --test tests/cli.test.mjs tests/scaffold.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs tests/toolchain-matrix.test.mjs tests/host-compiler-artifact-verification.test.mjs tests/artifact-fingerprints.test.mjs tests/artifact-archives.test.mjs tests/native-artifact-build-plan.test.mjs tests/android-runtime-config.test.mjs",
+    "test:cli": "node --test tests/cli.test.mjs tests/scaffold.test.mjs tests/package-smoke.test.mjs tests/workspace-packages.test.mjs tests/host-facade.test.mjs tests/toolchain-matrix.test.mjs tests/host-compiler-artifact-verification.test.mjs tests/artifact-fingerprints.test.mjs tests/artifact-archives.test.mjs tests/native-artifact-build-plan.test.mjs tests/android-runtime-config.test.mjs",
     "test:dev": "node --test tests/dev-core.test.mjs tests/dev-pipeline.test.mjs tests/dev-session.test.mjs tests/dev-tui.test.mjs tests/browser-target.test.mjs tests/inspector-bridge.test.mjs tests/profiler.test.mjs tests/dap-adapter.test.mjs tests/language-server.test.mjs tests/typed-native-target.test.mjs tests/hash-literal.test.mjs tests/installed-dev-loop.test.mjs tests/runtime-bug-pool.test.mjs",
     "test:lsp": "node --test tests/language-server.test.mjs",
     "test:vscode": "pnpm --filter ./editors/vscode test",
@@ -424,5 +429,9 @@
     "typescript": "7.0.2",
     "ws": "8.18.3",
     "yaml": "2.8.3"
+  },
+  "devDependencies": {
+    "oxfmt": "0.70.0",
+    "oxlint": "1.85.0"
   }
 }

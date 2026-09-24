@@ -123,8 +123,13 @@ export class BattleClient implements TransportReceiver {
   readonly leadTicks: number;
   readonly resumeToken = new Uint8Array(RESUME_TOKEN_BYTES);
   readonly stats: ClientStats = {
-    snapshotsApplied: 0, snapshotsIgnored: 0, replayedTicks: 0,
-    inputsSent: 0, inputsDropped: 0, lastServerTick: 0, lastRoundTripMilliseconds: 0,
+    snapshotsApplied: 0,
+    snapshotsIgnored: 0,
+    replayedTicks: 0,
+    inputsSent: 0,
+    inputsDropped: 0,
+    lastServerTick: 0,
+    lastRoundTripMilliseconds: 0,
   };
 
   private transport?: GameTransport;
@@ -132,8 +137,15 @@ export class BattleClient implements TransportReceiver {
   private readonly assistAim: boolean;
   private readonly configuredSnapshotIntervalTicks?: number;
   private readonly welcome: WelcomeMessage = {
-    matchId: 0, playerId: 0, team: 0, maximumPlayers: 0, botCount: 0,
-    mapSeed: 0, serverTick: 0, tickRate: 60, resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+    matchId: 0,
+    playerId: 0,
+    team: 0,
+    maximumPlayers: 0,
+    botCount: 0,
+    mapSeed: 0,
+    serverTick: 0,
+    tickRate: 60,
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
   };
   private readonly reject: RejectMessage = { code: 0, reason: "" };
   private readonly helloBuffer = new Uint8Array(HELLO_BYTES);
@@ -196,9 +208,8 @@ export class BattleClient implements TransportReceiver {
     this.options = options;
     this.leadTicks = clamp(Math.trunc(options.leadTicks ?? 2), 0, 16);
     this.assistAim = options.assistAim ?? true;
-    this.configuredSnapshotIntervalTicks = options.snapshotIntervalTicks === undefined
-      ? undefined
-      : clamp(Math.trunc(options.snapshotIntervalTicks), 1, 30);
+    this.configuredSnapshotIntervalTicks =
+      options.snapshotIntervalTicks === undefined ? undefined : clamp(Math.trunc(options.snapshotIntervalTicks), 1, 30);
     this.remoteInterpolationTicks = this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS;
     this.staging = createInputCommand(0, 1);
     for (let index = 0; index < INPUT_HISTORY_TICKS; index += 1) this.history.push(createInputCommand(0, 1));
@@ -260,7 +271,10 @@ export class BattleClient implements TransportReceiver {
       output.turretY = world.playerTurretY[slot]!;
       return true;
     }
-    const alpha = Math.min(1, this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * this.remoteInterpolationTicks));
+    const alpha = Math.min(
+      1,
+      this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * this.remoteInterpolationTicks),
+    );
     output.x = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
     output.y = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
     output.hullX = interpolate(this.remotePreviousHullX[slot]!, this.remoteCurrentHullX[slot]!, alpha);
@@ -359,9 +373,10 @@ export class BattleClient implements TransportReceiver {
     this.resumeToken.set(this.welcome.resumeToken);
     writeWelcomeAck(this.welcomeAckBuffer, { resumeToken: this.resumeToken });
     void this.send(TRANSPORT_CHANNEL_SESSION, this.welcomeAckBuffer);
-    this.remoteInterpolationTicks = payload.byteLength >= WELCOME_BYTES
-      ? clamp(Math.trunc(this.welcome.snapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS), 1, 30)
-      : (this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS);
+    this.remoteInterpolationTicks =
+      payload.byteLength >= WELCOME_BYTES
+        ? clamp(Math.trunc(this.welcome.snapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS), 1, 30)
+        : (this.configuredSnapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS);
     this.world = new BattleWorld(this.welcome.matchId, this.welcome.mapSeed);
     // A welcome is the authentication boundary for this connection. The
     // server's first post-welcome snapshot is always a keyframe, so discard
@@ -395,7 +410,9 @@ export class BattleClient implements TransportReceiver {
     this.state = "ready";
     this.welcomed = true;
     this.options.onWelcome?.(this.welcome);
-    this.options.onLog?.(`client-welcome:player=${this.playerId}:tick=${this.welcome.serverTick}:seed=${this.welcome.mapSeed}`);
+    this.options.onLog?.(
+      `client-welcome:player=${this.playerId}:tick=${this.welcome.serverTick}:seed=${this.welcome.mapSeed}`,
+    );
   }
 
   private handleReject(payload: Uint8Array): void {

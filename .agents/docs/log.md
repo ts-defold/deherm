@@ -1,5 +1,25 @@
 # Defold Hermes knowledge log
 
+## 2026-09-24 - GUI handle consumers preserve optional arity and producer identity
+
+The reproduced `gui.isEnabled(node)` argument-count error came from the handle
+generator dropping the projection's optional-parameter flag. It now emits the
+required count and optional nil codecs, and pushes only supplied arguments.
+The independent `gui.getId(node)` codec error came from crossing two generated
+transport families: `gui.getNode` produces the legacy GUI-pool token, while the
+handle router previously accepted only semantic-registry tokens. A bounded
+callback now resolves a legacy GUI token through its owning adapter pool only
+for the generated GUI-node semantic codec. Existing lifetime and context checks
+remain in force, with no second root or heap-backed conversion on the call path.
+
+All 17 focused generator/native tests pass. The new producer-consumer regression
+checks userdata identity, omitted and explicit optional arguments, rejected
+arity/type/kind mismatches, released/runtime-generation tokens, and zero C++
+`new` calls over 1,024 warmed queries. This is Lua 5.1 adapter evidence; packaged
+engine behavior and Lua allocation counts remain separate observations. The
+same native harness passes under AddressSanitizer and UndefinedBehaviorSanitizer. See
+[the handle frontier](research/borrowed-handle-generator-frontier.md#optional-arguments-and-gui-producer-consumer-compatibility).
+
 ## 2026-09-24 - Bob's default project view excludes authoring-only inputs
 
 The earlier Bob boundary hid the largest tool and cache directories but still
@@ -64,7 +84,7 @@ exports `_rel`, and the engine was initially launched outside Bob's resource
 directory.
 
 The corrected engine loaded `archive:game.dmanifest`, reported
-`static-application-activated` with all 27 reachable routes and zero blockers,
+`static-application-activated` with all 28 reachable routes and zero blockers,
 initialized the War Battles arena/camera/UI/player, fired and resolved a rocket,
 entered the eight-player match, and emitted repeated runtime telemetry with zero
 callback roots, six live Lua handles, and zero arena high-water bytes. This is
@@ -2959,7 +2979,7 @@ hashes; reject document, descriptor, capability, version, and path tampering;
 reuse a warm authenticated cache offline; and write nothing on a second pass.
 Issue #93 therefore remains a size and ownership optimization only. Its precise
 remaining compatibility-source debt is 12 SDK files (105,573 materialized
-bytes) and 106 revision outputs (1,718,286 bytes), plus redundant derived
+bytes) and 106 revision outputs (1,720,303 bytes), plus redundant derived
 documents in the 25,078,691-byte reachable policy graph. The current npm dry
 run is 605,060 compressed bytes and 2,557,962 unpacked bytes; those package and
 policy measurements remain separate.
@@ -2975,3 +2995,142 @@ component contract required by the public `deherm dev` path, so four tests
 failed before entering the loop. They now install the same generated contract
 fixture; all nine focused session tests pass without introducing a package-side
 fallback or weakening the package/policy boundary.
+
+## 2026-09-24 - Generated Defold host facade and pilot last-chance loop
+
+The project generator now emits one collision-checked `defold` object by
+combining the selected policy's actual Defold-root members with déherm's stable
+host adapter. War Battles and new scaffolds consume `defold.log` through
+`@deherm/project`; authored gameplay no longer declares the private
+`__defoldHostV1` transport symbol. The generated context surfaces retain their
+policy masks instead of widening back to the complete Defold root. Focused CLI,
+package, and host tests pass, and a regenerated War Battles project type-checks
+all shared, game-object, GUI, and render contexts against Defold revision
+`7f0f554f41f9dce1e0ddff99bf08200657d1ee05`.
+
+War Battles now carries authoritative tank, infantry, and dead modes. A tank
+loss ejects a fragile pistol-equipped pilot; depot entry acquires a replacement
+tank; moving hostile tanks can crush pilots; and terminal death alone scores.
+Snapshot version 7 carries the mode, the HUD points toward the nearest depot,
+and bots use persistent reaction-window aim rather than rereading exact target
+position every tick. All 67 focused core tests pass, including ejection,
+terminal scoring, snapshot restore, depot acquisition, crushing, bot difficulty,
+and deterministic 32-player bandwidth. Generated Defold mirrors are fresh and
+War Battles type-checks. These checks prove deterministic logic and source
+projection; an updated Bob/Chrome visual playability observation is still a
+separate gate.
+
+## 2026-09-24 - War Battles production-art direction and sponsored portrait seam
+
+The showcase now has separate zero-credit art-direction mockups for the title,
+combat HUD, and full battlefield under `examples/war-battles-online/design/`.
+The world target replaces the flat repeated tutorial grass with a readable
+volcanic-industrial tile grammar and calls out the complete production families:
+terrain, cover, hazards, objectives, tanks/turrets, ejected heroes, pickups,
+projectiles, effects, wrecks, and minimap/HUD composition. These images are
+design targets only; they are not runtime evidence or atlas inputs.
+
+Sprite Fusion produced one reviewed 64x64 driver portrait family and one
+eight-frame idle animation for 30 credits total. The API wrapper records request
+ids, input hashes, output asset ids, local paths, and remaining credits without
+persisting the credential. `tools/generate-hud-art.mjs` owns explicit frame cuts,
+two-pixel padding, anchor metadata, hashes, the Defold atlas, and freshness
+verification. The runtime title carries a readable `PIXEL ART SPONSORED BY
+SPRITE FUSION` lockup. Driver content now assigns one stable identity to every
+one of the 32 authoritative player/tank slots while sharing four planned visual
+variants; the same identity survives tank ejection and replacement. A cold
+Bob/Chrome screenshot is still required before claiming the new title/HUD as
+visually proven in engine.
+
+Sprite Fusion then produced two nine-candidate, 16px-class world batches for 30
+additional credits, bringing the total spend to 60 and the recorded remaining
+balance to 3,240. The pickup-pedestal batch is useful source art: the compact
+first candidate is selected as the neutral pickup base, with detailed variants
+reserved for depots and rare pickups. The request named basalt floor did not
+satisfy its seamless, opaque terrain contract. It is not shipped as terrain;
+five candidates are reclassified as refinery vents, lava fissures, and pipe
+props. This exposed the correct tool boundary: Sprite Fusion's documented API
+owns source-art generation, while checked-in local generators and Defold's
+native formats own tileset grammar, weighted variants, collisions, gameplay
+roles, atlas assembly, seeded maps, and freshness checks. The browser Tilemap
+Editor has no documented automation API and is not a build dependency. No
+further credits were spent while making that correction.
+
+The approved world subset is now mechanically integrated without another API
+call. `tools/generate-world-art.mjs` validates the immutable Sprite Fusion
+selection and request manifests, normalizes the chosen pickup pedestal and five
+hazard/pipe motifs into a deterministic 96x16 atlas, and rejects stale hashes,
+asset IDs, or dimensions. `tools/generate-art.mjs` imports those six roles into
+the single Defold `arena-tiles.tilesource`; `tools/generate-arena-tilemap.mjs`
+then emits a native `decor` layer from the authoritative four hazard positions
+and uses the selected pedestal at authoritative pickup pads. Focused generation,
+freshness checks, and the four world-art tests pass. This proves deterministic
+projection and native map emission; it does not yet prove the new pixels are
+visually correct in a running engine.
+
+## 2026-09-24 - Native Defold map proof and restart-required resource lane
+
+The checked-in arena generator owns the map rather than depending on an
+undocumented external editor API. It deterministically emits Defold's native
+`arena-tiles.tilesource` and three-layer `arena.tilemap`; focused world-art,
+freshness, TypeScript, and integration checks pass. A Bob-built macOS engine
+then rendered the generated terrain, concrete structures, markings, imported
+Sprite Fusion refinery props, pickups, tanks, projectiles, leaderboard, and HUD.
+The live engine logged `war-battles:title-hidden-by-deploy` after a real HID
+mouse event. This is visual/runtime evidence for the current native map path,
+not a claim that the art direction is finished; the observed ground variants
+remain too repetitive for the production target.
+
+That exercise also found a false HMR claim. Bob rebuilt and reloaded
+`game.input_binding`, but the active collection retained the action table it had
+when its input stack was created. The dev coordinator now classifies authored
+`.input_binding` files with `game.project`, native extensions, and extension
+manifests as restart-required resources. After the successful Bob build it logs
+the exact sources, gracefully stops the running engine, and relaunches it
+instead of treating the resource reload acknowledgement as activation. An
+input-binding-only batch also bypasses the TypeScript compiler, so it cannot
+announce an unchanged bundle as a new HMR generation. The focused classifier
+tests, all 20 dev-core tests, oxlint, and oxfmt pass.
+
+A fresh TUI session then supplied runtime evidence for the automatic branch. A
+whitespace-only `input/game.input_binding` edit produced a Bob build and the
+explicit `restarting for non-reloadable Defold resource` diagnostic, stopped
+engine PID 86903 with `SIGTERM`, launched PID 87017, reconnected the native
+Hermes inspector with connection epoch 2, and resumed component snapshots and
+telemetry. Restoring the file byte-for-byte repeated the restart with PID 87195.
+The session contained only startup compiler generation 1: neither input-only
+edit emitted a second compiler generation. This proves the native debug-session
+restart coordinator on this macOS host; it is not evidence that Defold can
+hot-swap an active input action table in process.
+
+## 2026-09-24 - Integrated generated-state seal after GUI handle and HMR repairs
+
+The GUI borrowed-handle repair was regenerated through its owning lowering
+pipeline, then propagated through the binding plan, recording engine,
+typed-native bridge, component capability, Static Hermes War Battles
+projection, content-addressed API policy, and frozen source-pipeline SDK
+manifest. The resulting policy root is
+`4b1ddb27e67dddf0b3ad2cef99a25e0e7a4cbc1bafc772f406f14ccd92939674`.
+The complete `pnpm check` passes: 926 script routes reconcile exactly, all
+1,361 dmSDK recipes remain materializable, both clean-room regeneration gates
+are byte-identical, policy-only SDK reconstruction matches the explicit
+old-pipeline fixture, and all type, LSP, resource-semantic, War Battles
+projection, performance, session, and knowledge gates pass.
+
+Focused native evidence also passes after the reseal. Seventeen generated
+handle tests cover all 407 classified routes, exact optional/nil arity, legacy
+GUI-node codec compatibility, deterministic generation, warning-clean C++, and
+the pinned Lua 5.1 router. The ASan/UBSan generated-family suite executes 405
+adapter-supported handle routes across six engine profiles, plus URL, dynamic
+value, callback, value-tail, overload, table-record, recording, and dmSDK
+families. It reports protected-error, stale-handle, kind-mismatch, reentrancy,
+exhaustion, and lifecycle success with zero warmed allocation calls. Two
+upstream-commented Box2D user-data routes remain source contradictions in the
+published report; they are not suppressed from the mirrored public surface.
+
+The War Battles durability suite exposed one scheduling-sensitive test helper:
+under parallel host load, twelve fixed `setImmediate` turns did not always
+outlast the asynchronous HMAC resume handshake. The product path was repeatably
+healthy in isolation. The test now waits for the bounded handshake state change
+for at most 64 event-loop turns and still asserts the exact `ready` state and
+player identity; the complete 80-test game/session suite passes afterward.

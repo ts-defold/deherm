@@ -1,0 +1,159 @@
+{
+  "schemaVersion": 1,
+  "owner": "tools/sprite-fusion.mjs",
+  "requestId": "req_3eedbb68-71ef-44ff-b45e-065ec5300c7a",
+  "operation": "style-reference",
+  "prompt": "One neutral 16x16 top-down pickup pedestal for a volcanic industrial tank arena. Compact dark metal base, four readable corner clamps, empty recessed center reserved for a generated item icon, one-pixel hard outline, charcoal steel and rust palette. Transparent outside the pedestal silhouette. No item symbol, weapon, cross, shield, letters, numbers, character, scene background, perspective, antialiasing, gradient, or soft glow. Match the supplied War Battles pickup footprint while making it feel like one cohesive military refinery prop.",
+  "size": 16,
+  "outputFrames": null,
+  "colors": null,
+  "inputs": [
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/pickup-pad-1.png",
+      "bytes": 158,
+      "sha256": "88aba226d92d93c77a2bdc93b19c51b4f4b7e38a26a5a4979aff59d7ee211c07"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/pickup-health-1.png",
+      "bytes": 122,
+      "sha256": "95ebdeb5130545f8be2e9850817395c1461deb75623344e0c903f6f693fc485a"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/pickup-armor-1.png",
+      "bytes": 158,
+      "sha256": "1f8b23187c0e0b328f376d5dd4f5aecb51a7fba7fb8c77ffbc0762fb8ecc9858"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/pickup-railgun-1.png",
+      "bytes": 130,
+      "sha256": "8e6a6d74d34c7632ddd96b9d48485ef75ecda2dd8a918890abfa79e33b226aaa"
+    },
+    {
+      "kind": "file",
+      "path": "defold/assets/derived/arena/pickup-overdrive-1.png",
+      "bytes": 127,
+      "sha256": "23fe36b93cd45d62715bb06ad92b4a2778148b610f8a96be68515c0c72ce101d"
+    }
+  ],
+  "spec": {
+    "path": "art/source/sprite-fusion/specs/refinery-pickup-pedestal-v1.json",
+    "sha256": "0ecf590add5375e4b1c20592ec74fd00408503148f9aacd5628086f0d5c9a850"
+  },
+  "outputs": [
+    {
+      "index": 0,
+      "assetId": "5822426e-2bc2-4d35-b90a-fd311cb3843c",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 18,
+      "height": 18,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/5822426e-2bc2-4d35-b90a-fd311cb3843c/image.png?v=1790270074527",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/00.png",
+      "bytes": 723,
+      "sha256": "7648e32fb4d675b8cdcf3e3df1be39496c8c54a55033ab7349a91fefb9550f68"
+    },
+    {
+      "index": 1,
+      "assetId": "0cd5d66b-65c2-484d-b2a8-9054cf3923bb",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 18,
+      "height": 18,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/0cd5d66b-65c2-484d-b2a8-9054cf3923bb/image.png?v=1790270075136",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/01.png",
+      "bytes": 826,
+      "sha256": "4ba046e86653d7857b3627e2a0b21bd2ca956fedf7ff2d57ca44cd359b4a7dde"
+    },
+    {
+      "index": 2,
+      "assetId": "23a32013-722a-4cb1-b790-1e000457cdd1",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 20,
+      "height": 20,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/23a32013-722a-4cb1-b790-1e000457cdd1/image.png?v=1790270075740",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/02.png",
+      "bytes": 896,
+      "sha256": "3547cc5ffaf49e1043848b47a481a0a3c89c0eeddf86ef6e6eead47fee67ed48"
+    },
+    {
+      "index": 3,
+      "assetId": "cd71d753-8183-4bfa-97a5-bd3bbc278757",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 20,
+      "height": 20,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/cd71d753-8183-4bfa-97a5-bd3bbc278757/image.png?v=1790270076370",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/03.png",
+      "bytes": 863,
+      "sha256": "cd5346a848ed2e04313fee64590acca07563145c6995dfa2bad840def57c5a3f"
+    },
+    {
+      "index": 4,
+      "assetId": "a5c37178-69aa-4a71-a08d-1afb706706e2",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 21,
+      "height": 21,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/a5c37178-69aa-4a71-a08d-1afb706706e2/image.png?v=1790270076983",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/04.png",
+      "bytes": 1048,
+      "sha256": "8d6d4fc40eb7a31b582bed0f02530cbb8625c1df1ab3f05d940ca473da235f87"
+    },
+    {
+      "index": 5,
+      "assetId": "e9efe5b3-ca08-4fd7-aac3-8106c0984c2e",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 22,
+      "height": 22,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/e9efe5b3-ca08-4fd7-aac3-8106c0984c2e/image.png?v=1790270077588",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/05.png",
+      "bytes": 1001,
+      "sha256": "9d81c003eeacd850bc9618678203a807c6db20be61f06084fcc256e8f0a4bd84"
+    },
+    {
+      "index": 6,
+      "assetId": "52d7c46b-f6ba-45cd-ad3e-3ae660f87abf",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 23,
+      "height": 23,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/52d7c46b-f6ba-45cd-ad3e-3ae660f87abf/image.png?v=1790270078192",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/06.png",
+      "bytes": 1093,
+      "sha256": "caabab8c6c42febc4be73085c45cec9c6249db1e30d7a3e85e920c6d37c11cc4"
+    },
+    {
+      "index": 7,
+      "assetId": "4c1bec4f-c865-49f5-a568-46e95dfbb6ce",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 19,
+      "height": 19,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/4c1bec4f-c865-49f5-a568-46e95dfbb6ce/image.png?v=1790270078822",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/07.png",
+      "bytes": 893,
+      "sha256": "dd90c66ff978c4ff52319a73902bcfb0bc8c90d0dc24b671808897525759af84"
+    },
+    {
+      "index": 8,
+      "assetId": "1f0ae4c1-34a3-4b1d-a51a-84342e383d21",
+      "type": "image",
+      "contentType": "image/png",
+      "width": 21,
+      "height": 21,
+      "assetUrl": "https://media.spritefusion.com/pixel-art-assets/4c54dc0a-fa81-4b38-acb5-bbdfb4210205/1f0ae4c1-34a3-4b1d-a51a-84342e383d21/image.png?v=1790270079450",
+      "path": "art/source/sprite-fusion/outputs/refinery-pickup-pedestal-v1/08.png",
+      "bytes": 1117,
+      "sha256": "1245759a1a93f2c767aa05f6a63bf1d8ad9e41e33c450e1b4271c05b78819156"
+    }
+  ],
+  "credits": {
+    "remaining": 3240
+  }
+}

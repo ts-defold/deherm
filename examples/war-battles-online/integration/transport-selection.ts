@@ -6,11 +6,7 @@ export type TransportCandidateId =
   | "colyseus-websocket"
   | "offline-headless";
 
-export type TransportWireProtocol =
-  | "webtransport-h3-quic"
-  | "webrtc-sctp-dtls-ice"
-  | "websocket-tcp"
-  | "in-memory";
+export type TransportWireProtocol = "webtransport-h3-quic" | "webrtc-sctp-dtls-ice" | "websocket-tcp" | "in-memory";
 
 export interface TransportEvidence {
   readonly browserWebTransport: boolean;

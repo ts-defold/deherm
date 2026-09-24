@@ -1,0 +1,34 @@
+{
+  "folders": [
+    {
+      "name": "War Battles Online",
+      "path": "."
+    }
+  ],
+  "settings": {
+    "deherm.cliPath": "../../bin/deherm.mjs",
+    "editor.formatOnSave": true,
+    "editor.inlayHints.enabled": "on",
+    "[javascript][javascriptreact][typescript][typescriptreact]": {
+      "editor.defaultFormatter": "oxc.oxc-vscode"
+    }
+  },
+  "extensions": {
+    "recommendations": [
+      "oxc.oxc-vscode",
+      "samchon.ttsc",
+      "ts-defold.deherm"
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "deherm",
+        "request": "attach",
+        "name": "déherm: Attach to War Battles",
+        "project": "${workspaceFolder}/defold"
+      }
+    ]
+  }
+}

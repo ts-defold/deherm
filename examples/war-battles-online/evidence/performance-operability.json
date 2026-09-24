@@ -16,17 +16,17 @@
     "wallClockObserved": false,
     "simulation": {
       "samples": 540,
-      "p50": 812,
-      "p95": 907,
-      "p99": 947,
-      "maximum": 1081
+      "p50": 860,
+      "p95": 936,
+      "p99": 972,
+      "maximum": 1067
     },
     "frame": {
       "samples": 540,
-      "p50": 852,
-      "p95": 5321,
-      "p99": 6005,
-      "maximum": 6705
+      "p50": 895,
+      "p95": 5628,
+      "p99": 6294,
+      "maximum": 7009
     },
     "evidenceBoundary": "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings."
   },
@@ -35,17 +35,17 @@
     "frames": 200,
     "keyframes": 1,
     "deltas": 199,
-    "totalBytes": 440275,
-    "bytesPerSimulatedSecond": 44027.5,
+    "totalBytes": 463860,
+    "bytesPerSimulatedSecond": 46386,
     "frameBytes": {
       "samples": 200,
-      "p50": 2067,
-      "p95": 2600,
-      "p99": 3097,
-      "maximum": 17776
+      "p50": 2228,
+      "p95": 2654,
+      "p99": 3093,
+      "maximum": 17904
     },
-    "keyframeBytes": 17776,
-    "fixedFrameCapacity": 17776
+    "keyframeBytes": 17904,
+    "fixedFrameCapacity": 17904
   },
   "reconciliation": {
     "samples": 200,
@@ -53,11 +53,11 @@
     "error": {
       "samples": 200,
       "p50": 0,
-      "p95": 28,
-      "p99": 42,
-      "maximum": 43
+      "p95": 27,
+      "p99": 41,
+      "maximum": 42
     },
-    "maximumError": 43,
+    "maximumError": 42,
     "correctedSnapshots": 18,
     "postRestoreError": 0
   },
@@ -69,7 +69,7 @@
     },
     "projectiles": {
       "capacity": 512,
-      "highWater": 27,
+      "highWater": 28,
       "failures": 0
     },
     "pickups": {
@@ -79,14 +79,14 @@
     },
     "presentationEvents": {
       "capacity": 256,
-      "highWater": 30,
+      "highWater": 28,
       "failures": 0,
       "droppedByOverflow": 0,
       "overflowPolicy": "drop-oldest"
     },
     "snapshotFrame": {
-      "capacity": 17776,
-      "highWater": 17776,
+      "capacity": 17904,
+      "highWater": 17904,
       "failures": 0
     },
     "arena": {
@@ -124,28 +124,28 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 21,
-      "bytes": 306894,
-      "sha256": "1e72cfd442990d5e25b6e4f9e60085481c30d64a101faa35c7ba4f566997fd76"
+      "bytes": 324047,
+      "sha256": "3ca2563d9ca3caf4324c962634b34a22d8f6d9e55d789bf7020b576492583433"
     },
     {
       "path": "examples/war-battles-online/integration/performance-harness.ts",
       "kind": "file",
-      "bytes": 12041,
-      "sha256": "1b07d24d46999b8661658ceea42eab1b1c7ce2181f5c665309f6f63c76909916"
+      "bytes": 12134,
+      "sha256": "0527318786b1c0be44493221f59876019eb7bef424d7c8ff323a4f003c3fd3f2"
     },
     {
       "path": "examples/war-battles-online/integration/performance-evidence.mjs",
       "kind": "file",
-      "bytes": 5150,
-      "sha256": "8298f2a71fdf70a7ff160d70561a7f85274cfe478aa2ac27e638ccc5419d0dd2"
+      "bytes": 5276,
+      "sha256": "cbde70f4321c0c7a28b57e93cad7653df13aa83cf035ed71f637d817abbfb2ab"
     },
     {
       "path": "examples/war-battles-online/integration/check-performance.mjs",
       "kind": "file",
-      "bytes": 1992,
-      "sha256": "92f86947de4f74a83c439c9246940f382609f64101d7152361661501169b475a"
+      "bytes": 1996,
+      "sha256": "b8709891a96f1b3aabc8c65ef4aa48860d630b3b5bfc286e4e00663e15a7a19a"
     }
   ],
-  "sourceKey": "9f249348c55f663d33c8c81b63cc533754c178e56345c87832cad9c98920911c",
+  "sourceKey": "92611b96b80acdee9a0c82afdf379b63c0a2c72609de0b60914149ec20dc056b",
   "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
 }

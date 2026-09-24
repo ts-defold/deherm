@@ -1,4 +1,5 @@
 import {
+  defold,
   defineComponent,
   gui,
   hashLiteral,
@@ -28,10 +29,6 @@ import {
   type ScreenPoint,
 } from "../src/generated-war-battles/index";
 import { DEFOLD_ATTACHMENT_ALLOWED } from "../src/capability-snapshot";
-
-declare const __defoldHostV1: {
-  log(level: "info", message: string): void;
-};
 
 const SCREEN_WIDTH = 1280;
 const SCREEN_HEIGHT = 720;
@@ -136,7 +133,7 @@ export default defineComponent({
     );
     msg.post(".", "acquire_input_focus");
     render(self);
-    __defoldHostV1.log("info", `war-battles-runtime:gui-init-rendered:${self.bodies.length}:${self.projectiles.length}`);
+    defold.log("info", `war-battles-runtime:gui-init-rendered:${self.bodies.length}:${self.projectiles.length}`);
   },
 
   update(self: BattleGuiSelf, dt: number): void {
@@ -155,7 +152,7 @@ export default defineComponent({
     render(self);
     if (!self.runtimeUpdateObserved) {
       self.runtimeUpdateObserved = true;
-      __defoldHostV1.log("info", `war-battles-runtime:first-update-rendered:${self.bodies.length}:${self.projectiles.length}`);
+      defold.log("info", `war-battles-runtime:first-update-rendered:${self.bodies.length}:${self.projectiles.length}`);
     }
   },
 
@@ -206,7 +203,16 @@ function render(self: BattleGuiSelf): void {
     const alive = world.playerHealth[slot]! > 0;
     if (alive && world.playerTeam[slot] === 1) livingA += 1;
     if (alive && world.playerTeam[slot] === 2) livingB += 1;
-    projectWorldToScreen(world.playerX[slot]!, world.playerY[slot]!, cameraX, cameraY, SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_SCALE, self.point);
+    projectWorldToScreen(
+      world.playerX[slot]!,
+      world.playerY[slot]!,
+      cameraX,
+      cameraY,
+      SCREEN_WIDTH,
+      SCREEN_HEIGHT,
+      VIEW_SCALE,
+      self.point,
+    );
     const visible = alive && visibleAt(self.point, SCREEN_WIDTH, SCREEN_HEIGHT);
     const body = self.bodies[slot]!;
     const turret = self.turrets[slot]!;
@@ -217,7 +223,8 @@ function render(self: BattleGuiSelf): void {
       gui.playFlipbook(explosion, "explosion");
     }
     self.previousHealth[slot] = currentHealth;
-    const explosionVisible = world.tick < self.explosionUntil[slot]! && visibleAt(self.point, SCREEN_WIDTH, SCREEN_HEIGHT, 80);
+    const explosionVisible =
+      world.tick < self.explosionUntil[slot]! && visibleAt(self.point, SCREEN_WIDTH, SCREEN_HEIGHT, 80);
     gui.setEnabled(explosion, explosionVisible);
     if (explosionVisible) gui.setPosition(explosion, vmath.vector3(self.point.x, self.point.y, 0));
     gui.setEnabled(body, visible);
@@ -235,30 +242,47 @@ function render(self: BattleGuiSelf): void {
     if (world.projectileActive[slot] === 0) continue;
     activeProjectiles += 1;
     if (renderedProjectiles >= VISIBLE_PROJECTILES) continue;
-    projectWorldToScreen(world.projectileX[slot]!, world.projectileY[slot]!, cameraX, cameraY, SCREEN_WIDTH, SCREEN_HEIGHT, VIEW_SCALE, self.point);
+    projectWorldToScreen(
+      world.projectileX[slot]!,
+      world.projectileY[slot]!,
+      cameraX,
+      cameraY,
+      SCREEN_WIDTH,
+      SCREEN_HEIGHT,
+      VIEW_SCALE,
+      self.point,
+    );
     if (!visibleAt(self.point, SCREEN_WIDTH, SCREEN_HEIGHT, 12)) continue;
     const node = self.projectiles[renderedProjectiles]!;
     renderedProjectiles += 1;
     gui.setEnabled(node, true);
     gui.setPosition(node, vmath.vector3(self.point.x, self.point.y, 0));
-    gui.setEuler(node, vmath.vector3(0, 0, aimDegrees(world.projectileDirectionX[slot]!, world.projectileDirectionY[slot]!)));
+    gui.setEuler(
+      node,
+      vmath.vector3(0, 0, aimDegrees(world.projectileDirectionX[slot]!, world.projectileDirectionY[slot]!)),
+    );
     const weapon = world.projectileWeapon[slot]!;
-    gui.setColor(node, weapon === WEAPON_RAILGUN ? self.railgun : weapon === WEAPON_AUTOCANNON ? self.autocannon : self.cannon);
+    gui.setColor(
+      node,
+      weapon === WEAPON_RAILGUN ? self.railgun : weapon === WEAPON_AUTOCANNON ? self.autocannon : self.cannon,
+    );
   }
-  for (let index = renderedProjectiles; index < VISIBLE_PROJECTILES; index += 1) gui.setEnabled(self.projectiles[index]!, false);
+  for (let index = renderedProjectiles; index < VISIBLE_PROJECTILES; index += 1)
+    gui.setEnabled(self.projectiles[index]!, false);
 
   const health = Math.max(0, world.playerHealth[localSlot]!);
-  gui.setSize(self.healthFill, vmath.vector3(240 * Math.min(health, 175) / 175, 16, 0));
+  gui.setSize(self.healthFill, vmath.vector3((240 * Math.min(health, 175)) / 175, 16, 0));
   gui.setText(
     self.hud,
     `ROUND ${self.battle.round}  TICK ${world.tick}  HP ${health}  SCORE ${world.playerScore[localSlot]}  CREDITS ${world.playerCredits[localSlot]}\n` +
-    `TEAL ${livingA}  ORANGE ${livingB}  PROJECTILES ${activeProjectiles}` +
-    (activeProjectiles > renderedProjectiles ? ` (${activeProjectiles - renderedProjectiles} CULLED)` : ""),
+      `TEAL ${livingA}  ORANGE ${livingB}  PROJECTILES ${activeProjectiles}` +
+      (activeProjectiles > renderedProjectiles ? ` (${activeProjectiles - renderedProjectiles} CULLED)` : ""),
   );
 }
 
 function nodeSeries(prefix: string, count: number, width: number): Node[] {
   const nodes: Node[] = [];
-  for (let index = 0; index < count; index += 1) nodes.push(gui.getNode(prefix + String(index + 1).padStart(width, "0")));
+  for (let index = 0; index < count; index += 1)
+    nodes.push(gui.getNode(prefix + String(index + 1).padStart(width, "0")));
   return nodes;
 }

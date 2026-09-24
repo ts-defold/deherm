@@ -73,7 +73,8 @@ export function createInMemoryTransportPair(
 ): readonly [GameTransport, GameTransport] {
   const maxDatagramBytes = options.maxDatagramBytes ?? 1_200;
   const dropEvery = options.dropEvery ?? 0;
-  if (!Number.isInteger(maxDatagramBytes) || maxDatagramBytes <= 0) throw new RangeError("maxDatagramBytes must be positive");
+  if (!Number.isInteger(maxDatagramBytes) || maxDatagramBytes <= 0)
+    throw new RangeError("maxDatagramBytes must be positive");
   if (!Number.isInteger(dropEvery) || dropEvery < 0) throw new RangeError("dropEvery must be non-negative");
   const left = new InMemoryEndpoint(leftReceiver, maxDatagramBytes, dropEvery);
   const right = new InMemoryEndpoint(rightReceiver, maxDatagramBytes, dropEvery);
@@ -90,11 +91,7 @@ class InMemoryEndpoint implements GameTransport {
   private readonly receiver: TransportReceiver;
   private readonly dropEvery: number;
 
-  constructor(
-    receiver: TransportReceiver,
-    maxDatagramBytes: number,
-    dropEvery: number,
-  ) {
+  constructor(receiver: TransportReceiver, maxDatagramBytes: number, dropEvery: number) {
     this.receiver = receiver;
     this.dropEvery = dropEvery;
     this.capabilities = Object.freeze({
@@ -137,5 +134,6 @@ export function validateReliableChannel(channel: number): asserts channel is Rel
     channel !== TRANSPORT_CHANNEL_CONTROL &&
     channel !== TRANSPORT_CHANNEL_SNAPSHOT &&
     channel !== TRANSPORT_CHANNEL_INPUT_FALLBACK
-  ) throw new Error(`unknown reliable channel ${channel}`);
+  )
+    throw new Error(`unknown reliable channel ${channel}`);
 }

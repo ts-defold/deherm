@@ -1,14 +1,11 @@
-// The arena: a deterministic, non-destructible tile grid with cover, chokepoints,
+// The arena: a deterministic tile grid with bounded reactive cover, chokepoints,
 // spawn points and pickup pads.
 //
-// WHY NON-DESTRUCTIBLE. The grid is derived from a single `mapSeed` word, so it
-// is *content* rather than state: it never enters a snapshot, a joining client
-// rebuilds it exactly from the seed in the session message, and the authoritative
-// snapshot stays a fixed 17,760 bytes with no terrain delta codec. Destructible
-// cover would put 10,800 mutable cells on the wire, or force a delta encoder that
-// this slice does not have. Quake 3's arenas are not destructible either; the
-// cover you learn stays where you learned it, which is what makes a map readable
-// at speed.
+// The base grid is derived from a single `mapSeed` word, so static terrain never
+// enters a snapshot. A bounded set of crate/sandbag cells is layered on top as
+// mutable cover panels; only one health byte per panel crosses the wire. The
+// fixed panel table keeps cover reactive without turning 10,800 map cells into
+// mutable network state.
 //
 // Layout is point-symmetric: cell (x, y) always matches cell
 // (MAP_WIDTH-1-x, MAP_HEIGHT-1-y). Neither half of a deathmatch can be the bad
@@ -18,6 +15,8 @@ import {
   MAP_CELLS,
   MAP_HEIGHT,
   MAP_WIDTH,
+  COVER_MAX_HEALTH,
+  MAX_COVER_PANELS,
   MAX_HAZARDS,
   MAX_PICKUPS,
   TILE_UNITS,
@@ -117,6 +116,13 @@ export class ArenaMap {
   readonly pickupX = new Int32Array(MAX_PICKUPS);
   readonly pickupY = new Int32Array(MAX_PICKUPS);
   readonly pickupKind = new Uint8Array(MAX_PICKUPS);
+  /** Cell -> panel index, or -1 for static terrain/non-cover. */
+  readonly coverPanelByCell = new Int16Array(MAP_CELLS);
+  readonly coverX = new Int32Array(MAX_COVER_PANELS);
+  readonly coverY = new Int32Array(MAX_COVER_PANELS);
+  readonly coverHealth = new Uint8Array(MAX_COVER_PANELS);
+  /** Number of occupied derived panels; the arrays remain MAX_COVER_PANELS wide. */
+  coverPanelCount = 0;
   /** Four deterministic vent centres; hazard activity is derived from tick. */
   readonly hazardX = new Int32Array(MAX_HAZARDS);
   readonly hazardY = new Int32Array(MAX_HAZARDS);
@@ -139,11 +145,28 @@ export class ArenaMap {
   }
 
   solidAt(cellX: number, cellY: number): boolean {
-    return this.cellAt(cellX, cellY) !== CELL_FLOOR;
+    if (this.cellAt(cellX, cellY) === CELL_FLOOR) return false;
+    const panel = this.coverPanelByCell[this.index(cellX, cellY)]!;
+    return panel < 0 || this.coverHealth[panel]! > 0;
   }
 
   solidAtWorld(x: number, y: number): boolean {
     return this.solidAt(cellOfX(x), cellOfY(y));
+  }
+
+  coverPanelAtWorld(x: number, y: number): number {
+    const cellX = cellOfX(x);
+    const cellY = cellOfY(y);
+    if (cellX < 0 || cellY < 0 || cellX >= MAP_WIDTH || cellY >= MAP_HEIGHT) return -1;
+    return this.coverPanelByCell[this.index(cellX, cellY)]!;
+  }
+
+  damageCoverAtWorld(x: number, y: number, damage: number): number {
+    const panel = this.coverPanelAtWorld(x, y);
+    if (panel < 0 || this.coverHealth[panel]! === 0) return -1;
+    const remaining = Math.max(0, this.coverHealth[panel]! - Math.max(0, Math.trunc(damage)));
+    this.coverHealth[panel] = remaining;
+    return remaining;
   }
 
   /**
@@ -207,20 +230,26 @@ export class ArenaMap {
     const absDeltaX = deltaX < 0 ? -deltaX : deltaX;
     const absDeltaY = deltaY < 0 ? -deltaY : deltaY;
     // Distance from the origin to the first cell boundary on each axis.
-    let tMaxX = stepX === 0 ? Number.MAX_SAFE_INTEGER
-      : stepX > 0
-        ? (WORLD_MIN_X + (cellX + 1) * TILE_UNITS - x0) * absDeltaY
-        : (x0 - (WORLD_MIN_X + cellX * TILE_UNITS)) * absDeltaY;
-    let tMaxY = stepY === 0 ? Number.MAX_SAFE_INTEGER
-      : stepY > 0
-        ? (WORLD_MIN_Y + (cellY + 1) * TILE_UNITS - y0) * absDeltaX
-        : (y0 - (WORLD_MIN_Y + cellY * TILE_UNITS)) * absDeltaX;
+    let tMaxX =
+      stepX === 0
+        ? Number.MAX_SAFE_INTEGER
+        : stepX > 0
+          ? (WORLD_MIN_X + (cellX + 1) * TILE_UNITS - x0) * absDeltaY
+          : (x0 - (WORLD_MIN_X + cellX * TILE_UNITS)) * absDeltaY;
+    let tMaxY =
+      stepY === 0
+        ? Number.MAX_SAFE_INTEGER
+        : stepY > 0
+          ? (WORLD_MIN_Y + (cellY + 1) * TILE_UNITS - y0) * absDeltaX
+          : (y0 - (WORLD_MIN_Y + cellY * TILE_UNITS)) * absDeltaX;
     const tDeltaX = stepX === 0 ? Number.MAX_SAFE_INTEGER : TILE_UNITS * absDeltaY;
     const tDeltaY = stepY === 0 ? Number.MAX_SAFE_INTEGER : TILE_UNITS * absDeltaX;
     // The walk is bounded by the Manhattan cell distance, so a degenerate input
     // can never spin here.
-    let guard = (endCellX > cellX ? endCellX - cellX : cellX - endCellX)
-      + (endCellY > cellY ? endCellY - cellY : cellY - endCellY) + 2;
+    let guard =
+      (endCellX > cellX ? endCellX - cellX : cellX - endCellX) +
+      (endCellY > cellY ? endCellY - cellY : cellY - endCellY) +
+      2;
     while (guard > 0 && (cellX !== endCellX || cellY !== endCellY)) {
       guard -= 1;
       if (tMaxX <= tMaxY) {
@@ -267,6 +296,11 @@ export class ArenaMap {
 
   private build(): void {
     this.cells.fill(CELL_FLOOR);
+    // `solidAt` is used while placing spawns and pickups, before the mutable
+    // cover table is populated. Keep every cell explicitly static until the
+    // deterministic panel pass below assigns the crate/sandbag entries.
+    this.coverPanelByCell.fill(-1);
+    this.coverHealth.fill(0);
     for (let cellY = 0; cellY < MAP_HEIGHT; cellY += 1) {
       for (let cellX = 0; cellX < MAP_WIDTH; cellX += 1) {
         if (cellX < BORDER || cellY < BORDER || cellX >= MAP_WIDTH - BORDER || cellY >= MAP_HEIGHT - BORDER) {
@@ -307,6 +341,7 @@ export class ArenaMap {
     this.placeSpawnPoints();
     this.placePickupPads();
     this.placeHazards();
+    this.placeDestructibleCover();
   }
 
   private stamp(centreX: number, centreY: number, stamp: Stamp): void {
@@ -319,9 +354,7 @@ export class ArenaMap {
         const cellX = left + offsetX;
         const cellY = bottom + offsetY;
         if (cellX < BORDER || cellY < BORDER || cellX >= MAP_WIDTH - BORDER || cellY >= MAP_HEIGHT - BORDER) continue;
-        const interior = stamp.hollow
-          && offsetX > 0 && offsetY > 0
-          && offsetX < width - 1 && offsetY < height - 1;
+        const interior = stamp.hollow && offsetX > 0 && offsetY > 0 && offsetX < width - 1 && offsetY < height - 1;
         // A hollow stamp is a bunker, not a sealed box: one wall cell in the
         // middle of the south face is left open so the interior is reachable and
         // the cover has a way in and a way out.
@@ -352,10 +385,22 @@ export class ArenaMap {
     // strong pickups sit at the ends of the cycle, which puts them near the
     // arena's long axis rather than in a corner.
     const cycle = [
-      WEAPON_AUTOCANNON, PICKUP_HEALTH, WEAPON_SCATTER, PICKUP_ARMOR,
-      WEAPON_RICOCHET, PICKUP_HEALTH, WEAPON_MORTAR, PICKUP_ARMOR,
-      WEAPON_AUTOCANNON, PICKUP_HEALTH, WEAPON_SCATTER, PICKUP_OVERDRIVE,
-      WEAPON_RICOCHET, PICKUP_HEALTH, WEAPON_RAILGUN, PICKUP_ARMOR,
+      WEAPON_AUTOCANNON,
+      PICKUP_HEALTH,
+      WEAPON_SCATTER,
+      PICKUP_ARMOR,
+      WEAPON_RICOCHET,
+      PICKUP_HEALTH,
+      WEAPON_MORTAR,
+      PICKUP_ARMOR,
+      WEAPON_AUTOCANNON,
+      PICKUP_HEALTH,
+      WEAPON_SCATTER,
+      PICKUP_OVERDRIVE,
+      WEAPON_RICOCHET,
+      PICKUP_HEALTH,
+      WEAPON_RAILGUN,
+      PICKUP_ARMOR,
     ];
     const point: WorldPoint = { x: 0, y: 0 };
     const columns = 8;
@@ -376,8 +421,10 @@ export class ArenaMap {
     // Keep the vents away from the central command beacon while preserving
     // point symmetry. They are derived content, not mutable terrain state.
     const cells = [
-      [30, 22], [MAP_WIDTH - 1 - 30, 22],
-      [30, MAP_HEIGHT - 1 - 22], [MAP_WIDTH - 1 - 30, MAP_HEIGHT - 1 - 22],
+      [30, 22],
+      [MAP_WIDTH - 1 - 30, 22],
+      [30, MAP_HEIGHT - 1 - 22],
+      [MAP_WIDTH - 1 - 30, MAP_HEIGHT - 1 - 22],
     ] as const;
     const point: WorldPoint = { x: 0, y: 0 };
     for (let index = 0; index < MAX_HAZARDS; index += 1) {
@@ -385,5 +432,38 @@ export class ArenaMap {
       this.hazardX[index] = point.x;
       this.hazardY[index] = point.y;
     }
+  }
+
+  private placeDestructibleCover(): void {
+    this.coverPanelByCell.fill(-1);
+    this.coverHealth.fill(0);
+    let panel = 0;
+    for (let cellY = BORDER; cellY < MAP_HEIGHT - BORDER && panel < MAX_COVER_PANELS; cellY += 1) {
+      for (let cellX = BORDER; cellX < MAP_WIDTH - BORDER && panel < MAX_COVER_PANELS; cellX += 1) {
+        const cell = this.index(cellX, cellY);
+        if (this.cells[cell] !== CELL_CRATE && this.cells[cell] !== CELL_SANDBAG) continue;
+        const mirrorX = MAP_WIDTH - 1 - cellX;
+        const mirrorY = MAP_HEIGHT - 1 - cellY;
+        const mirrorCell = this.index(mirrorX, mirrorY);
+        // Process each point-symmetric pair once. Selecting a row-major prefix
+        // without its mirror makes one side of the arena destructible and the
+        // other permanently solid.
+        if (cell > mirrorCell) continue;
+        if (panel + (cell === mirrorCell ? 1 : 2) > MAX_COVER_PANELS) return;
+        this.coverPanelByCell[cell] = panel;
+        this.coverX[panel] = cellCentreX(cellX);
+        this.coverY[panel] = cellCentreY(cellY);
+        this.coverHealth[panel] = COVER_MAX_HEALTH;
+        panel += 1;
+        if (cell !== mirrorCell) {
+          this.coverPanelByCell[mirrorCell] = panel;
+          this.coverX[panel] = cellCentreX(mirrorX);
+          this.coverY[panel] = cellCentreY(mirrorY);
+          this.coverHealth[panel] = COVER_MAX_HEALTH;
+          panel += 1;
+        }
+      }
+    }
+    this.coverPanelCount = panel;
   }
 }

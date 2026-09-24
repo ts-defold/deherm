@@ -24,11 +24,14 @@ class FakeSocket {
   }
 
   removeEventListener(type, listener) {
-    this.listeners.set(type, (this.listeners.get(type) ?? []).filter((entry) => entry !== listener));
+    this.listeners.set(
+      type,
+      (this.listeners.get(type) ?? []).filter((entry) => entry !== listener),
+    );
   }
 
   emit(type, event = {}) {
-    for (const listener of [...(this.listeners.get(type) ?? [])]) listener(event);
+    for (const listener of this.listeners.get(type) ?? []) listener(event);
   }
 
   open() {
@@ -65,9 +68,15 @@ function receiver() {
     reliable: [],
     datagrams: [],
     closed: [],
-    onReliable(channel, payload) { this.reliable.push({ channel, payload: [...payload] }); },
-    onDatagram(payload) { this.datagrams.push([...payload]); },
-    onClose(code, reason) { this.closed.push({ code, reason }); },
+    onReliable(channel, payload) {
+      this.reliable.push({ channel, payload: [...payload] });
+    },
+    onDatagram(payload) {
+      this.datagrams.push([...payload]);
+    },
+    onClose(code, reason) {
+      this.closed.push({ code, reason });
+    },
   };
 }
 
@@ -85,7 +94,9 @@ test("WebSocket fallback carries reliable control and explicit input-fallback la
   const serverReceiver = receiver();
   const clientReceiver = receiver();
   const ClientConstructor = class {
-    constructor() { return pair.left; }
+    constructor() {
+      return pair.left;
+    }
   };
   const client = await BrowserWebSocketClient.connect("ws://example.test/ws", clientReceiver, ClientConstructor);
   const server = BrowserWebSocketClient.adopt(pair.right, serverReceiver);
@@ -129,7 +140,9 @@ test("WebSocket fallback preserves message order across asynchronous Blob conver
   let releaseFirst;
   class DeferredBlob extends Blob {
     async arrayBuffer() {
-      await new Promise((resolve) => { releaseFirst = resolve; });
+      await new Promise((resolve) => {
+        releaseFirst = resolve;
+      });
       return super.arrayBuffer();
     }
   }
@@ -141,7 +154,10 @@ test("WebSocket fallback preserves message order across asynchronous Blob conver
   assert.deepEqual(serverReceiver.reliable, []);
   releaseFirst();
   await new Promise((resolve) => setImmediate(resolve));
-  assert.deepEqual(serverReceiver.reliable.map((entry) => entry.payload), [[1], [2]]);
+  assert.deepEqual(
+    serverReceiver.reliable.map((entry) => entry.payload),
+    [[1], [2]],
+  );
 });
 
 test("WebSocket fallback drops an async conversion completed after close", async () => {
@@ -151,13 +167,13 @@ test("WebSocket fallback drops an async conversion completed after close", async
   let release;
   class DeferredBlob extends Blob {
     async arrayBuffer() {
-      await new Promise((resolve) => { release = resolve; });
+      await new Promise((resolve) => {
+        release = resolve;
+      });
       return super.arrayBuffer();
     }
   }
-  pair.right.emit("message", { data: new DeferredBlob([
-    reliableFrame(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(3)),
-  ]) });
+  pair.right.emit("message", { data: new DeferredBlob([reliableFrame(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(3))]) });
   await new Promise((resolve) => setImmediate(resolve));
   server.close(1000, "closed while decoding");
   release();

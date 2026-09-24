@@ -1,0 +1,24 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "rules": {
+    "eslint/no-debugger": "error",
+    "eslint/no-duplicate-imports": "error",
+    "eslint/no-eval": "error"
+  },
+  "ignorePatterns": [
+    "defold/.deherm/**",
+    "defold/.internal/**",
+    "defold/build/**",
+    "defold/assets/derived/**",
+    "defold/defold_hermes/**",
+    "defold/defold_hermes_typed_native/**",
+    "defold/src/generated-war-battles/**",
+    "defold/tsconfig.deherm.*.json",
+    "evidence/**",
+    "test/fixtures/**",
+    "verification/generated/**"
+  ]
+}

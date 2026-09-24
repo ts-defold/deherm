@@ -1,9 +1,6 @@
 /** Deno file adapter for fixed authoritative world checkpoints. */
 
-import {
-  WORLD_CHECKPOINT_BYTES,
-  type WorldCheckpointStorage,
-} from "./world-persistence.ts";
+import { WORLD_CHECKPOINT_BYTES, type WorldCheckpointStorage } from "./world-persistence.ts";
 import { replaceDurably, type DurableFileRuntime } from "./durable-file.ts";
 
 interface DenoFileApi extends DurableFileRuntime {
