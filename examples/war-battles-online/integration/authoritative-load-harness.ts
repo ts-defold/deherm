@@ -2,6 +2,7 @@ import {
   BattleClient,
   INPUT_SEND_INTERVAL_TICKS,
   MatchServer,
+  NetworkBotDriver,
   TICK_MILLISECONDS,
   type BattleClientOptions,
   type GameTransport,
@@ -35,6 +36,8 @@ export interface LoadHarnessConfig {
   /** Per-client application-payload cap for server-to-client traffic. */
   readonly downlinkBitsPerSecond: number;
   readonly minimumInputAcceptanceRatio: number;
+  /** Shared production bot-brain difficulty used by every network client. */
+  readonly botSkill: number;
 }
 
 export const LOAD_HARNESS_CONFIG: Readonly<LoadHarnessConfig> = Object.freeze({
@@ -52,6 +55,7 @@ export const LOAD_HARNESS_CONFIG: Readonly<LoadHarnessConfig> = Object.freeze({
   uplinkBitsPerSecond: 24_000,
   downlinkBitsPerSecond: 160_000,
   minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO,
+  botSkill: 2,
 });
 
 const RELIABLE_CHANNELS: readonly ReliableChannel[] = [1, 2, 3, 4];
@@ -414,6 +418,7 @@ export async function runAuthoritativeLoadHarness(
     onLog: (line) => serverLogs.push(line),
   });
   const clients: BattleClient[] = [];
+  const botDrivers: NetworkBotDriver[] = [];
   const clientErrors: string[][] = [];
   const clientLogs: string[][] = [];
   const sessions = [];
@@ -423,16 +428,22 @@ export async function runAuthoritativeLoadHarness(
     const options: BattleClientOptions = {
       name: `load-${index + 1}`,
       leadTicks: 2,
+      // Preserve the shared bot brain's skill-dependent aim. Human clients
+      // default to aim assistance, while the production bot dashboard and this
+      // product matrix deliberately drive the ordinary aim API themselves.
+      assistAim: false,
       onError: (error) => errors.push(String(error instanceof Error ? error.message : error)),
       onLog: (line) => logs.push(line),
     };
     const client = new BattleClient(options);
+    const botDriver = new NetworkBotDriver(client, { skill: config.botSkill });
     const session = server.createSession();
     const clientTransport = new ImpairedTransport(network, index + 1, "client-to-server", session);
     const serverTransport = new ImpairedTransport(network, index + 1, "server-to-client", client);
     session.attach(serverTransport);
     client.attach(clientTransport);
     clients.push(client);
+    botDrivers.push(botDriver);
     sessions.push(session);
     clientErrors.push(errors);
     clientLogs.push(logs);
@@ -470,17 +481,6 @@ export async function runAuthoritativeLoadHarness(
   for (let tick = 1; tick <= config.ticks; tick += 1) {
     network.advanceTo(simulationTime);
     await Promise.resolve();
-    for (let index = 0; index < clients.length; index += 1) {
-      const player = index + 1;
-      clients[index]!.setControls({
-        moveX: ((tick + player) % 3) - 1,
-        moveY: ((tick * 2 + player) % 3) - 1,
-        fire: (tick + player) % 7 < 3,
-        boost: (tick + player) % 19 === 0,
-        weapon: (tick + player) % 4 === 0 ? 1 : 0,
-      });
-      clients[index]!.setAim((player % 2 === 0 ? -1 : 1) * 256, ((tick + player) % 5) - 2);
-    }
     const stepStarted = observer === undefined ? undefined : observer.now();
     server.step();
     if (stepStarted !== undefined && observer !== undefined) {
@@ -490,7 +490,7 @@ export async function runAuthoritativeLoadHarness(
       }
       observer.onAuthoritativeStep?.({ tick: server.world.tick, durationMilliseconds });
     }
-    for (const client of clients) client.update(TICK_MILLISECONDS);
+    for (const botDriver of botDrivers) botDriver.update(TICK_MILLISECONDS);
     await Promise.resolve();
     simulationTime += TICK_MILLISECONDS;
   }
@@ -588,6 +588,10 @@ export async function runAuthoritativeLoadHarness(
       replayedTicks: client.stats.replayedTicks,
       converged,
       errors: clientErrors[index]!.length,
+      botCommandsStaged: botDrivers[index]!.stats.commandsStaged,
+      botNonIdleCommands: botDrivers[index]!.stats.nonIdleCommands,
+      botChassisRequests: botDrivers[index]!.stats.chassisRequests,
+      botWeaponUpgradeRequests: botDrivers[index]!.stats.weaponUpgradeRequests,
     };
   });
   const allConverged = clientRows.every((client) => client.converged);
@@ -610,6 +614,9 @@ export async function runAuthoritativeLoadHarness(
     const generatedCommands = config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips;
     return client.inputsSent + client.inputsDropped === Math.ceil(generatedCommands / INPUT_SEND_INTERVAL_TICKS);
   });
+  const everyBotDroveTheProduct = clientRows.every(
+    (client) => client.botCommandsStaged === config.ticks && client.botNonIdleCommands >= config.ticks / 2,
+  );
   const generatedInputCommands = clientRows.reduce(
     (total, client) => total + config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips,
     0,
@@ -623,13 +630,14 @@ export async function runAuthoritativeLoadHarness(
     !reliableOrderPreserved ||
     !reliableDeliveryAccounted ||
     !everyClientAttemptedEverySendOpportunity ||
+    !everyBotDroveTheProduct ||
     inputAcceptanceRatio < config.minimumInputAcceptanceRatio ||
     !noErrors ||
     !boundedQueues ||
     network.queue.length !== 0
   ) {
     throw new Error(
-      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, reliableDeliveryAccounted, everyClientAttemptedEverySendOpportunity, inputAcceptanceRatio, minimumInputAcceptanceRatio: config.minimumInputAcceptanceRatio, noErrors, pending: network.queue.length, network: network.stats, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
+      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, reliableDeliveryAccounted, everyClientAttemptedEverySendOpportunity, everyBotDroveTheProduct, inputAcceptanceRatio, minimumInputAcceptanceRatio: config.minimumInputAcceptanceRatio, noErrors, pending: network.queue.length, network: network.stats, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
     );
   }
   return Object.freeze({
@@ -688,6 +696,8 @@ export async function runAuthoritativeLoadHarness(
       inputSendIntervalTicks: INPUT_SEND_INTERVAL_TICKS,
       minimumAttemptedInputDatagrams: Math.min(...clientRows.map((client) => client.inputsSent + client.inputsDropped)),
       maximumAttemptedInputDatagrams: Math.max(...clientRows.map((client) => client.inputsSent + client.inputsDropped)),
+      botDriver: "shared-production-network-bot",
+      everyBotDroveTheProduct,
       minInputsSent: Math.min(...clientRows.map((client) => client.inputsSent)),
       maxInputsSent: Math.max(...clientRows.map((client) => client.inputsSent)),
       maxInputsDropped: Math.max(...clientRows.map((client) => client.inputsDropped)),

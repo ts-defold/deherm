@@ -19,6 +19,7 @@ import {
   CONTROL_SET_WEAPON_UPGRADE,
   CONTROL_SUICIDE,
   DEFAULT_ARENA_SEED,
+  DIRECTION_SCALE,
   EVENT_KILL,
   EVENT_EJECT,
   EVENT_TANK_ACQUIRED,
@@ -43,6 +44,7 @@ import {
   MatchServer,
   NETWORK_SNAPSHOT_BYTES,
   NetworkBotDriver,
+  normalizeInto,
   PICKUP_HEALTH,
   REJECT_BAD_RESUME,
   REJECT_FULL,
@@ -1506,6 +1508,69 @@ test("network bots adapt the shared bot brain through ordinary client controls",
   assert.equal(driver.stats.nonIdleCommands, 1);
   assert.deepEqual(chassisRequests, []);
   assert.deepEqual(weaponUpgradeRequests, []);
+});
+
+test("network bot aim reaches the ordinary BattleClient input wire path", async () => {
+  const datagrams = [];
+  const transport = {
+    capabilities: {
+      protocol: "in-memory",
+      reliableStreams: true,
+      datagrams: true,
+      maxDatagramBytes: 1_200,
+    },
+    async sendReliable() {
+      return "sent";
+    },
+    async trySendDatagram(payload) {
+      datagrams.push(payload.slice());
+      return "sent";
+    },
+    close() {},
+  };
+  const matchId = 0x7251;
+  const mapSeed = 0xace0;
+  const client = new BattleClient({ name: "wire-bot", assistAim: false, leadTicks: 0 });
+  client.attach(transport);
+  await settle();
+  const welcome = new Uint8Array(WELCOME_BYTES);
+  writeWelcome(welcome, {
+    matchId,
+    playerId: 1,
+    team: 1,
+    maximumPlayers: 2,
+    botCount: 0,
+    mapSeed,
+    serverTick: 0,
+    tickRate: 60,
+    snapshotIntervalTicks: 3,
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES).fill(3),
+  });
+  client.onReliable(TRANSPORT_CHANNEL_SESSION, welcome);
+  await settle();
+  assert.equal(client.state, "ready");
+
+  client.world.playerX[0] = 10 * TILE_UNITS;
+  client.world.playerY[0] = 10 * TILE_UNITS;
+  client.world.playerX[1] = 16 * TILE_UNITS;
+  client.world.playerY[1] = 12 * TILE_UNITS;
+  client.world.setBotSkill(1, 2);
+
+  const driver = new NetworkBotDriver(client, { skill: 2 });
+  assert.equal(driver.update(TICK_MILLISECONDS), 1);
+  await settle();
+  assert.equal(datagrams.length, 1);
+  const decoded = Array.from({ length: INPUT_BUNDLE_MAX_COMMANDS }, () => createInputCommand(0, 1));
+  const count = readInputBundle(datagrams[0], datagrams[0].byteLength, decoded);
+  const transmitted = decoded[count - 1];
+  const staged = driver.staged;
+  assert.notEqual(staged.moveX + staged.moveY, 0, "fixture must exercise aim while the bot is moving");
+  const normalizedAim = { x: 0, y: 0 };
+  assert.equal(normalizeInto(staged.aimX, staged.aimY, normalizedAim), true);
+  assert.equal(transmitted.aimX, Math.trunc((normalizedAim.x * 127) / DIRECTION_SCALE));
+  assert.equal(transmitted.aimY, Math.trunc((normalizedAim.y * 127) / DIRECTION_SCALE));
+  assert.equal(transmitted.moveX, staged.moveX);
+  assert.equal(transmitted.moveY, staged.moveY);
 });
 
 test("network bots send predicted weapon purchases over the authoritative control lane", () => {

@@ -72,8 +72,11 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
       readonly rows: readonly {
         readonly snapshotsApplied: number;
         readonly maximumLocalCorrectionMagnitude: number;
+        readonly botCommandsStaged: number;
+        readonly botNonIdleCommands: number;
       }[];
       readonly maximumRemoteInterpolationDiscontinuity: number;
+      readonly everyBotDroveTheProduct: boolean;
     };
     const server = evidence.server as Record<string, number>;
     const transport = evidence.transport as Record<string, unknown>;
@@ -147,6 +150,9 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
           maximumSnapshotsApplied: Math.max(...clients.rows.map((row) => row.snapshotsApplied)),
           maximumLocalCorrectionMagnitude: Math.max(...clients.rows.map((row) => row.maximumLocalCorrectionMagnitude)),
           maximumRemoteInterpolationDiscontinuity: clients.maximumRemoteInterpolationDiscontinuity,
+          everyBotDroveTheProduct: clients.everyBotDroveTheProduct,
+          minimumBotCommandsStaged: Math.min(...clients.rows.map((row) => row.botCommandsStaged)),
+          minimumBotNonIdleCommands: Math.min(...clients.rows.map((row) => row.botNonIdleCommands)),
         }),
         convergence: evidence.convergence,
         errors: evidence.errors,
@@ -158,6 +164,6 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
     kind: "war-battles.32-player-network-impairment-matrix",
     profiles: Object.freeze(rows),
     evidenceBoundary:
-      "The production MatchServer, BattleClient, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
+      "The production MatchServer, BattleClient, shared NetworkBotDriver brain, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
   });
 }

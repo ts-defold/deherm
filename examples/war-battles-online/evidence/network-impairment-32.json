@@ -18,72 +18,76 @@
         "drainMilliseconds": 2000,
         "uplinkBitsPerSecond": 32000,
         "downlinkBitsPerSecond": 256000,
-        "minimumInputAcceptanceRatio": 0.95
+        "minimumInputAcceptanceRatio": 0.95,
+        "botSkill": 2
       },
       "transport": {
         "modeledDurationMilliseconds": 14693.666666666635,
         "workload": {
           "durationMilliseconds": 9999.999999999978,
           "bytes": {
-            "offered": 5691084,
-            "serialized": 5691084,
-            "delivered": 5619564,
-            "dropped": 25534,
+            "offered": 6155755,
+            "serialized": 6155755,
+            "delivered": 6032174,
+            "dropped": 25484,
             "backpressured": 0,
             "cancelledReliable": 0,
-            "clientToServerSerialized": 485582,
-            "clientToServerDelivered": 457448,
-            "serverToClientSerialized": 5205502,
-            "serverToClientDelivered": 5162116
+            "clientToServerSerialized": 486078,
+            "clientToServerDelivered": 458044,
+            "serverToClientSerialized": 5669677,
+            "serverToClientDelivered": 5574130
           }
         },
         "capBoundary": "application payload serialization; workload utilization counts bytes admitted during its exact ten-second window and excludes QUIC/HTTP3/TLS/UDP/IP framing and congestion control",
-        "offeredBytes": 5849940,
-        "serializedBytes": 5849940,
-        "deliveredBytes": 5824306,
-        "droppedBytes": 25634,
+        "offeredBytes": 6406603,
+        "serializedBytes": 6406603,
+        "deliveredBytes": 6380919,
+        "droppedBytes": 25684,
         "backpressuredBytes": 0,
         "cancelledReliableBytes": 0,
-        "clientToServerSerializedBytes": 489166,
-        "clientToServerDeliveredBytes": 463532,
-        "serverToClientSerializedBytes": 5360774,
-        "serverToClientDeliveredBytes": 5360774,
-        "droppedDatagrams": 514,
+        "clientToServerSerializedBytes": 489662,
+        "clientToServerDeliveredBytes": 463978,
+        "serverToClientSerializedBytes": 5916941,
+        "serverToClientDeliveredBytes": 5916941,
+        "droppedDatagrams": 515,
         "backpressuredDatagrams": 0,
-        "reorderedDatagrams": 41,
+        "reorderedDatagrams": 43,
         "cancelledReliable": 0,
         "peakQueue": 137,
-        "peakQueuedBytes": 131370,
+        "peakQueuedBytes": 167712,
         "queueBound": 2304,
-        "maximumSerializationDelayMilliseconds": 115.5,
-        "serializedUplinkBytesPerSecondPerClient": 1517.4437500000033,
+        "maximumSerializationDelayMilliseconds": 128.4375,
+        "serializedUplinkBytesPerSecondPerClient": 1518.9937500000033,
         "uplinkCapacityBytesPerSecond": 4000,
-        "uplinkCapacityUtilization": 0.3793609375000008,
-        "serializedDownlinkBytesPerSecondPerClient": 16267.193750000035,
+        "uplinkCapacityUtilization": 0.3797484375000008,
+        "serializedDownlinkBytesPerSecondPerClient": 17717.74062500004,
         "downlinkCapacityBytesPerSecond": 32000,
-        "downlinkCapacityUtilization": 0.5083498046875011
+        "downlinkCapacityUtilization": 0.5536793945312513
       },
       "server": {
         "finalTick": 616,
-        "snapshotsSent": 4846,
-        "snapshotBytesSent": 5358822,
-        "snapshotFramesSkippedByBudget": 82,
-        "snapshotSkipRatio": 0.016639610389610388,
+        "snapshotsSent": 4848,
+        "snapshotBytesSent": 5914989,
+        "snapshotFramesSkippedByBudget": 80,
+        "snapshotSkipRatio": 0.016233766233766232,
         "maximumSnapshotSkipRatio": 0.05,
-        "inputsAccepted": 18916,
-        "inputsLate": 446,
-        "inputAcceptanceRatio": 0.9732956007203499,
+        "inputsAccepted": 18941,
+        "inputsLate": 435,
+        "inputAcceptanceRatio": 0.9731798797718748,
         "minimumInputAcceptanceRatio": 0.95
       },
       "clients": {
-        "minimumSnapshotsApplied": 146,
+        "minimumSnapshotsApplied": 145,
         "minimumSnapshotsAppliedFloor": 120,
         "maximumSnapshotsApplied": 151,
-        "maximumLocalCorrectionMagnitude": 26176,
-        "maximumRemoteInterpolationDiscontinuity": 0
+        "maximumLocalCorrectionMagnitude": 11264,
+        "maximumRemoteInterpolationDiscontinuity": 0,
+        "everyBotDroveTheProduct": true,
+        "minimumBotCommandsStaged": 600,
+        "minimumBotNonIdleCommands": 474
       },
       "convergence": {
-        "authoritativeHash": 65367700,
+        "authoritativeHash": 215569739,
         "allClientsConverged": true,
         "uniquePlayerIds": 32,
         "finalTick": 616
@@ -111,72 +115,76 @@
         "drainMilliseconds": 2000,
         "uplinkBitsPerSecond": 24000,
         "downlinkBitsPerSecond": 160000,
-        "minimumInputAcceptanceRatio": 0.93
+        "minimumInputAcceptanceRatio": 0.93,
+        "botSkill": 2
       },
       "transport": {
         "modeledDurationMilliseconds": 14893.333333333296,
         "workload": {
           "durationMilliseconds": 9999.999999999975,
           "bytes": {
-            "offered": 5656289,
-            "serialized": 5656289,
-            "delivered": 5535076,
-            "dropped": 58428,
+            "offered": 6109233,
+            "serialized": 6109233,
+            "delivered": 5951920,
+            "dropped": 59028,
             "backpressured": 0,
             "cancelledReliable": 0,
-            "clientToServerSerialized": 488782,
-            "clientToServerDelivered": 426804,
-            "serverToClientSerialized": 5167507,
-            "serverToClientDelivered": 5108272
+            "clientToServerSerialized": 490230,
+            "clientToServerDelivered": 427902,
+            "serverToClientSerialized": 5619003,
+            "serverToClientDelivered": 5524018
           }
         },
         "capBoundary": "application payload serialization; workload utilization counts bytes admitted during its exact ten-second window and excludes QUIC/HTTP3/TLS/UDP/IP framing and congestion control",
-        "offeredBytes": 5905120,
-        "serializedBytes": 5905120,
-        "deliveredBytes": 5846292,
-        "droppedBytes": 58828,
+        "offeredBytes": 6347574,
+        "serializedBytes": 6347574,
+        "deliveredBytes": 6288096,
+        "droppedBytes": 59478,
         "backpressuredBytes": 0,
         "cancelledReliableBytes": 0,
-        "clientToServerSerializedBytes": 492366,
-        "clientToServerDeliveredBytes": 433538,
-        "serverToClientSerializedBytes": 5412754,
-        "serverToClientDeliveredBytes": 5412754,
-        "droppedDatagrams": 1178,
+        "clientToServerSerializedBytes": 493814,
+        "clientToServerDeliveredBytes": 434336,
+        "serverToClientSerializedBytes": 5853760,
+        "serverToClientDeliveredBytes": 5853760,
+        "droppedDatagrams": 1191,
         "backpressuredDatagrams": 0,
-        "reorderedDatagrams": 463,
+        "reorderedDatagrams": 506,
         "cancelledReliable": 0,
-        "peakQueue": 145,
-        "peakQueuedBytes": 154152,
+        "peakQueue": 146,
+        "peakQueuedBytes": 158185,
         "queueBound": 2304,
-        "maximumSerializationDelayMilliseconds": 193.28333333333467,
-        "serializedUplinkBytesPerSecondPerClient": 1527.4437500000038,
+        "maximumSerializationDelayMilliseconds": 235.9166666666788,
+        "serializedUplinkBytesPerSecondPerClient": 1531.9687500000039,
         "uplinkCapacityBytesPerSecond": 3000,
-        "uplinkCapacityUtilization": 0.5091479166666679,
-        "serializedDownlinkBytesPerSecondPerClient": 16148.45937500004,
+        "uplinkCapacityUtilization": 0.5106562500000013,
+        "serializedDownlinkBytesPerSecondPerClient": 17559.384375000045,
         "downlinkCapacityBytesPerSecond": 20000,
-        "downlinkCapacityUtilization": 0.807422968750002
+        "downlinkCapacityUtilization": 0.8779692187500022
       },
       "server": {
         "finalTick": 620,
-        "snapshotsSent": 4632,
-        "snapshotBytesSent": 5410802,
-        "snapshotFramesSkippedByBudget": 328,
-        "snapshotSkipRatio": 0.06612903225806452,
+        "snapshotsSent": 4293,
+        "snapshotBytesSent": 5851808,
+        "snapshotFramesSkippedByBudget": 667,
+        "snapshotSkipRatio": 0.13447580645161292,
         "maximumSnapshotSkipRatio": 0.15,
-        "inputsAccepted": 18590,
+        "inputsAccepted": 18598,
         "inputsLate": 676,
-        "inputAcceptanceRatio": 0.9505061867266592,
+        "inputAcceptanceRatio": 0.9480552581944232,
         "minimumInputAcceptanceRatio": 0.93
       },
       "clients": {
-        "minimumSnapshotsApplied": 140,
+        "minimumSnapshotsApplied": 129,
         "minimumSnapshotsAppliedFloor": 110,
-        "maximumSnapshotsApplied": 144,
-        "maximumLocalCorrectionMagnitude": 22528,
-        "maximumRemoteInterpolationDiscontinuity": 0
+        "maximumSnapshotsApplied": 134,
+        "maximumLocalCorrectionMagnitude": 18690,
+        "maximumRemoteInterpolationDiscontinuity": 0,
+        "everyBotDroveTheProduct": true,
+        "minimumBotCommandsStaged": 600,
+        "minimumBotNonIdleCommands": 509
       },
       "convergence": {
-        "authoritativeHash": 676358832,
+        "authoritativeHash": 2493710175,
         "allClientsConverged": true,
         "uniquePlayerIds": 32,
         "finalTick": 620
@@ -204,72 +212,76 @@
         "drainMilliseconds": 2000,
         "uplinkBitsPerSecond": 20000,
         "downlinkBitsPerSecond": 128000,
-        "minimumInputAcceptanceRatio": 0.9
+        "minimumInputAcceptanceRatio": 0.9,
+        "botSkill": 2
       },
       "transport": {
         "modeledDurationMilliseconds": 15321.33333333328,
         "workload": {
           "durationMilliseconds": 9999.999999999958,
           "bytes": {
-            "offered": 4811597,
-            "serialized": 4807297,
-            "delivered": 4618342,
-            "dropped": 49732,
-            "backpressured": 4300,
+            "offered": 4981656,
+            "serialized": 4978056,
+            "delivered": 4827169,
+            "dropped": 47732,
+            "backpressured": 3600,
             "cancelledReliable": 0,
-            "clientToServerSerialized": 486132,
-            "clientToServerDelivered": 431650,
-            "serverToClientSerialized": 4321165,
-            "serverToClientDelivered": 4186692
+            "clientToServerSerialized": 486880,
+            "clientToServerDelivered": 434648,
+            "serverToClientSerialized": 4491176,
+            "serverToClientDelivered": 4392521
           }
         },
         "capBoundary": "application payload serialization; workload utilization counts bytes admitted during its exact ten-second window and excludes QUIC/HTTP3/TLS/UDP/IP framing and congestion control",
-        "offeredBytes": 4966802,
-        "serializedBytes": 4962502,
-        "deliveredBytes": 4912370,
-        "droppedBytes": 50132,
-        "backpressuredBytes": 4300,
+        "offeredBytes": 5182158,
+        "serializedBytes": 5178558,
+        "deliveredBytes": 5130376,
+        "droppedBytes": 48182,
+        "backpressuredBytes": 3600,
         "cancelledReliableBytes": 0,
-        "clientToServerSerializedBytes": 489716,
-        "clientToServerDeliveredBytes": 439584,
-        "serverToClientSerializedBytes": 4472786,
-        "serverToClientDeliveredBytes": 4472786,
-        "droppedDatagrams": 1006,
-        "backpressuredDatagrams": 86,
-        "reorderedDatagrams": 1143,
+        "clientToServerSerializedBytes": 490464,
+        "clientToServerDeliveredBytes": 442282,
+        "serverToClientSerializedBytes": 4688094,
+        "serverToClientDeliveredBytes": 4688094,
+        "droppedDatagrams": 967,
+        "backpressuredDatagrams": 72,
+        "reorderedDatagrams": 1117,
         "cancelledReliable": 0,
         "peakQueue": 171,
-        "peakQueuedBytes": 141925,
+        "peakQueuedBytes": 151649,
         "queueBound": 2304,
-        "maximumSerializationDelayMilliseconds": 266.58333333333576,
-        "serializedUplinkBytesPerSecondPerClient": 1519.1625000000065,
+        "maximumSerializationDelayMilliseconds": 270.0208333333503,
+        "serializedUplinkBytesPerSecondPerClient": 1521.5000000000066,
         "uplinkCapacityBytesPerSecond": 2500,
-        "uplinkCapacityUtilization": 0.6076650000000026,
-        "serializedDownlinkBytesPerSecondPerClient": 13503.640625000058,
+        "uplinkCapacityUtilization": 0.6086000000000026,
+        "serializedDownlinkBytesPerSecondPerClient": 14034.92500000006,
         "downlinkCapacityBytesPerSecond": 16000,
-        "downlinkCapacityUtilization": 0.8439775390625036
+        "downlinkCapacityUtilization": 0.8771828125000037
       },
       "server": {
         "finalTick": 620,
-        "snapshotsSent": 3390,
-        "snapshotBytesSent": 4470834,
-        "snapshotFramesSkippedByBudget": 1570,
-        "snapshotSkipRatio": 0.3165322580645161,
+        "snapshotsSent": 3199,
+        "snapshotBytesSent": 4686142,
+        "snapshotFramesSkippedByBudget": 1761,
+        "snapshotSkipRatio": 0.35504032258064516,
         "maximumSnapshotSkipRatio": 0.45,
-        "inputsAccepted": 18158,
-        "inputsLate": 1192,
-        "inputAcceptanceRatio": 0.9256257327827905,
+        "inputsAccepted": 18221,
+        "inputsLate": 1169,
+        "inputAcceptanceRatio": 0.9274189443680969,
         "minimumInputAcceptanceRatio": 0.9
       },
       "clients": {
-        "minimumSnapshotsApplied": 100,
+        "minimumSnapshotsApplied": 93,
         "minimumSnapshotsAppliedFloor": 75,
-        "maximumSnapshotsApplied": 107,
-        "maximumLocalCorrectionMagnitude": 23793,
-        "maximumRemoteInterpolationDiscontinuity": 0
+        "maximumSnapshotsApplied": 101,
+        "maximumLocalCorrectionMagnitude": 25999,
+        "maximumRemoteInterpolationDiscontinuity": 0,
+        "everyBotDroveTheProduct": true,
+        "minimumBotCommandsStaged": 600,
+        "minimumBotNonIdleCommands": 509
       },
       "convergence": {
-        "authoritativeHash": 2457632579,
+        "authoritativeHash": 3271083645,
         "allClientsConverged": true,
         "uniquePlayerIds": 32,
         "finalTick": 620
@@ -282,7 +294,7 @@
       }
     }
   ],
-  "evidenceBoundary": "The production MatchServer, BattleClient, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
+  "evidenceBoundary": "The production MatchServer, BattleClient, shared NetworkBotDriver brain, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
   "owner": "examples/war-battles-online/integration/check-network-impairment.mjs",
   "generator": "examples/war-battles-online/integration/check-network-impairment.mjs",
   "sourceInputs": [
@@ -290,14 +302,14 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 439858,
-      "sha256": "9ae03534484bbf529c3830eb9b32f75fdf6549cbef6464d6e7fda1e46104393a"
+      "bytes": 439952,
+      "sha256": "f5537a5e2acd5cee8f9eecd4eeb7cf41b0ac83d91d888d98d62d7c194b372849"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
       "kind": "file",
-      "bytes": 31740,
-      "sha256": "2ff6b903e9f72faf25f7a832f1ef1af866c31b5c214d7ba1c43b4508427233b8"
+      "bytes": 32430,
+      "sha256": "3cc8696867dfec8a857baf3f0f70a9dec44eeb58f2aff0e9b78788fff85cb3c5"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-evidence.mjs",
@@ -314,8 +326,8 @@
     {
       "path": "examples/war-battles-online/package.json",
       "kind": "file",
-      "bytes": 8107,
-      "sha256": "be24f686cda0370446033f793685bbfa4ca3d177abeae6d9dd9f26e650710d3c"
+      "bytes": 8208,
+      "sha256": "75a1655aa12376932db5c63e88432b67167f5159c33a8e114293f692aa122a9c"
     },
     {
       "path": "package.json",
@@ -332,15 +344,15 @@
     {
       "path": "examples/war-battles-online/integration/network-impairment-matrix.ts",
       "kind": "file",
-      "bytes": 7151,
-      "sha256": "9890450f559c7a77de93e1eb56e9e3ac6aa5d04145ffa4fbebe378a3a3189080"
+      "bytes": 7588,
+      "sha256": "7b03bbd903bc97cc5e5e07e9d8ee6fa7a8601871ccbadb20bdc67add5df182c6"
     },
     {
       "path": "examples/war-battles-online/integration/check-network-impairment.mjs",
       "kind": "file",
-      "bytes": 5206,
-      "sha256": "bc7f8b6d939c18cf377962fa57ac37f8faa69e9a6a1b6cf7290e49b55e2ece0e"
+      "bytes": 5802,
+      "sha256": "f170b473595ef6984f6ceeaedf1876890f69f4332fb4cc5ce89165bf13ab2869"
     }
   ],
-  "sourceKey": "309734ed8d20585b7a87ba8f829f47fa46607b8f69f56ad562880224ca276e5a"
+  "sourceKey": "0334446fabefb39072dcda05ef665ae0facd03c81df1107dbf51cb875eb068a6"
 }

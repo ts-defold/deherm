@@ -1031,13 +1031,15 @@ payload serialization in both directions plus latency, jitter, datagram loss,
 reordering, bounded queue backpressure, and stale-stream cancellation. The
 three checked profiles are 256/32 Kbit/s broadband-adverse, 160/24 Kbit/s
 mobile-congested, and 128/20 Kbit/s edge-congested downlink/uplink. All 32
-clients converge without protocol errors; their input acceptance ratios are
-97.33%, 95.05%, and 92.56% respectively. During the ten-second workload the
-three profiles consume 50.83%, 80.74%, and 84.40% of their modeled downlink
+clients are driven by the production `NetworkBotDriver` and shared bot brain,
+stage all 600 decisions, produce non-idle play, and converge without protocol
+errors; their input acceptance ratios are 97.32%, 94.81%, and 92.74%
+respectively. During the ten-second workload the three profiles consume
+55.37%, 87.80%, and 87.72% of their modeled downlink
 application-payload caps; admitted packets that are later lost or cancelled
 still consume serialization capacity. The edge profile applies 70 +/- 35 ms
 one-way latency, 10% seeded datagram loss, records datagram backpressure, and
-applies 100-107 authoritative snapshots during the ten-second workload plus
+applies 93-101 authoritative snapshots during the ten-second workload plus
 final convergence probe (the regression floor is 75).
 
 That matrix exposed snapshot starvation under a speed cap: superseding every

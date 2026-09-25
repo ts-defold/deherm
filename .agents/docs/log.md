@@ -3638,16 +3638,22 @@ bounded.
 
 The sealed three-profile, 32-client matrix covers 256/32, 160/24, and 128/20
 Kbit/s downlink/uplink caps. With successively adverse latency, jitter, and
-loss, it records input acceptance of 97.33%, 95.05%, and 92.56% and downlink
-application-payload utilization of 50.83%, 80.74%, and 84.40%; zero remote
+loss, it records input acceptance of 97.32%, 94.81%, and 92.74% and downlink
+application-payload utilization of 55.37%, 87.80%, and 87.72%; zero remote
 interpolation discontinuities; bounded queues; no protocol errors; and exact
-final convergence for every client. The edge profile intentionally exercises
+final convergence for every client. Each client is driven by the production
+`NetworkBotDriver` and shared `BotController`, not a synthetic input pattern;
+all 32 stage 600 commands and even the least-active bot emits at least 474
+non-idle commands in every profile. Aim assistance is disabled exactly as in
+the production bot dashboard, so skill-dependent bot aim reaches the wire.
+The edge profile intentionally exercises
 datagram backpressure. Stale cancellation is instead covered by a focused
 stuck-transport regression; legitimate recovery frames receive a size-aware
 deadline derived from queued bytes, a 20 Kbit/s minimum serialization rate,
 and one second of latency/scheduling grace. A 4.7 KB frame that needs more than
 the old 300 ms cutoff now crosses the modeled 128 Kbit/s link. This is the real
-`MatchServer`, `BattleClient`, prediction, reconciliation, and wire codec
+`MatchServer`, `BattleClient`, shared network-bot brain, prediction,
+reconciliation, and wire codec
 behind a deterministic in-memory transport. It is not QUIC wire-byte,
 congestion-controller, browser, native Defold, or WAN evidence.
 
@@ -3660,3 +3666,24 @@ adapter completion-semantics evidence plus an RTT-aware byte window before it
 should change. A separate rejected-write regression now proves recovery credit
 is retained after transport backpressure, avoiding a 15 Hz large-keyframe retry
 loop.
+
+A final product-fidelity review caught that the constrained clients inherited
+`BattleClient` aim assistance while the production bot dashboard disables it.
+Disabling assistance exposed a deeper ordinary-client defect: `setAim()` was
+still replaced by movement direction whenever the tank moved. `BattleClient`
+now remembers that an explicit aim source exists and uses movement only as the
+pre-aim fallback. A real `BattleClient` plus `NetworkBotDriver` regression
+decodes the outgoing compact input bundle and proves the staged bot aim, move,
+and quantization reach the wire together. The matrix additionally requires at
+least half of every bot's 600 decisions to be non-idle and proves edge pressure
+structurally through lower admitted bytes plus greater snapshot shedding than
+the mobile profile, rather than a post-hoc utilization constant.
+
+The live projection refresh also found a build-order seam rather than accepting
+stale evidence: generated Defold sources must be synchronized before the
+one-shot TypeScript bundle is compiled, and Bob must then rebuild each packaged
+target that embeds that resource. The example `generate` command now performs
+the source sync first. The browser gate rejected the old wasm archive by
+fingerprint; a pinned Bob/local-Extender `wasm-web` bundle then passed in Chrome,
+and a rebuilt arm64-macOS archive passed the packaged Defold 1.14.0 runtime with
+the expected gameplay and graceful-exit markers.

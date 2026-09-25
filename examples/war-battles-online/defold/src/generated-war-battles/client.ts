@@ -278,6 +278,7 @@ export class BattleClient implements TransportReceiver {
   private weapon = 0;
   private aimX = DIRECTION_SCALE;
   private aimY = 0;
+  private hasExplicitAim = false;
   private reliableSendTail: Promise<void> = Promise.resolve();
 
   constructor(options: BattleClientOptions = {}) {
@@ -338,6 +339,7 @@ export class BattleClient implements TransportReceiver {
     if (normalizeInto(x, y, this.aim)) {
       this.aimX = this.aim.x;
       this.aimY = this.aim.y;
+      this.hasExplicitAim = true;
     }
   }
 
@@ -912,7 +914,7 @@ export class BattleClient implements TransportReceiver {
     if (world !== undefined && this.assistAim && assistedAim(world, slot, this.aim)) {
       this.aimX = this.aim.x;
       this.aimY = this.aim.y;
-    } else if (this.moveX !== 0 || this.moveY !== 0) {
+    } else if (!this.hasExplicitAim && (this.moveX !== 0 || this.moveY !== 0)) {
       if (normalizeInto(this.moveX, this.moveY, this.aim)) {
         this.aimX = this.aim.x;
         this.aimY = this.aim.y;

@@ -52,6 +52,9 @@ export function assertNetworkImpairmentEvidence(document, expectedSources) {
     assert.ok(profile.server.snapshotsSent > 0);
     assert.ok(profile.server.snapshotBytesSent > 0);
     assert.ok(profile.clients.minimumSnapshotsApplied >= profile.clients.minimumSnapshotsAppliedFloor);
+    assert.equal(profile.clients.everyBotDroveTheProduct, true);
+    assert.equal(profile.clients.minimumBotCommandsStaged, profile.config.ticks);
+    assert.ok(profile.clients.minimumBotNonIdleCommands >= profile.config.ticks / 2);
     assert.ok(profile.server.snapshotSkipRatio <= profile.server.maximumSnapshotSkipRatio);
     assert.equal(profile.clients.maximumRemoteInterpolationDiscontinuity, 0);
     assert.ok(profile.transport.droppedDatagrams > 0);
@@ -74,7 +77,14 @@ export function assertNetworkImpairmentEvidence(document, expectedSources) {
   );
   assert.ok(edge.server.snapshotFramesSkippedByBudget > 0);
   assert.ok(edge.transport.backpressuredDatagrams > 0);
-  assert.ok(edge.transport.downlinkCapacityUtilization > document.profiles[1].transport.downlinkCapacityUtilization);
+  // The edge scheduler sheds snapshot cadence once the cap is saturated, so
+  // utilization need not rise monotonically. Instead prove the tighter cap
+  // admitted fewer bytes while forcing more cadence shedding than mobile.
+  assert.ok(
+    edge.transport.serializedDownlinkBytesPerSecondPerClient <
+      document.profiles[1].transport.serializedDownlinkBytesPerSecondPerClient,
+  );
+  assert.ok(edge.server.snapshotSkipRatio > document.profiles[1].server.snapshotSkipRatio);
   assert.ok(
     document.profiles[1].transport.downlinkCapacityUtilization >
       document.profiles[0].transport.downlinkCapacityUtilization,
