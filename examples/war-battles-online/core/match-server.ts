@@ -595,11 +595,25 @@ export class ServerSession implements TransportReceiver {
     if (transport === undefined || this.closed) return;
     const now = this.server.nowMilliseconds();
     this.expireStaleSnapshots(now);
-    let inFlight = 0;
+    // A snapshot that has not crossed the transport boundary before a newer
+    // authoritative frame exists is obsolete. Ask every older operation to
+    // reset its private stream before admitting the new tick. Keep the record
+    // until its promise settles, though: a broken host that ignores abort must
+    // still be constrained by the fixed slot count and the 300 ms hard bound.
     for (const send of this.snapshotSends) {
-      if (send !== undefined) inFlight += 1;
+      if (send !== undefined && !send.controller.signal.aborted) {
+        send.controller.abort("snapshot superseded by newer state");
+      }
     }
-    if (inFlight >= SNAPSHOT_IN_FLIGHT_STREAMS) return;
+    let streamSlot = -1;
+    for (let offset = 0; offset < this.snapshotSends.length; offset += 1) {
+      const candidate = (this.snapshotSendCursor + offset) % this.snapshotSends.length;
+      if (this.snapshotSends[candidate] !== undefined) continue;
+      streamSlot = candidate;
+      this.snapshotSendCursor = (candidate + 1) % this.snapshotSends.length;
+      break;
+    }
+    if (streamSlot < 0) return;
     // The client retains the same fixed 64-frame history as the server. An
     // ACK may lag the newest send by more than the eight-stream window while
     // still remaining a valid delta base; throttling at eight frames created a
@@ -626,15 +640,9 @@ export class ServerSession implements TransportReceiver {
       this.snapshotFramesSinceKeyframe += 1;
     }
     // Every state packet owns an independent QUIC stream. Streams may finish
-    // out of order and never head-of-line block fresher state; a strict stale
-    // deadline resets packets congestion control has held too long. The fixed
-    // ring is also a hard cap if a host fails to settle an aborted write.
-    const streamSlot = this.snapshotSendCursor;
-    this.snapshotSendCursor = (this.snapshotSendCursor + 1) % this.snapshotSends.length;
-    const replaced = this.snapshotSends[streamSlot];
-    if (replaced !== undefined) {
-      replaced.controller.abort("snapshot stream capacity replaced");
-    }
+    // out of order without QUIC stream-order head-of-line blocking; newer
+    // state supersedes any unfinished older write. The stale deadline and
+    // fixed ring remain the hard bound when a host ignores cancellation.
     const controller = new AbortController();
     const send: SnapshotStreamSend = {
       tick,
@@ -646,10 +654,10 @@ export class ServerSession implements TransportReceiver {
       .sendReliable(TRANSPORT_CHANNEL_SNAPSHOT, this.snapshotFrame.subarray(0, length), controller.signal)
       .then(
         (disposition) => {
+          if (this.snapshotSends[streamSlot] === send) {
+            this.snapshotSends[streamSlot] = undefined;
+          }
           if (disposition === "closed") {
-            if (this.snapshotSends[streamSlot] === send) {
-              this.snapshotSends[streamSlot] = undefined;
-            }
             this.onClose(1_001, "transport closed");
           }
         },

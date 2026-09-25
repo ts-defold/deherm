@@ -468,9 +468,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "0dbc838676fa961d74448e751a2a2b58cfb9d77096b50f00f59e233af7cf1278",
+        "fingerprint": "87f88a795063bf98677d725167e15f9c20a7a19821ede3a50762b11539e0a7a7",
         "outputs": {
-          "deherm/app.dehermc": "f91e20edd75188a06825d4564c0ab14a0dc72df53cc9493b7cc59b2818cc12b3"
+          "deherm/app.dehermc": "fec3812d9ddb25bf1f646344a0e0713022e89e9a51f68a3745c97c408f9b57b2"
         },
         "build": {
           "entryPoint": "main/player.script.ts",
@@ -491,7 +491,7 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "0b5a619401905a68ceda71401b7c469025ebe3cb5d7347e7a81b8c64aa1791df",
+          "digest": "cd6767d3030f6d590c06e01c0749f8f3759ff869fbc2b6d687ac2d98034ecdc2",
           "fileCount": 79,
           "files": {
             ".deherm/generated/components/registry.ts": "2d47bf26dadbbaebd9a26053188c4237d03b32f4bf64c3b486aa66339887889c",
@@ -557,15 +557,15 @@
             "src/generated-war-battles/bots.ts": "02b4e438139a60b36044a034f2cf4c54e993286db513bfe93691d82ca97d6e24",
             "src/generated-war-battles/browser-websocket.ts": "aff36c8e49dbf1415922702b6f7bc0cba0b83cc3c91e965e9515733205781528",
             "src/generated-war-battles/browser-webtransport.ts": "15e4755288bb08d02ca5052c889cb896325c228f0cc8b678a27c564c783615fb",
-            "src/generated-war-battles/client.ts": "e777e3ab0d7551e8e9bf9a537926b4051f9593e5d71a180ec5d68da192bfc0bf",
+            "src/generated-war-battles/client.ts": "93cfb25061083e715d9d3d7edc59e8c662f459d9f67f8b60b1a419341dd5e0ea",
             "src/generated-war-battles/constants.ts": "2dc070680d1bfc85100e9700b0a124b7bfcbb534c7c945e6e96eeac6629f7c62",
             "src/generated-war-battles/content.ts": "b95ef0175eea497ba6f3689686ce848e875d439bd4ac5865fae6da190d1e322b",
             "src/generated-war-battles/events.ts": "f6dbef6f45fd8c485017971a6b6d8284be0279b55ae6188d859a9d2af95bf453",
             "src/generated-war-battles/fixed.ts": "d0cf2a0d5341ad92a878926f0164c00ec6627edf66b533fff8776fbc4ea6e654",
             "src/generated-war-battles/index.ts": "3e2d12ba3f99211b20b0162f000af9fc93dd0ec335c0bca10a0727641a4ad506",
             "src/generated-war-battles/playable.ts": "f509d1e4db144daf49fbef757ca8bbc82d657f79755ee5fb24b5315193c7ad50",
-            "src/generated-war-battles/protocol.ts": "1d9bc8587e041b1baaf8c9752492e4d844f4ddee976e4d3c9aec15bd4895767b",
-            "src/generated-war-battles/snapshot.ts": "f5eda78e9a056c62951fb513ba2c9a502d05a46b2a8462f9884a5aadacb22081",
+            "src/generated-war-battles/protocol.ts": "12f4b789eb581424d0cde28b8e8eb2905748a0dbc1d81915f6f419f2ad944a63",
+            "src/generated-war-battles/snapshot.ts": "ad9eee0fa203fdb5198f0fcd80e46aa7d8a122eb9c8d2d719de1562d1028f578",
             "src/generated-war-battles/ticks.ts": "56af336a2159b003bba8c8983d4f68632e1ea1b4f92b0a8334e9ef52e31ac610",
             "src/generated-war-battles/transport-selection.ts": "b1240eb8d85506a796d4ffb3d93be5349bb6020fc5b71d023c4f4723abf5e27e",
             "src/generated-war-battles/transport.ts": "d3c70fce2e4dbdeb14398b04a942a0b1364103d3c2c4c00612210e987e07f86f",

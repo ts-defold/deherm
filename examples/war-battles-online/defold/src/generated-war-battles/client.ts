@@ -95,6 +95,8 @@ export interface ClientClose {
 export const REMOTE_INTERPOLATION_TICKS = 3;
 const MAXIMUM_INPUT_LEAD_TICKS = 16;
 const INPUT_LEAD_SAFETY_TICKS = 3;
+const INPUT_LEAD_DECREASE_OBSERVATIONS = 12;
+const LOCAL_CORRECTION_MILLISECONDS = 100;
 
 export interface BattleClientOptions {
   readonly name?: string;
@@ -122,6 +124,19 @@ export interface ClientStats {
   /** Current adaptive prediction/input lead over the last observed server tick. */
   inputLeadTicks: number;
   inputLeadIncreases: number;
+  inputLeadDecreases: number;
+  /** Wall-clock ticks deliberately held so a lead decrease never rewinds simulation. */
+  inputLeadCatchdownSkips: number;
+  /** Current and maximum local positional presentation error, in fixed world units. */
+  localCorrectionMagnitude: number;
+  maximumLocalCorrectionMagnitude: number;
+  /** Remote segments rebased from an in-flight rendered pose rather than their old target. */
+  remoteInterpolationRebases: number;
+  maximumRemoteInterpolationRebaseDistance: number;
+  /** Maximum positional jump introduced by a non-lifecycle remote rebase. */
+  maximumRemoteInterpolationDiscontinuity: number;
+  /** Generation or player-mode changes intentionally hard-snapped for presentation. */
+  remoteLifecycleHardSnaps: number;
   /** Non-terminal server throttling notices received on the control lane. */
   rateLimitAdvisories: number;
   lastServerTick: number;
@@ -149,6 +164,14 @@ export class BattleClient implements TransportReceiver {
     inputCommandsSent: 0,
     inputLeadTicks: 0,
     inputLeadIncreases: 0,
+    inputLeadDecreases: 0,
+    inputLeadCatchdownSkips: 0,
+    localCorrectionMagnitude: 0,
+    maximumLocalCorrectionMagnitude: 0,
+    remoteInterpolationRebases: 0,
+    maximumRemoteInterpolationRebaseDistance: 0,
+    maximumRemoteInterpolationDiscontinuity: 0,
+    remoteLifecycleHardSnaps: 0,
     rateLimitAdvisories: 0,
     lastServerTick: 0,
     lastRoundTripMilliseconds: 0,
@@ -201,14 +224,21 @@ export class BattleClient implements TransportReceiver {
   private readonly remoteCurrentTurretX = new Int16Array(MAX_PLAYERS);
   private readonly remoteCurrentTurretY = new Int16Array(MAX_PLAYERS);
   private readonly remoteHaveSample = new Uint8Array(MAX_PLAYERS);
+  private readonly remoteGeneration = new Uint16Array(MAX_PLAYERS);
+  private readonly remoteMode = new Uint8Array(MAX_PLAYERS);
+  private readonly presentationDirection = createDirection();
 
   private accumulator = 0;
   private inputLeadTicks: number;
   private leadCatchupTicks = 0;
+  private leadCatchdownTicks = 0;
+  private inputLeadDecreaseObservations = 0;
   private remoteInterpolationMilliseconds = 0;
   private remoteInterpolationTicks = REMOTE_INTERPOLATION_TICKS;
   private localCorrectionX = 0;
   private localCorrectionY = 0;
+  private localHullCorrectionRadians = 0;
+  private localTurretCorrectionRadians = 0;
   private localCorrectionMilliseconds = 0;
   private localTick = 0;
   private appliedSnapshotTick = -1;
@@ -313,24 +343,57 @@ export class BattleClient implements TransportReceiver {
     const world = this.world;
     if (world === undefined || !Number.isInteger(slot) || slot < 0 || slot >= MAX_PLAYERS) return false;
     if (slot === this.playerId - 1 || this.remoteHaveSample[slot] === 0) {
-      output.x = world.playerX[slot]! + (slot === this.playerId - 1 ? this.localCorrectionX : 0);
-      output.y = world.playerY[slot]! + (slot === this.playerId - 1 ? this.localCorrectionY : 0);
-      output.hullX = world.playerHullX[slot]!;
-      output.hullY = world.playerHullY[slot]!;
-      output.turretX = world.playerTurretX[slot]!;
-      output.turretY = world.playerTurretY[slot]!;
+      const local = slot === this.playerId - 1;
+      output.x = world.playerX[slot]! + (local ? this.localCorrectionX : 0);
+      output.y = world.playerY[slot]! + (local ? this.localCorrectionY : 0);
+      if (local && this.localCorrectionMilliseconds > 0) {
+        rotateDirectionInto(
+          world.playerHullX[slot]!,
+          world.playerHullY[slot]!,
+          this.localHullCorrectionRadians,
+          this.presentationDirection,
+        );
+        output.hullX = this.presentationDirection.x;
+        output.hullY = this.presentationDirection.y;
+        rotateDirectionInto(
+          world.playerTurretX[slot]!,
+          world.playerTurretY[slot]!,
+          this.localTurretCorrectionRadians,
+          this.presentationDirection,
+        );
+        output.turretX = this.presentationDirection.x;
+        output.turretY = this.presentationDirection.y;
+      } else {
+        output.hullX = world.playerHullX[slot]!;
+        output.hullY = world.playerHullY[slot]!;
+        output.turretX = world.playerTurretX[slot]!;
+        output.turretY = world.playerTurretY[slot]!;
+      }
       return true;
     }
-    const alpha = Math.min(
-      1,
-      this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * this.remoteInterpolationTicks),
-    );
+    const alpha = this.remoteInterpolationAlpha();
     output.x = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
     output.y = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
-    output.hullX = interpolate(this.remotePreviousHullX[slot]!, this.remoteCurrentHullX[slot]!, alpha);
-    output.hullY = interpolate(this.remotePreviousHullY[slot]!, this.remoteCurrentHullY[slot]!, alpha);
-    output.turretX = interpolate(this.remotePreviousTurretX[slot]!, this.remoteCurrentTurretX[slot]!, alpha);
-    output.turretY = interpolate(this.remotePreviousTurretY[slot]!, this.remoteCurrentTurretY[slot]!, alpha);
+    interpolateDirectionInto(
+      this.remotePreviousHullX[slot]!,
+      this.remotePreviousHullY[slot]!,
+      this.remoteCurrentHullX[slot]!,
+      this.remoteCurrentHullY[slot]!,
+      alpha,
+      this.presentationDirection,
+    );
+    output.hullX = this.presentationDirection.x;
+    output.hullY = this.presentationDirection.y;
+    interpolateDirectionInto(
+      this.remotePreviousTurretX[slot]!,
+      this.remotePreviousTurretY[slot]!,
+      this.remoteCurrentTurretX[slot]!,
+      this.remoteCurrentTurretY[slot]!,
+      alpha,
+      this.presentationDirection,
+    );
+    output.turretX = this.presentationDirection.x;
+    output.turretY = this.presentationDirection.y;
     return true;
   }
 
@@ -341,25 +404,37 @@ export class BattleClient implements TransportReceiver {
    */
   update(elapsedMilliseconds: number, maximumSteps = 8): number {
     if (this.state !== "ready" || this.world === undefined) return 0;
-    this.applyPendingSnapshot();
+    // `elapsedMilliseconds` belongs to the presentation segment that was
+    // visible since the previous update. Consume it before installing a frame
+    // that may have arrived anywhere inside that interval; a new correction or
+    // remote segment must begin at alpha zero on its first render.
     this.remoteInterpolationMilliseconds = Math.min(
       TICK_MILLISECONDS * this.remoteInterpolationTicks,
       this.remoteInterpolationMilliseconds + Math.max(0, elapsedMilliseconds),
     );
     this.decayLocalCorrection(elapsedMilliseconds);
+    this.applyPendingSnapshot();
     this.accumulator += elapsedMilliseconds;
     let steps = 0;
-    while (this.leadCatchupTicks > 0 && steps < maximumSteps) {
+    let iterations = 0;
+    while (this.leadCatchupTicks > 0 && iterations < maximumSteps) {
       this.advanceOneTick();
       this.leadCatchupTicks -= 1;
       steps += 1;
+      iterations += 1;
     }
-    while (this.accumulator >= TICK_MILLISECONDS && steps < maximumSteps) {
+    while (this.accumulator >= TICK_MILLISECONDS && iterations < maximumSteps) {
       this.accumulator -= TICK_MILLISECONDS;
-      this.advanceOneTick();
-      steps += 1;
+      iterations += 1;
+      if (this.leadCatchdownTicks > 0) {
+        this.leadCatchdownTicks -= 1;
+        this.stats.inputLeadCatchdownSkips += 1;
+      } else {
+        this.advanceOneTick();
+        steps += 1;
+      }
     }
-    if (steps === maximumSteps) this.accumulator = 0;
+    if (iterations === maximumSteps) this.accumulator = 0;
     return steps;
   }
 
@@ -471,8 +546,12 @@ export class BattleClient implements TransportReceiver {
     // applied it at N + leadTicks, guaranteeing a correction every snapshot.
     this.inputLeadTicks = this.minimumInputLeadTicks;
     this.leadCatchupTicks = 0;
+    this.leadCatchdownTicks = 0;
+    this.inputLeadDecreaseObservations = 0;
     this.stats.inputLeadTicks = this.inputLeadTicks;
     this.stats.inputLeadIncreases = 0;
+    this.stats.inputLeadDecreases = 0;
+    this.stats.inputLeadCatchdownSkips = 0;
     for (let tick = 0; tick < this.inputLeadTicks; tick += 1) this.world.step();
     this.localTick = this.world.tick;
     this.appliedSnapshotTick = -1;
@@ -487,7 +566,15 @@ export class BattleClient implements TransportReceiver {
     }
     this.localCorrectionX = 0;
     this.localCorrectionY = 0;
+    this.localHullCorrectionRadians = 0;
+    this.localTurretCorrectionRadians = 0;
     this.localCorrectionMilliseconds = 0;
+    this.stats.localCorrectionMagnitude = 0;
+    this.stats.maximumLocalCorrectionMagnitude = 0;
+    this.stats.remoteInterpolationRebases = 0;
+    this.stats.maximumRemoteInterpolationRebaseDistance = 0;
+    this.stats.maximumRemoteInterpolationDiscontinuity = 0;
+    this.stats.remoteLifecycleHardSnaps = 0;
     void this.acknowledgeWelcome();
   }
 
@@ -595,6 +682,10 @@ export class BattleClient implements TransportReceiver {
     const localSlot = this.playerId - 1;
     const previousPresentedX = world.playerX[localSlot]! + this.localCorrectionX;
     const previousPresentedY = world.playerY[localSlot]! + this.localCorrectionY;
+    const previousPresentedHullRadians =
+      Math.atan2(world.playerHullY[localSlot]!, world.playerHullX[localSlot]!) + this.localHullCorrectionRadians;
+    const previousPresentedTurretRadians =
+      Math.atan2(world.playerTurretY[localSlot]!, world.playerTurretX[localSlot]!) + this.localTurretCorrectionRadians;
     const previousGeneration = world.playerGeneration[localSlot]!;
     const previousMode = world.playerMode[localSlot]!;
     try {
@@ -622,22 +713,38 @@ export class BattleClient implements TransportReceiver {
 
     // Snapshot arrival exposes one-way timing without a wall-clock protocol
     // field: localTick - snapshotTick is the configured lead plus observed
-    // delivery lag. Subtract the current lead to avoid a self-amplifying
-    // estimate, retain three ticks of jitter margin, and grow monotonically by
-    // at most one tick per authoritative frame. The matching catch-up step
-    // stages and transmits the newly future command; this is not metadata-only.
+    // delivery lag. Subtract the effective lead to avoid a self-amplifying
+    // estimate and retain three ticks of jitter margin. Growth is limited to
+    // one tick per authoritative frame. Shrinkage requires a sustained lower
+    // estimate and is realized by holding one future wall-clock tick rather
+    // than ever rewinding simulation or retimestamping an input.
     const targetDistance = tickAfter(target, snapshotTick) ? tickDistance(target, snapshotTick) : 0;
-    const observedTransitTicks = Math.max(0, targetDistance - this.inputLeadTicks);
+    const effectiveLeadTicks = this.inputLeadTicks + this.leadCatchdownTicks;
+    const observedTransitTicks = Math.max(0, targetDistance - effectiveLeadTicks);
     const desiredLeadTicks = clamp(
       observedTransitTicks + INPUT_LEAD_SAFETY_TICKS,
       this.minimumInputLeadTicks,
       MAXIMUM_INPUT_LEAD_TICKS,
     );
-    if (desiredLeadTicks > this.inputLeadTicks) {
+    if (this.leadCatchdownTicks > 0) {
+      this.inputLeadDecreaseObservations = 0;
+    } else if (desiredLeadTicks > this.inputLeadTicks) {
       this.inputLeadTicks += 1;
       this.leadCatchupTicks += 1;
+      this.inputLeadDecreaseObservations = 0;
       this.stats.inputLeadTicks = this.inputLeadTicks;
       this.stats.inputLeadIncreases += 1;
+    } else if (desiredLeadTicks < this.inputLeadTicks) {
+      this.inputLeadDecreaseObservations += 1;
+      if (this.inputLeadDecreaseObservations >= INPUT_LEAD_DECREASE_OBSERVATIONS) {
+        this.inputLeadTicks -= 1;
+        this.leadCatchdownTicks += 1;
+        this.inputLeadDecreaseObservations = 0;
+        this.stats.inputLeadTicks = this.inputLeadTicks;
+        this.stats.inputLeadDecreases += 1;
+      }
+    } else {
+      this.inputLeadDecreaseObservations = 0;
     }
 
     // Replay the local inputs the server has not yet folded in. If the client
@@ -664,24 +771,77 @@ export class BattleClient implements TransportReceiver {
     if (world.playerGeneration[localSlot] === previousGeneration && world.playerMode[localSlot] === previousMode) {
       this.localCorrectionX = previousPresentedX - world.playerX[localSlot]!;
       this.localCorrectionY = previousPresentedY - world.playerY[localSlot]!;
-      this.localCorrectionMilliseconds = 100;
+      this.localHullCorrectionRadians = shortestAngleDifference(
+        Math.atan2(world.playerHullY[localSlot]!, world.playerHullX[localSlot]!),
+        previousPresentedHullRadians,
+      );
+      this.localTurretCorrectionRadians = shortestAngleDifference(
+        Math.atan2(world.playerTurretY[localSlot]!, world.playerTurretX[localSlot]!),
+        previousPresentedTurretRadians,
+      );
+      this.localCorrectionMilliseconds = LOCAL_CORRECTION_MILLISECONDS;
+      const magnitude = correctionMagnitude(this.localCorrectionX, this.localCorrectionY);
+      this.stats.localCorrectionMagnitude = magnitude;
+      this.stats.maximumLocalCorrectionMagnitude = Math.max(this.stats.maximumLocalCorrectionMagnitude, magnitude);
     } else {
       this.localCorrectionX = 0;
       this.localCorrectionY = 0;
+      this.localHullCorrectionRadians = 0;
+      this.localTurretCorrectionRadians = 0;
       this.localCorrectionMilliseconds = 0;
+      this.stats.localCorrectionMagnitude = 0;
     }
   }
 
   private captureRemoteSnapshot(world: BattleWorld): void {
+    const alpha = this.remoteInterpolationAlpha();
     for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
       if (slot === this.playerId - 1) continue;
-      if (this.remoteHaveSample[slot] !== 0) {
-        this.remotePreviousX[slot] = this.remoteCurrentX[slot]!;
-        this.remotePreviousY[slot] = this.remoteCurrentY[slot]!;
-        this.remotePreviousHullX[slot] = this.remoteCurrentHullX[slot]!;
-        this.remotePreviousHullY[slot] = this.remoteCurrentHullY[slot]!;
-        this.remotePreviousTurretX[slot] = this.remoteCurrentTurretX[slot]!;
-        this.remotePreviousTurretY[slot] = this.remoteCurrentTurretY[slot]!;
+      const haveSample = this.remoteHaveSample[slot] !== 0;
+      const generation = world.playerGeneration[slot]!;
+      const mode = world.playerMode[slot]!;
+      const lifecycleChanged =
+        haveSample && (generation !== this.remoteGeneration[slot] || mode !== this.remoteMode[slot]);
+      let presentedX = world.playerX[slot]!;
+      let presentedY = world.playerY[slot]!;
+      let presentedHullX = world.playerHullX[slot]!;
+      let presentedHullY = world.playerHullY[slot]!;
+      let presentedTurretX = world.playerTurretX[slot]!;
+      let presentedTurretY = world.playerTurretY[slot]!;
+      if (haveSample && !lifecycleChanged) {
+        presentedX = interpolate(this.remotePreviousX[slot]!, this.remoteCurrentX[slot]!, alpha);
+        presentedY = interpolate(this.remotePreviousY[slot]!, this.remoteCurrentY[slot]!, alpha);
+        interpolateDirectionInto(
+          this.remotePreviousHullX[slot]!,
+          this.remotePreviousHullY[slot]!,
+          this.remoteCurrentHullX[slot]!,
+          this.remoteCurrentHullY[slot]!,
+          alpha,
+          this.presentationDirection,
+        );
+        presentedHullX = this.presentationDirection.x;
+        presentedHullY = this.presentationDirection.y;
+        interpolateDirectionInto(
+          this.remotePreviousTurretX[slot]!,
+          this.remotePreviousTurretY[slot]!,
+          this.remoteCurrentTurretX[slot]!,
+          this.remoteCurrentTurretY[slot]!,
+          alpha,
+          this.presentationDirection,
+        );
+        presentedTurretX = this.presentationDirection.x;
+        presentedTurretY = this.presentationDirection.y;
+        const rebaseDistance = correctionMagnitude(
+          this.remoteCurrentX[slot]! - presentedX,
+          this.remoteCurrentY[slot]! - presentedY,
+        );
+        if (rebaseDistance > 0) {
+          this.stats.remoteInterpolationRebases += 1;
+          this.stats.maximumRemoteInterpolationRebaseDistance = Math.max(
+            this.stats.maximumRemoteInterpolationRebaseDistance,
+            rebaseDistance,
+          );
+        }
       }
       this.remoteCurrentX[slot] = world.playerX[slot]!;
       this.remoteCurrentY[slot] = world.playerY[slot]!;
@@ -689,7 +849,9 @@ export class BattleClient implements TransportReceiver {
       this.remoteCurrentHullY[slot] = world.playerHullY[slot]!;
       this.remoteCurrentTurretX[slot] = world.playerTurretX[slot]!;
       this.remoteCurrentTurretY[slot] = world.playerTurretY[slot]!;
-      if (this.remoteHaveSample[slot] === 0) {
+      this.remoteGeneration[slot] = generation;
+      this.remoteMode[slot] = mode;
+      if (!haveSample || lifecycleChanged) {
         this.remotePreviousX[slot] = this.remoteCurrentX[slot]!;
         this.remotePreviousY[slot] = this.remoteCurrentY[slot]!;
         this.remotePreviousHullX[slot] = this.remoteCurrentHullX[slot]!;
@@ -697,9 +859,29 @@ export class BattleClient implements TransportReceiver {
         this.remotePreviousTurretX[slot] = this.remoteCurrentTurretX[slot]!;
         this.remotePreviousTurretY[slot] = this.remoteCurrentTurretY[slot]!;
         this.remoteHaveSample[slot] = 1;
+        if (lifecycleChanged) this.stats.remoteLifecycleHardSnaps += 1;
+      } else {
+        this.remotePreviousX[slot] = presentedX;
+        this.remotePreviousY[slot] = presentedY;
+        this.remotePreviousHullX[slot] = presentedHullX;
+        this.remotePreviousHullY[slot] = presentedHullY;
+        this.remotePreviousTurretX[slot] = presentedTurretX;
+        this.remotePreviousTurretY[slot] = presentedTurretY;
+        const discontinuity = correctionMagnitude(
+          this.remotePreviousX[slot]! - presentedX,
+          this.remotePreviousY[slot]! - presentedY,
+        );
+        this.stats.maximumRemoteInterpolationDiscontinuity = Math.max(
+          this.stats.maximumRemoteInterpolationDiscontinuity,
+          discontinuity,
+        );
       }
     }
     this.remoteInterpolationMilliseconds = 0;
+  }
+
+  private remoteInterpolationAlpha(): number {
+    return Math.min(1, this.remoteInterpolationMilliseconds / (TICK_MILLISECONDS * this.remoteInterpolationTicks));
   }
 
   private advanceOneTick(): void {
@@ -789,13 +971,20 @@ export class BattleClient implements TransportReceiver {
     if (elapsed >= this.localCorrectionMilliseconds) {
       this.localCorrectionX = 0;
       this.localCorrectionY = 0;
+      this.localHullCorrectionRadians = 0;
+      this.localTurretCorrectionRadians = 0;
       this.localCorrectionMilliseconds = 0;
+      this.stats.localCorrectionMagnitude = 0;
       return;
     }
     const remaining = this.localCorrectionMilliseconds - elapsed;
     this.localCorrectionX = Math.trunc((this.localCorrectionX * remaining) / this.localCorrectionMilliseconds);
     this.localCorrectionY = Math.trunc((this.localCorrectionY * remaining) / this.localCorrectionMilliseconds);
+    this.localHullCorrectionRadians = (this.localHullCorrectionRadians * remaining) / this.localCorrectionMilliseconds;
+    this.localTurretCorrectionRadians =
+      (this.localTurretCorrectionRadians * remaining) / this.localCorrectionMilliseconds;
     this.localCorrectionMilliseconds = remaining;
+    this.stats.localCorrectionMagnitude = correctionMagnitude(this.localCorrectionX, this.localCorrectionY);
   }
 
   private async send(channel: ReliableChannel, payload: Uint8Array): Promise<SendDisposition | undefined> {
@@ -822,4 +1011,53 @@ export class BattleClient implements TransportReceiver {
 
 function interpolate(previous: number, current: number, alpha: number): number {
   return Math.trunc(previous + (current - previous) * alpha);
+}
+
+function correctionMagnitude(x: number, y: number): number {
+  return Math.max(Math.abs(x), Math.abs(y));
+}
+
+function shortestAngleDifference(fromRadians: number, toRadians: number): number {
+  const difference = toRadians - fromRadians;
+  return Math.atan2(Math.sin(difference), Math.cos(difference));
+}
+
+function rotateDirectionInto(x: number, y: number, radians: number, output: Direction): void {
+  if (radians === 0) {
+    output.x = x;
+    output.y = y;
+    return;
+  }
+  const cosine = Math.cos(radians);
+  const sine = Math.sin(radians);
+  output.x = Math.round(x * cosine - y * sine);
+  output.y = Math.round(x * sine + y * cosine);
+}
+
+function interpolateDirectionInto(
+  previousX: number,
+  previousY: number,
+  currentX: number,
+  currentY: number,
+  alpha: number,
+  output: Direction,
+): void {
+  if (alpha <= 0) {
+    output.x = previousX;
+    output.y = previousY;
+    return;
+  }
+  if (alpha >= 1) {
+    output.x = currentX;
+    output.y = currentY;
+    return;
+  }
+  const previousRadians = Math.atan2(previousY, previousX);
+  const deltaRadians = Math.atan2(
+    previousX * currentY - previousY * currentX,
+    previousX * currentX + previousY * currentY,
+  );
+  const radians = previousRadians + deltaRadians * alpha;
+  output.x = Math.round(Math.cos(radians) * DIRECTION_SCALE);
+  output.y = Math.round(Math.sin(radians) * DIRECTION_SCALE);
 }

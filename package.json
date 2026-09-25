@@ -399,7 +399,7 @@
     "test:html5:war-battles": "node examples/war-battles-online/integration/check-browser-runtime.mjs",
     "test:html5:war-battles-websocket": "node examples/war-battles-online/integration/check-websocket-fallback.mjs",
     "test:html5:war-battles-hot-reload": "node examples/war-battles-online/integration/check-browser-hot-reload.mjs",
-    "test:war-battles-session": "node --test examples/war-battles-online/test/core.test.mjs examples/war-battles-online/test/session-durable.test.mjs",
+    "test:war-battles-session": "node --test examples/war-battles-online/test/core.test.mjs examples/war-battles-online/test/snapshot-latest-state.test.mjs examples/war-battles-online/test/presentation-smoothing.test.mjs examples/war-battles-online/test/session-durable.test.mjs",
     "test:typed-native:war-battles": "node examples/war-battles-online/integration/check-typed-native-transport.mjs",
     "test:native-defold:runtime": "node scripts/check-native-defold-runtime.mjs",
     "test:headless-conformance": "node --test tests/headless-conformance.test.mjs",

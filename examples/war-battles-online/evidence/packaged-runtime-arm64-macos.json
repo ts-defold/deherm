@@ -30,8 +30,8 @@
   "target": "arm64-macos",
   "status": "observed-clean",
   "artifactKey": "851d07bb411f1f2d207b12e4231209cae32f0641085ac7fcf79b6475c8655994",
-  "sourceKey": "a747ceaa1a411df606284a87e6824c96f20990395c88ef62f3c7976c9bc3204c",
-  "evidenceKey": "74101aab4a285045197c2a9fb9ec791209eeb1508ca86f1411b89516d5e6f479",
+  "sourceKey": "20fea664787b9732993dd885b20100510af9f0c95df771789815bb3cfee20c22",
+  "evidenceKey": "36451d2af60360855b6269afaff2ed85531e3700258a19d664fe8c82bdbc6b16",
   "artifacts": [
     {
       "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
@@ -76,8 +76,8 @@
       "path": "examples/war-battles-online/defold",
       "kind": "tree",
       "fileCount": 772,
-      "bytes": 8669699,
-      "sha256": "8b7b1e4d4adc6cffaef2150ef46c8b7b18599bd87ad90647c70ea03750e339e7"
+      "bytes": 8683927,
+      "sha256": "906d4630346ae385b070d5a034b0aa45d2312edecdae8e0cb69d99c0a60a8944"
     },
     {
       "path": "examples/war-battles-online/defold/.defignore#authored-rules",
@@ -142,11 +142,11 @@
       "method": "system-exit",
       "exitCode": 0,
       "signal": null,
-      "port": 50309
+      "port": 52164
     },
     "transcript": {
       "canonicalLineCount": 62,
-      "canonicalSha256": "0d71469ed3c22a225c572f470dc2da8d82affb6e5ca265b119b2e52d755c821c"
+      "canonicalSha256": "a7ba815ee6c9227b2d528b86ee04c9234c1ca8540f725ed7ab84f8459ee2ff0a"
     }
   }
 }

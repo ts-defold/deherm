@@ -368,7 +368,7 @@ runtime. It deliberately describes semantics instead of naming a vendor:
   its current resume token, then the server either restores the player slot and
   sends a fresh full snapshot or refuses the resume. A transport connection
   itself is never assumed resumable. Version 7 carries command-beacon state;
-  version 6 introduced the 40-byte HMAC resume credential. Current protocol 10
+  version 6 introduced the 40-byte HMAC resume credential. Current protocol 11
   additionally fixes simulation ticks as wrap-safe uint32 serials while
   retaining bounded redundant input datagrams. The Deno host accepts an
   explicit 32-byte secret and persists a fixed-capacity generation ledger at
@@ -377,8 +377,11 @@ runtime. It deliberately describes semantics instead of naming a vendor:
 The WebTransport adapter places replaceable snapshot state on independent,
 cancellable unidirectional streams. Client-originated session/control events
 share one ordered bidirectional stream, while server session/control events
-share their ordered bounded lane. This avoids snapshot head-of-line blocking
-and lets the server reset stale state without terminating the session. Its stream
+share their ordered bounded lane. This avoids QUIC stream-order head-of-line
+blocking; the streams still share connection congestion capacity. A newer
+authoritative frame resets every older unfinished snapshot write. Settled writes
+leave the fixed eight-slot tracker immediately, while a cancellation-ignoring
+host remains bounded by those slots and the 300 ms stale deadline. Its stream
 receive path buffers arbitrary read fragmentation and validates a fixed length
 prefix before delivery. When WebTransport is unavailable, the browser adapter
 connects to the Deno health/control listener's `/ws` endpoint. WebSocket is

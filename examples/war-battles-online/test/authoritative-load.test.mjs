@@ -49,10 +49,18 @@ test("impaired load records loss, reordering, bounded queues, and all-client con
   assert.ok(evidence.clients.maxInputLeadTicks <= 16);
   assert.equal(
     evidence.clients.rows.every(
-      (row) => row.inputsSent + row.inputsDropped === evidence.config.ticks + row.inputLeadIncreases,
+      (row) =>
+        row.inputsSent + row.inputsDropped ===
+        evidence.config.ticks + row.inputLeadIncreases - row.inputLeadCatchdownSkips,
     ),
     true,
   );
+  assert.equal(evidence.clients.maximumRemoteInterpolationDiscontinuity, 0);
+  assert.ok(evidence.clients.totalInputLeadDecreases > 0);
+  assert.ok(evidence.clients.maximumLocalCorrectionMagnitude > 0);
+  assert.ok(evidence.clients.totalRemoteInterpolationRebases > 0);
+  assert.ok(evidence.clients.maximumRemoteInterpolationRebaseDistance > 0);
+  assert.ok(evidence.clients.totalRemoteLifecycleHardSnaps > 0);
   assert.equal(
     evidence.clients.rows.every((row) => row.inputsSent > 0 && row.snapshotsApplied > 0),
     true,

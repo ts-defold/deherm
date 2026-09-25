@@ -122,10 +122,24 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.equal(document.server?.inputLateRatio, document.server?.inputsLate / document.server?.generatedInputCommands);
   assert.equal(
     document.server?.generatedInputCommands,
-    document.clients.rows.reduce((total, row) => total + document.config.ticks + row.inputLeadIncreases, 0),
+    document.clients.rows.reduce(
+      (total, row) => total + document.config.ticks + row.inputLeadIncreases - row.inputLeadCatchdownSkips,
+      0,
+    ),
   );
   assert.ok(document.clients?.minInputLeadTicks > 2);
   assert.ok(document.clients?.maxInputLeadTicks <= 16);
+  assert.ok(Number.isInteger(document.clients?.totalInputLeadDecreases));
+  assert.ok(document.clients.totalInputLeadDecreases > 0, "impaired load must exercise lead recovery");
+  assert.ok(Number.isInteger(document.clients?.maximumLocalCorrectionMagnitude));
+  assert.ok(document.clients.maximumLocalCorrectionMagnitude > 0, "impaired load must exercise local reconciliation");
+  assert.ok(Number.isInteger(document.clients?.totalRemoteInterpolationRebases));
+  assert.ok(document.clients.totalRemoteInterpolationRebases > 0, "impaired load must exercise in-flight rebasing");
+  assert.ok(Number.isInteger(document.clients?.maximumRemoteInterpolationRebaseDistance));
+  assert.ok(document.clients.maximumRemoteInterpolationRebaseDistance > 0);
+  assert.equal(document.clients?.maximumRemoteInterpolationDiscontinuity, 0);
+  assert.ok(Number.isInteger(document.clients?.totalRemoteLifecycleHardSnaps));
+  assert.ok(document.clients.totalRemoteLifecycleHardSnaps > 0, "load must exercise lifecycle discontinuities");
   assert.ok(
     Number.isInteger(document.transport?.queueBound) &&
       document.transport.observed.peakQueue <= document.transport.queueBound,
@@ -134,8 +148,20 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
     assert.equal(row.state, "ready");
     assert.equal(row.converged, true);
     assert.equal(row.errors, 0);
-    assert.equal(row.inputsSent + row.inputsDropped, document.config.ticks + row.inputLeadIncreases);
-    assert.equal(row.inputLeadTicks, row.inputLeadIncreases + 2);
+    assert.equal(
+      row.inputsSent + row.inputsDropped,
+      document.config.ticks + row.inputLeadIncreases - row.inputLeadCatchdownSkips,
+    );
+    assert.equal(row.inputLeadTicks, row.inputLeadIncreases - row.inputLeadDecreases + 2);
+    assert.ok(row.inputLeadCatchdownSkips <= row.inputLeadDecreases);
+    assert.ok(Number.isInteger(row.maximumLocalCorrectionMagnitude) && row.maximumLocalCorrectionMagnitude >= 0);
+    assert.ok(Number.isInteger(row.remoteInterpolationRebases) && row.remoteInterpolationRebases >= 0);
+    assert.ok(
+      Number.isInteger(row.maximumRemoteInterpolationRebaseDistance) &&
+        row.maximumRemoteInterpolationRebaseDistance >= 0,
+    );
+    assert.equal(row.maximumRemoteInterpolationDiscontinuity, 0);
+    assert.ok(Number.isInteger(row.remoteLifecycleHardSnaps) && row.remoteLifecycleHardSnaps >= 0);
     assert.equal(row.rateLimitAdvisories, 0);
   }
   return document;

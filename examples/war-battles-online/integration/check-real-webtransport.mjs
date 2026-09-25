@@ -143,6 +143,14 @@ function browserEntry(url, digest) {
       inputsDropped: 0,
       lastServerTick: 0,
       lastLocalTick: 0,
+      inputLeadTicks: 0,
+      inputLeadDecreases: 0,
+      localCorrectionMagnitude: 0,
+      maximumLocalCorrectionMagnitude: 0,
+      remoteInterpolationRebases: 0,
+      maximumRemoteInterpolationRebaseDistance: 0,
+      maximumRemoteInterpolationDiscontinuity: 0,
+      remoteLifecycleHardSnaps: 0,
       transport: null,
     };
     const digest = Uint8Array.from(${JSON.stringify([...digest])});
@@ -178,6 +186,14 @@ function browserEntry(url, digest) {
         evidence.inputsDropped = client.stats.inputsDropped;
         evidence.lastServerTick = client.stats.lastServerTick;
         evidence.lastLocalTick = client.world?.tick ?? 0;
+        evidence.inputLeadTicks = client.stats.inputLeadTicks;
+        evidence.inputLeadDecreases = client.stats.inputLeadDecreases;
+        evidence.localCorrectionMagnitude = client.stats.localCorrectionMagnitude;
+        evidence.maximumLocalCorrectionMagnitude = client.stats.maximumLocalCorrectionMagnitude;
+        evidence.remoteInterpolationRebases = client.stats.remoteInterpolationRebases;
+        evidence.maximumRemoteInterpolationRebaseDistance = client.stats.maximumRemoteInterpolationRebaseDistance;
+        evidence.maximumRemoteInterpolationDiscontinuity = client.stats.maximumRemoteInterpolationDiscontinuity;
+        evidence.remoteLifecycleHardSnaps = client.stats.remoteLifecycleHardSnaps;
         evidence.ok = client.state === "ready" && client.rosterSize === 32 &&
           client.stats.snapshotsApplied >= ${minimumSnapshotsApplied} &&
           client.stats.inputsSent >= ${minimumInputsSent};
@@ -328,6 +344,18 @@ async function run() {
       lastLocalTick: observed.lastLocalTick,
       input: { moveX: 1, moveY: 0, fire: false, boost: false, weapon: 0 },
       inputsDropped: observed.inputsDropped,
+      presentation: {
+        localCorrectionMagnitude: observed.localCorrectionMagnitude,
+        maximumLocalCorrectionMagnitude: observed.maximumLocalCorrectionMagnitude,
+        remoteInterpolationRebases: observed.remoteInterpolationRebases,
+        maximumRemoteInterpolationRebaseDistance: observed.maximumRemoteInterpolationRebaseDistance,
+        maximumRemoteInterpolationDiscontinuity: observed.maximumRemoteInterpolationDiscontinuity,
+        remoteLifecycleHardSnaps: observed.remoteLifecycleHardSnaps,
+      },
+      prediction: {
+        inputLeadTicks: observed.inputLeadTicks,
+        inputLeadDecreases: observed.inputLeadDecreases,
+      },
       server: {
         inputsAcceptedAtLeast: minimumInputsSent,
         markers: serverLines
@@ -341,7 +369,7 @@ async function run() {
       sourceInputs,
       sourceKey,
       evidenceBoundary:
-        "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence.",
+        "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim.",
     };
     assertWebTransportEvidence(evidence, { sourceInputs });
     await page.client.send("Runtime.evaluate", { expression: "globalThis.__warBattlesQuicClose?.()" });

@@ -50,6 +50,7 @@ import {
   SNAPSHOT_BYTES,
   SNAPSHOT_BASE_HISTORY_FRAMES,
   SNAPSHOT_DELTA,
+  SNAPSHOT_FRAME_HEADER_BYTES,
   SNAPSHOT_KEYFRAME,
   SNAPSHOT_KEYFRAME_INTERVAL,
   SNAPSHOT_MESSAGE_BYTES,
@@ -283,7 +284,7 @@ test("32-player snapshot deltas are compact and keyframes recover the baseline",
   world.writeSnapshot(second);
   const keyframeLength = writeSnapshotKeyframe(frame, world.tick, first);
   const deltaLength = writeSnapshotDelta(frame, world.tick, 0, first, second);
-  assert.equal(keyframeLength, SNAPSHOT_MESSAGE_BYTES);
+  assert.ok(keyframeLength > SNAPSHOT_FRAME_HEADER_BYTES && keyframeLength < SNAPSHOT_MESSAGE_BYTES);
   assert.ok(
     deltaLength > 0 && deltaLength < keyframeLength,
     `delta ${deltaLength} must beat keyframe ${keyframeLength}`,
@@ -294,28 +295,28 @@ test("32-player snapshot deltas are compact and keyframes recover the baseline",
     decoded: new Uint8Array(SNAPSHOT_BYTES),
     baselineTick: -1,
   };
-  writeSnapshotKeyframe(frame, 0, first);
-  const previousProtocolFrame = frame.slice();
+  const baselineKeyframeLength = writeSnapshotKeyframe(frame, 0, first);
+  const previousProtocolFrame = frame.slice(0, baselineKeyframeLength);
   previousProtocolFrame[2] = 4;
   assert.throws(() => readSnapshotFrame(previousProtocolFrame, scratch), /envelope mismatch/);
-  const reservedByteFrame = frame.slice();
+  const reservedByteFrame = frame.slice(0, baselineKeyframeLength);
   reservedByteFrame[9] = 1;
   assert.throws(() => readSnapshotFrame(reservedByteFrame, scratch), /reserved byte/);
-  const keyframeBaseFrame = frame.slice();
+  const keyframeBaseFrame = frame.slice(0, baselineKeyframeLength);
   keyframeBaseFrame[10] = 1;
   assert.throws(() => readSnapshotFrame(keyframeBaseFrame, scratch), /invalid snapshot keyframe/);
-  assert.equal(readSnapshotFrame(frame, scratch), 0);
+  assert.equal(readSnapshotFrame(frame.subarray(0, baselineKeyframeLength), scratch), 0);
   writeSnapshotDelta(frame, world.tick, 0, first, second);
   assert.equal(readSnapshotFrame(frame.subarray(0, deltaLength), scratch), world.tick);
   assert.deepEqual(scratch.decoded, second);
 
   const validDelta = frame.slice(0, deltaLength);
-  const malformed = validDelta.slice();
-  malformed[18] = 0;
-  malformed[19] = 0;
-  writeSnapshotKeyframe(frame, 0, first);
-  readSnapshotFrame(frame, scratch);
-  assert.throws(() => readSnapshotFrame(malformed, scratch), /run is invalid/);
+  const malformed = validDelta.slice(0, SNAPSHOT_FRAME_HEADER_BYTES + 1);
+  malformed[14] = 1;
+  malformed[15] = 0;
+  const recoveryKeyframeLength = writeSnapshotKeyframe(frame, 0, first);
+  readSnapshotFrame(frame.subarray(0, recoveryKeyframeLength), scratch);
+  assert.throws(() => readSnapshotFrame(malformed, scratch), /run header is truncated/);
 
   const missingBase = { ...scratch, baselineTick: -1 };
   assert.throws(() => readSnapshotFrame(validDelta, missingBase), /base is unavailable/);
@@ -332,8 +333,10 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   const current = new Uint8Array(SNAPSHOT_BYTES);
   const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
   const lengths = [];
+  const normal = [];
   let baselineTick = -1;
   let framesSinceKeyframe = SNAPSHOT_KEYFRAME_INTERVAL;
+  let keyframes = 0;
   for (let tick = 1; tick <= 600; tick += 1) {
     for (let playerId = 1; playerId <= MAX_PLAYERS; playerId += 1) {
       const input = createInputCommand(77, playerId);
@@ -350,8 +353,10 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
     if (length < 0) {
       length = writeSnapshotKeyframe(frame, world.tick, current);
       framesSinceKeyframe = 0;
+      keyframes += 1;
     } else {
       framesSinceKeyframe += 1;
+      normal.push(length);
     }
     lengths.push(length);
     previous.set(current);
@@ -359,15 +364,15 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   }
   lengths.sort((left, right) => left - right);
   assert.equal(lengths.length, 200);
-  assert.equal(lengths[0], 2_148);
-  assert.equal(lengths.at(-1), SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_547);
-  assert.equal(lengths.filter((length) => length === SNAPSHOT_MESSAGE_BYTES).length, 10);
-  const normal = lengths.filter((length) => length !== SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(normal.at(-1), 3_191);
+  assert.equal(lengths[0], 1_268);
+  assert.equal(lengths.at(-1), 4_748);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 1_496);
+  assert.equal(keyframes, 10);
+  normal.sort((left, right) => left - right);
+  assert.equal(normal.at(-1), 1_902);
 });
 
-test("independent snapshot streams stay bounded by the acknowledgement window", async () => {
+test("snapshot admission stays bounded when a host ignores stream cancellation", async () => {
   const server = new MatchServer({ rosterSize: 2 });
   const session = server.createSession();
   const frames = [];
@@ -377,9 +382,7 @@ test("independent snapshot streams stay bounded by the acknowledgement window", 
     sendReliable(_channel, payload, signal) {
       frames.push(payload.slice());
       signals.push(signal);
-      return new Promise((resolve) => {
-        signal.addEventListener("abort", () => resolve("backpressured"), { once: true });
-      });
+      return new Promise(() => {});
     },
     trySendDatagram: async () => "closed",
     close() {},
@@ -388,12 +391,15 @@ test("independent snapshot streams stay bounded by the acknowledgement window", 
   const first = new Uint8Array(SNAPSHOT_BYTES);
   for (let index = 0; index < 8; index += 1) session.sendSnapshot(first, 3 + index * 3);
   assert.equal(frames.length, 8);
-  assert.equal(signals[0].aborted, false, "independent state streams may complete out of order");
   session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(7), 27);
-  assert.equal(frames.length, 8, "an unacknowledged peer cannot grow the stream window");
+  assert.equal(frames.length, 8, "a cancellation-ignoring host cannot grow the stream window");
   assert.equal(frames[0][8], SNAPSHOT_KEYFRAME);
   assert.equal(frames[7][8], SNAPSHOT_KEYFRAME, "unacknowledged state cannot become a delta base");
-  assert.equal(signals[0].aborted, false, "capacity pressure must not evict an earlier packet before its deadline");
+  assert.equal(
+    signals.every((signal) => signal.aborted),
+    true,
+    "every obsolete operation is asked to reset",
+  );
   server.close();
 });
 

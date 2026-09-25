@@ -179,7 +179,15 @@ of adding bespoke application bindings.
 The online client now keeps a fixed-capacity pair of transform samples for all
 32 slots and samples remote hull/turret transforms across the authoritative
 snapshot interval advertised by the server (three ticks / 20 Hz by default).
-The local slot remains an immediate read from its predicted/reconciled world.
+An incoming sample starts from the pose that was actually rendered, not the
+previous authoritative target, so jittered or bunched streams do not jump an
+in-flight interpolation forward. Generation or player-mode changes hard-snap
+instead of blending across a respawn, slot reuse, or tank/on-foot transition.
+Hull and turret directions follow their shortest angular arc. The local slot
+remains an immediate read from its predicted/reconciled world, with positional
+and angular reconciliation error decaying over the same bounded 100 ms window.
+The preceding frame delta is consumed before a pending snapshot is installed,
+so a new segment or correction is first rendered at alpha zero.
 Defold tank components consume this caller-owned sample, while a failed dial,
 pre-welcome reject, or pre-welcome close returns to the offline `PlayableBattle`
 that was created at arena start.
@@ -279,7 +287,17 @@ predicted command N locally but retimestamped it to N + leadTicks for the
 server, which guaranteed repeated corrections. Local simulation accepts each
 authoritative correction and replays later commands on their exact original
 ticks; presentation decays only the remaining visual error over 100 ms. Remote
-players interpolate between authoritative samples.
+players interpolate between authoritative samples. Adaptive lead grows by at
+most one tick per authoritative sample, but no longer ratchets upward forever:
+twelve consecutive samples below the current target lower it by one tick. The
+client catches down by consuming one future wall-clock tick without stepping,
+never by rewinding simulation or changing an input's tick. Scalar client stats
+record current/maximum positional correction, remote in-flight rebases and
+their maximum distance, non-lifecycle interpolation discontinuity, lifecycle
+hard-snaps, current lead, lead decreases, and completed catch-down holds. These
+counters are allocation-free observability; they do not by themselves prove
+visual quality outside the deterministic and bounded loopback profiles that
+record them.
 
 Snapshot delivery is replaceable state, not an ordered event log. Each packet
 owns an independent WebTransport stream, up to eight unsettled streams; streams
@@ -523,7 +541,7 @@ baseline. Its first authoritative frame is therefore a complete keyframe, and
 the client clears all pending bytes and acknowledgement bits at the welcome
 boundary before applying it. Token rotation is two-phase: a staged credential
 becomes current only after the client echoes that exact credential in the
-`welcome-ack` introduced by protocol 8 and retained by current protocol 10;
+`welcome-ack` introduced by protocol 8 and retained by current protocol 11;
 local enqueue success alone is not admission evidence.
 A missing acknowledgement closes and releases the session after five seconds,
 while failed or closed delivery retains the prior credential and its original
@@ -932,6 +950,49 @@ artifact. This is loopback correctness evidence, not WAN loss/latency evidence.
 
 This tranche does not yet claim WAN deployment, matchmaking/account identity,
 network failover, or dedicated-server failover.
+
+## Snapshot bandwidth and projectile replication
+
+The simulation already uses integer fixed point: positions have 1/16-pixel
+precision, headings use Q8 direction vectors, and velocity has its own 1/256
+sub-unit scale. The initial network codec nevertheless treated the complete
+17,888-byte rollback image as its keyframe and byte-diff source. That made
+unused capacity—not gameplay state—part of the bandwidth bill.
+
+Protocol 11 keeps the fixed rollback image in memory but emits sparse
+keyframes and gap/length-varint deltas. Inactive projectile slots serialize
+only their generation; stale pool bytes are not logical world state. The
+deterministic 32-player, 20 Hz trace fell from 46,386 to 30,022.2 application
+payload bytes/second/client, and its largest keyframe fell from 17,904 to 4,558
+bytes. Input remains 5,760 payload bytes/second/client at 60 Hz. These numbers
+exclude QUIC, HTTP/3, TLS, UDP, IP, Ethernet, retransmission, acknowledgement,
+and congestion overhead.
+
+The result is an intermediate format, not the endpoint. Run metadata still
+accounts for 152,857 of 300,222 bytes in the ten-second trace, the p95 frame is
+1,726 bytes, and the adversarial fixed-capacity bound is 358,080 bytes/second/
+client (91.67 Mbit/s aggregate for 32 clients). The next codec therefore uses
+schema field masks and bounded integer widths rather than byte runs. Player
+position can be represented exactly in 15 bits per axis inside the authored
+arena; narrowing velocity or presentation precision requires an explicit range
+and error budget rather than an unchecked cast.
+
+Projectile replication follows state semantics, not a blanket “projectiles are
+events” rule. Hitscan weapons are fire/impact events. Missiles remain
+authoritative entities, but their wire state is trajectory-shaped: create or
+bounce establishes slot/generation, base tick/position, direction and speed;
+despawn/impact is an event; unchanged motion is evaluated from that trajectory
+instead of retransmitting x/y/life every snapshot. A keyframe still enumerates
+all live missile trajectories, and acknowledged-baseline deltas retain
+fail-closed recovery. This follows the useful Quake III split between compact
+entity-state trajectories and short-lived entity events without copying its
+float-based representation.
+
+Evidence owner: `integration/check-performance.mjs`; checked artifact:
+`evidence/performance-operability.json`. Current targets are 24,000 ordinary
+and 64,000 adversarial payload bytes/second/client, p95 at 1,100 bytes, and an
+8,000-byte keyframe. Only the keyframe and upstream targets pass this wave.
+
 Authenticated resume credentials, fail-closed durable admission, and local
 Docker process-restart resume are now proven at their named boundaries.
 The Deno host also owns a fixed-size, versioned and checksummed authoritative

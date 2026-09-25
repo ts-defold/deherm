@@ -24,28 +24,67 @@
     "frame": {
       "samples": 540,
       "p50": 895,
-      "p95": 5628,
-      "p99": 6294,
-      "maximum": 7009
+      "p95": 3894,
+      "p99": 7714,
+      "maximum": 10023
     },
     "evidenceBoundary": "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings."
   },
   "snapshotBandwidth": {
     "intervalTicks": 3,
     "frames": 200,
-    "keyframes": 1,
-    "deltas": 199,
-    "totalBytes": 463860,
-    "bytesPerSimulatedSecond": 46386,
+    "keyframes": 10,
+    "deltas": 190,
+    "totalBytes": 300222,
+    "bytesPerSimulatedSecond": 30022.2,
+    "bitsPerSimulatedSecond": 240177.6,
+    "aggregateServerPayloadBytesPerSecond": 960710.4,
+    "aggregateServerPayloadBitsPerSecond": 7685683.2,
+    "inputPayloadBytesPerSecondPerClient": 5760,
+    "inputPayloadBitsPerSecondPerClient": 46080,
+    "aggregateInputPayloadBytesPerSecond": 184320,
     "frameBytes": {
       "samples": 200,
-      "p50": 2228,
-      "p95": 2654,
-      "p99": 3093,
-      "maximum": 17904
+      "p50": 1397,
+      "p95": 1726,
+      "p99": 4160,
+      "maximum": 4558
     },
-    "keyframeBytes": 17904,
-    "fixedFrameCapacity": 17904
+    "keyframeBytes": 4558,
+    "fixedFrameCapacity": 17904,
+    "worstCaseBound": {
+      "assumption": "Every scheduled snapshot reaches the fixed frame capacity.",
+      "framesPerSecond": 20,
+      "bytesPerSecondPerClient": 358080,
+      "bitsPerSecondPerClient": 2864640,
+      "aggregateServerBytesPerSecond": 11458560,
+      "aggregateServerBitsPerSecond": 91668480
+    },
+    "byteAttribution": {
+      "frameHeaders": 3200,
+      "runHeaders": 152857,
+      "worldHeader": 507,
+      "players": 104259,
+      "projectiles": 35696,
+      "pickups": 3180,
+      "cover": 523
+    },
+    "targets": {
+      "downstreamBytesPerSecondPerClient": 24000,
+      "downstreamStretchBytesPerSecondPerClient": 8000,
+      "upstreamBytesPerSecondPerClient": 6000,
+      "snapshotP95Bytes": 1100,
+      "keyframeBytes": 8000,
+      "worstCaseDownstreamBytesPerSecondPerClient": 64000,
+      "downstreamTargetSatisfied": false,
+      "downstreamStretchTargetSatisfied": false,
+      "upstreamTargetSatisfied": true,
+      "snapshotP95TargetSatisfied": false,
+      "keyframeTargetSatisfied": true,
+      "worstCaseDownstreamTargetSatisfied": false,
+      "requiredDownstreamReductionRatio": 0.20059156224393948
+    },
+    "evidenceBoundary": "Application payload bytes only. QUIC, HTTP/3, TLS, UDP, IP, Ethernet, retransmission, acknowledgement, and congestion overhead are not observed by this deterministic codec harness."
   },
   "reconciliation": {
     "samples": 200,
@@ -86,7 +125,7 @@
     },
     "snapshotFrame": {
       "capacity": 17904,
-      "highWater": 17904,
+      "highWater": 4558,
       "failures": 0
     },
     "arena": {
@@ -124,20 +163,20 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 376115,
-      "sha256": "23836bf2ccd3ebbff0db1e667c6a11041394dcbefeff71ced3eee4f73ec3f15c"
+      "bytes": 390852,
+      "sha256": "41d48bd0f46be416cf6f7bc645ef96524796f6685a817b72911bef5e9f39d83d"
     },
     {
       "path": "examples/war-battles-online/integration/performance-harness.ts",
       "kind": "file",
-      "bytes": 12134,
-      "sha256": "0527318786b1c0be44493221f59876019eb7bef424d7c8ff323a4f003c3fd3f2"
+      "bytes": 19726,
+      "sha256": "f412c1b8f6858e115edcef192e7b337e9d6fcd25375ebcd45edd82988faa1863"
     },
     {
       "path": "examples/war-battles-online/integration/performance-evidence.mjs",
       "kind": "file",
-      "bytes": 5276,
-      "sha256": "cbde70f4321c0c7a28b57e93cad7653df13aa83cf035ed71f637d817abbfb2ab"
+      "bytes": 7576,
+      "sha256": "978ddfb3f0f6b59f7af30e51f470a8cf5f40fc8301dc38c10e3f3a9e3c6154e7"
     },
     {
       "path": "examples/war-battles-online/integration/check-performance.mjs",
@@ -146,6 +185,6 @@
       "sha256": "b8709891a96f1b3aabc8c65ef4aa48860d630b3b5bfc286e4e00663e15a7a19a"
     }
   ],
-  "sourceKey": "e1911609ad4b92036005d29001789e4755db12ea091bc32009eae00c74c5b533",
+  "sourceKey": "b44eab55ba60775c6211e5a3ed6c00abd608a7daeb878924e520f18be43eb4bc",
   "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
 }

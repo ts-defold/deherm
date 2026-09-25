@@ -17,7 +17,8 @@ import { WEAPON_COUNT } from "./content";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 10;
+// Version 11 uses sparse keyframes and gap/length varints for snapshot runs.
+export const PROTOCOL_VERSION = 11;
 export const INPUT_PACKET_BYTES = 32;
 /**
  * One unreliable transport datagram repeats the newest command plus two recent

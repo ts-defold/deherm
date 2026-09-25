@@ -440,6 +440,13 @@ export async function runAuthoritativeLoadHarness(
       inputCommandsSent: client.stats.inputCommandsSent,
       inputLeadTicks: client.stats.inputLeadTicks,
       inputLeadIncreases: client.stats.inputLeadIncreases,
+      inputLeadDecreases: client.stats.inputLeadDecreases,
+      inputLeadCatchdownSkips: client.stats.inputLeadCatchdownSkips,
+      maximumLocalCorrectionMagnitude: client.stats.maximumLocalCorrectionMagnitude,
+      remoteInterpolationRebases: client.stats.remoteInterpolationRebases,
+      maximumRemoteInterpolationRebaseDistance: client.stats.maximumRemoteInterpolationRebaseDistance,
+      maximumRemoteInterpolationDiscontinuity: client.stats.maximumRemoteInterpolationDiscontinuity,
+      remoteLifecycleHardSnaps: client.stats.remoteLifecycleHardSnaps,
       rateLimitAdvisories: client.stats.rateLimitAdvisories,
       replayedTicks: client.stats.replayedTicks,
       converged,
@@ -460,10 +467,12 @@ export async function runAuthoritativeLoadHarness(
     config.players * 2 * (config.datagramQueueCapacity + config.reliableQueueCapacity * RELIABLE_CHANNELS.length);
   const boundedQueues = network.stats.peakQueue <= queueBound;
   const everyClientAttemptedEveryTick = clientRows.every(
-    (client) => client.inputsSent + client.inputsDropped === config.ticks + client.inputLeadIncreases,
+    (client) =>
+      client.inputsSent + client.inputsDropped ===
+      config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips,
   );
   const generatedInputCommands = clientRows.reduce(
-    (total, client) => total + config.ticks + client.inputLeadIncreases,
+    (total, client) => total + config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips,
     0,
   );
   const inputAcceptanceRatio = server.stats.inputsAccepted / generatedInputCommands;
@@ -529,6 +538,19 @@ export async function runAuthoritativeLoadHarness(
       maxInputsDropped: Math.max(...clientRows.map((client) => client.inputsDropped)),
       minInputLeadTicks: Math.min(...clientRows.map((client) => client.inputLeadTicks)),
       maxInputLeadTicks: Math.max(...clientRows.map((client) => client.inputLeadTicks)),
+      totalInputLeadDecreases: clientRows.reduce((total, client) => total + client.inputLeadDecreases, 0),
+      maximumLocalCorrectionMagnitude: Math.max(...clientRows.map((client) => client.maximumLocalCorrectionMagnitude)),
+      totalRemoteInterpolationRebases: clientRows.reduce(
+        (total, client) => total + client.remoteInterpolationRebases,
+        0,
+      ),
+      maximumRemoteInterpolationRebaseDistance: Math.max(
+        ...clientRows.map((client) => client.maximumRemoteInterpolationRebaseDistance),
+      ),
+      maximumRemoteInterpolationDiscontinuity: Math.max(
+        ...clientRows.map((client) => client.maximumRemoteInterpolationDiscontinuity),
+      ),
+      totalRemoteLifecycleHardSnaps: clientRows.reduce((total, client) => total + client.remoteLifecycleHardSnaps, 0),
       maxSnapshotsIgnored: Math.max(...clientRows.map((client) => client.snapshotsIgnored)),
     },
     convergence: {

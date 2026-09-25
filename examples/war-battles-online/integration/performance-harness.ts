@@ -1,14 +1,28 @@
 import {
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
+  COVER_SNAPSHOT_BYTES,
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
+  PICKUP_SNAPSHOT_BYTES,
+  PLAYER_SNAPSHOT_BYTES,
+  PROJECTILE_SNAPSHOT_BYTES,
   SNAPSHOT_BYTES,
+  SNAPSHOT_HEADER_BYTES,
   TICK_RATE,
 } from "../core/constants.ts";
 import { EVENT_CAPACITY } from "../core/events.ts";
-import { createInputCommand, type InputCommand } from "../core/protocol.ts";
+import {
+  createInputCommand,
+  INPUT_BUNDLE_BYTES,
+  SNAPSHOT_DELTA,
+  SNAPSHOT_FRAME_HEADER_BYTES,
+  SNAPSHOT_KEYFRAME,
+  SNAPSHOT_KEYFRAME_INTERVAL,
+  SNAPSHOT_MESSAGE_BYTES,
+  type InputCommand,
+} from "../core/protocol.ts";
 import { writeSnapshotDelta, writeSnapshotKeyframe } from "../core/snapshot.ts";
 import { BattleWorld } from "../core/world.ts";
 
@@ -31,6 +45,43 @@ export const PERFORMANCE_HARNESS_CONFIG = Object.freeze({
   mapSeed: 0x0bad_cafe,
   snapshotIntervalTicks: 3,
 });
+
+/**
+ * Project-owned payload budgets. These are optimization targets, not claims
+ * about QUIC/IP overhead or historical Quake III byte counts.
+ */
+export const NETWORK_PAYLOAD_TARGETS = Object.freeze({
+  downstreamBytesPerSecondPerClient: 24_000,
+  downstreamStretchBytesPerSecondPerClient: 8_000,
+  upstreamBytesPerSecondPerClient: 6_000,
+  snapshotP95Bytes: 1_100,
+  keyframeBytes: 8_000,
+  worstCaseDownstreamBytesPerSecondPerClient: 64_000,
+});
+
+const SNAPSHOT_REGIONS = Object.freeze([
+  { name: "worldHeader", start: 0, bytes: SNAPSHOT_HEADER_BYTES },
+  { name: "players", start: SNAPSHOT_HEADER_BYTES, bytes: MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES },
+  {
+    name: "projectiles",
+    start: SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES,
+    bytes: MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES,
+  },
+  {
+    name: "pickups",
+    start: SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES + MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES,
+    bytes: MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES,
+  },
+  {
+    name: "cover",
+    start:
+      SNAPSHOT_HEADER_BYTES +
+      MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES +
+      MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES +
+      MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES,
+    bytes: COVER_SNAPSHOT_BYTES,
+  },
+]);
 
 export interface PerformanceEvidence {
   readonly schemaVersion: number;
@@ -65,6 +116,72 @@ function activeCount(values: Uint8Array): number {
   let active = 0;
   for (let index = 0; index < values.length; index += 1) active += values[index]!;
   return active;
+}
+
+interface SnapshotByteAttribution {
+  frameHeaders: number;
+  runHeaders: number;
+  worldHeader: number;
+  players: number;
+  projectiles: number;
+  pickups: number;
+  cover: number;
+}
+
+function createSnapshotByteAttribution(): SnapshotByteAttribution {
+  return { frameHeaders: 0, runHeaders: 0, worldHeader: 0, players: 0, projectiles: 0, pickups: 0, cover: 0 };
+}
+
+function addRegionBytes(attribution: SnapshotByteAttribution, offset: number, length: number): void {
+  const end = offset + length;
+  for (const region of SNAPSHOT_REGIONS) {
+    const overlap = Math.max(0, Math.min(end, region.start + region.bytes) - Math.max(offset, region.start));
+    if (overlap > 0) attribution[region.name as keyof SnapshotByteAttribution] += overlap;
+  }
+}
+
+function attributeSnapshotFrame(frame: Uint8Array, length: number, attribution: SnapshotByteAttribution): void {
+  attribution.frameHeaders += SNAPSHOT_FRAME_HEADER_BYTES;
+  const kind = frame[8];
+  const runCount = frame[14]! | (frame[15]! << 8);
+  if (kind === SNAPSHOT_KEYFRAME && runCount === 0 && length === SNAPSHOT_MESSAGE_BYTES) {
+    addRegionBytes(attribution, 0, SNAPSHOT_BYTES);
+    return;
+  }
+  if (kind !== SNAPSHOT_KEYFRAME && kind !== SNAPSHOT_DELTA) throw new Error(`unknown snapshot frame kind ${kind}`);
+  let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
+  let previousEnd = 0;
+  for (let run = 0; run < runCount; run += 1) {
+    const headerStart = cursor;
+    const packedGap = readFrameVarUint(frame, cursor, length);
+    cursor = packedGap & 0xffff;
+    const gap = packedGap >>> 16;
+    const packedLength = readFrameVarUint(frame, cursor, length);
+    cursor = packedLength & 0xffff;
+    const runLength = packedLength >>> 16;
+    const offset = previousEnd + gap;
+    attribution.runHeaders += cursor - headerStart;
+    if (cursor + runLength > length) throw new Error("snapshot attribution found a truncated run body");
+    addRegionBytes(attribution, offset, runLength);
+    cursor += runLength;
+    previousEnd = offset + runLength;
+  }
+  if (cursor !== length) throw new Error("snapshot attribution found trailing bytes");
+}
+
+function readFrameVarUint(frame: Uint8Array, offset: number, limit: number): number {
+  let value = 0;
+  for (let byte = 0; byte < 3; byte += 1) {
+    if (offset >= limit) throw new Error("snapshot attribution found a truncated run header");
+    const current = frame[offset++]!;
+    value |= (current & 0x7f) << (byte * 7);
+    if ((current & 0x80) === 0) return ((value << 16) | offset) >>> 0;
+  }
+  throw new Error("snapshot attribution found an invalid run header");
+}
+
+function sumAttribution(attribution: SnapshotByteAttribution): number {
+  return Object.values(attribution).reduce((sum, value) => sum + value, 0);
 }
 
 function setInput(
@@ -133,9 +250,12 @@ export function runPerformanceHarness(
   let snapshotSizeSampleCount = 0;
   let previousEventSequence = 0;
   let baselineTick = -1;
+  let framesSinceKeyframe = SNAPSHOT_KEYFRAME_INTERVAL;
   let keyframes = 0;
   let deltas = 0;
   let snapshotBytes = 0;
+  let maximumKeyframeBytes = 0;
+  const snapshotByteAttribution = createSnapshotByteAttribution();
   let snapshotBufferFailures = 0;
   let projectileHighWater = 0;
   let eventHighWater = 0;
@@ -172,20 +292,25 @@ export function runPerformanceHarness(
     if (tick % config.snapshotIntervalTicks === 0) {
       authoritative.writeSnapshot(rawSnapshot);
       let frameBytes: number;
-      if (baselineTick < 0) {
+      if (baselineTick < 0 || framesSinceKeyframe >= SNAPSHOT_KEYFRAME_INTERVAL - 1) {
         frameBytes = writeSnapshotKeyframe(snapshotFrame, tick, rawSnapshot);
         keyframes += 1;
+        framesSinceKeyframe = 0;
       } else {
         frameBytes = writeSnapshotDelta(snapshotFrame, tick, baselineTick, baselineSnapshot, rawSnapshot);
         if (frameBytes < 0) {
           frameBytes = writeSnapshotKeyframe(snapshotFrame, tick, rawSnapshot);
           keyframes += 1;
+          framesSinceKeyframe = 0;
         } else {
           deltas += 1;
+          framesSinceKeyframe += 1;
         }
       }
+      if (snapshotFrame[8] === SNAPSHOT_KEYFRAME) maximumKeyframeBytes = Math.max(maximumKeyframeBytes, frameBytes);
       if (frameBytes > snapshotFrame.byteLength) snapshotBufferFailures += 1;
       snapshotBytes += frameBytes;
+      attributeSnapshotFrame(snapshotFrame, frameBytes, snapshotByteAttribution);
       snapshotSizeSamples[snapshotSizeSampleCount++] = frameBytes;
       baselineSnapshot.set(rawSnapshot);
       baselineTick = tick;
@@ -219,6 +344,20 @@ export function runPerformanceHarness(
   const measuredReconciliation = reconciliationSamples.subarray(0, reconciliationSampleCount);
   const measuredSnapshotSizes = snapshotSizeSamples.subarray(0, snapshotSizeSampleCount);
   const fixedFrameCapacity = snapshotFrame.byteLength;
+  if (sumAttribution(snapshotByteAttribution) !== snapshotBytes) {
+    throw new Error(
+      `snapshot byte attribution mismatch: ${sumAttribution(snapshotByteAttribution)} attributed, ${snapshotBytes} sent`,
+    );
+  }
+  const snapshotBytesPerSecond = Math.round((snapshotBytes * config.tickRate * 100) / config.ticks) / 100;
+  const inputBytesPerSecond = INPUT_BUNDLE_BYTES * config.tickRate;
+  const aggregateSnapshotBytesPerSecond = snapshotBytesPerSecond * config.players;
+  const snapshotFramesPerSecond = config.tickRate / config.snapshotIntervalTicks;
+  const worstCaseSnapshotBytesPerSecond = fixedFrameCapacity * snapshotFramesPerSecond;
+  const requiredDownstreamReduction = Math.max(
+    0,
+    1 - NETWORK_PAYLOAD_TARGETS.downstreamBytesPerSecondPerClient / snapshotBytesPerSecond,
+  );
   return Object.freeze({
     schemaVersion: PERFORMANCE_HARNESS_SCHEMA_VERSION,
     kind: "war-battles.performance-operability",
@@ -237,10 +376,39 @@ export function runPerformanceHarness(
       keyframes,
       deltas,
       totalBytes: snapshotBytes,
-      bytesPerSimulatedSecond: Math.round((snapshotBytes * config.tickRate * 100) / config.ticks) / 100,
+      bytesPerSimulatedSecond: snapshotBytesPerSecond,
+      bitsPerSimulatedSecond: snapshotBytesPerSecond * 8,
+      aggregateServerPayloadBytesPerSecond: aggregateSnapshotBytesPerSecond,
+      aggregateServerPayloadBitsPerSecond: aggregateSnapshotBytesPerSecond * 8,
+      inputPayloadBytesPerSecondPerClient: inputBytesPerSecond,
+      inputPayloadBitsPerSecondPerClient: inputBytesPerSecond * 8,
+      aggregateInputPayloadBytesPerSecond: inputBytesPerSecond * config.players,
       frameBytes: summarize(measuredSnapshotSizes),
-      keyframeBytes: fixedFrameCapacity,
+      keyframeBytes: maximumKeyframeBytes,
       fixedFrameCapacity,
+      worstCaseBound: {
+        assumption: "Every scheduled snapshot reaches the fixed frame capacity.",
+        framesPerSecond: snapshotFramesPerSecond,
+        bytesPerSecondPerClient: worstCaseSnapshotBytesPerSecond,
+        bitsPerSecondPerClient: worstCaseSnapshotBytesPerSecond * 8,
+        aggregateServerBytesPerSecond: worstCaseSnapshotBytesPerSecond * config.players,
+        aggregateServerBitsPerSecond: worstCaseSnapshotBytesPerSecond * config.players * 8,
+      },
+      byteAttribution: snapshotByteAttribution,
+      targets: {
+        ...NETWORK_PAYLOAD_TARGETS,
+        downstreamTargetSatisfied: snapshotBytesPerSecond <= NETWORK_PAYLOAD_TARGETS.downstreamBytesPerSecondPerClient,
+        downstreamStretchTargetSatisfied:
+          snapshotBytesPerSecond <= NETWORK_PAYLOAD_TARGETS.downstreamStretchBytesPerSecondPerClient,
+        upstreamTargetSatisfied: inputBytesPerSecond <= NETWORK_PAYLOAD_TARGETS.upstreamBytesPerSecondPerClient,
+        snapshotP95TargetSatisfied: percentile(measuredSnapshotSizes, 0.95) <= NETWORK_PAYLOAD_TARGETS.snapshotP95Bytes,
+        keyframeTargetSatisfied: maximumKeyframeBytes <= NETWORK_PAYLOAD_TARGETS.keyframeBytes,
+        worstCaseDownstreamTargetSatisfied:
+          worstCaseSnapshotBytesPerSecond <= NETWORK_PAYLOAD_TARGETS.worstCaseDownstreamBytesPerSecondPerClient,
+        requiredDownstreamReductionRatio: requiredDownstreamReduction,
+      },
+      evidenceBoundary:
+        "Application payload bytes only. QUIC, HTTP/3, TLS, UDP, IP, Ethernet, retransmission, acknowledgement, and congestion overhead are not observed by this deterministic codec harness.",
     },
     reconciliation: {
       samples: reconciliationSampleCount,

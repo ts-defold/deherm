@@ -34,6 +34,12 @@ import type { BattleWorld } from "./world";
 const SNAPSHOT_MAGIC = 0x57425331;
 // Version 7 adds the authoritative tank/on-foot/dead player mode.
 const SNAPSHOT_VERSION = 8;
+// Snapshot runs use unsigned LEB128 for the gap from the previous run and the
+// run length. Typical gaps and lengths therefore cost two bytes total instead
+// of four fixed bytes. Carrying one unchanged byte is always cheaper than a
+// second run; larger gaps stay separate because measured varint-boundary cases
+// can make otherwise equal-size coalescing marginally worse.
+const RUN_COALESCE_GAP_BYTES = 1;
 
 export interface SnapshotFrameScratch {
   baseline: Uint8Array;
@@ -56,8 +62,14 @@ export function writeSnapshotKeyframe(target: Uint8Array, tick: number, source: 
   if (source.byteLength < SNAPSHOT_BYTES) throw new RangeError("snapshot keyframe source is truncated");
   requireFrameCapacity(target);
   frameHeader(target, tick, SNAPSHOT_KEYFRAME, 0);
+  const sparseLength = writeSnapshotRuns(target, source);
+  if (sparseLength >= 0) return sparseLength;
+  // The fixed raw form is the bounded fallback for an adversarial snapshot
+  // whose sparse run metadata would exceed the source itself. runCount=0 plus
+  // the full frame length distinguishes it from an all-zero sparse keyframe.
+  frameHeader(target, tick, SNAPSHOT_KEYFRAME, 0);
   copyBytes(target, SNAPSHOT_FRAME_HEADER_BYTES, source, 0, SNAPSHOT_BYTES);
-  return SNAPSHOT_FRAME_HEADER_BYTES + SNAPSHOT_BYTES;
+  return SNAPSHOT_MESSAGE_BYTES;
 }
 
 /**
@@ -77,26 +89,73 @@ export function writeSnapshotDelta(
   }
   requireFrameCapacity(target);
   frameHeader(target, tick, SNAPSHOT_DELTA, baselineTick);
+  const length = writeSnapshotRuns(target, current, baseline);
+  // Compare against the actual sparse keyframe representation, not the fixed
+  // in-memory capacity. A delta that costs at least as much should reset the
+  // recovery chain instead.
+  return length >= 0 && length < Math.min(snapshotRunLength(current), SNAPSHOT_MESSAGE_BYTES) ? length : -1;
+}
+
+function writeSnapshotRuns(target: Uint8Array, current: Uint8Array, baseline?: Uint8Array): number {
   let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
   let runCount = 0;
   let index = 0;
+  let previousEnd = 0;
   while (index < SNAPSHOT_BYTES) {
-    while (index < SNAPSHOT_BYTES && baseline[index] === current[index]) index += 1;
+    while (index < SNAPSHOT_BYTES && current[index] === (baseline?.[index] ?? 0)) index += 1;
     if (index === SNAPSHOT_BYTES) break;
     const start = index;
-    while (index < SNAPSHOT_BYTES && baseline[index] !== current[index] && index - start < 0xffff) index += 1;
-    const length = index - start;
-    if (runCount >= 0xffff || cursor + 4 + length > SNAPSHOT_MESSAGE_BYTES) return -1;
-    writeUint16LE(target, cursor, start);
-    writeUint16LE(target, cursor + 2, length);
-    copyBytes(target, cursor + 4, current, start, length);
-    cursor += 4 + length;
+    let lastChanged = index;
+    let unchanged = 0;
+    while (index < SNAPSHOT_BYTES && index - start < 0xffff) {
+      if (current[index] !== (baseline?.[index] ?? 0)) {
+        lastChanged = index;
+        unchanged = 0;
+      } else {
+        unchanged += 1;
+        if (unchanged > RUN_COALESCE_GAP_BYTES) break;
+      }
+      index += 1;
+    }
+    const length = lastChanged - start + 1;
+    const gap = start - previousEnd;
+    const headerBytes = varUintByteLength(gap) + varUintByteLength(length);
+    if (runCount >= 0xffff || cursor + headerBytes + length > SNAPSHOT_MESSAGE_BYTES) return -1;
+    cursor = writeVarUint(target, cursor, gap);
+    cursor = writeVarUint(target, cursor, length);
+    copyBytes(target, cursor, current, start, length);
+    cursor += length;
     runCount += 1;
+    previousEnd = start + length;
   }
   writeUint16LE(target, 14, runCount);
-  // A delta header plus its runs is useful only when it is smaller than the
-  // keyframe. Equal-sized frames are kept as keyframes for recovery clarity.
-  return cursor < SNAPSHOT_MESSAGE_BYTES ? cursor : -1;
+  return cursor;
+}
+
+function snapshotRunLength(current: Uint8Array): number {
+  let length = SNAPSHOT_FRAME_HEADER_BYTES;
+  let index = 0;
+  let previousEnd = 0;
+  while (index < SNAPSHOT_BYTES) {
+    while (index < SNAPSHOT_BYTES && current[index] === 0) index += 1;
+    if (index === SNAPSHOT_BYTES) break;
+    const start = index;
+    let lastChanged = index;
+    let unchanged = 0;
+    while (index < SNAPSHOT_BYTES && index - start < 0xffff) {
+      if (current[index] !== 0) {
+        lastChanged = index;
+        unchanged = 0;
+      } else if (++unchanged > RUN_COALESCE_GAP_BYTES) {
+        break;
+      }
+      index += 1;
+    }
+    const runLength = lastChanged - start + 1;
+    length += varUintByteLength(start - previousEnd) + varUintByteLength(runLength) + runLength;
+    previousEnd = start + runLength;
+  }
+  return length;
 }
 
 /**
@@ -116,38 +175,75 @@ export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScr
   if (scratch.baseline.byteLength < SNAPSHOT_BYTES || scratch.decoded.byteLength < SNAPSHOT_BYTES) {
     throw new RangeError("snapshot decode storage is truncated");
   }
+  let rawKeyframe = false;
   if (kind === SNAPSHOT_KEYFRAME) {
-    if (baseTick !== 0 || runCount !== 0 || payload.byteLength !== SNAPSHOT_MESSAGE_BYTES)
-      throw new Error("invalid snapshot keyframe");
-    copyBytes(scratch.decoded, 0, payload, SNAPSHOT_FRAME_HEADER_BYTES, SNAPSHOT_BYTES);
+    if (baseTick !== 0) throw new Error("invalid snapshot keyframe");
+    rawKeyframe = runCount === 0 && payload.byteLength === SNAPSHOT_MESSAGE_BYTES;
+    if (rawKeyframe) copyBytes(scratch.decoded, 0, payload, SNAPSHOT_FRAME_HEADER_BYTES, SNAPSHOT_BYTES);
+    else scratch.decoded.fill(0);
   } else if (kind === SNAPSHOT_DELTA) {
     if (scratch.baselineTick < 0 || baseTick !== scratch.baselineTick >>> 0) {
       throw new Error("snapshot delta base is unavailable");
     }
     scratch.decoded.set(scratch.baseline);
-    let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
-    let previousEnd = 0;
-    for (let run = 0; run < runCount; run += 1) {
-      if (cursor + 4 > payload.byteLength) throw new Error("snapshot delta run header is truncated");
-      const offset = readUint16LE(payload, cursor);
-      const length = readUint16LE(payload, cursor + 2);
-      if (length === 0 || offset < previousEnd || offset + length > SNAPSHOT_BYTES) {
-        throw new Error("snapshot delta run is invalid");
-      }
-      if (cursor + 4 + length > payload.byteLength) throw new Error("snapshot delta run is truncated");
-      copyBytes(scratch.decoded, offset, payload, cursor + 4, length);
-      cursor += 4 + length;
-      previousEnd = offset + length;
-    }
-    if (cursor !== payload.byteLength) throw new Error("snapshot delta has trailing bytes");
   } else {
     throw new Error("unknown snapshot frame kind");
   }
+  let cursor = rawKeyframe ? payload.byteLength : SNAPSHOT_FRAME_HEADER_BYTES;
+  let previousEnd = 0;
+  for (let run = 0; run < runCount; run += 1) {
+    const packedGap = readVarUint(payload, cursor);
+    cursor = packedGap & 0xffff;
+    const gap = packedGap >>> 16;
+    const packedLength = readVarUint(payload, cursor);
+    cursor = packedLength & 0xffff;
+    const length = packedLength >>> 16;
+    const offset = previousEnd + gap;
+    if (length === 0 || offset < previousEnd || offset + length > SNAPSHOT_BYTES) {
+      throw new Error("snapshot run is invalid");
+    }
+    if (cursor + length > payload.byteLength) throw new Error("snapshot run is truncated");
+    copyBytes(scratch.decoded, offset, payload, cursor, length);
+    cursor += length;
+    previousEnd = offset + length;
+  }
+  if (cursor !== payload.byteLength) throw new Error("snapshot frame has trailing bytes");
   if (commitBaseline) {
     scratch.baseline.set(scratch.decoded);
     scratch.baselineTick = tick;
   }
   return tick;
+}
+
+function varUintByteLength(value: number): number {
+  if (!Number.isInteger(value) || value < 0 || value > 0xffff) throw new RangeError("snapshot run value is invalid");
+  return value < 0x80 ? 1 : value < 0x4000 ? 2 : 3;
+}
+
+function writeVarUint(target: Uint8Array, offset: number, value: number): number {
+  let remaining = value;
+  do {
+    const continuation = remaining >= 0x80;
+    requireFrameRange(target, offset, 1);
+    target[offset++] = (remaining & 0x7f) | (continuation ? 0x80 : 0);
+    remaining >>>= 7;
+  } while (remaining !== 0);
+  return offset;
+}
+
+/** Returns `(value << 16) | nextOffset` without allocating a tuple/object. */
+function readVarUint(source: Uint8Array, offset: number): number {
+  let value = 0;
+  for (let byte = 0; byte < 3; byte += 1) {
+    if (offset >= source.byteLength) throw new Error("snapshot run header is truncated");
+    const current = source[offset++]!;
+    value |= (current & 0x7f) << (byte * 7);
+    if ((current & 0x80) === 0) {
+      if (value > 0xffff) throw new Error("snapshot run value is invalid");
+      return ((value << 16) | offset) >>> 0;
+    }
+  }
+  throw new Error("snapshot run value is invalid");
 }
 
 function frameHeader(target: Uint8Array, tick: number, kind: number, baseTick: number): void {
@@ -285,7 +381,20 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
   }
 
   for (let slot = 0; slot < MAX_PROJECTILES; slot += 1) {
-    view.setUint8(cursor, world.projectileActive[slot]!);
+    const active = world.projectileActive[slot]!;
+    view.setUint8(cursor, active);
+    // Dead projectile slots retain old values in the fixed simulation pool,
+    // but those bytes are not logical world state. Canonicalizing them keeps
+    // snapshots deterministic while preserving the generation required for
+    // stale-handle rejection and prevents expired shots from consuming wire
+    // bandwidth forever.
+    if (active === 0) {
+      view.setUint8(cursor + 1, 0);
+      view.setUint16(cursor + 2, world.projectileGeneration[slot]!, true);
+      for (let byte = 4; byte < PROJECTILE_SNAPSHOT_BYTES; byte += 1) view.setUint8(cursor + byte, 0);
+      cursor += PROJECTILE_SNAPSHOT_BYTES;
+      continue;
+    }
     view.setUint8(cursor + 1, world.projectileWeapon[slot]!);
     view.setUint16(cursor + 2, world.projectileGeneration[slot]!, true);
     view.setUint8(cursor + 4, world.projectileOwner[slot]!);

@@ -141,8 +141,34 @@ export function assertWebTransportEvidence(document, { sourceInputs } = {}) {
   // still accepts the repeated command from a following packet. Preserve the
   // count as evidence; authoritative server acceptance above is the gate.
   assert.ok(Number.isInteger(document.inputsDropped) && document.inputsDropped >= 0);
+  assert.ok(
+    Number.isInteger(document.presentation?.localCorrectionMagnitude) &&
+      document.presentation.localCorrectionMagnitude >= 0,
+  );
+  assert.ok(
+    Number.isInteger(document.presentation?.maximumLocalCorrectionMagnitude) &&
+      document.presentation.maximumLocalCorrectionMagnitude > 0 &&
+      document.presentation.maximumLocalCorrectionMagnitude >= document.presentation.localCorrectionMagnitude,
+  );
+  assert.ok(
+    Number.isInteger(document.presentation?.remoteInterpolationRebases) &&
+      document.presentation.remoteInterpolationRebases >= 0,
+  );
+  assert.ok(
+    Number.isInteger(document.presentation?.maximumRemoteInterpolationRebaseDistance) &&
+      document.presentation.maximumRemoteInterpolationRebaseDistance >= 0,
+  );
+  assert.equal(document.presentation?.maximumRemoteInterpolationDiscontinuity, 0);
+  assert.ok(
+    Number.isInteger(document.presentation?.remoteLifecycleHardSnaps) &&
+      document.presentation.remoteLifecycleHardSnaps >= 0,
+  );
+  assert.ok(Number.isInteger(document.prediction?.inputLeadTicks) && document.prediction.inputLeadTicks >= 0);
+  assert.ok(Number.isInteger(document.prediction?.inputLeadDecreases) && document.prediction.inputLeadDecreases >= 0);
   assert.ok(typeof document.runtime?.deno === "string" && typeof document.runtime?.chrome === "string");
-  assert.ok(typeof document.evidenceBoundary === "string" && !document.evidenceBoundary.includes("persistent"));
+  assert.ok(typeof document.evidenceBoundary === "string");
+  assert.match(document.evidenceBoundary, /not a visual-quality/u);
+  assert.match(document.evidenceBoundary, /reliable-lane-persistence claim/u);
   return document;
 }
 

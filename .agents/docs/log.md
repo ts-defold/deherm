@@ -3454,3 +3454,48 @@ H3_NO_ERROR connection close and does not consume the post-handshake capsule.
 The local exact result is runtime evidence. The connection backlog transition
 supports peer transport receipt only; it is not promoted to proof of Deno
 application-level capsule consumption.
+
+## 2026-09-25 - WebTransport snapshots supersede unfinished state
+
+War Battles now treats the fixed snapshot-send ring as unfinished transport
+work rather than acknowledgement history. Before admitting a newer 20 Hz
+authoritative frame, the server aborts every older unsettled per-snapshot stream;
+every settled disposition releases its slot immediately. A host that ignores
+cancellation remains constrained by the existing eight slots and injected-clock
+300 ms stale deadline, so latest-state preference does not turn a broken host
+into unbounded stream creation. Delta safety is unchanged: every frame still
+uses only the latest client-applied acknowledgement as its base, never an
+unacknowledged sibling.
+
+A joined `MatchServer` to stream-shaped WebTransport regression stalls the old
+stream at `writer.ready`, observes exactly one stream-local abort, and then
+observes the newer tick cross a fresh stream without closing the session. A
+second frozen-clock regression settles twenty consecutive sends and proves that
+completed work never consumes the eight unfinished slots. The cancellation-
+ignoring regression still proves the hard cap, and the complete core plus new
+focused suite passes 105/105. This is deterministic adapter evidence, not a WAN
+congestion or packet-capture observation; independent streams avoid stream-order
+head-of-line blocking but still share QUIC connection congestion.
+
+## 2026-09-25 - Snapshot bandwidth has ordinary and adversarial bounds
+
+The first bandwidth ledger found 46,386 application payload bytes/second/client
+in the deterministic 32-player 20 Hz trace. Of 463,860 bytes, 330,932 were
+four-byte byte-run headers; the codec was paying more to describe changes than
+to carry them. Protocol 11 now uses unsigned-varint gap/length runs, sparse
+keyframes, and canonical inactive projectile records. The same owner-recorded
+trace is 30,022.2 bytes/second/client (240.18 Kbit/s), p95 is 1,726 bytes, and
+the largest keyframe is 4,558 bytes. The keyframe target passes; the ordinary
+24,000-byte/s and p95 1,100-byte targets do not.
+
+The evidence now also carries the non-statistical hard bound: a full 17,904-byte
+frame at every 20 Hz send is 358,080 bytes/second/client, or 91.67 Mbit/s of
+server payload for 32 clients before transport overhead. It fails the explicit
+64,000-byte/s adversarial target. This closes the measurement gap but not the
+format frontier. The next format must use schema field masks, bounded integer
+widths, and trajectory-shaped missile creation/change/removal so fixed pool
+capacity is never confused with live network state.
+
+Focused core, latest-state, presentation-smoothing, and performance tests pass
+113/113 after the change. This is deterministic codec evidence, not a packet
+capture and not a WAN throughput claim.

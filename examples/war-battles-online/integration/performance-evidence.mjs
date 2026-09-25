@@ -97,6 +97,52 @@ export function assertPerformanceEvidence(document, { sourceInputs } = {}) {
     document.snapshotBandwidth.keyframes + document.snapshotBandwidth.deltas,
     document.snapshotBandwidth.frames,
   );
+  const attribution = document.snapshotBandwidth.byteAttribution;
+  assert.equal(
+    Object.values(attribution).reduce((sum, value) => sum + value, 0),
+    document.snapshotBandwidth.totalBytes,
+    "snapshot byte attribution must account for every application payload byte",
+  );
+  assert.equal(
+    document.snapshotBandwidth.bitsPerSimulatedSecond,
+    document.snapshotBandwidth.bytesPerSimulatedSecond * 8,
+  );
+  assert.equal(
+    document.snapshotBandwidth.aggregateServerPayloadBytesPerSecond,
+    document.snapshotBandwidth.bytesPerSimulatedSecond * document.config.players,
+  );
+  assert.equal(
+    document.snapshotBandwidth.aggregateServerPayloadBitsPerSecond,
+    document.snapshotBandwidth.aggregateServerPayloadBytesPerSecond * 8,
+  );
+  assert.equal(
+    document.snapshotBandwidth.aggregateInputPayloadBytesPerSecond,
+    document.snapshotBandwidth.inputPayloadBytesPerSecondPerClient * document.config.players,
+  );
+  assert.equal(document.snapshotBandwidth.targets.downstreamBytesPerSecondPerClient, 24_000);
+  assert.equal(document.snapshotBandwidth.targets.downstreamStretchBytesPerSecondPerClient, 8_000);
+  assert.equal(document.snapshotBandwidth.targets.upstreamBytesPerSecondPerClient, 6_000);
+  assert.equal(document.snapshotBandwidth.targets.worstCaseDownstreamBytesPerSecondPerClient, 64_000);
+  assert.equal(
+    document.snapshotBandwidth.targets.downstreamTargetSatisfied,
+    document.snapshotBandwidth.bytesPerSimulatedSecond <=
+      document.snapshotBandwidth.targets.downstreamBytesPerSecondPerClient,
+  );
+  assert.equal(
+    document.snapshotBandwidth.targets.upstreamTargetSatisfied,
+    document.snapshotBandwidth.inputPayloadBytesPerSecondPerClient <=
+      document.snapshotBandwidth.targets.upstreamBytesPerSecondPerClient,
+  );
+  assert.equal(
+    document.snapshotBandwidth.worstCaseBound.bytesPerSecondPerClient,
+    document.snapshotBandwidth.fixedFrameCapacity * document.snapshotBandwidth.worstCaseBound.framesPerSecond,
+  );
+  assert.equal(
+    document.snapshotBandwidth.targets.worstCaseDownstreamTargetSatisfied,
+    document.snapshotBandwidth.worstCaseBound.bytesPerSecondPerClient <=
+      document.snapshotBandwidth.targets.worstCaseDownstreamBytesPerSecondPerClient,
+  );
+  assert.match(document.snapshotBandwidth.evidenceBoundary, /QUIC/u);
   assert.ok(document.reconciliation.samples > 0);
   assert.equal(document.reconciliation.postRestoreError, 0);
   assert.ok(document.reconciliation.correctedSnapshots > 0);
