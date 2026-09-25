@@ -44,3 +44,27 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 +    PKG_CHECK_MODULES(BROTLI_ENC libbrotlienc)
 +ENDIF ()
  IF (BROTLI_DEC_FOUND AND BROTLI_ENC_FOUND)
+diff --git a/include/picotls.h b/include/picotls.h
+--- a/include/picotls.h
++++ b/include/picotls.h
+@@ -1420,7 +1420,10 @@ typedef struct st_ptls_log_getsni_t {
+         body                                                                                                                       \
+     }                                                                                                                              \
+     static inline ptls_log_getsni_t ptls_log_getsni_##suffix(type arg)                                                             \
+     {                                                                                                                              \
+-        return (ptls_log_getsni_t){ptls_log_getsni_cb_##suffix, arg};                                                              \
++        ptls_log_getsni_t result;                                                                                                  \
++        result.cb = ptls_log_getsni_cb_##suffix;                                                                                   \
++        result.arg = arg;                                                                                                          \
++        return result;                                                                                                             \
+     }
+@@ -2041,4 +2044,8 @@ inline void ptls_buffer_dispose(ptls_buffer_t *buf)
+ {
+     ptls_buffer__release_memory(buf);
+-    *buf = (ptls_buffer_t){NULL, 0, 0, 0, 0};
++    buf->base = NULL;
++    buf->capacity = 0;
++    buf->off = 0;
++    buf->is_allocated = 0;
++    buf->align_bits = 0;
+ }

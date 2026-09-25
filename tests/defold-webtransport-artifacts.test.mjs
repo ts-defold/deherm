@@ -302,4 +302,9 @@ test("CI publishes content-addressed rows immutably and release assembly consume
   assert.match(picotlsPatch, /IF \(WIN32\)[\s\S]*INCLUDE_DIRECTORIES\(picotlsvs\/picotls\)/u);
   assert.match(picotlsPatch, /LIST\(APPEND CORE_FILES picotlsvs\/picotls\/wintimeofday\.c\)/u,
     "Picotls' CMake build must consume its own Windows compatibility implementation");
+  assert.match(picotlsPatch, /ptls_log_getsni_t result/u);
+  assert.match(picotlsPatch, /buf->align_bits = 0/u,
+    "Picotls' public header must remain valid when consumed by MSVC C++");
+  assert.match(cmake, /target_compile_definitions\(deherm_webtransport_cpp PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN\)/u,
+    "the Windows SDK min/max macros must not rewrite bounded C++ calls");
 });

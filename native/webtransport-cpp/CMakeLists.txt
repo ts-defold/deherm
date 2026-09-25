@@ -106,6 +106,11 @@ target_include_directories(deherm_webtransport_cpp
   PRIVATE src "${picotls_SOURCE_DIR}/include")
 target_compile_features(deherm_webtransport_cpp PUBLIC cxx_std_17)
 set_target_properties(deherm_webtransport_cpp PROPERTIES OUTPUT_NAME defold_webtransport_core)
+if(WIN32)
+  # Windows headers define min/max macros unless NOMINMAX is set. Those macros
+  # corrupt std::min calls in the bounded close-reason path.
+  target_compile_definitions(deherm_webtransport_cpp PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN)
+endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR ANDROID)
   # picohttp and picoquic carry a circular static dependency through the qlog
   # helper. GNU ld resolves each archive only when it is encountered, while
