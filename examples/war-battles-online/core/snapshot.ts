@@ -35,9 +35,15 @@ const SNAPSHOT_MAGIC = 0x57425331;
 const SNAPSHOT_VERSION = 7;
 
 export interface SnapshotFrameScratch {
-  readonly baseline: Uint8Array;
+  baseline: Uint8Array;
   readonly decoded: Uint8Array;
   baselineTick: number;
+}
+
+/** Reads the named delta base without allocating or decoding the frame. */
+export function readSnapshotBaseTick(payload: Uint8Array): number {
+  if (payload.byteLength < SNAPSHOT_FRAME_HEADER_BYTES) throw new Error("snapshot frame is truncated");
+  return readUint32LE(payload, 10);
 }
 
 /**
@@ -96,7 +102,7 @@ export function writeSnapshotDelta(
  * Decodes one frame into caller-owned storage. A delta without the exact
  * advertised base tick is rejected; callers must wait for the next keyframe.
  */
-export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScratch): number {
+export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScratch, commitBaseline = true): number {
   if (payload.byteLength < SNAPSHOT_FRAME_HEADER_BYTES) throw new Error("snapshot frame is truncated");
   if (readUint16LE(payload, 0) !== ENVELOPE_MAGIC) throw new Error("snapshot frame envelope magic mismatch");
   if (payload[2] !== PROTOCOL_VERSION || payload[3] !== MESSAGE_SNAPSHOT)
@@ -136,8 +142,10 @@ export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScr
   } else {
     throw new Error("unknown snapshot frame kind");
   }
-  scratch.baseline.set(scratch.decoded);
-  scratch.baselineTick = tick;
+  if (commitBaseline) {
+    scratch.baseline.set(scratch.decoded);
+    scratch.baselineTick = tick;
+  }
   return tick;
 }
 

@@ -39,8 +39,18 @@ test("impaired load records loss, reordering, bounded queues, and all-client con
   assert.equal(evidence.transport.pendingQueue, 0);
   assert.equal(evidence.convergence.allClientsConverged, true);
   assert.ok(evidence.server.inputsAccepted > 0);
+  assert.ok(evidence.server.inputAcceptanceRatio >= evidence.server.minimumInputAcceptanceRatio);
+  assert.ok(evidence.server.inputsLate > 0);
   assert.equal(
-    evidence.clients.rows.every((row) => row.inputsSent + row.inputsDropped === evidence.config.ticks),
+    evidence.server.inputsAccepted + evidence.server.inputsLate + evidence.server.inputCommandsUnobserved,
+    evidence.server.generatedInputCommands,
+  );
+  assert.ok(evidence.clients.minInputLeadTicks > 2);
+  assert.ok(evidence.clients.maxInputLeadTicks <= 16);
+  assert.equal(
+    evidence.clients.rows.every(
+      (row) => row.inputsSent + row.inputsDropped === evidence.config.ticks + row.inputLeadIncreases,
+    ),
     true,
   );
   assert.equal(

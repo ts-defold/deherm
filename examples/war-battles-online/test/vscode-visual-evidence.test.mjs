@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 import {
   EXPECTED_LIVE_PROPERTIES,
   EXPECTED_PROPERTY_DEFAULTS,
+  VISUAL_EVIDENCE_SOURCE_PATHS,
   verifyVisualEvidence,
 } from "../integration/vscode-visual-evidence.mjs";
 
@@ -26,4 +27,8 @@ test("recorded VS Code evidence shows genuine live arena values", async () => {
   assert.equal(document.observation.instanceId.generation, 1);
   assert.equal(document.observation.omittedInstanceCount, 0);
   assert.ok(document.observation.projectedInstanceCount > 0);
+  assert.deepEqual(
+    document.sourceInputs.map((input) => input.path),
+    VISUAL_EVIDENCE_SOURCE_PATHS,
+  );
 });

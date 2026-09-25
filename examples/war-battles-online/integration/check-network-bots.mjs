@@ -134,7 +134,12 @@ async function run() {
         }
         if (value?.ready !== botCount || value.bots?.length !== botCount) return false;
         return value.bots.every(
-          (bot) => bot.snapshotsApplied >= 3 && bot.inputsSent >= 3 && bot.nonIdleCommands > 0 && bot.pongsReceived > 0,
+          (bot) =>
+            bot.snapshotsApplied >= 3 &&
+            bot.inputsSent >= 3 &&
+            bot.nonIdleCommands > 0 &&
+            bot.observedTravelUnits > 0 &&
+            bot.pongsReceived > 0,
         )
           ? value
           : false;
@@ -152,6 +157,7 @@ async function run() {
       assert.ok(bot.snapshotsApplied >= 3, `bot ${bot.index} must receive snapshots`);
       assert.ok(bot.inputsSent >= 3, `bot ${bot.index} must send inputs`);
       assert.ok(bot.nonIdleCommands > 0, `bot ${bot.index} must make a non-idle shared-brain decision`);
+      assert.ok(bot.observedTravelUnits > 0, `bot ${bot.index} must move in its snapshot-reconciled view`);
       assert.ok(bot.pongsReceived > 0, `bot ${bot.index} must receive protocol-ping telemetry`);
     }
     assert.equal(page.client.failures.length, 0);

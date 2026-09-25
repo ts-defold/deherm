@@ -22,19 +22,10 @@ import {
   createSessionAdmissionGate,
   websocketOriginAllowed,
 } from "../server/deno-main.ts";
+import { waitForCondition } from "./async-conditions.mjs";
 
-async function settle() {
-  for (let turn = 0; turn < 12; turn += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
-}
-
-async function settleUntil(predicate, maximumTurns = 64) {
-  for (let turn = 0; turn < maximumTurns; turn += 1) {
-    if (predicate()) return true;
-    await new Promise((resolve) => setImmediate(resolve));
-  }
-  return predicate();
+async function settleUntil(predicate, timeoutMilliseconds = 1_000) {
+  return waitForCondition(predicate, { timeoutMilliseconds });
 }
 
 test("session tokens are authenticated, scoped, expiring, and key-rotatable", async () => {
@@ -245,11 +236,11 @@ test("a configured token and ledger resume after new server construction", async
   const [firstClientTransport, firstServerTransport] = createInMemoryTransportPair(first, firstSession);
   firstSession.attach(firstServerTransport);
   first.attach(firstClientTransport);
-  await settle();
+  assert.equal(await settleUntil(() => first.state === "ready"), true, "initial handshake did not settle");
   const token = first.resumeToken.slice();
   const playerId = first.playerId;
   first.close(1_001, "restart");
-  await settle();
+  assert.equal(await settleUntil(() => first.state === "closed"), true, "initial close did not settle");
 
   const ledgerB = new SessionLedger({ matchId: 77, rosterSize: 2 });
   const persistenceB = new DurableSessionPersistence(ledgerB, storage);
@@ -272,6 +263,44 @@ test("a configured token and ledger resume after new server construction", async
   assert.equal(resumed.playerId, playerId);
   serverA.close();
   serverB.close();
+});
+
+test("resume handshakes settle while HMAC work is queued", async () => {
+  const service = new SessionTokenService({ keys: [{ id: 1, secret: new Uint8Array(32).fill(0x6b) }] });
+  const queued = (startGeneration) =>
+    Array.from({ length: 32 }, (_, index) =>
+      service.issue({
+        matchId: 88,
+        slot: 0,
+        generation: startGeneration + index,
+        issuedAtTick: 0,
+        expiresAtTick: 0,
+      }),
+    );
+  const server = new MatchServer({ matchId: 88, rosterSize: 1, resumeTokenService: service });
+  const first = new BattleClient({ name: "queued-first" });
+  const firstSession = server.createSession();
+  const [firstClientTransport, firstServerTransport] = createInMemoryTransportPair(first, firstSession);
+  firstSession.attach(firstServerTransport);
+  first.attach(firstClientTransport);
+  const firstHmacs = queued(1);
+  assert.equal(await settleUntil(() => first.state === "ready"), true, "queued initial handshake did not settle");
+  await Promise.all(firstHmacs);
+  const token = first.resumeToken.slice();
+  first.close(1_001, "resume test");
+  assert.equal(await settleUntil(() => server.countHumans() === 0), true, "initial close did not settle");
+
+  const resumed = new BattleClient({ name: "queued-resumed" });
+  resumed.resumeToken.set(token);
+  const resumedSession = server.createSession();
+  const [resumedClientTransport, resumedServerTransport] = createInMemoryTransportPair(resumed, resumedSession);
+  resumedSession.attach(resumedServerTransport);
+  resumed.attach(resumedClientTransport);
+  const resumedHmacs = queued(33);
+  assert.equal(await settleUntil(() => resumed.state === "ready"), true, "queued resume handshake did not settle");
+  await Promise.all(resumedHmacs);
+  assert.equal(resumed.playerId, first.playerId, "queued work must not change the resumed slot");
+  server.close();
 });
 
 test("async admission closes fail closed during verify and issue", async () => {
@@ -298,7 +327,7 @@ test("async admission closes fail closed during verify and issue", async () => {
   await Promise.resolve();
   verifySession.close(1_001, "closed while verifying");
   releaseVerify();
-  await settle();
+  assert.equal(await settleUntil(() => verifyServer.countHumans() === 0), true, "verify close did not settle");
   assert.equal(verifyServer.countHumans(), 0);
   assert.equal(verifyServer.sessionLedger.generation[0], 0);
 
@@ -324,7 +353,7 @@ test("async admission closes fail closed during verify and issue", async () => {
   await Promise.resolve();
   issueSession.close(1_001, "closed while issuing");
   releaseIssue();
-  await settle();
+  assert.equal(await settleUntil(() => issueServer.countHumans() === 0), true, "issue close did not settle");
   assert.equal(issueServer.countHumans(), 0);
   assert.equal(issueServer.sessionLedger.generation[0], 0);
 });
@@ -340,7 +369,7 @@ test("a token provider with a malformed result cannot commit admission", async (
   const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
   session.attach(serverTransport);
   client.attach(clientTransport);
-  await settle();
+  assert.equal(await settleUntil(() => client.state === "closed"), true, "malformed welcome did not settle");
   assert.equal(client.state, "closed");
   assert.equal(server.countHumans(), 0);
   assert.equal(server.sessionLedger.generation[0], 0);

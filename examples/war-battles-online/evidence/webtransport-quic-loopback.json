@@ -37,10 +37,10 @@
   "playerId": 1,
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
-  "observedSnapshotsApplied": 3,
-  "observedInputsSent": 9,
-  "lastServerTick": 111,
-  "lastLocalTick": 113,
+  "observedSnapshotsApplied": 4,
+  "observedInputsSent": 15,
+  "lastServerTick": 63,
+  "lastLocalTick": 73,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -48,12 +48,12 @@
     "boost": false,
     "weapon": 0
   },
-  "inputsDropped": 0,
+  "inputsDropped": 3,
   "server": {
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:51352",
+      "war-battles-server:health:http://localhost:58350",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -73,8 +73,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 337741,
-      "sha256": "69433e2fcb97fcb0570037276cf72f8cab0957e5a9838ba960f92c7948549310"
+      "bytes": 365815,
+      "sha256": "577042916704af1f6869648f52ad0fdde5a5e3829041496e2fe26164aaffa5bf"
     },
     {
       "path": "examples/war-battles-online/integration/check-real-webtransport.mjs",
@@ -91,8 +91,8 @@
     {
       "path": "examples/war-battles-online/integration/webtransport-evidence.mjs",
       "kind": "file",
-      "bytes": 6259,
-      "sha256": "d323213f97b2336d2de2c2b7394c8e1cac030c1c6909de46ccbe72578677f9f1"
+      "bytes": 6607,
+      "sha256": "5aa7db6c206d3c0e5fa47d30e524d335f92d8437ad69dbabd3ca6a74147c7420"
     },
     {
       "path": "examples/war-battles-online/package.json",
@@ -125,6 +125,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "e4c9f223012fc701bc7e15701175325c7493877c0cbfd6646a6dfec19a89f2f3",
+  "sourceKey": "05d209605655a5636beafff34c23a5199fd434fc1cac9ef77c439f704986ce49",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence."
 }

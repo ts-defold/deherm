@@ -27,6 +27,7 @@ import {
   HELLO_BYTES,
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
+  INPUT_BUNDLE_MAX_COMMANDS,
   INPUT_PACKET_BYTES,
   MAP_HEIGHT,
   MAP_WIDTH,
@@ -39,9 +40,13 @@ import {
   NetworkBotDriver,
   PICKUP_HEALTH,
   REJECT_BAD_RESUME,
+  REJECT_FULL,
+  REJECT_MAXIMUM_BYTES,
+  REJECT_RATE_LIMITED,
   PlayableBattle,
   RESUME_TOKEN_BYTES,
   SNAPSHOT_BYTES,
+  SNAPSHOT_BASE_HISTORY_FRAMES,
   SNAPSHOT_DELTA,
   SNAPSHOT_KEYFRAME,
   SNAPSHOT_KEYFRAME_INTERVAL,
@@ -49,6 +54,7 @@ import {
   TICK_MILLISECONDS,
   TILE_UNITS,
   TRANSPORT_CHANNEL_CONTROL,
+  TRANSPORT_CHANNEL_INPUT_FALLBACK,
   TRANSPORT_CHANNEL_SESSION,
   TRANSPORT_CHANNEL_SNAPSHOT,
   UPGRADE_DAMAGE,
@@ -62,11 +68,11 @@ import {
   WEAPON_RICOCHET,
   WEAPON_SCATTER,
   createBattleEvent,
+  createArenaRouteScratch,
   createInMemoryTransportPair,
   createInputCommand,
   createObjectiveView,
   createPlayerView,
-  encodeReliableFrame,
   OBJECTIVE_CAPTURE_TICKS,
   PLAYER_MODE_DEAD,
   PLAYER_MODE_INFANTRY,
@@ -78,12 +84,14 @@ import {
   isqrt,
   readHello,
   readInputPacket,
+  readReject,
   readSnapshotFrame,
   readWelcome,
   readWelcomeAck,
   sendTickInput,
   writeHello,
   writeInputPacket,
+  writeReject,
   writeSnapshotDelta,
   writeSnapshotKeyframe,
   writeWelcome,
@@ -110,6 +118,8 @@ import {
   driverByPlayerId,
   UPGRADE_MOBILITY,
 } from "../core/content.ts";
+import { NetworkBotClock } from "../bot-dashboard/network-bot-clock.ts";
+import { settleEventLoop, waitForCondition } from "./async-conditions.mjs";
 
 test("every authoritative tank slot has one stable driver identity", () => {
   const callSigns = new Set();
@@ -346,48 +356,165 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   }
   lengths.sort((left, right) => left - right);
   assert.equal(lengths.length, 200);
-  assert.equal(lengths[0], 1_872);
+  assert.equal(lengths[0], 2_148);
   assert.equal(lengths.at(-1), SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_642);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 2_547);
   assert.equal(lengths.filter((length) => length === SNAPSHOT_MESSAGE_BYTES).length, 10);
   const normal = lengths.filter((length) => length !== SNAPSHOT_MESSAGE_BYTES);
-  assert.equal(normal.at(-1), 3_270);
+  assert.equal(normal.at(-1), 3_191);
 });
 
-test("a replaced in-flight snapshot forces a recovery keyframe", async () => {
+test("independent snapshot streams stay bounded by the acknowledgement window", async () => {
   const server = new MatchServer({ rosterSize: 2 });
   const session = server.createSession();
   const frames = [];
-  let releaseFirst;
+  const signals = [];
   const transport = {
     capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
-    sendReliable(_channel, payload) {
+    sendReliable(_channel, payload, signal) {
       frames.push(payload.slice());
-      if (releaseFirst === undefined)
-        return new Promise((resolve) => {
-          releaseFirst = resolve;
-        });
-      return Promise.resolve("sent");
+      signals.push(signal);
+      return new Promise((resolve) => {
+        signal.addEventListener("abort", () => resolve("backpressured"), { once: true });
+      });
     },
     trySendDatagram: async () => "closed",
     close() {},
   };
   session.attach(transport);
   const first = new Uint8Array(SNAPSHOT_BYTES);
-  const second = new Uint8Array(SNAPSHOT_BYTES).fill(7);
-  session.sendSnapshot(first, 3);
-  session.sendSnapshot(second, 6);
-  assert.equal(frames.length, 1);
+  for (let index = 0; index < 8; index += 1) session.sendSnapshot(first, 3 + index * 3);
+  assert.equal(frames.length, 8);
+  assert.equal(signals[0].aborted, false, "independent state streams may complete out of order");
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(7), 27);
+  assert.equal(frames.length, 8, "an unacknowledged peer cannot grow the stream window");
   assert.equal(frames[0][8], SNAPSHOT_KEYFRAME);
-  releaseFirst("sent");
-  await new Promise((resolve) => setImmediate(resolve));
-  assert.equal(frames.length, 2);
-  assert.equal(frames[1][8], SNAPSHOT_KEYFRAME, "pending replacement cannot depend on an undelivered delta");
-  assert.notEqual(frames[1][8], SNAPSHOT_DELTA);
+  assert.equal(frames[7][8], SNAPSHOT_KEYFRAME, "unacknowledged state cannot become a delta base");
+  assert.equal(signals[0].aborted, false, "capacity pressure must not evict an earlier packet before its deadline");
   server.close();
 });
 
-test("a rejected snapshot send drops its stale pending replacement", async () => {
+test("snapshot stale capacity follows the injected match clock", () => {
+  let nowMilliseconds = 0;
+  const frames = [];
+  const signals = [];
+  const server = new MatchServer({ rosterSize: 2, nowMilliseconds: () => nowMilliseconds });
+  const session = server.createSession();
+  const transport = {
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(_channel, payload, signal) {
+      frames.push(payload.slice());
+      signals.push(signal);
+      return new Promise(() => {});
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  };
+  session.attach(transport);
+  const source = new Uint8Array(SNAPSHOT_BYTES);
+  for (let tick = 3; tick <= 60; tick += 3) {
+    nowMilliseconds = tick * TICK_MILLISECONDS;
+    session.beginTick();
+    session.sendSnapshot(source, tick);
+  }
+  assert.ok(frames.length > 8, "stale streams must free capacity from the injected clock");
+  assert.ok(
+    signals.some((signal) => signal.aborted),
+    "the injected clock must abort stale streams",
+  );
+  server.close();
+});
+
+test("snapshot cadence does not throttle an acknowledged baseline inside the 64-frame history", async () => {
+  let nowMilliseconds = 0;
+  const frames = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 3,
+    nowMilliseconds: () => nowMilliseconds,
+  });
+  const session = server.createSession();
+  // This test isolates snapshot scheduling; the handshake is covered by the
+  // transport integration tests below. The session is an admitted player so
+  // its acknowledgement packet exercises the production decoder.
+  session.ready = true;
+  session.slot = 0;
+  session.attach({
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(_channel, payload) {
+      frames.push(payload.slice());
+      return Promise.resolve("sent");
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  });
+  for (let tick = 0; tick < 3; tick += 1) {
+    nowMilliseconds = tick * TICK_MILLISECONDS;
+    server.step();
+  }
+  await settleEventLoop();
+  const acknowledgement = createInputCommand(server.world.matchId, 1);
+  acknowledgement.tick = server.world.tick + 1;
+  acknowledgement.latestSnapshotTick = server.world.tick;
+  acknowledgement.snapshotAckBits = 1;
+  const input = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(input, 0, acknowledgement);
+  session.onDatagram(input);
+  await settleEventLoop();
+
+  const source = new Uint8Array(SNAPSHOT_BYTES);
+  for (let tick = 6; tick <= 36; tick += 3) {
+    nowMilliseconds = tick * TICK_MILLISECONDS;
+    session.beginTick();
+    session.sendSnapshot(source, tick);
+    await settleEventLoop();
+  }
+  assert.equal(frames.length, 12, "an ACK lag below the 64-frame ring bound must not impose an eight-frame throttle");
+  server.close();
+});
+
+test("acknowledged snapshot streams are reset before leaving the bounded window", async () => {
+  const server = new MatchServer({ rosterSize: 2 });
+  const client = new BattleClient({ name: "snapshot-ack-reset" });
+  const session = server.createSession();
+  const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
+  const sendReliable = serverTransport.sendReliable.bind(serverTransport);
+  const snapshotSignals = [];
+  serverTransport.sendReliable = (channel, payload, signal) => {
+    if (channel !== TRANSPORT_CHANNEL_SNAPSHOT) return sendReliable(channel, payload, signal);
+    snapshotSignals.push(signal);
+    return new Promise((resolve) => {
+      signal.addEventListener("abort", () => resolve("backpressured"), { once: true });
+    });
+  };
+  session.attach(serverTransport);
+  client.attach(clientTransport);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  assert.equal(snapshotSignals.length, 1);
+  assert.equal(snapshotSignals[0].aborted, false);
+
+  const acknowledged = new Uint8Array(INPUT_PACKET_BYTES);
+  const input = createInputCommand(server.world.matchId, client.playerId);
+  input.tick = server.world.tick + 1;
+  input.latestSnapshotTick = server.world.tick;
+  input.snapshotAckBits = 1;
+  writeInputPacket(acknowledged, 0, input);
+  session.onDatagram(acknowledged);
+  assert.equal(snapshotSignals[0].aborted, true, "ACKed state no longer consumes QUIC stream credit");
+  server.close();
+});
+
+test("the authoritative baseline ring covers 3.2 seconds of 20 Hz snapshots", () => {
+  const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 1 });
+  for (let tick = 0; tick < SNAPSHOT_BASE_HISTORY_FRAMES; tick += 1) server.step();
+  assert.ok(server.snapshotAt(1));
+  server.step();
+  assert.equal(server.snapshotAt(1), undefined);
+  server.close();
+});
+
+test("a rejected independent snapshot does not block fresher state", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
   const session = server.createSession();
@@ -412,8 +539,8 @@ test("a rejected snapshot send drops its stale pending replacement", async () =>
   await new Promise((resolve) => setImmediate(resolve));
   session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(9), 9);
   await new Promise((resolve) => setImmediate(resolve));
-  assert.equal(frames.length, 2, "the rejected frame's stale pending replacement must not replay");
-  assert.equal(frames[1][8], SNAPSHOT_KEYFRAME, "the next usable frame recovers with a keyframe");
+  assert.equal(frames.length, 3, "each current state gets one independent send attempt");
+  assert.equal(frames[2][8], SNAPSHOT_KEYFRAME, "unacknowledged streams never become delta bases");
   assert.equal(errors.length, 1);
   server.close();
 });
@@ -478,6 +605,49 @@ test("the arena is reproducible from its seed, point-symmetric and fully connect
   // Cover, but still an arena: somewhere between a field and a maze.
   const solid = MAP_WIDTH * MAP_HEIGHT - first.openCellCount();
   assert.ok(solid > 800 && solid < 3_000, `arena has ${solid} solid cells`);
+});
+
+test("arena routing finds deterministic visible waypoints around blocked direct paths", () => {
+  const map = new ArenaMap(DEFAULT_ARENA_SEED);
+  const scratch = createArenaRouteScratch();
+  const waypoint = { x: 0, y: 0 };
+  let blockedRoute;
+  for (let spawn = 0; spawn < map.spawnX.length && blockedRoute === undefined; spawn += 1) {
+    for (let pickup = 0; pickup < map.pickupX.length; pickup += 1) {
+      const startX = map.spawnX[spawn];
+      const startY = map.spawnY[spawn];
+      const goalX = map.pickupX[pickup];
+      const goalY = map.pickupY[pickup];
+      const cost = map.routeWaypoint(startX, startY, goalX, goalY, spawn, scratch, waypoint);
+      assert.ok(cost >= 0, `spawn ${spawn} must reach pickup ${pickup}`);
+      assert.equal(map.solidAtWorld(waypoint.x, waypoint.y), false);
+      assert.equal(map.lineOfSight(startX, startY, waypoint.x, waypoint.y), true);
+      if (!map.lineOfSight(startX, startY, goalX, goalY)) {
+        blockedRoute = { startX, startY, goalX, goalY, bias: spawn, cost, x: waypoint.x, y: waypoint.y };
+        break;
+      }
+    }
+  }
+  assert.ok(blockedRoute, "the authored arena must exercise a route around cover");
+  assert.ok(blockedRoute.cost > 0);
+  assert.notDeepEqual(
+    { x: blockedRoute.x, y: blockedRoute.y },
+    { x: blockedRoute.goalX, y: blockedRoute.goalY },
+    "a blocked direct path must produce an intermediate route waypoint",
+  );
+
+  const repeated = { x: 0, y: 0 };
+  const repeatedCost = map.routeWaypoint(
+    blockedRoute.startX,
+    blockedRoute.startY,
+    blockedRoute.goalX,
+    blockedRoute.goalY,
+    blockedRoute.bias,
+    scratch,
+    repeated,
+  );
+  assert.equal(repeatedCost, blockedRoute.cost);
+  assert.deepEqual(repeated, { x: blockedRoute.x, y: blockedRoute.y });
 });
 
 test("the arena visual projector owns an explicit and exhaustive four-neighbour wall grammar", () => {
@@ -1260,6 +1430,46 @@ test("network bots send predicted weapon purchases over the authoritative contro
   assert.equal(driver.stats.weaponUpgradeRequests, 1);
 });
 
+test("network bot snapshot clocks keep driving when dashboard timers are throttled", () => {
+  const world = new BattleWorld(73, 0xace2);
+  world.addPlayer(1);
+  const updates = [];
+  const client = {
+    playerId: 1,
+    world,
+    stats: { snapshotsApplied: 0 },
+    update(elapsed, maximumSteps) {
+      assert.equal(elapsed, 0);
+      assert.equal(maximumSteps, undefined);
+      this.stats.snapshotsApplied += 1;
+      this.world.playerX[0] += 32;
+      return 0;
+    },
+  };
+  const driver = {
+    update(elapsed, maximumSteps) {
+      updates.push([elapsed, maximumSteps]);
+      return 1;
+    },
+  };
+  const clock = new NetworkBotClock(client, driver, 1_000);
+
+  // There is no foreground interval between these calls: incoming snapshots
+  // alone wake the bot and preserve the bounded catch-up policy.
+  assert.equal(clock.onSnapshot(1_050), 1);
+  assert.equal(clock.onSnapshot(1_100), 1);
+  assert.deepEqual(updates, [
+    [50, 8],
+    [50, 8],
+  ]);
+  assert.equal(clock.observedTravelUnits, 32);
+
+  // A long suspended interval remains bounded instead of causing a packet
+  // storm when the browser delivers the next network event.
+  assert.equal(clock.onSnapshot(2_000), 1);
+  assert.deepEqual(updates.at(-1), [250, 8]);
+});
+
 test("client reliable control messages preserve program order across independent QUIC streams", async () => {
   const calls = [];
   const transport = {
@@ -1466,24 +1676,20 @@ async function settle() {
   // Native WebCrypto key import/signing crosses task boundaries. Give the
   // control-plane handshake bounded room to complete without assuming a
   // particular host's crypto scheduling latency.
-  for (let turn = 0; turn < 12; turn += 1) {
-    await new Promise((resolve) => setImmediate(resolve));
-  }
+  await settleEventLoop();
 }
 
-async function settleUntil(predicate, what, maximumTurns = 64) {
-  for (let turn = 0; turn < maximumTurns; turn += 1) {
-    if (predicate()) return;
-    await new Promise((resolve) => setImmediate(resolve));
+async function settleUntil(predicate, what, timeoutMilliseconds = 1_000) {
+  if (!(await waitForCondition(predicate, { timeoutMilliseconds }))) {
+    throw new Error(`${what} did not settle within ${timeoutMilliseconds} milliseconds`);
   }
-  if (!predicate()) throw new Error(`${what} did not settle within ${maximumTurns} event-loop turns`);
 }
 
 test("a welcomed player resumes its slot and the new stream starts from a keyframe", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, botSkill: 1, onError: (error) => errors.push(error) });
   const first = join(server, "commander", errors);
-  await settle();
+  await settleUntil(() => first.state === "ready", "initial welcome");
   assert.equal(first.state, "ready");
   const playerId = first.playerId;
   const tokenBeforeDisconnect = first.resumeToken.slice();
@@ -1500,7 +1706,7 @@ test("a welcomed player resumes its slot and the new stream starts from a keyfra
   // Establish and consume the old session's baseline, then disconnect after
   // welcome. The world remains authoritative while the bot fills the slot.
   for (let tick = 0; tick < 3; tick += 1) server.step();
-  await settle();
+  await settleUntil(() => first.state === "ready", "initial snapshot delivery");
   first.update(0);
   first.close(1_001, "link lost");
   assert.equal(server.countHumans(), 0);
@@ -1517,7 +1723,7 @@ test("a welcomed player resumes its slot and the new stream starts from a keyfra
   };
   resumedSession.attach(serverTransport);
   resumed.attach(clientTransport);
-  await settle();
+  await settleUntil(() => resumed.state === "ready", "resumed welcome");
   assert.equal(resumed.state, "ready");
   assert.equal(resumed.playerId, playerId, "resume must restore the authenticated player slot");
   assert.deepEqual(
@@ -1535,7 +1741,7 @@ test("a welcomed player resumes its slot and the new stream starts from a keyfra
   server.step();
   server.step();
   server.step();
-  await settle();
+  await settleUntil(() => frames.length > 0, "resumed snapshot");
   assert.ok(frames.length > 0);
   assert.equal(frames[0][8], SNAPSHOT_KEYFRAME, "a resumed session cannot depend on the old baseline");
   resumed.update(0);
@@ -1549,7 +1755,7 @@ test("non-zero invalid, stale, and foreign resume tokens fail closed", async () 
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, resumeGraceTicks: 2, onError: (error) => errors.push(error) });
   const first = join(server, "owner", errors);
-  await settle();
+  await settleUntil(() => first.state === "ready", "initial owner welcome");
   const originalToken = first.resumeToken.slice();
   first.close(1_001, "link lost");
 
@@ -1558,7 +1764,7 @@ test("non-zero invalid, stale, and foreign resume tokens fail closed", async () 
     resumeToken: new Uint8Array(RESUME_TOKEN_BYTES).fill(0x5a),
     onReject: (reject) => invalidRejected.push({ ...reject }),
   });
-  await settle();
+  await settleUntil(() => invalid.state === "rejected", "invalid resume rejection");
   assert.equal(invalid.state, "rejected");
   assert.equal(invalidRejected[0].code, REJECT_BAD_RESUME);
   assert.equal(server.countHumans(), 0);
@@ -1566,7 +1772,7 @@ test("non-zero invalid, stale, and foreign resume tokens fail closed", async () 
   // A valid resume rotates the credential. The old one is then stale even
   // after the resumed connection disconnects.
   const resumed = join(server, "owner-again", errors, { resumeToken: originalToken });
-  await settle();
+  await settleUntil(() => resumed.state === "ready", "valid resume");
   assert.equal(resumed.state, "ready");
   assert.notDeepEqual([...resumed.resumeToken], [...originalToken]);
   resumed.close(1_001, "link lost again");
@@ -1575,13 +1781,13 @@ test("non-zero invalid, stale, and foreign resume tokens fail closed", async () 
     resumeToken: originalToken,
     onReject: (reject) => staleRejected.push({ ...reject }),
   });
-  await settle();
+  await settleUntil(() => stale.state === "rejected", "stale resume rejection");
   assert.equal(stale.state, "rejected");
   assert.equal(staleRejected[0].code, REJECT_BAD_RESUME);
 
   const expiringServer = new MatchServer({ rosterSize: 1, resumeGraceTicks: 1 });
   const expiring = join(expiringServer, "expiring", errors);
-  await settle();
+  await settleUntil(() => expiring.state === "ready", "expiring owner welcome");
   const expiringToken = expiring.resumeToken.slice();
   expiring.close(1_001, "link lost");
   expiringServer.step();
@@ -1591,14 +1797,14 @@ test("non-zero invalid, stale, and foreign resume tokens fail closed", async () 
     resumeToken: expiringToken,
     onReject: (reject) => expiredRejected.push({ ...reject }),
   });
-  await settle();
+  await settleUntil(() => expired.state === "rejected", "expired resume rejection");
   assert.equal(expired.state, "rejected");
   assert.equal(expiredRejected[0].code, REJECT_BAD_RESUME);
   expiringServer.close();
 
   const otherServer = new MatchServer({ rosterSize: 2 });
   const foreign = join(otherServer, "foreign", errors);
-  await settle();
+  await settleUntil(() => foreign.state === "ready", "foreign owner welcome");
   assert.notDeepEqual(
     [...foreign.resumeToken],
     [...resumed.resumeToken],
@@ -1609,7 +1815,7 @@ test("non-zero invalid, stale, and foreign resume tokens fail closed", async () 
     resumeToken: foreign.resumeToken,
     onReject: (reject) => foreignRejected.push({ ...reject }),
   });
-  await settle();
+  await settleUntil(() => foreignAttempt.state === "rejected", "foreign resume rejection");
   assert.equal(foreignAttempt.state, "rejected");
   assert.equal(foreignRejected[0].code, REJECT_BAD_RESUME);
   otherServer.close();
@@ -1622,17 +1828,17 @@ test("failed welcome delivery does not consume an old or initial resume credenti
   const initialServer = new MatchServer({ rosterSize: 1 });
   const initialFailure = new BattleClient({ onError: (error) => errors.push(error) });
   failWelcome(initialServer, initialFailure, "closed");
-  await settle();
+  await settleUntil(() => initialFailure.state === "closed", "initial failed welcome");
   assert.equal(initialFailure.state, "closed");
   assert.equal(initialServer.countHumans(), 0);
   const initialRetry = join(initialServer, "initial-retry", errors);
-  await settle();
+  await settleUntil(() => initialRetry.state === "ready", "initial retry welcome");
   assert.equal(initialRetry.state, "ready", "an initial failed welcome must release its anonymous slot");
   initialServer.close();
 
   const server = new MatchServer({ rosterSize: 1 });
   const owner = join(server, "owner", errors);
-  await settle();
+  await settleUntil(() => owner.state === "ready", "owner welcome");
   const oldToken = owner.resumeToken.slice();
   const playerId = owner.playerId;
   owner.close(1_001, "link lost");
@@ -1640,12 +1846,12 @@ test("failed welcome delivery does not consume an old or initial resume credenti
   const failedResume = new BattleClient({ onError: (error) => errors.push(error) });
   failedResume.resumeToken.set(oldToken);
   failWelcome(server, failedResume, "reject");
-  await settle();
+  await settleUntil(() => failedResume.state === "closed", "failed resumed welcome");
   assert.equal(failedResume.state, "closed");
   assert.equal(server.countHumans(), 0);
 
   const retry = join(server, "retry", errors, { resumeToken: oldToken });
-  await settle();
+  await settleUntil(() => retry.state === "ready", "retry welcome");
   assert.equal(retry.state, "ready");
   assert.equal(retry.playerId, playerId, "the old credential must remain usable after failed welcome delivery");
   assert.notDeepEqual([...retry.resumeToken], [...oldToken], "a successfully sent welcome must rotate the credential");
@@ -1655,7 +1861,7 @@ test("failed welcome delivery does not consume an old or initial resume credenti
     resumeToken: oldToken,
     onReject: (reject) => staleRejects.push({ ...reject }),
   });
-  await settle();
+  await settleUntil(() => stale.state === "rejected", "stale retry rejection");
   assert.equal(stale.state, "rejected");
   assert.equal(staleRejects[0].code, REJECT_BAD_RESUME);
   server.close();
@@ -1722,9 +1928,9 @@ test("a failed fresh takeover does not resurrect an expired resume credential", 
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, resumeGraceTicks: 1 });
   const occupied = join(server, "occupied", errors);
-  await settle();
+  await settleUntil(() => occupied.state === "ready", "occupied welcome");
   const expiring = join(server, "expiring", errors);
-  await settle();
+  await settleUntil(() => expiring.state === "ready", "expiring welcome");
   const staleToken = expiring.resumeToken.slice();
   expiring.close(1_001, "link lost");
   server.step();
@@ -1732,7 +1938,7 @@ test("a failed fresh takeover does not resurrect an expired resume credential", 
 
   const failedFresh = new BattleClient({ onError: (error) => errors.push(error) });
   failWelcome(server, failedFresh, "reject");
-  await settle();
+  await settleUntil(() => failedFresh.state === "closed", "failed fresh welcome");
   assert.equal(failedFresh.state, "closed");
   assert.equal(server.countHumans(), 1, "the failed takeover must release its claimed slot");
 
@@ -1741,7 +1947,7 @@ test("a failed fresh takeover does not resurrect an expired resume credential", 
     resumeToken: staleToken,
     onReject: (reject) => staleRejects.push({ ...reject }),
   });
-  await settle();
+  await settleUntil(() => stale.state === "rejected", "expired stale rejection");
   assert.equal(stale.state, "rejected");
   assert.equal(staleRejects[0].code, REJECT_BAD_RESUME);
   occupied.close(1_001, "test done");
@@ -1749,7 +1955,7 @@ test("a failed fresh takeover does not resurrect an expired resume credential", 
   assert.deepEqual(errors, []);
 });
 
-test("snapshot decode failure latches until a keyframe and reports only its root error", async () => {
+test("snapshot decode rejects foreign bases and advances only after applied acknowledgements", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
   const client = join(server, "decoder", errors);
@@ -1774,23 +1980,55 @@ test("snapshot decode failure latches until a keyframe and reports only its root
   const ignoredAfterRoot = client.stats.snapshotsIgnored;
   const dependentLength = writeSnapshotDelta(frame, 9, 3, baseline, baseline);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, dependentLength));
-  assert.equal(errors.length, 1, "dependent deltas must not report a second error");
-  assert.equal(client.stats.snapshotsIgnored, ignoredAfterRoot + 1);
+  assert.equal(errors.length, 1, "another frame based on the applied acknowledgement remains decodable");
+  assert.equal(client.stats.snapshotsIgnored, ignoredAfterRoot);
 
   const keyframeLength = writeSnapshotKeyframe(frame, 12, baseline);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, keyframeLength));
-  // The keyframe and its dependent delta can arrive in one receive burst. The
-  // decoded keyframe must release the latch before the delta is considered.
+  // A received-but-not-applied keyframe is deliberately not a delta base. The
+  // client acknowledges only state that entered its simulation timeline.
   const recoveredDeltaLength = writeSnapshotDelta(frame, 15, 12, baseline, next);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, recoveredDeltaLength));
   client.update(0);
-  assert.equal(client.stats.snapshotsApplied, 2, "a valid keyframe must recover a same-burst dependent delta");
-  assert.equal(client.world.stateHash(), nextWorld.stateHash(), "the latest valid burst state must be applied");
-  const nextDeltaLength = writeSnapshotDelta(frame, 18, 15, next, next);
+  assert.equal(client.stats.snapshotsApplied, 2, "the complete keyframe must apply before dependent state");
+  const nextDeltaLength = writeSnapshotDelta(frame, 18, 12, baseline, next);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, nextDeltaLength));
   client.update(0);
   assert.equal(client.stats.snapshotsApplied, 3, "the recovered delta chain must remain usable");
-  assert.equal(errors.length, 1);
+  assert.equal(client.world.stateHash(), nextWorld.stateHash());
+  assert.equal(errors.length, 2);
+  server.close();
+});
+
+test("independent deltas sharing one acknowledged base coalesce without losing that base", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = join(server, "shared-base", errors);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  client.update(0);
+
+  const baseline = new Uint8Array(SNAPSHOT_BYTES);
+  server.world.writeSnapshot(baseline);
+  const future = new BattleWorld(server.world.matchId, server.world.mapSeed);
+  future.restoreSnapshot(baseline);
+  const first = new Uint8Array(SNAPSHOT_BYTES);
+  const second = new Uint8Array(SNAPSHOT_BYTES);
+  future.step();
+  future.writeSnapshot(first);
+  future.step();
+  future.writeSnapshot(second);
+  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  let length = writeSnapshotDelta(frame, 6, 3, baseline, first);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, length));
+  length = writeSnapshotDelta(frame, 9, 3, baseline, second);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, length));
+  client.update(0);
+
+  assert.equal(client.stats.snapshotsApplied, 2, "the newest complete sibling delta is applied once");
+  assert.equal(client.world.stateHash(), future.stateHash());
+  assert.deepEqual(errors, []);
   server.close();
 });
 
@@ -1877,6 +2115,149 @@ test("the first post-welcome input is accepted before the next server tick", asy
   server.close();
 });
 
+test("late input accounting ignores accepted and repeated redundancy across tick wrap", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, inputBudgetPerTick: 8, onError: (error) => errors.push(error) });
+  const client = join(server, "late-accounting", errors);
+  await settle();
+  const command = createInputCommand(server.world.matchId, client.playerId);
+  const packet = new Uint8Array(INPUT_PACKET_BYTES);
+
+  server.world.tick = 0xffff_fffe;
+  command.tick = 0xffff_ffff;
+  command.sequence = 1;
+  writeInputPacket(packet, 0, command);
+  client.session.onDatagram(packet);
+  assert.equal(server.stats.inputsAccepted, 1);
+  server.step();
+  client.session.onDatagram(packet);
+  assert.equal(server.stats.inputsLate, 0, "an accepted command repeated after consumption is benign redundancy");
+
+  command.tick = 0xffff_fffe;
+  command.sequence = 2;
+  writeInputPacket(packet, 0, command);
+  client.session.onDatagram(packet);
+  client.session.onDatagram(packet);
+  assert.equal(server.stats.inputsLate, 1, "one never-accepted tick is counted once across redundant copies");
+  assert.equal(server.stats.inputsRejected, 0);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("input rate limiting is advisory and does not reject a live client", async () => {
+  const errors = [];
+  const logs = [];
+  const rejects = [];
+  const server = new MatchServer({ rosterSize: 2, inputBudgetPerTick: 1, onError: (error) => errors.push(error) });
+  const client = join(server, "rate-limited", errors, {
+    onLog: (line) => logs.push(line),
+    onReject: (reject) => rejects.push({ ...reject }),
+  });
+  await settle();
+  assert.equal(client.state, "ready");
+
+  // More than one datagram before the next authoritative tick exhausts the
+  // per-session ingress budget and makes the server send REJECT_RATE_LIMITED.
+  client.update(TICK_MILLISECONDS * 3, 3);
+  await settle();
+  assert.equal(client.state, "ready");
+  assert.equal(client.stats.rateLimitAdvisories, 1);
+  assert.deepEqual(rejects, [], "advisory throttling must not enter the terminal admission-reject path");
+  assert.ok(logs.some((line) => line.startsWith("client-rate-limited:")));
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("terminal rejection remains distinct from a live rate-limit advisory", () => {
+  const rejects = [];
+  const client = new BattleClient({ onReject: (reject) => rejects.push({ ...reject }) });
+  const payload = new Uint8Array(128);
+  const length = writeReject(payload, { code: REJECT_BAD_RESUME, reason: "terminal" });
+  client.onReliable(TRANSPORT_CHANNEL_CONTROL, payload.subarray(0, length));
+  assert.equal(client.state, "rejected");
+  assert.deepEqual(rejects, [{ code: REJECT_BAD_RESUME, reason: "terminal" }]);
+
+  const advisoryClient = new BattleClient();
+  advisoryClient.state = "ready";
+  const advisoryLength = writeReject(payload, { code: REJECT_RATE_LIMITED, reason: "slow down" });
+  advisoryClient.onReliable(TRANSPORT_CHANNEL_CONTROL, payload.subarray(0, advisoryLength));
+  assert.equal(advisoryClient.state, "ready");
+  assert.equal(advisoryClient.stats.rateLimitAdvisories, 1);
+});
+
+test("prediction lead advances the local clock without retimestamping input", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = join(server, "same-timeline", errors, { leadTicks: 2 });
+  await settle();
+  assert.equal(client.world.tick, server.world.tick + 2);
+  client.setControls({ moveX: 1, moveY: 0, fire: false });
+  client.update(TICK_MILLISECONDS);
+  await settle();
+  assert.equal(client.world.tick, 3);
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  const slot = client.playerId - 1;
+  assert.equal(server.world.playerLastInputTick[slot], 3, "the server must consume the command on its predicted tick");
+  assert.equal(client.world.playerX[slot], server.world.playerX[slot]);
+  assert.equal(client.world.playerY[slot], server.world.playerY[slot]);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("server deltas use the latest client-applied snapshot as their exact base", async () => {
+  const errors = [];
+  const frames = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = new BattleClient({ name: "snapshot-ack", onError: (error) => errors.push(error) });
+  const session = server.createSession();
+  const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
+  const sendReliable = serverTransport.sendReliable.bind(serverTransport);
+  serverTransport.sendReliable = (channel, payload, signal) => {
+    if (channel === TRANSPORT_CHANNEL_SNAPSHOT) frames.push(payload.slice());
+    return sendReliable(channel, payload, signal);
+  };
+  session.attach(serverTransport);
+  client.attach(clientTransport);
+  await settle();
+
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  client.update(0);
+  assert.equal(frames[0][8], SNAPSHOT_KEYFRAME);
+  client.update(TICK_MILLISECONDS);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  assert.equal(frames[1][8], SNAPSHOT_DELTA);
+  assert.equal(new DataView(frames[1].buffer, frames[1].byteOffset).getUint32(10, true), 3);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("input datagrams repeat a bounded command window and survive deterministic loss", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, inputBudgetPerTick: 4, onError: (error) => errors.push(error) });
+  const client = join(server, "lossy", errors, { leadTicks: 4, transport: { dropEvery: 2 } });
+  await settle();
+  const slot = client.playerId - 1;
+  const startX = server.world.playerX[slot];
+  client.setControls({ moveX: 1, moveY: 0, fire: false });
+  for (let tick = 0; tick < 180; tick += 1) {
+    client.update(TICK_MILLISECONDS);
+    await settle();
+    server.step();
+    await settle();
+  }
+  assert.ok(client.stats.inputCommandsSent >= client.stats.inputsSent * 2);
+  assert.ok(client.stats.inputCommandsSent <= client.stats.inputsSent * INPUT_BUNDLE_MAX_COMMANDS);
+  assert.ok(server.stats.inputsAccepted > 150, "redundant future commands must fill dropped datagram gaps");
+  assert.equal(server.stats.inputsRejected, 0);
+  assert.ok(server.world.playerX[slot] > startX + TILE_UNITS, "loss must not leave the tank stationary");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
 test("a client that falls behind reconciles by replaying its own inputs", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 4, botSkill: 1, onError: (error) => errors.push(error) });
@@ -1938,6 +2319,40 @@ test("remote presentation uses bounded 20 Hz interpolation while local stays pre
   const local = { ...first };
   assert.equal(client.samplePlayerTransform(client.playerId - 1, local), true);
   assert.equal(local.x, client.world.playerX[client.playerId - 1], "local presentation remains immediate prediction");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("local authoritative corrections decay in presentation without delaying simulation truth", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = join(server, "correction-smoothing", errors);
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  client.update(0);
+  const slot = client.playerId - 1;
+  client.world.playerX[slot] += TILE_UNITS * 4;
+  const before = { x: 0, y: 0, hullX: 0, hullY: 0, turretX: 0, turretY: 0 };
+  client.samplePlayerTransform(slot, before);
+
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  client.update(0);
+  const correctedTruth = client.world.playerX[slot];
+  assert.notEqual(correctedTruth, before.x, "the simulation must accept the authoritative correction immediately");
+  const continuous = { ...before };
+  client.samplePlayerTransform(slot, continuous);
+  assert.equal(continuous.x, before.x, "presentation must be continuous on the correction frame");
+
+  client.update(50);
+  const halfway = { ...before };
+  client.samplePlayerTransform(slot, halfway);
+  assert.ok(Math.abs(halfway.x - correctedTruth) < Math.abs(before.x - correctedTruth));
+  client.update(50);
+  const settled = { ...before };
+  client.samplePlayerTransform(slot, settled);
+  assert.equal(settled.x, client.world.playerX[slot]);
   assert.deepEqual(errors, []);
   server.close();
 });
@@ -2292,6 +2707,7 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
     outgoingDatagrams = [];
     closeResolve;
     incomingController;
+    reliableController;
     incomingBidirectionalController;
     datagramController;
     closed = new Promise((resolve) => {
@@ -2331,14 +2747,12 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
     }
     async createBidirectionalStream() {
       const chunks = [];
+      this.outgoingBidirectionalStreams.push(chunks);
       return {
         readable: new ReadableStream(),
         writable: new WritableStream({
           write(chunk) {
             chunks.push(chunk.slice());
-          },
-          close: () => {
-            this.outgoingBidirectionalStreams.push(chunks);
           },
         }),
       };
@@ -2362,18 +2776,29 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
         bytes.set(payload, offset + 5);
         offset += 5 + payload.length;
       }
-      const readable = new ReadableStream({
-        start(controller) {
-          controller.enqueue(bytes.subarray(0, 2));
-          controller.enqueue(bytes.subarray(2, 6));
-          controller.enqueue(bytes.subarray(6));
-          controller.close();
-        },
-      });
       if (direction === "server") {
+        const readable = new ReadableStream({
+          start(controller) {
+            controller.enqueue(bytes.subarray(0, 2));
+            controller.enqueue(bytes.subarray(2, 6));
+            controller.enqueue(bytes.subarray(6));
+            controller.close();
+          },
+        });
         this.incomingBidirectionalController.enqueue({ readable, writable: new WritableStream() });
       } else {
-        this.incomingController.enqueue(readable);
+        if (this.reliableController === undefined) {
+          this.incomingController.enqueue(
+            new ReadableStream({
+              start: (controller) => {
+                this.reliableController = controller;
+              },
+            }),
+          );
+        }
+        this.reliableController.enqueue(bytes.subarray(0, 2));
+        this.reliableController.enqueue(bytes.subarray(2, 6));
+        this.reliableController.enqueue(bytes.subarray(6));
       }
     }
   }
@@ -2405,8 +2830,7 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
   assert.equal(await sendPromise, "sent");
   assert.equal(session.outgoingBidirectionalStreams.length, 1);
   assert.equal(session.outgoingStreams.length, 0);
-  assert.deepEqual([...session.outgoingBidirectionalStreams[0][0]], [TRANSPORT_CHANNEL_SESSION, 2, 0, 0, 0]);
-  assert.deepEqual([...session.outgoingBidirectionalStreams[0][1]], [8, 9]);
+  assert.deepEqual([...session.outgoingBidirectionalStreams[0][0]], [TRANSPORT_CHANNEL_SESSION, 2, 0, 0, 0, 8, 9]);
   assert.equal(await client.trySendDatagram(Uint8Array.of(1, 2, 3)), "sent");
   assert.equal(await client.trySendDatagram(new Uint8Array(9)), "too-large");
   session.pushReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(5, 6, 7));
@@ -2443,6 +2867,142 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
   await new Promise((resolve) => setImmediate(resolve));
   assert.deepEqual(serverEvents, [["reliable", TRANSPORT_CHANNEL_CONTROL, [7]]]);
   serverTransport.close(12, "finished");
+});
+
+class AsynchronousServerWebTransportSession {
+  ready = Promise.resolve();
+  incomingUnidirectionalStreams = new ReadableStream();
+  incomingBidirectionalStreams = new ReadableStream();
+  datagrams = { maxDatagramSize: 0, readable: new ReadableStream(), writable: new WritableStream() };
+  closeResolve;
+  closed = new Promise((resolve) => {
+    this.closeResolve = resolve;
+  });
+  closeCalls = 0;
+  terminal = false;
+  delivered = [];
+  events = [];
+  stallStreamClose = false;
+  outgoing = new WritableStream({
+    write: (chunk) => {
+      const owned = chunk.slice();
+      this.events.push("write-start");
+      // A browser WebTransport write crosses an asynchronous stream/network
+      // boundary. Closing the session first makes this queued write disappear.
+      return new Promise((resolve) => {
+        setImmediate(() => {
+          if (!this.terminal) {
+            this.delivered.push(owned);
+            this.events.push("network-delivery");
+          }
+          resolve();
+        });
+      });
+    },
+    close: () => {
+      this.events.push("stream-close");
+      return this.stallStreamClose ? new Promise(() => {}) : Promise.resolve();
+    },
+    abort: () => {
+      this.events.push("stream-abort");
+    },
+  });
+
+  async createUnidirectionalStream() {
+    await new Promise((resolve) => setImmediate(resolve));
+    return this.outgoing;
+  }
+
+  createBidirectionalStream() {
+    throw new Error("not used");
+  }
+
+  close(options = {}) {
+    this.closeCalls += 1;
+    this.terminal = true;
+    this.events.push("session-close");
+    this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+  }
+}
+
+function encodedReject(code, reason) {
+  const target = new Uint8Array(REJECT_MAXIMUM_BYTES);
+  return target.subarray(0, writeReject(target, { code, reason }));
+}
+
+test("a terminal reject drains and FINs the real stream-shaped adapter before session close", async () => {
+  const session = new AsynchronousServerWebTransportSession();
+  const closes = [];
+  const transport = await adoptServerWebTransportSession(session, {
+    onReliable() {},
+    onDatagram() {},
+    onClose(code, reason) {
+      closes.push([code, reason]);
+    },
+  });
+  const send = transport.sendReliable(TRANSPORT_CHANNEL_SESSION, encodedReject(REJECT_FULL, "match is full"));
+  transport.close(4_004, "match is full");
+
+  assert.equal(session.closeCalls, 0, "close is deferred while the terminal frame crosses the stream boundary");
+  assert.equal(
+    await transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, encodedReject(REJECT_RATE_LIMITED, "late")),
+    "closed",
+    "graceful close admits no new reliable frames",
+  );
+  assert.equal(await send, "sent");
+  assert.equal(await waitForCondition(() => session.closeCalls === 1), true);
+  assert.deepEqual(session.events, ["write-start", "network-delivery", "stream-close", "session-close"]);
+  assert.equal(session.delivered.length, 1);
+  const frame = session.delivered[0];
+  assert.equal(frame[0], TRANSPORT_CHANNEL_SESSION);
+  assert.equal(new DataView(frame.buffer, frame.byteOffset, frame.byteLength).getUint32(1, true), frame.byteLength - 5);
+  assert.deepEqual(readReject(frame.subarray(5), { code: 0, reason: "" }), {
+    code: REJECT_FULL,
+    reason: "match is full",
+  });
+  assert.deepEqual(closes, [[4_004, "match is full"]]);
+});
+
+test("a rate-limit reject remains advisory and graceful close has a hard deadline", async () => {
+  const advisorySession = new AsynchronousServerWebTransportSession();
+  const advisoryTransport = await adoptServerWebTransportSession(advisorySession, {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  });
+  assert.equal(
+    await advisoryTransport.sendReliable(
+      TRANSPORT_CHANNEL_CONTROL,
+      encodedReject(REJECT_RATE_LIMITED, "input rate exceeded"),
+    ),
+    "sent",
+  );
+  assert.equal(advisorySession.closeCalls, 0, "a rate advisory does not terminate the session");
+  assert.deepEqual(readReject(advisorySession.delivered[0].subarray(5), { code: 0, reason: "" }), {
+    code: REJECT_RATE_LIMITED,
+    reason: "input rate exceeded",
+  });
+  advisoryTransport.close(12, "finished");
+  assert.equal(await waitForCondition(() => advisorySession.closeCalls === 1), true);
+
+  const stalledSession = new AsynchronousServerWebTransportSession();
+  stalledSession.stallStreamClose = true;
+  const stalledTransport = await adoptServerWebTransportSession(stalledSession, {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  });
+  assert.equal(
+    await stalledTransport.sendReliable(TRANSPORT_CHANNEL_SESSION, encodedReject(REJECT_FULL, "match is full")),
+    "sent",
+  );
+  stalledTransport.close(4_004, "match is full");
+  assert.equal(
+    await waitForCondition(() => stalledSession.closeCalls === 1, { timeoutMilliseconds: 1_500 }),
+    true,
+    "a stuck stream close cannot retain a rejected session",
+  );
+  assert.equal(stalledSession.events.includes("session-close"), true);
 });
 
 test("datagram staging owns caller bytes and has fixed in-flight capacity", async () => {
@@ -2580,11 +3140,14 @@ test("WebTransport datagrams support the current createWritable API", async () =
 
   assert.equal(session.createWritableCalls, 1);
   assert.equal(await client.trySendDatagram(Uint8Array.of(3, 4)), "sent");
-  assert.deepEqual(session.writes.map((chunk) => [...chunk]), [[3, 4]]);
+  assert.deepEqual(
+    session.writes.map((chunk) => [...chunk]),
+    [[3, 4]],
+  );
   client.close(12, "finished");
 });
 
-test("repeated client reliable streams cancel their unused reverse directions", async () => {
+test("client hello and control frames share one ordered stream", async () => {
   class RepeatedBidiSession {
     ready = Promise.resolve();
     incomingController;
@@ -2596,20 +3159,30 @@ test("repeated client reliable streams cancel their unused reverse directions", 
       this.closeResolve = resolve;
     });
     reverseCancels = 0;
+    outgoingStreams = [];
     close(options = {}) {
       this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
     }
     createUnidirectionalStream() {
       throw new Error("not used");
     }
-    createBidirectionalStream() {
+    async createBidirectionalStream() {
       const session = this;
+      const chunks = [];
+      this.outgoingStreams.push(chunks);
       const readable = new ReadableStream({
         cancel() {
           session.reverseCancels += 1;
         },
       });
-      return { readable, writable: new WritableStream() };
+      return {
+        readable,
+        writable: new WritableStream({
+          write(chunk) {
+            chunks.push(chunk.slice());
+          },
+        }),
+      };
     }
   }
   const session = new RepeatedBidiSession();
@@ -2627,12 +3200,122 @@ test("repeated client reliable streams cancel their unused reverse directions", 
     },
     FakeConstructor,
   );
-  for (let index = 0; index < 8; index += 1) {
-    assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(index)), "sent");
-  }
+  assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_SESSION, Uint8Array.of(11)), "sent");
+  assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(22)), "sent");
   await new Promise((resolve) => setImmediate(resolve));
-  assert.equal(session.reverseCancels, 8);
+  assert.equal(session.outgoingStreams.length, 1, "QUIC stream ordering is the handshake ordering guarantee");
+  assert.deepEqual(
+    session.outgoingStreams[0].map((chunk) => [...chunk]),
+    [
+      [TRANSPORT_CHANNEL_SESSION, 1, 0, 0, 0, 11],
+      [TRANSPORT_CHANNEL_CONTROL, 1, 0, 0, 0, 22],
+    ],
+  );
+  assert.equal(session.reverseCancels, 1);
   client.close(12, "finished");
+});
+
+test("client reliable input fallback is latest-only under stream backpressure", async () => {
+  let releaseInput;
+  const writes = [];
+  const session = {
+    ready: Promise.resolve(),
+    incomingUnidirectionalStreams: new ReadableStream(),
+    incomingBidirectionalStreams: new ReadableStream(),
+    datagrams: { maxDatagramSize: 0, readable: new ReadableStream(), writable: new WritableStream() },
+    closed: new Promise(() => {}),
+    async createBidirectionalStream() {
+      return {
+        readable: new ReadableStream(),
+        writable: {
+          getWriter() {
+            return {
+              desiredSize: 1,
+              ready: Promise.resolve(),
+              write(frame) {
+                writes.push(frame.slice());
+                if (frame[0] !== TRANSPORT_CHANNEL_INPUT_FALLBACK) return Promise.resolve();
+                return new Promise((resolve) => {
+                  releaseInput = resolve;
+                });
+              },
+              abort: async () => {},
+              releaseLock() {},
+            };
+          },
+        },
+      };
+    },
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    },
+    close() {},
+  };
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
+  const client = await WebTransportGameClient.connect(
+    "https://example.invalid",
+    { onReliable() {}, onDatagram() {}, onClose() {} },
+    FakeConstructor,
+  );
+  assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_SESSION, Uint8Array.of(1)), "sent");
+  const first = client.sendReliable(TRANSPORT_CHANNEL_INPUT_FALLBACK, Uint8Array.of(2));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(await client.sendReliable(TRANSPORT_CHANNEL_INPUT_FALLBACK, Uint8Array.of(3)), "backpressured");
+  releaseInput();
+  assert.equal(await first, "sent");
+  assert.equal(writes.length, 2, "the stale fallback never entered the persistent stream queue");
+  const aborted = new AbortController();
+  aborted.abort("stale tick");
+  assert.equal(
+    await client.sendReliable(TRANSPORT_CHANNEL_INPUT_FALLBACK, Uint8Array.of(4), aborted.signal),
+    "backpressured",
+  );
+  client.close(12, "finished");
+});
+
+test("a snapshot cancelled during stream creation resets the created QUIC stream", async () => {
+  let resolveCreate;
+  let aborts = 0;
+  const session = {
+    ready: Promise.resolve(),
+    incomingBidirectionalStreams: new ReadableStream(),
+    incomingUnidirectionalStreams: new ReadableStream(),
+    datagrams: { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() },
+    closed: new Promise(() => {}),
+    createUnidirectionalStream() {
+      return new Promise((resolve) => {
+        resolveCreate = () =>
+          resolve(
+            new WritableStream({
+              abort() {
+                aborts += 1;
+              },
+            }),
+          );
+      });
+    },
+    createBidirectionalStream() {
+      throw new Error("not used");
+    },
+    close() {},
+  };
+  const transport = await adoptServerWebTransportSession(session, {
+    onReliable() {},
+    onDatagram() {},
+    onClose() {},
+  });
+  const stale = new AbortController();
+  const send = transport.sendReliable(TRANSPORT_CHANNEL_SNAPSHOT, Uint8Array.of(1), stale.signal);
+  await new Promise((resolve) => setImmediate(resolve));
+  stale.abort("superseded before stream credit arrived");
+  resolveCreate();
+  assert.equal(await send, "backpressured");
+  assert.equal(aborts, 1, "the late-created stream is reset rather than leaked");
+  transport.close(12, "finished");
 });
 
 test("server reliable streams close reverse writers without escalating peer resets", async () => {
@@ -2755,16 +3438,18 @@ test("the persistent reliable decoder handles coalesced frames and rejects overs
       this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
     }
     pushBytes(bytes) {
-      this.incomingController.enqueue(
-        new ReadableStream({
-          start: (controller) => {
-            controller.enqueue(bytes.subarray(0, 1));
-            controller.enqueue(bytes.subarray(1, 8));
-            controller.enqueue(bytes.subarray(8));
-            controller.close();
-          },
-        }),
-      );
+      if (this.reliableController === undefined) {
+        this.incomingController.enqueue(
+          new ReadableStream({
+            start: (controller) => {
+              this.reliableController = controller;
+            },
+          }),
+        );
+      }
+      this.reliableController.enqueue(bytes.subarray(0, 1));
+      this.reliableController.enqueue(bytes.subarray(1, 8));
+      this.reliableController.enqueue(bytes.subarray(8));
     }
   }
   const session = new DecoderSession();
@@ -2819,6 +3504,54 @@ test("the persistent reliable decoder handles coalesced frames and rejects overs
   client.close(12, "finished");
 });
 
+test("ending the persistent server event stream closes the client session", async () => {
+  let incomingController;
+  let closeResolve;
+  const session = {
+    ready: Promise.resolve(),
+    incomingUnidirectionalStreams: new ReadableStream({
+      start(controller) {
+        incomingController = controller;
+      },
+    }),
+    incomingBidirectionalStreams: new ReadableStream(),
+    datagrams: { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() },
+    closed: new Promise((resolve) => {
+      closeResolve = resolve;
+    }),
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    },
+    createBidirectionalStream() {
+      throw new Error("not used");
+    },
+    close(options = {}) {
+      closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    },
+  };
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
+  const closes = [];
+  await WebTransportGameClient.connect(
+    "https://example.invalid",
+    { onReliable() {}, onDatagram() {}, onClose: (code, reason) => closes.push([code, reason]) },
+    FakeConstructor,
+  );
+  incomingController.enqueue(
+    new ReadableStream({
+      start(controller) {
+        controller.enqueue(Uint8Array.of(TRANSPORT_CHANNEL_SESSION, 1, 0, 0, 0, 7));
+        controller.close();
+      },
+    }),
+  );
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(closes, [[2, "persistent server reliable stream ended"]]);
+});
+
 test("a remote WebTransport close is observed without issuing a second close", async () => {
   class RemotelyClosedSession {
     ready = Promise.resolve();
@@ -2864,7 +3597,7 @@ test("a remote WebTransport close is observed without issuing a second close", a
   assert.deepEqual(events, [[7, "peer closed"]]);
 });
 
-test("server snapshots coalesce to one bounded pending frame under stream backpressure", async () => {
+test("server snapshot streams are independently cancellable under backpressure", async () => {
   class BackpressuredSession {
     ready = Promise.resolve();
     outgoingStreams = [];
@@ -2877,6 +3610,7 @@ test("server snapshots coalesce to one bounded pending frame under stream backpr
     });
     closeCalls = 0;
     capacity = 0;
+    rejectClose = false;
     readyResolve;
     readyWaiters = 0;
     async createUnidirectionalStream() {
@@ -2899,6 +3633,9 @@ test("server snapshots coalesce to one bounded pending frame under stream backpr
           ready = new Promise((resolve) => {
             this.readyResolve = resolve;
           });
+        },
+        close: async () => {
+          if (this.rejectClose) throw new Error("peer stopped snapshot stream");
         },
         abort: async () => {},
         releaseLock() {},
@@ -2923,23 +3660,30 @@ test("server snapshots coalesce to one bounded pending frame under stream backpr
     onDatagram() {},
     onClose() {},
   });
-  assert.equal(await transport.sendReliable(3, Uint8Array.of(1)), "backpressured");
-  assert.equal(await transport.sendReliable(3, Uint8Array.of(2)), "backpressured");
+  const stale = new AbortController();
+  const first = transport.sendReliable(3, Uint8Array.of(1), stale.signal);
+  await new Promise((resolve) => setImmediate(resolve));
   assert.equal(session.outgoingStreams.length, 1);
   assert.deepEqual(session.outgoingStreams[0], []);
-  await new Promise((resolve) => setImmediate(resolve));
   assert.equal(session.readyWaiters, 1, "one active pump owns the blocked writer.ready wait");
-  for (let value = 3; value <= 100; value += 1) {
-    assert.equal(await transport.sendReliable(3, Uint8Array.of(value)), "backpressured");
-  }
+  stale.abort("superseded");
+  assert.equal(await first, "backpressured");
+
+  const current = new AbortController();
+  const second = transport.sendReliable(3, Uint8Array.of(100), current.signal);
   await new Promise((resolve) => setImmediate(resolve));
-  assert.equal(session.readyWaiters, 1, "snapshot flood does not retain additional writer.ready waiters");
+  assert.equal(session.outgoingStreams.length, 2, "fresh state owns a fresh QUIC stream");
   session.releaseCapacity();
+  assert.equal(await second, "sent");
+  assert.deepEqual([...session.outgoingStreams[1][0]], [3, 1, 0, 0, 0]);
+  assert.deepEqual([...session.outgoingStreams[1][1]], [100]);
+
+  session.rejectClose = true;
+  const retiredByPeer = transport.sendReliable(3, Uint8Array.of(101));
   await new Promise((resolve) => setImmediate(resolve));
-  assert.deepEqual([...session.outgoingStreams[0][0]], [3, 1, 0, 0, 0, 100], "only the latest snapshot is retained");
   session.releaseCapacity();
-  assert.equal(await transport.sendReliable(TRANSPORT_CHANNEL_CONTROL, Uint8Array.of(4)), "sent");
-  assert.deepEqual([...session.outgoingStreams[0][1]], [TRANSPORT_CHANNEL_CONTROL, 1, 0, 0, 0, 4]);
+  assert.equal(await retiredByPeer, "backpressured", "a peer-retired snapshot stream is not a session failure");
+  assert.equal(session.closeCalls, 0);
   transport.close(12, "finished");
 });
 

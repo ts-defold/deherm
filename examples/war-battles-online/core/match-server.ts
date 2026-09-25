@@ -9,13 +9,20 @@
 // Admission authentication and its bounded restart ledger are injected as
 // control-plane seams. They never participate in the fixed-step simulation.
 
-import { MAX_PLAYERS, SNAPSHOT_BYTES, TICK_RATE } from "./constants.ts";
+import {
+  INPUT_HISTORY_TICKS,
+  MAX_PLAYERS,
+  SNAPSHOT_BASE_HISTORY_FRAMES,
+  SNAPSHOT_BYTES,
+  TICK_RATE,
+} from "./constants.ts";
 import {
   CONTROL_BUY_UPGRADE,
   CONTROL_SET_WEAPON,
   CONTROL_SET_CHASSIS,
   CONTROL_SET_WEAPON_UPGRADE,
   INPUT_PACKET_BYTES,
+  INPUT_BUNDLE_MAX_COMMANDS,
   CONTROL_SUICIDE,
   MESSAGE_CONTROL,
   MESSAGE_HELLO,
@@ -88,6 +95,8 @@ export interface MatchServerOptions {
   readonly onSessionStateChange?: (reason: "commit" | "release", tick: number) => void;
   readonly onError?: (error: unknown) => void;
   readonly onLog?: (line: string) => void;
+  /** Monotonic-ish host clock for transport deadlines; injectable by deterministic harnesses. */
+  readonly nowMilliseconds?: () => number;
 }
 
 export interface MatchServerStats {
@@ -97,9 +106,18 @@ export interface MatchServerStats {
   snapshotsSent: number;
   inputsAccepted: number;
   inputsRejected: number;
+  /** Valid authoritative commands first observed after their simulation tick. */
+  inputsLate: number;
 }
 
-const SNAPSHOT_BUFFER_RING = 8;
+const SNAPSHOT_IN_FLIGHT_STREAMS = 8;
+const SNAPSHOT_STALE_MILLISECONDS = 300;
+
+interface SnapshotStreamSend {
+  readonly tick: number;
+  readonly controller: AbortController;
+  readonly staleAtMilliseconds: number;
+}
 const WELCOME_ACK_TIMEOUT_TICKS = TICK_RATE * 5;
 
 export class MatchServer {
@@ -117,9 +135,12 @@ export class MatchServer {
   private readonly bots = new BotController();
   private readonly botCommand: InputCommand;
   private readonly snapshotBuffers: Uint8Array[] = [];
+  private readonly snapshotTicks = new Uint32Array(SNAPSHOT_BASE_HISTORY_FRAMES);
+  private readonly snapshotValid = new Uint8Array(SNAPSHOT_BASE_HISTORY_FRAMES);
   private snapshotBufferCursor = 0;
   private readonly onError: (error: unknown) => void;
   private readonly onLog: (line: string) => void;
+  readonly nowMilliseconds: () => number;
   readonly resumeTokenService: SessionTokenProvider;
   readonly sessionLedger: SessionLedger;
   /** World ticks restart at zero; admission ticks continue from the checkpoint. */
@@ -134,6 +155,7 @@ export class MatchServer {
     snapshotsSent: 0,
     inputsAccepted: 0,
     inputsRejected: 0,
+    inputsLate: 0,
   };
 
   constructor(options: MatchServerOptions = {}) {
@@ -147,6 +169,7 @@ export class MatchServer {
     this.resumeGraceTicks = clampInteger(options.resumeGraceTicks ?? TICK_RATE * 30, 1, MAX_TICK_SPAN);
     this.onError = options.onError ?? (() => {});
     this.onLog = options.onLog ?? (() => {});
+    this.nowMilliseconds = options.nowMilliseconds ?? (() => performance.now());
     this.resumeTokenService =
       options.resumeTokenService ??
       new SessionTokenService({
@@ -166,7 +189,7 @@ export class MatchServer {
     this.onSessionStateChange = options.onSessionStateChange ?? (() => {});
     this.botCommand = createInputCommand(matchId, 1);
     for (let slot = 0; slot < MAX_PLAYERS; slot += 1) this.slotOwner.push(undefined);
-    for (let index = 0; index < SNAPSHOT_BUFFER_RING; index += 1) {
+    for (let index = 0; index < SNAPSHOT_BASE_HISTORY_FRAMES; index += 1) {
       this.snapshotBuffers.push(new Uint8Array(SNAPSHOT_BYTES));
     }
     // Every slot is occupied from the first tick; a joining human takes one over
@@ -345,14 +368,27 @@ export class MatchServer {
   }
 
   private broadcastSnapshot(): void {
-    const buffer = this.snapshotBuffers[this.snapshotBufferCursor]!;
-    this.snapshotBufferCursor = (this.snapshotBufferCursor + 1) % SNAPSHOT_BUFFER_RING;
+    const index = this.snapshotBufferCursor;
+    const buffer = this.snapshotBuffers[index]!;
+    this.snapshotBufferCursor = (this.snapshotBufferCursor + 1) % SNAPSHOT_BASE_HISTORY_FRAMES;
     this.world.writeSnapshot(buffer);
+    this.snapshotTicks[index] = this.world.tick;
+    this.snapshotValid[index] = 1;
     for (const session of this.sessions) {
       if (!session.ready) continue;
       session.sendSnapshot(buffer, this.world.tick);
       this.stats.snapshotsSent += 1;
     }
+  }
+
+  /** @internal Returns an immutable-for-the-current-ring-turn snapshot base. */
+  snapshotAt(tick: number): Uint8Array | undefined {
+    for (let index = 0; index < SNAPSHOT_BASE_HISTORY_FRAMES; index += 1) {
+      if (this.snapshotValid[index] !== 0 && this.snapshotTicks[index] === tick >>> 0) {
+        return this.snapshotBuffers[index];
+      }
+    }
+    return undefined;
   }
 
   /** @internal */
@@ -389,6 +425,10 @@ export class ServerSession implements TransportReceiver {
   private readonly ping: PingMessage = { clientTime: 0, serverTick: 0 };
   private readonly welcomeAck: WelcomeAckMessage = { resumeToken: new Uint8Array(RESUME_TOKEN_BYTES) };
   private readonly command: InputCommand;
+  /** Exact accepted ticks distinguish redundant old copies from true late arrivals. */
+  private readonly acceptedInputTicks = new Float64Array(INPUT_HISTORY_TICKS);
+  /** Exact late ticks ensure a redundant bundle cannot inflate late accounting. */
+  private readonly lateInputTicks = new Float64Array(INPUT_HISTORY_TICKS);
   private readonly welcomeBuffer = new Uint8Array(WELCOME_BYTES);
   private readonly rejectBuffer = new Uint8Array(REJECT_MAXIMUM_BYTES);
   private readonly pingBuffer = new Uint8Array(12);
@@ -398,10 +438,10 @@ export class ServerSession implements TransportReceiver {
   private snapshotBaselineTick = -1;
   private snapshotFramesSinceKeyframe = 0;
   private forceSnapshotKeyframe = true;
-  private snapshotSendBusy = false;
-  private readonly pendingSnapshotState = new Uint8Array(SNAPSHOT_BYTES);
-  private pendingSnapshotTick = 0;
-  private pendingSnapshotReady = false;
+  private readonly snapshotSends: Array<SnapshotStreamSend | undefined> = Array.from({
+    length: SNAPSHOT_IN_FLIGHT_STREAMS,
+  });
+  private snapshotSendCursor = 0;
   private inputBudget = 0;
   /** Closes the double-hello race while async HMAC verification is pending. */
   private sessionHandling = false;
@@ -412,6 +452,8 @@ export class ServerSession implements TransportReceiver {
   constructor(server: MatchServer) {
     this.server = server;
     this.command = createInputCommand(server.world.matchId, 1);
+    this.acceptedInputTicks.fill(-1);
+    this.lateInputTicks.fill(-1);
   }
 
   attach(transport: GameTransport): void {
@@ -420,6 +462,7 @@ export class ServerSession implements TransportReceiver {
 
   /** @internal */
   beginTick(): void {
+    this.expireStaleSnapshots(this.server.nowMilliseconds());
     if (this.awaitingWelcomeAck && tickAfter(this.server.sessionTick(), this.welcomeAckDeadline)) {
       this.close(4_008, "welcome acknowledgement timeout");
       return;
@@ -459,6 +502,12 @@ export class ServerSession implements TransportReceiver {
   onClose(code: number, reason: string): void {
     if (this.closed) return;
     this.closed = true;
+    for (let index = 0; index < this.snapshotSends.length; index += 1) {
+      const send = this.snapshotSends[index];
+      if (send === undefined) continue;
+      send.controller.abort("session closed");
+      this.snapshotSends[index] = undefined;
+    }
     this.sessionHandling = false;
     this.ready = false;
     this.server.log(`session-closed:${code}:${reason}`);
@@ -499,58 +548,73 @@ export class ServerSession implements TransportReceiver {
   sendSnapshot(source: Uint8Array, tick: number): void {
     const transport = this.transport;
     if (transport === undefined || this.closed) return;
-    if (this.snapshotSendBusy) {
-      // The browser adapter keeps only its latest pending snapshot. Retain the
-      // same bounded latest-only policy here and force a keyframe after the
-      // in-flight write: the pending frame must not depend on a delta that the
-      // adapter may have replaced.
-      this.pendingSnapshotState.set(source);
-      this.pendingSnapshotTick = tick;
-      this.pendingSnapshotReady = true;
-      this.forceSnapshotKeyframe = true;
-      return;
+    const now = this.server.nowMilliseconds();
+    this.expireStaleSnapshots(now);
+    let inFlight = 0;
+    for (const send of this.snapshotSends) {
+      if (send !== undefined) inFlight += 1;
+    }
+    if (inFlight >= SNAPSHOT_IN_FLIGHT_STREAMS) return;
+    // The client retains the same fixed 64-frame history as the server. An
+    // ACK may lag the newest send by more than the eight-stream window while
+    // still remaining a valid delta base; throttling at eight frames created a
+    // false ~3 Hz ceiling on healthy high-RTT links. Only the actual history
+    // bound forces recovery to a keyframe.
+    if (this.snapshotBaselineTick >= 0) {
+      const acknowledgedAgeTicks = (tick - this.snapshotBaselineTick) >>> 0;
+      const historyAgeTicks = this.server.snapshotIntervalTicks * (SNAPSHOT_BASE_HISTORY_FRAMES - 1);
+      if (acknowledgedAgeTicks >= historyAgeTicks) this.forceSnapshotKeyframe = true;
     }
     let length = -1;
-    if (!this.forceSnapshotKeyframe && this.snapshotFramesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1) {
+    if (
+      this.snapshotBaselineTick >= 0 &&
+      !this.forceSnapshotKeyframe &&
+      this.snapshotFramesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1
+    ) {
       length = writeSnapshotDelta(this.snapshotFrame, tick, this.snapshotBaselineTick, this.snapshotBaseline, source);
     }
     if (length < 0) {
       length = writeSnapshotKeyframe(this.snapshotFrame, tick, source);
-      this.forceSnapshotKeyframe = false;
+      this.forceSnapshotKeyframe = this.snapshotBaselineTick < 0;
       this.snapshotFramesSinceKeyframe = 0;
     } else {
       this.snapshotFramesSinceKeyframe += 1;
     }
-    this.snapshotBaseline.set(source);
-    this.snapshotBaselineTick = tick;
-    this.snapshotSendBusy = true;
-    void transport.sendReliable(TRANSPORT_CHANNEL_SNAPSHOT, this.snapshotFrame.subarray(0, length)).then(
-      (disposition) => {
-        this.snapshotSendBusy = false;
-        if (disposition === "closed") {
-          this.pendingSnapshotReady = false;
-          this.onClose(1_001, "transport closed");
-          return;
-        }
-        // The browser adapter intentionally keeps only the latest backpressured
-        // snapshot. A delta that was replaced must not become the base for the
-        // next frame, so force a recovery keyframe at the next cadence.
-        if (disposition !== "sent") this.forceSnapshotKeyframe = true;
-        if (this.pendingSnapshotReady) {
-          this.pendingSnapshotReady = false;
-          this.sendSnapshot(this.pendingSnapshotState, this.pendingSnapshotTick);
-        }
-      },
-      (error: unknown) => {
-        this.snapshotSendBusy = false;
-        this.forceSnapshotKeyframe = true;
-        // A rejected send has no delivery ordering we can trust. Drop the
-        // retained latest state rather than replaying it after a later caller
-        // supplies a newer frame; that newer call will be forced to keyframe.
-        this.pendingSnapshotReady = false;
-        this.server.report(error);
-      },
-    );
+    // Every state packet owns an independent QUIC stream. Streams may finish
+    // out of order and never head-of-line block fresher state; a strict stale
+    // deadline resets packets congestion control has held too long. The fixed
+    // ring is also a hard cap if a host fails to settle an aborted write.
+    const streamSlot = this.snapshotSendCursor;
+    this.snapshotSendCursor = (this.snapshotSendCursor + 1) % this.snapshotSends.length;
+    const replaced = this.snapshotSends[streamSlot];
+    if (replaced !== undefined) {
+      replaced.controller.abort("snapshot stream capacity replaced");
+    }
+    const controller = new AbortController();
+    const send: SnapshotStreamSend = {
+      tick,
+      controller,
+      staleAtMilliseconds: now + SNAPSHOT_STALE_MILLISECONDS,
+    };
+    this.snapshotSends[streamSlot] = send;
+    void transport
+      .sendReliable(TRANSPORT_CHANNEL_SNAPSHOT, this.snapshotFrame.subarray(0, length), controller.signal)
+      .then(
+        (disposition) => {
+          if (disposition === "closed") {
+            if (this.snapshotSends[streamSlot] === send) {
+              this.snapshotSends[streamSlot] = undefined;
+            }
+            this.onClose(1_001, "transport closed");
+          }
+        },
+        (error: unknown) => {
+          if (this.snapshotSends[streamSlot] === send) {
+            this.snapshotSends[streamSlot] = undefined;
+          }
+          this.server.report(error);
+        },
+      );
   }
 
   private async handleSession(payload: Uint8Array): Promise<void> {
@@ -654,9 +718,15 @@ export class ServerSession implements TransportReceiver {
 
   private handleInput(payload: Uint8Array): void {
     if (!this.ready) return;
-    if (payload.byteLength !== INPUT_PACKET_BYTES) {
+    if (
+      payload.byteLength === 0 ||
+      payload.byteLength % INPUT_PACKET_BYTES !== 0 ||
+      payload.byteLength > INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS
+    ) {
       throw new Error(
-        payload.byteLength < INPUT_PACKET_BYTES ? "input packet is truncated" : "input packet has trailing bytes",
+        payload.byteLength < INPUT_PACKET_BYTES
+          ? "input packet is truncated"
+          : "input packet has trailing bytes or too many bundled commands",
       );
     }
     if (this.inputBudget <= 0) {
@@ -669,14 +739,69 @@ export class ServerSession implements TransportReceiver {
       return;
     }
     this.inputBudget -= 1;
-    readInputPacket(payload, 0, this.command);
-    // A session may only ever move its own tank, whatever the packet says.
-    if (this.command.playerId !== this.slot + 1) {
-      this.server.stats.inputsRejected += 1;
-      return;
+    // Commands are oldest-first. Already-consumed redundancy is a benign
+    // duplicate, not a protocol rejection; future commands are still staged so
+    // one lost datagram does not create a movement hole.
+    for (let offset = 0; offset < payload.byteLength; offset += INPUT_PACKET_BYTES) {
+      readInputPacket(payload, offset, this.command);
+      // A session may only ever move its own tank, whatever the packet says.
+      if (this.command.playerId !== this.slot + 1) {
+        this.server.stats.inputsRejected += 1;
+        continue;
+      }
+      if (
+        this.command.matchId !== this.server.world.matchId ||
+        tickAfter(this.command.tick, tickDeadline(this.server.world.tick, INPUT_HISTORY_TICKS - 1))
+      ) {
+        this.server.stats.inputsRejected += 1;
+        continue;
+      }
+      this.observeSnapshotAcknowledgement(this.command);
+      const acceptedSlot = this.command.tick % this.acceptedInputTicks.length;
+      if (!tickAfter(this.command.tick, this.server.world.tick)) {
+        if (
+          this.acceptedInputTicks[acceptedSlot] !== this.command.tick &&
+          this.lateInputTicks[acceptedSlot] !== this.command.tick
+        ) {
+          this.lateInputTicks[acceptedSlot] = this.command.tick;
+          this.server.stats.inputsLate += 1;
+        }
+        continue;
+      }
+      if (this.server.world.submitInput(this.command)) {
+        this.acceptedInputTicks[acceptedSlot] = this.command.tick;
+        this.server.stats.inputsAccepted += 1;
+      }
+      // A false result after the explicit authority/time checks is an older
+      // copy of a future command already staged by another redundant bundle.
+      // Treat that as successful loss protection, not hostile input.
     }
-    if (this.server.world.submitInput(this.command)) this.server.stats.inputsAccepted += 1;
-    else this.server.stats.inputsRejected += 1;
+  }
+
+  private observeSnapshotAcknowledgement(command: Readonly<InputCommand>): void {
+    if ((command.snapshotAckBits & 1) === 0) return;
+    if (this.snapshotBaselineTick >= 0 && !tickAfter(command.latestSnapshotTick, this.snapshotBaselineTick)) return;
+    if (tickAfter(command.latestSnapshotTick, this.server.world.tick)) return;
+    const acknowledged = this.server.snapshotAt(command.latestSnapshotTick);
+    if (acknowledged === undefined) return;
+    this.snapshotBaseline.set(acknowledged);
+    this.snapshotBaselineTick = command.latestSnapshotTick;
+    this.forceSnapshotKeyframe = false;
+    for (let index = 0; index < this.snapshotSends.length; index += 1) {
+      const send = this.snapshotSends[index];
+      if (send === undefined || tickAfter(send.tick, this.snapshotBaselineTick)) continue;
+      send.controller.abort("snapshot acknowledged");
+      this.snapshotSends[index] = undefined;
+    }
+  }
+
+  private expireStaleSnapshots(now: number): void {
+    for (let index = 0; index < this.snapshotSends.length; index += 1) {
+      const send = this.snapshotSends[index];
+      if (send === undefined || now < send.staleAtMilliseconds) continue;
+      send.controller.abort("stale snapshot");
+      if (this.snapshotSends[index] === send) this.snapshotSends[index] = undefined;
+    }
   }
 }
 

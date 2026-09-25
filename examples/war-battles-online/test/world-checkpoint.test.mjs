@@ -13,10 +13,7 @@ import {
   WorldCheckpointError,
 } from "../server/world-persistence.ts";
 import { crc32 } from "../core/session-persistence.ts";
-
-async function settle() {
-  for (let turn = 0; turn < 12; turn += 1) await new Promise((resolve) => setImmediate(resolve));
-}
+import { settleEventLoop, waitForCondition } from "./async-conditions.mjs";
 
 function reseal(bytes) {
   new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).setUint32(
@@ -72,7 +69,7 @@ test("authoritative world checkpoint round-trips the complete fixed state across
   session.attach(serverTransport);
   client.attach(clientTransport);
   for (let tick = 0; tick < 3; tick += 1) restarted.step();
-  await settle();
+  assert.equal(await waitForCondition(() => client.state === "ready"), true, "post-restart handshake did not settle");
   client.update(0);
   assert.equal(client.state, "ready");
   assert.equal(restarted.world.playerScore[0], 321, "the authoritative world remains restored after admission");
@@ -190,7 +187,7 @@ test("slow checkpoint storage retains one active write and one coalesced latest 
 
   server.step();
   const first = persistence.flush(server.world);
-  await settle();
+  await settleEventLoop();
   assert.equal(writes.length, 1);
 
   server.step();
@@ -202,7 +199,7 @@ test("slow checkpoint storage retains one active write and one coalesced latest 
 
   releases.shift()();
   await first;
-  await settle();
+  await settleEventLoop();
   assert.equal(writes.length, 2);
   const latestView = new DataView(writes[1].buffer, writes[1].byteOffset, writes[1].byteLength);
   assert.equal(latestView.getUint32(20, true), server.world.tick, "the retained write is the newest snapshot");
@@ -234,7 +231,7 @@ test("a failed active checkpoint does not poison the bounded latest retry", asyn
   const persistence = new DurableWorldCheckpoint(storage, checkpointContext(server));
   server.step();
   const failed = persistence.flush(server.world);
-  await settle();
+  await settleEventLoop();
   server.step();
   const recovered = persistence.flush(server.world);
   releaseFirst();

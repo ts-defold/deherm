@@ -114,6 +114,16 @@ offline. This closes the literal VS Code presentation boundary; it does not
 claim that a locked macOS display was unlocked or that hosted Extender produced
 a new engine during this observation.
 
+The source binding is semantic rather than a whole-file arena hash. The record
+stores the ordered `players`, `botSkill`, `mapSeed`, and `autoEngageSeconds`
+declarations and defaults that the screenshot presents; unrelated gameplay or
+telemetry edits do not invalidate it, while a rename, reorder, type/default
+change, extension renderer change, or inspector-bridge change does. The one-time
+schema migration checked the previously recorded full-file SHA-256 against the
+source at `d3c41a5`, projected those declarations, and required that projection
+to equal the current source before re-keying the record. This is preservation of
+the existing visual observation, not a claim that a new screenshot was taken.
+
 The receiver projection is intentionally narrower than sender projection: it
 requires the generated static-evidence source, one-based line/column join, and
 the canonical SDK `hashLiteral` wrapper. Missing, stale, dynamic, shadowed, or

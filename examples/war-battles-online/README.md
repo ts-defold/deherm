@@ -185,22 +185,40 @@ map structure, and reproducibility. Every stage is byte-reproducible and has a
 
 `core/match-server.ts` is the authoritative match: one `BattleWorld`, one session
 per client, bots filling every slot no human has taken. `core/client.ts` is the
-predicting client: it runs the world locally, sends one input per tick on the
-unreliable lane, and on each authoritative snapshot restores and replays its own
-newer inputs so the local tank does not rubber-band while the rest of the arena
-snaps to the truth. Both talk to `GameTransport` and nothing else, so the same
+predicting client: it runs the world locally at 60 Hz and sends one input
+datagram per tick containing the newest command plus up to two predecessors.
+The local world starts `leadTicks` ahead, and commands keep that exact tick on
+the wire so prediction and authority run the same timeline. On each
+authoritative snapshot it restores and replays newer local inputs.
+Simulation accepts the correction immediately, local presentation decays its
+visual error over 100 ms, and remote tanks interpolate between 20 Hz samples.
+Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 8.
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 9.
 It carries 40-byte authenticated resume credentials and requires the client to
 acknowledge the exact welcome credential before the server commits its rotation,
 alongside the authoritative chassis, weapon-branch, and command-beacon state.
-The tick input packet is still exactly 32 bytes (version 1 reserved byte
+Each tick input command is still exactly 32 bytes (version 1 reserved byte
 15 and wrote zero; it is now the weapon request, so every other offset is
-unchanged), and the session, control and snapshot lanes now carry a typed
+unchanged). A QUIC datagram carries one to three oldest-first commands, so one
+lost packet usually does not erase its movement transition and stale inputs are
+never queued for retransmission. The session, control and snapshot lanes carry a typed
 four-byte envelope whose kind fixes the lane it is allowed on. Full table in
 [`server/README.md`](./server/README.md).
+
+Snapshot state is partially reliable rather than ordered behind old state. Each
+20 Hz packet gets an independent WebTransport stream; an unsettled packet is
+reset after 300 ms, and at most eight can exist per session. Deltas are built
+only against the exact snapshot tick the client applied and acknowledged. The
+server and client retain a fixed 64-snapshot exact-base history (3.2 seconds at
+20 Hz), so WAN acknowledgements and several independently completed deltas may
+safely name an older applied base. A complete one-frame state stream is retired
+as soon as its payload is consumed; an acknowledgement, stale deadline, or peer
+reset retires the matching replaceable packet without closing the session.
+Session/control events keep reliable ordered semantics, while tick inputs use
+unreliable datagrams with bounded command redundancy.
 
 **What is and is not proven.** The two-client match, the prediction agreeing with
 the server exactly, the reconciliation replay, the full-match refusal, the
@@ -242,8 +260,8 @@ session ledger, preventing the restored world tick from being counted twice.
 Docker mounts this beside the resume ledger as `server/state/world.bin`.
 
 The compact snapshot unit test independently proves the codec against a full
-32-player world: the fixed world image is 17,824 bytes and its keyframe is
-17,840 bytes, while the measured 20 Hz bot trace uses bounded deltas.
+32-player world: the fixed world image is 17,888 bytes and its keyframe is
+17,904 bytes, while the measured 20 Hz bot trace uses bounded deltas.
 The test also proves keyframe reconstruction, exact-base enforcement, sorted
 run bounds, and rejection of a delta without its baseline. This is protocol and
 in-process evidence; it is not a WAN compression, packet-loss, or allocation
@@ -343,9 +361,11 @@ runtime. It deliberately describes semantics instead of naming a vendor:
   credential; the Deno host accepts an explicit 32-byte secret and persists a
   fixed-capacity generation ledger at lifecycle checkpoints.
 
-The WebTransport browser adapter places each reliable protocol message on an
-independent unidirectional stream. That avoids cross-lane ordered head-of-line
-blocking and lets a caller abort an obsolete reliable input fallback. Its stream
+The WebTransport adapter places replaceable snapshot state on independent,
+cancellable unidirectional streams. Client-originated session/control events
+share one ordered bidirectional stream, while server session/control events
+share their ordered bounded lane. This avoids snapshot head-of-line blocking
+and lets the server reset stale state without terminating the session. Its stream
 receive path buffers arbitrary read fragmentation and validates a fixed length
 prefix before delivery. When WebTransport is unavailable, the browser adapter
 connects to the Deno health/control listener's `/ws` endpoint. WebSocket is

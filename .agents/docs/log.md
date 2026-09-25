@@ -1,5 +1,59 @@
 # Defold Hermes knowledge log
 
+## 2026-09-25 - Real QUIC evidence accepts observable latest-state drops
+
+The browser-to-Deno WebTransport evidence no longer equates a zero client
+datagram-drop counter with correctness. The fixed staging ring intentionally
+rejects old redundant packets under backpressure; the generated input bundle
+repeats commands and the server-side accepted-input marker is the runtime
+correctness gate.
+
+The evidence keeps `inputsDropped` as a non-negative integer so transport
+pressure remains visible. It still requires real HTTP/3/WebTransport,
+datagrams, authoritative admission, snapshots, sent inputs, and server-side
+input acceptance.
+
+## 2026-09-25 - WebTransport state is independently replaceable without leaking stream credit
+
+War Battles now gives each lane one explicit delivery contract. Client hello,
+welcome acknowledgement, and control share one ordered bidirectional stream;
+server welcome/control share one ordered unidirectional stream; tick inputs use
+bounded redundant datagrams; and each 20 Hz snapshot owns one independently
+resettable stream. A cancellation that wins while QUIC stream creation is still
+pending now resets the late-created stream, and acknowledging a snapshot aborts
+its unsettled stream before releasing the fixed eight-slot window. Focused
+regressions reproduce both former stream-credit leaks.
+
+The exact-base history is 64 frames/3.2 seconds at 20 Hz on the server and
+client, or 1,144,832 preallocated bytes each. This removes the old roughly
+400 ms RTT/keyframe cliff while keeping hot-path storage fixed. The deterministic
+32-client gate injects both its token provider and clock, and two fresh Node
+processes produced the same evidence hash. The full example gate passes
+190/190 tests, the real Chrome-to-Deno HTTP/3 gate admitted the client and
+accepted inputs, and a freshly rebuilt native Defold-to-Deno session remained
+admitted with continuous telemetry for more than 60 seconds. The long native
+run is a manual loopback observation; the checked artifacts retain their
+narrower packaged-runtime and short real-WebTransport claims.
+
+Claude's read-only adversarial review first identified the cancel-during-create,
+post-ACK tracking, high-RTT history, fallback-queue, persistent-lane, and visual
+evidence-contract risks. Each accepted transport claim now has a targeted
+regression. The VS Code observation was not silently re-recorded: a migration
+verified the prior full-file SHA-256 against `d3c41a5`, proved its ordered
+property/default projection equals the current arena source, and then sealed
+that semantic projection in the evidence record.
+
+The stale-snapshot deadline is now driven by the same injected monotonic clock
+as the match tick, not by a host `setTimeout`. `beginTick()` and
+`sendSnapshot()` sweep expired entries in the fixed eight-slot ring, so a test
+can advance time synchronously and recover capacity without relying on
+event-loop scheduling. ACK age is compared with the full 64-frame history,
+not the eight-stream send window; a roughly 400 ms RTT therefore does not
+create an artificial 3 Hz ceiling, while an ACK older than the ring forces a
+keyframe. The focused injected-clock and high-RTT-cadence regressions and the
+complete War Battles core suite pass (92/92); this proves deterministic bounded
+capacity, not WAN latency or browser delivery quality.
+
 ## 2026-09-24 - GUI handle consumers preserve optional arity and producer identity
 
 The reproduced `gui.isEnabled(node)` argument-count error came from the handle

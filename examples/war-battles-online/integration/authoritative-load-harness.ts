@@ -6,10 +6,16 @@ import {
   type GameTransport,
   type ReliableChannel,
   type SendDisposition,
+  SESSION_TOKEN_BYTES,
+  type SessionTokenClaims,
+  type SessionTokenExpectation,
+  type SessionTokenProvider,
   type TransportReceiver,
 } from "../core/index.ts";
 
 export const LOAD_HARNESS_SCHEMA_VERSION = 1;
+/** Conservative floor below the deterministic 98.5% impaired-run baseline. */
+export const MINIMUM_INPUT_ACCEPTANCE_RATIO = 0.95;
 export const LOAD_HARNESS_CONFIG = Object.freeze({
   players: 32,
   ticks: 600,
@@ -25,6 +31,27 @@ export const LOAD_HARNESS_CONFIG = Object.freeze({
 });
 
 const RELIABLE_CHANNELS: readonly ReliableChannel[] = [1, 2, 3, 4];
+
+/**
+ * The load gate proves simulation and transport behavior, not WebCrypto.
+ * Keeping token issue completion synchronous and ordered prevents host crypto
+ * scheduling from perturbing the seeded network packet sequence between runs.
+ */
+class DeterministicLoadTokenProvider implements SessionTokenProvider {
+  issue(claims: SessionTokenClaims): Promise<Uint8Array> {
+    const token = new Uint8Array(SESSION_TOKEN_BYTES);
+    const view = new DataView(token.buffer);
+    view.setUint32(0, claims.matchId, true);
+    view.setUint32(4, claims.slot, true);
+    view.setUint32(8, claims.generation, true);
+    view.setUint32(12, claims.issuedAtTick, true);
+    return Promise.resolve(token);
+  }
+
+  verify(_token: Uint8Array, _expected: SessionTokenExpectation): Promise<SessionTokenClaims | null> {
+    return Promise.resolve(null);
+  }
+}
 
 interface PendingPacket {
   readonly id: number;
@@ -294,7 +321,8 @@ export async function runAuthoritativeLoadHarness(
     matchId: config.matchId,
     mapSeed: config.mapSeed,
     rosterSize: config.players,
-    resumeSecret: config.seed,
+    resumeTokenService: new DeterministicLoadTokenProvider(),
+    nowMilliseconds: () => network.time(),
     onError: (error) => serverErrors.push(String(error instanceof Error ? error.message : error)),
     onLog: (line) => serverLogs.push(line),
   });
@@ -330,7 +358,7 @@ export async function runAuthoritativeLoadHarness(
   let simulationTime = config.baseLatencyMilliseconds * 4 + config.jitterMilliseconds * 2;
   network.advanceTo(simulationTime);
   await settleInitialAdmissions(sessions, () => {
-    // Protocol-v8 admission is a reliable hello/welcome/ack exchange. Pump one
+    // Protocol-v9 admission is a reliable hello/welcome/ack exchange. Pump one
     // worst-case reliable latency per host-crypto turn while the simulation
     // clock remains paused; completion still requires the server-side ack.
     simulationTime += config.baseLatencyMilliseconds + config.jitterMilliseconds + 1;
@@ -367,9 +395,21 @@ export async function runAuthoritativeLoadHarness(
     simulationTime += TICK_MILLISECONDS;
   }
 
+  // Prediction intentionally leaves each client at its adaptive lead. Stop
+  // producing commands, advance the server through the furthest predicted
+  // tick, then finish the current snapshot cadence. This drains any configured
+  // or learned lead without assuming the old fixed value of two.
+  const predictedTargetTick = Math.max(...clients.map((client) => client.world?.tick ?? server.world.tick));
+  while (server.world.tick < predictedTargetTick || server.world.tick % server.snapshotIntervalTicks !== 0) {
+    server.step();
+    simulationTime += TICK_MILLISECONDS;
+    network.advanceTo(simulationTime);
+    await Promise.resolve();
+  }
+
   // Reliable frames are allowed to settle, including the final pending
   // snapshot for each session. update(0) applies the latest decoded frame
-  // without advancing prediction beyond the authoritative tick.
+  // without creating another predicted command.
   for (let step = 0; step <= config.drainMilliseconds; step += 1) {
     network.advanceTo(simulationTime + step);
     await Promise.resolve();
@@ -397,6 +437,10 @@ export async function runAuthoritativeLoadHarness(
       snapshotsIgnored: client.stats.snapshotsIgnored,
       inputsSent: client.stats.inputsSent,
       inputsDropped: client.stats.inputsDropped,
+      inputCommandsSent: client.stats.inputCommandsSent,
+      inputLeadTicks: client.stats.inputLeadTicks,
+      inputLeadIncreases: client.stats.inputLeadIncreases,
+      rateLimitAdvisories: client.stats.rateLimitAdvisories,
       replayedTicks: client.stats.replayedTicks,
       converged,
       errors: clientErrors[index]!.length,
@@ -416,20 +460,28 @@ export async function runAuthoritativeLoadHarness(
     config.players * 2 * (config.datagramQueueCapacity + config.reliableQueueCapacity * RELIABLE_CHANNELS.length);
   const boundedQueues = network.stats.peakQueue <= queueBound;
   const everyClientAttemptedEveryTick = clientRows.every(
-    (client) => client.inputsSent + client.inputsDropped === config.ticks,
+    (client) => client.inputsSent + client.inputsDropped === config.ticks + client.inputLeadIncreases,
   );
+  const generatedInputCommands = clientRows.reduce(
+    (total, client) => total + config.ticks + client.inputLeadIncreases,
+    0,
+  );
+  const inputAcceptanceRatio = server.stats.inputsAccepted / generatedInputCommands;
+  const inputLateRatio = server.stats.inputsLate / generatedInputCommands;
+  const inputCommandsUnobserved = generatedInputCommands - server.stats.inputsAccepted - server.stats.inputsLate;
   if (
     !allConverged ||
     uniquePlayerIds.size !== config.players ||
     !reliableOrderPreserved ||
     !reliableDeliveryComplete ||
     !everyClientAttemptedEveryTick ||
+    inputAcceptanceRatio < MINIMUM_INPUT_ACCEPTANCE_RATIO ||
     !noErrors ||
     !boundedQueues ||
     network.queue.length !== 0
   ) {
     throw new Error(
-      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, everyClientAttemptedEveryTick, noErrors, pending: network.queue.length, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
+      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, everyClientAttemptedEveryTick, inputAcceptanceRatio, minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO, noErrors, pending: network.queue.length, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
     );
   }
   return Object.freeze({
@@ -458,6 +510,12 @@ export async function runAuthoritativeLoadHarness(
       snapshotsSent: server.stats.snapshotsSent,
       inputsAccepted: server.stats.inputsAccepted,
       inputsRejected: server.stats.inputsRejected,
+      inputsLate: server.stats.inputsLate,
+      generatedInputCommands,
+      inputAcceptanceRatio,
+      inputLateRatio,
+      inputCommandsUnobserved,
+      minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO,
       logs: serverLogs.length,
       sessionsReady: sessions.filter((session) => session.ready).length,
     },
@@ -469,6 +527,8 @@ export async function runAuthoritativeLoadHarness(
       minInputsSent: Math.min(...clientRows.map((client) => client.inputsSent)),
       maxInputsSent: Math.max(...clientRows.map((client) => client.inputsSent)),
       maxInputsDropped: Math.max(...clientRows.map((client) => client.inputsDropped)),
+      minInputLeadTicks: Math.min(...clientRows.map((client) => client.inputLeadTicks)),
+      maxInputLeadTicks: Math.max(...clientRows.map((client) => client.inputLeadTicks)),
       maxSnapshotsIgnored: Math.max(...clientRows.map((client) => client.snapshotsIgnored)),
     },
     convergence: {

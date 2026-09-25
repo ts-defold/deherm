@@ -192,3 +192,5 @@ export const SNAPSHOT_BYTES =
   MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES +
   MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES +
   COVER_SNAPSHOT_BYTES;
+/** 3.2 seconds of 20 Hz authoritative bases, shared by server and client. */
+export const SNAPSHOT_BASE_HISTORY_FRAMES = 64;

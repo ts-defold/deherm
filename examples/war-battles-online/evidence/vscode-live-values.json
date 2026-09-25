@@ -48,11 +48,6 @@
   },
   "sourceInputs": [
     {
-      "path": "package.json",
-      "bytes": 46297,
-      "sha256": "0da6e5d638818be19210773a41deb6e4ca88d2b08d6af32a89d6d9cc6a16e6c1"
-    },
-    {
       "path": "editors/vscode/package.json",
       "bytes": 3877,
       "sha256": "6ccd3a7949ce76b22e94bda49a0220126b40f1faf172c97da240e35b5d343267"
@@ -71,22 +66,28 @@
       "path": "packages/cli/src/dev/inspector-bridge.mjs",
       "bytes": 12191,
       "sha256": "a14e9b63ab7bc09ca1e1152614174d191c6f7ec04283eb21732c793169e9ca01"
-    },
-    {
-      "path": "examples/war-battles-online/defold/main/arena.script.ts",
-      "bytes": 31304,
-      "sha256": "6d901cf6309361338c5f0b81c924a54007bded4de93934887d0efdec38dc71e9"
-    },
-    {
-      "path": "examples/war-battles-online/integration/check-vscode-visual.mjs",
-      "bytes": 5350,
-      "sha256": "28115bb0b23b401d88a7ef74725ff869a752d5e0d2eddeb98bbb20801b8d2ad3"
-    },
-    {
-      "path": "examples/war-battles-online/integration/vscode-visual-evidence.mjs",
-      "bytes": 5780,
-      "sha256": "e5191118898425553eae3cb70ef4178cf5d2e0a22385014dced23d14b983186c"
     }
   ],
-  "evidenceKey": "ef1cab6be1accdb3c0073d760ae16490fa73b6e5acd7320128012f991cd430be"
+  "evidenceKey": "d18cc11761519822c22d9f2bea55e6404993baada5e68c56c004e80727cf4010",
+  "arenaPropertyProjection": {
+    "path": "examples/war-battles-online/defold/main/arena.script.ts",
+    "declarations": [
+      {
+        "name": "players",
+        "value": 8
+      },
+      {
+        "name": "botSkill",
+        "value": 1
+      },
+      {
+        "name": "mapSeed",
+        "value": 0
+      },
+      {
+        "name": "autoEngageSeconds",
+        "value": 0
+      }
+    ]
+  }
 }

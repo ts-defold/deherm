@@ -91,6 +91,23 @@ export interface CircleResolution {
   hitY: boolean;
 }
 
+/** Caller-owned, fixed-capacity scratch for deterministic arena routing. */
+export interface ArenaRouteScratch {
+  readonly frontier: Int32Array;
+  readonly parent: Int32Array;
+  readonly visited: Uint32Array;
+  generation: number;
+}
+
+export function createArenaRouteScratch(): ArenaRouteScratch {
+  return {
+    frontier: new Int32Array(MAP_CELLS),
+    parent: new Int32Array(MAP_CELLS),
+    visited: new Uint32Array(MAP_CELLS),
+    generation: 0,
+  };
+}
+
 /** Centre of a cell, in simulation units. */
 export function cellCentreX(cellX: number): number {
   return WORLD_MIN_X + cellX * TILE_UNITS + TILE_UNITS / 2;
@@ -263,6 +280,93 @@ export class ArenaMap {
       if (this.solidAt(cellX, cellY)) return false;
     }
     return true;
+  }
+
+  /**
+   * Finds the farthest immediately visible waypoint on a shortest open-cell
+   * route. The search is breadth-first because every tank traversal edge has
+   * the same cost; deterministic neighbour rotation lets roster slots choose
+   * different equal-cost corridors without random state or heap allocation.
+   * Returns the route length in cells, or `-1` when the goal is unreachable.
+   */
+  routeWaypoint(
+    startX: number,
+    startY: number,
+    goalX: number,
+    goalY: number,
+    routeBias: number,
+    scratch: ArenaRouteScratch,
+    output: WorldPoint,
+  ): number {
+    const startCellX = cellOfX(startX);
+    const startCellY = cellOfY(startY);
+    const goalCellX = cellOfX(goalX);
+    const goalCellY = cellOfY(goalY);
+    if (this.solidAt(startCellX, startCellY) || this.solidAt(goalCellX, goalCellY)) return -1;
+    const start = this.index(startCellX, startCellY);
+    const goal = this.index(goalCellX, goalCellY);
+    if (start === goal || this.lineOfSight(startX, startY, goalX, goalY)) {
+      output.x = goalX;
+      output.y = goalY;
+      return 0;
+    }
+
+    scratch.generation = (scratch.generation + 1) >>> 0;
+    if (scratch.generation === 0) {
+      scratch.visited.fill(0);
+      scratch.generation = 1;
+    }
+    const generation = scratch.generation;
+    let read = 0;
+    let write = 0;
+    scratch.frontier[write++] = start;
+    scratch.visited[start] = generation;
+    scratch.parent[start] = -1;
+    let found = false;
+    const bias = routeBias & 3;
+    while (read < write && !found) {
+      const cell = scratch.frontier[read++]!;
+      const x = cell % MAP_WIDTH;
+      const y = Math.trunc(cell / MAP_WIDTH);
+      for (let step = 0; step < 4; step += 1) {
+        const direction = (step + bias) & 3;
+        const nextX = x + (direction === 0 ? 1 : direction === 2 ? -1 : 0);
+        const nextY = y + (direction === 1 ? 1 : direction === 3 ? -1 : 0);
+        if (nextX < 0 || nextY < 0 || nextX >= MAP_WIDTH || nextY >= MAP_HEIGHT) continue;
+        if (this.solidAt(nextX, nextY)) continue;
+        const next = this.index(nextX, nextY);
+        if (scratch.visited[next] === generation) continue;
+        scratch.visited[next] = generation;
+        scratch.parent[next] = cell;
+        scratch.frontier[write++] = next;
+        if (next === goal) {
+          found = true;
+          break;
+        }
+      }
+    }
+    if (!found) return -1;
+
+    let cursor = goal;
+    let routeLength = 0;
+    let waypoint = goal;
+    let haveWaypoint = false;
+    while (cursor !== start && routeLength < MAP_CELLS) {
+      const cellX = cursor % MAP_WIDTH;
+      const cellY = Math.trunc(cursor / MAP_WIDTH);
+      const candidateX = cellCentreX(cellX);
+      const candidateY = cellCentreY(cellY);
+      if (!haveWaypoint && this.lineOfSight(startX, startY, candidateX, candidateY)) {
+        waypoint = cursor;
+        haveWaypoint = true;
+      }
+      cursor = scratch.parent[cursor]!;
+      routeLength += 1;
+      if (cursor < 0) return -1;
+    }
+    output.x = cellCentreX(waypoint % MAP_WIDTH);
+    output.y = cellCentreY(Math.trunc(waypoint / MAP_WIDTH));
+    return routeLength;
   }
 
   /** Nearest open cell centre to a world point, searched in rings. */

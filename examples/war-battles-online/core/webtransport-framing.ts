@@ -45,6 +45,11 @@ export class ReliableFrameDecoder {
   private payload: Uint8Array | undefined;
   private payloadBytes = 0;
 
+  /** Channel already named by a partial frame, if its header arrived. */
+  get partialChannel(): ReliableChannel | undefined {
+    return this.channel;
+  }
+
   push(chunk: Uint8Array, emit: (channel: ReliableChannel, payload: Uint8Array) => void): void {
     let offset = 0;
     while (offset < chunk.byteLength) {

@@ -1,10 +1,13 @@
 import {
   BattleClient,
   NetworkBotDriver,
+  TRANSPORT_CHANNEL_SNAPSHOT,
   WebTransportGameClient,
   type ClientState,
+  type TransportReceiver,
   type WebTransportConnectionOptions,
 } from "../core/index.ts";
+import { NetworkBotClock } from "./network-bot-clock.ts";
 
 interface DashboardConfig {
   readonly webTransportUrl: string;
@@ -23,6 +26,7 @@ interface BotRow {
   readonly index: number;
   readonly client: BattleClient;
   readonly driver: NetworkBotDriver;
+  readonly clock: NetworkBotClock;
   state: ClientState | "opening" | "failed";
   error: string;
   transport?: WebTransportGameClient;
@@ -42,6 +46,7 @@ export interface NetworkBotDashboardBotSummary {
   readonly nonIdleCommands: number;
   readonly chassisRequests: number;
   readonly weaponUpgradeRequests: number;
+  readonly observedTravelUnits: number;
 }
 
 export interface NetworkBotDashboardSummary {
@@ -78,7 +83,6 @@ let configured: DashboardConfig = {
 };
 let generation = 0;
 let timer: number | undefined;
-let lastFrame = performance.now();
 let activeConnectionKey = "";
 
 const byId = <T extends HTMLElement>(id: string): T => {
@@ -134,7 +138,12 @@ const api: NetworkBotDashboardApi = {
       rows.push(row);
       render();
       try {
-        const transport = await WebTransportGameClient.connect(url, row.client, undefined, connectionOptions);
+        const transport = await WebTransportGameClient.connect(
+          url,
+          networkBotReceiver(row),
+          undefined,
+          connectionOptions,
+        );
         if (activeGeneration !== generation) {
           transport.close(1000, "dashboard run replaced");
           break;
@@ -151,7 +160,8 @@ const api: NetworkBotDashboardApi = {
       await delay(20);
     }
     if (activeGeneration !== generation) return;
-    lastFrame = performance.now();
+    const now = performance.now();
+    for (const row of rows) row.clock.reset(now);
     timer = window.setInterval(tick, frameMilliseconds);
     startButton.disabled = false;
     render();
@@ -205,6 +215,7 @@ function makeBot(index: number, skill: number): BotRow {
     assistAim: false,
     onWelcome: () => {
       row.state = "ready";
+      row.clock.reset(performance.now());
       saveResumeToken(row);
     },
     onClose: (close) => {
@@ -222,10 +233,12 @@ function makeBot(index: number, skill: number): BotRow {
   });
   const resumeToken = resumeTokens[index];
   if (resumeToken !== undefined) client.resumeToken.set(resumeToken);
+  const driver = new NetworkBotDriver(client, { skill });
   Object.assign(row, {
     index,
     client,
-    driver: new NetworkBotDriver(client, { skill }),
+    driver,
+    clock: new NetworkBotClock(client, driver, performance.now()),
     state: "opening" as const,
     error: "",
     lastPingAt: 0,
@@ -235,10 +248,8 @@ function makeBot(index: number, skill: number): BotRow {
 
 function tick(): void {
   const now = performance.now();
-  const elapsed = Math.min(250, Math.max(0, now - lastFrame));
-  lastFrame = now;
   for (const row of rows) {
-    row.driver.update(elapsed, 8);
+    row.clock.update(now);
     if (row.client.state === "ready" && now - row.lastPingAt >= 1_000) {
       row.client.ping(Date.now());
       row.lastPingAt = now;
@@ -290,6 +301,7 @@ function summary(): NetworkBotDashboardSummary {
       nonIdleCommands: row.driver.stats.nonIdleCommands,
       chassisRequests: row.driver.stats.chassisRequests,
       weaponUpgradeRequests: row.driver.stats.weaponUpgradeRequests,
+      observedTravelUnits: row.clock.observedTravelUnits,
     });
   }
   return {
@@ -303,6 +315,24 @@ function summary(): NetworkBotDashboardSummary {
     maximumRoundTripMilliseconds,
     players,
     bots,
+  };
+}
+
+function networkBotReceiver(row: BotRow): TransportReceiver {
+  return {
+    onReliable(channel, payload) {
+      row.client.onReliable(channel, payload);
+      // Browser timers are deliberately not an authority for a network bot.
+      // A received snapshot proves the session clock advanced and remains a
+      // prompt wake-up even while the dashboard tab is behind the native game.
+      if (channel === TRANSPORT_CHANNEL_SNAPSHOT) row.clock.onSnapshot(performance.now());
+    },
+    onDatagram(payload) {
+      row.client.onDatagram(payload);
+    },
+    onClose(code, reason) {
+      row.client.onClose(code, reason);
+    },
   };
 }
 
@@ -339,6 +369,7 @@ function renderBot(row: BotRow): HTMLTableRowElement {
     row.client.stats.snapshotsApplied,
     row.client.stats.inputsSent,
     row.client.stats.inputsDropped,
+    row.clock.observedTravelUnits,
     row.client.stats.lastRoundTripMilliseconds || "—",
     row.error || "—",
   ];

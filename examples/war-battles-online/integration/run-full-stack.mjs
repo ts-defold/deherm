@@ -5,6 +5,8 @@ import { access, readFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { createDefoldBuilder } from "../../../packages/cli/src/dev/defold-builder.mjs";
+
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 if (process.argv.includes("--help") || process.argv.includes("-h")) {
   console.log(`Usage: pnpm stack -- [options]
@@ -17,7 +19,9 @@ Starts the Deno HTTP/3 match server, packaged native game, and browser bot dashb
   --quic-port <port>     WebTransport port (default: 4433)
   --health-port <port>   HTTP health/WebSocket port (default: 8080)
   --dashboard-port <p>   bot dashboard port (default: 8090)
+  --build-server <url>   local Defold Extender (default: http://127.0.0.1:9010)
   --deno <path>          Deno executable (default: DEHERM_DENO or deno)
+  --no-build             explicitly reuse an existing packaged native game
   --no-browser           do not open the bot dashboard`);
   process.exit(0);
 }
@@ -30,9 +34,11 @@ const webTransportUrl = `https://localhost:${options.quicPort}`;
 const healthUrl = `http://localhost:${options.healthPort}/health`;
 const dashboardUrl = `http://127.0.0.1:${options.dashboardPort}/?autostart=${options.bots}&skill=${options.skill}`;
 const children = new Set();
+const childOutput = new WeakMap();
 let stopping = false;
 
 try {
+  if (!options.noBuild) await buildPackagedGame(options.buildServer);
   execFileSync(join(exampleRoot, "server/make-cert.sh"), { cwd: exampleRoot, stdio: "inherit" });
   execFileSync(process.execPath, [join(exampleRoot, "bot-dashboard/build.mjs")], {
     cwd: exampleRoot,
@@ -64,9 +70,14 @@ try {
     "--bot-skill",
     String(options.skill),
   ]);
-  await waitFor(async () => (await fetch(healthUrl).catch(() => undefined))?.ok === true, "match server");
+  await waitFor(
+    async () =>
+      saw(server, "war-battles-server:listening:") && (await fetch(healthUrl).catch(() => undefined))?.ok === true,
+    "match server",
+    server,
+  );
 
-  start("dashboard", options.deno, [
+  const dashboard = start("dashboard", options.deno, [
     "run",
     "--allow-net",
     "--allow-read",
@@ -82,22 +93,32 @@ try {
     "--maximum-bots",
     String(options.roster - 1),
   ]);
-  await waitFor(async () => (await fetch(dashboardUrl).catch(() => undefined))?.ok === true, "bot dashboard");
+  await waitFor(
+    async () =>
+      saw(dashboard, "war-battles-network-bot-dashboard:listening:") &&
+      (await fetch(dashboardUrl).catch(() => undefined))?.ok === true,
+    "bot dashboard",
+    dashboard,
+  );
 
   const game = start("game", process.execPath, [
     "integration/play-packaged.mjs",
     `--config=war_battles.server=${webTransportUrl}`,
     `--config=war_battles.server_certificate_sha256=${fingerprint}`,
   ]);
-  await waitFor(async () => {
-    if (game.exitCode !== null || game.signalCode !== null) {
-      throw new Error("The packaged game exited before joining the match; build it with `pnpm dev --once` first");
-    }
-    const response = await fetch(healthUrl).catch(() => undefined);
-    if (!response?.ok) return false;
-    const health = await response.json();
-    return health.stats?.humans >= 1;
-  }, "native game admission");
+  await waitFor(
+    async () => {
+      if (game.exitCode !== null || game.signalCode !== null) {
+        throw new Error("The packaged game exited before joining the match; build it with `pnpm dev --once` first");
+      }
+      const response = await fetch(healthUrl).catch(() => undefined);
+      if (!response?.ok) return false;
+      const health = await response.json();
+      return saw(game, "war-battles:net:client-welcome:") && health.stats?.humans >= 1;
+    },
+    "native game admission",
+    game,
+  );
 
   if (!options.noBrowser) openBrowser(dashboardUrl);
   console.log(`war-battles-stack:ready:game=1:bots=${options.bots}:server=${webTransportUrl}`);
@@ -113,22 +134,80 @@ try {
 function start(name, command, arguments_) {
   const child = spawn(command, arguments_, { cwd: exampleRoot, stdio: ["ignore", "pipe", "pipe"] });
   children.add(child);
-  pipeLines(child.stdout, name, false);
-  pipeLines(child.stderr, name, true);
+  const output = [];
+  childOutput.set(child, output);
+  pipeLines(child.stdout, name, false, output);
+  pipeLines(child.stderr, name, true, output);
   child.once("error", (error) => {
     if (!stopping) console.error(`[${name}] ${error.message}`);
   });
   return child;
 }
 
-function pipeLines(stream, name, error) {
+async function buildPackagedGame(buildServer) {
+  // Compile the current TypeScript generation first. Bob consumes that owned
+  // resource; launching an older packaged binary against a newer protocol
+  // server otherwise fails closed only after an opaque admission timeout.
+  execFileSync(
+    process.execPath,
+    [
+      resolve(exampleRoot, "../../bin/deherm.mjs"),
+      "dev",
+      "--project",
+      "defold",
+      "--entry",
+      "main/player.script.ts",
+      "--watch",
+      ".",
+      "--build-server",
+      buildServer,
+      "--once",
+      "--headless",
+    ],
+    {
+      cwd: exampleRoot,
+      stdio: "inherit",
+      env: {
+        ...process.env,
+        // The project already owns the platform archive selected by `deherm
+        // generate`. A stack run compiles gameplay; it must not rotate that
+        // artifact to an unpublished contributor-worktree fingerprint.
+        DEHERM_WEBTRANSPORT_SOURCE: "defold_webtransport",
+      },
+    },
+  );
+  const builder = await createDefoldBuilder({
+    projectRoot: join(exampleRoot, "defold"),
+    buildServer,
+    emit(event) {
+      if (event.type !== "log" || !event.message) return;
+      const level = event.level === "error" ? "error" : "log";
+      console[level](`[build:${event.source ?? "deherm"}] ${event.message}`);
+    },
+  });
+  try {
+    await builder.build("War Battles full-stack preflight");
+  } finally {
+    await builder.close();
+  }
+}
+
+function pipeLines(stream, name, error, output) {
   let buffered = "";
   stream.on("data", (chunk) => {
     buffered += chunk.toString("utf8");
     const lines = buffered.split(/\r?\n/u);
     buffered = lines.pop() ?? "";
-    for (const line of lines) (error ? console.error : console.log)(`[${name}] ${line}`);
+    for (const line of lines) {
+      output.push(line);
+      if (output.length > 200) output.shift();
+      (error ? console.error : console.log)(`[${name}] ${line}`);
+    }
   });
+}
+
+function saw(child, marker) {
+  return childOutput.get(child)?.some((line) => line.includes(marker)) === true;
 }
 
 function exited(child) {
@@ -157,9 +236,12 @@ async function stopAll() {
   }
 }
 
-async function waitFor(predicate, description) {
+async function waitFor(predicate, description, child) {
   const deadline = Date.now() + 20_000;
   while (Date.now() < deadline) {
+    if (child !== undefined && (child.exitCode !== null || child.signalCode !== null)) {
+      throw new Error(`${description} process exited before reporting ready`);
+    }
     if (await predicate()) return;
     await new Promise((done) => setTimeout(done, 100));
   }
@@ -198,7 +280,9 @@ function parseArguments(arguments_) {
     quicPort: integer("--quic-port", 4433, 1, 65_535),
     healthPort: integer("--health-port", 8080, 1, 65_535),
     dashboardPort: integer("--dashboard-port", 8090, 1, 65_535),
+    buildServer: value("--build-server", process.env.DEHERM_BUILD_SERVER ?? "http://127.0.0.1:9010"),
     deno: value("--deno", process.env.DEHERM_DENO ?? "deno"),
+    noBuild: arguments_.includes("--no-build"),
     noBrowser: arguments_.includes("--no-browser"),
   };
 }

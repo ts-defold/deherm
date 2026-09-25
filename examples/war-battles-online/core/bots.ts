@@ -38,6 +38,7 @@ import {
   weaponUpgradeId,
 } from "./content.ts";
 import { clamp, length, mixSigned, normalizeInto, createDirection, type Direction } from "./fixed.ts";
+import { createArenaRouteScratch, type WorldPoint } from "./arena.ts";
 import type { InputCommand } from "./protocol.ts";
 import type { BattleWorld } from "./world.ts";
 
@@ -141,8 +142,15 @@ export class BotController {
   private readonly strafeSign = new Int8Array(MAX_PLAYERS);
   private readonly avoidSign = new Int8Array(MAX_PLAYERS);
   private readonly stuckTicks = new Uint16Array(MAX_PLAYERS);
+  private readonly routeX = new Int32Array(MAX_PLAYERS);
+  private readonly routeY = new Int32Array(MAX_PLAYERS);
+  private readonly routeCost = new Uint16Array(MAX_PLAYERS);
+  private readonly routeReplans = new Uint32Array(MAX_PLAYERS);
+  private readonly routeFailures = new Uint16Array(MAX_PLAYERS);
   private readonly lastX = new Int32Array(MAX_PLAYERS);
   private readonly lastY = new Int32Array(MAX_PLAYERS);
+  private readonly routeScratch = createArenaRouteScratch();
+  private readonly routePoint: WorldPoint = { x: 0, y: 0 };
   private readonly move: Direction = createDirection();
   private readonly aim: Direction = createDirection();
 
@@ -158,6 +166,21 @@ export class BotController {
     this.goalTarget.fill(-1);
     this.decideAt.fill(-1);
     this.stuckTicks.fill(0);
+    this.routeCost.fill(0);
+    this.routeReplans.fill(0);
+    this.routeFailures.fill(0);
+  }
+
+  routeCostFor(playerId: number): number {
+    return this.routeCost[playerId - 1] ?? 0;
+  }
+
+  routeReplansFor(playerId: number): number {
+    return this.routeReplans[playerId - 1] ?? 0;
+  }
+
+  routeFailuresFor(playerId: number): number {
+    return this.routeFailures[playerId - 1] ?? 0;
   }
 
   /**
@@ -286,6 +309,7 @@ export class BotController {
       this.goal[slot] = GOAL_DEPOT;
       this.goalX[slot] = world.map.spawnX[depot]!;
       this.goalY[slot] = world.map.spawnY[depot]!;
+      this.planRoute(world, slot, tick);
       return;
     }
     // Chassis purchases use the same authoritative credit path as a human
@@ -314,6 +338,7 @@ export class BotController {
       this.goal[slot] = GOAL_PICKUP;
       this.goalX[slot] = world.pickupX[pad]!;
       this.goalY[slot] = world.pickupY[pad]!;
+      this.planRoute(world, slot, tick);
       return;
     }
     // Team bots periodically contest the central beacon. They still fight on
@@ -327,12 +352,14 @@ export class BotController {
       this.goal[slot] = GOAL_OBJECTIVE;
       this.goalX[slot] = 0;
       this.goalY[slot] = 0;
+      this.planRoute(world, slot, tick);
       return;
     }
     if (enemy < 0) {
       this.goal[slot] = GOAL_PICKUP;
       this.goalX[slot] = world.pickupX[(slot * 3) % MAX_PICKUPS]!;
       this.goalY[slot] = world.pickupY[(slot * 3) % MAX_PICKUPS]!;
+      this.planRoute(world, slot, tick);
       return;
     }
     const sighted = world.map.lineOfSight(
@@ -344,7 +371,31 @@ export class BotController {
     this.goal[slot] = sighted ? GOAL_FIGHT : GOAL_HUNT;
     this.goalX[slot] = world.playerX[enemy]!;
     this.goalY[slot] = world.playerY[enemy]!;
+    this.planRoute(world, slot, tick);
     if ((hash(tick, slot * 11 + 5) & 0x3f) === 0) this.strafeSign[slot] = this.strafeSign[slot]! > 0 ? -1 : 1;
+  }
+
+  private planRoute(world: BattleWorld, slot: number, tick: number): void {
+    this.routeReplans[slot] = this.routeReplans[slot]! + 1;
+    const cost = world.map.routeWaypoint(
+      world.playerX[slot]!,
+      world.playerY[slot]!,
+      this.goalX[slot]!,
+      this.goalY[slot]!,
+      slot + (tick >>> 6),
+      this.routeScratch,
+      this.routePoint,
+    );
+    if (cost < 0) {
+      this.routeFailures[slot] = this.routeFailures[slot]! + 1;
+      this.routeCost[slot] = 0;
+      this.routeX[slot] = this.goalX[slot]!;
+      this.routeY[slot] = this.goalY[slot]!;
+      return;
+    }
+    this.routeCost[slot] = Math.min(0xffff, cost);
+    this.routeX[slot] = this.routePoint.x;
+    this.routeY[slot] = this.routePoint.y;
   }
 
   private sampleAim(world: BattleWorld, slot: number, enemy: number, skill: BotDifficulty): void {
@@ -403,8 +454,11 @@ export class BotController {
   private steer(world: BattleWorld, slot: number, skill: BotDifficulty, tick: number): void {
     const selfX = world.playerX[slot]!;
     const selfY = world.playerY[slot]!;
-    let desiredX = this.goalX[slot]! - selfX;
-    let desiredY = this.goalY[slot]! - selfY;
+    const routeDeltaX = this.routeX[slot]! - selfX;
+    const routeDeltaY = this.routeY[slot]! - selfY;
+    const reachedRoutePoint = Math.abs(routeDeltaX) + Math.abs(routeDeltaY) < TILE_UNITS;
+    let desiredX = (reachedRoutePoint ? this.goalX[slot]! : this.routeX[slot]!) - selfX;
+    let desiredY = (reachedRoutePoint ? this.goalY[slot]! : this.routeY[slot]!) - selfY;
 
     if (this.goal[slot] === GOAL_FIGHT) {
       const weapon = weaponById(world.playerWeapon[slot]!);

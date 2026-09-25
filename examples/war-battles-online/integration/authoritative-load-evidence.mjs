@@ -111,6 +111,21 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.ok(document.transport?.observed?.droppedDatagrams > 0);
   assert.ok(document.transport?.observed?.backpressuredDatagrams > 0);
   assert.ok(document.transport?.observed?.reorderedDatagrams > 0);
+  assert.equal(document.server?.minimumInputAcceptanceRatio, 0.95);
+  assert.ok(document.server?.inputAcceptanceRatio >= document.server.minimumInputAcceptanceRatio);
+  assert.ok(document.server?.inputsLate > 0, "deterministic impairment must exercise unique late-input accounting");
+  assert.ok(document.server?.inputCommandsUnobserved >= 0);
+  assert.equal(
+    document.server?.inputsAccepted + document.server?.inputsLate + document.server?.inputCommandsUnobserved,
+    document.server?.generatedInputCommands,
+  );
+  assert.equal(document.server?.inputLateRatio, document.server?.inputsLate / document.server?.generatedInputCommands);
+  assert.equal(
+    document.server?.generatedInputCommands,
+    document.clients.rows.reduce((total, row) => total + document.config.ticks + row.inputLeadIncreases, 0),
+  );
+  assert.ok(document.clients?.minInputLeadTicks > 2);
+  assert.ok(document.clients?.maxInputLeadTicks <= 16);
   assert.ok(
     Number.isInteger(document.transport?.queueBound) &&
       document.transport.observed.peakQueue <= document.transport.queueBound,
@@ -119,7 +134,9 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
     assert.equal(row.state, "ready");
     assert.equal(row.converged, true);
     assert.equal(row.errors, 0);
-    assert.equal(row.inputsSent + row.inputsDropped, document.config.ticks);
+    assert.equal(row.inputsSent + row.inputsDropped, document.config.ticks + row.inputLeadIncreases);
+    assert.equal(row.inputLeadTicks, row.inputLeadIncreases + 2);
+    assert.equal(row.rateLimitAdvisories, 0);
   }
   return document;
 }

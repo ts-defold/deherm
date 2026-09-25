@@ -3,7 +3,8 @@ import { INPUT_BUTTON_MASK, MAX_PLAYERS, SESSION_TOKEN_BYTES, SNAPSHOT_BYTES, TI
 import { WEAPON_COUNT } from "./content";
 
 /**
- * Version 8 adds an explicit credential acknowledgement after welcome so a
+ * Version 9 allows an unreliable input datagram to carry a bounded oldest-first
+ * window of three complete commands. Version 8 adds an explicit credential acknowledgement after welcome so a
  * server never revokes the last credential merely because a welcome was
  * enqueued locally. Version 7 adds the authoritative central command-beacon state to snapshots.
  * Version 6 adds authenticated 40-byte resume credentials to hello/welcome.
@@ -15,8 +16,16 @@ import { WEAPON_COUNT } from "./content";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 8;
+export const PROTOCOL_VERSION = 9;
 export const INPUT_PACKET_BYTES = 32;
+/**
+ * One unreliable transport datagram repeats the newest command plus two recent
+ * commands. This is the same loss-tolerance shape used by classic arena
+ * shooters: losing one datagram does not necessarily lose the input transition
+ * it carried, and no retransmission queue can make stale movement arrive late.
+ */
+export const INPUT_BUNDLE_MAX_COMMANDS = 3;
+export const INPUT_BUNDLE_BYTES = INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
 

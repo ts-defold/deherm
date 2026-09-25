@@ -88,6 +88,15 @@ public-key hash the cert script prints:
 
 …or install the certificate in the system trust store.
 
+The wire lanes are deliberately asymmetric. Client hello, welcome-ack, and
+control frames share one ordered bidirectional QUIC stream; input commands use
+unreliable datagrams. Server welcome/control frames share one ordered
+unidirectional stream, while every replaceable snapshot owns a separate stream
+that is retired after its one frame or reset after 300 ms. Both peers keep a
+64-entry acknowledged snapshot history (3.2 seconds at 20 Hz), while the server
+allows at most eight unsettled snapshot streams. Several out-of-order deltas
+can therefore use the same exact base without making the stream window grow.
+
 **Two clients:** open the bundle in two browser windows, or two separate Chrome
 profiles. Each gets its own `WebTransport` session, its own slot and its own
 resume token; the remaining six tanks stay bots. There is no matchmaking, so
@@ -184,11 +193,21 @@ boundary; it does not claim a persistent-stream open count. It does not prove
 WAN ingress, native Defold transport, adverse-network behavior, 32 human
 clients, or production certificate policy.
 
+Snapshot state is sent on independent cancellable WebTransport streams, capped
+at eight unsettled packets per session with a 300 ms stale deadline. This gives
+state partial-reliability semantics: a delayed packet may be reset and a newer
+packet may complete first. Delta frames use only a snapshot tick the client has
+applied and acknowledged. Session and control messages remain reliable ordered
+events; input bundles remain unreliable QUIC datagrams.
+
 ## Protocol
 
-Tick input is one 32-byte packet per tick on the unreliable lane — latest-only,
-dropped rather than queued when backpressured, and never silently promoted into
-the reliable lane. Everything else crosses inside a four-byte reliable envelope
+Tick input is one datagram per 60 Hz simulation tick on the unreliable lane.
+Each datagram carries one to three complete 32-byte commands, newest plus up to
+two predecessors. It is dropped rather than queued when backpressured and never
+silently promoted into the reliable lane. The server stages still-future
+commands oldest-first and ignores already-consumed redundant copies. Everything
+else crosses inside a four-byte reliable envelope
 whose kind fixes the lane it is allowed on:
 
 | Kind            | Lane     | Direction       | Bytes                                     |
@@ -201,7 +220,8 @@ whose kind fixes the lane it is allowed on:
 | `control`       | control  | client → server | 8                                         |
 | `snapshot`      | snapshot | server → client | 17,776 keyframe; compact delta after join |
 
-`PROTOCOL_VERSION` is 8: snapshots carry the authoritative command-beacon
+`PROTOCOL_VERSION` is 9: bounded input-command redundancy is the versioned wire
+change. Snapshots carry the authoritative command-beacon
 state, while hello/welcome frames carry 40-byte authenticated
 resume credentials, the client echoes the exact welcome credential before its
 rotation becomes current, and the snapshot carries the authoritative chassis and
@@ -212,16 +232,16 @@ version 1 reserved byte 15 and wrote zero there, and that byte is now the weapon
 request, so every other field kept its offset.
 
 Snapshot frames have a 16-byte envelope/codec header. A keyframe carries the
-17,760-byte raw world image. Established sessions receive sorted,
+17,888-byte raw world image. Established sessions receive sorted,
 non-overlapping changed-byte runs against their own fixed-capacity baseline;
-the server emits a keyframe at least every 20 snapshots, and a backpressured
-or replaced latest-only frame forces the next one. The client rejects a delta
+the server emits a keyframe at least every 20 snapshots. The client rejects a delta
 whose base tick is unavailable, so loss or late join cannot silently apply a
-partial world. The server also permits only one snapshot send in flight and
-retains one latest pending raw state; if that replacement is needed, it is a
-keyframe, never a delta that depends on an undelivered frame. The codec's
-encode/decode loops allocate no typed-array views or heap objects after setup;
-one baseline, decode buffer, and pending raw state are allocated per client.
+partial world. The match owns one 1,144,832-byte/64-frame raw history, each
+server session owns one 17,888-byte acknowledged baseline plus eight bounded
+stream slots, and each predicting client owns its own 1,144,832-byte exact-base
+history. The codec's encode/decode loops allocate no typed-array views or heap
+objects after setup; transport streams still have their explicitly bounded
+host resources.
 The final transport call still creates one bounded payload view at the send
 boundary; that is transport framing and is not a codec allocation claim.
 The decoder rejects nonzero reserved header fields and keyframes with a base

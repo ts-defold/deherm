@@ -14,6 +14,22 @@ sources:
     resource: https://github.com/ts-defold/tsd-template-war-battles
     title: Existing ts-defold War Battles template
     author: team:ts-defold
+  - id: quake3-client-input
+    resource: https://github.com/id-Software/Quake-III-Arena/blob/master/code/client/cl_input.c
+    title: Quake III Arena client input transport
+    author: organization:id-software
+  - id: quake3-client-prediction
+    resource: https://github.com/id-Software/Quake-III-Arena/blob/master/code/cgame/cg_predict.c
+    title: Quake III Arena client prediction
+    author: organization:id-software
+  - id: quake3-aas-routing
+    resource: https://github.com/id-Software/Quake-III-Arena/blob/master/code/botlib/be_aas_route.c
+    title: Quake III Arena AAS routing
+    author: organization:id-software
+  - id: supertripland-webtransport
+    resource: https://x.com/0xGuavaGuy/status/2093400953294582110
+    title: 128-Ticks Per Second Multiplayer in a Web Browser
+    author: person:guavaguy
 ---
 
 # Outcome
@@ -175,15 +191,27 @@ evidence; the broader multiplayer release gate remains open.
 
 The production `GameTransport` adapter now passes a loopback Chrome-to-Deno 2.9
 HTTP/3/WebTransport gate. Chrome completes the 32-player authoritative welcome,
-applies multiple 20 Hz snapshots over the reliable lane, sends tick inputs as
-QUIC datagrams, and observes the authoritative MatchServer accept them.
-Repeated reliable frames use the existing bounded five-byte framing; focused
-adapter tests prove one persistent server stream and latest-only snapshot
-backpressure, while the loopback record makes no stream-open-count claim. The
+applies multiple 20 Hz snapshots, sends tick inputs as QUIC datagrams, and
+observes the authoritative MatchServer accept them. Snapshot state now uses one
+independently cancellable stream per packet; ordered session/control delivery
+remains separate. Repeated frames use the existing bounded five-byte framing;
+focused adapter tests prove stream-local stale cancellation, while the loopback
+record makes no stream-open-count claim. The
 evidence artifact is mechanically source-bound, records the browser and Deno
 versions, and explicitly excludes WAN, ingress, native Defold, impairment,
 load, persistent-stream runtime, and allocation claims. Those remain separate
 gates rather than implied by loopback transport success.
+
+Server terminal rejects use the same persistent ordered event stream. When a
+reject is immediately followed by session close, the adapter stops admitting
+new frames, drains the bounded reliable FIFO, closes the stream to emit FIN,
+and only then closes the WebTransport session. A one-second deadline still
+closes a session whose stream sink never settles. The focused regression uses
+an asynchronous Web Streams sink where premature session close discards queued
+bytes; it proves terminal reject delivery before close rather than relying on
+the synchronous in-memory transport. `REJECT_RATE_LIMITED` remains different:
+it is an advisory on the live control lane, increments client telemetry, and
+does not close or reject an already-ready client.
 
 ## Network bot dashboard tranche
 
@@ -195,7 +223,7 @@ production WebTransport surface the HTML5 game uses. The dashboard therefore
 opens one genuine HTTP/3/WebTransport session per bot without adding a Node
 native-addon dependency or inventing a Deno-only protocol.
 
-`core/network-bot.ts` is the only adaptation seam. It feeds the existing
+`core/network-bot.ts` is the only intent-adaptation seam. It feeds the existing
 `BotController` from each `BattleClient`'s predicted/reconciled `BattleWorld`,
 then copies the staged intent into the ordinary client controls. Local,
 authoritative-server, and network bots share the same difficulty rows and
@@ -206,21 +234,84 @@ focused exact-call test proves the adapter mapping and an independent server
 control test proves authoritative application; the short real-QUIC bot gate
 does not manufacture credits and therefore does not claim to observe a purchase.
 
+The dashboard's foreground interval is not a gameplay-clock authority. Chromium
+may throttle that interval when the packaged native game owns focus, which used
+to leave a session visibly ready while its tank received only occasional input
+bursts and coasted to a stop. Each bot now has an independent bounded clock that
+is also awakened by authoritative snapshot delivery. The network wake applies
+the latest snapshot first, records movement from the reconciled client view, then
+advances at most 250 milliseconds/eight client steps; it neither builds an
+unbounded catch-up queue nor depends on a foreground browser tab.
+
 `pnpm bots:dashboard` builds and hosts the operator UI. It reports per-session
-slot, state, server tick, snapshots, inputs, drops, RTT, and last error, with
-count and skill controls up to the 32-player cap. `pnpm runtime:network-bots`
+slot, state, server tick, snapshots, inputs, drops, reconciled travel, RTT, and
+last error, with count and skill controls up to the 32-player cap.
+`pnpm runtime:network-bots`
 is the executable acceptance gate: it starts the Deno HTTP/3 server and a fresh
 headless Chrome, admits four independent dashboard sessions, observes unique
 authoritative slots and replacement of four server bots, applies snapshots,
 sends inputs, and requires `MatchServer` to accept those inputs. The gate checks
-every bot independently for snapshots, inputs, and a non-idle decision instead
-of accepting aggregate traffic as proof. A same-endpoint skill redeploy must
+every bot independently for snapshots, inputs, a non-idle decision, and nonzero
+travel in the reconciled view after authoritative snapshots instead of accepting
+aggregate traffic or local prediction as proof. A deterministic unit test also
+proves that snapshot wakes keep advancing during a fully absent dashboard timer
+and retain the catch-up bound. A same-endpoint skill redeploy must
 retain the live sessions and their authoritative player slots; explicit stops
 retain resume credentials for a later restart. The dashboard sends periodic
 protocol pings so its RTT column is live telemetry rather than decoration.
 This is real loopback browser-to-Deno QUIC evidence; it does not claim WAN
 behavior, long-duration load, packet
 impairment, or native-Defold client coverage.
+
+## Arena-shooter replication and navigation wave
+
+The authoritative simulation remains 60 Hz. Human and network-bot clients
+predict at that same rate and submit one unreliable datagram per tick. Protocol
+9 repeats up to three complete commands oldest-first in each datagram; the
+server ignores consumed copies and stages every still-future command. This is a
+bounded loss-recovery window, not a retransmission queue. The deterministic
+loss test drops every second datagram and still observes continuous
+authoritative travel with zero protocol rejections.
+
+Server state remains 20 Hz by default. Prediction now advances the local world
+by `leadTicks` and preserves every command's tick on the wire. The former path
+predicted command N locally but retimestamped it to N + leadTicks for the
+server, which guaranteed repeated corrections. Local simulation accepts each
+authoritative correction and replays later commands on their exact original
+ticks; presentation decays only the remaining visual error over 100 ms. Remote
+players interpolate between authoritative samples.
+
+Snapshot delivery is replaceable state, not an ordered event log. Each packet
+owns an independent WebTransport stream, up to eight unsettled streams; streams
+still pending after 300 ms are reset, acknowledged streams are reset before
+leaving the fixed window, and newer state is dropped while all eight slots are
+occupied. A reset is stream-local and never closes the session.
+This intentionally provides unreliable/partial-reliability semantics without
+putting large fragmented snapshots into the browser datagram queue. Inputs
+remain true unreliable QUIC datagrams. Session/control events remain reliable
+and ordered.
+
+`latestSnapshotTick` now selects the server delta base only after the client
+applied that exact snapshot and returned the acknowledgement in an input. The
+server and client retain a fixed 64-snapshot exact-base history (3.2 seconds at
+20 Hz) and the server emits a keyframe whenever the acknowledged base is
+absent. Receiving a frame does not mutate the client's decode base; applying
+it does. Consequently independently completing streams
+may arrive out of order, a bad stream cannot discard a newer complete pending
+frame, and no delta depends on state the client merely received but never used.
+Focused tests prove command-tick identity, exact acknowledged delta bases,
+bounded independent streams, and stream-local cancellation. WAN impairment is
+still a separate evidence gate.
+
+Bot movement now separates route planning from local avoidance. `ArenaMap`
+derives deterministic routes from the seeded collision grid, and
+`BotController` uses one fixed-capacity breadth-first scratch arena to pick the
+farthest visible waypoint on a shortest route. Equal-cost neighbour order is
+deterministically biased per slot so a full roster does not select one identical
+corridor. Existing steering, hazard repulsion, and stuck recovery are the
+last-metre movement layer; they no longer have to discover a route around a
+multi-cell bunker. Route cost, replans, and failures are fixed typed-array bot
+state and introduce no per-tick heap allocation.
 
 `pnpm stack` is the local operator entry point for the complete playable path.
 One supervisor reuses or creates the pinned localhost certificate, starts the
@@ -369,14 +460,37 @@ unchanged.
 `evidence/authoritative-load-32.json` record generated from the real
 `MatchServer` and `BattleClient` protocol. The bounded in-process network seam
 emulates the transport's ordered reliable-channel contract and verifies all
-6,224 reliable sends were delivered without backpressure, while applying
+6,592 reliable sends were delivered without backpressure, while applying
 reproducible 42 ms latency, ±25 ms jitter, 12% datagram loss, bounded datagram
-backpressure, and datagram reordering to all 32 clients. A 600-tick run accepted
-5,691 inputs, delivered 16,916 datagrams, dropped 2,261, backpressured 23 sends,
-observed 3,714 reordered datagrams, peaked at 130 queued packets, and drained to
-zero pending packets. Every client completed the welcome, attempted 600 inputs
-(598–600 delivered), applied authoritative snapshots, and converged on the
-server's final tick/hash with zero captured protocol errors.
+backpressure, and datagram reordering to all 32 clients. The former fixed
+two-tick lead reproduced a hidden failure: only 5,743 of 19,200 generated input
+ticks were accepted (29.9%), while already-consumed redundant commands were
+silently discarded and the evidence asserted only that some input succeeded.
+
+`BattleClient` now derives one-way transit ticks from each applied snapshot's
+tick versus its local predicted tick, subtracts the current lead to avoid a
+self-amplifying estimate, keeps a three-tick jitter margin, and grows its lead
+by at most one tick per authoritative frame up to the fixed 16-tick bound. Each
+increase performs a real predicted/staged/transmitted catch-up step; it is not
+metadata-only and adds no dynamic storage. The server uses fixed per-session
+accepted/late tick rings to distinguish already-accepted redundant copies from
+unique commands first seen after their simulation tick, including around the
+32-bit tick wrap.
+
+The current 600-tick run generated 19,348 commands, accepted 19,153 (98.992%),
+classified 169 unique commands as late and 26 as never observed. Clients learned
+a six-to-seven tick lead. The run delivered 17,016 datagrams, dropped 2,264,
+backpressured 68 sends, observed 3,907 reordered datagrams, peaked at 144 queued
+packets, and drained to zero pending packets. Every client completed welcome,
+applied authoritative snapshots, and converged on tick 609 and the same final
+hash with zero captured protocol errors. The harness fails below a conservative
+95% unique-command acceptance floor, so connectivity or convergence alone can
+no longer hide late-input collapse.
+
+`REJECT_RATE_LIMITED` is a live-session advisory, not an admission failure. A
+ready client records and logs it without entering `rejected` or invoking the
+terminal rejection callback that can trigger offline fallback. Other reject
+codes retain the terminal path; focused tests exercise both outcomes.
 The source inventory and digest in the evidence prevent stale results from
 being presented as current. This is deterministic transport/simulation load
 evidence only; it excludes WAN behavior, native Defold networking, browser
@@ -688,12 +802,29 @@ The game source no longer imports a provider-specific native adapter or pumps
 transport events itself. Browser and native builds share the same structural
 streams/datagrams consumer; browser construction delegates to the host global,
 while native construction is supplied by the generated extension facade and
-its hidden once-per-frame runtime pump. The focused game transport suite proves
-that source-level convergence, but packaged native Defold/QUIC evidence remains
-pending until the standalone extension archive is linked into a real Bob build.
+its hidden once-per-frame runtime pump.
 
-This tranche does not yet claim packaged native Defold networking, WAN deployment,
-matchmaking/account identity, network failover, or dedicated-server failover.
+The native Defold full-stack gate on 2026-09-25 exposed and then closed two
+transport-only failures that the browser gate could not reveal. First,
+client-originated hello/control frames used separate QUIC streams and could be
+delivered out of order; they now share one ordered bidirectional lane. Second,
+one-stream-per-snapshot exhausted the native facade's 64 active stream handles;
+the client now retires a complete one-frame snapshot immediately and the server
+treats that peer retirement as packet-local backpressure. The server caps eight
+outstanding state streams with a 300 ms stale deadline, aborts acknowledged
+streams before releasing their slots, and both sides retain a 64-snapshot
+exact-base history so WAN acknowledgements and sibling deltas may complete out
+of order.
+Focused exact-wire/core tests passed, real Chrome-to-Deno WebTransport passed,
+and a manually observed rebuilt native Defold-to-Deno session remained admitted
+with continuous telemetry for more than 45 seconds—well beyond the former
+roughly three-second 64-stream failure—with no stream-limit close or
+missing-base report. The checked evidence artifacts cover the shorter packaged
+runtime and real WebTransport gates; the 45-second observation is not a sealed
+artifact. This is loopback correctness evidence, not WAN loss/latency evidence.
+
+This tranche does not yet claim WAN deployment, matchmaking/account identity,
+network failover, or dedicated-server failover.
 Authenticated resume credentials, fail-closed durable admission, and local
 Docker process-restart resume are now proven at their named boundaries.
 The Deno host also owns a fixed-size, versioned and checksummed authoritative
@@ -707,15 +838,14 @@ session ledger so the world tick is not counted twice. The focused restart test 
 and restored tick/state before a new session is admitted. Slow and failing
 storage tests prove the retained queue stays bounded and that the single latest
 retry can recover without preserving an unbounded history. This remains local
-Deno/Docker evidence, not a claim that Colyseus H3 interop or native Defold
-transport is complete.
-Protocol-v8 acknowledgement, exact WebSocket Origin admission, non-root runtime
+Deno/Docker evidence, not a claim that Colyseus H3 interop is complete.
+Protocol-v9 acknowledgement, exact WebSocket Origin admission, non-root runtime
 ownership, fsync-backed atomic replacement, and wrap-safe deadlines are now
 implemented and covered by focused owner tests. Compose uses a bounded root-only
 volume migrator and runs the long-lived server as uid/gid 10001. These are
 control-plane correctness claims; a trusted public certificate, application
-identity/matchmaking, secret management, WAN failover, and packaged native
-Defold transport evidence remain separate deployment frontiers.
+identity/matchmaking, secret management, and WAN failover remain separate
+deployment frontiers.
 
 # Verification
 

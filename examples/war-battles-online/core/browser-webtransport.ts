@@ -1,4 +1,5 @@
 import {
+  TRANSPORT_CHANNEL_INPUT_FALLBACK,
   TRANSPORT_CHANNEL_SNAPSHOT,
   validateReliableChannel,
   type GameTransport,
@@ -19,11 +20,22 @@ const DATAGRAM_STAGING_SLOTS = 4;
 // rather than allowing a stalled peer to grow memory without bound.
 const MAX_PENDING_SERVER_RELIABLE_FRAMES = 32;
 const MAX_PENDING_SERVER_RELIABLE_BYTES = 256 * 1024;
+// A terminal reject must reach the ordered stream before the WebTransport
+// session is torn down. Do not, however, let a stalled peer retain a rejected
+// server session indefinitely.
+const SERVER_RELIABLE_CLOSE_GRACE_MILLISECONDS = 1_000;
 type ReliableStreamMode = "client" | "server";
 
 interface PendingServerReliableFrame {
   readonly frame: Uint8Array;
   readonly resolve: (disposition: SendDisposition) => void;
+}
+
+interface PendingServerClose {
+  readonly code: number;
+  readonly reason: string;
+  readonly timeout: ReturnType<typeof setTimeout>;
+  finalizing: boolean;
 }
 
 export interface WebTransportDatagramsLike {
@@ -35,18 +47,14 @@ export interface WebTransportDatagramsLike {
   readonly maxDatagramSize?: number;
 }
 
-function createDatagramWriter(
-  datagrams: WebTransportDatagramsLike,
-): WritableStreamWriterLike<Uint8Array> {
+function createDatagramWriter(datagrams: WebTransportDatagramsLike): WritableStreamWriterLike<Uint8Array> {
   if (typeof datagrams.createWritable === "function") {
     return datagrams.createWritable().getWriter();
   }
   if (datagrams.writable !== undefined) {
     return datagrams.writable.getWriter();
   }
-  throw new Error(
-    "WebTransport datagrams expose neither createWritable() nor writable",
-  );
+  throw new Error("WebTransport datagrams expose neither createWritable() nor writable");
 }
 
 export type ReadResultLike<T> =
@@ -109,12 +117,12 @@ export interface WebTransportConstructorLike {
 
 /**
  * WebTransport-shaped game adapter shared by browser and native Defold. The
- * selected constructor owns the platform implementation. Client-originated reliable messages use
- * independent QUIC bidirectional streams. Server-originated reliable messages
- * share one persistent unidirectional stream, with the existing five-byte
- * frames repeated on that stream. Tick inputs use datagrams only when the
- * negotiated session exposes them and the writable queue can accept data
- * immediately.
+ * selected constructor owns the platform implementation. Client-originated
+ * session/control messages share one ordered bidirectional stream. Server
+ * session/control messages share one ordered unidirectional stream. Replaceable
+ * snapshots each use an independently resettable unidirectional stream. Tick
+ * inputs use datagrams only when the negotiated session exposes them and the
+ * writable queue can accept data immediately.
  */
 export class WebTransportGameClient implements GameTransport {
   readonly capabilities: TransportCapabilities;
@@ -124,14 +132,19 @@ export class WebTransportGameClient implements GameTransport {
   private readonly session: WebTransportSessionLike;
   private readonly receiver: TransportReceiver;
   private readonly reliableStreamMode: ReliableStreamMode;
+  private clientReliableWriter?: WritableStreamWriterLike<Uint8Array>;
+  private clientReliableWriterPromise?: Promise<WritableStreamWriterLike<Uint8Array> | undefined>;
+  private clientReliableTail: Promise<void> = Promise.resolve();
+  private pendingClientReliableFrames = 0;
+  private serverPersistentStreamSeen = false;
   private serverReliableWriter?: WritableStreamWriterLike<Uint8Array>;
   private serverReliableWriterPromise?: Promise<WritableStreamWriterLike<Uint8Array> | undefined>;
   private serverReliableWrite?: Promise<void>;
   private readonly pendingServerReliable: PendingServerReliableFrame[] = [];
   private pendingServerReliableBytes = 0;
-  private pendingServerSnapshot?: Uint8Array;
-  private snapshotFlushScheduled = false;
-  private snapshotFlushActive = false;
+  private serverReliableFlushScheduled = false;
+  private serverReliableFlushActive = false;
+  private pendingServerClose?: PendingServerClose;
   private datagramWriterClosed = false;
   private sessionCloseRequested = false;
   private closed = false;
@@ -204,17 +217,117 @@ export class WebTransportGameClient implements GameTransport {
   }
 
   async sendReliable(channel: ReliableChannel, payload: Uint8Array, signal?: AbortSignal): Promise<SendDisposition> {
-    if (this.closed || signal?.aborted === true) return "closed";
+    if (this.closed || this.pendingServerClose !== undefined) return "closed";
+    if (signal?.aborted === true) return "backpressured";
     validateReliableChannel(channel);
     if (payload.byteLength > MAX_RELIABLE_MESSAGE_BYTES) return "too-large";
 
-    if (this.reliableStreamMode === "server") {
+    if (this.reliableStreamMode === "client") {
+      return this.sendClientReliable(channel, payload, signal);
+    }
+
+    if (channel !== TRANSPORT_CHANNEL_SNAPSHOT) {
       // sendServerReliable builds the owned frame synchronously before its
       // first queue or writer boundary, so a second payload copy would only
       // add allocation pressure to the 20 Hz snapshot path.
       return this.sendServerReliable(channel, payload);
     }
 
+    return this.sendIndependentReliable(channel, payload, signal);
+  }
+
+  /** Keeps client session/control events on one ordered QUIC byte stream. */
+  private async sendClientReliable(
+    channel: ReliableChannel,
+    payload: Uint8Array,
+    signal?: AbortSignal,
+  ): Promise<SendDisposition> {
+    const frame = encodeReliableFrame(channel, payload);
+    const cancelled = (): boolean => signal?.aborted === true;
+    if (
+      channel === TRANSPORT_CHANNEL_INPUT_FALLBACK &&
+      (this.pendingClientReliableFrames !== 0 ||
+        this.clientReliableWriter === undefined ||
+        (this.clientReliableWriter.desiredSize ?? 0) <= 0)
+    ) {
+      return "backpressured";
+    }
+    this.pendingClientReliableFrames += 1;
+    let disposition: SendDisposition = "closed";
+    const write = this.clientReliableTail.then(async () => {
+      if (this.closed) return;
+      if (cancelled()) {
+        disposition = "backpressured";
+        return;
+      }
+      const writer = await this.clientReliableWriterOrClosed();
+      if (writer === undefined || this.closed) return;
+      if (cancelled()) {
+        disposition = "backpressured";
+        return;
+      }
+      try {
+        await writer.ready;
+        if (cancelled()) {
+          disposition = "backpressured";
+          return;
+        }
+        await writer.write(frame);
+        disposition = "sent";
+      } catch {
+        this.finishClose(1, "client reliable stream write failed");
+      }
+    });
+    this.clientReliableTail = write.catch(() => undefined);
+    try {
+      await write;
+      return disposition;
+    } finally {
+      this.pendingClientReliableFrames -= 1;
+    }
+  }
+
+  private async clientReliableWriterOrClosed(): Promise<WritableStreamWriterLike<Uint8Array> | undefined> {
+    if (this.closed) return undefined;
+    if (this.clientReliableWriter !== undefined) return this.clientReliableWriter;
+    if (this.clientReliableWriterPromise === undefined) {
+      this.clientReliableWriterPromise = this.session
+        .createBidirectionalStream()
+        .then((stream) => {
+          // This protocol uses the reverse direction only as the bidirectional
+          // stream admission mechanism. Server events arrive on server-owned
+          // unidirectional streams.
+          void stream.readable.cancel().catch(() => undefined);
+          if (this.closed) {
+            const writer = stream.writable.getWriter();
+            void writer.abort("transport closed").catch(() => undefined);
+            writer.releaseLock();
+            return undefined;
+          }
+          this.clientReliableWriter = stream.writable.getWriter();
+          return this.clientReliableWriter;
+        })
+        .catch((error: unknown) => {
+          this.finishClose(1, error instanceof Error ? error.message : "client reliable stream create failed");
+          return undefined;
+        })
+        .finally(() => {
+          this.clientReliableWriterPromise = undefined;
+        });
+    }
+    return this.clientReliableWriterPromise;
+  }
+
+  /**
+   * Sends one replaceable message on its own QUIC stream. Snapshot state must
+   * never sit behind an older snapshot on a persistent ordered stream: callers
+   * can abort this stream as soon as a fresher state packet exists.
+   */
+  private async sendIndependentReliable(
+    channel: ReliableChannel,
+    payload: Uint8Array,
+    signal?: AbortSignal,
+  ): Promise<SendDisposition> {
     // Own the bytes before any stream creation, queueing, or other await. The
     // caller is free to reuse or mutate its buffer as soon as this method
     // returns a promise.
@@ -222,8 +335,14 @@ export class WebTransportGameClient implements GameTransport {
 
     let reverseReadable: ReadableStreamLike<Uint8Array> | undefined;
     let writer: WritableStreamWriterLike<Uint8Array> | undefined;
+    let releaseAbort!: () => void;
+    const aborted = new Promise<void>((resolve) => {
+      releaseAbort = resolve;
+    });
+    const cancelled = (): boolean => signal?.aborted === true;
     const abort = (): void => {
-      void writer?.abort(signal?.reason);
+      releaseAbort();
+      void writer?.abort(signal?.reason).catch(() => undefined);
     };
     signal?.addEventListener("abort", abort, { once: true });
     try {
@@ -236,17 +355,27 @@ export class WebTransportGameClient implements GameTransport {
         writable = await this.session.createUnidirectionalStream();
       }
       writer = writable.getWriter();
+      if (cancelled()) {
+        await writer.abort(signal?.reason).catch(() => undefined);
+        return "backpressured";
+      }
       const header = new Uint8Array(RELIABLE_FRAME_HEADER_BYTES);
       const view = new DataView(header.buffer);
       view.setUint8(0, channel);
       view.setUint32(1, ownedPayload.byteLength, true);
-      await writer.ready;
-      await writer.write(header);
-      await writer.write(ownedPayload);
-      await writer.close();
+      await Promise.race([writer.ready, aborted]);
+      if (cancelled()) return "backpressured";
+      await Promise.race([writer.write(header), aborted]);
+      if (cancelled()) return "backpressured";
+      await Promise.race([writer.write(ownedPayload), aborted]);
+      if (cancelled()) return "backpressured";
+      await Promise.race([writer.close(), aborted]);
+      if (cancelled()) return "backpressured";
       return "sent";
     } catch {
-      return "closed";
+      // Resetting a superseded state stream is expected and is local to that
+      // stream. It is not evidence that the WebTransport session closed.
+      return signal?.aborted === true || channel === TRANSPORT_CHANNEL_SNAPSHOT ? "backpressured" : "closed";
     } finally {
       signal?.removeEventListener("abort", abort);
       writer?.releaseLock();
@@ -289,8 +418,65 @@ export class WebTransportGameClient implements GameTransport {
   }
 
   close(code: number, reason: string): void {
-    if (this.closed) return;
+    if (this.closed || this.pendingServerClose !== undefined) return;
+    if (
+      this.reliableStreamMode === "server" &&
+      (this.pendingServerReliable.length !== 0 ||
+        this.serverReliableWriter !== undefined ||
+        this.serverReliableWriterPromise !== undefined ||
+        this.serverReliableWrite !== undefined ||
+        this.serverReliableFlushScheduled ||
+        this.serverReliableFlushActive)
+    ) {
+      this.closeServerAfterReliableDrain(code, reason);
+      return;
+    }
     this.finishClose(code, reason);
+  }
+
+  private closeServerAfterReliableDrain(code: number, reason: string): void {
+    const timeout = setTimeout(() => {
+      this.finishClose(code, reason);
+    }, SERVER_RELIABLE_CLOSE_GRACE_MILLISECONDS);
+    this.pendingServerClose = { code, reason, timeout, finalizing: false };
+    this.scheduleServerReliableFlush();
+    this.maybeFinishServerClose();
+  }
+
+  private maybeFinishServerClose(): void {
+    const pending = this.pendingServerClose;
+    if (
+      pending === undefined ||
+      pending.finalizing ||
+      this.closed ||
+      this.pendingServerReliable.length !== 0 ||
+      this.serverReliableWriterPromise !== undefined ||
+      this.serverReliableWrite !== undefined ||
+      this.serverReliableFlushScheduled ||
+      this.serverReliableFlushActive
+    ) {
+      return;
+    }
+    pending.finalizing = true;
+    const writer = this.serverReliableWriter;
+    if (writer === undefined) {
+      this.finishClose(pending.code, pending.reason);
+      return;
+    }
+    void writer
+      .close()
+      .catch(() => undefined)
+      .finally(() => {
+        if (this.serverReliableWriter === writer) {
+          this.serverReliableWriter = undefined;
+          try {
+            writer.releaseLock();
+          } catch {
+            // A concurrent peer/session close may already have released it.
+          }
+        }
+        this.finishClose(pending.code, pending.reason);
+      });
   }
 
   private async receiveReliableStreams(): Promise<void> {
@@ -310,7 +496,9 @@ export class WebTransportGameClient implements GameTransport {
           this.reliableStreamMode === "server"
             ? (next.value as WebTransportBidirectionalStreamLike).writable
             : undefined;
-        void this.readReliableStream(stream, reverseWritable);
+        const persistent = this.reliableStreamMode === "client" && !this.serverPersistentStreamSeen;
+        if (persistent) this.serverPersistentStreamSeen = true;
+        void this.readReliableStream(stream, reverseWritable, persistent);
       }
     } catch (error: unknown) {
       this.finishClose(1, error instanceof Error ? error.message : "reliable stream receive failed");
@@ -322,6 +510,7 @@ export class WebTransportGameClient implements GameTransport {
   private async readReliableStream(
     stream: ReadableStreamLike<Uint8Array>,
     reverseWritable?: WritableStreamLike<Uint8Array>,
+    persistent = false,
   ): Promise<void> {
     const reader = stream.getReader();
     let reverseWriter: WritableStreamWriterLike<Uint8Array> | undefined;
@@ -334,17 +523,49 @@ export class WebTransportGameClient implements GameTransport {
     }
     const decoder = new ReliableFrameDecoder();
     let receivedBytes = false;
+    let snapshotDelivered = false;
     try {
       while (true) {
         const next = await reader.read();
         if (next.done) break;
         if (next.value.byteLength > 0) receivedBytes = true;
-        decoder.push(next.value, (channel, payload) => this.receiver.onReliable(channel, payload));
+        decoder.push(next.value, (channel, payload) => {
+          if (snapshotDelivered) throw new Error("snapshot stream carried more than one frame");
+          if (this.reliableStreamMode === "client") {
+            if (persistent && channel === TRANSPORT_CHANNEL_SNAPSHOT) {
+              throw new Error("persistent server stream carried snapshot state");
+            }
+            if (!persistent && channel !== TRANSPORT_CHANNEL_SNAPSHOT) {
+              throw new Error("independent server stream carried an ordered event");
+            }
+          }
+          this.receiver.onReliable(channel, payload);
+          if (channel === TRANSPORT_CHANNEL_SNAPSHOT) snapshotDelivered = true;
+        });
+        if (snapshotDelivered) {
+          if (decoder.partialChannel !== undefined) throw new Error("snapshot stream carried trailing frame bytes");
+          // A snapshot stream is one packet, not a byte lane. Retire it as soon
+          // as its complete frame is delivered instead of retaining a native
+          // handle while waiting for a delayed FIN callback.
+          await reader.cancel("snapshot frame consumed");
+          break;
+        }
       }
       if (!receivedBytes) throw new Error("truncated reliable message");
       decoder.finish();
+      if (persistent && !this.closed) this.finishClose(2, "persistent server reliable stream ended");
     } catch (error: unknown) {
-      this.finishClose(2, error instanceof Error ? error.message : "invalid reliable message");
+      // A replaceable snapshot stream may be reset by the sender when fresher
+      // state exists. QUIC stream reset is intentionally stream-local; retain
+      // the session and wait for the next complete snapshot. Control/session
+      // stream corruption still fails the whole connection closed.
+      if (
+        persistent ||
+        this.reliableStreamMode !== "client" ||
+        (decoder.partialChannel !== undefined && decoder.partialChannel !== TRANSPORT_CHANNEL_SNAPSHOT)
+      ) {
+        this.finishClose(2, error instanceof Error ? error.message : "invalid reliable message");
+      }
     } finally {
       reader.releaseLock();
       if (reverseWriter !== undefined) {
@@ -381,7 +602,9 @@ export class WebTransportGameClient implements GameTransport {
   private finishClose(code: number, reason: string, requestSessionClose = true): void {
     if (this.closed) return;
     this.closed = true;
-    this.pendingServerSnapshot = undefined;
+    const pendingClose = this.pendingServerClose;
+    this.pendingServerClose = undefined;
+    if (pendingClose !== undefined) clearTimeout(pendingClose.timeout);
     for (const pending of this.pendingServerReliable) pending.resolve("closed");
     this.pendingServerReliable.length = 0;
     this.pendingServerReliableBytes = 0;
@@ -389,7 +612,17 @@ export class WebTransportGameClient implements GameTransport {
     this.serverReliableWriter = undefined;
     if (writer !== undefined) {
       void writer.abort(reason).catch(() => undefined);
-      writer.releaseLock();
+      try {
+        writer.releaseLock();
+      } catch {
+        // A graceful stream close can race the session-level timeout.
+      }
+    }
+    const clientWriter = this.clientReliableWriter;
+    this.clientReliableWriter = undefined;
+    if (clientWriter !== undefined) {
+      void clientWriter.abort(reason).catch(() => undefined);
+      clientWriter.releaseLock();
     }
     if (!this.datagramWriterClosed) {
       this.datagramWriterClosed = true;
@@ -421,23 +654,6 @@ export class WebTransportGameClient implements GameTransport {
 
     if (this.closed) return "closed";
 
-    if (channel === TRANSPORT_CHANNEL_SNAPSHOT) {
-      // A snapshot is state, not an event. Keep at most the latest frame while
-      // the persistent reliable lane is flow-controlled.
-      if (
-        this.serverReliableWrite !== undefined ||
-        this.pendingServerReliable.length !== 0 ||
-        this.serverReliableWriter === undefined ||
-        (this.serverReliableWriter.desiredSize ?? 0) <= 0
-      ) {
-        this.pendingServerSnapshot = frame;
-        this.scheduleSnapshotFlush();
-        return "backpressured";
-      }
-      this.pendingServerSnapshot = undefined;
-      return this.writeServerFrame(this.serverReliableWriter!, frame);
-    }
-
     // Session/control messages are never silently dropped. Once the writer
     // is busy or flow-controlled, put the owned frame in one bounded FIFO and
     // let the single pump own the sole writer.ready waiter.
@@ -457,7 +673,7 @@ export class WebTransportGameClient implements GameTransport {
       return new Promise((resolve) => {
         this.pendingServerReliable.push({ frame, resolve });
         this.pendingServerReliableBytes += frame.byteLength;
-        this.scheduleSnapshotFlush();
+        this.scheduleServerReliableFlush();
       });
     }
     return this.writeServerFrame(this.serverReliableWriter!, frame);
@@ -485,6 +701,7 @@ export class WebTransportGameClient implements GameTransport {
         })
         .finally(() => {
           this.serverReliableWriterPromise = undefined;
+          this.maybeFinishServerClose();
         });
     }
     return this.serverReliableWriterPromise;
@@ -510,37 +727,34 @@ export class WebTransportGameClient implements GameTransport {
       return "closed";
     } finally {
       if (this.serverReliableWrite === write) this.serverReliableWrite = undefined;
-      this.scheduleSnapshotFlush();
+      this.scheduleServerReliableFlush();
+      this.maybeFinishServerClose();
     }
   }
 
-  private scheduleSnapshotFlush(): void {
+  private scheduleServerReliableFlush(): void {
     if (
-      this.snapshotFlushScheduled ||
-      this.snapshotFlushActive ||
-      (this.pendingServerSnapshot === undefined && this.pendingServerReliable.length === 0) ||
+      this.serverReliableFlushScheduled ||
+      this.serverReliableFlushActive ||
+      this.pendingServerReliable.length === 0 ||
       this.closed
     )
       return;
-    this.snapshotFlushScheduled = true;
+    this.serverReliableFlushScheduled = true;
     queueMicrotask(() => {
-      this.snapshotFlushScheduled = false;
-      if (this.snapshotFlushActive || this.closed) return;
-      this.snapshotFlushActive = true;
-      void this.flushPendingSnapshot().finally(() => {
-        this.snapshotFlushActive = false;
-        this.scheduleSnapshotFlush();
+      this.serverReliableFlushScheduled = false;
+      if (this.serverReliableFlushActive || this.closed) return;
+      this.serverReliableFlushActive = true;
+      void this.flushPendingServerReliable().finally(() => {
+        this.serverReliableFlushActive = false;
+        this.scheduleServerReliableFlush();
+        this.maybeFinishServerClose();
       });
     });
   }
 
-  private async flushPendingSnapshot(): Promise<void> {
-    if (
-      this.closed ||
-      (this.pendingServerSnapshot === undefined && this.pendingServerReliable.length === 0) ||
-      this.serverReliableWrite !== undefined
-    )
-      return;
+  private async flushPendingServerReliable(): Promise<void> {
+    if (this.closed || this.pendingServerReliable.length === 0 || this.serverReliableWrite !== undefined) return;
     const writer = await this.serverReliableWriterOrClosed();
     if (writer === undefined || this.closed) return;
     if ((writer.desiredSize ?? 0) <= 0) {
@@ -553,7 +767,7 @@ export class WebTransportGameClient implements GameTransport {
       if (this.closed) return;
     }
     if (this.serverReliableWrite !== undefined) {
-      this.scheduleSnapshotFlush();
+      this.scheduleServerReliableFlush();
       return;
     }
 
@@ -562,13 +776,7 @@ export class WebTransportGameClient implements GameTransport {
       this.pendingServerReliableBytes -= pending.frame.byteLength;
       const disposition = await this.writeServerFrame(writer, pending.frame);
       pending.resolve(disposition);
-      return;
     }
-
-    if (this.pendingServerSnapshot === undefined) return;
-    const frame = this.pendingServerSnapshot;
-    this.pendingServerSnapshot = undefined;
-    if ((await this.writeServerFrame(writer, frame)) === "closed") this.pendingServerSnapshot = undefined;
   }
 }
 

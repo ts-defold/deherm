@@ -5,6 +5,13 @@ import path from "node:path";
 export const VISUAL_EVIDENCE_KIND = "deherm.war-battles.vscode-live-values-evidence";
 export const VISUAL_EVIDENCE_SCHEMA_VERSION = 3;
 export const ARENA_SOURCE = "main/arena.script.ts";
+export const ARENA_SOURCE_PATH = "examples/war-battles-online/defold/main/arena.script.ts";
+export const VISUAL_EVIDENCE_SOURCE_PATHS = Object.freeze([
+  "editors/vscode/package.json",
+  "editors/vscode/src/extension.ts",
+  "editors/vscode/src/live-values.ts",
+  "packages/cli/src/dev/inspector-bridge.mjs",
+]);
 export const EXPECTED_PROPERTY_DEFAULTS = Object.freeze({
   players: 8,
   botSkill: 1,
@@ -65,6 +72,29 @@ export function requireInlineValueTexts(renderedText) {
   });
 }
 
+export function projectArenaPropertyDefaults(source) {
+  const declarations = [];
+  for (const [name, value] of Object.entries(EXPECTED_PROPERTY_DEFAULTS)) {
+    const declaration = new RegExp(`\\b${name}\\s*:\\s*property\\.number\\(\\s*${value}\\s*\\)`, "u");
+    const match = declaration.exec(source);
+    if (!match) throw new Error(`Arena property default is stale: ${name}`);
+    declarations.push({ name, value, offset: match.index });
+  }
+  const ordered = [...declarations].sort((left, right) => left.offset - right.offset);
+  if (ordered.some((entry, index) => entry.name !== declarations[index]?.name)) {
+    throw new Error("Arena property declaration order is stale");
+  }
+  return {
+    path: ARENA_SOURCE_PATH,
+    declarations: declarations.map(({ name, value }) => ({ name, value })),
+  };
+}
+
+export async function buildArenaPropertyProjection(repositoryRoot) {
+  const source = await readFile(path.join(repositoryRoot, ARENA_SOURCE_PATH), "utf8");
+  return projectArenaPropertyDefaults(source);
+}
+
 export function evidenceKey(document) {
   const copy = structuredClone(document);
   delete copy.evidenceKey;
@@ -79,6 +109,7 @@ export function buildVisualEvidence({
   vscode,
   packageArtifact,
   vsixArtifact,
+  arenaPropertyProjection,
 }) {
   const arena = requireArenaInstance(state);
   const inlineValueTexts = requireInlineValueTexts(renderedText);
@@ -114,6 +145,7 @@ export function buildVisualEvidence({
       npmPackage: packageArtifact,
       vsix: vsixArtifact,
     },
+    arenaPropertyProjection,
     sourceInputs,
   };
   document.evidenceKey = evidenceKey(document);
@@ -132,6 +164,10 @@ export async function verifyVisualEvidence(document, repositoryRoot) {
     throw new Error("VS Code visual evidence has no inline property values");
   }
   requireInlineValueTexts(document.observation.inlineValueTexts.join("\n"));
+  const arenaPropertyProjection = await buildArenaPropertyProjection(repositoryRoot);
+  if (JSON.stringify(document.arenaPropertyProjection) !== JSON.stringify(arenaPropertyProjection)) {
+    throw new Error("VS Code visual evidence arena property projection is stale");
+  }
   for (const [name, expected] of Object.entries(EXPECTED_LIVE_PROPERTIES)) {
     if (document.observation.properties?.[name] !== expected) {
       throw new Error(`Recorded VS Code property ${name} is stale`);
@@ -148,11 +184,41 @@ export async function verifyVisualEvidence(document, repositoryRoot) {
   ) {
     throw new Error("VS Code screenshot bytes do not match the recorded evidence");
   }
-  for (const input of document.sourceInputs ?? []) {
+  const inputPaths = (document.sourceInputs ?? []).map((input) => input.path);
+  if (JSON.stringify(inputPaths) !== JSON.stringify(VISUAL_EVIDENCE_SOURCE_PATHS)) {
+    throw new Error("VS Code visual evidence source contract is stale");
+  }
+  for (const input of document.sourceInputs) {
     const current = await hashFile(repositoryRoot, input.path);
     if (JSON.stringify(current) !== JSON.stringify(input)) {
       throw new Error(`VS Code visual evidence source is stale: ${input.path}`);
     }
   }
   return document;
+}
+
+export async function refreshVisualEvidenceSourceContract(document, repositoryRoot, { previousArenaSource }) {
+  const previousInputs = new Map((document.sourceInputs ?? []).map((input) => [input.path, input]));
+  const previousArenaInput = previousInputs.get(ARENA_SOURCE_PATH);
+  if (!previousArenaInput || sha256(previousArenaSource) !== previousArenaInput.sha256) {
+    throw new Error("Previous arena source does not match the recorded VS Code observation");
+  }
+  const previousArenaProjection = projectArenaPropertyDefaults(previousArenaSource);
+  const arenaPropertyProjection = await buildArenaPropertyProjection(repositoryRoot);
+  if (JSON.stringify(previousArenaProjection) !== JSON.stringify(arenaPropertyProjection)) {
+    throw new Error("Arena property projection changed and requires a new VS Code observation");
+  }
+  const sourceInputs = [];
+  for (const relativePath of VISUAL_EVIDENCE_SOURCE_PATHS) {
+    const previous = previousInputs.get(relativePath);
+    if (!previous) throw new Error(`VS Code visual evidence did not observe required source: ${relativePath}`);
+    const current = await hashFile(repositoryRoot, relativePath);
+    if (JSON.stringify(current) !== JSON.stringify(previous)) {
+      throw new Error(`VS Code visual evidence source changed and requires a new observation: ${relativePath}`);
+    }
+    sourceInputs.push(current);
+  }
+  const refreshed = { ...structuredClone(document), arenaPropertyProjection, sourceInputs };
+  refreshed.evidenceKey = evidenceKey(refreshed);
+  return refreshed;
 }
