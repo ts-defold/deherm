@@ -1,5 +1,6 @@
 import {
   BattleClient,
+  INPUT_SEND_INTERVAL_TICKS,
   MatchServer,
   TICK_MILLISECONDS,
   type BattleClientOptions,
@@ -466,11 +467,10 @@ export async function runAuthoritativeLoadHarness(
   const queueBound =
     config.players * 2 * (config.datagramQueueCapacity + config.reliableQueueCapacity * RELIABLE_CHANNELS.length);
   const boundedQueues = network.stats.peakQueue <= queueBound;
-  const everyClientAttemptedEveryTick = clientRows.every(
-    (client) =>
-      client.inputsSent + client.inputsDropped ===
-      config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips,
-  );
+  const everyClientAttemptedEverySendOpportunity = clientRows.every((client) => {
+    const generatedCommands = config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips;
+    return client.inputsSent + client.inputsDropped === Math.ceil(generatedCommands / INPUT_SEND_INTERVAL_TICKS);
+  });
   const generatedInputCommands = clientRows.reduce(
     (total, client) => total + config.ticks + client.inputLeadIncreases - client.inputLeadCatchdownSkips,
     0,
@@ -483,14 +483,14 @@ export async function runAuthoritativeLoadHarness(
     uniquePlayerIds.size !== config.players ||
     !reliableOrderPreserved ||
     !reliableDeliveryComplete ||
-    !everyClientAttemptedEveryTick ||
+    !everyClientAttemptedEverySendOpportunity ||
     inputAcceptanceRatio < MINIMUM_INPUT_ACCEPTANCE_RATIO ||
     !noErrors ||
     !boundedQueues ||
     network.queue.length !== 0
   ) {
     throw new Error(
-      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, everyClientAttemptedEveryTick, inputAcceptanceRatio, minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO, noErrors, pending: network.queue.length, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
+      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, everyClientAttemptedEverySendOpportunity, inputAcceptanceRatio, minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO, noErrors, pending: network.queue.length, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
     );
   }
   return Object.freeze({
@@ -532,7 +532,10 @@ export async function runAuthoritativeLoadHarness(
       count: clients.length,
       ready: clientRows.filter((client) => client.state === "ready").length,
       rows: clientRows,
-      attemptedInputsPerClient: config.ticks,
+      generatedInputCommandsPerClient: config.ticks,
+      inputSendIntervalTicks: INPUT_SEND_INTERVAL_TICKS,
+      minimumAttemptedInputDatagrams: Math.min(...clientRows.map((client) => client.inputsSent + client.inputsDropped)),
+      maximumAttemptedInputDatagrams: Math.max(...clientRows.map((client) => client.inputsSent + client.inputsDropped)),
       minInputsSent: Math.min(...clientRows.map((client) => client.inputsSent)),
       maxInputsSent: Math.max(...clientRows.map((client) => client.inputsSent)),
       maxInputsDropped: Math.max(...clientRows.map((client) => client.inputsDropped)),

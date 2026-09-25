@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 4,
-  "observedInputsSent": 13,
-  "lastServerTick": 111,
-  "lastLocalTick": 118,
+  "observedInputsSent": 8,
+  "lastServerTick": 75,
+  "lastLocalTick": 82,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -48,10 +48,10 @@
     "boost": false,
     "weapon": 0
   },
-  "inputsDropped": 2,
+  "inputsDropped": 0,
   "presentation": {
-    "localCorrectionMagnitude": 302,
-    "maximumLocalCorrectionMagnitude": 5015,
+    "localCorrectionMagnitude": 115,
+    "maximumLocalCorrectionMagnitude": 3279,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
@@ -65,7 +65,7 @@
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:53929",
+      "war-battles-server:health:http://localhost:56347",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -85,8 +85,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 408373,
-      "sha256": "e42b7a89c4d21cfa8476bd822eb8a3cbc8d4ece7fe5f6bdbcb79c7f1971093a0"
+      "bytes": 434724,
+      "sha256": "130be96171e5e03384ef2f3e05b8822b13fc0f6cc5d71023a6dea4c784813aa3"
     },
     {
       "path": "examples/war-battles-online/integration/check-real-webtransport.mjs",
@@ -137,6 +137,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "9f1c2d9763d0e043001f62dd6eddba17abedefbef791e3507e33dc8f40504bb3",
+  "sourceKey": "50117075b21e83ea04c954332c0b1f8fc021e92b2741ab14cf718c8cdb579331",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

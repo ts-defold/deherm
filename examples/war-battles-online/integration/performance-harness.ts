@@ -5,10 +5,10 @@ import {
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
+  NETWORK_PLAYER_SNAPSHOT_BYTES,
   NETWORK_PROJECTILE_SNAPSHOT_BYTES,
   NETWORK_SNAPSHOT_BYTES,
   PICKUP_SNAPSHOT_BYTES,
-  PLAYER_SNAPSHOT_BYTES,
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
   TICK_RATE,
@@ -17,6 +17,7 @@ import { EVENT_CAPACITY } from "../core/events.ts";
 import {
   createInputCommand,
   INPUT_BUNDLE_BYTES,
+  INPUT_SEND_INTERVAL_TICKS,
   SNAPSHOT_DELTA,
   SNAPSHOT_FRAME_HEADER_BYTES,
   SNAPSHOT_KEYFRAME,
@@ -69,23 +70,25 @@ export const NETWORK_PAYLOAD_TARGETS = Object.freeze({
 
 const SNAPSHOT_REGIONS = Object.freeze([
   { name: "worldHeader", start: 0, bytes: SNAPSHOT_HEADER_BYTES },
-  { name: "players", start: SNAPSHOT_HEADER_BYTES, bytes: MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES },
+  { name: "players", start: SNAPSHOT_HEADER_BYTES, bytes: MAX_PLAYERS * NETWORK_PLAYER_SNAPSHOT_BYTES },
   {
     name: "projectiles",
-    start: SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES,
+    start: SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * NETWORK_PLAYER_SNAPSHOT_BYTES,
     bytes: MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES,
   },
   {
     name: "pickups",
     start:
-      SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES + MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES,
+      SNAPSHOT_HEADER_BYTES +
+      MAX_PLAYERS * NETWORK_PLAYER_SNAPSHOT_BYTES +
+      MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES,
     bytes: MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES,
   },
   {
     name: "cover",
     start:
       SNAPSHOT_HEADER_BYTES +
-      MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES +
+      MAX_PLAYERS * NETWORK_PLAYER_SNAPSHOT_BYTES +
       MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES +
       MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES,
     bytes: COVER_SNAPSHOT_BYTES,
@@ -372,7 +375,7 @@ export function runPerformanceHarness(
     );
   }
   const snapshotBytesPerSecond = Math.round((snapshotBytes * config.tickRate * 100) / config.ticks) / 100;
-  const inputBytesPerSecond = INPUT_BUNDLE_BYTES * config.tickRate;
+  const inputBytesPerSecond = INPUT_BUNDLE_BYTES * (config.tickRate / INPUT_SEND_INTERVAL_TICKS);
   const aggregateSnapshotBytesPerSecond = snapshotBytesPerSecond * config.players;
   const snapshotFramesPerSecond = config.tickRate / config.snapshotIntervalTicks;
   const recoveryFramesPerSecond = 1;

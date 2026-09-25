@@ -271,15 +271,25 @@ session ledger, preventing the restored world tick from being counted twice.
 Docker mounts this beside the resume ledger as `server/state/world.bin`.
 
 The compact snapshot tests independently prove the codec against the broad
-17,888-byte rollback image. Protocol 12 projects that image into an exact
-11,232-byte network image and a bounded 11,248-byte recovery frame. Projectile
-records encode fixed-point trajectory phase and expiry tick, so straight flight
-is byte-identical across snapshots and the delta stream carries only spawn,
-trajectory-change, and despawn state. The measured 15 Hz bot trace uses bounded
-deltas. Tests also prove exact reconstruction, exact-base enforcement, sorted
-run bounds, all-512-projectile recovery capacity, and rejection of a delta
-without its baseline. This is protocol and in-process evidence; it is not a WAN
-compression, packet-loss, or VM-allocation benchmark.
+17,888-byte rollback image. Protocol 13 projects that image into an exact
+10,272-byte network image and a bounded 10,288-byte recovery frame. Each player
+uses a schema-aware 66-byte record (including six checked reserved bits), while
+projectile records encode fixed-point trajectory phase and expiry tick, so
+straight flight is byte-identical across snapshots and the delta stream carries
+only spawn, trajectory-change, and despawn state. The measured 15 Hz bot trace
+uses bounded deltas. Tests also prove exact reconstruction across all 32 player
+slots at field boundaries, exact-base enforcement, sorted run bounds, all-512-
+projectile recovery capacity, and rejection of corrupt or baseline-free deltas.
+This is protocol and in-process evidence; it is not a WAN compression,
+packet-loss, or VM-allocation benchmark.
+
+The client samples and predicts input at 60 Hz but emits 30 unreliable
+datagrams per second. Each steady-state datagram carries two new commands plus
+the prior two-command window without repeating four complete packet headers.
+One common identity, acknowledgement, tick, and sequence header plus six bytes
+per command costs 50 bytes instead of 128. The decoder validates the whole
+bundle before simulation sees a command and reconstructs tick/sequence exactly
+across wrap.
 
 ## Evidence
 

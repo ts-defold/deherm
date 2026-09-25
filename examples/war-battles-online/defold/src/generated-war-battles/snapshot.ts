@@ -3,16 +3,20 @@ import {
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
+  MAX_ARMOR,
   COVER_MAX_HEALTH,
   COVER_SNAPSHOT_BYTES,
+  NETWORK_PLAYER_SNAPSHOT_BYTES,
   NETWORK_PROJECTILE_SNAPSHOT_BYTES,
   NETWORK_SNAPSHOT_BYTES,
   OBJECTIVE_CAPTURE_TICKS,
+  OVERDRIVE_TICKS,
   PICKUP_SNAPSHOT_BYTES,
   PLAYER_SNAPSHOT_BYTES,
   PROJECTILE_SNAPSHOT_BYTES,
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
+  TANK_BOOST_CAPACITY,
   WORLD_MAX_X,
   WORLD_MAX_Y,
   WORLD_MIN_X,
@@ -24,6 +28,7 @@ import {
   WEAPON_COUNT,
   WEAPON_UPGRADE_COUNT,
   chassisUnlockBit,
+  weaponById,
   weaponUpgradeById,
 } from "./content";
 import {
@@ -47,6 +52,7 @@ const SNAPSHOT_VERSION = 8;
 // second run; larger gaps stay separate because measured varint-boundary cases
 // can make otherwise equal-size coalescing marginally worse.
 const RUN_COALESCE_GAP_BYTES = 1;
+const NETWORK_MAX_PLAYER_HEALTH = 240;
 
 export interface SnapshotFrameScratch {
   baseline: Uint8Array;
@@ -55,7 +61,8 @@ export interface SnapshotFrameScratch {
 }
 
 const RAW_PROJECTILE_OFFSET = SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES;
-const NETWORK_PROJECTILE_OFFSET = RAW_PROJECTILE_OFFSET;
+const NETWORK_PLAYER_OFFSET = SNAPSHOT_HEADER_BYTES;
+const NETWORK_PROJECTILE_OFFSET = NETWORK_PLAYER_OFFSET + MAX_PLAYERS * NETWORK_PLAYER_SNAPSHOT_BYTES;
 const RAW_PICKUP_OFFSET = RAW_PROJECTILE_OFFSET + MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES;
 const NETWORK_PICKUP_OFFSET = NETWORK_PROJECTILE_OFFSET + MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
 const RAW_COVER_OFFSET = RAW_PICKUP_OFFSET + MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES;
@@ -69,9 +76,12 @@ const NETWORK_COVER_OFFSET = NETWORK_PICKUP_OFFSET + MAX_PICKUPS * PICKUP_SNAPSH
 export function compactNetworkSnapshot(source: Uint8Array, target: Uint8Array): number {
   if (source.byteLength < SNAPSHOT_BYTES) throw new RangeError("rollback snapshot source is truncated");
   if (target.byteLength < NETWORK_SNAPSHOT_BYTES) throw new RangeError("network snapshot target is truncated");
-  copyBytes(target, 0, source, 0, RAW_PROJECTILE_OFFSET);
+  copyBytes(target, 0, source, 0, SNAPSHOT_HEADER_BYTES);
   const sourceView = new DataView(source.buffer, source.byteOffset, SNAPSHOT_BYTES);
   const snapshotTick = sourceView.getUint32(8, true);
+  for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+    compactNetworkPlayer(sourceView, target, slot);
+  }
   for (let slot = 0; slot < MAX_PROJECTILES; slot += 1) {
     const raw = RAW_PROJECTILE_OFFSET + slot * PROJECTILE_SNAPSHOT_BYTES;
     const packed = NETWORK_PROJECTILE_OFFSET + slot * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
@@ -147,11 +157,14 @@ export function compactNetworkSnapshot(source: Uint8Array, target: Uint8Array): 
 export function expandNetworkSnapshot(source: Uint8Array, target: Uint8Array, expectedTick?: number): number {
   if (source.byteLength < NETWORK_SNAPSHOT_BYTES) throw new RangeError("network snapshot source is truncated");
   if (target.byteLength < SNAPSHOT_BYTES) throw new RangeError("rollback snapshot target is truncated");
-  copyBytes(target, 0, source, 0, RAW_PROJECTILE_OFFSET);
+  copyBytes(target, 0, source, 0, SNAPSHOT_HEADER_BYTES);
   const targetView = new DataView(target.buffer, target.byteOffset, SNAPSHOT_BYTES);
   const snapshotTick = targetView.getUint32(8, true);
   if (expectedTick !== undefined && snapshotTick !== expectedTick >>> 0) {
     throw new Error("snapshot frame tick does not match its projected world state");
+  }
+  for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+    expandNetworkPlayer(source, targetView, slot);
   }
   for (let slot = 0; slot < MAX_PROJECTILES; slot += 1) {
     const packed = NETWORK_PROJECTILE_OFFSET + slot * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
@@ -229,6 +242,368 @@ export function expandNetworkSnapshot(source: Uint8Array, target: Uint8Array, ex
   copyBytes(target, RAW_PICKUP_OFFSET, source, NETWORK_PICKUP_OFFSET, MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES);
   copyBytes(target, RAW_COVER_OFFSET, source, NETWORK_COVER_OFFSET, COVER_SNAPSHOT_BYTES);
   return SNAPSHOT_BYTES;
+}
+
+/**
+ * The player wire schema is 522 bits (66 bytes, with six reserved bits), versus the 96-byte rollback
+ * record. Every narrowed field is bounded by the simulation/content schema;
+ * the two signed Int32 velocities and three signed Int32 counters stay full
+ * width because their values are not otherwise bounded by gameplay rules.
+ *
+ * Field order is deliberately shared by compactNetworkPlayer and
+ * expandNetworkPlayer. It is a fixed record, not a variable-length bitstream,
+ * so the projection remains bounded and does not acquire per-call storage.
+ */
+function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number): void {
+  const raw = SNAPSHOT_HEADER_BYTES + slot * PLAYER_SNAPSHOT_BYTES;
+  const packed = NETWORK_PLAYER_OFFSET + slot * NETWORK_PLAYER_SNAPSHOT_BYTES;
+  for (let byte = 0; byte < NETWORK_PLAYER_SNAPSHOT_BYTES; byte += 1) target[packed + byte] = 0;
+  let bit = 0;
+
+  const active = source.getUint8(raw);
+  const team = source.getUint8(raw + 1);
+  const weapon = source.getUint8(raw + 2);
+  const damageLevel = source.getUint8(raw + 3);
+  const mobilityLevel = source.getUint8(raw + 4);
+  const armorLevel = source.getUint8(raw + 5);
+  const generation = source.getUint16(raw + 6, true);
+  const x = source.getInt32(raw + 8, true);
+  const y = source.getInt32(raw + 12, true);
+  const velocityX = source.getInt32(raw + 16, true);
+  const velocityY = source.getInt32(raw + 20, true);
+  const hullX = source.getInt16(raw + 24, true);
+  const hullY = source.getInt16(raw + 26, true);
+  const turretX = source.getInt16(raw + 28, true);
+  const turretY = source.getInt16(raw + 30, true);
+  const aimX = source.getInt16(raw + 32, true);
+  const aimY = source.getInt16(raw + 34, true);
+  const health = source.getInt16(raw + 36, true);
+  const armor = source.getInt16(raw + 38, true);
+  const cooldown = source.getUint16(raw + 40, true);
+  const respawnTicks = source.getUint16(raw + 42, true);
+  const spawnProtectTicks = source.getUint16(raw + 44, true);
+  const overdriveTicks = source.getUint16(raw + 46, true);
+  const boostCharge = source.getUint16(raw + 48, true);
+  const lastSequence = source.getUint16(raw + 50, true);
+  const score = source.getInt32(raw + 52, true);
+  const deaths = source.getInt32(raw + 56, true);
+  const credits = source.getInt32(raw + 60, true);
+  const lastInputTick = source.getUint32(raw + 64, true);
+  const lastMoveX = source.getInt8(raw + 68);
+  const lastMoveY = source.getInt8(raw + 69);
+  const lastAimX = source.getInt8(raw + 70);
+  const lastAimY = source.getInt8(raw + 71);
+  const lastButtons = source.getUint8(raw + 72);
+  const weaponRequest = source.getUint8(raw + 73);
+  const botSkill = source.getUint8(raw + 74);
+  const boostTicks = source.getUint8(raw + 75);
+  const chassis = source.getUint8(raw + 76);
+  const chassisUnlocks = source.getUint8(raw + 77);
+  const weaponUpgradeUnlocks = source.getUint16(raw + 78, true);
+  const weaponUpgradeSelections = source.getUint16(raw + 80, true);
+  const mode = source.getUint8(raw + 94);
+  const lastInputValid = source.getUint8(raw + 95);
+
+  requirePackedUnsigned(active, 1, "player active");
+  requirePackedRange(weapon, 0, WEAPON_COUNT, "player weapon");
+  requirePackedUnsigned(damageLevel, 2, "player damage level");
+  requirePackedUnsigned(mobilityLevel, 2, "player mobility level");
+  requirePackedUnsigned(armorLevel, 2, "player armor level");
+  requirePackedRange(x, WORLD_MIN_X, WORLD_MAX_X, "player x");
+  requirePackedRange(y, WORLD_MIN_Y, WORLD_MAX_Y, "player y");
+  requirePackedRange(hullX, -256, 256, "player hull x");
+  requirePackedRange(hullY, -256, 256, "player hull y");
+  requirePackedRange(turretX, -256, 256, "player turret x");
+  requirePackedRange(turretY, -256, 256, "player turret y");
+  requirePackedRange(aimX, -256, 256, "player aim x");
+  requirePackedRange(aimY, -256, 256, "player aim y");
+  requirePackedRange(health, 0, NETWORK_MAX_PLAYER_HEALTH, "player health");
+  requirePackedRange(armor, 0, MAX_ARMOR, "player armor");
+  requirePackedUnsigned(cooldown, 8, "player cooldown");
+  requirePackedUnsigned(respawnTicks, 8, "player respawn ticks");
+  requirePackedUnsigned(spawnProtectTicks, 8, "player spawn protect ticks");
+  requirePackedRange(overdriveTicks, 0, OVERDRIVE_TICKS, "player overdrive ticks");
+  requirePackedRange(boostCharge, 0, TANK_BOOST_CAPACITY, "player boost charge");
+  requirePackedUnsigned(lastButtons, 2, "player last buttons");
+  requirePackedRange(weaponRequest, 0, WEAPON_COUNT, "player weapon request");
+  requirePackedUnsigned(boostTicks, 1, "player boost ticks");
+  requirePackedRange(chassis, 0, CHASSIS_COUNT, "player chassis");
+  requirePackedUnsigned(chassisUnlocks, 4, "player chassis unlocks");
+  requirePackedUnsigned(weaponUpgradeUnlocks, 12, "player weapon upgrade unlocks");
+  requirePackedUnsigned(weaponUpgradeSelections, 12, "player weapon upgrade selections");
+  requirePackedUnsigned(mode, 2, "player mode");
+  requirePackedUnsigned(lastInputValid, 1, "player input valid");
+  if (lastInputValid === 0 && lastInputTick !== 0) throw new RangeError("invalid player input tick sentinel");
+  if (mode > 2) throw new RangeError("player mode is invalid");
+  if (active !== 0 && weapon === 0) throw new RangeError("active player weapon is invalid");
+  if (active !== 0 && chassis === 0) throw new RangeError("active player chassis is invalid");
+  if (active !== 0 && (chassisUnlocks & chassisUnlockBit(chassis)) === 0) {
+    throw new RangeError("active player chassis is not unlocked");
+  }
+  if ((chassisUnlocks & ~CHASSIS_UNLOCK_MASK) !== 0) throw new RangeError("player chassis unlock mask is invalid");
+  if ((weaponUpgradeUnlocks & ~((1 << WEAPON_UPGRADE_COUNT) - 1)) !== 0) {
+    throw new RangeError("player weapon upgrade mask is invalid");
+  }
+  for (let weaponId = 1; weaponId <= WEAPON_COUNT; weaponId += 1) {
+    const branch = (weaponUpgradeSelections >>> ((weaponId - 1) * 2)) & 3;
+    if (branch > 2) throw new RangeError("player weapon upgrade selection is invalid");
+    if (branch !== 0) {
+      const upgradeId = (weaponId - 1) * 2 + branch;
+      if ((weaponUpgradeUnlocks & (1 << (upgradeId - 1))) === 0)
+        throw new RangeError("player selected weapon upgrade is locked");
+    }
+    const maximumAmmo = weaponById(weaponId).maximumAmmo;
+    requirePackedUnsigned(source.getUint16(raw + 82 + (weaponId - 1) * 2, true), 9, "player ammo");
+    if (source.getUint16(raw + 82 + (weaponId - 1) * 2, true) > maximumAmmo) {
+      throw new RangeError("player ammo exceeds weapon capacity");
+    }
+  }
+
+  bit = writePackedBits(target, packed, bit, active, 1);
+  bit = writePackedBits(target, packed, bit, team, 8);
+  bit = writePackedBits(target, packed, bit, weapon, 3);
+  bit = writePackedBits(target, packed, bit, damageLevel, 2);
+  bit = writePackedBits(target, packed, bit, mobilityLevel, 2);
+  bit = writePackedBits(target, packed, bit, armorLevel, 2);
+  bit = writePackedBits(target, packed, bit, generation, 16);
+  bit = writePackedBits(target, packed, bit, x - WORLD_MIN_X, 15);
+  bit = writePackedBits(target, packed, bit, y - WORLD_MIN_Y, 15);
+  bit = writePackedBits(target, packed, bit, velocityX >>> 0, 32);
+  bit = writePackedBits(target, packed, bit, velocityY >>> 0, 32);
+  bit = writePackedBits(target, packed, bit, hullX + 256, 10);
+  bit = writePackedBits(target, packed, bit, hullY + 256, 10);
+  bit = writePackedBits(target, packed, bit, turretX + 256, 10);
+  bit = writePackedBits(target, packed, bit, turretY + 256, 10);
+  bit = writePackedBits(target, packed, bit, aimX + 256, 10);
+  bit = writePackedBits(target, packed, bit, aimY + 256, 10);
+  bit = writePackedBits(target, packed, bit, health, 8);
+  bit = writePackedBits(target, packed, bit, armor, 7);
+  bit = writePackedBits(target, packed, bit, cooldown, 8);
+  bit = writePackedBits(target, packed, bit, respawnTicks, 8);
+  bit = writePackedBits(target, packed, bit, spawnProtectTicks, 8);
+  bit = writePackedBits(target, packed, bit, overdriveTicks, 10);
+  bit = writePackedBits(target, packed, bit, boostTicks, 1);
+  bit = writePackedBits(target, packed, bit, boostCharge, 7);
+  bit = writePackedBits(target, packed, bit, lastSequence, 16);
+  bit = writePackedBits(target, packed, bit, score >>> 0, 32);
+  bit = writePackedBits(target, packed, bit, deaths >>> 0, 32);
+  bit = writePackedBits(target, packed, bit, credits >>> 0, 32);
+  bit = writePackedBits(target, packed, bit, lastInputTick, 32);
+  bit = writePackedBits(target, packed, bit, lastInputValid, 1);
+  bit = writePackedBits(target, packed, bit, lastMoveX + 128, 8);
+  bit = writePackedBits(target, packed, bit, lastMoveY + 128, 8);
+  bit = writePackedBits(target, packed, bit, lastAimX + 128, 8);
+  bit = writePackedBits(target, packed, bit, lastAimY + 128, 8);
+  bit = writePackedBits(target, packed, bit, lastButtons, 2);
+  bit = writePackedBits(target, packed, bit, weaponRequest, 3);
+  bit = writePackedBits(target, packed, bit, botSkill, 8);
+  bit = writePackedBits(target, packed, bit, chassis, 3);
+  bit = writePackedBits(target, packed, bit, chassisUnlocks, 4);
+  bit = writePackedBits(target, packed, bit, weaponUpgradeUnlocks, 12);
+  bit = writePackedBits(target, packed, bit, weaponUpgradeSelections, 12);
+  bit = writePackedBits(target, packed, bit, mode, 2);
+  for (let weaponId = 1; weaponId <= WEAPON_COUNT; weaponId += 1) {
+    bit = writePackedBits(target, packed, bit, source.getUint16(raw + 80 + weaponId * 2, true), 9);
+  }
+  bit = writePackedBits(target, packed, bit, 0, 6);
+  if (bit !== NETWORK_PLAYER_SNAPSHOT_BYTES * 8) throw new Error("network player schema width mismatch");
+}
+
+function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number): void {
+  const raw = SNAPSHOT_HEADER_BYTES + slot * PLAYER_SNAPSHOT_BYTES;
+  const packed = NETWORK_PLAYER_OFFSET + slot * NETWORK_PLAYER_SNAPSHOT_BYTES;
+  let bit = 0;
+  const active = readPackedBits(source, packed, bit, 1);
+  bit += 1;
+  const team = readPackedBits(source, packed, bit, 8);
+  bit += 8;
+  const weapon = readPackedBits(source, packed, bit, 3);
+  bit += 3;
+  const damageLevel = readPackedBits(source, packed, bit, 2);
+  bit += 2;
+  const mobilityLevel = readPackedBits(source, packed, bit, 2);
+  bit += 2;
+  const armorLevel = readPackedBits(source, packed, bit, 2);
+  bit += 2;
+  const generation = readPackedBits(source, packed, bit, 16);
+  bit += 16;
+  const x = readPackedBits(source, packed, bit, 15) + WORLD_MIN_X;
+  bit += 15;
+  const y = readPackedBits(source, packed, bit, 15) + WORLD_MIN_Y;
+  bit += 15;
+  const velocityX = readPackedBits(source, packed, bit, 32) | 0;
+  bit += 32;
+  const velocityY = readPackedBits(source, packed, bit, 32) | 0;
+  bit += 32;
+  const hullX = readPackedBits(source, packed, bit, 10) - 256;
+  bit += 10;
+  const hullY = readPackedBits(source, packed, bit, 10) - 256;
+  bit += 10;
+  const turretX = readPackedBits(source, packed, bit, 10) - 256;
+  bit += 10;
+  const turretY = readPackedBits(source, packed, bit, 10) - 256;
+  bit += 10;
+  const aimX = readPackedBits(source, packed, bit, 10) - 256;
+  bit += 10;
+  const aimY = readPackedBits(source, packed, bit, 10) - 256;
+  bit += 10;
+  const health = readPackedBits(source, packed, bit, 8);
+  bit += 8;
+  const armor = readPackedBits(source, packed, bit, 7);
+  bit += 7;
+  const cooldown = readPackedBits(source, packed, bit, 8);
+  bit += 8;
+  const respawnTicks = readPackedBits(source, packed, bit, 8);
+  bit += 8;
+  const spawnProtectTicks = readPackedBits(source, packed, bit, 8);
+  bit += 8;
+  const overdriveTicks = readPackedBits(source, packed, bit, 10);
+  bit += 10;
+  const boostTicks = readPackedBits(source, packed, bit, 1);
+  bit += 1;
+  const boostCharge = readPackedBits(source, packed, bit, 7);
+  bit += 7;
+  const lastSequence = readPackedBits(source, packed, bit, 16);
+  bit += 16;
+  const score = readPackedBits(source, packed, bit, 32) | 0;
+  bit += 32;
+  const deaths = readPackedBits(source, packed, bit, 32) | 0;
+  bit += 32;
+  const credits = readPackedBits(source, packed, bit, 32) | 0;
+  bit += 32;
+  const lastInputTick = readPackedBits(source, packed, bit, 32);
+  bit += 32;
+  const lastInputValid = readPackedBits(source, packed, bit, 1);
+  bit += 1;
+  const lastMoveX = readPackedBits(source, packed, bit, 8) - 128;
+  bit += 8;
+  const lastMoveY = readPackedBits(source, packed, bit, 8) - 128;
+  bit += 8;
+  const lastAimX = readPackedBits(source, packed, bit, 8) - 128;
+  bit += 8;
+  const lastAimY = readPackedBits(source, packed, bit, 8) - 128;
+  bit += 8;
+  const lastButtons = readPackedBits(source, packed, bit, 2);
+  bit += 2;
+  const weaponRequest = readPackedBits(source, packed, bit, 3);
+  bit += 3;
+  const botSkill = readPackedBits(source, packed, bit, 8);
+  bit += 8;
+  const chassis = readPackedBits(source, packed, bit, 3);
+  bit += 3;
+  const chassisUnlocks = readPackedBits(source, packed, bit, 4);
+  bit += 4;
+  const weaponUpgradeUnlocks = readPackedBits(source, packed, bit, 12);
+  bit += 12;
+  const weaponUpgradeSelections = readPackedBits(source, packed, bit, 12);
+  bit += 12;
+  const mode = readPackedBits(source, packed, bit, 2);
+  bit += 2;
+  if (bit + WEAPON_COUNT * 9 + 6 !== NETWORK_PLAYER_SNAPSHOT_BYTES * 8) {
+    throw new Error("network player schema width mismatch");
+  }
+  if (active > 1 || weapon > WEAPON_COUNT || damageLevel > 3 || mobilityLevel > 3 || armorLevel > 3) {
+    throw new Error("network player progression field is invalid");
+  }
+  if (x < WORLD_MIN_X || x > WORLD_MAX_X || y < WORLD_MIN_Y || y > WORLD_MAX_Y) {
+    throw new Error("network player position is invalid");
+  }
+  if (
+    hullX < -256 ||
+    hullX > 256 ||
+    hullY < -256 ||
+    hullY > 256 ||
+    turretX < -256 ||
+    turretX > 256 ||
+    turretY < -256 ||
+    turretY > 256 ||
+    aimX < -256 ||
+    aimX > 256 ||
+    aimY < -256 ||
+    aimY > 256
+  ) {
+    throw new Error("network player direction is invalid");
+  }
+  if (
+    health > NETWORK_MAX_PLAYER_HEALTH ||
+    armor > MAX_ARMOR ||
+    lastButtons > 3 ||
+    weaponRequest > WEAPON_COUNT ||
+    chassis > CHASSIS_COUNT ||
+    chassisUnlocks > CHASSIS_UNLOCK_MASK ||
+    mode > 2 ||
+    lastInputValid > 1 ||
+    (lastInputValid === 0 && lastInputTick !== 0) ||
+    overdriveTicks > OVERDRIVE_TICKS ||
+    boostCharge > TANK_BOOST_CAPACITY
+  ) {
+    throw new Error("network player bounded field is invalid");
+  }
+  if (active !== 0 && (weapon === 0 || chassis === 0)) throw new Error("active network player identity is invalid");
+  if (active !== 0 && (chassisUnlocks & chassisUnlockBit(chassis)) === 0) {
+    throw new Error("active network player chassis is not unlocked");
+  }
+  if ((weaponUpgradeUnlocks & ~((1 << WEAPON_UPGRADE_COUNT) - 1)) !== 0) {
+    throw new Error("network player weapon upgrade mask is invalid");
+  }
+  for (let weaponId = 1; weaponId <= WEAPON_COUNT; weaponId += 1) {
+    const branch = (weaponUpgradeSelections >>> ((weaponId - 1) * 2)) & 3;
+    if (branch > 2) throw new Error("network player weapon upgrade selection is invalid");
+    if (branch !== 0) {
+      const upgradeId = (weaponId - 1) * 2 + branch;
+      if ((weaponUpgradeUnlocks & (1 << (upgradeId - 1))) === 0)
+        throw new Error("network player selected upgrade is locked");
+    }
+    const ammo = readPackedBits(source, packed, bit, 9);
+    bit += 9;
+    if (ammo > weaponById(weaponId).maximumAmmo) throw new Error("network player ammo exceeds weapon capacity");
+    target.setUint16(raw + 82 + (weaponId - 1) * 2, ammo, true);
+  }
+  if (packedRecordHasNonZeroBits(source, packed, bit, 6)) throw new Error("network player reserved bits are nonzero");
+
+  target.setUint8(raw, active);
+  target.setUint8(raw + 1, team);
+  target.setUint8(raw + 2, weapon);
+  target.setUint8(raw + 3, damageLevel);
+  target.setUint8(raw + 4, mobilityLevel);
+  target.setUint8(raw + 5, armorLevel);
+  target.setUint16(raw + 6, generation, true);
+  target.setInt32(raw + 8, x, true);
+  target.setInt32(raw + 12, y, true);
+  target.setInt32(raw + 16, velocityX, true);
+  target.setInt32(raw + 20, velocityY, true);
+  target.setInt16(raw + 24, hullX, true);
+  target.setInt16(raw + 26, hullY, true);
+  target.setInt16(raw + 28, turretX, true);
+  target.setInt16(raw + 30, turretY, true);
+  target.setInt16(raw + 32, aimX, true);
+  target.setInt16(raw + 34, aimY, true);
+  target.setInt16(raw + 36, health, true);
+  target.setInt16(raw + 38, armor, true);
+  target.setUint16(raw + 40, cooldown, true);
+  target.setUint16(raw + 42, respawnTicks, true);
+  target.setUint16(raw + 44, spawnProtectTicks, true);
+  target.setUint16(raw + 46, overdriveTicks, true);
+  target.setUint16(raw + 48, boostCharge, true);
+  target.setUint16(raw + 50, lastSequence, true);
+  target.setInt32(raw + 52, score, true);
+  target.setInt32(raw + 56, deaths, true);
+  target.setInt32(raw + 60, credits, true);
+  target.setUint32(raw + 64, lastInputTick, true);
+  target.setInt8(raw + 68, lastMoveX);
+  target.setInt8(raw + 69, lastMoveY);
+  target.setInt8(raw + 70, lastAimX);
+  target.setInt8(raw + 71, lastAimY);
+  target.setUint8(raw + 72, lastButtons);
+  target.setUint8(raw + 73, weaponRequest);
+  target.setUint8(raw + 74, botSkill);
+  target.setUint8(raw + 75, boostTicks);
+  target.setUint8(raw + 76, chassis);
+  target.setUint8(raw + 77, chassisUnlocks);
+  target.setUint16(raw + 78, weaponUpgradeUnlocks, true);
+  target.setUint16(raw + 80, weaponUpgradeSelections, true);
+  target.setUint8(raw + 94, mode);
+  target.setUint8(raw + 95, lastInputValid);
 }
 
 /** Reads the named delta base without allocating or decoding the frame. */

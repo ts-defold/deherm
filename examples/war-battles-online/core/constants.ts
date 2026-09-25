@@ -177,6 +177,8 @@ export const DIRECTION_DIAGONAL = 181;
 // Two additive bytes carry player mode plus the last-input-tick validity bit.
 // The separate bit keeps every uint32 tick, including 0xffffffff, representable.
 export const PLAYER_SNAPSHOT_BYTES = 96;
+/** Exact schema-aware player record used only by the network projection. */
+export const NETWORK_PLAYER_SNAPSHOT_BYTES = 66;
 export const PROJECTILE_SNAPSHOT_BYTES = 28;
 /** Exact fixed-point trajectory/event record used only by the network projection. */
 export const NETWORK_PROJECTILE_SNAPSHOT_BYTES = 15;
@@ -194,13 +196,13 @@ export const SNAPSHOT_BYTES =
   MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES +
   COVER_SNAPSHOT_BYTES;
 /**
- * The network image is independent from the broad rollback image. Player and
- * world records stay byte-identical for now; projectile records use bounded
- * bit fields so the worst-case recovery image fits below 12 KiB.
+ * The network image is independent from the broad rollback image. Player
+ * records use an exact bounded bit schema and projectile records use bounded
+ * trajectory fields so the worst-case recovery image fits below 12 KiB.
  */
 export const NETWORK_SNAPSHOT_BYTES =
   SNAPSHOT_HEADER_BYTES +
-  MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES +
+  MAX_PLAYERS * NETWORK_PLAYER_SNAPSHOT_BYTES +
   MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES +
   MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES +
   COVER_SNAPSHOT_BYTES;

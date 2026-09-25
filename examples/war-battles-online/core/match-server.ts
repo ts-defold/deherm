@@ -22,7 +22,7 @@ import {
   CONTROL_SET_WEAPON,
   CONTROL_SET_CHASSIS,
   CONTROL_SET_WEAPON_UPGRADE,
-  INPUT_PACKET_BYTES,
+  INPUT_BUNDLE_BYTES,
   INPUT_BUNDLE_MAX_COMMANDS,
   CONTROL_SUICIDE,
   MESSAGE_CONTROL,
@@ -45,7 +45,7 @@ import {
   messageKind,
   readControl,
   readHello,
-  readInputPacket,
+  readInputBundle,
   readPing,
   readWelcomeAck,
   writePing,
@@ -444,7 +444,7 @@ export class ServerSession implements TransportReceiver {
   private readonly control: ControlMessage = { action: 0, argument: 0 };
   private readonly ping: PingMessage = { clientTime: 0, serverTick: 0 };
   private readonly welcomeAck: WelcomeAckMessage = { resumeToken: new Uint8Array(RESUME_TOKEN_BYTES) };
-  private readonly command: InputCommand;
+  private readonly commands: readonly InputCommand[];
   /** Exact accepted ticks distinguish redundant old copies from true late arrivals. */
   private readonly acceptedInputTicks = new Float64Array(INPUT_HISTORY_TICKS);
   /** Exact late ticks ensure a redundant bundle cannot inflate late accounting. */
@@ -478,8 +478,10 @@ export class ServerSession implements TransportReceiver {
   // QUIC datagrams are unordered relative to the reliable session stream. Keep
   // exactly the latest bounded bundle that arrives after WELCOME but before
   // WELCOME_ACK, then admit it on the first authoritative tick after the ACK.
-  private readonly preReadyInput = new Uint8Array(INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS);
+  private readonly preReadyInput = new Uint8Array(INPUT_BUNDLE_BYTES);
   private preReadyInputBytes = 0;
+  private preReadyInputTick = -1;
+  private preReadyInputSequence = -1;
   private awaitingWelcomeAck = false;
   private stagedResumeGeneration = 0;
   private welcomeAckDeadline = 0;
@@ -487,7 +489,9 @@ export class ServerSession implements TransportReceiver {
   constructor(server: MatchServer, diagnosticId: number) {
     this.server = server;
     this.diagnosticId = diagnosticId;
-    this.command = createInputCommand(server.world.matchId, 1);
+    this.commands = Array.from({ length: INPUT_BUNDLE_MAX_COMMANDS }, () =>
+      createInputCommand(server.world.matchId, 1),
+    );
     this.acceptedInputTicks.fill(-1);
     this.lateInputTicks.fill(-1);
   }
@@ -507,6 +511,8 @@ export class ServerSession implements TransportReceiver {
     if (this.ready && this.preReadyInputBytes > 0) {
       const byteLength = this.preReadyInputBytes;
       this.preReadyInputBytes = 0;
+      this.preReadyInputTick = -1;
+      this.preReadyInputSequence = -1;
       try {
         this.handleInput(this.preReadyInput, byteLength);
       } catch (error: unknown) {
@@ -541,9 +547,18 @@ export class ServerSession implements TransportReceiver {
   onDatagram(payload: Uint8Array): void {
     try {
       if (!this.ready && this.awaitingWelcomeAck && this.slot >= 0) {
-        this.requireInputBundleSize(payload.byteLength, payload.byteLength);
-        this.preReadyInput.set(payload, 0);
-        this.preReadyInputBytes = payload.byteLength;
+        const commandCount = readInputBundle(payload, payload.byteLength, this.commands);
+        const newest = this.commands[commandCount - 1]!;
+        if (
+          this.preReadyInputTick < 0 ||
+          tickAfter(newest.tick, this.preReadyInputTick) ||
+          (newest.tick === this.preReadyInputTick && sequenceIsNewer(newest.sequence, this.preReadyInputSequence))
+        ) {
+          this.preReadyInput.set(payload, 0);
+          this.preReadyInputBytes = payload.byteLength;
+          this.preReadyInputTick = newest.tick;
+          this.preReadyInputSequence = newest.sequence;
+        }
         return;
       }
       this.handleInput(payload);
@@ -567,6 +582,8 @@ export class ServerSession implements TransportReceiver {
     this.sessionHandling = false;
     this.clearReliableDispatch();
     this.preReadyInputBytes = 0;
+    this.preReadyInputTick = -1;
+    this.preReadyInputSequence = -1;
     this.ready = false;
     this.server.log(`session-closed:${code}:${reason}:session=${this.diagnosticId}:slot=${this.slot + 1}`);
     this.server.releaseSlot(this);
@@ -865,7 +882,7 @@ export class ServerSession implements TransportReceiver {
 
   private handleInput(payload: Uint8Array, byteLength = payload.byteLength): void {
     if (!this.ready) return;
-    this.requireInputBundleSize(byteLength, payload.byteLength);
+    const commandCount = readInputBundle(payload, byteLength, this.commands);
     if (this.inputBudget <= 0) {
       // A client flooding the input lane is throttled, not disconnected: the
       // honest cause is a burst after a stall.
@@ -879,54 +896,39 @@ export class ServerSession implements TransportReceiver {
     // Commands are oldest-first. Already-consumed redundancy is a benign
     // duplicate, not a protocol rejection; future commands are still staged so
     // one lost datagram does not create a movement hole.
-    for (let offset = 0; offset < byteLength; offset += INPUT_PACKET_BYTES) {
-      readInputPacket(payload, offset, this.command);
+    for (let index = 0; index < commandCount; index += 1) {
+      const command = this.commands[index]!;
       // A session may only ever move its own tank, whatever the packet says.
-      if (this.command.playerId !== this.slot + 1) {
+      if (command.playerId !== this.slot + 1) {
         this.server.stats.inputsRejected += 1;
         continue;
       }
       if (
-        this.command.matchId !== this.server.world.matchId ||
-        tickAfter(this.command.tick, tickDeadline(this.server.world.tick, INPUT_HISTORY_TICKS - 1))
+        command.matchId !== this.server.world.matchId ||
+        tickAfter(command.tick, tickDeadline(this.server.world.tick, INPUT_HISTORY_TICKS - 1))
       ) {
         this.server.stats.inputsRejected += 1;
         continue;
       }
-      this.observeSnapshotAcknowledgement(this.command);
-      const acceptedSlot = this.command.tick % this.acceptedInputTicks.length;
-      if (!tickAfter(this.command.tick, this.server.world.tick)) {
+      this.observeSnapshotAcknowledgement(command);
+      const acceptedSlot = command.tick % this.acceptedInputTicks.length;
+      if (!tickAfter(command.tick, this.server.world.tick)) {
         if (
-          this.acceptedInputTicks[acceptedSlot] !== this.command.tick &&
-          this.lateInputTicks[acceptedSlot] !== this.command.tick
+          this.acceptedInputTicks[acceptedSlot] !== command.tick &&
+          this.lateInputTicks[acceptedSlot] !== command.tick
         ) {
-          this.lateInputTicks[acceptedSlot] = this.command.tick;
+          this.lateInputTicks[acceptedSlot] = command.tick;
           this.server.stats.inputsLate += 1;
         }
         continue;
       }
-      if (this.server.world.submitInput(this.command)) {
-        this.acceptedInputTicks[acceptedSlot] = this.command.tick;
+      if (this.server.world.submitInput(command)) {
+        this.acceptedInputTicks[acceptedSlot] = command.tick;
         this.server.stats.inputsAccepted += 1;
       }
       // A false result after the explicit authority/time checks is an older
       // copy of a future command already staged by another redundant bundle.
       // Treat that as successful loss protection, not hostile input.
-    }
-  }
-
-  private requireInputBundleSize(byteLength: number, capacity: number): void {
-    if (
-      byteLength === 0 ||
-      byteLength > capacity ||
-      byteLength % INPUT_PACKET_BYTES !== 0 ||
-      byteLength > INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS
-    ) {
-      throw new Error(
-        byteLength < INPUT_PACKET_BYTES
-          ? "input packet is truncated"
-          : "input packet has trailing bytes or too many bundled commands",
-      );
     }
   }
 
@@ -955,6 +957,11 @@ export class ServerSession implements TransportReceiver {
       if (this.snapshotSends[index] === send) this.snapshotSends[index] = undefined;
     }
   }
+}
+
+function sequenceIsNewer(candidate: number, existing: number): boolean {
+  const distance = (candidate - existing) & 0xffff;
+  return distance !== 0 && distance < 0x8000;
 }
 
 function clampInteger(value: number, minimum: number, maximum: number): number {

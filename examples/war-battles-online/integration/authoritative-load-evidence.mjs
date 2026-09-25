@@ -109,7 +109,10 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.equal(document.transport?.observed?.sentReliable, document.transport?.observed?.deliveredReliable);
   assert.ok(document.transport?.observed?.deliveredDatagrams > 0);
   assert.ok(document.transport?.observed?.droppedDatagrams > 0);
-  assert.ok(document.transport?.observed?.backpressuredDatagrams > 0);
+  // At the production 30 Hz input cadence the deterministic 42 +/- 25 ms link
+  // must remain below its four-datagram bound. Dedicated transport tests force
+  // saturation; this load trace proves the ordinary cadence avoids it.
+  assert.equal(document.transport?.observed?.backpressuredDatagrams, 0);
   assert.ok(document.transport?.observed?.reorderedDatagrams > 0);
   assert.equal(document.server?.minimumInputAcceptanceRatio, 0.95);
   assert.ok(document.server?.inputAcceptanceRatio >= document.server.minimumInputAcceptanceRatio);
@@ -127,6 +130,9 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
       0,
     ),
   );
+  assert.equal(document.clients?.inputSendIntervalTicks, 2);
+  assert.ok(document.clients?.minimumAttemptedInputDatagrams > 0);
+  assert.ok(document.clients?.maximumAttemptedInputDatagrams >= document.clients?.minimumAttemptedInputDatagrams);
   assert.ok(document.clients?.minInputLeadTicks > 2);
   assert.ok(document.clients?.maxInputLeadTicks <= 16);
   assert.ok(Number.isInteger(document.clients?.totalInputLeadDecreases));
@@ -150,7 +156,10 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
     assert.equal(row.errors, 0);
     assert.equal(
       row.inputsSent + row.inputsDropped,
-      document.config.ticks + row.inputLeadIncreases - row.inputLeadCatchdownSkips,
+      Math.ceil(
+        (document.config.ticks + row.inputLeadIncreases - row.inputLeadCatchdownSkips) /
+          document.clients.inputSendIntervalTicks,
+      ),
     );
     assert.equal(row.inputLeadTicks, row.inputLeadIncreases - row.inputLeadDecreases + 2);
     assert.ok(row.inputLeadCatchdownSkips <= row.inputLeadDecreases);

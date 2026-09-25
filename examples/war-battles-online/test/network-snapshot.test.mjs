@@ -3,9 +3,11 @@ import test from "node:test";
 
 import {
   BattleWorld,
+  CHASSIS_UNLOCK_MASK,
   MAX_PLAYERS,
   MAX_PROJECTILES,
   NETWORK_PROJECTILE_SNAPSHOT_BYTES,
+  NETWORK_PLAYER_SNAPSHOT_BYTES,
   NETWORK_SNAPSHOT_BYTES,
   NETWORK_SNAPSHOT_MESSAGE_BYTES,
   PLAYER_SNAPSHOT_BYTES,
@@ -20,7 +22,8 @@ import {
   writeNetworkSnapshotKeyframe,
 } from "../core/index.ts";
 
-const projectileOffset = SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES;
+const rawProjectileOffset = SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES;
+const networkProjectileOffset = SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * NETWORK_PLAYER_SNAPSHOT_BYTES;
 
 function fixture() {
   const world = new BattleWorld(77, 0x1234_5678);
@@ -53,7 +56,68 @@ test("the compact network image preserves every exact rollback field at its decl
   assert.equal(compactNetworkSnapshot(rollback, network), NETWORK_SNAPSHOT_BYTES);
   assert.equal(expandNetworkSnapshot(network, expanded), SNAPSHOT_BYTES);
   assert.deepEqual(expanded, rollback);
-  assert.equal(SNAPSHOT_BYTES - NETWORK_SNAPSHOT_BYTES, MAX_PROJECTILES * (28 - NETWORK_PROJECTILE_SNAPSHOT_BYTES));
+  assert.equal(
+    SNAPSHOT_BYTES - NETWORK_SNAPSHOT_BYTES,
+    MAX_PLAYERS * (PLAYER_SNAPSHOT_BYTES - NETWORK_PLAYER_SNAPSHOT_BYTES) +
+      MAX_PROJECTILES * (28 - NETWORK_PROJECTILE_SNAPSHOT_BYTES),
+  );
+});
+
+test("all player slots preserve the exact schema boundaries and rollback bytes", () => {
+  const { rollback, world } = fixture();
+  const ammoMaximums = [0, 400, 20, 40, 24, 120];
+  for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+    world.playerTeam[slot] = 0xff;
+    world.playerWeapon[slot] = 6;
+    world.playerDamageLevel[slot] = 3;
+    world.playerMobilityLevel[slot] = 3;
+    world.playerArmorLevel[slot] = 3;
+    world.playerX[slot] = WORLD_MIN_X;
+    world.playerY[slot] = WORLD_MAX_Y;
+    world.playerVelocityX[slot] = 0x7fff_ffff;
+    world.playerVelocityY[slot] = -0x8000_0000;
+    world.playerHullX[slot] = 256;
+    world.playerHullY[slot] = -256;
+    world.playerTurretX[slot] = 256;
+    world.playerTurretY[slot] = -256;
+    world.playerAimX[slot] = 256;
+    world.playerAimY[slot] = -256;
+    world.playerHealth[slot] = 240;
+    world.playerArmor[slot] = 100;
+    world.playerCooldown[slot] = 108;
+    world.playerRespawnTicks[slot] = 96;
+    world.playerSpawnProtectTicks[slot] = 60;
+    world.playerOverdriveTicks[slot] = 600;
+    world.playerBoostTicks[slot] = 1;
+    world.playerBoostCharge[slot] = 90;
+    world.playerLastSequence[slot] = 0xffff;
+    world.playerScore[slot] = -0x8000_0000;
+    world.playerDeaths[slot] = 0x7fff_ffff;
+    world.playerCredits[slot] = 0x7fff_ffff;
+    world.playerLastInputTick[slot] = 0xffff_ffff;
+    world.playerLastMoveX[slot] = -128;
+    world.playerLastMoveY[slot] = 127;
+    world.playerLastAimX[slot] = -128;
+    world.playerLastAimY[slot] = 127;
+    world.playerLastButtons[slot] = 3;
+    world.playerWeaponRequest[slot] = 6;
+    world.playerBotSkill[slot] = 0xff;
+    world.playerChassis[slot] = 4;
+    world.playerChassisUnlocks[slot] = CHASSIS_UNLOCK_MASK;
+    world.playerWeaponUpgradeUnlocks[slot] = 0xfff;
+    world.playerWeaponUpgradeSelections[slot] = 0xaaa;
+    world.playerMode[slot] = 2;
+    for (let weapon = 0; weapon < ammoMaximums.length; weapon += 1) {
+      world.playerAmmo[slot * ammoMaximums.length + weapon] = ammoMaximums[weapon];
+    }
+  }
+  world.writeSnapshot(rollback);
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const expanded = new Uint8Array(SNAPSHOT_BYTES);
+  compactNetworkSnapshot(rollback, network);
+  expandNetworkSnapshot(network, expanded);
+  assert.deepEqual(expanded, rollback);
+  assert.equal(NETWORK_PLAYER_SNAPSHOT_BYTES, 66);
 });
 
 test("straight projectile motion leaves its trajectory record byte-identical", () => {
@@ -92,8 +156,8 @@ test("straight projectile motion leaves its trajectory record byte-identical", (
   compactNetworkSnapshot(secondRaw, secondNetwork);
 
   assert.deepEqual(
-    secondNetwork.subarray(projectileOffset, projectileOffset + NETWORK_PROJECTILE_SNAPSHOT_BYTES),
-    firstNetwork.subarray(projectileOffset, projectileOffset + NETWORK_PROJECTILE_SNAPSHOT_BYTES),
+    secondNetwork.subarray(networkProjectileOffset, networkProjectileOffset + NETWORK_PROJECTILE_SNAPSHOT_BYTES),
+    firstNetwork.subarray(networkProjectileOffset, networkProjectileOffset + NETWORK_PROJECTILE_SNAPSHOT_BYTES),
   );
   const expanded = new Uint8Array(SNAPSHOT_BYTES);
   expandNetworkSnapshot(secondNetwork, expanded);
@@ -103,10 +167,35 @@ test("straight projectile motion leaves its trajectory record byte-identical", (
 test("the compact network image rejects values outside its exact fixed-point contract", () => {
   const { rollback } = fixture();
   const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
-  const projectile = new DataView(rollback.buffer, rollback.byteOffset + projectileOffset, 28);
+  const projectile = new DataView(rollback.buffer, rollback.byteOffset + rawProjectileOffset, 28);
 
   projectile.setInt16(6, 512, true);
   assert.throws(() => compactNetworkSnapshot(rollback, network), /projectile damage must fit 9 unsigned bits/u);
+});
+
+test("the player projection rejects out-of-schema rollback values", () => {
+  const { rollback } = fixture();
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const player = new DataView(rollback.buffer, rollback.byteOffset + SNAPSHOT_HEADER_BYTES, PLAYER_SNAPSHOT_BYTES);
+
+  player.setInt16(36, 241, true);
+  assert.throws(() => compactNetworkSnapshot(rollback, network), /player health must be in/u);
+
+  player.setInt16(36, 100, true);
+  player.setUint16(82 + 2, 401, true);
+  assert.throws(() => compactNetworkSnapshot(rollback, network), /player ammo exceeds weapon capacity/u);
+
+  player.setUint16(82 + 2, 0, true);
+  player.setInt32(8, WORLD_MIN_X - 1, true);
+  assert.throws(() => compactNetworkSnapshot(rollback, network), /player x must be in/u);
+
+  player.setInt32(8, WORLD_MIN_X, true);
+  player.setUint16(46, 601, true);
+  assert.throws(() => compactNetworkSnapshot(rollback, network), /player overdrive ticks must be in/u);
+
+  player.setUint16(46, 0, true);
+  player.setUint16(48, 91, true);
+  assert.throws(() => compactNetworkSnapshot(rollback, network), /player boost charge must be in/u);
 });
 
 test("the compact network image rejects reserved and inactive payload bits before expansion", () => {
@@ -116,14 +205,19 @@ test("the compact network image rejects reserved and inactive payload bits befor
   compactNetworkSnapshot(rollback, network);
 
   const reserved = network.slice();
-  reserved[projectileOffset + NETWORK_PROJECTILE_SNAPSHOT_BYTES - 1] |= 0x80;
+  reserved[networkProjectileOffset + NETWORK_PROJECTILE_SNAPSHOT_BYTES - 1] |= 0x80;
   assert.throws(() => expandNetworkSnapshot(reserved, expanded), /reserved bit/u);
 
   world.projectileActive[0] = 0;
   world.writeSnapshot(rollback);
   compactNetworkSnapshot(rollback, network);
-  network[projectileOffset + 2] |= 0x02;
+  network[networkProjectileOffset + 2] |= 0x02;
   assert.throws(() => expandNetworkSnapshot(network, expanded), /inactive projectile network record is noncanonical/u);
+
+  compactNetworkSnapshot(rollback, network);
+  const playerReserved = 32 + NETWORK_PLAYER_SNAPSHOT_BYTES - 1;
+  network[playerReserved] |= 0x04;
+  assert.throws(() => expandNetworkSnapshot(network, expanded), /player reserved bits/u);
 });
 
 test("the projected world tick must match its enclosing snapshot frame", () => {
@@ -139,7 +233,7 @@ test("the projected world tick must match its enclosing snapshot frame", () => {
 });
 
 test("the declared compact image is below the 12 KiB recovery ceiling", () => {
-  assert.equal(NETWORK_SNAPSHOT_BYTES, 11_232);
+  assert.equal(NETWORK_SNAPSHOT_BYTES, 10_272);
   assert.ok(NETWORK_SNAPSHOT_BYTES + 16 < 12 * 1_024);
 });
 

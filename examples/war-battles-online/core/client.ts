@@ -1,8 +1,8 @@
 // The networked client.
 //
 // It keeps a locally predicted `BattleWorld`, sends one bounded redundant input
-// bundle per tick on the unreliable lane, and reconciles against the authoritative snapshots that come
-// back on the reliable one. Reconciliation is the ordinary rollback: restore the
+// bundle every two ticks on the unreliable lane, and reconciles against the
+// authoritative snapshots that come back on the reliable one. Reconciliation is the ordinary rollback: restore the
 // server's state, then re-apply every local input newer than it and step forward
 // to where the client already was, so the local tank does not rubber-band while
 // the rest of the arena snaps to the truth.
@@ -32,7 +32,7 @@ import {
   HELLO_BYTES,
   INPUT_BUNDLE_BYTES,
   INPUT_BUNDLE_MAX_COMMANDS,
-  INPUT_PACKET_BYTES,
+  INPUT_SEND_INTERVAL_TICKS,
   MESSAGE_PONG,
   MESSAGE_REJECT,
   MESSAGE_SNAPSHOT,
@@ -50,7 +50,7 @@ import {
   readWelcome,
   writeControl,
   writeHello,
-  writeInputPacket,
+  writeInputBundle,
   writePing,
   writeWelcomeAck,
   type InputCommand,
@@ -249,6 +249,7 @@ export class BattleClient implements TransportReceiver {
   private appliedSnapshotTick = -1;
   private snapshotAckBits = 0;
   private sequence = 0;
+  private lastInputSendSequence = -1;
   private readonly pendingSnapshot = new Uint8Array(SNAPSHOT_BYTES);
   private readonly snapshotHistory = Array.from(
     { length: SNAPSHOT_BASE_HISTORY_FRAMES },
@@ -560,6 +561,7 @@ export class BattleClient implements TransportReceiver {
     for (let tick = 0; tick < this.inputLeadTicks; tick += 1) this.world.step();
     this.localTick = this.world.tick;
     this.appliedSnapshotTick = -1;
+    this.lastInputSendSequence = -1;
     this.historyTick.fill(-1);
     for (const command of this.history) {
       command.matchId = this.welcome.matchId;
@@ -933,6 +935,17 @@ export class BattleClient implements TransportReceiver {
   private transmit(command: InputCommand): void {
     const transport = this.transport;
     if (transport === undefined) return;
+    // Match the classic arena-shooter shape: sample and predict every 60 Hz
+    // tick, but send one datagram at 30 Hz. Four commands carry the two new
+    // ticks plus the previous packet window, so one lost packet creates no
+    // authoritative input hole.
+    if (
+      this.lastInputSendSequence >= 0 &&
+      ((command.sequence - this.lastInputSendSequence) & 0xffff) < INPUT_SEND_INTERVAL_TICKS
+    ) {
+      return;
+    }
+    this.lastInputSendSequence = command.sequence;
     // The local world already runs `leadTicks` ahead of the server. Preserve
     // the command tick exactly so authoritative simulation and replay execute
     // the same input on the same deterministic tick.
@@ -940,8 +953,20 @@ export class BattleClient implements TransportReceiver {
     for (let offset = INPUT_BUNDLE_MAX_COMMANDS - 1; offset >= 0; offset -= 1) {
       const tick = (command.tick - offset) >>> 0;
       const historySlot = tick % INPUT_HISTORY_TICKS;
-      if (this.historyTick[historySlot] !== tick) continue;
+      if (this.historyTick[historySlot] !== tick) {
+        // A reconciliation may jump over a tick. Only the contiguous suffix
+        // ending at the newest command has the tick/sequence relationship the
+        // compact bundle reconstructs; discard any older prefix across a gap.
+        commandCount = 0;
+        continue;
+      }
       const source = this.history[historySlot]!;
+      const previous = commandCount === 0 ? undefined : this.staging[commandCount - 1];
+      if (previous !== undefined && ((source.sequence - previous.sequence) & 0xffff) !== 1) {
+        // Bounded replay may rewind the local tick while the monotonic command
+        // sequence continues. Start a fresh suffix at that discontinuity.
+        commandCount = 0;
+      }
       const staged = this.staging[commandCount]!;
       staged.tick = source.tick;
       staged.sequence = source.sequence;
@@ -954,11 +979,11 @@ export class BattleClient implements TransportReceiver {
       staged.fireSubtick = source.fireSubtick;
       staged.latestSnapshotTick = source.latestSnapshotTick;
       staged.snapshotAckBits = source.snapshotAckBits;
-      writeInputPacket(this.inputBuffer, commandCount * INPUT_PACKET_BYTES, staged);
       commandCount += 1;
     }
     if (commandCount === 0) return;
-    const payload = this.inputBuffer.subarray(0, commandCount * INPUT_PACKET_BYTES);
+    const byteLength = writeInputBundle(this.inputBuffer, this.staging, commandCount);
+    const payload = this.inputBuffer.subarray(0, byteLength);
     void sendTickInput(transport, payload).then(
       (result) => {
         if (result.disposition === "sent") {

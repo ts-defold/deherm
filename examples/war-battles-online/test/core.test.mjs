@@ -29,8 +29,10 @@ import {
   HELLO_BYTES,
   INPUT_BUTTON_BOOST,
   INPUT_BUTTON_FIRE,
+  INPUT_BUNDLE_BYTES,
   INPUT_BUNDLE_MAX_COMMANDS,
   INPUT_PACKET_BYTES,
+  INPUT_SEND_INTERVAL_TICKS,
   MAP_HEIGHT,
   MAP_WIDTH,
   MAX_PICKUPS,
@@ -88,6 +90,7 @@ import {
   HAZARD_RADIUS,
   isqrt,
   readHello,
+  readInputBundle,
   readInputPacket,
   readReject,
   readSnapshotFrame,
@@ -97,6 +100,7 @@ import {
   writeHello,
   writeControl,
   writeInputPacket,
+  writeInputBundle,
   writeReject,
   writeSnapshotDelta,
   writeSnapshotKeyframe,
@@ -210,6 +214,41 @@ test("input packets round-trip every authoritative and acknowledgement field", (
   assert.deepEqual(observed, expected);
   bytes[INPUT_PACKET_BYTES + 9] ^= 1;
   assert.throws(() => readInputPacket(bytes, INPUT_PACKET_BYTES, observed), /checksum/);
+});
+
+test("compact input bundles share headers and reconstruct wrap-safe redundant commands", () => {
+  const commands = [
+    command(7, 0xffff_fffe, { sequence: 0xfffe, moveY: 43 }),
+    command(7, 0xffff_ffff, { sequence: 0xffff, moveX: -127, buttons: INPUT_BUTTON_BOOST }),
+    command(7, 0, { sequence: 0, aimY: 77, weaponRequest: WEAPON_MORTAR }),
+    command(7, 1, {
+      sequence: 1,
+      aimX: -99,
+      buttons: INPUT_BUTTON_FIRE,
+      fireSubtick: 31,
+      latestSnapshotTick: 0xffff_fffe,
+      snapshotAckBits: 0xa55a_0ff1,
+    }),
+  ];
+  for (const input of commands) input.matchId = 0x1020_3040;
+  const bytes = new Uint8Array(INPUT_BUNDLE_BYTES);
+  assert.equal(writeInputBundle(bytes, commands, commands.length), INPUT_BUNDLE_BYTES);
+  assert.equal(INPUT_BUNDLE_BYTES, 50, "four commands must cost less than two former 32-byte packets");
+  const observed = commands.map(() => createInputCommand(0, 1));
+  assert.equal(readInputBundle(bytes, bytes.byteLength, observed), 4);
+  for (let index = 0; index < commands.length; index += 1) {
+    assert.deepEqual(observed[index], {
+      ...commands[index],
+      latestSnapshotTick: commands[3].latestSnapshotTick,
+      snapshotAckBits: commands[3].snapshotAckBits,
+    });
+  }
+
+  bytes[24] |= 0x80;
+  assert.throws(() => readInputBundle(bytes, bytes.byteLength, observed), /checksum/);
+  bytes[bytes.length - 2] = 0;
+  bytes[bytes.length - 1] = 0;
+  assert.throws(() => readInputBundle(bytes, bytes.byteLength, observed), /checksum/);
 });
 
 test("session messages round-trip and reject a foreign kind", () => {
@@ -1815,7 +1854,7 @@ test("server preserves HELLO, acknowledgement, and control order across async ad
   server.close();
 });
 
-test("server retains the latest input datagram that overtakes WELCOME_ACK", async () => {
+test("server retains the newest input datagram that overtakes WELCOME_ACK out of order", async () => {
   const errors = [];
   const reliable = [];
   const server = new MatchServer({
@@ -1874,12 +1913,28 @@ test("server retains the latest input datagram that overtakes WELCOME_ACK", asyn
   session.onDatagram(firstPacket);
 
   const latest = createInputCommand(welcome.matchId, welcome.playerId);
-  latest.tick = 1;
-  latest.sequence = 2;
-  latest.moveX = 127;
+  latest.tick = 3;
+  latest.sequence = 3;
+  latest.moveX = -127;
   const latestPacket = new Uint8Array(INPUT_PACKET_BYTES);
   writeInputPacket(latestPacket, 0, latest);
   session.onDatagram(latestPacket);
+
+  const corrected = createInputCommand(welcome.matchId, welcome.playerId);
+  corrected.tick = 3;
+  corrected.sequence = 4;
+  corrected.moveX = 127;
+  const correctedPacket = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(correctedPacket, 0, corrected);
+  session.onDatagram(correctedPacket);
+
+  const stale = createInputCommand(welcome.matchId, welcome.playerId);
+  stale.tick = 2;
+  stale.sequence = 2;
+  stale.moveX = -127;
+  const stalePacket = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(stalePacket, 0, stale);
+  session.onDatagram(stalePacket);
   assert.equal(server.stats.inputsAccepted, 0, "pre-ACK input cannot execute before admission");
 
   const acknowledgement = new Uint8Array(WELCOME_ACK_BYTES);
@@ -1887,10 +1942,10 @@ test("server retains the latest input datagram that overtakes WELCOME_ACK", asyn
   session.onReliable(TRANSPORT_CHANNEL_SESSION, acknowledgement);
   await settleUntil(() => session.ready, "cross-lane acknowledgement");
   const initialX = server.world.playerX[welcome.playerId - 1];
-  server.step();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
 
   assert.equal(server.stats.inputsAccepted, 1, "exactly the latest bounded pre-ACK bundle is admitted");
-  assert.equal(server.world.playerLastInputTick[welcome.playerId - 1], 1);
+  assert.equal(server.world.playerLastInputTick[welcome.playerId - 1], 3);
   assert.ok(
     server.world.playerX[welcome.playerId - 1] > initialX,
     "the latest input replaces the older buffered datagram",
@@ -2645,8 +2700,10 @@ test("input rate limiting is advisory and does not reject a live client", async 
 
   // More than one datagram before the next authoritative tick exhausts the
   // per-session ingress budget and makes the server send REJECT_RATE_LIMITED.
-  client.update(TICK_MILLISECONDS * 3, 3);
-  await settle();
+  for (let tick = 0; tick < 3; tick += 1) {
+    client.update(TICK_MILLISECONDS);
+    await settle();
+  }
   assert.equal(client.state, "ready");
   assert.equal(client.stats.rateLimitAdvisories, 1);
   assert.deepEqual(rejects, [], "advisory throttling must not enter the terminal admission-reject path");
@@ -2744,11 +2801,32 @@ test("input datagrams repeat a bounded command window and survive deterministic 
     server.step();
     await settle();
   }
+  assert.equal(
+    client.stats.inputsSent + client.stats.inputsDropped,
+    180 / INPUT_SEND_INTERVAL_TICKS,
+    "60 Hz sampling must produce exactly 30 unreliable datagrams per second",
+  );
   assert.ok(client.stats.inputCommandsSent >= client.stats.inputsSent * 2);
   assert.ok(client.stats.inputCommandsSent <= client.stats.inputsSent * INPUT_BUNDLE_MAX_COMMANDS);
   assert.ok(server.stats.inputsAccepted > 150, "redundant future commands must fill dropped datagram gaps");
   assert.equal(server.stats.inputsRejected, 0);
   assert.ok(server.world.playerX[slot] > startX + TILE_UNITS, "loss must not leave the tank stationary");
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("input bundling resets its redundant suffix after bounded replay rewinds the local tick", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const client = join(server, "rewound-input", errors, { leadTicks: 0 });
+  await settle();
+  for (let tick = 0; tick < 300; tick += 1) client.update(TICK_MILLISECONDS);
+  assert.equal(client.world.tick, 300);
+  server.step();
+  await settle();
+  assert.doesNotThrow(() => client.update(TICK_MILLISECONDS));
+  await settle();
+  assert.ok(client.stats.inputsSent > 0);
   assert.deepEqual(errors, []);
   server.close();
 });

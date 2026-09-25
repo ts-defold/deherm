@@ -3528,3 +3528,49 @@ frame, and recovery-credit admission. The deterministic performance harness
 also expands and byte-compares every projected snapshot before reconciliation.
 This is codec and in-process scheduling evidence, not WAN packet-capture or VM
 allocation evidence.
+
+## 2026-09-25 - Protocol 13 compacts exact player state and redundant inputs
+
+The local rollback image remains 17,888 bytes, but the network projection now
+stores every 96-byte player record in an exact 66-byte schema. Narrowed fields
+have explicit content/simulation bounds, unbounded velocities and counters stay
+full width, six reserved bits reject noncanonical payloads, and the performance
+harness still expands and byte-compares every complete rollback image. Together
+with the trajectory records, this reduces the fixed network image to 10,272
+bytes and its framed recovery capacity to 10,288 bytes.
+
+The client still samples and predicts input at 60 Hz, but the unreliable lane
+now emits at 30 Hz. Its two new commands plus prior two-command loss window sit
+behind one match/player, acknowledgement, tick, and sequence header. A command
+adds six bytes, so the steady-state datagram is 50 bytes instead of four
+32-byte packets. Tick and uint16 sequence ages are reconstructed across wrap,
+and a bounded reconciliation rewind starts a new contiguous suffix instead of
+producing an ambiguous bundle. The decoder validates checksum, exact length,
+canonical ages, reserved bits, and every command before simulation admission.
+
+The checked 32-player trace now records 20,165.9 downstream application bytes
+per second/client and 1,500 upstream bytes per second/client. Its p50/p95/
+maximum frames are 1,252/2,167/3,909 bytes. The enforced downstream admission
+bound is 53,296 bytes/second/client because at most one 10,288-byte recovery may
+replace one of fifteen 3,072-byte normal frames per second. These are codec and
+in-process application-payload measurements; QUIC/H3/TLS/UDP/IP overhead and
+WAN behavior remain unmeasured. Generic byte-run metadata and player changes
+remain the dominant downstream cost, so a field-aware delta plus an explicit
+hitscan event journal is the next network tranche.
+
+The cadence follows the source-backed Quake III shape rather than copying a
+number from memory: [`CL_CreateNewCommands`](https://github.com/id-Software/Quake-III-Arena/blob/master/code/client/cl_input.c)
+creates commands at the client frame cadence, while `CL_ReadyToSendPacket`
+throttles packet emission and lets commands accumulate; stock
+[`cl_maxpackets`](https://github.com/id-Software/Quake-III-Arena/blob/master/code/client/cl_main.c)
+defaults to 30 and `cl_packetdup` defaults to 1. Our fixed simulation produces
+exactly two new 60 Hz commands between sends and retains the preceding pair as
+the explicit redundant window.
+
+Adversarial review closed two pre-commit gaps. Player compaction now applies the
+same gameplay bounds as expansion (`overdriveTicks <= 600`,
+`boostCharge <= 90`), so every encoder-accepted record is decoder-accepted.
+The one-slot pre-`WELCOME_ACK` input buffer now retains the newest tick under
+uint32 serial ordering, with a uint16 sequence tie-breaker for same-tick
+corrections; a later-arriving stale QUIC datagram cannot regress admission.
+Focused negative and cross-lane reordering tests cover both fixes.

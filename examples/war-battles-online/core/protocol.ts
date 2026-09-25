@@ -23,20 +23,33 @@ import { WEAPON_COUNT } from "./content.ts";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-// Version 12 separates the compact fixed-point network image from the broad
-// rollback image and packs each projectile into an exact 15-byte record.
-export const PROTOCOL_VERSION = 12;
+// Version 13 packs a four-command unreliable input window behind one common
+// identity, acknowledgement, tick, and sequence header. Version 12 separated
+// the compact fixed-point network image from the broad rollback image and
+// packed each projectile into an exact 15-byte record.
+export const PROTOCOL_VERSION = 13;
 export const INPUT_PACKET_BYTES = 32;
 /**
- * One unreliable transport datagram repeats the newest command plus two recent
- * commands. This is the same loss-tolerance shape used by classic arena
- * shooters: losing one datagram does not necessarily lose the input transition
- * it carried, and no retransmission queue can make stale movement arrive late.
+ * One unreliable transport datagram carries the two commands sampled since the
+ * previous 30 Hz send plus that packet's two-command window. This is the same
+ * loss-tolerance shape used by classic arena shooters: losing one datagram does
+ * not necessarily lose the input transition it carried, and no retransmission
+ * queue can make stale movement arrive late.
  */
-export const INPUT_BUNDLE_MAX_COMMANDS = 3;
-export const INPUT_BUNDLE_BYTES = INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS;
+/** Sample at 60 Hz but emit one command datagram every two simulation ticks. */
+export const INPUT_SEND_INTERVAL_TICKS = 2;
+/** Two new commands plus the previous two-command packet window. */
+export const INPUT_BUNDLE_MAX_COMMANDS = 4;
+const INPUT_BUNDLE_HEADER_BYTES = 24;
+const INPUT_BUNDLE_COMMAND_BYTES = 6;
+const INPUT_BUNDLE_CHECKSUM_BYTES = 2;
+export const INPUT_BUNDLE_MIN_BYTES =
+  INPUT_BUNDLE_HEADER_BYTES + INPUT_BUNDLE_COMMAND_BYTES + INPUT_BUNDLE_CHECKSUM_BYTES;
+export const INPUT_BUNDLE_BYTES =
+  INPUT_BUNDLE_HEADER_BYTES + INPUT_BUNDLE_COMMAND_BYTES * INPUT_BUNDLE_MAX_COMMANDS + INPUT_BUNDLE_CHECKSUM_BYTES;
 const PACKET_MAGIC = 0x5742;
 const PACKET_KIND_INPUT = 1;
+const PACKET_KIND_INPUT_BUNDLE = 2;
 
 export interface InputCommand {
   matchId: number;
@@ -141,6 +154,126 @@ export function readInputPacket(source: Uint8Array, byteOffset: number, output: 
   output.snapshotAckBits = view.getUint32(26, true);
   validateInputCommand(output);
   return byteOffset + INPUT_PACKET_BYTES;
+}
+
+/**
+ * Writes one latest-first loss-tolerant input window without repeating the
+ * session, acknowledgement, tick, and sequence headers for every command.
+ * Commands are supplied oldest-first; each must be one of the newest four
+ * consecutive client ticks, so a two-bit age reconstructs both tick and
+ * sequence exactly across their unsigned wrap boundaries.
+ */
+export function writeInputBundle(
+  target: Uint8Array,
+  commands: readonly Readonly<InputCommand>[],
+  commandCount: number,
+): number {
+  unsigned(commandCount, INPUT_BUNDLE_MAX_COMMANDS, "input bundle command count");
+  if (commandCount === 0 || commandCount > commands.length) {
+    throw new RangeError("input bundle command count is outside the supplied commands");
+  }
+  const byteLength = inputBundleBytes(commandCount);
+  requireCapacity(target, byteLength);
+  const newest = commands[commandCount - 1]!;
+  validateInputCommand(newest);
+  const view = new DataView(target.buffer, target.byteOffset, byteLength);
+  view.setUint16(0, PACKET_MAGIC, true);
+  view.setUint8(2, PROTOCOL_VERSION);
+  view.setUint8(3, PACKET_KIND_INPUT_BUNDLE);
+  view.setUint8(4, commandCount);
+  view.setUint8(5, newest.playerId);
+  view.setUint16(6, newest.sequence, true);
+  view.setUint32(8, newest.matchId, true);
+  view.setUint32(12, newest.tick, true);
+  view.setUint32(16, newest.latestSnapshotTick, true);
+  view.setUint32(20, newest.snapshotAckBits, true);
+  for (let index = 0; index < commandCount; index += 1) {
+    const command = commands[index]!;
+    validateInputCommand(command);
+    if (command.matchId !== newest.matchId || command.playerId !== newest.playerId) {
+      throw new Error("input bundle commands must share match and player identity");
+    }
+    const age = (newest.tick - command.tick) >>> 0;
+    const sequenceAge = (newest.sequence - command.sequence) & 0xffff;
+    const expectedAge = commandCount - index - 1;
+    if (age !== expectedAge || sequenceAge !== age) {
+      throw new Error("input bundle commands must be unique, consecutive, and oldest-first");
+    }
+    const offset = INPUT_BUNDLE_HEADER_BYTES + index * INPUT_BUNDLE_COMMAND_BYTES;
+    const flags = age | (command.buttons << 2) | (command.weaponRequest << 4);
+    view.setUint8(offset, flags);
+    view.setInt8(offset + 1, command.moveX);
+    view.setInt8(offset + 2, command.moveY);
+    view.setInt8(offset + 3, command.aimX);
+    view.setInt8(offset + 4, command.aimY);
+    view.setUint8(offset + 5, command.fireSubtick);
+  }
+  view.setUint16(byteLength - INPUT_BUNDLE_CHECKSUM_BYTES, packetChecksum(target, 0, byteLength - 2), true);
+  return byteLength;
+}
+
+/**
+ * Validates an entire bundle before exposing any command to simulation code.
+ * A legacy-sized single command remains accepted for replay/tool callers; live
+ * clients always emit the compact bundle kind.
+ */
+export function readInputBundle(source: Uint8Array, byteLength: number, outputs: readonly InputCommand[]): number {
+  if (!Number.isInteger(byteLength) || byteLength <= 0 || byteLength > source.byteLength) {
+    throw new RangeError("input bundle byte length is outside the supplied payload");
+  }
+  if (source[3] === PACKET_KIND_INPUT && byteLength !== INPUT_PACKET_BYTES) {
+    throw new Error(byteLength < INPUT_PACKET_BYTES ? "input packet is truncated" : "input packet has trailing bytes");
+  }
+  if (source[3] === PACKET_KIND_INPUT) {
+    if (outputs.length < 1) throw new RangeError("input bundle output capacity is zero");
+    readInputPacket(source, 0, outputs[0]!);
+    return 1;
+  }
+  if (byteLength < INPUT_BUNDLE_MIN_BYTES) throw new Error("input packet is truncated");
+  const view = new DataView(source.buffer, source.byteOffset, byteLength);
+  if (view.getUint16(0, true) !== PACKET_MAGIC) throw new Error("input bundle magic mismatch");
+  if (view.getUint8(2) !== PROTOCOL_VERSION) throw new Error("input bundle version mismatch");
+  if (view.getUint8(3) !== PACKET_KIND_INPUT_BUNDLE) throw new Error("packet is not an input bundle");
+  const commandCount = view.getUint8(4);
+  if (commandCount === 0 || commandCount > INPUT_BUNDLE_MAX_COMMANDS || commandCount > outputs.length) {
+    throw new Error("input bundle command count is invalid");
+  }
+  const expectedBytes = inputBundleBytes(commandCount);
+  if (byteLength !== expectedBytes) throw new Error("input packet has trailing bytes or an invalid command count");
+  if (view.getUint16(byteLength - 2, true) !== packetChecksum(source, 0, byteLength - 2)) {
+    throw new Error("input bundle checksum mismatch");
+  }
+  const playerId = view.getUint8(5);
+  const newestSequence = view.getUint16(6, true);
+  const matchId = view.getUint32(8, true);
+  const newestTick = view.getUint32(12, true);
+  const latestSnapshotTick = view.getUint32(16, true);
+  const snapshotAckBits = view.getUint32(20, true);
+  for (let index = 0; index < commandCount; index += 1) {
+    const offset = INPUT_BUNDLE_HEADER_BYTES + index * INPUT_BUNDLE_COMMAND_BYTES;
+    const flags = view.getUint8(offset);
+    if ((flags & 0x80) !== 0) throw new Error("input bundle reserved flag is nonzero");
+    const age = flags & 3;
+    if (age !== commandCount - index - 1) {
+      throw new Error("input bundle command ages are not unique and oldest-first");
+    }
+    const output = outputs[index]!;
+    output.matchId = matchId;
+    output.playerId = playerId;
+    output.tick = (newestTick - age) >>> 0;
+    output.sequence = (newestSequence - age) & 0xffff;
+    output.buttons = (flags >>> 2) & 3;
+    output.weaponRequest = (flags >>> 4) & 7;
+    output.moveX = view.getInt8(offset + 1);
+    output.moveY = view.getInt8(offset + 2);
+    output.aimX = view.getInt8(offset + 3);
+    output.aimY = view.getInt8(offset + 4);
+    output.fireSubtick = view.getUint8(offset + 5);
+    output.latestSnapshotTick = latestSnapshotTick;
+    output.snapshotAckBits = snapshotAckBits;
+    validateInputCommand(output);
+  }
+  return commandCount;
 }
 
 // --- reliable envelope ------------------------------------------------------
@@ -404,6 +537,10 @@ function packetChecksum(bytes: Uint8Array, offset: number, length: number): numb
     second = (second + first) % 255;
   }
   return (second << 8) | first;
+}
+
+function inputBundleBytes(commandCount: number): number {
+  return INPUT_BUNDLE_HEADER_BYTES + commandCount * INPUT_BUNDLE_COMMAND_BYTES + INPUT_BUNDLE_CHECKSUM_BYTES;
 }
 
 function requirePacketRange(bytes: Uint8Array, byteOffset: number): void {
