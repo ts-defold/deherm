@@ -468,9 +468,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "ca48870ddf58cfebd6ebd81e03c3dee1d585d3775b0bdcb68e0197dda167ce9f",
+        "fingerprint": "ea811777763be3a7e2267b98789b746cfe4582555b3036bf1fd7c5bb956a4b1d",
         "outputs": {
-          "deherm/app.dehermc": "28b127c2bda72a63e8272711ba885a73a60ea40672a9bf123554a2795d7aaff4"
+          "deherm/app.dehermc": "cad70ea29ff8dd0951cdbcaae6a694d58562402f542fe36e0480c9c8001efd49"
         },
         "build": {
           "entryPoint": "main/player.script.ts",
@@ -491,7 +491,7 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "4f88ce309910a8dec7beac18ff7ed5d3d87b314d8993f71cd8d281ecea3cba67",
+          "digest": "13fc6b9d7ac48ebdd8fb9112cc41ff1ee94c679134318604f470d78266a84328",
           "fileCount": 79,
           "files": {
             ".deherm/generated/components/registry.ts": "2d47bf26dadbbaebd9a26053188c4237d03b32f4bf64c3b486aa66339887889c",
@@ -557,7 +557,7 @@
             "src/generated-war-battles/bots.ts": "02b4e438139a60b36044a034f2cf4c54e993286db513bfe93691d82ca97d6e24",
             "src/generated-war-battles/browser-websocket.ts": "aff36c8e49dbf1415922702b6f7bc0cba0b83cc3c91e965e9515733205781528",
             "src/generated-war-battles/browser-webtransport.ts": "e3cee4468d453190e3d45194a9aabff113f0f5a6b8730f26200b3565d6e0bb7d",
-            "src/generated-war-battles/client.ts": "aeedeaf666d441c19db225dfe09143fda60cc706d739f47bc2e88ea0ad9c82e1",
+            "src/generated-war-battles/client.ts": "4156a4b201d6d9aeb31e3e32df24b13fb8a2528c4054ce0d10a75404db60d4a4",
             "src/generated-war-battles/constants.ts": "2dc070680d1bfc85100e9700b0a124b7bfcbb534c7c945e6e96eeac6629f7c62",
             "src/generated-war-battles/content.ts": "b95ef0175eea497ba6f3689686ce848e875d439bd4ac5865fae6da190d1e322b",
             "src/generated-war-battles/events.ts": "f6dbef6f45fd8c485017971a6b6d8284be0279b55ae6188d859a9d2af95bf453",

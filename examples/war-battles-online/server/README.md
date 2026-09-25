@@ -220,8 +220,9 @@ whose kind fixes the lane it is allowed on:
 | `control`       | control  | client → server | 8                                         |
 | `snapshot`      | snapshot | server → client | 17,776 keyframe; compact delta after join |
 
-`PROTOCOL_VERSION` is 9: bounded input-command redundancy is the versioned wire
-change. Snapshots carry the authoritative command-beacon
+`PROTOCOL_VERSION` is 10: bounded input-command redundancy remains on the wire,
+and simulation tick ordering plus last-input validity are now unambiguously
+uint32 across wrap. Snapshots carry the authoritative command-beacon
 state, while hello/welcome frames carry 40-byte authenticated
 resume credentials, the client echoes the exact welcome credential before its
 rotation becomes current, and the snapshot carries the authoritative chassis and

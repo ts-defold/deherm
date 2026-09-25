@@ -24,8 +24,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 371686,
-      "sha256": "cf0f71e81bcc2bd42fe960ef5f97e20cb57e9825e459768b4f269f16dcf8c168"
+      "bytes": 373091,
+      "sha256": "418b71380075d7522d0ca7165a0485dee32e322a5ca2dec33ae7a86d31e850cd"
     },
     {
       "path": "examples/war-battles-online/headless/fixture.ts",
@@ -76,6 +76,6 @@
       "sha256": "fbacd2a0d4c0edb257c033ab73b71c0f2d60fb5f42a8c779a37b674c10844dd9"
     }
   ],
-  "sourceKey": "a5af92fa8c2ed119ff409aaf26ff665302728a384437c4c4daa09839b25c03c5",
+  "sourceKey": "9c25629a10a7f7385ea0e9f373c1d1193be6dcf71ee7933c5ed8dc1bbdbb64a0",
   "evidenceBoundary": "Deterministic in-process simulation and rollback replay only; not network, Defold engine, rendering, VM allocation, or wall-clock performance evidence."
 }

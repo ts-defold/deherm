@@ -459,6 +459,11 @@ export class ServerSession implements TransportReceiver {
   private reliableDispatchSize = 0;
   private reliableDispatchBytes = 0;
   private reliableDispatchActive = false;
+  // QUIC datagrams are unordered relative to the reliable session stream. Keep
+  // exactly the latest bounded bundle that arrives after WELCOME but before
+  // WELCOME_ACK, then admit it on the first authoritative tick after the ACK.
+  private readonly preReadyInput = new Uint8Array(INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS);
+  private preReadyInputBytes = 0;
   private awaitingWelcomeAck = false;
   private stagedResumeGeneration = 0;
   private welcomeAckDeadline = 0;
@@ -482,6 +487,16 @@ export class ServerSession implements TransportReceiver {
       return;
     }
     this.inputBudget = this.server.inputBudgetPerTick;
+    if (this.ready && this.preReadyInputBytes > 0) {
+      const byteLength = this.preReadyInputBytes;
+      this.preReadyInputBytes = 0;
+      try {
+        this.handleInput(this.preReadyInput, byteLength);
+      } catch (error: unknown) {
+        this.server.stats.inputsRejected += 1;
+        this.server.report(error);
+      }
+    }
   }
 
   onReliable(channel: ReliableChannel, payload: Uint8Array): void {
@@ -508,6 +523,12 @@ export class ServerSession implements TransportReceiver {
 
   onDatagram(payload: Uint8Array): void {
     try {
+      if (!this.ready && this.awaitingWelcomeAck && this.slot >= 0) {
+        this.requireInputBundleSize(payload.byteLength, payload.byteLength);
+        this.preReadyInput.set(payload, 0);
+        this.preReadyInputBytes = payload.byteLength;
+        return;
+      }
       this.handleInput(payload);
     } catch (error: unknown) {
       // A malformed datagram is dropped rather than closing the session: on an
@@ -528,6 +549,7 @@ export class ServerSession implements TransportReceiver {
     }
     this.sessionHandling = false;
     this.clearReliableDispatch();
+    this.preReadyInputBytes = 0;
     this.ready = false;
     this.server.log(`session-closed:${code}:${reason}`);
     this.server.releaseSlot(this);
@@ -779,19 +801,9 @@ export class ServerSession implements TransportReceiver {
     }
   }
 
-  private handleInput(payload: Uint8Array): void {
+  private handleInput(payload: Uint8Array, byteLength = payload.byteLength): void {
     if (!this.ready) return;
-    if (
-      payload.byteLength === 0 ||
-      payload.byteLength % INPUT_PACKET_BYTES !== 0 ||
-      payload.byteLength > INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS
-    ) {
-      throw new Error(
-        payload.byteLength < INPUT_PACKET_BYTES
-          ? "input packet is truncated"
-          : "input packet has trailing bytes or too many bundled commands",
-      );
-    }
+    this.requireInputBundleSize(byteLength, payload.byteLength);
     if (this.inputBudget <= 0) {
       // A client flooding the input lane is throttled, not disconnected: the
       // honest cause is a burst after a stall.
@@ -805,7 +817,7 @@ export class ServerSession implements TransportReceiver {
     // Commands are oldest-first. Already-consumed redundancy is a benign
     // duplicate, not a protocol rejection; future commands are still staged so
     // one lost datagram does not create a movement hole.
-    for (let offset = 0; offset < payload.byteLength; offset += INPUT_PACKET_BYTES) {
+    for (let offset = 0; offset < byteLength; offset += INPUT_PACKET_BYTES) {
       readInputPacket(payload, offset, this.command);
       // A session may only ever move its own tank, whatever the packet says.
       if (this.command.playerId !== this.slot + 1) {
@@ -838,6 +850,21 @@ export class ServerSession implements TransportReceiver {
       // A false result after the explicit authority/time checks is an older
       // copy of a future command already staged by another redundant bundle.
       // Treat that as successful loss protection, not hostile input.
+    }
+  }
+
+  private requireInputBundleSize(byteLength: number, capacity: number): void {
+    if (
+      byteLength === 0 ||
+      byteLength > capacity ||
+      byteLength % INPUT_PACKET_BYTES !== 0 ||
+      byteLength > INPUT_PACKET_BYTES * INPUT_BUNDLE_MAX_COMMANDS
+    ) {
+      throw new Error(
+        byteLength < INPUT_PACKET_BYTES
+          ? "input packet is truncated"
+          : "input packet has trailing bytes or too many bundled commands",
+      );
     }
   }
 

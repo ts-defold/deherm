@@ -1711,6 +1711,90 @@ test("server preserves HELLO, acknowledgement, and control order across async ad
   server.close();
 });
 
+test("server retains the latest input datagram that overtakes WELCOME_ACK", async () => {
+  const errors = [];
+  const reliable = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    inputBudgetPerTick: 4,
+    onError: (error) => errors.push(error),
+  });
+  const session = server.createSession();
+  session.attach({
+    capabilities: { protocol: "webtransport-h3", reliableStreams: true, datagrams: true, maxDatagramBytes: 1_200 },
+    async sendReliable(channel, payload) {
+      reliable.push({ channel, payload: payload.slice() });
+      return "sent";
+    },
+    async trySendDatagram() {
+      return "sent";
+    },
+    close(code, reason) {
+      session.onClose(code, reason);
+    },
+  });
+
+  const hello = new Uint8Array(HELLO_BYTES);
+  writeHello(hello, {
+    clientSalt: 17,
+    name: "cross-lane",
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+    preferredTeam: 0,
+  });
+  session.onReliable(TRANSPORT_CHANNEL_SESSION, hello);
+  await settleUntil(
+    () => reliable.some(({ payload }) => payload.byteLength === WELCOME_BYTES),
+    "welcome before cross-lane input",
+  );
+  const welcomeFrame = reliable.find(({ payload }) => payload.byteLength === WELCOME_BYTES).payload;
+  const welcome = {
+    matchId: 0,
+    playerId: 0,
+    team: 0,
+    maximumPlayers: 0,
+    botCount: 0,
+    mapSeed: 0,
+    serverTick: 0,
+    tickRate: 0,
+    snapshotIntervalTicks: 0,
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+  };
+  readWelcome(welcomeFrame, welcome);
+
+  const first = createInputCommand(welcome.matchId, welcome.playerId);
+  first.tick = 1;
+  first.sequence = 1;
+  first.moveX = -127;
+  const firstPacket = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(firstPacket, 0, first);
+  session.onDatagram(firstPacket);
+
+  const latest = createInputCommand(welcome.matchId, welcome.playerId);
+  latest.tick = 1;
+  latest.sequence = 2;
+  latest.moveX = 127;
+  const latestPacket = new Uint8Array(INPUT_PACKET_BYTES);
+  writeInputPacket(latestPacket, 0, latest);
+  session.onDatagram(latestPacket);
+  assert.equal(server.stats.inputsAccepted, 0, "pre-ACK input cannot execute before admission");
+
+  const acknowledgement = new Uint8Array(WELCOME_ACK_BYTES);
+  writeWelcomeAck(acknowledgement, { resumeToken: welcome.resumeToken });
+  session.onReliable(TRANSPORT_CHANNEL_SESSION, acknowledgement);
+  await settleUntil(() => session.ready, "cross-lane acknowledgement");
+  const initialX = server.world.playerX[welcome.playerId - 1];
+  server.step();
+
+  assert.equal(server.stats.inputsAccepted, 1, "exactly the latest bounded pre-ACK bundle is admitted");
+  assert.equal(server.world.playerLastInputTick[welcome.playerId - 1], 1);
+  assert.ok(
+    server.world.playerX[welcome.playerId - 1] > initialX,
+    "the latest input replaces the older buffered datagram",
+  );
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
 test("server fail-closes control before HELLO or before WELCOME_ACK", async () => {
   const control = new Uint8Array(CONTROL_BYTES);
   writeControl(control, { action: CONTROL_SUICIDE, argument: 0 });
@@ -2367,6 +2451,34 @@ test("world input, snapshot state, and bot stepping cross the uint32 tick bounda
       assert.equal(restored.stateHash(), world.stateHash());
     }
   }
+});
+
+test("client transmits and the server executes input across the signed uint32 boundary", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 1,
+    inputBudgetPerTick: 4,
+    onError: (error) => errors.push(error),
+  });
+  server.world.tick = 0x7fff_ffff;
+  const client = join(server, "signed-boundary", errors, { leadTicks: 0 });
+  await settleUntil(() => client.state === "ready", "signed-boundary welcome");
+  assert.equal(client.world.tick, 0x7fff_ffff);
+
+  client.setControls({ moveX: 1, moveY: 0, fire: false });
+  client.update(TICK_MILLISECONDS);
+  await settle();
+  assert.equal(client.world.tick, 0x8000_0000);
+  assert.equal(client.stats.inputsSent, 1, "the unsigned tick must survive history lookup and transmission");
+
+  server.step();
+  await settle();
+  assert.equal(server.world.tick, 0x8000_0000);
+  assert.equal(server.world.playerLastInputTick[client.playerId - 1], 0x8000_0000);
+  assert.equal(server.stats.inputsAccepted, 1);
+  assert.deepEqual(errors, []);
+  server.close();
 });
 
 test("authoritative prediction, redundant datagrams, and snapshots survive uint32 tick wrap", async () => {

@@ -176,7 +176,10 @@ export class BattleClient implements TransportReceiver {
   private readonly welcomeAckBuffer = new Uint8Array(WELCOME_ACK_BYTES);
   private readonly inputBuffer = new Uint8Array(INPUT_BUNDLE_BYTES);
   private readonly history: InputCommand[] = [];
-  private readonly historyTick = new Int32Array(INPUT_HISTORY_TICKS);
+  // Float64 preserves the local -1 sentinel and every uint32 tick exactly.
+  // Int32 storage silently changed ticks >= 0x80000000 into negative values,
+  // breaking the exact history lookup used by transmit and replay.
+  private readonly historyTick = new Float64Array(INPUT_HISTORY_TICKS);
   private readonly aim: Direction = createDirection();
   private readonly staging: InputCommand[] = [];
 

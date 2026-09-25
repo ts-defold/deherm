@@ -345,6 +345,13 @@ snapshot application. This is deterministic long-session correctness evidence;
 it does not extend the separately bounded credential/session horizon beyond
 RFC-1982's half range.
 
+The client's prediction-history tick keys use `Float64Array`, not signed
+`Int32Array`, so the exact local `-1` sentinel and every uint32 wire tick coexist.
+A focused client/server regression crosses `0x7fffffff -> 0x80000000`, proves
+the command is transmitted, and proves the authoritative world executes that
+same tick. The earlier wrap regression began above the signed boundary and did
+not expose the storage conversion; both boundaries are now covered.
+
 ## Ordered admission and native close tranche
 
 All frames on the client's one ordered reliable stream now enter one bounded
@@ -357,6 +364,14 @@ enqueues WELCOME_ACK before exposing the ready state. Positive and negative
 tests cover delayed token issuance, control before HELLO, control before ACK,
 and capacity exhaustion; the complete native stack then joined and submitted
 inputs through this path.
+
+The unreliable lane has no ordering relation with that stream. A datagram may
+therefore arrive after WELCOME but before WELCOME_ACK even when both peers are
+correct. Each pending session now owns one fixed-capacity input-bundle buffer;
+pre-ACK datagrams replace its contents latest-only, and the selected bundle is
+validated and processed on the first authoritative tick after admission. A
+forced cross-lane regression proves the older bundle is replaced, nothing is
+executed before the ACK, and exactly one bounded bundle is admitted afterward.
 
 The native WebTransport client now owns a local close reason in fixed 256-byte
 storage rather than retaining packet-loop scratch memory. It sends the
@@ -469,8 +484,9 @@ state, rotates the token again, and starts a fresh session-local snapshot
 baseline. Its first authoritative frame is therefore a complete keyframe, and
 the client clears all pending bytes and acknowledgement bits at the welcome
 boundary before applying it. Token rotation is two-phase: a staged credential
-becomes current only after the client echoes that exact credential in a
-protocol-v8 `welcome-ack`; local enqueue success alone is not admission evidence.
+becomes current only after the client echoes that exact credential in the
+`welcome-ack` introduced by protocol 8 and retained by current protocol 10;
+local enqueue success alone is not admission evidence.
 A missing acknowledgement closes and releases the session after five seconds,
 while failed or closed delivery retains the prior credential and its original
 grace deadline. A snapshot send that reports a terminal transport
@@ -892,7 +908,7 @@ and restored tick/state before a new session is admitted. Slow and failing
 storage tests prove the retained queue stays bounded and that the single latest
 retry can recover without preserving an unbounded history. This remains local
 Deno/Docker evidence, not a claim that Colyseus H3 interop is complete.
-Protocol-v9 acknowledgement, exact WebSocket Origin admission, non-root runtime
+Protocol-10 acknowledgement, exact WebSocket Origin admission, non-root runtime
 ownership, fsync-backed atomic replacement, and wrap-safe deadlines are now
 implemented and covered by focused owner tests. Compose uses a bounded root-only
 volume migrator and runs the long-lived server as uid/gid 10001. These are

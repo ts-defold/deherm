@@ -1,5 +1,27 @@
 # Defold Hermes knowledge log
 
+## 2026-09-25 - Cross-lane admission and signed tick storage are bounded
+
+The ordered reliable admission fix did not by itself order QUIC datagrams:
+the first input can legitimately overtake `WELCOME_ACK`. Pending server
+sessions now retain exactly one latest structurally valid input bundle in a
+fixed buffer, execute none of it before credential acknowledgement, and admit
+the selected bundle after the next tick resets its normal ingress budget. A
+forced transport-order regression sends two pre-ACK datagrams and proves only
+the newer command executes after admission.
+
+The client prediction ring separately stored uint32 tick keys in an
+`Int32Array`. Values from `0x80000000` through `0xffffffff` became negative and
+failed exact transmission/replay lookup even though the wire and simulation
+were wrap-safe. `Float64Array` preserves both the local `-1` sentinel and every
+uint32 value exactly. A focused welcomed client/server regression crosses
+`0x7fffffff -> 0x80000000` and proves transmission plus authoritative
+execution. The full 100-test core suite and TypeScript context checks pass. A
+fresh public-CLI build and `pnpm stack` run then admitted one native Defold
+client plus seven browser bots over HTTP/3, accepted datagram inputs, and
+reported repeated live Hermes telemetry without the reported pre-HELLO close.
+This is local arm64-macOS runtime evidence, not WAN or cross-host evidence.
+
 ## 2026-09-25 - Windows native WebTransport test remains C++17
 
 The first complete native artifact matrix after the Picotls patch correction

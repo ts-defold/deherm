@@ -196,7 +196,7 @@ Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 9.
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 10.
 It carries 40-byte authenticated resume credentials and requires the client to
 acknowledge the exact welcome credential before the server commits its rotation,
 alongside the authoritative chassis, weapon-branch, and command-beacon state.
@@ -219,6 +219,12 @@ as soon as its payload is consumed; an acknowledgement, stale deadline, or peer
 reset retires the matching replaceable packet without closing the session.
 Session/control events keep reliable ordered semantics, while tick inputs use
 unreliable datagrams with bounded command redundancy.
+
+QUIC datagrams are unordered relative to the reliable admission stream. If a
+client's first input overtakes `WELCOME_ACK`, the server retains exactly the
+latest structurally valid input bundle in fixed storage and admits it only on
+the first authoritative tick after the acknowledgement is validated. It never
+executes pre-admission input and never grows a queue while admission is pending.
 
 **What is and is not proven.** The two-client match, the prediction agreeing with
 the server exactly, the reconciliation replay, the full-match refusal, the
@@ -357,9 +363,11 @@ runtime. It deliberately describes semantics instead of naming a vendor:
   its current resume token, then the server either restores the player slot and
   sends a fresh full snapshot or refuses the resume. A transport connection
   itself is never assumed resumable. Version 7 carries command-beacon state;
-  version 6 carries a 40-byte HMAC resume
-  credential; the Deno host accepts an explicit 32-byte secret and persists a
-  fixed-capacity generation ledger at lifecycle checkpoints.
+  version 6 introduced the 40-byte HMAC resume credential. Current protocol 10
+  additionally fixes simulation ticks as wrap-safe uint32 serials while
+  retaining bounded redundant input datagrams. The Deno host accepts an
+  explicit 32-byte secret and persists a fixed-capacity generation ledger at
+  lifecycle checkpoints.
 
 The WebTransport adapter places replaceable snapshot state on independent,
 cancellable unidirectional streams. Client-originated session/control events
