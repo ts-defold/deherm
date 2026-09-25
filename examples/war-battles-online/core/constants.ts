@@ -174,8 +174,8 @@ export const DIRECTION_DIAGONAL = 181;
 
 // Four additive bytes carry a per-player weapon-upgrade unlock mask and packed
 // branch selections; the record remains fixed-capacity and ammo stays aligned.
-// Two additive bytes carry player mode plus a reserved byte for aligned future
-// state. The depot itself is derived from the map's existing spawn table.
+// Two additive bytes carry player mode plus the last-input-tick validity bit.
+// The separate bit keeps every uint32 tick, including 0xffffffff, representable.
 export const PLAYER_SNAPSHOT_BYTES = 96;
 export const PROJECTILE_SNAPSHOT_BYTES = 28;
 export const PICKUP_SNAPSHOT_BYTES = 12;

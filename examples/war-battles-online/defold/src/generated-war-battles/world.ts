@@ -89,6 +89,7 @@ import {
 import { createDirection, length, normalizeInto, slewInto, spreadInto, type Direction } from "./fixed";
 import { validateInputCommand, type InputCommand } from "./protocol";
 import { readWorldSnapshot, writeWorldSnapshot } from "./snapshot";
+import { tickAfter, tickDistance } from "./ticks";
 
 export interface PlayerView {
   active: boolean;
@@ -167,7 +168,6 @@ export interface HazardView {
 
 const ENTITY_KIND_PLAYER = 1;
 const ENTITY_KIND_PROJECTILE = 2;
-const EMPTY_INPUT_TICK = 0xffff_ffff;
 
 /** Team zero is free-for-all: everyone is everyone else's enemy. */
 export const TEAM_FREE_FOR_ALL = 0;
@@ -227,7 +227,8 @@ export class BattleWorld {
   readonly playerScore = new Int32Array(MAX_PLAYERS);
   readonly playerDeaths = new Int32Array(MAX_PLAYERS);
   readonly playerCredits = new Int32Array(MAX_PLAYERS);
-  readonly playerLastInputTick = new Int32Array(MAX_PLAYERS);
+  /** Float64 preserves every uint32 tick while retaining -1 as the never-input sentinel. */
+  readonly playerLastInputTick = new Float64Array(MAX_PLAYERS);
   readonly playerLastSequence = new Uint16Array(MAX_PLAYERS);
   readonly playerLastMoveX = new Int8Array(MAX_PLAYERS);
   readonly playerLastMoveY = new Int8Array(MAX_PLAYERS);
@@ -268,6 +269,8 @@ export class BattleWorld {
   objectiveTeamTwoScore = 0;
 
   private readonly inputTick = new Uint32Array(MAX_PLAYERS * INPUT_HISTORY_TICKS);
+  /** A separate bit keeps 0xffffffff available as a real queued input tick. */
+  private readonly inputValid = new Uint8Array(MAX_PLAYERS * INPUT_HISTORY_TICKS);
   private readonly inputSequence = new Uint16Array(MAX_PLAYERS * INPUT_HISTORY_TICKS);
   private readonly inputMoveX = new Int8Array(MAX_PLAYERS * INPUT_HISTORY_TICKS);
   private readonly inputMoveY = new Int8Array(MAX_PLAYERS * INPUT_HISTORY_TICKS);
@@ -289,7 +292,6 @@ export class BattleWorld {
     this.matchId = matchId;
     this.mapSeed = mapSeed >>> 0;
     this.map = new ArenaMap(this.mapSeed);
-    this.inputTick.fill(EMPTY_INPUT_TICK);
     this.playerLastInputTick.fill(-1);
     for (let index = 0; index < MAX_PICKUPS; index += 1) {
       this.pickupKind[index] = this.map.pickupKind[index]!;
@@ -348,10 +350,16 @@ export class BattleWorld {
     if (command.matchId !== this.matchId) return false;
     const slot = playerSlot(command.playerId);
     if (this.playerActive[slot] === 0) return false;
-    if (command.tick <= this.tick || command.tick > this.tick + INPUT_HISTORY_TICKS - 1) return false;
-    const input = inputIndex(slot, command.tick);
-    if (this.inputTick[input] === command.tick && !sequenceIsNewer(command.sequence, this.inputSequence[input]!))
+    if (!tickAfter(command.tick, this.tick) || tickDistance(command.tick, this.tick) > INPUT_HISTORY_TICKS - 1)
       return false;
+    const input = inputIndex(slot, command.tick);
+    if (
+      this.inputValid[input] !== 0 &&
+      this.inputTick[input] === command.tick &&
+      !sequenceIsNewer(command.sequence, this.inputSequence[input]!)
+    )
+      return false;
+    this.inputValid[input] = 1;
     this.inputTick[input] = command.tick;
     this.inputSequence[input] = command.sequence;
     this.inputMoveX[input] = command.moveX;
@@ -725,7 +733,7 @@ export class BattleWorld {
 
   private consumeInput(slot: number): void {
     const input = inputIndex(slot, this.tick);
-    if (this.inputTick[input] === this.tick) {
+    if (this.inputValid[input] !== 0 && this.inputTick[input] === this.tick) {
       this.playerLastInputTick[slot] = this.tick;
       this.playerLastSequence[slot] = this.inputSequence[input]!;
       this.playerLastMoveX[slot] = this.inputMoveX[input]!;
@@ -734,8 +742,11 @@ export class BattleWorld {
       this.playerLastAimY[slot] = this.inputAimY[input]!;
       this.playerLastButtons[slot] = this.inputButtons[input]!;
       if (this.inputWeapon[input] !== 0) this.playerWeaponRequest[slot] = this.inputWeapon[input]!;
-      this.inputTick[input] = EMPTY_INPUT_TICK;
-    } else if (this.tick - this.playerLastInputTick[slot]! > INPUT_HOLD_TICKS) {
+      this.inputValid[input] = 0;
+    } else if (
+      this.playerLastInputTick[slot]! < 0 ||
+      tickDistance(this.tick, this.playerLastInputTick[slot]!) > INPUT_HOLD_TICKS
+    ) {
       // A client that has gone quiet coasts to a stop rather than driving on.
       this.playerLastMoveX[slot] = 0;
       this.playerLastMoveY[slot] = 0;

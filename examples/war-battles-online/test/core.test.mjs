@@ -13,9 +13,11 @@ import {
   WebTransportGameClient,
   DenoWebTransportServer,
   CELL_FLOOR,
+  CONTROL_BYTES,
   CONTROL_BUY_UPGRADE,
   CONTROL_SET_CHASSIS,
   CONTROL_SET_WEAPON_UPGRADE,
+  CONTROL_SUICIDE,
   DEFAULT_ARENA_SEED,
   EVENT_KILL,
   EVENT_EJECT,
@@ -90,6 +92,7 @@ import {
   readWelcomeAck,
   sendTickInput,
   writeHello,
+  writeControl,
   writeInputPacket,
   writeReject,
   writeSnapshotDelta,
@@ -1470,7 +1473,7 @@ test("network bot snapshot clocks keep driving when dashboard timers are throttl
   assert.deepEqual(updates.at(-1), [250, 8]);
 });
 
-test("client reliable control messages preserve program order across independent QUIC streams", async () => {
+test("client gates control until WELCOME_ACK and preserves ordered control writes", async () => {
   const calls = [];
   const transport = {
     capabilities: {
@@ -1500,16 +1503,38 @@ test("client reliable control messages preserve program order across independent
   await new Promise((done) => setImmediate(done));
 
   client.sendChassis(CHASSIS_BULWARK);
-  client.sendWeaponUpgrade(WEAPON_UPGRADE_CANNON_BLAST);
+  assert.equal(calls.length, 1, "control before welcome is not admitted to the ordered stream");
+  const welcome = new Uint8Array(WELCOME_BYTES);
+  writeWelcome(welcome, {
+    matchId: 77,
+    playerId: 1,
+    team: 1,
+    maximumPlayers: 8,
+    botCount: 7,
+    mapSeed: DEFAULT_ARENA_SEED,
+    serverTick: 0,
+    tickRate: 60,
+    snapshotIntervalTicks: 3,
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES).fill(7),
+  });
+  client.onReliable(TRANSPORT_CHANNEL_SESSION, welcome);
   await new Promise((done) => setImmediate(done));
-  assert.equal(calls.length, 2, "the second control waits for the first stream to finish");
-  assert.deepEqual([...calls[1].payload.subarray(4, 6)], [CONTROL_SET_CHASSIS, CHASSIS_BULWARK]);
-
+  assert.equal(calls.length, 2, "welcome acknowledgement is the first post-hello frame");
+  assert.equal(calls[1].channel, TRANSPORT_CHANNEL_SESSION);
   calls[1].resolve("sent");
   await new Promise((done) => setImmediate(done));
-  assert.equal(calls.length, 3);
-  assert.deepEqual([...calls[2].payload.subarray(4, 6)], [CONTROL_SET_WEAPON_UPGRADE, WEAPON_UPGRADE_CANNON_BLAST]);
+
+  client.sendChassis(CHASSIS_BULWARK);
+  client.sendWeaponUpgrade(WEAPON_UPGRADE_CANNON_BLAST);
+  await new Promise((done) => setImmediate(done));
+  assert.equal(calls.length, 3, "the second control waits for the first stream to finish");
+  assert.deepEqual([...calls[2].payload.subarray(4, 6)], [CONTROL_SET_CHASSIS, CHASSIS_BULWARK]);
+
   calls[2].resolve("sent");
+  await new Promise((done) => setImmediate(done));
+  assert.equal(calls.length, 4);
+  assert.deepEqual([...calls[3].payload.subarray(4, 6)], [CONTROL_SET_WEAPON_UPGRADE, WEAPON_UPGRADE_CANNON_BLAST]);
+  calls[3].resolve("sent");
 });
 
 test("bots fight, score, stay out of cover and pick their arena up", () => {
@@ -1617,6 +1642,178 @@ test("playable orchestration is deterministic and supports restart and upgrades"
 test("authoritative stats expose the initial bot roster before first admission", () => {
   const server = new MatchServer({ rosterSize: 8 });
   assert.deepEqual({ humans: server.stats.humans, bots: server.stats.bots }, { humans: 0, bots: 8 });
+  server.close();
+});
+
+test("server preserves HELLO, acknowledgement, and control order across async admission", async () => {
+  const token = new Uint8Array(RESUME_TOKEN_BYTES).fill(0x5a);
+  let releaseIssue;
+  const resumeTokenService = {
+    issue() {
+      return new Promise((resolve) => {
+        releaseIssue = () => resolve(token.slice());
+      });
+    },
+    async verify() {
+      return null;
+    },
+  };
+  const errors = [];
+  const closes = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    resumeTokenService,
+    onError: (error) => errors.push(error),
+  });
+  const session = server.createSession();
+  session.attach({
+    capabilities: { protocol: "webtransport-h3", reliableStreams: true, datagrams: true, maxDatagramBytes: 1_200 },
+    async sendReliable() {
+      return "sent";
+    },
+    async trySendDatagram() {
+      return "sent";
+    },
+    close(code, reason) {
+      closes.push([code, reason]);
+      session.onClose(code, reason);
+    },
+  });
+
+  const hello = new Uint8Array(HELLO_BYTES);
+  writeHello(hello, {
+    clientSalt: 7,
+    name: "ordered",
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+    preferredTeam: 0,
+  });
+  const acknowledgement = new Uint8Array(WELCOME_ACK_BYTES);
+  writeWelcomeAck(acknowledgement, { resumeToken: token });
+  const control = new Uint8Array(CONTROL_BYTES);
+  writeControl(control, { action: CONTROL_SUICIDE, argument: 0 });
+
+  // These are the exact callback timings of coalesced frames on one ordered
+  // QUIC stream: decoding is synchronous while credential issuance is not.
+  session.onReliable(TRANSPORT_CHANNEL_SESSION, hello);
+  session.onReliable(TRANSPORT_CHANNEL_SESSION, acknowledgement);
+  session.onReliable(TRANSPORT_CHANNEL_CONTROL, control);
+  await settleUntil(() => typeof releaseIssue === "function", "credential issue boundary");
+  assert.equal(session.ready, false);
+  assert.equal(errors.length, 0);
+  assert.equal(closes.length, 0);
+
+  releaseIssue();
+  await settleUntil(() => session.ready, "ordered async admission");
+  await settle();
+  assert.equal(server.world.playerHealth[session.slot], 0, "control executes only after the queued acknowledgement");
+  assert.equal(errors.length, 0);
+  assert.equal(closes.length, 0);
+  server.close();
+});
+
+test("server fail-closes control before HELLO or before WELCOME_ACK", async () => {
+  const control = new Uint8Array(CONTROL_BYTES);
+  writeControl(control, { action: CONTROL_SUICIDE, argument: 0 });
+
+  for (const afterHello of [false, true]) {
+    const errors = [];
+    const closes = [];
+    const token = new Uint8Array(RESUME_TOKEN_BYTES).fill(0x31);
+    const server = new MatchServer({
+      rosterSize: 2,
+      resumeTokenService: {
+        async issue() {
+          return token.slice();
+        },
+        async verify() {
+          return null;
+        },
+      },
+      onError: (error) => errors.push(error),
+    });
+    const session = server.createSession();
+    session.attach({
+      capabilities: { protocol: "webtransport-h3", reliableStreams: true, datagrams: true, maxDatagramBytes: 1_200 },
+      async sendReliable() {
+        return "sent";
+      },
+      async trySendDatagram() {
+        return "sent";
+      },
+      close(code, reason) {
+        closes.push([code, reason]);
+        session.onClose(code, reason);
+      },
+    });
+    if (afterHello) {
+      const hello = new Uint8Array(HELLO_BYTES);
+      writeHello(hello, {
+        clientSalt: 9,
+        name: "not-yet-admitted",
+        resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+        preferredTeam: 0,
+      });
+      session.onReliable(TRANSPORT_CHANNEL_SESSION, hello);
+    }
+    session.onReliable(TRANSPORT_CHANNEL_CONTROL, control.slice());
+    await settleUntil(() => session.closed, afterHello ? "pre-ack rejection" : "pre-hello rejection");
+    assert.deepEqual(closes, [[4_003, "protocol error"]]);
+    assert.match(String(errors[0]), afterHello ? /before welcome acknowledgement/u : /before hello/u);
+    server.close();
+  }
+});
+
+test("server reliable admission queue fails closed at its fixed capacity", async () => {
+  const token = new Uint8Array(RESUME_TOKEN_BYTES).fill(0x42);
+  let releaseIssue;
+  const errors = [];
+  const closes = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    resumeTokenService: {
+      issue() {
+        return new Promise((resolve) => {
+          releaseIssue = () => resolve(token.slice());
+        });
+      },
+      async verify() {
+        return null;
+      },
+    },
+    onError: (error) => errors.push(error),
+  });
+  const session = server.createSession();
+  session.attach({
+    capabilities: { protocol: "webtransport-h3", reliableStreams: true, datagrams: true, maxDatagramBytes: 1_200 },
+    async sendReliable() {
+      return "sent";
+    },
+    async trySendDatagram() {
+      return "sent";
+    },
+    close(code, reason) {
+      closes.push([code, reason]);
+      session.onClose(code, reason);
+    },
+  });
+  const hello = new Uint8Array(HELLO_BYTES);
+  writeHello(hello, {
+    clientSalt: 11,
+    name: "bounded",
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES),
+    preferredTeam: 0,
+  });
+  const control = new Uint8Array(CONTROL_BYTES);
+  writeControl(control, { action: CONTROL_SUICIDE, argument: 0 });
+  session.onReliable(TRANSPORT_CHANNEL_SESSION, hello);
+  await settleUntil(() => typeof releaseIssue === "function", "blocked credential issue");
+  for (let index = 0; index < 33; index += 1) {
+    session.onReliable(TRANSPORT_CHANNEL_CONTROL, control.slice());
+  }
+  assert.deepEqual(closes, [[4_003, "protocol queue capacity exceeded"]]);
+  assert.match(String(errors[0]), /ordered reliable dispatch capacity exceeded/u);
+  releaseIssue();
+  await settle();
   server.close();
 });
 
@@ -2140,6 +2337,65 @@ test("late input accounting ignores accepted and repeated redundancy across tick
   client.session.onDatagram(packet);
   assert.equal(server.stats.inputsLate, 1, "one never-accepted tick is counted once across redundant copies");
   assert.equal(server.stats.inputsRejected, 0);
+  assert.deepEqual(errors, []);
+  server.close();
+});
+
+test("world input, snapshot state, and bot stepping cross the uint32 tick boundary", () => {
+  const world = new BattleWorld(77);
+  world.addPlayer(1);
+  world.tick = 0xffff_fffd;
+  const command = createInputCommand(77, 1);
+  const expectedTicks = [0xffff_fffe, 0xffff_ffff, 0, 1];
+
+  for (let index = 0; index < expectedTicks.length; index += 1) {
+    command.tick = expectedTicks[index];
+    command.sequence = index + 1;
+    command.moveX = 1;
+    assert.equal(world.submitInput(command), true, `tick ${command.tick} must remain queueable`);
+    world.step();
+    assert.equal(world.tick, command.tick);
+    assert.equal(world.playerLastInputTick[0], command.tick);
+
+    if (command.tick === 0xffff_ffff) {
+      const snapshot = new Uint8Array(SNAPSHOT_BYTES);
+      world.writeSnapshot(snapshot);
+      const restored = new BattleWorld(77);
+      restored.restoreSnapshot(snapshot);
+      assert.equal(restored.tick, 0xffff_ffff);
+      assert.equal(restored.playerLastInputTick[0], 0xffff_ffff);
+      assert.equal(restored.stateHash(), world.stateHash());
+    }
+  }
+});
+
+test("authoritative prediction, redundant datagrams, and snapshots survive uint32 tick wrap", async () => {
+  const errors = [];
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 1,
+    inputBudgetPerTick: 8,
+    onError: (error) => errors.push(error),
+  });
+  server.world.tick = 0xffff_fffd;
+  const client = join(server, "wrap-client", errors, { leadTicks: 2 });
+  await settle();
+  assert.equal(client.state, "ready");
+  assert.equal(client.world.tick, 0xffff_ffff);
+
+  client.setControls({ moveX: 1, moveY: 0, fire: false });
+  for (let step = 0; step < 8; step += 1) {
+    client.update(TICK_MILLISECONDS);
+    await settle();
+    server.step();
+    await settle();
+    client.update(0);
+  }
+
+  assert.equal(server.world.tick, 5);
+  assert.ok(server.stats.inputsAccepted >= 8, "the wrapped redundant input window must remain admissible");
+  assert.ok(client.stats.snapshotsApplied >= 5, "post-wrap snapshots must remain ordered in serial space");
+  assert.equal(client.state, "ready");
   assert.deepEqual(errors, []);
   server.close();
 });

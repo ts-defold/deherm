@@ -19,6 +19,7 @@ export interface TransportCapabilities {
 }
 
 export interface TransportReceiver {
+  /** Transfers one immutable frame; the receiver owns and may retain it. */
   onReliable(channel: ReliableChannel, payload: Uint8Array): void;
   onDatagram(payload: Uint8Array): void;
   onClose(code: number, reason: string): void;

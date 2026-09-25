@@ -182,7 +182,7 @@ test("Defold-local deterministic sources are fresh copies of the canonical core"
     cwd: repositoryRoot,
     encoding: "utf8",
   });
-  assert.match(result, /18 generated Defold sources are fresh/);
+  assert.match(result, /19 generated Defold sources are fresh/);
 });
 
 test("all targets consume the generated WebTransport constructor without a game-level native split", async () => {

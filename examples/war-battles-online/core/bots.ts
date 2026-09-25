@@ -41,6 +41,7 @@ import { clamp, length, mixSigned, normalizeInto, createDirection, type Directio
 import { createArenaRouteScratch, type WorldPoint } from "./arena.ts";
 import type { InputCommand } from "./protocol.ts";
 import type { BattleWorld } from "./world.ts";
+import { tickAdd, tickAfter } from "./ticks.ts";
 
 export interface BotDifficulty {
   readonly id: number;
@@ -138,7 +139,7 @@ export class BotController {
   private readonly goalY = new Int32Array(MAX_PLAYERS);
   private readonly aimTargetX = new Int32Array(MAX_PLAYERS);
   private readonly aimTargetY = new Int32Array(MAX_PLAYERS);
-  private readonly decideAt = new Int32Array(MAX_PLAYERS);
+  private readonly decideAt = new Float64Array(MAX_PLAYERS);
   private readonly strafeSign = new Int8Array(MAX_PLAYERS);
   private readonly avoidSign = new Int8Array(MAX_PLAYERS);
   private readonly stuckTicks = new Uint16Array(MAX_PLAYERS);
@@ -192,7 +193,7 @@ export class BotController {
     const slot = playerId - 1;
     command.tick = tick;
     command.sequence = tick & 0xffff;
-    command.latestSnapshotTick = tick > 0 ? tick - 1 : 0;
+    command.latestSnapshotTick = (tick - 1) >>> 0;
     command.snapshotAckBits = 0xffff_ffff;
     command.fireSubtick = 255;
     command.weaponRequest = 0;
@@ -206,9 +207,9 @@ export class BotController {
     }
     const skill = botDifficulty(world.playerBotSkill[slot]!);
     this.detectStuck(world, slot);
-    if (tick >= this.decideAt[slot]!) {
+    if (this.decideAt[slot]! < 0 || tick === this.decideAt[slot]! || tickAfter(tick, this.decideAt[slot]!)) {
       this.decide(world, slot, skill, tick);
-      this.decideAt[slot] = tick + skill.reactionTicks;
+      this.decideAt[slot] = tickAdd(tick, skill.reactionTicks);
     }
 
     const enemy = this.goalTarget[slot]!;

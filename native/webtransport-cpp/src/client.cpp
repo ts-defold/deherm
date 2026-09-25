@@ -2,6 +2,7 @@
 
 #include "bounded_payload_ring.hpp"
 #include "control_capsule_parser.hpp"
+#include "local_close.hpp"
 #include "transport_policy.hpp"
 #include "url.hpp"
 
@@ -350,15 +351,23 @@ class Client::Impl final {
     if (state() != State::failed) state_.store(State::closed, std::memory_order_release);
   }
 
-  static int packetLoopCallback(picoquic_quic_t*, const picoquic_packet_loop_cb_enum event, void* context, void*) {
+  static int packetLoopCallback(picoquic_quic_t*, const picoquic_packet_loop_cb_enum event, void* context,
+                                void* event_context) {
     auto* self = static_cast<Impl*>(context);
     switch (event) {
+      case picoquic_packet_loop_ready:
+        static_cast<picoquic_packet_loop_options_t*>(event_context)->do_time_check = 1;
+        break;
       case picoquic_packet_loop_wake_up:
         self->processCommands();
         break;
       case picoquic_packet_loop_after_receive:
       case picoquic_packet_loop_after_send:
         if (self->connection_ != nullptr && picoquic_get_cnx_state(self->connection_) == picoquic_state_disconnected) {
+          if (self->local_close_.pending()) {
+            self->completeLocalClose();
+            break;
+          }
           const auto remote_error = picoquic_get_remote_error(self->connection_);
           std::uint32_t application_error = 0;
           if (remote_error == 0 || remote_error == H3ZERO_NO_ERROR) {
@@ -369,10 +378,36 @@ class Client::Impl final {
             self->emitFailure("QUIC connection disconnected");
           }
         }
+        if (self->connection_ != nullptr) {
+          // QUIC acknowledgement proves the peer received the capsule bytes,
+          // not that its WebTransport task has consumed them. Retain a short,
+          // bounded application grace before closing the containing HTTP/3
+          // connection so the capsule remains the authoritative close signal.
+          (void)self->local_close_.observeBacklog(picoquic_is_cnx_backlog_empty(self->connection_) != 0,
+                                                  picoquic_get_quic_time(self->quic_));
+        }
+        if (event == picoquic_packet_loop_after_send && self->local_close_.fallbackStarted() &&
+            event_context != nullptr && *static_cast<const std::size_t*>(event_context) != 0) {
+          self->completeLocalClose();
+        }
         break;
-      case picoquic_packet_loop_ready:
+      case picoquic_packet_loop_time_check: {
+        auto* check = static_cast<packet_loop_time_check_arg_t*>(event_context);
+        if (self->local_close_.capsuleQueued() && self->local_close_.deadlineReached(check->current_time)) {
+          // The WebTransport capsule is authoritative. This HTTP/3 no-error
+          // fallback only bounds a peer that never acknowledges/closes the
+          // CONNECT stream; never expose a mapped WebTransport code here.
+          self->beginLocalConnectionClose(check->current_time);
+        } else if (self->local_close_.capsuleAcknowledged() &&
+                   self->local_close_.deadlineReached(check->current_time)) {
+          self->beginLocalConnectionClose(check->current_time);
+        } else if (self->local_close_.fallbackStarted() && self->local_close_.deadlineReached(check->current_time)) {
+          self->completeLocalClose();
+        }
+        check->delta_t = self->local_close_.constrainDelay(check->current_time, check->delta_t);
+        break;
+      }
       case picoquic_packet_loop_port_update:
-      case picoquic_packet_loop_time_check:
       case picoquic_packet_loop_system_call_duration:
       case picoquic_packet_loop_alt_port:
         break;
@@ -497,7 +532,7 @@ class Client::Impl final {
 
   int processControlCapsules(const std::uint8_t* bytes, const std::size_t size, const bool fin) noexcept {
     const bool valid = control_capsules_.feed(bytes, size, fin, [this](const detail::ControlCapsuleEvent& event) {
-      if (event.kind == detail::ControlCapsuleKind::close) {
+      if (event.kind == detail::ControlCapsuleKind::close && !local_close_.pending()) {
         emitGracefulClose(event.code,
                           std::string_view(reinterpret_cast<const char*>(event.reason.data()), event.reason_size));
       }
@@ -508,7 +543,10 @@ class Client::Impl final {
       emitFailure("malformed WebTransport control capsule");
       return -1;
     }
-    if (fin) emitGracefulClose(0, "WebTransport control stream closed");
+    if (fin) {
+      if (local_close_.pending()) completeLocalClose();
+      else emitGracefulClose(0, "WebTransport control stream closed");
+    }
     return 0;
   }
 
@@ -582,16 +620,13 @@ class Client::Impl final {
           return;
         }
       } else {
-        const std::string reason(reinterpret_cast<const char*>(command_scratch_.data()), command.size);
+        const std::string_view reason(reinterpret_cast<const char*>(command_scratch_.data()), command.size);
         const auto close_code = static_cast<std::uint32_t>(command.code);
-        std::uint64_t h3_error = 0;
-        if (!detail::webTransportApplicationErrorToH3(close_code, h3_error)) {
-          emitFailure("local close used an invalid WebTransport application error");
-          return;
+        local_close_.begin(close_code, reason, picoquic_get_quic_time(quic_));
+        if (picowt_send_close_session_message(connection_, control_stream_, close_code,
+                                              local_close_.reasonCString()) != 0) {
+          emitFailure("failed to queue WebTransport close capsule");
         }
-        (void)picowt_send_close_session_message(connection_, control_stream_, close_code, reason.c_str());
-        (void)picoquic_close_ex(connection_, h3_error, reason.c_str());
-        emitGracefulClose(close_code, reason);
         return;
       }
     }
@@ -629,6 +664,19 @@ class Client::Impl final {
     emitTerminal(State::closed, code, reason);
   }
 
+  void completeLocalClose() noexcept {
+    emitGracefulClose(local_close_.code(), local_close_.reason());
+  }
+
+  void beginLocalConnectionClose(const std::uint64_t now) noexcept {
+    if (!local_close_.capsuleQueued() && !local_close_.capsuleAcknowledged()) return;
+    if (connection_ == nullptr || picoquic_close_ex(connection_, H3ZERO_NO_ERROR, nullptr) != 0) {
+      completeLocalClose();
+      return;
+    }
+    local_close_.beginFallback(now);
+  }
+
   void emitFailure(const std::string_view reason) noexcept { emitTerminal(State::failed, 2, reason); }
 
   void emitTerminal(const State terminal, const std::uint32_t code, const std::string_view reason) noexcept {
@@ -660,6 +708,7 @@ class Client::Impl final {
   std::atomic<std::size_t> datagram_max_{0};
   std::atomic<bool> close_emitted_{false};
   detail::ControlCapsuleParser control_capsules_;
+  detail::LocalClose local_close_;
   std::atomic<bool> datagram_queued_{false};
   BoundedPayloadRing<Command, kDescriptorCapacity, kCommandByteCapacity> commands_;
   BoundedPayloadRing<EventRecord, kDescriptorCapacity, kEventByteCapacity> events_;

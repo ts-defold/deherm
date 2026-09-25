@@ -267,7 +267,7 @@ impairment, or native-Defold client coverage.
 
 The authoritative simulation remains 60 Hz. Human and network-bot clients
 predict at that same rate and submit one unreliable datagram per tick. Protocol
-9 repeats up to three complete commands oldest-first in each datagram; the
+10 repeats up to three complete commands oldest-first in each datagram; the
 server ignores consumed copies and stages every still-future command. This is a
 bounded loss-recovery window, not a retransmission queue. The deterministic
 loss test drops every second datagram and still observes continuous
@@ -318,10 +318,63 @@ One supervisor reuses or creates the pinned localhost certificate, starts the
 Deno HTTP/3 match server, launches the packaged native Defold client with that
 pin, hosts and opens the browser dashboard, autodeploys the remaining seven
 network bots, and tears down its owned server/dashboard processes when the game
-closes or the operator presses Ctrl-C. A local smoke observed native
-`webtransport-h3-quic`, authoritative slot admission, accepted inputs, and live
-Hermes telemetry; it did not claim a clean-machine native build because the
-command intentionally consumes the already packaged game.
+closes or the operator presses Ctrl-C. The command compiles the current
+TypeScript generation and rebuilds the Bob archive before launch; `--no-build`
+is an explicit expert escape hatch and may only reuse a protocol-compatible
+archive. A local smoke observed native `webtransport-h3-quic`, authoritative
+slot admission, accepted inputs, and live Hermes telemetry from the freshly
+rebuilt protocol-10 archive. It remains local arm64-macOS runtime evidence, not
+cross-host or WAN evidence.
+
+## Uint32 tick-wrap hardening tranche
+
+Protocol 10 closes the simulation-clock boundary that the admission ledger had
+already treated as a uint32 serial number. Server, offline, client-prediction,
+replay, bot-reaction, redundant-input, and snapshot ordering now share the
+RFC-1982 half-range helpers instead of JavaScript numeric `<`/`>` comparisons.
+Tick `0xffffffff` is a real input-ring value rather than an empty sentinel: a
+separate fixed validity bitmap owns queue occupancy. Player last-input state is
+stored in a `Float64Array` so all uint32 values plus the local `-1` sentinel are
+exact; snapshot version 8 uses the former reserved player byte as an explicit
+validity bit and transports the tick itself as uint32.
+
+Focused tests cross `0xfffffffd -> 0xffffffff -> 0 -> 1` through direct world
+input and snapshot restore, then cross the same boundary through a welcomed
+predicting client, redundant datagrams, the authoritative server, bots, and
+snapshot application. This is deterministic long-session correctness evidence;
+it does not extend the separately bounded credential/session horizon beyond
+RFC-1982's half range.
+
+## Ordered admission and native close tranche
+
+All frames on the client's one ordered reliable stream now enter one bounded
+server dispatch queue. The queue retains at most 32 immutable frame references
+and 256 KiB while asynchronous credential admission settles, then dispatches
+HELLO, WELCOME_ACK, control, and reliable-input frames in their original order.
+Overflow and any control or ping before the corresponding admission state fail
+closed. The client also suppresses pre-ready control and ping emission and
+enqueues WELCOME_ACK before exposing the ready state. Positive and negative
+tests cover delayed token issuance, control before HELLO, control before ACK,
+and capacity exhaustion; the complete native stack then joined and submitted
+inputs through this path.
+
+The native WebTransport client now owns a local close reason in fixed 256-byte
+storage rather than retaining packet-loop scratch memory. It sends the
+WT_CLOSE_SESSION capsule and CONNECT FIN, permits a bounded delivery/application
+grace, closes the dedicated HTTP/3 connection with H3_NO_ERROR, and reports the
+original application code and reason locally. A fresh ASan/UBSan build, the
+native runtime test, and a live picoquic-to-Deno probe observed local code `1`
+with `known-close-reason`; the former dangling reason and mapped 14-digit H3
+code no longer appear.
+
+Deno 2.9.7 currently resolves its server-side WebTransport `closed` promise
+from the underlying QUIC connection and does not parse a post-handshake close
+capsule on the retained CONNECT stream. Its server telemetry therefore reports
+decimal `256` (`H3_NO_ERROR`) with an empty reason. The connection-wide QUIC
+backlog transition is delivery evidence, not a capsule-specific application
+acknowledgement, so this work does not claim Deno consumed the application code
+or reason. A future generic/poolable client should prefer an observed peer
+CONNECT FIN/reset before teardown while retaining the bounded deadline.
 
 ## Reliable WebSocket fallback tranche
 

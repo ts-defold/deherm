@@ -5,12 +5,14 @@
 #include "native_v1_internal.hpp"
 #include "bounded_payload_ring.hpp"
 #include "control_capsule_parser.hpp"
+#include "local_close.hpp"
 #include "transport_policy.hpp"
 
 #include <atomic>
 #include <cassert>
 #include <cstdio>
 #include <cstdint>
+#include <string>
 
 using deherm::webtransport::Client;
 using deherm::webtransport::Options;
@@ -74,6 +76,32 @@ int main() {
   assert(capsules.feed(close_capsule.data() + 1, 3, false, on_capsule));
   assert(capsules.feed(close_capsule.data() + 4, close_capsule.size() - 4, true, on_capsule));
   assert(close_seen);
+
+  // The packet loop must own the close reason beyond the command scratch
+  // lifetime. The first deadline preserves a capsule delivery window; the
+  // second bounds the HTTP/3 no-error fallback.
+  deherm::webtransport::detail::LocalClose local_close;
+  {
+    std::string temporary_reason = "known-close-reason";
+    local_close.begin(1, temporary_reason, 1'000);
+    temporary_reason.assign(temporary_reason.size(), 'x');
+  }
+  assert(local_close.pending() && local_close.capsuleQueued());
+  assert(local_close.code() == 1 && local_close.reason() == "known-close-reason");
+  assert(local_close.constrainDelay(1'000, 9'000'000) ==
+         static_cast<std::int64_t>(deherm::webtransport::detail::kLocalCloseCapsuleGraceMicroseconds));
+  assert(!local_close.deadlineReached(1'000 + deherm::webtransport::detail::kLocalCloseCapsuleGraceMicroseconds - 1));
+  assert(local_close.deadlineReached(1'000 + deherm::webtransport::detail::kLocalCloseCapsuleGraceMicroseconds));
+  assert(!local_close.observeBacklog(true, 2'000));
+  assert(!local_close.observeBacklog(false, 2'000));
+  assert(local_close.observeBacklog(true, 2'000));
+  assert(local_close.capsuleAcknowledged());
+  assert(local_close.constrainDelay(2'000, 1'000'000) ==
+         static_cast<std::int64_t>(deherm::webtransport::detail::kLocalCloseCapsuleAckGraceMicroseconds));
+  local_close.beginFallback(3'000'000);
+  assert(local_close.fallbackStarted());
+  assert(local_close.constrainDelay(3'000'000, 1'000'000) ==
+         static_cast<std::int64_t>(deherm::webtransport::detail::kLocalCloseFallbackGraceMicroseconds));
 
   deherm::webtransport::detail::ControlCapsuleParser malformed_capsule;
   const std::array<std::uint8_t, 6> short_close{0x68, 0x43, 0x03, 1, 2, 3};

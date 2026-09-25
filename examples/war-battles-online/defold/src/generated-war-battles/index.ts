@@ -11,6 +11,7 @@ export * from "./events";
 export * from "./fixed";
 export * from "./playable";
 export * from "./protocol";
+export * from "./ticks";
 export * from "./transport";
 export * from "./webtransport-framing";
 export * from "./world";

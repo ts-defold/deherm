@@ -31,6 +31,7 @@ import { BotController, botDifficulty, nearestEnemy } from "./bots";
 import { clamp, createDirection, length, normalizeInto, type Direction } from "./fixed";
 import { createInputCommand, type InputCommand } from "./protocol";
 import { BattleWorld } from "./world";
+import { tickNext } from "./ticks";
 
 export const PLAYABLE_MATCH_ID = 77;
 export const LOCAL_PLAYER_ID = 1;
@@ -122,7 +123,7 @@ export class PlayableBattle {
   }
 
   step(): void {
-    const tick = this.world.tick + 1;
+    const tick = tickNext(this.world.tick);
     this.stageLocalCommand(this.commands[LOCAL_PLAYER_ID - 1]!, tick);
     this.world.submitInput(this.commands[LOCAL_PLAYER_ID - 1]!);
     for (let playerId = 2; playerId <= this.playerCount; playerId += 1) {
@@ -216,7 +217,7 @@ export class PlayableBattle {
     command.buttons = (this.localFire ? INPUT_BUTTON_FIRE : 0) | (this.localBoost ? INPUT_BUTTON_BOOST : 0);
     command.weaponRequest = this.localWeapon;
     command.fireSubtick = this.localFire ? 127 : 255;
-    command.latestSnapshotTick = tick > 0 ? tick - 1 : 0;
+    command.latestSnapshotTick = (tick - 1) >>> 0;
     command.snapshotAckBits = 0xffff_ffff;
     this.localWeapon = 0;
   }

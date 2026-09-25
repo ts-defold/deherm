@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 4,
-  "observedInputsSent": 15,
-  "lastServerTick": 63,
-  "lastLocalTick": 73,
+  "observedInputsSent": 13,
+  "lastServerTick": 120,
+  "lastLocalTick": 125,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -48,12 +48,12 @@
     "boost": false,
     "weapon": 0
   },
-  "inputsDropped": 3,
+  "inputsDropped": 1,
   "server": {
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:58350",
+      "war-battles-server:health:http://localhost:62886",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -73,8 +73,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 365815,
-      "sha256": "577042916704af1f6869648f52ad0fdde5a5e3829041496e2fe26164aaffa5bf"
+      "bytes": 371686,
+      "sha256": "cf0f71e81bcc2bd42fe960ef5f97e20cb57e9825e459768b4f269f16dcf8c168"
     },
     {
       "path": "examples/war-battles-online/integration/check-real-webtransport.mjs",
@@ -125,6 +125,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "05d209605655a5636beafff34c23a5199fd434fc1cac9ef77c439f704986ce49",
+  "sourceKey": "b8ab9cd16258a552e183786ca8173bc36f498f34644c5b5512d51069ed552838",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input evidence; server input acceptance is observed from MatchServer stats; reliable-lane persistence is not claimed; not WAN, ingress, native Defold, or allocation evidence."
 }

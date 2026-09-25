@@ -68,7 +68,7 @@ import {
 } from "./transport.ts";
 import { SessionTokenService, type SessionTokenProvider } from "./session-auth.ts";
 import { SessionLedger } from "./session-persistence.ts";
-import { MAX_TICK_SPAN, tickAfter, tickDeadline } from "./ticks.ts";
+import { MAX_TICK_SPAN, tickAfter, tickDeadline, tickNext } from "./ticks.ts";
 
 export interface MatchServerOptions {
   readonly matchId?: number;
@@ -112,6 +112,12 @@ export interface MatchServerStats {
 
 const SNAPSHOT_IN_FLIGHT_STREAMS = 8;
 const SNAPSHOT_STALE_MILLISECONDS = 300;
+// The ordered client stream can deliver several complete frames while the
+// first HELLO is waiting on an asynchronous credential provider. Preserve the
+// stream's order in a fixed-capacity queue instead of dispatching later control
+// frames ahead of admission.
+const RELIABLE_DISPATCH_CAPACITY = 32;
+const RELIABLE_DISPATCH_BYTE_CAPACITY = 256 * 1024;
 
 interface SnapshotStreamSend {
   readonly tick: number;
@@ -214,7 +220,7 @@ export class MatchServer {
 
   step(): void {
     if (this.closed) return;
-    const tick = this.world.tick + 1;
+    const tick = tickNext(this.world.tick);
     for (let playerId = 1; playerId <= this.rosterSize; playerId += 1) {
       const slot = playerId - 1;
       if (this.world.playerActive[slot] === 0) continue;
@@ -445,6 +451,14 @@ export class ServerSession implements TransportReceiver {
   private inputBudget = 0;
   /** Closes the double-hello race while async HMAC verification is pending. */
   private sessionHandling = false;
+  private readonly reliableDispatchChannels = new Uint8Array(RELIABLE_DISPATCH_CAPACITY);
+  private readonly reliableDispatchPayloads: Array<Uint8Array | undefined> = Array.from({
+    length: RELIABLE_DISPATCH_CAPACITY,
+  });
+  private reliableDispatchHead = 0;
+  private reliableDispatchSize = 0;
+  private reliableDispatchBytes = 0;
+  private reliableDispatchActive = false;
   private awaitingWelcomeAck = false;
   private stagedResumeGeneration = 0;
   private welcomeAckDeadline = 0;
@@ -471,21 +485,25 @@ export class ServerSession implements TransportReceiver {
   }
 
   onReliable(channel: ReliableChannel, payload: Uint8Array): void {
-    if (channel === TRANSPORT_CHANNEL_SESSION) {
-      void this.handleSession(payload).catch((error: unknown) => {
-        this.server.report(error);
-        this.close(4_003, "protocol error");
-      });
+    if (this.closed) return;
+    if (
+      this.reliableDispatchSize >= RELIABLE_DISPATCH_CAPACITY ||
+      this.reliableDispatchBytes + payload.byteLength > RELIABLE_DISPATCH_BYTE_CAPACITY
+    ) {
+      this.server.report(new Error("ordered reliable dispatch capacity exceeded"));
+      this.close(4_003, "protocol queue capacity exceeded");
       return;
     }
-    try {
-      if (channel === TRANSPORT_CHANNEL_CONTROL) this.handleControl(payload);
-      else if (channel === 4) this.handleInput(payload);
-      else throw new Error(`client sent an unexpected reliable channel ${channel}`);
-    } catch (error: unknown) {
-      this.server.report(error);
-      this.close(4_003, "protocol error");
-    }
+    const tail = (this.reliableDispatchHead + this.reliableDispatchSize) % RELIABLE_DISPATCH_CAPACITY;
+    this.reliableDispatchChannels[tail] = channel;
+    // Every transport hands ownership of this immutable frame to the receiver;
+    // retaining the reference avoids a second copy while admission is pending.
+    this.reliableDispatchPayloads[tail] = payload;
+    this.reliableDispatchSize += 1;
+    this.reliableDispatchBytes += payload.byteLength;
+    if (this.reliableDispatchActive) return;
+    this.reliableDispatchActive = true;
+    void this.drainReliableDispatch();
   }
 
   onDatagram(payload: Uint8Array): void {
@@ -509,6 +527,7 @@ export class ServerSession implements TransportReceiver {
       this.snapshotSends[index] = undefined;
     }
     this.sessionHandling = false;
+    this.clearReliableDispatch();
     this.ready = false;
     this.server.log(`session-closed:${code}:${reason}`);
     this.server.releaseSlot(this);
@@ -620,6 +639,7 @@ export class ServerSession implements TransportReceiver {
   private async handleSession(payload: Uint8Array): Promise<void> {
     const kind = messageKind(payload);
     if (kind === MESSAGE_PING) {
+      if (!this.ready) throw new Error("session message before hello");
       readPing(payload, this.ping);
       this.ping.serverTick = this.server.world.tick;
       writePing(this.pingBuffer, this.ping, true);
@@ -680,6 +700,45 @@ export class ServerSession implements TransportReceiver {
     });
   }
 
+  private async drainReliableDispatch(): Promise<void> {
+    try {
+      while (!this.closed && this.reliableDispatchSize > 0) {
+        const index = this.reliableDispatchHead;
+        const channel = this.reliableDispatchChannels[index]! as ReliableChannel;
+        const payload = this.reliableDispatchPayloads[index]!;
+        this.reliableDispatchPayloads[index] = undefined;
+        this.reliableDispatchHead = (index + 1) % RELIABLE_DISPATCH_CAPACITY;
+        this.reliableDispatchSize -= 1;
+        this.reliableDispatchBytes -= payload.byteLength;
+        if (channel === TRANSPORT_CHANNEL_SESSION) await this.handleSession(payload);
+        else if (channel === TRANSPORT_CHANNEL_CONTROL) this.handleControl(payload);
+        else if (channel === 4) this.handleInput(payload);
+        else throw new Error(`client sent an unexpected reliable channel ${channel}`);
+      }
+    } catch (error: unknown) {
+      this.server.report(error);
+      this.close(4_003, "protocol error");
+    } finally {
+      this.reliableDispatchActive = false;
+      // A transport callback can enqueue reentrantly while the last handler is
+      // settling. Restart exactly once if work arrived after the loop's check.
+      if (!this.closed && this.reliableDispatchSize > 0) {
+        this.reliableDispatchActive = true;
+        void this.drainReliableDispatch();
+      }
+    }
+  }
+
+  private clearReliableDispatch(): void {
+    for (let offset = 0; offset < this.reliableDispatchSize; offset += 1) {
+      const index = (this.reliableDispatchHead + offset) % RELIABLE_DISPATCH_CAPACITY;
+      this.reliableDispatchPayloads[index] = undefined;
+    }
+    this.reliableDispatchHead = 0;
+    this.reliableDispatchSize = 0;
+    this.reliableDispatchBytes = 0;
+  }
+
   private handleWelcomeAck(payload: Uint8Array): void {
     if (!this.awaitingWelcomeAck || this.ready || this.slot < 0) {
       throw new Error("unexpected welcome acknowledgement");
@@ -698,7 +757,11 @@ export class ServerSession implements TransportReceiver {
   }
 
   private handleControl(payload: Uint8Array): void {
-    if (!this.ready) throw new Error("control message before hello");
+    if (!this.ready) {
+      throw new Error(
+        this.slot < 0 ? "control message before hello" : "control message before welcome acknowledgement",
+      );
+    }
     if (messageKind(payload) !== MESSAGE_CONTROL) throw new Error("control lane carried a non-control message");
     readControl(payload, this.control);
     const playerId = this.slot + 1;

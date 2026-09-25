@@ -32,7 +32,7 @@ import type { BattleWorld } from "./world.ts";
 
 const SNAPSHOT_MAGIC = 0x57425331;
 // Version 7 adds the authoritative tank/on-foot/dead player mode.
-const SNAPSHOT_VERSION = 7;
+const SNAPSHOT_VERSION = 8;
 
 export interface SnapshotFrameScratch {
   baseline: Uint8Array;
@@ -262,7 +262,7 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
     view.setInt32(cursor + 52, world.playerScore[slot]!, true);
     view.setInt32(cursor + 56, world.playerDeaths[slot]!, true);
     view.setInt32(cursor + 60, world.playerCredits[slot]!, true);
-    view.setInt32(cursor + 64, world.playerLastInputTick[slot]!, true);
+    view.setUint32(cursor + 64, world.playerLastInputTick[slot]! < 0 ? 0 : world.playerLastInputTick[slot]!, true);
     view.setInt8(cursor + 68, world.playerLastMoveX[slot]!);
     view.setInt8(cursor + 69, world.playerLastMoveY[slot]!);
     view.setInt8(cursor + 70, world.playerLastAimX[slot]!);
@@ -279,7 +279,7 @@ export function writeWorldSnapshot(world: BattleWorld, target: Uint8Array, byteO
       view.setUint16(cursor + 82 + weapon * 2, world.playerAmmo[slot * WEAPON_COUNT + weapon]!, true);
     }
     view.setUint8(cursor + 94, world.playerMode[slot]!);
-    view.setUint8(cursor + 95, 0);
+    view.setUint8(cursor + 95, world.playerLastInputTick[slot]! < 0 ? 0 : 1);
     cursor += PLAYER_SNAPSHOT_BYTES;
   }
 
@@ -372,7 +372,9 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     world.playerScore[slot] = view.getInt32(cursor + 52, true);
     world.playerDeaths[slot] = view.getInt32(cursor + 56, true);
     world.playerCredits[slot] = view.getInt32(cursor + 60, true);
-    world.playerLastInputTick[slot] = view.getInt32(cursor + 64, true);
+    const lastInputValid = view.getUint8(cursor + 95);
+    if (lastInputValid > 1) throw new Error("snapshot player input-valid flag is invalid");
+    world.playerLastInputTick[slot] = lastInputValid === 0 ? -1 : view.getUint32(cursor + 64, true);
     world.playerLastMoveX[slot] = view.getInt8(cursor + 68);
     world.playerLastMoveY[slot] = view.getInt8(cursor + 69);
     world.playerLastAimX[slot] = view.getInt8(cursor + 70);
@@ -386,7 +388,7 @@ export function readWorldSnapshot(world: BattleWorld, source: Uint8Array, byteOf
     const weaponUpgradeUnlocks = view.getUint16(cursor + 78, true);
     const weaponUpgradeSelections = view.getUint16(cursor + 80, true);
     const mode = view.getUint8(cursor + 94);
-    if (mode > 2 || view.getUint8(cursor + 95) !== 0) throw new Error("snapshot player mode is invalid");
+    if (mode > 2) throw new Error("snapshot player mode is invalid");
     if (world.playerActive[slot] !== 0 && (chassis < 1 || chassis > CHASSIS_COUNT))
       throw new Error("snapshot chassis id is invalid");
     if ((chassisUnlocks & ~CHASSIS_UNLOCK_MASK) !== 0) throw new Error("snapshot chassis unlock mask is invalid");

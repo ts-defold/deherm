@@ -16,6 +16,8 @@ namespace wt = deherm::webtransport;
 
 namespace {
 
+constexpr std::uint8_t kWarBattlesProtocolVersion = 10;
+
 int nibble(const char value) {
   if (value >= '0' && value <= '9') return value - '0';
   if (value >= 'a' && value <= 'f') return value - 'a' + 10;
@@ -67,7 +69,7 @@ std::vector<std::uint8_t> reliableFrame(const std::uint8_t channel, const std::u
   frame[0] = channel;
   write32(frame.data() + 1, static_cast<std::uint32_t>(payload_size));
   write16(frame.data() + 5, 0x5743);
-  frame[7] = 8;
+  frame[7] = kWarBattlesProtocolVersion;
   frame[8] = kind;
   return frame;
 }
@@ -75,8 +77,8 @@ std::vector<std::uint8_t> reliableFrame(const std::uint8_t channel, const std::u
 }  // namespace
 
 int main(const int argc, char** argv) {
-  if (argc != 3) {
-    std::fprintf(stderr, "usage: %s https://host:port/path certificate-sha256-hex\n", argv[0]);
+  if (argc < 3 || argc > 4 || (argc == 4 && std::string_view(argv[3]) != "close")) {
+    std::fprintf(stderr, "usage: %s https://host:port/path certificate-sha256-hex [close]\n", argv[0]);
     return 64;
   }
 
@@ -150,8 +152,8 @@ int main(const int argc, char** argv) {
       if (event.kind == wt::EventKind::stream_data) {
         auto& bytes = incoming[event.stream_id];
         bytes.insert(bytes.end(), event.bytes.begin(), event.bytes.begin() + event.size);
-        if (bytes.size() >= 9 && bytes.size() == 5 + read32(bytes.data() + 1) && bytes[0] == 1 && bytes[7] == 8 &&
-            bytes[8] == 2) {
+        if (bytes.size() >= 9 && bytes.size() == 5 + read32(bytes.data() + 1) && bytes[0] == 1 &&
+            bytes[7] == kWarBattlesProtocolVersion && bytes[8] == 2) {
           welcome = bytes;
         }
       } else if (event.kind == wt::EventKind::close) {
@@ -211,6 +213,24 @@ int main(const int argc, char** argv) {
     std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
   if (!(write_failure && reset_failure && stop_failure) || client->state() != wt::State::ready) return 1;
+
+  if (argc == 4) {
+    client->close(1, "known-close-reason");
+    bool local_close_seen = false;
+    const auto local_close_deadline = std::chrono::steady_clock::now() + std::chrono::seconds(4);
+    while (std::chrono::steady_clock::now() < local_close_deadline && !local_close_seen) {
+      while (client->poll(event)) {
+        if (event.kind != wt::EventKind::close) continue;
+        const std::string_view reason(reinterpret_cast<const char*>(event.bytes.data()), event.size);
+        if (event.code != 1 || reason != "known-close-reason") return 1;
+        local_close_seen = true;
+      }
+      std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+    if (!local_close_seen || client->state() != wt::State::closed) return 1;
+    std::printf("native-webtransport-probe:local-close:code=1:reason=known-close-reason\n");
+    return 0;
+  }
 
   std::array<std::uint8_t, 32> datagram{};
   write16(datagram.data(), 0x5742);

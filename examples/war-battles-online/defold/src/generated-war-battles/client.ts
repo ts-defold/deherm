@@ -68,6 +68,7 @@ import {
   type TransportReceiver,
 } from "./transport";
 import { BattleWorld } from "./world";
+import { tickAfter, tickDistance, tickNext } from "./ticks";
 
 export type ClientState = "idle" | "connecting" | "ready" | "rejected" | "closed";
 
@@ -352,6 +353,10 @@ export class BattleClient implements TransportReceiver {
   }
 
   sendControl(action: number, argument: number): void {
+    // A HELLO is not admission. Sending control while still connecting can put
+    // it ahead of WELCOME_ACK on the ordered stream, so pre-welcome UI input is
+    // deliberately ignored and may be retried once the client is ready.
+    if (this.state !== "ready") return;
     writeControl(this.controlBuffer, { action, argument });
     void this.send(TRANSPORT_CHANNEL_CONTROL, this.controlBuffer);
   }
@@ -368,6 +373,7 @@ export class BattleClient implements TransportReceiver {
   }
 
   ping(clientTime: number): void {
+    if (this.state !== "ready") return;
     writePing(this.pingBuffer, { clientTime: clientTime >>> 0, serverTick: 0 });
     void this.send(TRANSPORT_CHANNEL_SESSION, this.pingBuffer);
   }
@@ -499,7 +505,10 @@ export class BattleClient implements TransportReceiver {
     }
     try {
       const tick = readSnapshotTick(payload);
-      if (tick <= this.appliedSnapshotTick || tick <= this.pendingSnapshotTick) {
+      if (
+        (this.appliedSnapshotTick >= 0 && !tickAfter(tick, this.appliedSnapshotTick)) ||
+        (this.pendingSnapshotTick >= 0 && !tickAfter(tick, this.pendingSnapshotTick))
+      ) {
         this.stats.snapshotsIgnored += 1;
         return;
       }
@@ -549,7 +558,7 @@ export class BattleClient implements TransportReceiver {
     this.pendingSnapshotTick = -1;
     const snapshotKeyframe = this.pendingSnapshotKeyframe;
     this.pendingSnapshotKeyframe = false;
-    if (snapshotTick <= this.appliedSnapshotTick) {
+    if (this.appliedSnapshotTick >= 0 && !tickAfter(snapshotTick, this.appliedSnapshotTick)) {
       this.stats.snapshotsIgnored += 1;
       return;
     }
@@ -589,7 +598,8 @@ export class BattleClient implements TransportReceiver {
     // estimate, retain three ticks of jitter margin, and grow monotonically by
     // at most one tick per authoritative frame. The matching catch-up step
     // stages and transmits the newly future command; this is not metadata-only.
-    const observedTransitTicks = Math.max(0, target - snapshotTick - this.inputLeadTicks);
+    const targetDistance = tickAfter(target, snapshotTick) ? tickDistance(target, snapshotTick) : 0;
+    const observedTransitTicks = Math.max(0, targetDistance - this.inputLeadTicks);
     const desiredLeadTicks = clamp(
       observedTransitTicks + INPUT_LEAD_SAFETY_TICKS,
       this.minimumInputLeadTicks,
@@ -605,12 +615,12 @@ export class BattleClient implements TransportReceiver {
     // Replay the local inputs the server has not yet folded in. If the client
     // had fallen behind the server, there is nothing to replay and the local
     // clock jumps forward instead.
-    if (target <= world.tick) {
+    if (!tickAfter(target, world.tick)) {
       this.localTick = world.tick;
     } else {
       let replayed = 0;
-      while (world.tick < target && replayed < INPUT_HISTORY_TICKS) {
-        const next: number = world.tick + 1;
+      while (tickAfter(target, world.tick) && replayed < INPUT_HISTORY_TICKS) {
+        const next = tickNext(world.tick);
         const slot = next % INPUT_HISTORY_TICKS;
         if (this.historyTick[slot] === next) world.submitInput(this.history[slot]!);
         world.step();
@@ -667,7 +677,7 @@ export class BattleClient implements TransportReceiver {
   private advanceOneTick(): void {
     const world = this.world;
     if (world === undefined) return;
-    const tick = world.tick + 1;
+    const tick = tickNext(world.tick);
     const slot = tick % INPUT_HISTORY_TICKS;
     const command = this.history[slot]!;
     this.stageCommand(command, tick);
@@ -711,9 +721,9 @@ export class BattleClient implements TransportReceiver {
     // The local world already runs `leadTicks` ahead of the server. Preserve
     // the command tick exactly so authoritative simulation and replay execute
     // the same input on the same deterministic tick.
-    const firstTick = Math.max(1, command.tick - (INPUT_BUNDLE_MAX_COMMANDS - 1));
     let commandCount = 0;
-    for (let tick = firstTick; tick <= command.tick; tick += 1) {
+    for (let offset = INPUT_BUNDLE_MAX_COMMANDS - 1; offset >= 0; offset -= 1) {
+      const tick = (command.tick - offset) >>> 0;
       const historySlot = tick % INPUT_HISTORY_TICKS;
       if (this.historyTick[historySlot] !== tick) continue;
       const source = this.history[historySlot]!;

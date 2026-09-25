@@ -3352,3 +3352,45 @@ all declared text inputs after deterministic LF normalization. A fixture
 rewrites the CMake input to CRLF and requires the identity to remain unchanged;
 real source edits still rotate it. The earlier mixed-identity release remains
 invalid evidence and is not consumed by the generated index.
+
+## 2026-09-25 - War Battles simulation ticks wrap as uint32 end to end
+
+The network admission ledger was wrap-safe, but the live simulation was not:
+`MatchServer`, `BattleWorld`, `BattleClient`, offline play, and bots still mixed
+plain JavaScript ordering with a uint32 wire clock. A match reaching
+`0xffffffff` could reject the next queued input, misorder post-wrap snapshots,
+stop prediction replay, and store the last-input tick as a negative `Int32`.
+
+All simulation paths now use the shared half-range serial helpers. The input
+ring has an explicit fixed validity bitmap, so `0xffffffff` no longer aliases
+an empty slot. Snapshot version 8 consumes the reserved per-player byte for a
+last-input validity bit and preserves the tick as uint32; protocol version 10
+makes the wire incompatibility fail closed. Two focused regressions cross the
+boundary through world/snapshot restore and through the complete welcomed
+client/server prediction, redundant-datagram, bot, and snapshot path. Core
+tests and TypeScript context checks pass. Generator-owned evidence was refreshed
+before this wave, and the public `pnpm stack` path subsequently rebuilt the Bob
+archive and observed protocol-10 native admission, accepted QUIC-datagram
+inputs, and repeated Hermes heap/frame/root/handle/arena telemetry. This local
+runtime does not promote the result to WAN or cross-host evidence.
+
+## 2026-09-25 - Reliable admission is ordered and native close owns its bytes
+
+The reported `control message before hello` was a real ordering bug: one QUIC
+stream delivered frames in order, but the server dispatched its asynchronous
+HELLO and later synchronous control callbacks concurrently. A fixed 32-frame,
+256-KiB queue now serializes that dispatch without copying retained immutable
+frames. Client control and ping are unavailable until WELCOME_ACK has been
+queued. Positive delayed-admission coverage and negative pre-HELLO, pre-ACK,
+and queue-overflow coverage pass as part of the 98-test core suite.
+
+The native close path separately retained a pointer into command scratch and
+closed QUIC with the mapped WebTransport application code. The packet loop now
+owns the reason in fixed storage, sends WT_CLOSE_SESSION plus CONNECT FIN, and
+uses a bounded H3_NO_ERROR connection teardown. Fresh ASan/UBSan and native
+tests pass. A live picoquic/Deno probe observed exact local code `1` and reason
+`known-close-reason`; Deno reported `256:` because version 2.9.7 exposes the raw
+H3_NO_ERROR connection close and does not consume the post-handshake capsule.
+The local exact result is runtime evidence. The connection backlog transition
+supports peer transport receipt only; it is not promoted to proof of Deno
+application-level capsule consumption.

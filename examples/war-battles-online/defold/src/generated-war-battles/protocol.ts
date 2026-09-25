@@ -3,6 +3,7 @@ import { INPUT_BUTTON_MASK, MAX_PLAYERS, SESSION_TOKEN_BYTES, SNAPSHOT_BYTES, TI
 import { WEAPON_COUNT } from "./content";
 
 /**
+ * Version 10 makes every simulation and snapshot tick a wrap-safe uint32 value.
  * Version 9 allows an unreliable input datagram to carry a bounded oldest-first
  * window of three complete commands. Version 8 adds an explicit credential acknowledgement after welcome so a
  * server never revokes the last credential merely because a welcome was
@@ -16,7 +17,7 @@ import { WEAPON_COUNT } from "./content";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-export const PROTOCOL_VERSION = 9;
+export const PROTOCOL_VERSION = 10;
 export const INPUT_PACKET_BYTES = 32;
 /**
  * One unreliable transport datagram repeats the newest command plus two recent

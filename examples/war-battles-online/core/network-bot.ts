@@ -4,6 +4,7 @@ import { INPUT_BUTTON_BOOST, INPUT_BUTTON_FIRE } from "./constants.ts";
 import type { BattleClient } from "./client.ts";
 import type { PlayControls } from "./playable.ts";
 import { createInputCommand, type InputCommand } from "./protocol.ts";
+import { tickNext } from "./ticks.ts";
 
 export interface NetworkBotDriverOptions {
   /** The same 0-3 difficulty rows used by local and authoritative bots. */
@@ -65,7 +66,7 @@ export class NetworkBotDriver {
     const slot = playerId - 1;
     const previousChassis = world.playerChassis[slot]!;
     const previousWeaponSelections = world.playerWeaponUpgradeSelections[slot]!;
-    this.controller.stage(world, this.staged, playerId, world.tick + 1);
+    this.controller.stage(world, this.staged, playerId, tickNext(world.tick));
     this.stats.commandsStaged += 1;
     if (this.staged.moveX !== 0 || this.staged.moveY !== 0 || this.staged.buttons !== 0) {
       this.stats.nonIdleCommands += 1;

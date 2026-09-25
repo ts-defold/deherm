@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "repository": "ts-defold/deherm",
-  "tag": "defold-webtransport-native-51ba8e0e229d",
-  "fingerprint": "51ba8e0e229d378971dc0984f4a0625c2b6739f64b29583dc6c7384c5681c18d",
+  "tag": "defold-webtransport-native-a631a34671a6",
+  "fingerprint": "a631a34671a62f54acb11d82a0061e631f65c2907573a2dceb86372882d23567",
   "abiSha256": "544a26fded780ef78910acb8ad39fb1bd76fe9c7af0c12151c49be3fcfb65543",
   "assets": [
     {
