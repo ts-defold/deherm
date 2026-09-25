@@ -21,6 +21,21 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 -FIND_PACKAGE(PkgConfig REQUIRED)
 +FIND_PACKAGE(PkgConfig QUIET)
  INCLUDE(cmake/boringssl-adjust.cmake)
+@@ -38,3 +38,6 @@ INCLUDE_DIRECTORIES(
+     include
+     ${CMAKE_CURRENT_BINARY_DIR})
++IF (WIN32)
++    INCLUDE_DIRECTORIES(picotlsvs/picotls)
++ENDIF ()
+ SET(MINICRYPTO_LIBRARY_FILES
+@@ -56,4 +59,7 @@ SET(CORE_FILES
+     lib/hpke.c
+     lib/picotls.c
+     lib/pembase64.c)
++IF (WIN32)
++    LIST(APPEND CORE_FILES picotlsvs/picotls/wintimeofday.c)
++ENDIF ()
+ SET(CORE_TEST_FILES
 @@ -74,3 +74,5 @@ ENDIF ()
 -PKG_CHECK_MODULES(BROTLI_DEC libbrotlidec)
 -PKG_CHECK_MODULES(BROTLI_ENC libbrotlienc)

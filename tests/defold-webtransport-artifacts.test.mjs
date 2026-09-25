@@ -299,4 +299,7 @@ test("CI publishes content-addressed rows immutably and release assembly consume
   assert.match(picotlsPatch, /FIND_PACKAGE\(PkgConfig QUIET\)/u);
   assert.match(picotlsPatch, /IF \(PkgConfig_FOUND\)[\s\S]*PKG_CHECK_MODULES/u,
     "optional Brotli discovery must not make pkg-config a Windows build prerequisite");
+  assert.match(picotlsPatch, /IF \(WIN32\)[\s\S]*INCLUDE_DIRECTORIES\(picotlsvs\/picotls\)/u);
+  assert.match(picotlsPatch, /LIST\(APPEND CORE_FILES picotlsvs\/picotls\/wintimeofday\.c\)/u,
+    "Picotls' CMake build must consume its own Windows compatibility implementation");
 });
