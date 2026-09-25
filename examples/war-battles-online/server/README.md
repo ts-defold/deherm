@@ -42,7 +42,7 @@ or, from this package, `pnpm serve`.
 | `--cert`, `--key`             | PEM paths; default `server/certs/localhost.{crt,key}`               |
 | `--roster`                    | Total tanks, humans plus bots. Default 8, maximum 32                |
 | `--bot-skill`                 | 0 recruit, 1 regular, 2 veteran, 3 nightmare                        |
-| `--snapshot-interval`         | Ticks between authoritative snapshots; 3 is 20 Hz                   |
+| `--snapshot-interval`         | Ticks between authoritative snapshots; default 4 is 15 Hz           |
 | `--teams`                     | Two teams instead of a free-for-all                                 |
 | `--world-checkpoint`          | Fixed authoritative state file; also `WAR_BATTLES_WORLD_CHECKPOINT` |
 | `--world-checkpoint-interval` | Ticks between control-plane world writes; default 60                |
@@ -93,7 +93,7 @@ control frames share one ordered bidirectional QUIC stream; input commands use
 unreliable datagrams. Server welcome/control frames share one ordered
 unidirectional stream, while every replaceable snapshot owns a separate stream
 that is retired after its one frame or reset after 300 ms. Both peers keep a
-64-entry acknowledged snapshot history (3.2 seconds at 20 Hz), while the server
+64-entry acknowledged snapshot history (about 4.27 seconds at 15 Hz), while the server
 allows at most eight unsettled snapshot streams. Several out-of-order deltas
 can therefore use the same exact base without making the stream window grow.
 

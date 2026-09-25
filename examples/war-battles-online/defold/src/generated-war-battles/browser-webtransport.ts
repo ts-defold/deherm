@@ -189,7 +189,7 @@ export class WebTransportGameClient implements GameTransport {
     const session = new Constructor(url, {
       // WebTransport session stream credits are separate from the QUIC
       // connection's limits. Chromium otherwise grants only one server stream,
-      // which is enough for welcome but starves the 20 Hz snapshot lane.
+      // which is enough for welcome but starves the authoritative snapshot lane.
       anticipatedConcurrentIncomingUnidirectionalStreams: 64,
       anticipatedConcurrentIncomingBidirectionalStreams: 8,
       ...options,
@@ -233,7 +233,7 @@ export class WebTransportGameClient implements GameTransport {
     if (channel !== TRANSPORT_CHANNEL_SNAPSHOT) {
       // sendServerReliable builds the owned frame synchronously before its
       // first queue or writer boundary, so a second payload copy would only
-      // add allocation pressure to the 20 Hz snapshot path.
+      // add allocation pressure to the authoritative snapshot path.
       return this.sendServerReliable(channel, payload);
     }
 

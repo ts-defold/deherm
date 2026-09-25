@@ -1,4 +1,11 @@
-import { INPUT_BUTTON_MASK, MAX_PLAYERS, SESSION_TOKEN_BYTES, SNAPSHOT_BYTES, TICK_RATE } from "./constants.ts";
+import {
+  INPUT_BUTTON_MASK,
+  MAX_PLAYERS,
+  NETWORK_SNAPSHOT_BYTES,
+  SESSION_TOKEN_BYTES,
+  SNAPSHOT_BYTES,
+  TICK_RATE,
+} from "./constants.ts";
 import { WEAPON_COUNT } from "./content.ts";
 
 /**
@@ -16,8 +23,9 @@ import { WEAPON_COUNT } from "./content.ts";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-// Version 11 uses sparse keyframes and gap/length varints for snapshot runs.
-export const PROTOCOL_VERSION = 11;
+// Version 12 separates the compact fixed-point network image from the broad
+// rollback image and packs each projectile into an exact 15-byte record.
+export const PROTOCOL_VERSION = 12;
 export const INPUT_PACKET_BYTES = 32;
 /**
  * One unreliable transport datagram repeats the newest command plus two recent
@@ -171,6 +179,13 @@ export const SNAPSHOT_DELTA = 1;
 /** A keyframe is required often enough to bound late-join/recovery cost. */
 export const SNAPSHOT_KEYFRAME_INTERVAL = 20;
 export const SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_FRAME_HEADER_BYTES + SNAPSHOT_BYTES;
+export const NETWORK_SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_FRAME_HEADER_BYTES + NETWORK_SNAPSHOT_BYTES;
+/** Ordinary latest-state packets above this size consume recovery credit. */
+export const SNAPSHOT_NORMAL_MAX_BYTES = 3 * 1_024;
+/** The compact image guarantees even an adversarial raw recovery fits here. */
+export const SNAPSHOT_RECOVERY_MAX_BYTES = 12 * 1_024;
+/** Recovery traffic is a one-packet token bucket with no burst allowance. */
+export const SNAPSHOT_RECOVERY_INTERVAL_MILLISECONDS = 1_000;
 export const REJECT_HEADER_BYTES = ENVELOPE_BYTES + 2;
 export const REJECT_MAXIMUM_BYTES = REJECT_HEADER_BYTES + 96;
 
@@ -286,7 +301,7 @@ export function writeWelcome(target: Uint8Array, message: Readonly<WelcomeMessag
   view.setUint32(12, message.mapSeed >>> 0, true);
   view.setUint32(16, message.serverTick >>> 0, true);
   target.set(message.resumeToken, 20);
-  view.setUint8(WELCOME_BASE_BYTES, message.snapshotIntervalTicks ?? 3);
+  view.setUint8(WELCOME_BASE_BYTES, message.snapshotIntervalTicks ?? 4);
   return WELCOME_BYTES;
 }
 

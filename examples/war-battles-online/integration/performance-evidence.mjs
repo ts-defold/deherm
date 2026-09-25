@@ -135,7 +135,10 @@ export function assertPerformanceEvidence(document, { sourceInputs } = {}) {
   );
   assert.equal(
     document.snapshotBandwidth.worstCaseBound.bytesPerSecondPerClient,
-    document.snapshotBandwidth.fixedFrameCapacity * document.snapshotBandwidth.worstCaseBound.framesPerSecond,
+    document.snapshotBandwidth.worstCaseBound.normalFramesPerSecond *
+      document.snapshotBandwidth.normalFrameMaximumBytes +
+      document.snapshotBandwidth.worstCaseBound.recoveryFramesPerSecond *
+        Math.min(document.snapshotBandwidth.recoveryFrameMaximumBytes, document.snapshotBandwidth.fixedFrameCapacity),
   );
   assert.equal(
     document.snapshotBandwidth.targets.worstCaseDownstreamTargetSatisfied,

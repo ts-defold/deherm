@@ -12,6 +12,7 @@
 import {
   INPUT_HISTORY_TICKS,
   MAX_PLAYERS,
+  NETWORK_SNAPSHOT_BYTES,
   SNAPSHOT_BASE_HISTORY_FRAMES,
   SNAPSHOT_BYTES,
   TICK_RATE,
@@ -34,7 +35,10 @@ import {
   REJECT_RATE_LIMITED,
   REJECT_VERSION,
   RESUME_TOKEN_BYTES,
-  SNAPSHOT_MESSAGE_BYTES,
+  NETWORK_SNAPSHOT_MESSAGE_BYTES,
+  SNAPSHOT_NORMAL_MAX_BYTES,
+  SNAPSHOT_RECOVERY_INTERVAL_MILLISECONDS,
+  SNAPSHOT_RECOVERY_MAX_BYTES,
   SNAPSHOT_KEYFRAME_INTERVAL,
   WELCOME_BYTES,
   createInputCommand,
@@ -53,7 +57,7 @@ import {
   type PingMessage,
   type WelcomeAckMessage,
 } from "./protocol.ts";
-import { writeSnapshotDelta, writeSnapshotKeyframe } from "./snapshot.ts";
+import { compactNetworkSnapshot, writeNetworkSnapshotDelta, writeNetworkSnapshotKeyframe } from "./snapshot.ts";
 import { isWeaponId, isWeaponUpgradeId } from "./content.ts";
 import { BotController } from "./bots.ts";
 import { BattleWorld } from "./world.ts";
@@ -75,7 +79,7 @@ export interface MatchServerOptions {
   readonly mapSeed?: number;
   /** Slots the match uses in total, humans plus bots. */
   readonly rosterSize?: number;
-  /** Ticks between authoritative snapshots. 3 is 20 Hz at a 60 Hz tick. */
+  /** Ticks between authoritative snapshots. 4 is 15 Hz at a 60 Hz tick. */
   readonly snapshotIntervalTicks?: number;
   readonly botSkill?: number;
   readonly teams?: boolean;
@@ -104,6 +108,10 @@ export interface MatchServerStats {
   humans: number;
   bots: number;
   snapshotsSent: number;
+  snapshotBytesSent: number;
+  snapshotNormalFramesSent: number;
+  snapshotRecoveryFramesSent: number;
+  snapshotFramesSkippedByBudget: number;
   inputsAccepted: number;
   inputsRejected: number;
   /** Valid authoritative commands first observed after their simulation tick. */
@@ -160,6 +168,10 @@ export class MatchServer {
     humans: 0,
     bots: 0,
     snapshotsSent: 0,
+    snapshotBytesSent: 0,
+    snapshotNormalFramesSent: 0,
+    snapshotRecoveryFramesSent: 0,
+    snapshotFramesSkippedByBudget: 0,
     inputsAccepted: 0,
     inputsRejected: 0,
     inputsLate: 0,
@@ -169,7 +181,7 @@ export class MatchServer {
     const matchId = (options.matchId ?? 77) >>> 0;
     this.world = new BattleWorld(matchId, options.mapSeed);
     this.rosterSize = clampInteger(options.rosterSize ?? 8, 2, MAX_PLAYERS);
-    this.snapshotIntervalTicks = clampInteger(options.snapshotIntervalTicks ?? 3, 1, 30);
+    this.snapshotIntervalTicks = clampInteger(options.snapshotIntervalTicks ?? 4, 1, 30);
     this.botSkill = clampInteger(options.botSkill ?? 2, 0, 3);
     this.teams = options.teams ?? false;
     this.inputBudgetPerTick = clampInteger(options.inputBudgetPerTick ?? 8, 1, 64);
@@ -384,8 +396,7 @@ export class MatchServer {
     this.snapshotValid[index] = 1;
     for (const session of this.sessions) {
       if (!session.ready) continue;
-      session.sendSnapshot(buffer, this.world.tick);
-      this.stats.snapshotsSent += 1;
+      if (session.sendSnapshot(buffer, this.world.tick)) this.stats.snapshotsSent += 1;
     }
   }
 
@@ -442,8 +453,9 @@ export class ServerSession implements TransportReceiver {
   private readonly rejectBuffer = new Uint8Array(REJECT_MAXIMUM_BYTES);
   private readonly pingBuffer = new Uint8Array(12);
   private readonly resumeToken = new Uint8Array(RESUME_TOKEN_BYTES);
-  private readonly snapshotBaseline = new Uint8Array(SNAPSHOT_BYTES);
-  private readonly snapshotFrame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  private readonly snapshotBaseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  private readonly snapshotCurrent = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  private readonly snapshotFrame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
   private snapshotBaselineTick = -1;
   private snapshotFramesSinceKeyframe = 0;
   private forceSnapshotKeyframe = true;
@@ -451,6 +463,7 @@ export class ServerSession implements TransportReceiver {
     length: SNAPSHOT_IN_FLIGHT_STREAMS,
   });
   private snapshotSendCursor = 0;
+  private nextSnapshotRecoveryAtMilliseconds = 0;
   private inputBudget = 0;
   /** Closes the double-hello race while async HMAC verification is pending. */
   private sessionHandling = false;
@@ -590,16 +603,58 @@ export class ServerSession implements TransportReceiver {
    * session-local because a late joiner starts with a keyframe while an
    * established client can receive a compact delta stream.
    */
-  sendSnapshot(source: Uint8Array, tick: number): void {
+  sendSnapshot(source: Uint8Array, tick: number): boolean {
     const transport = this.transport;
-    if (transport === undefined || this.closed) return;
+    if (transport === undefined || this.closed) return false;
     const now = this.server.nowMilliseconds();
     this.expireStaleSnapshots(now);
-    // A snapshot that has not crossed the transport boundary before a newer
-    // authoritative frame exists is obsolete. Ask every older operation to
-    // reset its private stream before admitting the new tick. Keep the record
-    // until its promise settles, though: a broken host that ignores abort must
-    // still be constrained by the fixed slot count and the 300 ms hard bound.
+    // The client retains the same fixed 64-frame history as the server. An
+    // ACK may lag the newest send by more than the eight-stream window while
+    // still remaining a valid delta base; throttling at eight frames created a
+    // false ~3 Hz ceiling on healthy high-RTT links. Only the actual history
+    // bound forces recovery to a keyframe.
+    if (this.snapshotBaselineTick >= 0) {
+      const acknowledgedAgeTicks = (tick - this.snapshotBaselineTick) >>> 0;
+      const historyAgeTicks = this.server.snapshotIntervalTicks * (SNAPSHOT_BASE_HISTORY_FRAMES - 1);
+      if (acknowledgedAgeTicks >= historyAgeTicks) this.forceSnapshotKeyframe = true;
+    }
+    compactNetworkSnapshot(source, this.snapshotCurrent);
+    let length = -1;
+    let keyframe = false;
+    if (
+      this.snapshotBaselineTick >= 0 &&
+      !this.forceSnapshotKeyframe &&
+      this.snapshotFramesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1
+    ) {
+      length = writeNetworkSnapshotDelta(
+        this.snapshotFrame,
+        tick,
+        this.snapshotBaselineTick,
+        this.snapshotBaseline,
+        this.snapshotCurrent,
+      );
+    }
+    if (length < 0) {
+      length = writeNetworkSnapshotKeyframe(this.snapshotFrame, tick, this.snapshotCurrent);
+      keyframe = true;
+    }
+    if (length > SNAPSHOT_RECOVERY_MAX_BYTES) {
+      const error = new RangeError(
+        `snapshot frame ${length} exceeds the ${SNAPSHOT_RECOVERY_MAX_BYTES}-byte recovery ceiling`,
+      );
+      this.server.report(error);
+      this.close(4_003, "snapshot recovery ceiling exceeded");
+      return false;
+    }
+    const recovery = length > SNAPSHOT_NORMAL_MAX_BYTES;
+    if (recovery && now < this.nextSnapshotRecoveryAtMilliseconds) {
+      this.server.stats.snapshotFramesSkippedByBudget += 1;
+      if (keyframe) this.forceSnapshotKeyframe = true;
+      return false;
+    }
+    // Only an admitted replacement supersedes older state. In particular, a
+    // recovery frame denied by its one-per-second budget must not cancel the
+    // last frame still crossing the transport boundary.
     for (const send of this.snapshotSends) {
       if (send !== undefined && !send.controller.signal.aborted) {
         send.controller.abort("snapshot superseded by newer state");
@@ -613,27 +668,15 @@ export class ServerSession implements TransportReceiver {
       this.snapshotSendCursor = (candidate + 1) % this.snapshotSends.length;
       break;
     }
-    if (streamSlot < 0) return;
-    // The client retains the same fixed 64-frame history as the server. An
-    // ACK may lag the newest send by more than the eight-stream window while
-    // still remaining a valid delta base; throttling at eight frames created a
-    // false ~3 Hz ceiling on healthy high-RTT links. Only the actual history
-    // bound forces recovery to a keyframe.
-    if (this.snapshotBaselineTick >= 0) {
-      const acknowledgedAgeTicks = (tick - this.snapshotBaselineTick) >>> 0;
-      const historyAgeTicks = this.server.snapshotIntervalTicks * (SNAPSHOT_BASE_HISTORY_FRAMES - 1);
-      if (acknowledgedAgeTicks >= historyAgeTicks) this.forceSnapshotKeyframe = true;
+    if (streamSlot < 0) return false;
+    if (recovery) {
+      this.nextSnapshotRecoveryAtMilliseconds = now + SNAPSHOT_RECOVERY_INTERVAL_MILLISECONDS;
+      this.server.stats.snapshotRecoveryFramesSent += 1;
+    } else {
+      this.server.stats.snapshotNormalFramesSent += 1;
     }
-    let length = -1;
-    if (
-      this.snapshotBaselineTick >= 0 &&
-      !this.forceSnapshotKeyframe &&
-      this.snapshotFramesSinceKeyframe < SNAPSHOT_KEYFRAME_INTERVAL - 1
-    ) {
-      length = writeSnapshotDelta(this.snapshotFrame, tick, this.snapshotBaselineTick, this.snapshotBaseline, source);
-    }
-    if (length < 0) {
-      length = writeSnapshotKeyframe(this.snapshotFrame, tick, source);
+    this.server.stats.snapshotBytesSent += length;
+    if (keyframe) {
       this.forceSnapshotKeyframe = this.snapshotBaselineTick < 0;
       this.snapshotFramesSinceKeyframe = 0;
     } else {
@@ -668,6 +711,7 @@ export class ServerSession implements TransportReceiver {
           this.server.report(error);
         },
       );
+    return true;
   }
 
   private async handleSession(payload: Uint8Array): Promise<void> {
@@ -892,7 +936,7 @@ export class ServerSession implements TransportReceiver {
     if (tickAfter(command.latestSnapshotTick, this.server.world.tick)) return;
     const acknowledged = this.server.snapshotAt(command.latestSnapshotTick);
     if (acknowledged === undefined) return;
-    this.snapshotBaseline.set(acknowledged);
+    compactNetworkSnapshot(acknowledged, this.snapshotBaseline);
     this.snapshotBaselineTick = command.latestSnapshotTick;
     this.forceSnapshotKeyframe = false;
     for (let index = 0; index < this.snapshotSends.length; index += 1) {
@@ -949,6 +993,6 @@ function localDevelopmentResumeKey(seed: number | undefined): Uint8Array {
 }
 
 /** Exported so a host can size its own buffers without importing the layout. */
-export const SERVER_SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_MESSAGE_BYTES;
+export const SERVER_SNAPSHOT_MESSAGE_BYTES = NETWORK_SNAPSHOT_MESSAGE_BYTES;
 export const SERVER_SNAPSHOT_BODY_BYTES = SNAPSHOT_BYTES;
 export const SERVER_REJECT_VERSION = REJECT_VERSION;

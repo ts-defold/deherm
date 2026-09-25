@@ -5,12 +5,18 @@ import {
   MAX_PROJECTILES,
   COVER_MAX_HEALTH,
   COVER_SNAPSHOT_BYTES,
+  NETWORK_PROJECTILE_SNAPSHOT_BYTES,
+  NETWORK_SNAPSHOT_BYTES,
   OBJECTIVE_CAPTURE_TICKS,
   PICKUP_SNAPSHOT_BYTES,
   PLAYER_SNAPSHOT_BYTES,
   PROJECTILE_SNAPSHOT_BYTES,
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
+  WORLD_MAX_X,
+  WORLD_MAX_Y,
+  WORLD_MIN_X,
+  WORLD_MIN_Y,
 } from "./constants";
 import {
   CHASSIS_COUNT,
@@ -23,6 +29,7 @@ import {
 import {
   ENVELOPE_MAGIC,
   MESSAGE_SNAPSHOT,
+  NETWORK_SNAPSHOT_MESSAGE_BYTES,
   PROTOCOL_VERSION,
   SNAPSHOT_DELTA,
   SNAPSHOT_FRAME_HEADER_BYTES,
@@ -47,6 +54,183 @@ export interface SnapshotFrameScratch {
   baselineTick: number;
 }
 
+const RAW_PROJECTILE_OFFSET = SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES;
+const NETWORK_PROJECTILE_OFFSET = RAW_PROJECTILE_OFFSET;
+const RAW_PICKUP_OFFSET = RAW_PROJECTILE_OFFSET + MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES;
+const NETWORK_PICKUP_OFFSET = NETWORK_PROJECTILE_OFFSET + MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
+const RAW_COVER_OFFSET = RAW_PICKUP_OFFSET + MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES;
+const NETWORK_COVER_OFFSET = NETWORK_PICKUP_OFFSET + MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES;
+
+/**
+ * Projects the broad rollback image into the exact fixed-point network image.
+ * No backing arrays are acquired; callers own both buffers. The short-lived
+ * DataView wrapper is reported separately by the allocation-shape evidence.
+ */
+export function compactNetworkSnapshot(source: Uint8Array, target: Uint8Array): number {
+  if (source.byteLength < SNAPSHOT_BYTES) throw new RangeError("rollback snapshot source is truncated");
+  if (target.byteLength < NETWORK_SNAPSHOT_BYTES) throw new RangeError("network snapshot target is truncated");
+  copyBytes(target, 0, source, 0, RAW_PROJECTILE_OFFSET);
+  const sourceView = new DataView(source.buffer, source.byteOffset, SNAPSHOT_BYTES);
+  const snapshotTick = sourceView.getUint32(8, true);
+  for (let slot = 0; slot < MAX_PROJECTILES; slot += 1) {
+    const raw = RAW_PROJECTILE_OFFSET + slot * PROJECTILE_SNAPSHOT_BYTES;
+    const packed = NETWORK_PROJECTILE_OFFSET + slot * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
+    for (let byte = 0; byte < NETWORK_PROJECTILE_SNAPSHOT_BYTES; byte += 1) target[packed + byte] = 0;
+    const active = sourceView.getUint8(raw);
+    const generation = sourceView.getUint16(raw + 2, true);
+    requirePackedUnsigned(active, 1, "projectile active");
+    let bit = 0;
+    bit = writePackedBits(target, packed, bit, active, 1);
+    bit = writePackedBits(target, packed, bit, generation, 16);
+    if (active === 0) continue;
+    const weapon = sourceView.getUint8(raw + 1);
+    const owner = sourceView.getUint8(raw + 4);
+    const bounces = sourceView.getUint8(raw + 5);
+    const damage = sourceView.getInt16(raw + 6, true);
+    const x = sourceView.getInt32(raw + 8, true);
+    const y = sourceView.getInt32(raw + 12, true);
+    const directionX = sourceView.getInt16(raw + 16, true);
+    const directionY = sourceView.getInt16(raw + 18, true);
+    const life = sourceView.getUint16(raw + 20, true);
+    const speed = sourceView.getUint16(raw + 22, true);
+    const radius = sourceView.getUint16(raw + 24, true);
+    const pierce = sourceView.getUint8(raw + 26);
+    const upgrade = sourceView.getUint8(raw + 27);
+    requirePackedRange(owner, 1, MAX_PLAYERS, "projectile owner");
+    requirePackedRange(weapon, 1, WEAPON_COUNT, "projectile weapon");
+    requirePackedUnsigned(upgrade, 4, "projectile upgrade");
+    if (upgrade > WEAPON_UPGRADE_COUNT || (upgrade !== 0 && weaponUpgradeById(upgrade).weaponId !== weapon)) {
+      throw new RangeError("projectile upgrade does not match its weapon");
+    }
+    requirePackedUnsigned(bounces, 3, "projectile bounces");
+    requirePackedUnsigned(pierce, 2, "projectile pierce");
+    requirePackedUnsigned(damage, 9, "projectile damage");
+    requirePackedRange(x, WORLD_MIN_X, WORLD_MAX_X, "projectile x");
+    requirePackedRange(y, WORLD_MIN_Y, WORLD_MAX_Y, "projectile y");
+    requirePackedRange(directionX, -256, 256, "projectile direction x");
+    requirePackedRange(directionY, -256, 256, "projectile direction y");
+    requirePackedUnsigned(life, 8, "projectile life");
+    requirePackedUnsigned(speed, 10, "projectile speed");
+    requirePackedUnsigned(radius, 8, "projectile radius");
+    bit = writePackedBits(target, packed, bit, owner - 1, 5);
+    bit = writePackedBits(target, packed, bit, weapon - 1, 3);
+    bit = writePackedBits(target, packed, bit, upgrade, 4);
+    bit = writePackedBits(target, packed, bit, bounces, 3);
+    bit = writePackedBits(target, packed, bit, pierce, 2);
+    bit = writePackedBits(target, packed, bit, damage, 9);
+    // Encode a trajectory invariant rather than the current position. The
+    // fixed-point simulation advances a straight segment by the same integer
+    // displacement each tick, so (position - tick * displacement) modulo the
+    // coordinate field is constant until a bounce/correction changes the
+    // trajectory. Likewise (tick + remaining life) modulo 256 is constant.
+    // The ordinary snapshot delta codec therefore carries spawn, trajectory
+    // change and despawn events instead of paying for motion every snapshot.
+    const velocityX = projectileDisplacementPerTick(directionX, speed);
+    const velocityY = projectileDisplacementPerTick(directionY, speed);
+    const phaseX = positiveModulo(x - WORLD_MIN_X - snapshotTick * velocityX, 1 << 15);
+    const phaseY = positiveModulo(y - WORLD_MIN_Y - snapshotTick * velocityY, 1 << 15);
+    const expiryTick = (snapshotTick + life) & 0xff;
+    bit = writePackedBits(target, packed, bit, phaseX, 15);
+    bit = writePackedBits(target, packed, bit, phaseY, 15);
+    bit = writePackedBits(target, packed, bit, directionX + 256, 10);
+    bit = writePackedBits(target, packed, bit, directionY + 256, 10);
+    bit = writePackedBits(target, packed, bit, expiryTick, 8);
+    bit = writePackedBits(target, packed, bit, speed, 10);
+    writePackedBits(target, packed, bit, radius, 8);
+  }
+  copyBytes(target, NETWORK_PICKUP_OFFSET, source, RAW_PICKUP_OFFSET, MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES);
+  copyBytes(target, NETWORK_COVER_OFFSET, source, RAW_COVER_OFFSET, COVER_SNAPSHOT_BYTES);
+  return NETWORK_SNAPSHOT_BYTES;
+}
+
+/** Expands and validates one compact network image into the rollback layout. */
+export function expandNetworkSnapshot(source: Uint8Array, target: Uint8Array, expectedTick?: number): number {
+  if (source.byteLength < NETWORK_SNAPSHOT_BYTES) throw new RangeError("network snapshot source is truncated");
+  if (target.byteLength < SNAPSHOT_BYTES) throw new RangeError("rollback snapshot target is truncated");
+  copyBytes(target, 0, source, 0, RAW_PROJECTILE_OFFSET);
+  const targetView = new DataView(target.buffer, target.byteOffset, SNAPSHOT_BYTES);
+  const snapshotTick = targetView.getUint32(8, true);
+  if (expectedTick !== undefined && snapshotTick !== expectedTick >>> 0) {
+    throw new Error("snapshot frame tick does not match its projected world state");
+  }
+  for (let slot = 0; slot < MAX_PROJECTILES; slot += 1) {
+    const packed = NETWORK_PROJECTILE_OFFSET + slot * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
+    const raw = RAW_PROJECTILE_OFFSET + slot * PROJECTILE_SNAPSHOT_BYTES;
+    let bit = 0;
+    const active = readPackedBits(source, packed, bit, 1);
+    bit += 1;
+    const generation = readPackedBits(source, packed, bit, 16);
+    bit += 16;
+    targetView.setUint8(raw, active);
+    targetView.setUint16(raw + 2, generation, true);
+    if (active === 0) {
+      if (packedRecordHasNonZeroBits(source, packed, bit, 120 - bit)) {
+        throw new Error("inactive projectile network record is noncanonical");
+      }
+      targetView.setUint8(raw + 1, 0);
+      for (let byte = 4; byte < PROJECTILE_SNAPSHOT_BYTES; byte += 1) targetView.setUint8(raw + byte, 0);
+      continue;
+    }
+    const owner = readPackedBits(source, packed, bit, 5) + 1;
+    bit += 5;
+    const weapon = readPackedBits(source, packed, bit, 3) + 1;
+    bit += 3;
+    const upgrade = readPackedBits(source, packed, bit, 4);
+    bit += 4;
+    const bounces = readPackedBits(source, packed, bit, 3);
+    bit += 3;
+    const pierce = readPackedBits(source, packed, bit, 2);
+    bit += 2;
+    const damage = readPackedBits(source, packed, bit, 9);
+    bit += 9;
+    const phaseX = readPackedBits(source, packed, bit, 15);
+    bit += 15;
+    const phaseY = readPackedBits(source, packed, bit, 15);
+    bit += 15;
+    const directionX = readPackedBits(source, packed, bit, 10) - 256;
+    bit += 10;
+    const directionY = readPackedBits(source, packed, bit, 10) - 256;
+    bit += 10;
+    const expiryTick = readPackedBits(source, packed, bit, 8);
+    bit += 8;
+    const speed = readPackedBits(source, packed, bit, 10);
+    bit += 10;
+    const radius = readPackedBits(source, packed, bit, 8);
+    bit += 8;
+    if (readPackedBits(source, packed, bit, 1) !== 0) throw new Error("projectile network reserved bit is nonzero");
+    const velocityX = projectileDisplacementPerTick(directionX, speed);
+    const velocityY = projectileDisplacementPerTick(directionY, speed);
+    const x = WORLD_MIN_X + positiveModulo(phaseX + snapshotTick * velocityX, 1 << 15);
+    const y = WORLD_MIN_Y + positiveModulo(phaseY + snapshotTick * velocityY, 1 << 15);
+    const life = positiveModulo(expiryTick - (snapshotTick & 0xff), 1 << 8);
+    requirePackedRange(owner, 1, MAX_PLAYERS, "projectile owner");
+    requirePackedRange(weapon, 1, WEAPON_COUNT, "projectile weapon");
+    if (upgrade > WEAPON_UPGRADE_COUNT || (upgrade !== 0 && weaponUpgradeById(upgrade).weaponId !== weapon)) {
+      throw new Error("projectile network upgrade does not match its weapon");
+    }
+    requirePackedRange(x, WORLD_MIN_X, WORLD_MAX_X, "projectile x");
+    requirePackedRange(y, WORLD_MIN_Y, WORLD_MAX_Y, "projectile y");
+    requirePackedRange(directionX, -256, 256, "projectile direction x");
+    requirePackedRange(directionY, -256, 256, "projectile direction y");
+    targetView.setUint8(raw + 1, weapon);
+    targetView.setUint8(raw + 4, owner);
+    targetView.setUint8(raw + 5, bounces);
+    targetView.setInt16(raw + 6, damage, true);
+    targetView.setInt32(raw + 8, x, true);
+    targetView.setInt32(raw + 12, y, true);
+    targetView.setInt16(raw + 16, directionX, true);
+    targetView.setInt16(raw + 18, directionY, true);
+    targetView.setUint16(raw + 20, life, true);
+    targetView.setUint16(raw + 22, speed, true);
+    targetView.setUint16(raw + 24, radius, true);
+    targetView.setUint8(raw + 26, pierce);
+    targetView.setUint8(raw + 27, upgrade);
+  }
+  copyBytes(target, RAW_PICKUP_OFFSET, source, NETWORK_PICKUP_OFFSET, MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES);
+  copyBytes(target, RAW_COVER_OFFSET, source, NETWORK_COVER_OFFSET, COVER_SNAPSHOT_BYTES);
+  return SNAPSHOT_BYTES;
+}
+
 /** Reads the named delta base without allocating or decoding the frame. */
 export function readSnapshotBaseTick(payload: Uint8Array): number {
   if (payload.byteLength < SNAPSHOT_FRAME_HEADER_BYTES) throw new Error("snapshot frame is truncated");
@@ -59,17 +243,31 @@ export function readSnapshotBaseTick(payload: Uint8Array): number {
  * callers size the fixed frame buffer with `SNAPSHOT_MESSAGE_BYTES`.
  */
 export function writeSnapshotKeyframe(target: Uint8Array, tick: number, source: Uint8Array): number {
-  if (source.byteLength < SNAPSHOT_BYTES) throw new RangeError("snapshot keyframe source is truncated");
-  requireFrameCapacity(target);
+  return writeSnapshotKeyframeSized(target, tick, source, SNAPSHOT_BYTES, SNAPSHOT_MESSAGE_BYTES);
+}
+
+export function writeNetworkSnapshotKeyframe(target: Uint8Array, tick: number, source: Uint8Array): number {
+  return writeSnapshotKeyframeSized(target, tick, source, NETWORK_SNAPSHOT_BYTES, NETWORK_SNAPSHOT_MESSAGE_BYTES);
+}
+
+function writeSnapshotKeyframeSized(
+  target: Uint8Array,
+  tick: number,
+  source: Uint8Array,
+  imageBytes: number,
+  messageBytes: number,
+): number {
+  if (source.byteLength < imageBytes) throw new RangeError("snapshot keyframe source is truncated");
+  requireFrameCapacity(target, messageBytes);
   frameHeader(target, tick, SNAPSHOT_KEYFRAME, 0);
-  const sparseLength = writeSnapshotRuns(target, source);
+  const sparseLength = writeSnapshotRuns(target, source, imageBytes, messageBytes);
   if (sparseLength >= 0) return sparseLength;
   // The fixed raw form is the bounded fallback for an adversarial snapshot
   // whose sparse run metadata would exceed the source itself. runCount=0 plus
   // the full frame length distinguishes it from an all-zero sparse keyframe.
   frameHeader(target, tick, SNAPSHOT_KEYFRAME, 0);
-  copyBytes(target, SNAPSHOT_FRAME_HEADER_BYTES, source, 0, SNAPSHOT_BYTES);
-  return SNAPSHOT_MESSAGE_BYTES;
+  copyBytes(target, SNAPSHOT_FRAME_HEADER_BYTES, source, 0, imageBytes);
+  return messageBytes;
 }
 
 /**
@@ -84,30 +282,66 @@ export function writeSnapshotDelta(
   baseline: Uint8Array,
   current: Uint8Array,
 ): number {
-  if (baseline.byteLength < SNAPSHOT_BYTES || current.byteLength < SNAPSHOT_BYTES) {
+  return writeSnapshotDeltaSized(target, tick, baselineTick, baseline, current, SNAPSHOT_BYTES, SNAPSHOT_MESSAGE_BYTES);
+}
+
+export function writeNetworkSnapshotDelta(
+  target: Uint8Array,
+  tick: number,
+  baselineTick: number,
+  baseline: Uint8Array,
+  current: Uint8Array,
+): number {
+  return writeSnapshotDeltaSized(
+    target,
+    tick,
+    baselineTick,
+    baseline,
+    current,
+    NETWORK_SNAPSHOT_BYTES,
+    NETWORK_SNAPSHOT_MESSAGE_BYTES,
+  );
+}
+
+function writeSnapshotDeltaSized(
+  target: Uint8Array,
+  tick: number,
+  baselineTick: number,
+  baseline: Uint8Array,
+  current: Uint8Array,
+  imageBytes: number,
+  messageBytes: number,
+): number {
+  if (baseline.byteLength < imageBytes || current.byteLength < imageBytes) {
     throw new RangeError("snapshot delta source is truncated");
   }
-  requireFrameCapacity(target);
+  requireFrameCapacity(target, messageBytes);
   frameHeader(target, tick, SNAPSHOT_DELTA, baselineTick);
-  const length = writeSnapshotRuns(target, current, baseline);
+  const length = writeSnapshotRuns(target, current, imageBytes, messageBytes, baseline);
   // Compare against the actual sparse keyframe representation, not the fixed
   // in-memory capacity. A delta that costs at least as much should reset the
   // recovery chain instead.
-  return length >= 0 && length < Math.min(snapshotRunLength(current), SNAPSHOT_MESSAGE_BYTES) ? length : -1;
+  return length >= 0 && length < Math.min(snapshotRunLength(current, imageBytes), messageBytes) ? length : -1;
 }
 
-function writeSnapshotRuns(target: Uint8Array, current: Uint8Array, baseline?: Uint8Array): number {
+function writeSnapshotRuns(
+  target: Uint8Array,
+  current: Uint8Array,
+  imageBytes: number,
+  messageBytes: number,
+  baseline?: Uint8Array,
+): number {
   let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
   let runCount = 0;
   let index = 0;
   let previousEnd = 0;
-  while (index < SNAPSHOT_BYTES) {
-    while (index < SNAPSHOT_BYTES && current[index] === (baseline?.[index] ?? 0)) index += 1;
-    if (index === SNAPSHOT_BYTES) break;
+  while (index < imageBytes) {
+    while (index < imageBytes && current[index] === (baseline?.[index] ?? 0)) index += 1;
+    if (index === imageBytes) break;
     const start = index;
     let lastChanged = index;
     let unchanged = 0;
-    while (index < SNAPSHOT_BYTES && index - start < 0xffff) {
+    while (index < imageBytes && index - start < 0xffff) {
       if (current[index] !== (baseline?.[index] ?? 0)) {
         lastChanged = index;
         unchanged = 0;
@@ -120,7 +354,7 @@ function writeSnapshotRuns(target: Uint8Array, current: Uint8Array, baseline?: U
     const length = lastChanged - start + 1;
     const gap = start - previousEnd;
     const headerBytes = varUintByteLength(gap) + varUintByteLength(length);
-    if (runCount >= 0xffff || cursor + headerBytes + length > SNAPSHOT_MESSAGE_BYTES) return -1;
+    if (runCount >= 0xffff || cursor + headerBytes + length > messageBytes) return -1;
     cursor = writeVarUint(target, cursor, gap);
     cursor = writeVarUint(target, cursor, length);
     copyBytes(target, cursor, current, start, length);
@@ -132,17 +366,17 @@ function writeSnapshotRuns(target: Uint8Array, current: Uint8Array, baseline?: U
   return cursor;
 }
 
-function snapshotRunLength(current: Uint8Array): number {
+function snapshotRunLength(current: Uint8Array, imageBytes: number): number {
   let length = SNAPSHOT_FRAME_HEADER_BYTES;
   let index = 0;
   let previousEnd = 0;
-  while (index < SNAPSHOT_BYTES) {
-    while (index < SNAPSHOT_BYTES && current[index] === 0) index += 1;
-    if (index === SNAPSHOT_BYTES) break;
+  while (index < imageBytes) {
+    while (index < imageBytes && current[index] === 0) index += 1;
+    if (index === imageBytes) break;
     const start = index;
     let lastChanged = index;
     let unchanged = 0;
-    while (index < SNAPSHOT_BYTES && index - start < 0xffff) {
+    while (index < imageBytes && index - start < 0xffff) {
       if (current[index] !== 0) {
         lastChanged = index;
         unchanged = 0;
@@ -163,6 +397,30 @@ function snapshotRunLength(current: Uint8Array): number {
  * advertised base tick is rejected; callers must wait for the next keyframe.
  */
 export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScratch, commitBaseline = true): number {
+  return readSnapshotFrameSized(payload, scratch, SNAPSHOT_BYTES, SNAPSHOT_MESSAGE_BYTES, commitBaseline);
+}
+
+export function readNetworkSnapshotFrame(
+  payload: Uint8Array,
+  scratch: SnapshotFrameScratch,
+  commitBaseline = true,
+): number {
+  return readSnapshotFrameSized(
+    payload,
+    scratch,
+    NETWORK_SNAPSHOT_BYTES,
+    NETWORK_SNAPSHOT_MESSAGE_BYTES,
+    commitBaseline,
+  );
+}
+
+function readSnapshotFrameSized(
+  payload: Uint8Array,
+  scratch: SnapshotFrameScratch,
+  imageBytes: number,
+  messageBytes: number,
+  commitBaseline: boolean,
+): number {
   if (payload.byteLength < SNAPSHOT_FRAME_HEADER_BYTES) throw new Error("snapshot frame is truncated");
   if (readUint16LE(payload, 0) !== ENVELOPE_MAGIC) throw new Error("snapshot frame envelope magic mismatch");
   if (payload[2] !== PROTOCOL_VERSION || payload[3] !== MESSAGE_SNAPSHOT)
@@ -172,15 +430,15 @@ export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScr
   if (payload[9] !== 0) throw new Error("snapshot frame reserved byte is nonzero");
   const baseTick = readUint32LE(payload, 10);
   const runCount = readUint16LE(payload, 14);
-  if (scratch.baseline.byteLength < SNAPSHOT_BYTES || scratch.decoded.byteLength < SNAPSHOT_BYTES) {
+  if (scratch.baseline.byteLength < imageBytes || scratch.decoded.byteLength < imageBytes) {
     throw new RangeError("snapshot decode storage is truncated");
   }
   let rawKeyframe = false;
   if (kind === SNAPSHOT_KEYFRAME) {
     if (baseTick !== 0) throw new Error("invalid snapshot keyframe");
-    rawKeyframe = runCount === 0 && payload.byteLength === SNAPSHOT_MESSAGE_BYTES;
-    if (rawKeyframe) copyBytes(scratch.decoded, 0, payload, SNAPSHOT_FRAME_HEADER_BYTES, SNAPSHOT_BYTES);
-    else scratch.decoded.fill(0);
+    rawKeyframe = runCount === 0 && payload.byteLength === messageBytes;
+    if (rawKeyframe) copyBytes(scratch.decoded, 0, payload, SNAPSHOT_FRAME_HEADER_BYTES, imageBytes);
+    else scratch.decoded.fill(0, 0, imageBytes);
   } else if (kind === SNAPSHOT_DELTA) {
     if (scratch.baselineTick < 0 || baseTick !== scratch.baselineTick >>> 0) {
       throw new Error("snapshot delta base is unavailable");
@@ -199,7 +457,7 @@ export function readSnapshotFrame(payload: Uint8Array, scratch: SnapshotFrameScr
     cursor = packedLength & 0xffff;
     const length = packedLength >>> 16;
     const offset = previousEnd + gap;
-    if (length === 0 || offset < previousEnd || offset + length > SNAPSHOT_BYTES) {
+    if (length === 0 || offset < previousEnd || offset + length > imageBytes) {
       throw new Error("snapshot run is invalid");
     }
     if (cursor + length > payload.byteLength) throw new Error("snapshot run is truncated");
@@ -257,9 +515,9 @@ function frameHeader(target: Uint8Array, tick: number, kind: number, baseTick: n
   writeUint16LE(target, 14, 0);
 }
 
-function requireFrameCapacity(target: Uint8Array): void {
-  if (target.byteLength < SNAPSHOT_MESSAGE_BYTES) {
-    throw new RangeError(`snapshot frame requires ${SNAPSHOT_MESSAGE_BYTES} bytes`);
+function requireFrameCapacity(target: Uint8Array, messageBytes: number): void {
+  if (target.byteLength < messageBytes) {
+    throw new RangeError(`snapshot frame requires ${messageBytes} bytes`);
   }
 }
 
@@ -304,6 +562,78 @@ function copyBytes(
   for (let index = 0; index < length; index += 1) {
     target[targetOffset + index] = source[sourceOffset + index]!;
   }
+}
+
+function requirePackedUnsigned(value: number, width: number, label: string): void {
+  const maximum = 2 ** width - 1;
+  if (!Number.isInteger(value) || value < 0 || value > maximum) {
+    throw new RangeError(`${label} must fit ${width} unsigned bits`);
+  }
+}
+
+function requirePackedRange(value: number, minimum: number, maximum: number, label: string): void {
+  if (!Number.isInteger(value) || value < minimum || value > maximum) {
+    throw new RangeError(`${label} must be in [${minimum}, ${maximum}]`);
+  }
+}
+
+/** Exact net displacement produced by BattleWorld's fixed substep loop. */
+function projectileDisplacementPerTick(direction: number, speed: number): number {
+  const substeps = 1 + (speed >> 7);
+  return Math.trunc((direction * speed) / (256 * substeps)) * substeps;
+}
+
+function positiveModulo(value: number, modulus: number): number {
+  const remainder = value % modulus;
+  return remainder < 0 ? remainder + modulus : remainder;
+}
+
+function writePackedBits(target: Uint8Array, base: number, bitOffset: number, value: number, width: number): number {
+  requirePackedUnsigned(value, width, "packed value");
+  let remaining = width;
+  let source = value;
+  let cursor = bitOffset;
+  while (remaining > 0) {
+    const byteOffset = base + (cursor >>> 3);
+    const shift = cursor & 7;
+    const count = Math.min(remaining, 8 - shift);
+    const mask = (1 << count) - 1;
+    target[byteOffset] = target[byteOffset]! | ((source & mask) << shift);
+    source = Math.trunc(source / 2 ** count);
+    cursor += count;
+    remaining -= count;
+  }
+  return cursor;
+}
+
+function readPackedBits(source: Uint8Array, base: number, bitOffset: number, width: number): number {
+  let result = 0;
+  let resultShift = 0;
+  let remaining = width;
+  let cursor = bitOffset;
+  while (remaining > 0) {
+    const byteOffset = base + (cursor >>> 3);
+    const shift = cursor & 7;
+    const count = Math.min(remaining, 8 - shift);
+    const mask = (1 << count) - 1;
+    result += ((source[byteOffset]! >>> shift) & mask) * 2 ** resultShift;
+    resultShift += count;
+    cursor += count;
+    remaining -= count;
+  }
+  return result;
+}
+
+function packedRecordHasNonZeroBits(source: Uint8Array, base: number, bitOffset: number, width: number): boolean {
+  let remaining = width;
+  let cursor = bitOffset;
+  while (remaining > 0) {
+    const count = Math.min(remaining, 16);
+    if (readPackedBits(source, base, cursor, count) !== 0) return true;
+    cursor += count;
+    remaining -= count;
+  }
+  return false;
 }
 
 /**

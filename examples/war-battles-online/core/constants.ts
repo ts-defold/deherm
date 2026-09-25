@@ -178,6 +178,8 @@ export const DIRECTION_DIAGONAL = 181;
 // The separate bit keeps every uint32 tick, including 0xffffffff, representable.
 export const PLAYER_SNAPSHOT_BYTES = 96;
 export const PROJECTILE_SNAPSHOT_BYTES = 28;
+/** Exact fixed-point trajectory/event record used only by the network projection. */
+export const NETWORK_PROJECTILE_SNAPSHOT_BYTES = 15;
 export const PICKUP_SNAPSHOT_BYTES = 12;
 /** One byte of remaining health per destructible cover panel. */
 export const COVER_SNAPSHOT_BYTES = MAX_COVER_PANELS;
@@ -191,5 +193,16 @@ export const SNAPSHOT_BYTES =
   MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES +
   MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES +
   COVER_SNAPSHOT_BYTES;
-/** 3.2 seconds of 20 Hz authoritative bases, shared by server and client. */
+/**
+ * The network image is independent from the broad rollback image. Player and
+ * world records stay byte-identical for now; projectile records use bounded
+ * bit fields so the worst-case recovery image fits below 12 KiB.
+ */
+export const NETWORK_SNAPSHOT_BYTES =
+  SNAPSHOT_HEADER_BYTES +
+  MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES +
+  MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES +
+  MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES +
+  COVER_SNAPSHOT_BYTES;
+/** About 4.27 seconds of 15 Hz authoritative bases, shared by server and client. */
 export const SNAPSHOT_BASE_HISTORY_FRAMES = 64;

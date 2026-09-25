@@ -3499,3 +3499,32 @@ capacity is never confused with live network state.
 Focused core, latest-state, presentation-smoothing, and performance tests pass
 113/113 after the change. This is deterministic codec evidence, not a packet
 capture and not a WAN throughput claim.
+
+## 2026-09-25 - Protocol 12 carries projectile trajectories, not repeated poses
+
+The rollback image remains an exact 17,888-byte local structure. Protocol 12
+now projects it into an 11,232-byte network image whose 15-byte projectile
+records use bounded integer fields. Position is encoded as the fixed-point
+trajectory phase `position - tick * displacement` modulo the 15-bit coordinate
+field; lifetime is encoded as the modulo-256 expiry tick. Both are invariant
+during straight flight. Spawn, bounce, pierce/correction, and despawn therefore
+change the acknowledged-baseline image, while ordinary motion does not. The
+client expands each record back to exact rollback `x`, `y`, and remaining life.
+
+The checked 32-player ten-second trace sends 218,587 bytes at 15 Hz: 21,858.7
+application payload bytes/second/client, with 1,340-byte p50, 2,750-byte p95,
+and 4,358-byte maximum/keyframe. Projectile attribution fell from 24,234 to
+15,287 bytes. The runtime enforces a 3 KiB normal frame, one recovery frame per
+second, and a 12 KiB recovery ceiling. That bounds admitted application payload
+at 54,256 bytes/second/client, excluding QUIC and lower-layer overhead. Player
+changes and byte-run metadata now dominate; field-mask player projection is the
+next bandwidth target.
+
+Focused coverage proves exact compact/expand round trips, byte-identical
+straight trajectories across a uint16 tick boundary and modulo-256 expiry,
+fail-closed
+range/reserved-bit handling, all 512 live projectiles inside the fixed recovery
+frame, and recovery-credit admission. The deterministic performance harness
+also expands and byte-compares every projected snapshot before reconciliation.
+This is codec and in-process scheduling evidence, not WAN packet-capture or VM
+allocation evidence.

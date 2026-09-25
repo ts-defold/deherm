@@ -39,6 +39,7 @@ import {
   COVER_MAX_HEALTH,
   MAX_PLAYERS,
   MatchServer,
+  NETWORK_SNAPSHOT_BYTES,
   NetworkBotDriver,
   PICKUP_HEALTH,
   REJECT_BAD_RESUME,
@@ -71,6 +72,7 @@ import {
   WEAPON_RICOCHET,
   WEAPON_SCATTER,
   createBattleEvent,
+  compactNetworkSnapshot,
   createArenaRouteScratch,
   createInMemoryTransportPair,
   createInputCommand,
@@ -98,6 +100,8 @@ import {
   writeReject,
   writeSnapshotDelta,
   writeSnapshotKeyframe,
+  writeNetworkSnapshotDelta,
+  writeNetworkSnapshotKeyframe,
   writeWelcome,
   writeWelcomeAck,
 } from "../core/index.ts";
@@ -123,6 +127,26 @@ import {
   UPGRADE_MOBILITY,
 } from "../core/content.ts";
 import { NetworkBotClock } from "../bot-dashboard/network-bot-clock.ts";
+
+function writeClientKeyframe(frame, tick, rollback) {
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  compactNetworkSnapshot(rollbackAtTick(rollback, tick), network);
+  return writeNetworkSnapshotKeyframe(frame, tick, network);
+}
+
+function writeClientDelta(frame, tick, baselineTick, rollbackBaseline, rollbackCurrent) {
+  const baseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const current = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  compactNetworkSnapshot(rollbackAtTick(rollbackBaseline, baselineTick), baseline);
+  compactNetworkSnapshot(rollbackAtTick(rollbackCurrent, tick), current);
+  return writeNetworkSnapshotDelta(frame, tick, baselineTick, baseline, current);
+}
+
+function rollbackAtTick(rollback, tick) {
+  const projected = rollback.slice();
+  new DataView(projected.buffer, projected.byteOffset, projected.byteLength).setUint32(8, tick, true);
+  return projected;
+}
 import { settleEventLoop, waitForCondition } from "./async-conditions.mjs";
 
 test("every authoritative tank slot has one stable driver identity", () => {
@@ -391,7 +415,7 @@ test("snapshot admission stays bounded when a host ignores stream cancellation",
   const first = new Uint8Array(SNAPSHOT_BYTES);
   for (let index = 0; index < 8; index += 1) session.sendSnapshot(first, 3 + index * 3);
   assert.equal(frames.length, 8);
-  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(7), 27);
+  session.sendSnapshot(first, 27);
   assert.equal(frames.length, 8, "a cancellation-ignoring host cannot grow the stream window");
   assert.equal(frames[0][8], SNAPSHOT_KEYFRAME);
   assert.equal(frames[7][8], SNAPSHOT_KEYFRAME, "unacknowledged state cannot become a delta base");
@@ -483,7 +507,7 @@ test("snapshot cadence does not throttle an acknowledged baseline inside the 64-
 });
 
 test("acknowledged snapshot streams are reset before leaving the bounded window", async () => {
-  const server = new MatchServer({ rosterSize: 2 });
+  const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 3 });
   const client = new BattleClient({ name: "snapshot-ack-reset" });
   const session = server.createSession();
   const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
@@ -514,7 +538,7 @@ test("acknowledged snapshot streams are reset before leaving the bounded window"
   server.close();
 });
 
-test("the authoritative baseline ring covers 3.2 seconds of 20 Hz snapshots", () => {
+test("the authoritative baseline ring keeps 64 exact acknowledged bases", () => {
   const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 1 });
   for (let tick = 0; tick < SNAPSHOT_BASE_HISTORY_FRAMES; tick += 1) server.step();
   assert.ok(server.snapshotAt(1));
@@ -544,9 +568,9 @@ test("a rejected independent snapshot does not block fresher state", async () =>
   };
   session.attach(transport);
   session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES), 3);
-  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(7), 6);
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES), 6);
   await new Promise((resolve) => setImmediate(resolve));
-  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(9), 9);
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES), 9);
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(frames.length, 3, "each current state gets one independent send attempt");
   assert.equal(frames[2][8], SNAPSHOT_KEYFRAME, "unacknowledged streams never become delta bases");
@@ -556,7 +580,11 @@ test("a rejected independent snapshot does not block fresher state", async () =>
 
 test("a closed snapshot send releases the server session", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 1, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 1,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const client = new BattleClient({ name: "closing", onError: (error) => errors.push(error) });
   const session = server.createSession();
   const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
@@ -2044,7 +2072,12 @@ async function settleUntil(predicate, what, timeoutMilliseconds = 1_000) {
 
 test("a welcomed player resumes its slot and the new stream starts from a keyframe", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2, botSkill: 1, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    botSkill: 1,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const first = join(server, "commander", errors);
   await settleUntil(() => first.state === "ready", "initial welcome");
   assert.equal(first.state, "ready");
@@ -2314,7 +2347,11 @@ test("a failed fresh takeover does not resurrect an expired resume credential", 
 
 test("snapshot decode rejects foreign bases and advances only after applied acknowledgements", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const client = join(server, "decoder", errors);
   await settle();
   server.step();
@@ -2331,27 +2368,28 @@ test("snapshot decode rejects foreign bases and advances only after applied ackn
   nextWorld.writeSnapshot(next);
   const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
 
-  const missingBaseLength = writeSnapshotDelta(frame, 6, 999, baseline, baseline);
+  const missingBaseLength = writeClientDelta(frame, 6, 999, baseline, baseline);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, missingBaseLength));
   assert.equal(errors.length, 1);
   const ignoredAfterRoot = client.stats.snapshotsIgnored;
-  const dependentLength = writeSnapshotDelta(frame, 9, 3, baseline, baseline);
+  const dependentLength = writeClientDelta(frame, 9, 3, baseline, baseline);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, dependentLength));
   assert.equal(errors.length, 1, "another frame based on the applied acknowledgement remains decodable");
   assert.equal(client.stats.snapshotsIgnored, ignoredAfterRoot);
 
-  const keyframeLength = writeSnapshotKeyframe(frame, 12, baseline);
+  const keyframeLength = writeClientKeyframe(frame, 12, baseline);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, keyframeLength));
   // A received-but-not-applied keyframe is deliberately not a delta base. The
   // client acknowledges only state that entered its simulation timeline.
-  const recoveredDeltaLength = writeSnapshotDelta(frame, 15, 12, baseline, next);
+  const recoveredDeltaLength = writeClientDelta(frame, 15, 12, baseline, next);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, recoveredDeltaLength));
   client.update(0);
   assert.equal(client.stats.snapshotsApplied, 2, "the complete keyframe must apply before dependent state");
-  const nextDeltaLength = writeSnapshotDelta(frame, 18, 12, baseline, next);
+  const nextDeltaLength = writeClientDelta(frame, 18, 12, baseline, next);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, nextDeltaLength));
   client.update(0);
   assert.equal(client.stats.snapshotsApplied, 3, "the recovered delta chain must remain usable");
+  nextWorld.tick = 18;
   assert.equal(client.world.stateHash(), nextWorld.stateHash());
   assert.equal(errors.length, 2);
   server.close();
@@ -2359,7 +2397,11 @@ test("snapshot decode rejects foreign bases and advances only after applied ackn
 
 test("independent deltas sharing one acknowledged base coalesce without losing that base", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const client = join(server, "shared-base", errors);
   await settle();
   for (let tick = 0; tick < 3; tick += 1) server.step();
@@ -2377,13 +2419,14 @@ test("independent deltas sharing one acknowledged base coalesce without losing t
   future.step();
   future.writeSnapshot(second);
   const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
-  let length = writeSnapshotDelta(frame, 6, 3, baseline, first);
+  let length = writeClientDelta(frame, 6, 3, baseline, first);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, length));
-  length = writeSnapshotDelta(frame, 9, 3, baseline, second);
+  length = writeClientDelta(frame, 9, 3, baseline, second);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, length));
   client.update(0);
 
   assert.equal(client.stats.snapshotsApplied, 2, "the newest complete sibling delta is applied once");
+  future.tick = 9;
   assert.equal(client.world.stateHash(), future.stateHash());
   assert.deepEqual(errors, []);
   server.close();
@@ -2391,7 +2434,7 @@ test("independent deltas sharing one acknowledged base coalesce without losing t
 
 test("snapshot restore failures are reported without escaping update and recover by keyframe", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2 });
+  const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 3 });
   const client = join(server, "restore-guard", errors);
   await settle();
   server.step();
@@ -2404,12 +2447,12 @@ test("snapshot restore failures are reported without escaping update and recover
   const bad = baseline.slice();
   bad[0] ^= 1;
   const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
-  const badLength = writeSnapshotKeyframe(frame, 6, bad);
+  const badLength = writeClientKeyframe(frame, 6, bad);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, badLength));
   assert.doesNotThrow(() => client.update(0));
   assert.equal(errors.length, 1);
 
-  const goodLength = writeSnapshotKeyframe(frame, 9, baseline);
+  const goodLength = writeClientKeyframe(frame, 9, baseline);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, goodLength));
   assert.doesNotThrow(() => client.update(0));
   assert.equal(client.stats.snapshotsApplied, 2);
@@ -2631,7 +2674,11 @@ test("terminal rejection remains distinct from a live rate-limit advisory", () =
 
 test("prediction lead advances the local clock without retimestamping input", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const client = join(server, "same-timeline", errors, { leadTicks: 2 });
   await settle();
   assert.equal(client.world.tick, server.world.tick + 2);
@@ -2652,7 +2699,11 @@ test("prediction lead advances the local clock without retimestamping input", as
 test("server deltas use the latest client-applied snapshot as their exact base", async () => {
   const errors = [];
   const frames = [];
-  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const client = new BattleClient({ name: "snapshot-ack", onError: (error) => errors.push(error) });
   const session = server.createSession();
   const [clientTransport, serverTransport] = createInMemoryTransportPair(client, session);
@@ -2727,9 +2778,14 @@ test("a client that falls behind reconciles by replaying its own inputs", async 
   server.close();
 });
 
-test("remote presentation uses bounded 20 Hz interpolation while local stays predicted", async () => {
+test("remote presentation uses the server cadence while local stays predicted", async () => {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2, botSkill: 1, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    botSkill: 1,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const client = join(server, "presenter", errors);
   await settle();
   // Three 60 Hz ticks are one authoritative 20 Hz snapshot interval.

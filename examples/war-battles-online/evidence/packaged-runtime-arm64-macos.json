@@ -29,9 +29,9 @@
   },
   "target": "arm64-macos",
   "status": "observed-clean",
-  "artifactKey": "851d07bb411f1f2d207b12e4231209cae32f0641085ac7fcf79b6475c8655994",
-  "sourceKey": "20fea664787b9732993dd885b20100510af9f0c95df771789815bb3cfee20c22",
-  "evidenceKey": "36451d2af60360855b6269afaff2ed85531e3700258a19d664fe8c82bdbc6b16",
+  "artifactKey": "e8b4147ed82d1ce42eeefbaad11ec676ccce36864bce47b6163466f87307673c",
+  "sourceKey": "3452141bbbad442b4dc0f5cb07a2f5cb9f9d888c75bfdb9309b6771764fccdc9",
+  "evidenceKey": "a9f96a19f11059aec0a0fac1e070c0f622c08116b5892ce1ad3bcde9c057c3e0",
   "artifacts": [
     {
       "path": "examples/war-battles-online/defold/build/arm64-osx/dmengine",
@@ -60,8 +60,8 @@
     },
     {
       "path": "examples/war-battles-online/defold/build/default/deherm/app.dehermc",
-      "bytes": 373149,
-      "sha256": "f91e20edd75188a06825d4564c0ab14a0dc72df53cc9493b7cc59b2818cc12b3"
+      "bytes": 389822,
+      "sha256": "aa01c3ea01fca74b4a1a042473b30fb5a564c8ebad37fed63c842093e2dfb97c"
     }
   ],
   "sourceInputs": [
@@ -76,8 +76,8 @@
       "path": "examples/war-battles-online/defold",
       "kind": "tree",
       "fileCount": 772,
-      "bytes": 8683927,
-      "sha256": "906d4630346ae385b070d5a034b0aa45d2312edecdae8e0cb69d99c0a60a8944"
+      "bytes": 8699871,
+      "sha256": "6daaf2573ec8f82d96d86d3e3adf90cd60fe587aaece6bc12e952beec1e062dd"
     },
     {
       "path": "examples/war-battles-online/defold/.defignore#authored-rules",
@@ -92,7 +92,7 @@
     {
       "path": "examples/war-battles-online/defold/deherm.lock",
       "bytes": 29614,
-      "sha256": "c04e61e740c905e1b475db68da398361876ea73c63b0dbf961f1c08d966795af"
+      "sha256": "7049fca29fcae44de23a930ea8ee7720246341218d61628d58a2a1ec11969b26"
     },
     {
       "path": "examples/war-battles-online/defold/.deherm/ir/binding-lowering-plan.sentinel.json",
@@ -142,11 +142,11 @@
       "method": "system-exit",
       "exitCode": 0,
       "signal": null,
-      "port": 52164
+      "port": 53958
     },
     "transcript": {
       "canonicalLineCount": 62,
-      "canonicalSha256": "a7ba815ee6c9227b2d528b86ee04c9234c1ca8540f725ed7ab84f8459ee2ff0a"
+      "canonicalSha256": "bfd3c3a408dea720303b7531833dc6aac5c22afe36c159f3a5f33cc4731894df"
     }
   }
 }

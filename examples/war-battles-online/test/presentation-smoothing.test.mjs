@@ -5,12 +5,14 @@ import {
   BattleClient,
   DIRECTION_SCALE,
   MatchServer,
+  NETWORK_SNAPSHOT_BYTES,
+  NETWORK_SNAPSHOT_MESSAGE_BYTES,
   SNAPSHOT_BYTES,
-  SNAPSHOT_MESSAGE_BYTES,
   TICK_MILLISECONDS,
   TRANSPORT_CHANNEL_SNAPSHOT,
   createInMemoryTransportPair,
-  writeSnapshotKeyframe,
+  compactNetworkSnapshot,
+  writeNetworkSnapshotKeyframe,
 } from "../core/index.ts";
 import { waitForCondition } from "./async-conditions.mjs";
 
@@ -26,7 +28,11 @@ function direction(degrees) {
 
 async function join(options = {}) {
   const errors = [];
-  const server = new MatchServer({ rosterSize: 2, onError: (error) => errors.push(error) });
+  const server = new MatchServer({
+    rosterSize: 2,
+    snapshotIntervalTicks: 3,
+    onError: (error) => errors.push(error),
+  });
   const client = new BattleClient({
     name: "presentation-smoothing",
     onError: (error) => errors.push(error),
@@ -44,33 +50,35 @@ async function join(options = {}) {
   return { client, errors, server };
 }
 
-function deliverKeyframe(client, world, tick, raw, frame) {
+function deliverKeyframe(client, world, tick, raw, network, frame) {
   world.tick = tick >>> 0;
   world.writeSnapshot(raw);
-  const length = writeSnapshotKeyframe(frame, world.tick, raw);
+  compactNetworkSnapshot(raw, network);
+  const length = writeNetworkSnapshotKeyframe(frame, world.tick, network);
   client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, length));
 }
 
 test("a nonzero update starts new local and remote smoothing at the currently presented pose", async () => {
   const { client, errors, server } = await join();
   const raw = new Uint8Array(SNAPSHOT_BYTES);
-  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
   const localSlot = client.playerId - 1;
   const remoteSlot = localSlot === 0 ? 1 : 0;
 
   server.world.playerX[remoteSlot] = 1_000;
-  deliverKeyframe(client, server.world, 3, raw, frame);
+  deliverKeyframe(client, server.world, 3, raw, network, frame);
   client.update(0);
   const firstRemote = transform();
   client.samplePlayerTransform(remoteSlot, firstRemote);
 
   server.world.playerX[remoteSlot] = 1_100;
-  deliverKeyframe(client, server.world, 6, raw, frame);
+  deliverKeyframe(client, server.world, 6, raw, network, frame);
   client.update(0);
   client.update(10);
 
   server.world.playerX[remoteSlot] = 1_200;
-  deliverKeyframe(client, server.world, 9, raw, frame);
+  deliverKeyframe(client, server.world, 9, raw, network, frame);
   client.update(17);
   const rebasedRemote = transform();
   client.samplePlayerTransform(remoteSlot, rebasedRemote);
@@ -82,7 +90,7 @@ test("a nonzero update starts new local and remote smoothing at the currently pr
   client.world.playerX[localSlot] += 400;
   const beforeCorrection = transform();
   client.samplePlayerTransform(localSlot, beforeCorrection);
-  deliverKeyframe(client, server.world, 12, raw, frame);
+  deliverKeyframe(client, server.world, 12, raw, network, frame);
   client.update(17);
   const correctionFrame = transform();
   client.samplePlayerTransform(localSlot, correctionFrame);
@@ -99,7 +107,8 @@ test("a nonzero update starts new local and remote smoothing at the currently pr
 test("remote lifecycle changes hard-snap and directions interpolate across the shortest arc", async () => {
   const { client, errors, server } = await join();
   const raw = new Uint8Array(SNAPSHOT_BYTES);
-  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
   const remoteSlot = client.playerId === 1 ? 1 : 0;
   const positive = direction(170);
   const negative = direction(-170);
@@ -108,14 +117,14 @@ test("remote lifecycle changes hard-snap and directions interpolate across the s
   server.world.playerHullY[remoteSlot] = positive.y;
   server.world.playerTurretX[remoteSlot] = positive.x;
   server.world.playerTurretY[remoteSlot] = positive.y;
-  deliverKeyframe(client, server.world, 3, raw, frame);
+  deliverKeyframe(client, server.world, 3, raw, network, frame);
   client.update(0);
 
   server.world.playerHullX[remoteSlot] = negative.x;
   server.world.playerHullY[remoteSlot] = negative.y;
   server.world.playerTurretX[remoteSlot] = negative.x;
   server.world.playerTurretY[remoteSlot] = negative.y;
-  deliverKeyframe(client, server.world, 6, raw, frame);
+  deliverKeyframe(client, server.world, 6, raw, network, frame);
   client.update(0);
   client.update(25);
   const halfway = transform();
@@ -125,7 +134,7 @@ test("remote lifecycle changes hard-snap and directions interpolate across the s
 
   server.world.playerGeneration[remoteSlot] += 1;
   server.world.playerX[remoteSlot] += 2_000;
-  deliverKeyframe(client, server.world, 9, raw, frame);
+  deliverKeyframe(client, server.world, 9, raw, network, frame);
   client.update(0);
   const respawned = transform();
   client.samplePlayerTransform(remoteSlot, respawned);
@@ -138,12 +147,13 @@ test("remote lifecycle changes hard-snap and directions interpolate across the s
 test("local direction correction uses the shortest arc and decays over the bounded window", async () => {
   const { client, errors, server } = await join();
   const raw = new Uint8Array(SNAPSHOT_BYTES);
-  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
   const slot = client.playerId - 1;
   const positive = direction(170);
   const negative = direction(-170);
 
-  deliverKeyframe(client, server.world, 3, raw, frame);
+  deliverKeyframe(client, server.world, 3, raw, network, frame);
   client.update(0);
   client.world.playerHullX[slot] = positive.x;
   client.world.playerHullY[slot] = positive.y;
@@ -156,7 +166,7 @@ test("local direction correction uses the shortest arc and decays over the bound
   const before = transform();
   client.samplePlayerTransform(slot, before);
 
-  deliverKeyframe(client, server.world, 6, raw, frame);
+  deliverKeyframe(client, server.world, 6, raw, network, frame);
   client.update(0);
   const continuous = transform();
   client.samplePlayerTransform(slot, continuous);
@@ -177,13 +187,14 @@ test("local direction correction uses the shortest arc and decays over the bound
 test("prediction lead decays after sustained recovery and catches down without rewinding", async () => {
   const { client, errors, server } = await join({ leadTicks: 2 });
   const raw = new Uint8Array(SNAPSHOT_BYTES);
-  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  const network = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
   let snapshotTick = 0;
 
   for (let sample = 0; sample < 6; sample += 1) {
     client.update(TICK_MILLISECONDS * 4, 8);
     snapshotTick += 1;
-    deliverKeyframe(client, server.world, snapshotTick, raw, frame);
+    deliverKeyframe(client, server.world, snapshotTick, raw, network, frame);
     client.update(0);
   }
   const inflatedLead = client.leadTicks;
@@ -191,7 +202,7 @@ test("prediction lead decays after sustained recovery and catches down without r
 
   for (let sample = 0; sample < 96 && client.stats.inputLeadDecreases === 0; sample += 1) {
     snapshotTick = ((client.world?.tick ?? snapshotTick) + 1) >>> 0;
-    deliverKeyframe(client, server.world, snapshotTick, raw, frame);
+    deliverKeyframe(client, server.world, snapshotTick, raw, network, frame);
     client.update(0);
     client.update(TICK_MILLISECONDS);
   }

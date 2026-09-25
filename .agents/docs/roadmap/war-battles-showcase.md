@@ -178,7 +178,7 @@ of adding bespoke application bindings.
 
 The online client now keeps a fixed-capacity pair of transform samples for all
 32 slots and samples remote hull/turret transforms across the authoritative
-snapshot interval advertised by the server (three ticks / 20 Hz by default).
+snapshot interval advertised by the server (four ticks / 15 Hz by default).
 An incoming sample starts from the pose that was actually rendered, not the
 previous authoritative target, so jittered or bunched streams do not jump an
 in-flight interpolation forward. Generation or player-mode changes hard-snap
@@ -199,7 +199,7 @@ evidence; the broader multiplayer release gate remains open.
 
 The production `GameTransport` adapter now passes a loopback Chrome-to-Deno 2.9
 HTTP/3/WebTransport gate. Chrome completes the 32-player authoritative welcome,
-applies multiple 20 Hz snapshots, sends tick inputs as QUIC datagrams, and
+applies multiple authoritative snapshots, sends tick inputs as QUIC datagrams, and
 observes the authoritative MatchServer accept them. Snapshot state now uses one
 independently cancellable stream per packet; ordered session/control delivery
 remains separate. Repeated frames use the existing bounded five-byte framing;
@@ -281,7 +281,7 @@ bounded loss-recovery window, not a retransmission queue. The deterministic
 loss test drops every second datagram and still observes continuous
 authoritative travel with zero protocol rejections.
 
-Server state remains 20 Hz by default. Prediction now advances the local world
+Server state is 15 Hz by default. Prediction now advances the local world
 by `leadTicks` and preserves every command's tick on the wire. The former path
 predicted command N locally but retimestamped it to N + leadTicks for the
 server, which guaranteed repeated corrections. Local simulation accepts each
@@ -311,8 +311,8 @@ and ordered.
 
 `latestSnapshotTick` now selects the server delta base only after the client
 applied that exact snapshot and returned the acknowledgement in an input. The
-server and client retain a fixed 64-snapshot exact-base history (3.2 seconds at
-20 Hz) and the server emits a keyframe whenever the acknowledged base is
+server and client retain a fixed 64-snapshot exact-base history (about 4.27 seconds at
+15 Hz) and the server emits a keyframe whenever the acknowledged base is
 absent. Receiving a frame does not mutate the client's decode base; applying
 it does. Consequently independently completing streams
 may arrive out of order, a bad stream cannot discard a newer complete pending
@@ -512,22 +512,29 @@ separate runtime scenario.
 
 ## Bounded compact snapshot tranche
 
-Authoritative snapshots now use a session-local fixed-capacity baseline. A
-joining or recovering session receives a complete 17,904-byte keyframe (the
-16-byte protocol/codec header plus the 17,888-byte raw world image). Established
-sessions receive sorted, non-overlapping changed-byte runs against their last
-sent baseline, with a keyframe at least every 20 snapshot frames. The browser
-transport's latest-only backpressure path forces the next frame to be a
-keyframe, so replacing a pending delta cannot poison the client's base tick.
-The server permits one snapshot send in flight and retains exactly one latest
-pending raw state; a pending replacement is always encoded as a keyframe after
-the in-flight result resolves.
-The client rejects a delta whose exact base is unavailable and waits for the
-next periodic keyframe; it never applies a partial state.
-The frame decoder also rejects nonzero reserved/header fields. After any decode
-or world-restore failure, the client reports the root error once, drops pending
-dependent deltas, and waits for a valid keyframe before accepting the stream
-again.
+Authoritative snapshots use a session-local, fixed-capacity acknowledged
+baseline. Protocol 12 leaves the 17,888-byte rollback image broad and projects
+it into an exact 11,232-byte network image; the fixed recovery frame is 11,248
+bytes. Established sessions receive sorted, non-overlapping changed-byte runs
+against the exact snapshot the client applied and acknowledged, with a
+keyframe at least every 20 snapshot frames.
+
+The 15-byte projectile record is trajectory/event state, not a repeated pose.
+It stores a slot generation, owner/content fields, exact Q8 direction and speed,
+and two fixed-point phase invariants: `position - tick * displacement` modulo
+the coordinate width and `tick + remainingLife` modulo 256. Straight motion is
+therefore byte-identical. Spawn, bounce, pierce/correction and despawn change
+the record and naturally become delta events; keyframes still enumerate every
+live trajectory. Expansion reconstructs the exact rollback `x`, `y`, and life
+at the snapshot tick and rejects noncanonical or out-of-range fields.
+
+Ordinary frames are capped at 3 KiB. A frame up to 12 KiB consumes the one-per-
+second recovery credit; larger frames close fail-closed. Only an admitted newer
+state cancels an older unfinished stream. The client rejects a delta whose
+exact base is unavailable and waits for the next periodic keyframe; it never
+applies partial state. Focused tests cover all 512 live projectile slots,
+straight-trajectory byte identity, exact reconstruction, reserved fields, and
+recovery-budget admission.
 
 ## Bounded reconnect/resume tranche
 
@@ -541,7 +548,7 @@ baseline. Its first authoritative frame is therefore a complete keyframe, and
 the client clears all pending bytes and acknowledgement bits at the welcome
 boundary before applying it. Token rotation is two-phase: a staged credential
 becomes current only after the client echoes that exact credential in the
-`welcome-ack` introduced by protocol 8 and retained by current protocol 11;
+`welcome-ack` introduced by protocol 8 and retained by current protocol 12;
 local enqueue success alone is not admission evidence.
 A missing acknowledgement closes and releases the session after five seconds,
 while failed or closed delivery retains the prior credential and its original
@@ -872,16 +879,16 @@ fixture over the real `BattleWorld` and snapshot codec. It records p50/p95/p99
 simulation and frame operation-cost percentiles after a 60-tick warm-up, plus
 keyframe/delta counts, total and per-simulated-second snapshot bytes, and
 reconciliation drift immediately before authoritative restore. The current
-record contains 540 measured ticks, 200 snapshot frames (one 17,904-byte
-keyframe followed by 199 deltas), 463,860 total snapshot bytes, and a maximum
-42 fixed-point-unit pre-restore error; post-restore error is zero.
+record contains 540 measured ticks, 150 snapshot frames (eight periodic or
+recovery keyframes and 142 deltas), 218,587 total snapshot bytes, and a maximum
+53 fixed-point-unit pre-restore error; post-restore error is zero.
 
 The same run reports observable high-water/failure counters for all 32 player
 slots, 512 projectile slots, 32 pickups, the 256-entry presentation-event ring,
 and the fixed snapshot frame buffer. It explicitly marks the native/VM arena as
 unobservable. Allocation evidence is not yet measured: the record explicitly
 leaves both VM allocation counts and transitive source-shape inspection unset.
-The snapshot boundary records its four caller-owned buffers and two `DataView`
+The snapshot boundary records its six caller-owned buffers and five `DataView`
 constructions per snapshot, but that is structure rather than a heap-allocation
 measurement. No Hermes/VM, Defold, native-heap, browser-queue, or wall-clock
 allocation/timing claim is made. The evidence inventory and digest bind the
@@ -959,23 +966,29 @@ sub-unit scale. The initial network codec nevertheless treated the complete
 17,888-byte rollback image as its keyframe and byte-diff source. That made
 unused capacity—not gameplay state—part of the bandwidth bill.
 
-Protocol 11 keeps the fixed rollback image in memory but emits sparse
-keyframes and gap/length-varint deltas. Inactive projectile slots serialize
-only their generation; stale pool bytes are not logical world state. The
-deterministic 32-player, 20 Hz trace fell from 46,386 to 30,022.2 application
-payload bytes/second/client, and its largest keyframe fell from 17,904 to 4,558
-bytes. Input remains 5,760 payload bytes/second/client at 60 Hz. These numbers
-exclude QUIC, HTTP/3, TLS, UDP, IP, Ethernet, retransmission, acknowledgement,
-and congestion overhead.
+Protocol 12 keeps the fixed rollback image in memory but projects an exact
+11,232-byte network image before emitting sparse keyframes and gap/length-
+varint deltas. Inactive projectile slots serialize only their generation;
+stale pool bytes are not logical world state. Projectile trajectory phase makes
+straight flight byte-identical across snapshots, so the delta codec carries
+lifecycle/trajectory changes rather than repeated `x/y/life` updates.
 
-The result is an intermediate format, not the endpoint. Run metadata still
-accounts for 152,857 of 300,222 bytes in the ten-second trace, the p95 frame is
-1,726 bytes, and the adversarial fixed-capacity bound is 358,080 bytes/second/
-client (91.67 Mbit/s aggregate for 32 clients). The next codec therefore uses
-schema field masks and bounded integer widths rather than byte runs. Player
-position can be represented exactly in 15 bits per axis inside the authored
-arena; narrowing velocity or presentation precision requires an explicit range
-and error budget rather than an unchecked cast.
+The deterministic 32-player, 15 Hz trace records 21,858.7 application payload
+bytes/second/client (174,869.6 bit/s), a 1,340-byte median, a 2,750-byte p95,
+and a 4,358-byte largest keyframe. Projectile attribution fell from 24,234 to
+15,287 bytes per ten-second trace after the trajectory representation. Input
+remains 5,760 payload bytes/second/client at 60 Hz. These numbers exclude QUIC,
+HTTP/3, TLS, UDP, IP, Ethernet, retransmission, acknowledgement, and congestion
+overhead.
+
+The runtime enforces a 3,072-byte ordinary-frame ceiling plus at most one
+11,248-byte recovery frame per second. At 15 Hz that is a hard application-
+payload admission bound of 54,256 bytes/second/client (434,048 bit/s), or
+1,736,192 bytes/second for 32 clients. Run metadata (95,159 bytes) and player
+changes (102,405 bytes) now dominate the ten-second trace; projectiles are no
+longer the primary target. A schema field-mask player codec is the next useful
+compression step. Narrowing velocity or presentation precision requires an
+explicit range and error budget rather than an unchecked cast.
 
 Projectile replication follows state semantics, not a blanket “projectiles are
 events” rule. Hitscan weapons are fire/impact events. Missiles remain
@@ -991,7 +1004,8 @@ float-based representation.
 Evidence owner: `integration/check-performance.mjs`; checked artifact:
 `evidence/performance-operability.json`. Current targets are 24,000 ordinary
 and 64,000 adversarial payload bytes/second/client, p95 at 1,100 bytes, and an
-8,000-byte keyframe. Only the keyframe and upstream targets pass this wave.
+8,000-byte keyframe. Ordinary downlink, adversarial bound, keyframe, and
+upstream targets pass; the 8,000-byte stretch and 1,100-byte p95 remain open.
 
 Authenticated resume credentials, fail-closed durable admission, and local
 Docker process-restart resume are now proven at their named boundaries.

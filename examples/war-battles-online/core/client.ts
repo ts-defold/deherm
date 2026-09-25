@@ -17,6 +17,7 @@ import {
   INPUT_BUTTON_FIRE,
   INPUT_HISTORY_TICKS,
   MAX_PLAYERS,
+  NETWORK_SNAPSHOT_BYTES,
   SNAPSHOT_BYTES,
   SNAPSHOT_BASE_HISTORY_FRAMES,
   TICK_MILLISECONDS,
@@ -56,7 +57,12 @@ import {
   type RejectMessage,
   type WelcomeMessage,
 } from "./protocol.ts";
-import { readSnapshotBaseTick, readSnapshotFrame, type SnapshotFrameScratch } from "./snapshot.ts";
+import {
+  expandNetworkSnapshot,
+  readNetworkSnapshotFrame,
+  readSnapshotBaseTick,
+  type SnapshotFrameScratch,
+} from "./snapshot.ts";
 import {
   TRANSPORT_CHANNEL_CONTROL,
   TRANSPORT_CHANNEL_SESSION,
@@ -246,11 +252,11 @@ export class BattleClient implements TransportReceiver {
   private readonly pendingSnapshot = new Uint8Array(SNAPSHOT_BYTES);
   private readonly snapshotHistory = Array.from(
     { length: SNAPSHOT_BASE_HISTORY_FRAMES },
-    () => new Uint8Array(SNAPSHOT_BYTES),
+    () => new Uint8Array(NETWORK_SNAPSHOT_BYTES),
   );
   private readonly snapshotHistoryTicks = new Float64Array(SNAPSHOT_BASE_HISTORY_FRAMES);
   private snapshotHistoryCursor = 0;
-  private readonly snapshotDecoded = new Uint8Array(SNAPSHOT_BYTES);
+  private readonly snapshotDecoded = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
   private readonly snapshotScratch: SnapshotFrameScratch = {
     baseline: this.snapshotHistory[0]!,
     decoded: this.snapshotDecoded,
@@ -639,13 +645,13 @@ export class BattleClient implements TransportReceiver {
         this.snapshotScratch.baseline = this.snapshotHistory[baseIndex]!;
         this.snapshotScratch.baselineTick = baseTick;
       }
-      readSnapshotFrame(payload, this.snapshotScratch, false);
+      readNetworkSnapshotFrame(payload, this.snapshotScratch, false);
       // The decoded keyframe is now the exact base for any following frames
       // already buffered by the transport. Restore remains guarded below; if
       // it fails, applyPendingSnapshot re-latches the stream before exposing
       // any state to the simulation.
       if (isKeyframe) this.awaitingSnapshotKeyframe = false;
-      this.pendingSnapshot.set(this.snapshotDecoded);
+      expandNetworkSnapshot(this.snapshotDecoded, this.pendingSnapshot, tick);
       this.pendingSnapshotReady = true;
       this.pendingSnapshotTick = tick;
       this.pendingSnapshotKeyframe = isKeyframe;
@@ -698,7 +704,7 @@ export class BattleClient implements TransportReceiver {
       return;
     }
     const historyIndex = this.snapshotHistoryCursor;
-    this.snapshotHistory[historyIndex]!.set(this.pendingSnapshot);
+    this.snapshotHistory[historyIndex]!.set(this.snapshotDecoded);
     this.snapshotHistoryTicks[historyIndex] = snapshotTick;
     this.snapshotHistoryCursor = (historyIndex + 1) % this.snapshotHistory.length;
     this.snapshotScratch.baseline = this.snapshotHistory[historyIndex]!;

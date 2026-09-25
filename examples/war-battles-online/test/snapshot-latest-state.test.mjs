@@ -4,6 +4,8 @@ import test from "node:test";
 import {
   MatchServer,
   SNAPSHOT_BYTES,
+  SNAPSHOT_NORMAL_MAX_BYTES,
+  SNAPSHOT_RECOVERY_MAX_BYTES,
   TRANSPORT_CHANNEL_SNAPSHOT,
   adoptServerWebTransportSession,
   readSnapshotTick,
@@ -96,11 +98,11 @@ test("a newer authoritative snapshot resets a blocked stream and crosses the rea
   const session = server.createSession();
   session.attach(transport);
 
-  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(3), 3);
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES), 3);
   await settleUntil(() => host.outgoing.length === 1, "the first blocked snapshot stream");
   assert.deepEqual(host.outgoing[0].chunks, []);
 
-  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES).fill(6), 6);
+  session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES), 6);
   await settleUntil(
     () => host.outgoing.length === 2 && host.outgoing[1].chunks.length === 2,
     "the replacement snapshot payload",
@@ -147,5 +149,55 @@ test("settled snapshot sends never consume the fixed unfinished-work slots", asy
     "settled operations leave no stale abort target",
   );
   assert.equal(readSnapshotTick(frames.at(-1)), 60);
+  server.close();
+});
+
+test("large recovery frames have one-per-second credit without cancelling the last admitted state", () => {
+  let nowMilliseconds = 0;
+  const frames = [];
+  const signals = [];
+  const server = new MatchServer({ rosterSize: 32, nowMilliseconds: () => nowMilliseconds });
+  const session = server.createSession();
+  session.attach({
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(channel, payload, signal) {
+      assert.equal(channel, TRANSPORT_CHANNEL_SNAPSHOT);
+      frames.push(payload.slice());
+      signals.push(signal);
+      return new Promise(() => {});
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  });
+  const source = new Uint8Array(SNAPSHOT_BYTES);
+  for (let slot = 0; slot < 128; slot += 1) {
+    server.world.projectileActive[slot] = 1;
+    server.world.projectileGeneration[slot] = 1;
+    server.world.projectileOwner[slot] = (slot % 32) + 1;
+    server.world.projectileWeapon[slot] = 1;
+    server.world.projectileDamage[slot] = 30;
+    server.world.projectileDirectionX[slot] = 256;
+    server.world.projectileLife[slot] = 75;
+    server.world.projectileSpeed[slot] = 176;
+    server.world.projectileRadius[slot] = 80;
+  }
+  server.world.writeSnapshot(source);
+
+  assert.equal(session.sendSnapshot(source, 4), true);
+  assert.ok(frames[0].byteLength > SNAPSHOT_NORMAL_MAX_BYTES);
+  assert.ok(frames[0].byteLength <= SNAPSHOT_RECOVERY_MAX_BYTES);
+  assert.equal(server.stats.snapshotRecoveryFramesSent, 1);
+
+  nowMilliseconds = 250;
+  assert.equal(session.sendSnapshot(source, 8), false);
+  assert.equal(frames.length, 1);
+  assert.equal(signals[0].aborted, false, "denied recovery must preserve the last admitted state");
+  assert.equal(server.stats.snapshotFramesSkippedByBudget, 1);
+
+  nowMilliseconds = 1_000;
+  assert.equal(session.sendSnapshot(source, 12), true);
+  assert.equal(frames.length, 2);
+  assert.equal(signals[0].aborted, true, "the next admitted recovery supersedes the old stream");
+  assert.equal(server.stats.snapshotRecoveryFramesSent, 2);
   server.close();
 });

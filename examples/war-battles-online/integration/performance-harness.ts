@@ -5,9 +5,10 @@ import {
   MAX_PICKUPS,
   MAX_PLAYERS,
   MAX_PROJECTILES,
+  NETWORK_PROJECTILE_SNAPSHOT_BYTES,
+  NETWORK_SNAPSHOT_BYTES,
   PICKUP_SNAPSHOT_BYTES,
   PLAYER_SNAPSHOT_BYTES,
-  PROJECTILE_SNAPSHOT_BYTES,
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
   TICK_RATE,
@@ -20,10 +21,17 @@ import {
   SNAPSHOT_FRAME_HEADER_BYTES,
   SNAPSHOT_KEYFRAME,
   SNAPSHOT_KEYFRAME_INTERVAL,
-  SNAPSHOT_MESSAGE_BYTES,
+  SNAPSHOT_NORMAL_MAX_BYTES,
+  SNAPSHOT_RECOVERY_MAX_BYTES,
+  NETWORK_SNAPSHOT_MESSAGE_BYTES,
   type InputCommand,
 } from "../core/protocol.ts";
-import { writeSnapshotDelta, writeSnapshotKeyframe } from "../core/snapshot.ts";
+import {
+  compactNetworkSnapshot,
+  expandNetworkSnapshot,
+  writeNetworkSnapshotDelta,
+  writeNetworkSnapshotKeyframe,
+} from "../core/snapshot.ts";
 import { BattleWorld } from "../core/world.ts";
 
 /**
@@ -43,7 +51,7 @@ export const PERFORMANCE_HARNESS_CONFIG = Object.freeze({
   seed: 0x51_4f_50_53,
   matchId: 0x50_45_52_46,
   mapSeed: 0x0bad_cafe,
-  snapshotIntervalTicks: 3,
+  snapshotIntervalTicks: 4,
 });
 
 /**
@@ -65,11 +73,12 @@ const SNAPSHOT_REGIONS = Object.freeze([
   {
     name: "projectiles",
     start: SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES,
-    bytes: MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES,
+    bytes: MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES,
   },
   {
     name: "pickups",
-    start: SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES + MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES,
+    start:
+      SNAPSHOT_HEADER_BYTES + MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES + MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES,
     bytes: MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES,
   },
   {
@@ -77,7 +86,7 @@ const SNAPSHOT_REGIONS = Object.freeze([
     start:
       SNAPSHOT_HEADER_BYTES +
       MAX_PLAYERS * PLAYER_SNAPSHOT_BYTES +
-      MAX_PROJECTILES * PROJECTILE_SNAPSHOT_BYTES +
+      MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES +
       MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES,
     bytes: COVER_SNAPSHOT_BYTES,
   },
@@ -144,8 +153,8 @@ function attributeSnapshotFrame(frame: Uint8Array, length: number, attribution: 
   attribution.frameHeaders += SNAPSHOT_FRAME_HEADER_BYTES;
   const kind = frame[8];
   const runCount = frame[14]! | (frame[15]! << 8);
-  if (kind === SNAPSHOT_KEYFRAME && runCount === 0 && length === SNAPSHOT_MESSAGE_BYTES) {
-    addRegionBytes(attribution, 0, SNAPSHOT_BYTES);
+  if (kind === SNAPSHOT_KEYFRAME && runCount === 0 && length === NETWORK_SNAPSHOT_MESSAGE_BYTES) {
+    addRegionBytes(attribution, 0, NETWORK_SNAPSHOT_BYTES);
     return;
   }
   if (kind !== SNAPSHOT_KEYFRAME && kind !== SNAPSHOT_DELTA) throw new Error(`unknown snapshot frame kind ${kind}`);
@@ -237,8 +246,10 @@ export function runPerformanceHarness(
   }
 
   const rawSnapshot = new Uint8Array(SNAPSHOT_BYTES);
-  const baselineSnapshot = new Uint8Array(SNAPSHOT_BYTES);
-  const snapshotFrame = new Uint8Array(SNAPSHOT_BYTES + 16);
+  const networkSnapshot = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const baselineSnapshot = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const snapshotFrame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
+  const expandedSnapshot = new Uint8Array(SNAPSHOT_BYTES);
   const restoredSnapshot = new Uint8Array(SNAPSHOT_BYTES);
   const simulationSamples = new Float64Array(config.ticks - config.warmupTicks);
   const frameSamples = new Float64Array(config.ticks - config.warmupTicks);
@@ -254,6 +265,8 @@ export function runPerformanceHarness(
   let keyframes = 0;
   let deltas = 0;
   let snapshotBytes = 0;
+  let recoveryFrames = 0;
+  let normalFrames = 0;
   let maximumKeyframeBytes = 0;
   const snapshotByteAttribution = createSnapshotByteAttribution();
   let snapshotBufferFailures = 0;
@@ -291,15 +304,22 @@ export function runPerformanceHarness(
     let frameWork = simulationWork;
     if (tick % config.snapshotIntervalTicks === 0) {
       authoritative.writeSnapshot(rawSnapshot);
+      compactNetworkSnapshot(rawSnapshot, networkSnapshot);
+      expandNetworkSnapshot(networkSnapshot, expandedSnapshot, tick);
+      for (let byte = 0; byte < rawSnapshot.byteLength; byte += 1) {
+        if (expandedSnapshot[byte] !== rawSnapshot[byte]) {
+          throw new Error(`network projection changed rollback state at tick ${tick}, byte ${byte}`);
+        }
+      }
       let frameBytes: number;
       if (baselineTick < 0 || framesSinceKeyframe >= SNAPSHOT_KEYFRAME_INTERVAL - 1) {
-        frameBytes = writeSnapshotKeyframe(snapshotFrame, tick, rawSnapshot);
+        frameBytes = writeNetworkSnapshotKeyframe(snapshotFrame, tick, networkSnapshot);
         keyframes += 1;
         framesSinceKeyframe = 0;
       } else {
-        frameBytes = writeSnapshotDelta(snapshotFrame, tick, baselineTick, baselineSnapshot, rawSnapshot);
+        frameBytes = writeNetworkSnapshotDelta(snapshotFrame, tick, baselineTick, baselineSnapshot, networkSnapshot);
         if (frameBytes < 0) {
-          frameBytes = writeSnapshotKeyframe(snapshotFrame, tick, rawSnapshot);
+          frameBytes = writeNetworkSnapshotKeyframe(snapshotFrame, tick, networkSnapshot);
           keyframes += 1;
           framesSinceKeyframe = 0;
         } else {
@@ -310,9 +330,11 @@ export function runPerformanceHarness(
       if (snapshotFrame[8] === SNAPSHOT_KEYFRAME) maximumKeyframeBytes = Math.max(maximumKeyframeBytes, frameBytes);
       if (frameBytes > snapshotFrame.byteLength) snapshotBufferFailures += 1;
       snapshotBytes += frameBytes;
+      if (frameBytes > SNAPSHOT_NORMAL_MAX_BYTES) recoveryFrames += 1;
+      else normalFrames += 1;
       attributeSnapshotFrame(snapshotFrame, frameBytes, snapshotByteAttribution);
       snapshotSizeSamples[snapshotSizeSampleCount++] = frameBytes;
-      baselineSnapshot.set(rawSnapshot);
+      baselineSnapshot.set(networkSnapshot);
       baselineTick = tick;
       frameWork += frameBytes * 2;
 
@@ -325,7 +347,7 @@ export function runPerformanceHarness(
       reconciliationSamples[reconciliationSampleCount++] = positionError;
       maxReconciliationError = Math.max(maxReconciliationError, positionError);
       if (positionError !== 0) correctedSnapshots += 1;
-      predicted.restoreSnapshot(rawSnapshot);
+      predicted.restoreSnapshot(expandedSnapshot);
       predicted.writeSnapshot(restoredSnapshot);
       for (let byte = 0; byte < rawSnapshot.byteLength; byte += 1) {
         if (restoredSnapshot[byte] !== rawSnapshot[byte]) {
@@ -353,7 +375,11 @@ export function runPerformanceHarness(
   const inputBytesPerSecond = INPUT_BUNDLE_BYTES * config.tickRate;
   const aggregateSnapshotBytesPerSecond = snapshotBytesPerSecond * config.players;
   const snapshotFramesPerSecond = config.tickRate / config.snapshotIntervalTicks;
-  const worstCaseSnapshotBytesPerSecond = fixedFrameCapacity * snapshotFramesPerSecond;
+  const recoveryFramesPerSecond = 1;
+  const normalFramesPerSecond = Math.max(0, snapshotFramesPerSecond - recoveryFramesPerSecond);
+  const worstCaseSnapshotBytesPerSecond =
+    normalFramesPerSecond * SNAPSHOT_NORMAL_MAX_BYTES +
+    recoveryFramesPerSecond * Math.min(SNAPSHOT_RECOVERY_MAX_BYTES, fixedFrameCapacity);
   const requiredDownstreamReduction = Math.max(
     0,
     1 - NETWORK_PAYLOAD_TARGETS.downstreamBytesPerSecondPerClient / snapshotBytesPerSecond,
@@ -386,9 +412,16 @@ export function runPerformanceHarness(
       frameBytes: summarize(measuredSnapshotSizes),
       keyframeBytes: maximumKeyframeBytes,
       fixedFrameCapacity,
+      normalFrames,
+      recoveryFrames,
+      normalFrameMaximumBytes: SNAPSHOT_NORMAL_MAX_BYTES,
+      recoveryFrameMaximumBytes: SNAPSHOT_RECOVERY_MAX_BYTES,
       worstCaseBound: {
-        assumption: "Every scheduled snapshot reaches the fixed frame capacity.",
+        assumption:
+          "One recovery frame per second replaces one normal frame; every admitted frame reaches its enforced ceiling.",
         framesPerSecond: snapshotFramesPerSecond,
+        normalFramesPerSecond,
+        recoveryFramesPerSecond,
         bytesPerSecondPerClient: worstCaseSnapshotBytesPerSecond,
         bitsPerSecondPerClient: worstCaseSnapshotBytesPerSecond * 8,
         aggregateServerBytesPerSecond: worstCaseSnapshotBytesPerSecond * config.players,
@@ -447,8 +480,8 @@ export function runPerformanceHarness(
         limit: "unmeasured until a transitive AST/source-shape checker covers BattleWorld.step and its callees",
       },
       snapshotBoundary: {
-        callerOwnedBuffers: 4,
-        transientDataViewsPerSnapshot: 2,
+        callerOwnedBuffers: 6,
+        transientDataViewsPerSnapshot: 5,
         limit: "fixed snapshot buffers; DataView construction is observable source shape, not a VM allocation count",
       },
       excluded: [

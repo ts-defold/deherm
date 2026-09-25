@@ -42,13 +42,16 @@ test("performance evidence keeps observable and unobservable boundaries explicit
     Object.values(evidence.snapshotBandwidth.byteAttribution).reduce((sum, value) => sum + value, 0),
     evidence.snapshotBandwidth.totalBytes,
   );
-  assert.equal(evidence.snapshotBandwidth.targets.downstreamTargetSatisfied, false);
+  assert.equal(evidence.snapshotBandwidth.targets.downstreamTargetSatisfied, true);
   assert.equal(evidence.snapshotBandwidth.targets.downstreamStretchTargetSatisfied, false);
   assert.equal(evidence.snapshotBandwidth.targets.snapshotP95TargetSatisfied, false);
   assert.equal(evidence.snapshotBandwidth.targets.keyframeTargetSatisfied, true);
-  assert.equal(evidence.snapshotBandwidth.targets.worstCaseDownstreamTargetSatisfied, false);
+  assert.equal(evidence.snapshotBandwidth.targets.worstCaseDownstreamTargetSatisfied, true);
   assert.equal(evidence.snapshotBandwidth.targets.upstreamTargetSatisfied, true);
-  assert.ok(evidence.snapshotBandwidth.targets.requiredDownstreamReductionRatio > 0);
+  assert.equal(evidence.snapshotBandwidth.targets.requiredDownstreamReductionRatio, 0);
+  assert.equal(evidence.snapshotBandwidth.normalFrameMaximumBytes, 3 * 1_024);
+  assert.equal(evidence.snapshotBandwidth.recoveryFrameMaximumBytes, 12 * 1_024);
+  assert.ok(evidence.snapshotBandwidth.worstCaseBound.bytesPerSecondPerClient <= 64_000);
   assert.match(evidence.snapshotBandwidth.evidenceBoundary, /Application payload bytes only/u);
 });
 

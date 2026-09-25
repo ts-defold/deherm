@@ -196,12 +196,12 @@ The local world starts `leadTicks` ahead, and commands keep that exact tick on
 the wire so prediction and authority run the same timeline. On each
 authoritative snapshot it restores and replays newer local inputs.
 Simulation accepts the correction immediately, local presentation decays its
-visual error over 100 ms, and remote tanks interpolate between 20 Hz samples.
+visual error over 100 ms, and remote tanks interpolate between 15 Hz samples.
 Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 10.
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 12.
 It carries 40-byte authenticated resume credentials and requires the client to
 acknowledge the exact welcome credential before the server commits its rotation,
 alongside the authoritative chassis, weapon-branch, and command-beacon state.
@@ -214,11 +214,11 @@ four-byte envelope whose kind fixes the lane it is allowed on. Full table in
 [`server/README.md`](./server/README.md).
 
 Snapshot state is partially reliable rather than ordered behind old state. Each
-20 Hz packet gets an independent WebTransport stream; an unsettled packet is
+15 Hz packet gets an independent WebTransport stream; an unsettled packet is
 reset after 300 ms, and at most eight can exist per session. Deltas are built
 only against the exact snapshot tick the client applied and acknowledged. The
-server and client retain a fixed 64-snapshot exact-base history (3.2 seconds at
-20 Hz), so WAN acknowledgements and several independently completed deltas may
+server and client retain a fixed 64-snapshot exact-base history (about 4.27 seconds at
+15 Hz), so WAN acknowledgements and several independently completed deltas may
 safely name an older applied base. A complete one-frame state stream is retired
 as soon as its payload is consumed; an acknowledgement, stale deadline, or peer
 reset retires the matching replaceable packet without closing the session.
@@ -270,13 +270,16 @@ checkpoints fail closed. Restore rebases the admission clock against the
 session ledger, preventing the restored world tick from being counted twice.
 Docker mounts this beside the resume ledger as `server/state/world.bin`.
 
-The compact snapshot unit test independently proves the codec against a full
-32-player world: the fixed world image is 17,888 bytes and its keyframe is
-17,904 bytes, while the measured 20 Hz bot trace uses bounded deltas.
-The test also proves keyframe reconstruction, exact-base enforcement, sorted
-run bounds, and rejection of a delta without its baseline. This is protocol and
-in-process evidence; it is not a WAN compression, packet-loss, or allocation
-benchmark.
+The compact snapshot tests independently prove the codec against the broad
+17,888-byte rollback image. Protocol 12 projects that image into an exact
+11,232-byte network image and a bounded 11,248-byte recovery frame. Projectile
+records encode fixed-point trajectory phase and expiry tick, so straight flight
+is byte-identical across snapshots and the delta stream carries only spawn,
+trajectory-change, and despawn state. The measured 15 Hz bot trace uses bounded
+deltas. Tests also prove exact reconstruction, exact-base enforcement, sorted
+run bounds, all-512-projectile recovery capacity, and rejection of a delta
+without its baseline. This is protocol and in-process evidence; it is not a WAN
+compression, packet-loss, or VM-allocation benchmark.
 
 ## Evidence
 
@@ -368,7 +371,7 @@ runtime. It deliberately describes semantics instead of naming a vendor:
   its current resume token, then the server either restores the player slot and
   sends a fresh full snapshot or refuses the resume. A transport connection
   itself is never assumed resumable. Version 7 carries command-beacon state;
-  version 6 introduced the 40-byte HMAC resume credential. Current protocol 11
+  version 6 introduced the 40-byte HMAC resume credential. Current protocol 12
   additionally fixes simulation ticks as wrap-safe uint32 serials while
   retaining bounded redundant input datagrams. The Deno host accepts an
   explicit 32-byte secret and persists a fixed-capacity generation ledger at
