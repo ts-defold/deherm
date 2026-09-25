@@ -1,5 +1,15 @@
 # Defold Hermes knowledge log
 
+## 2026-09-25 - Windows native WebTransport test remains C++17
+
+The first complete native artifact matrix after the Picotls patch correction
+compiled and packaged every Linux, Android, macOS, and iOS lane, but MSVC
+rejected three C++20 designated initializers in the native client test while
+the library itself compiled successfully. The fixture now uses C++17 aggregate
+construction plus explicit field assignment, matching the target's declared
+`cxx_std_17` contract. This is a test-source portability fix; it does not alter
+the shipped native library fingerprint or ABI.
+
 ## 2026-09-25 - Real QUIC evidence accepts observable latest-state drops
 
 The browser-to-Deno WebTransport evidence no longer equates a zero client

@@ -226,15 +226,19 @@ int main() {
   assert(request_ring.pop(poll_head, poll_bytes.data(), poll_bytes.size()));
   assert(poll_head.request_id == 0);
 
-  Options no_trust{.url = "https://localhost:4433"};
+  Options no_trust{};
+  no_trust.url = "https://localhost:4433";
   assert(Client::open(no_trust) == nullptr);
 
-  Options bad_scheme{.url = "ws://localhost:4433", .has_certificate_sha256 = true};
+  Options bad_scheme{};
+  bad_scheme.url = "ws://localhost:4433";
+  bad_scheme.has_certificate_sha256 = true;
   assert(Client::open(bad_scheme) == nullptr);
 
-  Options invalid_hint{.url = "https://localhost:4433",
-                       .anticipated_incoming_unidirectional_streams = UINT16_MAX + 1U,
-                       .has_certificate_sha256 = true};
+  Options invalid_hint{};
+  invalid_hint.url = "https://localhost:4433";
+  invalid_hint.anticipated_incoming_unidirectional_streams = UINT16_MAX + 1U;
+  invalid_hint.has_certificate_sha256 = true;
   assert(Client::open(invalid_hint) == nullptr);
 
   DefoldWebTransportOptions null_hashes{};
