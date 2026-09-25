@@ -86,10 +86,11 @@ export const TANK_MAX_SPEED = 88 * VELOCITY_SCALE;
 /** Extra top speed per mobility upgrade level. */
 export const TANK_SPEED_PER_MOBILITY = 8 * VELOCITY_SCALE;
 /**
- * Hard ceiling on total speed. The drive speed above is enforced by refusing to
- * add thrust that would exceed it, NOT by clamping the velocity vector: an
- * explosion has to be able to throw a tank faster than it can drive, or splash
- * knockback and rocket jumps are cancelled out on the very next tick.
+ * Hard ceiling on total speed. This is deliberately three times the ordinary
+ * drive limit: explosions can throw a tank faster than it can drive without
+ * allowing impulses to grow without bound. The authoritative tick boundary
+ * clamps only to this impulse ceiling, preserving splash knockback and rocket
+ * jumps below it.
  */
 export const TANK_MAX_IMPULSE_SPEED = 3 * TANK_MAX_SPEED;
 /** Thrust applied per tick while a direction is held. */
@@ -178,7 +179,7 @@ export const DIRECTION_DIAGONAL = 181;
 // The separate bit keeps every uint32 tick, including 0xffffffff, representable.
 export const PLAYER_SNAPSHOT_BYTES = 96;
 /** Exact schema-aware player record used only by the network projection. */
-export const NETWORK_PLAYER_SNAPSHOT_BYTES = 66;
+export const NETWORK_PLAYER_SNAPSHOT_BYTES = 62;
 export const PROJECTILE_SNAPSHOT_BYTES = 28;
 /** Exact fixed-point trajectory/event record used only by the network projection. */
 export const NETWORK_PROJECTILE_SNAPSHOT_BYTES = 15;

@@ -84,6 +84,7 @@ import {
   PLAYER_MODE_DEAD,
   PLAYER_MODE_INFANTRY,
   PLAYER_MODE_TANK,
+  TANK_MAX_IMPULSE_SPEED,
   HAZARD_ACTIVE_TICKS,
   HAZARD_CYCLE_TICKS,
   HAZARD_PULSE_TICKS,
@@ -978,6 +979,36 @@ test("a tank carries momentum rather than teleporting, and cover stops it", () =
   run(world, 600, (tick) => world.submitInput(command(1, tick + 46, { moveX: 1, moveY: 1 })));
   world.readPlayer(1, view);
   assert.equal(world.map.solidAtWorld(view.x, view.y), false, "a tank must never end inside cover");
+});
+
+test("the authoritative tick boundary enforces the documented impulse-speed ceiling", () => {
+  const world = new BattleWorld(77);
+  const centre = { x: 0, y: 0 };
+  world.map.nearestOpen(0, 0, centre);
+  const cellX = cellOfX(centre.x);
+  const cellY = cellOfY(centre.y);
+  for (let offsetY = -2; offsetY <= 2; offsetY += 1) {
+    for (let offsetX = -2; offsetX <= 2; offsetX += 1) {
+      world.map.cells[world.map.index(cellX + offsetX, cellY + offsetY)] = CELL_FLOOR;
+    }
+  }
+  world.addPlayer(1, 0, centre.x, centre.y);
+  world.playerSpawnProtectTicks[0] = 0;
+  world.playerVelocityX[0] = TANK_MAX_IMPULSE_SPEED;
+  const beforeHealth = world.playerHealth[0];
+  world.projectileActive[0] = 1;
+  world.projectileOwner[0] = 0;
+  world.projectileWeapon[0] = WEAPON_MORTAR;
+  world.projectileLife[0] = 0;
+  world.projectileX[0] = centre.x;
+  world.projectileY[0] = centre.y;
+
+  world.step();
+
+  const speed = isqrt(world.playerVelocityX[0] ** 2 + world.playerVelocityY[0] ** 2);
+  assert.ok(world.playerHealth[0] < beforeHealth, "the post-movement mortar impulse must have landed");
+  assert.equal(world.playerVelocityX[0], TANK_MAX_IMPULSE_SPEED);
+  assert.ok(speed <= TANK_MAX_IMPULSE_SPEED);
 });
 
 test("armour absorbs damage, tank destruction ejects the pilot, and the terminal kill scores", () => {

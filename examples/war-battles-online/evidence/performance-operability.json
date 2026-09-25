@@ -24,9 +24,9 @@
     "frame": {
       "samples": 540,
       "p50": 885,
-      "p95": 3538,
-      "p99": 6448,
-      "maximum": 8725
+      "p95": 2763,
+      "p99": 5852,
+      "maximum": 8149
     },
     "evidenceBoundary": "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings."
   },
@@ -35,25 +35,25 @@
     "frames": 150,
     "keyframes": 8,
     "deltas": 142,
-    "totalBytes": 201659,
-    "bytesPerSimulatedSecond": 20165.9,
-    "bitsPerSimulatedSecond": 161327.2,
-    "aggregateServerPayloadBytesPerSecond": 645308.8,
-    "aggregateServerPayloadBitsPerSecond": 5162470.4,
+    "totalBytes": 144660,
+    "bytesPerSimulatedSecond": 14466,
+    "bitsPerSimulatedSecond": 115728,
+    "aggregateServerPayloadBytesPerSecond": 462912,
+    "aggregateServerPayloadBitsPerSecond": 3703296,
     "inputPayloadBytesPerSecondPerClient": 1500,
     "inputPayloadBitsPerSecondPerClient": 12000,
     "aggregateInputPayloadBytesPerSecond": 48000,
     "frameBytes": {
       "samples": 150,
-      "p50": 1252,
-      "p95": 2167,
-      "p99": 3555,
-      "maximum": 3909
+      "p50": 858,
+      "p95": 1968,
+      "p99": 3275,
+      "maximum": 3621
     },
-    "keyframeBytes": 3909,
-    "fixedFrameCapacity": 10288,
-    "normalFrames": 146,
-    "recoveryFrames": 4,
+    "keyframeBytes": 3621,
+    "fixedFrameCapacity": 10160,
+    "normalFrames": 147,
+    "recoveryFrames": 3,
     "normalFrameMaximumBytes": 3072,
     "recoveryFrameMaximumBytes": 12288,
     "worstCaseBound": {
@@ -61,16 +61,16 @@
       "framesPerSecond": 15,
       "normalFramesPerSecond": 14,
       "recoveryFramesPerSecond": 1,
-      "bytesPerSecondPerClient": 53296,
-      "bitsPerSecondPerClient": 426368,
-      "aggregateServerBytesPerSecond": 1705472,
-      "aggregateServerBitsPerSecond": 13643776
+      "bytesPerSecondPerClient": 53168,
+      "bitsPerSecondPerClient": 425344,
+      "aggregateServerBytesPerSecond": 1701376,
+      "aggregateServerBitsPerSecond": 13611008
     },
     "byteAttribution": {
       "frameHeaders": 2400,
-      "runHeaders": 68585,
+      "runHeaders": 37395,
       "worldHeader": 398,
-      "players": 112051,
+      "players": 86242,
       "projectiles": 15287,
       "pickups": 2518,
       "cover": 420
@@ -130,8 +130,8 @@
       "overflowPolicy": "drop-oldest"
     },
     "snapshotFrame": {
-      "capacity": 10288,
-      "highWater": 3909,
+      "capacity": 10160,
+      "highWater": 3621,
       "failures": 0
     },
     "arena": {
@@ -169,8 +169,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 434724,
-      "sha256": "130be96171e5e03384ef2f3e05b8822b13fc0f6cc5d71023a6dea4c784813aa3"
+      "bytes": 437828,
+      "sha256": "ebff67ca8c9423cf93e6b4cd1297546c6073d571170ec08f8979eb6dc95026c2"
     },
     {
       "path": "examples/war-battles-online/integration/performance-harness.ts",
@@ -191,6 +191,6 @@
       "sha256": "b8709891a96f1b3aabc8c65ef4aa48860d630b3b5bfc286e4e00663e15a7a19a"
     }
   ],
-  "sourceKey": "b7af9873e3afa412e49ffcb6c4e62bdece8152c29a0cdcee1fa025375a1b9440",
+  "sourceKey": "0a1e8555b4616eab693be2b1fb9e7985c610a202a7a0e83c65158616af088121",
   "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
 }

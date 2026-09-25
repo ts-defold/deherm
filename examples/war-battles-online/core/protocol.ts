@@ -23,11 +23,14 @@ import { WEAPON_COUNT } from "./content.ts";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-// Version 13 packs a four-command unreliable input window behind one common
-// identity, acknowledgement, tick, and sequence header. Version 12 separated
-// the compact fixed-point network image from the broad rollback image and
-// packed each projectile into an exact 15-byte record.
-export const PROTOCOL_VERSION = 13;
+// Version 14 makes countdown expiries and accepted-input coordinates stable
+// against the enclosing snapshot tick, so ordinary sparse deltas carry state
+// changes rather than deterministic clock motion. Version 13 packs a four-
+// command unreliable input window behind one common identity, acknowledgement,
+// tick, and sequence header. Version 12 separated the compact fixed-point
+// network image from the broad rollback image and packed each projectile into
+// an exact 15-byte record.
+export const PROTOCOL_VERSION = 14;
 export const INPUT_PACKET_BYTES = 32;
 /**
  * One unreliable transport datagram carries the two commands sampled since the

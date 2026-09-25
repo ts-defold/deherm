@@ -390,6 +390,13 @@ export class BattleWorld {
     this.stepPickups();
     this.stepObjective();
     this.stepHazards();
+    // Projectile and splash impulses are applied after movement. Reassert the
+    // documented hard ceiling at the authoritative tick boundary so snapshots
+    // never expose a one-tick overshoot and the exact network width remains a
+    // source-enforced invariant rather than a workload assumption.
+    for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+      if (this.playerActive[slot] !== 0) this.clampPlayerVelocity(slot);
+    }
   }
 
   // --- progression ----------------------------------------------------------
@@ -844,11 +851,7 @@ export class BattleWorld {
     const dragShift = infantry ? INFANTRY_DRAG_SHIFT : chassis.dragShift;
     this.playerVelocityX[slot] = this.playerVelocityX[slot]! - (this.playerVelocityX[slot]! >> dragShift);
     this.playerVelocityY[slot] = this.playerVelocityY[slot]! - (this.playerVelocityY[slot]! >> dragShift);
-    const speed = length(this.playerVelocityX[slot]!, this.playerVelocityY[slot]!);
-    if (speed > TANK_MAX_IMPULSE_SPEED) {
-      this.playerVelocityX[slot] = Math.trunc((this.playerVelocityX[slot]! * TANK_MAX_IMPULSE_SPEED) / speed);
-      this.playerVelocityY[slot] = Math.trunc((this.playerVelocityY[slot]! * TANK_MAX_IMPULSE_SPEED) / speed);
-    }
+    this.clampPlayerVelocity(slot);
 
     const stepX = Math.trunc(this.playerVelocityX[slot]! / VELOCITY_SCALE);
     const stepY = Math.trunc(this.playerVelocityY[slot]! / VELOCITY_SCALE);
@@ -914,6 +917,13 @@ export class BattleWorld {
     );
     this.playerTurretX[slot] = this.scratchDirection.x;
     this.playerTurretY[slot] = this.scratchDirection.y;
+  }
+
+  private clampPlayerVelocity(slot: number): void {
+    const speed = length(this.playerVelocityX[slot]!, this.playerVelocityY[slot]!);
+    if (speed <= TANK_MAX_IMPULSE_SPEED) return;
+    this.playerVelocityX[slot] = Math.trunc((this.playerVelocityX[slot]! * TANK_MAX_IMPULSE_SPEED) / speed);
+    this.playerVelocityY[slot] = Math.trunc((this.playerVelocityY[slot]! * TANK_MAX_IMPULSE_SPEED) / speed);
   }
 
   private tryFire(slot: number): void {

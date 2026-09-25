@@ -191,7 +191,8 @@ map structure, and reproducibility. Every stage is byte-reproducible and has a
 `core/match-server.ts` is the authoritative match: one `BattleWorld`, one session
 per client, bots filling every slot no human has taken. `core/client.ts` is the
 predicting client: it runs the world locally at 60 Hz and sends one input
-datagram per tick containing the newest command plus up to two predecessors.
+datagram every two ticks containing the two newly sampled commands plus the
+previous two-command loss window.
 The local world starts `leadTicks` ahead, and commands keep that exact tick on
 the wire so prediction and authority run the same timeline. On each
 authoritative snapshot it restores and replays newer local inputs.
@@ -201,15 +202,15 @@ Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 12.
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 14.
 It carries 40-byte authenticated resume credentials and requires the client to
 acknowledge the exact welcome credential before the server commits its rotation,
 alongside the authoritative chassis, weapon-branch, and command-beacon state.
 Each tick input command is still exactly 32 bytes (version 1 reserved byte
 15 and wrote zero; it is now the weapon request, so every other offset is
-unchanged). A QUIC datagram carries one to three oldest-first commands, so one
-lost packet usually does not erase its movement transition and stale inputs are
-never queued for retransmission. The session, control and snapshot lanes carry a typed
+unchanged). A QUIC datagram carries one to four oldest-first compact commands,
+so one lost packet usually does not erase its movement transition and stale
+inputs are never queued for retransmission. The session, control and snapshot lanes carry a typed
 four-byte envelope whose kind fixes the lane it is allowed on. Full table in
 [`server/README.md`](./server/README.md).
 
@@ -271,13 +272,16 @@ session ledger, preventing the restored world tick from being counted twice.
 Docker mounts this beside the resume ledger as `server/state/world.bin`.
 
 The compact snapshot tests independently prove the codec against the broad
-17,888-byte rollback image. Protocol 13 projects that image into an exact
-10,272-byte network image and a bounded 10,288-byte recovery frame. Each player
-uses a schema-aware 66-byte record (including six checked reserved bits), while
-projectile records encode fixed-point trajectory phase and expiry tick, so
+17,888-byte rollback image. Protocol 14 projects that image into an exact
+10,144-byte network image and a bounded 10,160-byte recovery frame. Each player
+uses a schema-aware 62-byte record (including two checked reserved bits).
+Velocity uses the simulation's exact 3× impulse-speed bound; countdowns carry
+stable expiry phases and accepted input tick/sequence values are relative to
+the enclosing snapshot tick. Projectile records encode fixed-point trajectory phase and expiry tick, so
 straight flight is byte-identical across snapshots and the delta stream carries
 only spawn, trajectory-change, and despawn state. The measured 15 Hz bot trace
-uses bounded deltas. Tests also prove exact reconstruction across all 32 player
+uses 14,466 application payload bytes/second/client with an 858-byte median,
+1,968-byte p95, and 3,621-byte largest keyframe. Tests also prove exact reconstruction across all 32 player
 slots at field boundaries, exact-base enforcement, sorted run bounds, all-512-
 projectile recovery capacity, and rejection of corrupt or baseline-free deltas.
 This is protocol and in-process evidence; it is not a WAN compression,

@@ -206,26 +206,27 @@ events; input bundles remain unreliable QUIC datagrams.
 ## Protocol
 
 Tick input is one datagram per 60 Hz simulation tick on the unreliable lane.
-Each datagram carries one to three complete 32-byte commands, newest plus up to
-two predecessors. It is dropped rather than queued when backpressured and never
+Each datagram carries one to four compact commands: the two newly sampled
+commands plus the previous two-command window. It is dropped rather than queued when backpressured and never
 silently promoted into the reliable lane. The server stages still-future
 commands oldest-first and ignores already-consumed redundant copies. Everything
 else crosses inside a four-byte reliable envelope
 whose kind fixes the lane it is allowed on:
 
-| Kind            | Lane     | Direction       | Bytes                                     |
-| --------------- | -------- | --------------- | ----------------------------------------- |
-| `hello`         | session  | client → server | 68                                        |
-| `welcome`       | session  | server → client | 61                                        |
-| `welcome-ack`   | session  | client → server | 44                                        |
-| `reject`        | session  | server → client | ≤ 102                                     |
-| `ping` / `pong` | session  | both            | 12                                        |
-| `control`       | control  | client → server | 8                                         |
-| `snapshot`      | snapshot | server → client | 17,776 keyframe; compact delta after join |
+| Kind            | Lane     | Direction       | Bytes                                       |
+| --------------- | -------- | --------------- | ------------------------------------------- |
+| `hello`         | session  | client → server | 68                                          |
+| `welcome`       | session  | server → client | 61                                          |
+| `welcome-ack`   | session  | client → server | 44                                          |
+| `reject`        | session  | server → client | ≤ 102                                       |
+| `ping` / `pong` | session  | both            | 12                                          |
+| `control`       | control  | client → server | 8                                           |
+| `snapshot`      | snapshot | server → client | ≤ 10,160 recovery; compact delta after join |
 
-`PROTOCOL_VERSION` is 10: bounded input-command redundancy remains on the wire,
-and simulation tick ordering plus last-input validity are now unambiguously
-uint32 across wrap. Snapshots carry the authoritative command-beacon
+`PROTOCOL_VERSION` is 14: bounded input-command redundancy remains on the wire,
+simulation tick ordering plus last-input validity are unambiguously uint32
+across wrap, and player countdown/input coordinates are stable against the
+snapshot tick. Snapshots carry the authoritative command-beacon
 state, while hello/welcome frames carry 40-byte authenticated
 resume credentials, the client echoes the exact welcome credential before its
 rotation becomes current, and the snapshot carries the authoritative chassis and
@@ -235,15 +236,15 @@ input packet is still exactly 32 bytes:
 version 1 reserved byte 15 and wrote zero there, and that byte is now the weapon
 request, so every other field kept its offset.
 
-Snapshot frames have a 16-byte envelope/codec header. A keyframe carries the
-17,888-byte raw world image. Established sessions receive sorted,
+Snapshot frames have a 16-byte envelope/codec header. A keyframe projects the
+17,888-byte rollback image into an exact 10,144-byte network image. Established sessions receive sorted,
 non-overlapping changed-byte runs against their own fixed-capacity baseline;
 the server emits a keyframe at least every 20 snapshots. The client rejects a delta
 whose base tick is unavailable, so loss or late join cannot silently apply a
-partial world. The match owns one 1,144,832-byte/64-frame raw history, each
-server session owns one 17,888-byte acknowledged baseline plus eight bounded
-stream slots, and each predicting client owns its own 1,144,832-byte exact-base
-history. The codec's encode/decode loops allocate no typed-array views or heap
+partial world. The match retains 64 exact broad rollback bases (1,144,832
+bytes), while each predicting client retains 64 compact network bases (649,216
+bytes). Each server session owns fixed current, baseline, and frame buffers plus
+eight bounded stream slots. The codec's encode/decode loops allocate no typed-array views or heap
 objects after setup; transport streams still have their explicitly bounded
 host resources.
 The final transport call still creates one bounded payload view at the send

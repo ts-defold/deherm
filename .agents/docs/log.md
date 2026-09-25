@@ -3574,3 +3574,42 @@ The one-slot pre-`WELCOME_ACK` input buffer now retains the newest tick under
 uint32 serial ordering, with a uint16 sequence tie-breaker for same-tick
 corrections; a later-arriving stale QUIC datagram cannot regress admission.
 Focused negative and cross-lane reordering tests cover both fixes.
+
+## 2026-09-25 - Protocol 14 removes deterministic clock motion from player deltas
+
+The exact network projection now treats four monotonically decreasing player
+timers as expiry phases, and accepted input tick/sequence coordinates as phases
+relative to the enclosing snapshot tick. Those values reconstruct byte-for-byte
+into the broad rollback image, including across uint32 tick wrap, but remain
+stable in the acknowledged network image while the underlying clock advances.
+Zero countdowns retain a distinct stable sentinel. The projection also applies
+the source-enforced `TANK_MAX_IMPULSE_SPEED` component bound, representing each
+velocity in 18 bits rather than retaining an unneeded signed 32-bit lane. This
+shrinks each player record from 66 to 62 bytes and the fixed network image from
+10,272 to 10,144 bytes.
+
+Source review found that movement clamped velocity before projectile impacts,
+which allowed a post-impact value to exceed the named ceiling until the next
+tick. The authoritative step now reasserts the same vector-magnitude ceiling
+after projectiles, objectives, and hazards. A focused boundary test covers the
+invariant; the encoder still rejects a caller-mutated out-of-range snapshot.
+The 18-bit projection therefore rests on an enforced simulation rule, not only
+the current deterministic workload.
+
+The deterministic 32-player, 15 Hz trace falls from 20,165.9 to 14,466
+application payload bytes/second/client. Median/p95/largest frames move from
+1,252/2,167/3,909 to 858/1,968/3,621 bytes. Player data falls from 112,051 to
+86,242 trace bytes and run metadata from 68,585 to 37,395; projectile bytes stay
+15,287. The ordinary, keyframe, upstream, and adversarial admission targets
+remain green. The 8,000-byte/s stretch and 1,100-byte p95 targets remain open,
+so separate exact owner correction versus remote presentation state remains the
+next compression frontier.
+
+Focused codec tests prove exact all-field round trips, a post-movement mortar
+impulse reaching the new velocity boundary, noncanonical countdown and
+reserved-bit rejection, retained inactive input sequence, timer and input
+phases across uint32 wrap, and all-projectile recovery capacity. The
+performance harness expands and byte-compares every network image before using
+it for reconciliation. These are deterministic in-process codec measurements,
+not WAN packet capture, transport-overhead, wall-clock, or VM-allocation
+evidence.

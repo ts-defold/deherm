@@ -966,18 +966,21 @@ sub-unit scale. The initial network codec nevertheless treated the complete
 17,888-byte rollback image as its keyframe and byte-diff source. That made
 unused capacity—not gameplay state—part of the bandwidth bill.
 
-Protocol 13 keeps the fixed rollback image in memory but projects an exact
-10,272-byte network image before emitting sparse keyframes and gap/length-
-varint deltas. Each player record is an exact 66-byte schema projection rather
-than a copied 96-byte rollback record; fields without a proven narrower bound
-remain full width. Inactive projectile slots serialize only their generation;
+Protocol 14 keeps the fixed rollback image in memory but projects an exact
+10,144-byte network image before emitting sparse keyframes and gap/length-
+varint deltas. Each player record is an exact 62-byte schema projection rather
+than a copied 96-byte rollback record. Velocity uses the simulation's explicit
+3× impulse-speed component bound, reasserted after all tick impulses;
+countdowns encode stable expiry phases, and
+accepted input tick/sequence coordinates are relative to the enclosing
+snapshot tick. Inactive projectile slots serialize only their generation;
 stale pool bytes are not logical world state. Projectile trajectory phase makes
 straight flight byte-identical across snapshots, so the delta codec carries
 lifecycle/trajectory changes rather than repeated `x/y/life` updates.
 
-The deterministic 32-player, 15 Hz trace records 20,165.9 application payload
-bytes/second/client (161,327.2 bit/s), a 1,252-byte median, a 2,167-byte p95,
-and a 3,909-byte largest keyframe. Projectile attribution remains 15,287 bytes
+The deterministic 32-player, 15 Hz trace records 14,466 application payload
+bytes/second/client (115,728 bit/s), an 858-byte median, a 1,968-byte p95,
+and a 3,621-byte largest keyframe. Projectile attribution remains 15,287 bytes
 per ten-second trace. Local input remains sampled and predicted at 60 Hz, while
 the unreliable lane emits at 30 Hz. Its two new commands plus prior two-command
 window share one identity, acknowledgement, tick, and sequence header and cost
@@ -995,14 +998,14 @@ accumulates them behind the `cl_maxpackets` throttle; the stock
 are 30 and 1 respectively.
 
 The runtime enforces a 3,072-byte ordinary-frame ceiling plus at most one
-10,288-byte recovery frame per second. At 15 Hz that is a hard application-
-payload admission bound of 53,296 bytes/second/client (426,368 bit/s), or
-1,705,472 bytes/second for 32 clients. Run metadata (68,585 bytes) and player
-changes (112,051 bytes) dominate the ten-second trace; projectiles are no
+10,160-byte recovery frame per second. At 15 Hz that is a hard application-
+payload admission bound of 53,168 bytes/second/client (425,344 bit/s), or
+1,701,376 bytes/second for 32 clients. Run metadata (37,395 bytes) and player
+changes (86,242 bytes) dominate the ten-second trace; projectiles are no
 longer the primary target. A field-aware player delta with separate exact owner
 correction and remote presentation state is the next useful compression step.
-Narrowing velocity or presentation precision requires an explicit range and
-error budget rather than an unchecked cast.
+Any further narrowing or presentation quantization still requires an explicit
+range and error budget rather than an unchecked cast.
 
 Projectile replication follows state semantics, not a blanket “projectiles are
 events” rule. Hitscan weapons are fire/impact events. Missiles remain

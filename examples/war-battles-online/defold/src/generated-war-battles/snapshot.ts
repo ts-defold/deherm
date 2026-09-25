@@ -14,9 +14,12 @@ import {
   PICKUP_SNAPSHOT_BYTES,
   PLAYER_SNAPSHOT_BYTES,
   PROJECTILE_SNAPSHOT_BYTES,
+  RESPAWN_TICKS,
   SNAPSHOT_BYTES,
   SNAPSHOT_HEADER_BYTES,
+  SPAWN_PROTECT_TICKS,
   TANK_BOOST_CAPACITY,
+  TANK_MAX_IMPULSE_SPEED,
   WORLD_MAX_X,
   WORLD_MAX_Y,
   WORLD_MIN_X,
@@ -80,7 +83,7 @@ export function compactNetworkSnapshot(source: Uint8Array, target: Uint8Array): 
   const sourceView = new DataView(source.buffer, source.byteOffset, SNAPSHOT_BYTES);
   const snapshotTick = sourceView.getUint32(8, true);
   for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
-    compactNetworkPlayer(sourceView, target, slot);
+    compactNetworkPlayer(sourceView, target, slot, snapshotTick);
   }
   for (let slot = 0; slot < MAX_PROJECTILES; slot += 1) {
     const raw = RAW_PROJECTILE_OFFSET + slot * PROJECTILE_SNAPSHOT_BYTES;
@@ -164,7 +167,7 @@ export function expandNetworkSnapshot(source: Uint8Array, target: Uint8Array, ex
     throw new Error("snapshot frame tick does not match its projected world state");
   }
   for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
-    expandNetworkPlayer(source, targetView, slot);
+    expandNetworkPlayer(source, targetView, slot, snapshotTick);
   }
   for (let slot = 0; slot < MAX_PROJECTILES; slot += 1) {
     const packed = NETWORK_PROJECTILE_OFFSET + slot * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
@@ -245,16 +248,17 @@ export function expandNetworkSnapshot(source: Uint8Array, target: Uint8Array, ex
 }
 
 /**
- * The player wire schema is 522 bits (66 bytes, with six reserved bits), versus the 96-byte rollback
+ * The player wire schema is 494 bits (62 bytes, with two reserved bits), versus the 96-byte rollback
  * record. Every narrowed field is bounded by the simulation/content schema;
- * the two signed Int32 velocities and three signed Int32 counters stay full
- * width because their values are not otherwise bounded by gameplay rules.
+ * the two velocity components use the simulation's exact impulse-speed bound;
+ * the three signed Int32 counters stay full width because gameplay does not
+ * otherwise bound them.
  *
  * Field order is deliberately shared by compactNetworkPlayer and
  * expandNetworkPlayer. It is a fixed record, not a variable-length bitstream,
  * so the projection remains bounded and does not acquire per-call storage.
  */
-function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number): void {
+function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number, snapshotTick: number): void {
   const raw = SNAPSHOT_HEADER_BYTES + slot * PLAYER_SNAPSHOT_BYTES;
   const packed = NETWORK_PLAYER_OFFSET + slot * NETWORK_PLAYER_SNAPSHOT_BYTES;
   for (let byte = 0; byte < NETWORK_PLAYER_SNAPSHOT_BYTES; byte += 1) target[packed + byte] = 0;
@@ -311,6 +315,8 @@ function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number
   requirePackedUnsigned(armorLevel, 2, "player armor level");
   requirePackedRange(x, WORLD_MIN_X, WORLD_MAX_X, "player x");
   requirePackedRange(y, WORLD_MIN_Y, WORLD_MAX_Y, "player y");
+  requirePackedRange(velocityX, -TANK_MAX_IMPULSE_SPEED, TANK_MAX_IMPULSE_SPEED, "player velocity x");
+  requirePackedRange(velocityY, -TANK_MAX_IMPULSE_SPEED, TANK_MAX_IMPULSE_SPEED, "player velocity y");
   requirePackedRange(hullX, -256, 256, "player hull x");
   requirePackedRange(hullY, -256, 256, "player hull y");
   requirePackedRange(turretX, -256, 256, "player turret x");
@@ -319,9 +325,9 @@ function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number
   requirePackedRange(aimY, -256, 256, "player aim y");
   requirePackedRange(health, 0, NETWORK_MAX_PLAYER_HEALTH, "player health");
   requirePackedRange(armor, 0, MAX_ARMOR, "player armor");
-  requirePackedUnsigned(cooldown, 8, "player cooldown");
-  requirePackedUnsigned(respawnTicks, 8, "player respawn ticks");
-  requirePackedUnsigned(spawnProtectTicks, 8, "player spawn protect ticks");
+  requirePackedRange(cooldown, 0, 254, "player cooldown");
+  requirePackedRange(respawnTicks, 0, RESPAWN_TICKS, "player respawn ticks");
+  requirePackedRange(spawnProtectTicks, 0, SPAWN_PROTECT_TICKS, "player spawn protect ticks");
   requirePackedRange(overdriveTicks, 0, OVERDRIVE_TICKS, "player overdrive ticks");
   requirePackedRange(boostCharge, 0, TANK_BOOST_CAPACITY, "player boost charge");
   requirePackedUnsigned(lastButtons, 2, "player last buttons");
@@ -368,8 +374,8 @@ function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number
   bit = writePackedBits(target, packed, bit, generation, 16);
   bit = writePackedBits(target, packed, bit, x - WORLD_MIN_X, 15);
   bit = writePackedBits(target, packed, bit, y - WORLD_MIN_Y, 15);
-  bit = writePackedBits(target, packed, bit, velocityX >>> 0, 32);
-  bit = writePackedBits(target, packed, bit, velocityY >>> 0, 32);
+  bit = writePackedBits(target, packed, bit, velocityX + TANK_MAX_IMPULSE_SPEED, 18);
+  bit = writePackedBits(target, packed, bit, velocityY + TANK_MAX_IMPULSE_SPEED, 18);
   bit = writePackedBits(target, packed, bit, hullX + 256, 10);
   bit = writePackedBits(target, packed, bit, hullY + 256, 10);
   bit = writePackedBits(target, packed, bit, turretX + 256, 10);
@@ -378,17 +384,23 @@ function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number
   bit = writePackedBits(target, packed, bit, aimY + 256, 10);
   bit = writePackedBits(target, packed, bit, health, 8);
   bit = writePackedBits(target, packed, bit, armor, 7);
-  bit = writePackedBits(target, packed, bit, cooldown, 8);
-  bit = writePackedBits(target, packed, bit, respawnTicks, 8);
-  bit = writePackedBits(target, packed, bit, spawnProtectTicks, 8);
-  bit = writePackedBits(target, packed, bit, overdriveTicks, 10);
+  bit = writePackedBits(target, packed, bit, encodeNetworkCountdown(cooldown, snapshotTick, 255), 8);
+  bit = writePackedBits(target, packed, bit, encodeNetworkCountdown(respawnTicks, snapshotTick, 255), 8);
+  bit = writePackedBits(target, packed, bit, encodeNetworkCountdown(spawnProtectTicks, snapshotTick, 255), 8);
+  bit = writePackedBits(target, packed, bit, encodeNetworkCountdown(overdriveTicks, snapshotTick, 1_023), 10);
   bit = writePackedBits(target, packed, bit, boostTicks, 1);
   bit = writePackedBits(target, packed, bit, boostCharge, 7);
-  bit = writePackedBits(target, packed, bit, lastSequence, 16);
+  bit = writePackedBits(
+    target,
+    packed,
+    bit,
+    lastInputValid === 0 ? lastSequence : positiveModulo(lastSequence - snapshotTick, 1 << 16),
+    16,
+  );
   bit = writePackedBits(target, packed, bit, score >>> 0, 32);
   bit = writePackedBits(target, packed, bit, deaths >>> 0, 32);
   bit = writePackedBits(target, packed, bit, credits >>> 0, 32);
-  bit = writePackedBits(target, packed, bit, lastInputTick, 32);
+  bit = writePackedBits(target, packed, bit, lastInputValid === 0 ? 0 : (lastInputTick - snapshotTick) >>> 0, 32);
   bit = writePackedBits(target, packed, bit, lastInputValid, 1);
   bit = writePackedBits(target, packed, bit, lastMoveX + 128, 8);
   bit = writePackedBits(target, packed, bit, lastMoveY + 128, 8);
@@ -405,11 +417,11 @@ function compactNetworkPlayer(source: DataView, target: Uint8Array, slot: number
   for (let weaponId = 1; weaponId <= WEAPON_COUNT; weaponId += 1) {
     bit = writePackedBits(target, packed, bit, source.getUint16(raw + 80 + weaponId * 2, true), 9);
   }
-  bit = writePackedBits(target, packed, bit, 0, 6);
+  bit = writePackedBits(target, packed, bit, 0, 2);
   if (bit !== NETWORK_PLAYER_SNAPSHOT_BYTES * 8) throw new Error("network player schema width mismatch");
 }
 
-function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number): void {
+function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number, snapshotTick: number): void {
   const raw = SNAPSHOT_HEADER_BYTES + slot * PLAYER_SNAPSHOT_BYTES;
   const packed = NETWORK_PLAYER_OFFSET + slot * NETWORK_PLAYER_SNAPSHOT_BYTES;
   let bit = 0;
@@ -431,10 +443,10 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
   bit += 15;
   const y = readPackedBits(source, packed, bit, 15) + WORLD_MIN_Y;
   bit += 15;
-  const velocityX = readPackedBits(source, packed, bit, 32) | 0;
-  bit += 32;
-  const velocityY = readPackedBits(source, packed, bit, 32) | 0;
-  bit += 32;
+  const velocityX = readPackedBits(source, packed, bit, 18) - TANK_MAX_IMPULSE_SPEED;
+  bit += 18;
+  const velocityY = readPackedBits(source, packed, bit, 18) - TANK_MAX_IMPULSE_SPEED;
+  bit += 18;
   const hullX = readPackedBits(source, packed, bit, 10) - 256;
   bit += 10;
   const hullY = readPackedBits(source, packed, bit, 10) - 256;
@@ -451,19 +463,19 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
   bit += 8;
   const armor = readPackedBits(source, packed, bit, 7);
   bit += 7;
-  const cooldown = readPackedBits(source, packed, bit, 8);
+  const cooldown = decodeNetworkCountdown(readPackedBits(source, packed, bit, 8), snapshotTick, 255);
   bit += 8;
-  const respawnTicks = readPackedBits(source, packed, bit, 8);
+  const respawnTicks = decodeNetworkCountdown(readPackedBits(source, packed, bit, 8), snapshotTick, 255);
   bit += 8;
-  const spawnProtectTicks = readPackedBits(source, packed, bit, 8);
+  const spawnProtectTicks = decodeNetworkCountdown(readPackedBits(source, packed, bit, 8), snapshotTick, 255);
   bit += 8;
-  const overdriveTicks = readPackedBits(source, packed, bit, 10);
+  const overdriveTicks = decodeNetworkCountdown(readPackedBits(source, packed, bit, 10), snapshotTick, 1_023);
   bit += 10;
   const boostTicks = readPackedBits(source, packed, bit, 1);
   bit += 1;
   const boostCharge = readPackedBits(source, packed, bit, 7);
   bit += 7;
-  const lastSequence = readPackedBits(source, packed, bit, 16);
+  const lastSequencePhase = readPackedBits(source, packed, bit, 16);
   bit += 16;
   const score = readPackedBits(source, packed, bit, 32) | 0;
   bit += 32;
@@ -471,10 +483,12 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
   bit += 32;
   const credits = readPackedBits(source, packed, bit, 32) | 0;
   bit += 32;
-  const lastInputTick = readPackedBits(source, packed, bit, 32);
+  const lastInputTickPhase = readPackedBits(source, packed, bit, 32);
   bit += 32;
   const lastInputValid = readPackedBits(source, packed, bit, 1);
   bit += 1;
+  const lastSequence = lastInputValid === 0 ? lastSequencePhase : (lastSequencePhase + snapshotTick) & 0xffff;
+  const lastInputTick = lastInputValid === 0 ? 0 : (lastInputTickPhase + snapshotTick) >>> 0;
   const lastMoveX = readPackedBits(source, packed, bit, 8) - 128;
   bit += 8;
   const lastMoveY = readPackedBits(source, packed, bit, 8) - 128;
@@ -499,7 +513,7 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
   bit += 12;
   const mode = readPackedBits(source, packed, bit, 2);
   bit += 2;
-  if (bit + WEAPON_COUNT * 9 + 6 !== NETWORK_PLAYER_SNAPSHOT_BYTES * 8) {
+  if (bit + WEAPON_COUNT * 9 + 2 !== NETWORK_PLAYER_SNAPSHOT_BYTES * 8) {
     throw new Error("network player schema width mismatch");
   }
   if (active > 1 || weapon > WEAPON_COUNT || damageLevel > 3 || mobilityLevel > 3 || armorLevel > 3) {
@@ -507,6 +521,14 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
   }
   if (x < WORLD_MIN_X || x > WORLD_MAX_X || y < WORLD_MIN_Y || y > WORLD_MAX_Y) {
     throw new Error("network player position is invalid");
+  }
+  if (
+    velocityX < -TANK_MAX_IMPULSE_SPEED ||
+    velocityX > TANK_MAX_IMPULSE_SPEED ||
+    velocityY < -TANK_MAX_IMPULSE_SPEED ||
+    velocityY > TANK_MAX_IMPULSE_SPEED
+  ) {
+    throw new Error("network player velocity is invalid");
   }
   if (
     hullX < -256 ||
@@ -527,6 +549,9 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
   if (
     health > NETWORK_MAX_PLAYER_HEALTH ||
     armor > MAX_ARMOR ||
+    cooldown > 254 ||
+    respawnTicks > RESPAWN_TICKS ||
+    spawnProtectTicks > SPAWN_PROTECT_TICKS ||
     lastButtons > 3 ||
     weaponRequest > WEAPON_COUNT ||
     chassis > CHASSIS_COUNT ||
@@ -559,7 +584,7 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
     if (ammo > weaponById(weaponId).maximumAmmo) throw new Error("network player ammo exceeds weapon capacity");
     target.setUint16(raw + 82 + (weaponId - 1) * 2, ammo, true);
   }
-  if (packedRecordHasNonZeroBits(source, packed, bit, 6)) throw new Error("network player reserved bits are nonzero");
+  if (packedRecordHasNonZeroBits(source, packed, bit, 2)) throw new Error("network player reserved bits are nonzero");
 
   target.setUint8(raw, active);
   target.setUint8(raw + 1, team);
@@ -604,6 +629,23 @@ function expandNetworkPlayer(source: Uint8Array, target: DataView, slot: number)
   target.setUint16(raw + 80, weaponUpgradeSelections, true);
   target.setUint8(raw + 94, mode);
   target.setUint8(raw + 95, lastInputValid);
+}
+
+/**
+ * Zero is a stable inactive sentinel. Active countdowns carry their absolute
+ * expiry phase modulo `period`, so a timer decrementing with the world tick is
+ * byte-identical until it reaches zero. The simulation bounds remain below the
+ * period, making reconstruction exact rather than approximate.
+ */
+function encodeNetworkCountdown(value: number, snapshotTick: number, period: number): number {
+  return value === 0 ? 0 : positiveModulo(snapshotTick + value, period) + 1;
+}
+
+function decodeNetworkCountdown(encoded: number, snapshotTick: number, period: number): number {
+  if (encoded === 0) return 0;
+  const value = positiveModulo(encoded - 1 - positiveModulo(snapshotTick, period), period);
+  if (value === 0) throw new Error("network countdown is noncanonical");
+  return value;
 }
 
 /** Reads the named delta base without allocating or decoding the frame. */
