@@ -77,7 +77,11 @@ test("content fingerprint rotates when a pinned native build input changes", asy
   }
   const first = await fingerprintNativeArtifacts({ root });
   const cmake = path.join(root, "native/webtransport-cpp/CMakeLists.txt");
-  await writeFile(cmake, `${await readFile(cmake, "utf8")}\n# fingerprint fixture mutation\n`);
+  const cmakeSource = await readFile(cmake, "utf8");
+  await writeFile(cmake, cmakeSource.replace(/\n/gu, "\r\n"));
+  assert.equal(await fingerprintNativeArtifacts({ root }), first,
+    "Git line-ending materialization must not change a content-addressed release identity");
+  await writeFile(cmake, `${cmakeSource}\n# fingerprint fixture mutation\n`);
   const second = await fingerprintNativeArtifacts({ root });
   assert.match(first, /^[0-9a-f]{64}$/u);
   assert.notEqual(second, first);

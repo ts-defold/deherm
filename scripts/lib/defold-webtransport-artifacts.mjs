@@ -120,13 +120,17 @@ const fingerprintTrees = Object.freeze([
 
 export async function fingerprintNativeArtifacts({ root = repositoryRoot } = {}) {
   const hash = createHash("sha256");
-  hash.update("deherm.defold-webtransport-native-artifacts.v2\0");
+  hash.update("deherm.defold-webtransport-native-artifacts.v3\0");
   const relatives = [...fingerprintFiles, "native/webtransport-cpp/CMakeLists.txt"];
   for (const tree of fingerprintTrees) {
     for (const relative of await filesBelow(path.join(root, tree))) relatives.push(path.posix.join(tree, relative));
   }
   for (const relative of [...new Set(relatives)].sort(compare)) {
-    const bytes = await readFile(path.join(root, ...relative.split("/")));
+    // Every declared fingerprint input is source text. Git may materialize that
+    // text with CRLF on Windows; hash its canonical LF form so all builders
+    // package the release identity planned by the Linux authority job.
+    const source = await readFile(path.join(root, ...relative.split("/")), "utf8");
+    const bytes = Buffer.from(source.replace(/\r\n?/gu, "\n"), "utf8");
     hash.update(`${relative}\0${bytes.byteLength}\0`);
     hash.update(bytes);
   }

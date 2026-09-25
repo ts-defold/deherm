@@ -3342,3 +3342,13 @@ so MSBuild resolves its selected configuration and Ninja/Make retain their
 existing paths. A source-level contract test guards the distinction. Local
 single-config native compilation and tests remain separate evidence; the
 replacement Windows matrix is the authority for the MSBuild path.
+
+The matrix then proved the Windows compile, native runtime test, and archive
+upload, but its final cross-host audit found that the Windows packager had
+computed a different release fingerprint from the Linux planner. Git had
+materialized the same source text with CRLF, and the fingerprint hashed checkout
+bytes rather than canonical source text. Native artifact identity v3 now hashes
+all declared text inputs after deterministic LF normalization. A fixture
+rewrites the CMake input to CRLF and requires the identity to remain unchanged;
+real source edits still rotate it. The earlier mixed-identity release remains
+invalid evidence and is not consumed by the generated index.
