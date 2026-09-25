@@ -118,8 +118,14 @@ export interface MatchServerStats {
   inputsLate: number;
 }
 
-const SNAPSHOT_IN_FLIGHT_STREAMS = 8;
-const SNAPSHOT_STALE_MILLISECONDS = 300;
+const SNAPSHOT_IN_FLIGHT_STREAMS = 2;
+// Snapshot streams are bounded by count, so the stale watchdog protects
+// liveness rather than memory. Size it from the bytes already admitted ahead
+// of this frame at a deliberately low supported application-payload rate. A
+// fixed sub-second deadline recreates starvation whenever one recovery frame
+// legitimately needs longer than that to cross a capped link.
+const SNAPSHOT_MINIMUM_SERIALIZATION_BITS_PER_SECOND = 20_000;
+const SNAPSHOT_STALE_GRACE_MILLISECONDS = 1_000;
 // The ordered client stream can deliver several complete frames while the
 // first HELLO is waiting on an asynchronous credential provider. Preserve the
 // stream's order in a fixed-capacity queue instead of dispatching later control
@@ -130,6 +136,9 @@ const RELIABLE_DISPATCH_BYTE_CAPACITY = 256 * 1024;
 interface SnapshotStreamSend {
   readonly tick: number;
   readonly controller: AbortController;
+  readonly byteLength: number;
+  readonly keyframe: boolean;
+  readonly recovery: boolean;
   readonly staleAtMilliseconds: number;
 }
 const WELCOME_ACK_TIMEOUT_TICKS = TICK_RATE * 5;
@@ -625,8 +634,25 @@ export class ServerSession implements TransportReceiver {
     if (transport === undefined || this.closed) return false;
     const now = this.server.nowMilliseconds();
     this.expireStaleSnapshots(now);
+    // Keep at most two latest-state writes admitted to the transport per
+    // session. Two streams fill one bandwidth-delay product while the first
+    // crosses the path; a larger queue mostly retains obsolete state.
+    // Superseding a frame every snapshot tick can starve a capped
+    // link forever when serialization plus latency exceeds the snapshot
+    // interval: every stream is cancelled immediately before it completes.
+    // Skipping this candidate preserves a bounded queue and lets the admitted
+    // frame establish a usable acknowledgement base. The next cadence samples
+    // fresh authoritative state rather than retaining a pending copy.
+    let admittedSnapshotWrites = 0;
+    for (const send of this.snapshotSends) {
+      if (send !== undefined && !send.controller.signal.aborted) admittedSnapshotWrites += 1;
+    }
+    if (admittedSnapshotWrites >= SNAPSHOT_IN_FLIGHT_STREAMS) {
+      this.server.stats.snapshotFramesSkippedByBudget += 1;
+      return false;
+    }
     // The client retains the same fixed 64-frame history as the server. An
-    // ACK may lag the newest send by more than the eight-stream window while
+    // ACK may lag the newest send by more than the transport write window while
     // still remaining a valid delta base; throttling at eight frames created a
     // false ~3 Hz ceiling on healthy high-RTT links. Only the actual history
     // bound forces recovery to a keyframe.
@@ -669,14 +695,6 @@ export class ServerSession implements TransportReceiver {
       if (keyframe) this.forceSnapshotKeyframe = true;
       return false;
     }
-    // Only an admitted replacement supersedes older state. In particular, a
-    // recovery frame denied by its one-per-second budget must not cancel the
-    // last frame still crossing the transport boundary.
-    for (const send of this.snapshotSends) {
-      if (send !== undefined && !send.controller.signal.aborted) {
-        send.controller.abort("snapshot superseded by newer state");
-      }
-    }
     let streamSlot = -1;
     for (let offset = 0; offset < this.snapshotSends.length; offset += 1) {
       const candidate = (this.snapshotSendCursor + offset) % this.snapshotSends.length;
@@ -699,32 +717,46 @@ export class ServerSession implements TransportReceiver {
     } else {
       this.snapshotFramesSinceKeyframe += 1;
     }
-    // Every state packet owns an independent QUIC stream. Streams may finish
-    // out of order without QUIC stream-order head-of-line blocking; newer
-    // state supersedes any unfinished older write. The stale deadline and
-    // fixed ring remain the hard bound when a host ignores cancellation.
+    // Every state packet owns an independent QUIC stream. There is no
+    // connection-wide stream-order head-of-line blocking, while the bounded
+    // admitted window above prevents a bandwidth-capped link from accumulating
+    // stale state or repeatedly cancelling every frame before completion.
     const controller = new AbortController();
+    let admittedSnapshotBytes = length;
+    for (const active of this.snapshotSends) {
+      if (active !== undefined && !active.controller.signal.aborted) admittedSnapshotBytes += active.byteLength;
+    }
+    const staleAfterMilliseconds =
+      SNAPSHOT_STALE_GRACE_MILLISECONDS +
+      Math.ceil((admittedSnapshotBytes * 8 * 1_000) / SNAPSHOT_MINIMUM_SERIALIZATION_BITS_PER_SECOND);
     const send: SnapshotStreamSend = {
       tick,
       controller,
-      staleAtMilliseconds: now + SNAPSHOT_STALE_MILLISECONDS,
+      byteLength: length,
+      keyframe,
+      recovery,
+      staleAtMilliseconds: now + staleAfterMilliseconds,
     };
     this.snapshotSends[streamSlot] = send;
     void transport
       .sendReliable(TRANSPORT_CHANNEL_SNAPSHOT, this.snapshotFrame.subarray(0, length), controller.signal)
       .then(
         (disposition) => {
-          if (this.snapshotSends[streamSlot] === send) {
+          const stillOwned = this.snapshotSends[streamSlot] === send;
+          if (stillOwned) {
             this.snapshotSends[streamSlot] = undefined;
           }
+          if (stillOwned && disposition !== "sent" && send.keyframe) this.forceSnapshotKeyframe = true;
           if (disposition === "closed") {
             this.onClose(1_001, "transport closed");
           }
         },
         (error: unknown) => {
-          if (this.snapshotSends[streamSlot] === send) {
+          const stillOwned = this.snapshotSends[streamSlot] === send;
+          if (stillOwned) {
             this.snapshotSends[streamSlot] = undefined;
           }
+          if (stillOwned && send.keyframe) this.forceSnapshotKeyframe = true;
           this.server.report(error);
         },
       );
@@ -953,6 +985,10 @@ export class ServerSession implements TransportReceiver {
     for (let index = 0; index < this.snapshotSends.length; index += 1) {
       const send = this.snapshotSends[index];
       if (send === undefined || now < send.staleAtMilliseconds) continue;
+      if (send.keyframe) this.forceSnapshotKeyframe = true;
+      if (send.recovery) {
+        this.nextSnapshotRecoveryAtMilliseconds = Math.min(this.nextSnapshotRecoveryAtMilliseconds, now);
+      }
       send.controller.abort("stale snapshot");
       if (this.snapshotSends[index] === send) this.snapshotSends[index] = undefined;
     }

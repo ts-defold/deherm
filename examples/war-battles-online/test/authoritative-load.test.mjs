@@ -31,7 +31,11 @@ test("impaired load records loss, reordering, bounded queues, and all-client con
   const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
   assert.equal(evidence.transport.observed.reliableOrderViolations, 0);
   assert.equal(evidence.transport.observed.backpressuredReliable, 0);
-  assert.equal(evidence.transport.observed.sentReliable, evidence.transport.observed.deliveredReliable);
+  assert.equal(
+    evidence.transport.observed.sentReliable,
+    evidence.transport.observed.deliveredReliable + evidence.transport.observed.cancelledReliable,
+  );
+  assert.equal(evidence.transport.observed.cancelledReliable, 0);
   assert.ok(evidence.transport.observed.droppedDatagrams > 0);
   assert.equal(
     evidence.transport.observed.backpressuredDatagrams,
@@ -39,6 +43,10 @@ test("impaired load records loss, reordering, bounded queues, and all-client con
     "the production 30 Hz input cadence must remain below the modeled queue bound",
   );
   assert.ok(evidence.transport.observed.reorderedDatagrams > 0);
+  assert.ok(evidence.transport.observed.maximumSerializationDelayMilliseconds > 0);
+  assert.ok(evidence.transport.observed.peakQueuedBytes > 0);
+  assert.ok(evidence.transport.observed.clientToServerOfferedBytes > 0);
+  assert.ok(evidence.transport.observed.serverToClientOfferedBytes > 0);
   assert.ok(evidence.transport.observed.peakQueue <= evidence.transport.queueBound);
   assert.equal(evidence.transport.pendingQueue, 0);
   assert.equal(evidence.convergence.allClientsConverged, true);

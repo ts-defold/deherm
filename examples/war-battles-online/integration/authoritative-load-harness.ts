@@ -14,10 +14,30 @@ import {
   type TransportReceiver,
 } from "../core/index.ts";
 
-export const LOAD_HARNESS_SCHEMA_VERSION = 1;
-/** Conservative floor below the deterministic 98.5% impaired-run baseline. */
-export const MINIMUM_INPUT_ACCEPTANCE_RATIO = 0.95;
-export const LOAD_HARNESS_CONFIG = Object.freeze({
+export const LOAD_HARNESS_SCHEMA_VERSION = 2;
+/** Conservative floor below the deterministic capped-link impaired run. */
+export const MINIMUM_INPUT_ACCEPTANCE_RATIO = 0.93;
+
+export interface LoadHarnessConfig {
+  readonly players: number;
+  readonly ticks: number;
+  readonly seed: number;
+  readonly matchId: number;
+  readonly mapSeed: number;
+  readonly baseLatencyMilliseconds: number;
+  readonly jitterMilliseconds: number;
+  readonly datagramLossPercent: number;
+  readonly datagramQueueCapacity: number;
+  readonly reliableQueueCapacity: number;
+  readonly drainMilliseconds: number;
+  /** Per-client application-payload cap for client-to-server traffic. */
+  readonly uplinkBitsPerSecond: number;
+  /** Per-client application-payload cap for server-to-client traffic. */
+  readonly downlinkBitsPerSecond: number;
+  readonly minimumInputAcceptanceRatio: number;
+}
+
+export const LOAD_HARNESS_CONFIG: Readonly<LoadHarnessConfig> = Object.freeze({
   players: 32,
   ticks: 600,
   seed: 0x5eed_1234,
@@ -28,7 +48,10 @@ export const LOAD_HARNESS_CONFIG = Object.freeze({
   datagramLossPercent: 12,
   datagramQueueCapacity: 4,
   reliableQueueCapacity: 8,
-  drainMilliseconds: 500,
+  drainMilliseconds: 2_000,
+  uplinkBitsPerSecond: 24_000,
+  downlinkBitsPerSecond: 160_000,
+  minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO,
 });
 
 const RELIABLE_CHANNELS: readonly ReliableChannel[] = [1, 2, 3, 4];
@@ -64,6 +87,8 @@ interface PendingPacket {
   readonly sequence: number;
   readonly due: number;
   readonly receiver: TransportReceiver;
+  readonly signal?: AbortSignal;
+  readonly drop: boolean;
   readonly resolve: (disposition: SendDisposition) => void;
 }
 
@@ -73,7 +98,7 @@ interface PendingPacket {
  * datagrams are the only lane exposed to loss, reordering and backpressure.
  */
 class ImpairedNetwork {
-  readonly config: Readonly<typeof LOAD_HARNESS_CONFIG>;
+  readonly config: Readonly<LoadHarnessConfig>;
   readonly queue: PendingPacket[] = [];
   readonly stats = {
     sentReliable: 0,
@@ -84,7 +109,22 @@ class ImpairedNetwork {
     droppedDatagrams: 0,
     backpressuredDatagrams: 0,
     reorderedDatagrams: 0,
+    cancelledReliable: 0,
+    cancelledReliableBytes: 0,
+    offeredBytes: 0,
+    serializedBytes: 0,
+    deliveredBytes: 0,
+    droppedBytes: 0,
+    backpressuredBytes: 0,
+    clientToServerOfferedBytes: 0,
+    clientToServerSerializedBytes: 0,
+    clientToServerDeliveredBytes: 0,
+    serverToClientOfferedBytes: 0,
+    serverToClientSerializedBytes: 0,
+    serverToClientDeliveredBytes: 0,
+    maximumSerializationDelayMilliseconds: 0,
     peakQueue: 0,
+    peakQueuedBytes: 0,
     reliableOrderViolations: 0,
   };
 
@@ -92,11 +132,12 @@ class ImpairedNetwork {
   private nextPacketId = 1;
   private nextSequence = new Map<string, number>();
   private reliableTail = new Map<string, number>();
+  private serializationTail = new Map<string, number>();
   private lastReliableDelivered = new Map<string, number>();
   private lastDatagramDelivered = new Map<string, number>();
   private randomState: number;
 
-  constructor(config: Readonly<typeof LOAD_HARNESS_CONFIG>) {
+  constructor(config: Readonly<LoadHarnessConfig>) {
     this.config = config;
     this.randomState = config.seed >>> 0;
   }
@@ -123,6 +164,18 @@ class ImpairedNetwork {
       if (selected < 0) break;
       const [packet] = this.queue.splice(selected, 1);
       this.now = packet!.due;
+      if (packet!.signal?.aborted === true) {
+        this.stats.cancelledReliable += 1;
+        this.stats.cancelledReliableBytes += packet!.payload.byteLength;
+        packet!.resolve("sent");
+        continue;
+      }
+      if (packet!.drop) {
+        this.stats.droppedDatagrams += 1;
+        this.stats.droppedBytes += packet!.payload.byteLength;
+        packet!.resolve("sent");
+        continue;
+      }
       if (packet!.kind === "reliable") {
         this.stats.deliveredReliable += 1;
         const key = `${packet!.linkId}:${packet!.direction}:${packet!.channel}`;
@@ -138,6 +191,12 @@ class ImpairedNetwork {
         this.lastDatagramDelivered.set(key, Math.max(previous ?? -1, packet!.sequence));
         packet!.receiver!.onDatagram(packet!.payload);
       }
+      this.stats.deliveredBytes += packet!.payload.byteLength;
+      if (packet!.direction === "client-to-server") {
+        this.stats.clientToServerDeliveredBytes += packet!.payload.byteLength;
+      } else {
+        this.stats.serverToClientDeliveredBytes += packet!.payload.byteLength;
+      }
       packet!.resolve("sent");
     }
     this.now = target;
@@ -150,10 +209,16 @@ class ImpairedNetwork {
     kind: "reliable" | "datagram",
     payload: Uint8Array,
     channel?: ReliableChannel,
+    signal?: AbortSignal,
   ): Promise<SendDisposition> {
+    if (signal?.aborted === true) return Promise.resolve("sent");
+    this.stats.offeredBytes += payload.byteLength;
+    if (direction === "client-to-server") this.stats.clientToServerOfferedBytes += payload.byteLength;
+    else this.stats.serverToClientOfferedBytes += payload.byteLength;
     const sequenceKey = `${linkId}:${direction}:${kind}:${channel ?? 0}`;
     const sequence = this.nextSequence.get(sequenceKey) ?? 0;
     this.nextSequence.set(sequenceKey, sequence + 1);
+    let drop = false;
     if (kind === "datagram") {
       this.stats.sentDatagrams += 1;
       const pending = this.queue.filter(
@@ -161,12 +226,13 @@ class ImpairedNetwork {
       ).length;
       if (pending >= this.config.datagramQueueCapacity) {
         this.stats.backpressuredDatagrams += 1;
+        this.stats.backpressuredBytes += payload.byteLength;
         return Promise.resolve("backpressured");
       }
-      if (this.nextRandom() < this.config.datagramLossPercent) {
-        this.stats.droppedDatagrams += 1;
-        return Promise.resolve("sent");
-      }
+      // Model path loss after the sender-side bottleneck. A lost datagram still
+      // consumes the configured link rate; otherwise loss would incorrectly
+      // create free bandwidth and make a congested profile less congested.
+      drop = this.nextRandom() < this.config.datagramLossPercent;
     } else {
       this.stats.sentReliable += 1;
       const pending = this.queue.filter(
@@ -178,11 +244,27 @@ class ImpairedNetwork {
       ).length;
       if (pending >= this.config.reliableQueueCapacity) {
         this.stats.backpressuredReliable += 1;
+        this.stats.backpressuredBytes += payload.byteLength;
         return Promise.resolve("backpressured");
       }
     }
+    const bitsPerSecond =
+      direction === "client-to-server" ? this.config.uplinkBitsPerSecond : this.config.downlinkBitsPerSecond;
+    if (!Number.isFinite(bitsPerSecond) || bitsPerSecond <= 0) throw new RangeError("link speed must be positive");
+    const serializationKey = `${linkId}:${direction}`;
+    const serializationStart = Math.max(this.now, this.serializationTail.get(serializationKey) ?? this.now);
+    const serializationMilliseconds = (payload.byteLength * 8 * 1_000) / bitsPerSecond;
+    const serializationEnd = serializationStart + serializationMilliseconds;
+    this.serializationTail.set(serializationKey, serializationEnd);
+    this.stats.serializedBytes += payload.byteLength;
+    if (direction === "client-to-server") this.stats.clientToServerSerializedBytes += payload.byteLength;
+    else this.stats.serverToClientSerializedBytes += payload.byteLength;
+    this.stats.maximumSerializationDelayMilliseconds = Math.max(
+      this.stats.maximumSerializationDelayMilliseconds,
+      serializationEnd - this.now,
+    );
     const jitter = this.nextInteger(-this.config.jitterMilliseconds, this.config.jitterMilliseconds);
-    const proposed = this.now + this.config.baseLatencyMilliseconds + jitter;
+    const proposed = serializationEnd + this.config.baseLatencyMilliseconds + jitter;
     const orderedKey = `${linkId}:${direction}:${channel ?? 0}`;
     const due =
       kind === "reliable"
@@ -201,9 +283,13 @@ class ImpairedNetwork {
         due,
         resolve,
         receiver,
+        signal,
+        drop,
       };
       this.queue.push(packet);
       if (this.queue.length > this.stats.peakQueue) this.stats.peakQueue = this.queue.length;
+      const queuedBytes = this.queue.reduce((total, queued) => total + queued.payload.byteLength, 0);
+      if (queuedBytes > this.stats.peakQueuedBytes) this.stats.peakQueuedBytes = queuedBytes;
     });
   }
 
@@ -246,9 +332,9 @@ class ImpairedTransport implements GameTransport {
     this.receiver = receiver;
   }
 
-  sendReliable(channel: ReliableChannel, payload: Uint8Array, _signal?: AbortSignal): Promise<SendDisposition> {
+  sendReliable(channel: ReliableChannel, payload: Uint8Array, signal?: AbortSignal): Promise<SendDisposition> {
     if (this.closed) return Promise.resolve("closed");
-    return this.network.enqueue(this.linkId, this.direction, this.receiver, "reliable", payload, channel);
+    return this.network.enqueue(this.linkId, this.direction, this.receiver, "reliable", payload, channel, signal);
   }
 
   trySendDatagram(payload: Uint8Array): Promise<SendDisposition> {
@@ -312,7 +398,7 @@ export interface AuthoritativeLoadObserver {
 }
 
 export async function runAuthoritativeLoadHarness(
-  config: Readonly<typeof LOAD_HARNESS_CONFIG> = LOAD_HARNESS_CONFIG,
+  config: Readonly<LoadHarnessConfig> = LOAD_HARNESS_CONFIG,
   observer?: AuthoritativeLoadObserver,
 ): Promise<LoadHarnessEvidence> {
   const serverErrors: string[] = [];
@@ -368,6 +454,19 @@ export async function runAuthoritativeLoadHarness(
   await Promise.resolve();
   for (const client of clients) client.update(0);
   await Promise.resolve();
+  const workloadStartMilliseconds = simulationTime;
+  const workloadStartBytes = {
+    offered: network.stats.offeredBytes,
+    serialized: network.stats.serializedBytes,
+    delivered: network.stats.deliveredBytes,
+    dropped: network.stats.droppedBytes,
+    backpressured: network.stats.backpressuredBytes,
+    cancelledReliable: network.stats.cancelledReliableBytes,
+    clientToServerSerialized: network.stats.clientToServerSerializedBytes,
+    clientToServerDelivered: network.stats.clientToServerDeliveredBytes,
+    serverToClientSerialized: network.stats.serverToClientSerializedBytes,
+    serverToClientDelivered: network.stats.serverToClientDeliveredBytes,
+  };
   for (let tick = 1; tick <= config.ticks; tick += 1) {
     network.advanceTo(simulationTime);
     await Promise.resolve();
@@ -395,6 +494,19 @@ export async function runAuthoritativeLoadHarness(
     await Promise.resolve();
     simulationTime += TICK_MILLISECONDS;
   }
+  const workloadDurationMilliseconds = simulationTime - workloadStartMilliseconds;
+  const workloadBytes = {
+    offered: network.stats.offeredBytes - workloadStartBytes.offered,
+    serialized: network.stats.serializedBytes - workloadStartBytes.serialized,
+    delivered: network.stats.deliveredBytes - workloadStartBytes.delivered,
+    dropped: network.stats.droppedBytes - workloadStartBytes.dropped,
+    backpressured: network.stats.backpressuredBytes - workloadStartBytes.backpressured,
+    cancelledReliable: network.stats.cancelledReliableBytes - workloadStartBytes.cancelledReliable,
+    clientToServerSerialized: network.stats.clientToServerSerializedBytes - workloadStartBytes.clientToServerSerialized,
+    clientToServerDelivered: network.stats.clientToServerDeliveredBytes - workloadStartBytes.clientToServerDelivered,
+    serverToClientSerialized: network.stats.serverToClientSerializedBytes - workloadStartBytes.serverToClientSerialized,
+    serverToClientDelivered: network.stats.serverToClientDeliveredBytes - workloadStartBytes.serverToClientDelivered,
+  };
 
   // Prediction intentionally leaves each client at its adaptive lead. Stop
   // producing commands, advance the server through the furthest predicted
@@ -411,6 +523,30 @@ export async function runAuthoritativeLoadHarness(
   // Reliable frames are allowed to settle, including the final pending
   // snapshot for each session. update(0) applies the latest decoded frame
   // without creating another predicted command.
+  for (let step = 0; step <= config.drainMilliseconds; step += 1) {
+    network.advanceTo(simulationTime + step);
+    await Promise.resolve();
+    for (const client of clients) client.update(0);
+    await Promise.resolve();
+    if (network.queue.length === 0) break;
+  }
+  network.advanceTo(simulationTime + config.drainMilliseconds + 1);
+  simulationTime += config.drainMilliseconds + 1;
+  await Promise.resolve();
+  for (const client of clients) client.update(0);
+  await Promise.resolve();
+
+  // A cadence may have been intentionally skipped while the prior latest-state
+  // write serialized through the capped downlink. Once that write is drained,
+  // advance to one fresh authoritative cadence and deliver it. This is an
+  // explicit end-of-run convergence probe, not extra recovery available during
+  // the measured ten-second workload.
+  for (let step = 0; step < server.snapshotIntervalTicks; step += 1) {
+    server.step();
+    simulationTime += TICK_MILLISECONDS;
+    network.advanceTo(simulationTime);
+    await Promise.resolve();
+  }
   for (let step = 0; step <= config.drainMilliseconds; step += 1) {
     network.advanceTo(simulationTime + step);
     await Promise.resolve();
@@ -459,6 +595,9 @@ export async function runAuthoritativeLoadHarness(
   const reliableOrderPreserved = network.stats.reliableOrderViolations === 0;
   const reliableDeliveryComplete =
     network.stats.backpressuredReliable === 0 && network.stats.sentReliable === network.stats.deliveredReliable;
+  const reliableDeliveryAccounted =
+    network.stats.backpressuredReliable === 0 &&
+    network.stats.sentReliable === network.stats.deliveredReliable + network.stats.cancelledReliable;
   const noErrors = serverErrors.length === 0 && clientErrors.every((errors) => errors.length === 0);
   // Capacity is enforced independently for both directions of every link and,
   // for reliable traffic, independently per channel. This is the structural
@@ -482,15 +621,15 @@ export async function runAuthoritativeLoadHarness(
     !allConverged ||
     uniquePlayerIds.size !== config.players ||
     !reliableOrderPreserved ||
-    !reliableDeliveryComplete ||
+    !reliableDeliveryAccounted ||
     !everyClientAttemptedEverySendOpportunity ||
-    inputAcceptanceRatio < MINIMUM_INPUT_ACCEPTANCE_RATIO ||
+    inputAcceptanceRatio < config.minimumInputAcceptanceRatio ||
     !noErrors ||
     !boundedQueues ||
     network.queue.length !== 0
   ) {
     throw new Error(
-      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, everyClientAttemptedEverySendOpportunity, inputAcceptanceRatio, minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO, noErrors, pending: network.queue.length, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
+      `authoritative load harness failed: ${JSON.stringify({ allConverged, uniquePlayerIds: uniquePlayerIds.size, reliableOrderPreserved, reliableDeliveryComplete, reliableDeliveryAccounted, everyClientAttemptedEverySendOpportunity, inputAcceptanceRatio, minimumInputAcceptanceRatio: config.minimumInputAcceptanceRatio, noErrors, pending: network.queue.length, network: network.stats, serverTick: server.world.tick, serverErrors, clientErrors, rows: clientRows.filter((client) => !client.converged) })}`,
     );
   }
   return Object.freeze({
@@ -505,6 +644,15 @@ export async function runAuthoritativeLoadHarness(
       latencyMilliseconds: config.baseLatencyMilliseconds,
       jitterMilliseconds: config.jitterMilliseconds,
       datagramLossPercent: config.datagramLossPercent,
+      uplinkBitsPerSecond: config.uplinkBitsPerSecond,
+      downlinkBitsPerSecond: config.downlinkBitsPerSecond,
+      capBoundary:
+        "application payload serialization; workload utilization counts bytes admitted during its exact ten-second window and excludes QUIC/HTTP3/TLS/UDP/IP framing and congestion control",
+      modeledDurationMilliseconds: network.time(),
+      workload: {
+        durationMilliseconds: workloadDurationMilliseconds,
+        bytes: workloadBytes,
+      },
       observed: { ...network.stats },
       pendingQueue: network.queue.length,
       queueCapacity: config.datagramQueueCapacity,
@@ -517,6 +665,10 @@ export async function runAuthoritativeLoadHarness(
       humans: server.stats.humans,
       bots: server.stats.bots,
       snapshotsSent: server.stats.snapshotsSent,
+      snapshotBytesSent: server.stats.snapshotBytesSent,
+      snapshotNormalFramesSent: server.stats.snapshotNormalFramesSent,
+      snapshotRecoveryFramesSent: server.stats.snapshotRecoveryFramesSent,
+      snapshotFramesSkippedByBudget: server.stats.snapshotFramesSkippedByBudget,
       inputsAccepted: server.stats.inputsAccepted,
       inputsRejected: server.stats.inputsRejected,
       inputsLate: server.stats.inputsLate,
@@ -524,7 +676,7 @@ export async function runAuthoritativeLoadHarness(
       inputAcceptanceRatio,
       inputLateRatio,
       inputCommandsUnobserved,
-      minimumInputAcceptanceRatio: MINIMUM_INPUT_ACCEPTANCE_RATIO,
+      minimumInputAcceptanceRatio: config.minimumInputAcceptanceRatio,
       logs: serverLogs.length,
       sessionsReady: sessions.filter((session) => session.ready).length,
     },

@@ -91,7 +91,7 @@ class BackpressuredSnapshotSession {
   }
 }
 
-test("a newer authoritative snapshot resets a blocked stream and crosses the realistic adapter", async () => {
+test("two snapshots pipeline across a blocked stream and the bounded window coalesces newer state", async () => {
   const host = new BackpressuredSnapshotSession();
   const transport = await adoptServerWebTransportSession(host, receiver());
   const server = new MatchServer({ rosterSize: 2, nowMilliseconds: () => 0 });
@@ -105,15 +105,15 @@ test("a newer authoritative snapshot resets a blocked stream and crosses the rea
   session.sendSnapshot(new Uint8Array(SNAPSHOT_BYTES), 6);
   await settleUntil(
     () => host.outgoing.length === 2 && host.outgoing[1].chunks.length === 2,
-    "the replacement snapshot payload",
+    "the pipelined snapshot payload",
   );
 
-  assert.equal(host.outgoing[0].aborts, 1, "the stale stream is reset rather than left ahead of current state");
-  assert.equal(host.outgoing[0].releases, 1);
+  assert.equal(host.outgoing[0].aborts, 0, "the first stream must be allowed to establish a usable state base");
+  assert.equal(host.outgoing[0].releases, 0);
   assert.equal(host.outgoing[1].closes, 1);
   assert.equal(host.outgoing[1].chunks[0][0], TRANSPORT_CHANNEL_SNAPSHOT);
   assert.equal(readSnapshotTick(host.outgoing[1].chunks[1]), 6);
-  assert.equal(host.closeCalls, 0, "stream-local supersession must not close the WebTransport session");
+  assert.equal(host.closeCalls, 0, "snapshot coalescing must not close the WebTransport session");
 
   server.close();
   assert.equal(host.closeCalls, 1);
@@ -149,6 +149,30 @@ test("settled snapshot sends never consume the fixed unfinished-work slots", asy
     "settled operations leave no stale abort target",
   );
   assert.equal(readSnapshotTick(frames.at(-1)), 60);
+  server.close();
+});
+
+test("unfinished ordinary snapshots are bounded to a two-stream bandwidth-delay window", () => {
+  const frames = [];
+  const server = new MatchServer({ rosterSize: 2, nowMilliseconds: () => 0 });
+  const session = server.createSession();
+  session.attach({
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(channel, payload) {
+      assert.equal(channel, TRANSPORT_CHANNEL_SNAPSHOT);
+      frames.push(payload.slice());
+      return new Promise(() => {});
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  });
+  const source = new Uint8Array(SNAPSHOT_BYTES);
+  assert.equal(session.sendSnapshot(source, 3), true);
+  assert.equal(session.sendSnapshot(source, 6), true);
+  assert.equal(session.sendSnapshot(source, 9), false);
+  assert.equal(frames.length, 2);
+  assert.deepEqual(frames.map(readSnapshotTick), [3, 6]);
+  assert.equal(server.stats.snapshotFramesSkippedByBudget, 1);
   server.close();
 });
 
@@ -197,7 +221,120 @@ test("large recovery frames have one-per-second credit without cancelling the la
   nowMilliseconds = 1_000;
   assert.equal(session.sendSnapshot(source, 12), true);
   assert.equal(frames.length, 2);
-  assert.equal(signals[0].aborted, true, "the next admitted recovery supersedes the old stream");
+  assert.equal(signals[0].aborted, false, "a valid capped-link recovery retains its serialization budget");
   assert.equal(server.stats.snapshotRecoveryFramesSent, 2);
+  nowMilliseconds = 2_000;
+  assert.equal(session.sendSnapshot(source, 16), false);
+  assert.equal(frames.length, 2);
+  assert.equal(signals[1].aborted, false);
+  assert.equal(server.stats.snapshotFramesSkippedByBudget, 2);
+  nowMilliseconds = 10_000;
+  assert.equal(session.sendSnapshot(source, 20), true);
+  assert.equal(frames.length, 3);
+  assert.equal(signals[0].aborted, true, "the size-aware watchdog still retires a genuinely stuck stream");
+  assert.equal(signals[1].aborted, true, "the bounded second stream also expires after its byte budget");
+  server.close();
+});
+
+test("a recovery frame slower than 300 ms crosses the supported capped link", async () => {
+  let nowMilliseconds = 0;
+  let serializationTail = 0;
+  let firstDue = -1;
+  let firstLength = -1;
+  let delivered = 0;
+  const pending = [];
+  const server = new MatchServer({ rosterSize: 32, nowMilliseconds: () => nowMilliseconds });
+  const session = server.createSession();
+  session.attach({
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(channel, payload, signal) {
+      assert.equal(channel, TRANSPORT_CHANNEL_SNAPSHOT);
+      const serializationStart = Math.max(nowMilliseconds, serializationTail);
+      serializationTail = serializationStart + (payload.byteLength * 8 * 1_000) / 128_000;
+      const due = serializationTail + 70;
+      if (firstDue < 0) {
+        firstDue = due;
+        firstLength = payload.byteLength;
+      }
+      return new Promise((resolve) => pending.push({ due, signal, resolve }));
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  });
+  const source = new Uint8Array(SNAPSHOT_BYTES);
+  for (let slot = 0; slot < 200; slot += 1) {
+    server.world.projectileActive[slot] = 1;
+    server.world.projectileGeneration[slot] = 1;
+    server.world.projectileOwner[slot] = (slot % 32) + 1;
+    server.world.projectileWeapon[slot] = 1;
+    server.world.projectileDamage[slot] = 30;
+    server.world.projectileDirectionX[slot] = 256;
+    server.world.projectileLife[slot] = 75;
+    server.world.projectileSpeed[slot] = 176;
+    server.world.projectileRadius[slot] = 80;
+  }
+  server.world.writeSnapshot(source);
+  assert.equal(session.sendSnapshot(source, 4), true);
+  assert.ok(firstLength > 3_680, `fixture must cross the old edge-profile cliff (${firstLength} bytes)`);
+  assert.ok(firstDue > 300, `fixture must need more than the old stale deadline (${firstDue} ms)`);
+
+  nowMilliseconds = 301;
+  assert.equal(
+    session.sendSnapshot(source, 8),
+    false,
+    "recovery credit coalesces instead of cancelling the first frame",
+  );
+  assert.equal(pending[0].signal.aborted, false);
+
+  nowMilliseconds = firstDue;
+  for (const packet of pending) {
+    if (packet.due > nowMilliseconds) continue;
+    if (!packet.signal.aborted) delivered += 1;
+    packet.resolve(packet.signal.aborted ? "backpressured" : "sent");
+  }
+  await Promise.resolve();
+  assert.equal(delivered, 1);
+  assert.equal(pending[0].signal.aborted, false);
+  server.close();
+});
+
+test("a transport-rejected recovery frame retains its one-second retry credit", async () => {
+  let nowMilliseconds = 0;
+  let attempts = 0;
+  const server = new MatchServer({ rosterSize: 32, nowMilliseconds: () => nowMilliseconds });
+  const session = server.createSession();
+  session.attach({
+    capabilities: { protocol: "in-memory", reliableStreams: true, datagrams: false, maxDatagramBytes: 0 },
+    sendReliable(channel, payload) {
+      assert.equal(channel, TRANSPORT_CHANNEL_SNAPSHOT);
+      assert.ok(payload.byteLength > SNAPSHOT_NORMAL_MAX_BYTES);
+      attempts += 1;
+      return Promise.resolve("backpressured");
+    },
+    trySendDatagram: async () => "closed",
+    close() {},
+  });
+  const source = new Uint8Array(SNAPSHOT_BYTES);
+  for (let slot = 0; slot < 128; slot += 1) {
+    server.world.projectileActive[slot] = 1;
+    server.world.projectileGeneration[slot] = 1;
+    server.world.projectileOwner[slot] = (slot % 32) + 1;
+    server.world.projectileWeapon[slot] = 1;
+    server.world.projectileDamage[slot] = 30;
+    server.world.projectileDirectionX[slot] = 256;
+    server.world.projectileLife[slot] = 75;
+    server.world.projectileSpeed[slot] = 176;
+    server.world.projectileRadius[slot] = 80;
+  }
+  server.world.writeSnapshot(source);
+
+  assert.equal(session.sendSnapshot(source, 4), true);
+  await Promise.resolve();
+  nowMilliseconds = 67;
+  assert.equal(session.sendSnapshot(source, 8), false);
+  assert.equal(attempts, 1, "backpressure must not turn a recovery frame into a 15 Hz retry loop");
+  nowMilliseconds = 1_000;
+  assert.equal(session.sendSnapshot(source, 12), true);
+  assert.equal(attempts, 2);
   server.close();
 });

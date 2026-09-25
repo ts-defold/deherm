@@ -1024,6 +1024,47 @@ and 64,000 adversarial payload bytes/second/client, p95 at 1,100 bytes, and an
 8,000-byte keyframe. Ordinary downlink, adversarial bound, keyframe, and
 upstream targets pass; the 8,000-byte stretch and 1,100-byte p95 remain open.
 
+The production `MatchServer` and `BattleClient` also run through a deterministic
+32-client capped-link matrix owned by
+`integration/check-network-impairment.mjs`. It models per-client application-
+payload serialization in both directions plus latency, jitter, datagram loss,
+reordering, bounded queue backpressure, and stale-stream cancellation. The
+three checked profiles are 256/32 Kbit/s broadband-adverse, 160/24 Kbit/s
+mobile-congested, and 128/20 Kbit/s edge-congested downlink/uplink. All 32
+clients converge without protocol errors; their input acceptance ratios are
+97.33%, 95.05%, and 92.56% respectively. During the ten-second workload the
+three profiles consume 50.83%, 80.74%, and 84.40% of their modeled downlink
+application-payload caps; admitted packets that are later lost or cancelled
+still consume serialization capacity. The edge profile applies 70 +/- 35 ms
+one-way latency, 10% seeded datagram loss, records datagram backpressure, and
+applies 100-107 authoritative snapshots during the ten-second workload plus
+final convergence probe (the regression floor is 75).
+
+That matrix exposed snapshot starvation under a speed cap: superseding every
+unfinished independent stream could cancel each frame before its serialization
+plus latency completed. Each session now admits a two-stream bandwidth-delay
+window and coalesces newer cadence samples while it is full. This retains
+bounded latest-state behavior, pipelines enough work to use the path, and does
+not build a stale reliable queue. The stale watchdog is sized from all admitted
+snapshot bytes at a 20 Kbit/s minimum serialization rate plus one second of
+latency/scheduling grace; a focused 4.7 KB recovery-frame regression proves a
+frame taking longer than the old 300 ms cutoff is delivered, while a separate
+stuck-transport test proves the watchdog remains bounded. The checked matrix is
+production protocol and simulation code over an in-memory impairment
+transport. It is not an observed QUIC/H3 packet capture and does not include
+framing, encryption, ACK,
+retransmission, IP, link-layer, or congestion-controller bytes; real wire
+capture remains a separate gate.
+
+The fixed two-write window preserves 15 Hz while write completion stays below
+about 133 ms, but a transport that resolves only after peer acknowledgement can
+reduce cadence on higher RTT paths (measured: 10 Hz at 150 ms, 6 Hz at 300 ms,
+and 5.2 Hz at 400 ms). Before changing the bound, pin the native and Deno
+adapters' completion semantics and feed an observed RTT/serialization estimate
+into a byte-based bandwidth-delay window. The current count remains fixed and
+allocation-bounded; this is a throughput optimization frontier, not a claim of
+15 Hz at arbitrary RTT.
+
 Authenticated resume credentials, fail-closed durable admission, and local
 Docker process-restart resume are now proven at their named boundaries.
 The Deno host also owns a fixed-size, versioned and checksummed authoritative

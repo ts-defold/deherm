@@ -80,7 +80,7 @@ export function digestAuthoritativeLoadSourceInputs(sourceInputs) {
 }
 
 export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {}) {
-  assert.equal(document?.schemaVersion, 1);
+  assert.equal(document?.schemaVersion, 2);
   assert.equal(document?.kind, "war-battles.authoritative-32-player-load");
   assert.equal(document?.owner, AUTHORITATIVE_LOAD_OWNER);
   assert.equal(document?.generator, AUTHORITATIVE_LOAD_OWNER);
@@ -106,7 +106,45 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   assert.deepEqual(document.errors?.clients, []);
   assert.equal(document.transport?.pendingQueue, 0);
   assert.equal(document.transport?.observed?.backpressuredReliable, 0);
-  assert.equal(document.transport?.observed?.sentReliable, document.transport?.observed?.deliveredReliable);
+  assert.equal(
+    document.transport?.observed?.sentReliable,
+    document.transport?.observed?.deliveredReliable + document.transport?.observed?.cancelledReliable,
+  );
+  assert.equal(document.transport?.observed?.cancelledReliable, 0);
+  assert.equal(document.transport?.uplinkBitsPerSecond, document.config?.uplinkBitsPerSecond);
+  assert.equal(document.transport?.downlinkBitsPerSecond, document.config?.downlinkBitsPerSecond);
+  assert.match(document.transport?.capBoundary, /application payload/u);
+  assert.ok(
+    Math.abs(document.transport?.workload?.durationMilliseconds - document.config?.ticks * (1_000 / 60)) < 1e-6,
+  );
+  assert.ok(document.transport?.workload?.bytes?.serialized > 0);
+  assert.equal(
+    document.transport?.workload?.bytes?.serialized,
+    document.transport?.workload?.bytes?.clientToServerSerialized +
+      document.transport?.workload?.bytes?.serverToClientSerialized,
+  );
+  assert.ok(document.transport?.observed?.clientToServerOfferedBytes > 0);
+  assert.ok(document.transport?.observed?.serverToClientOfferedBytes > 0);
+  assert.ok(document.transport?.observed?.clientToServerSerializedBytes > 0);
+  assert.ok(document.transport?.observed?.serverToClientSerializedBytes > 0);
+  assert.equal(
+    document.transport?.observed?.serializedBytes,
+    document.transport?.observed?.clientToServerSerializedBytes +
+      document.transport?.observed?.serverToClientSerializedBytes,
+  );
+  assert.equal(
+    document.transport?.observed?.offeredBytes,
+    document.transport?.observed?.serializedBytes + document.transport?.observed?.backpressuredBytes,
+  );
+  assert.equal(
+    document.transport?.observed?.serializedBytes,
+    document.transport?.observed?.deliveredBytes +
+      document.transport?.observed?.droppedBytes +
+      document.transport?.observed?.cancelledReliableBytes,
+  );
+  assert.equal(document.transport?.observed?.cancelledReliableBytes, 0);
+  assert.ok(document.transport?.observed?.maximumSerializationDelayMilliseconds > 0);
+  assert.ok(document.transport?.observed?.peakQueuedBytes > 0);
   assert.ok(document.transport?.observed?.deliveredDatagrams > 0);
   assert.ok(document.transport?.observed?.droppedDatagrams > 0);
   // At the production 30 Hz input cadence the deterministic 42 +/- 25 ms link
@@ -114,7 +152,8 @@ export function assertAuthoritativeLoadEvidence(document, { sourceInputs } = {})
   // saturation; this load trace proves the ordinary cadence avoids it.
   assert.equal(document.transport?.observed?.backpressuredDatagrams, 0);
   assert.ok(document.transport?.observed?.reorderedDatagrams > 0);
-  assert.equal(document.server?.minimumInputAcceptanceRatio, 0.95);
+  assert.equal(document.server?.minimumInputAcceptanceRatio, document.config?.minimumInputAcceptanceRatio);
+  assert.equal(document.config?.minimumInputAcceptanceRatio, 0.93);
   assert.ok(document.server?.inputAcceptanceRatio >= document.server.minimumInputAcceptanceRatio);
   assert.ok(document.server?.inputsLate > 0, "deterministic impairment must exercise unique late-input accounting");
   assert.ok(document.server?.inputCommandsUnobserved >= 0);

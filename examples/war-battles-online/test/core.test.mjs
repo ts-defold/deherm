@@ -436,7 +436,7 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   assert.equal(normal.at(-1), 1_902);
 });
 
-test("snapshot admission stays bounded when a host ignores stream cancellation", async () => {
+test("snapshot admission stays bounded when a host ignores stream completion", async () => {
   const server = new MatchServer({ rosterSize: 2 });
   const session = server.createSession();
   const frames = [];
@@ -454,15 +454,15 @@ test("snapshot admission stays bounded when a host ignores stream cancellation",
   session.attach(transport);
   const first = new Uint8Array(SNAPSHOT_BYTES);
   for (let index = 0; index < 8; index += 1) session.sendSnapshot(first, 3 + index * 3);
-  assert.equal(frames.length, 8);
+  assert.equal(frames.length, 2);
   session.sendSnapshot(first, 27);
-  assert.equal(frames.length, 8, "a cancellation-ignoring host cannot grow the stream window");
+  assert.equal(frames.length, 2, "a completion-ignoring host cannot grow the stream window");
   assert.equal(frames[0][8], SNAPSHOT_KEYFRAME);
-  assert.equal(frames[7][8], SNAPSHOT_KEYFRAME, "unacknowledged state cannot become a delta base");
+  assert.equal(frames[1][8], SNAPSHOT_KEYFRAME, "unacknowledged state cannot become a delta base");
   assert.equal(
-    signals.every((signal) => signal.aborted),
+    signals.every((signal) => !signal.aborted),
     true,
-    "every obsolete operation is asked to reset",
+    "cadence coalescing must not repeatedly reset the only frames capable of establishing a base",
   );
   server.close();
 });
@@ -485,16 +485,15 @@ test("snapshot stale capacity follows the injected match clock", () => {
   };
   session.attach(transport);
   const source = new Uint8Array(SNAPSHOT_BYTES);
-  for (let tick = 3; tick <= 60; tick += 3) {
-    nowMilliseconds = tick * TICK_MILLISECONDS;
-    session.beginTick();
-    session.sendSnapshot(source, tick);
-  }
-  assert.ok(frames.length > 8, "stale streams must free capacity from the injected clock");
-  assert.ok(
-    signals.some((signal) => signal.aborted),
-    "the injected clock must abort stale streams",
-  );
+  assert.equal(session.sendSnapshot(source, 3), true);
+  assert.equal(session.sendSnapshot(source, 6), true);
+  assert.equal(session.sendSnapshot(source, 9), false);
+  nowMilliseconds = 5_000;
+  session.beginTick();
+  assert.equal(session.sendSnapshot(source, 12), true, "size-aware stale streams free injected-clock capacity");
+  assert.equal(frames.length, 3);
+  assert.equal(signals[0].aborted, true);
+  assert.equal(signals[1].aborted, true);
   server.close();
 });
 

@@ -3613,3 +3613,50 @@ performance harness expands and byte-compares every network image before using
 it for reconciliation. These are deterministic in-process codec measurements,
 not WAN packet capture, transport-overhead, wall-clock, or VM-allocation
 evidence.
+
+## 2026-09-25 - Capped-link matrix closes snapshot supersession starvation
+
+The authoritative load seam now serializes every production transport payload
+through independent per-client uplink/downlink speed caps in addition to its
+seeded latency, jitter, datagram loss, reordering, queue capacity, and
+backpressure. Loss is applied after bottleneck serialization, so a dropped
+datagram does not create free bandwidth. Its evidence schema records offered,
+serialized, delivered, dropped, cancelled, backpressured, and direction-
+attributed bytes; peak queued bytes; maximum serialization delay; ten-second
+workload utilization; and the explicit application-payload-only boundary.
+
+The first 160 Kbit/s downlink run reproduced a product failure: the server
+superseded snapshots every 66.7 ms, while serialization plus modeled latency
+often exceeded that interval. Almost every stream was cancelled before the
+client could establish a delta base, and input lead adaptation consequently
+collapsed. The server now retains a fixed two-stream bandwidth-delay window per
+session and coalesces new snapshot samples while both writes are unfinished.
+It neither grows a reliable backlog nor starves a capped path. Focused adapter
+tests prove two writes may pipeline, a third unfinished ordinary frame is
+coalesced, settled sends release capacity, and recovery/stale deadlines remain
+bounded.
+
+The sealed three-profile, 32-client matrix covers 256/32, 160/24, and 128/20
+Kbit/s downlink/uplink caps. With successively adverse latency, jitter, and
+loss, it records input acceptance of 97.33%, 95.05%, and 92.56% and downlink
+application-payload utilization of 50.83%, 80.74%, and 84.40%; zero remote
+interpolation discontinuities; bounded queues; no protocol errors; and exact
+final convergence for every client. The edge profile intentionally exercises
+datagram backpressure. Stale cancellation is instead covered by a focused
+stuck-transport regression; legitimate recovery frames receive a size-aware
+deadline derived from queued bytes, a 20 Kbit/s minimum serialization rate,
+and one second of latency/scheduling grace. A 4.7 KB frame that needs more than
+the old 300 ms cutoff now crosses the modeled 128 Kbit/s link. This is the real
+`MatchServer`, `BattleClient`, prediction, reconciliation, and wire codec
+behind a deterministic in-memory transport. It is not QUIC wire-byte,
+congestion-controller, browser, native Defold, or WAN evidence.
+
+The adversarial re-review independently reproduced the old 300 ms failure,
+passed the corrected fixture against the working scheduler, and returned a ship
+verdict. Its remaining scheduler observation is non-blocking: if a transport's
+write promise resolves on peer acknowledgement, the fixed two-write window
+measures 10 Hz at 150 ms RTT, 6 Hz at 300 ms, and 5.2 Hz at 400 ms. That needs
+adapter completion-semantics evidence plus an RTT-aware byte window before it
+should change. A separate rejected-write regression now proves recovery credit
+is retained after transport backpressure, avoiding a 15 Hz large-keyframe retry
+loop.
