@@ -29,8 +29,25 @@ interface PendingServerReliableFrame {
 
 export interface WebTransportDatagramsLike {
   readonly readable: ReadableStreamLike<Uint8Array>;
-  readonly writable: WritableStreamLike<Uint8Array>;
+  /** Current WebTransport API used by Safari/WebKit. */
+  createWritable?(): WritableStreamLike<Uint8Array>;
+  /** Legacy WebTransport API still exposed by Chromium and Deno. */
+  readonly writable?: WritableStreamLike<Uint8Array>;
   readonly maxDatagramSize?: number;
+}
+
+function createDatagramWriter(
+  datagrams: WebTransportDatagramsLike,
+): WritableStreamWriterLike<Uint8Array> {
+  if (typeof datagrams.createWritable === "function") {
+    return datagrams.createWritable().getWriter();
+  }
+  if (datagrams.writable !== undefined) {
+    return datagrams.writable.getWriter();
+  }
+  throw new Error(
+    "WebTransport datagrams expose neither createWritable() nor writable",
+  );
 }
 
 export type ReadResultLike<T> =
@@ -135,7 +152,7 @@ export class WebTransportGameClient implements GameTransport {
       datagrams: maxDatagramBytes > 0,
       maxDatagramBytes,
     });
-    this.datagramWriter = session.datagrams.writable.getWriter();
+    this.datagramWriter = createDatagramWriter(session.datagrams);
     // A datagram write may remain pending after the caller reuses its input
     // buffer. Own at most four in-flight datagrams in preallocated storage;
     // no gameplay-path queue can grow beyond this fixed bound.

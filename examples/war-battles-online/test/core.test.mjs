@@ -2528,6 +2528,62 @@ test("datagram staging owns caller bytes and has fixed in-flight capacity", asyn
   assert.equal(session.datagramReleaseCalls, 1);
 });
 
+test("WebTransport datagrams support the current createWritable API", async () => {
+  class CurrentDatagramSession {
+    ready = Promise.resolve();
+    incomingUnidirectionalStreams = new ReadableStream();
+    incomingBidirectionalStreams = new ReadableStream();
+    writes = [];
+    createWritableCalls = 0;
+    closeResolve;
+    closed = new Promise((resolve) => {
+      this.closeResolve = resolve;
+    });
+    datagrams = {
+      maxDatagramSize: 8,
+      readable: new ReadableStream(),
+      createWritable: () => {
+        this.createWritableCalls += 1;
+        return new WritableStream({
+          write: (chunk) => {
+            this.writes.push(chunk.slice());
+          },
+        });
+      },
+    };
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    close(options = {}) {
+      this.closeResolve({ closeCode: options.closeCode, reason: options.reason });
+    }
+  }
+
+  const session = new CurrentDatagramSession();
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
+  const client = await WebTransportGameClient.connect(
+    "https://example.invalid",
+    {
+      onReliable() {},
+      onDatagram() {},
+      onClose() {},
+    },
+    FakeConstructor,
+  );
+
+  assert.equal(session.createWritableCalls, 1);
+  assert.equal(await client.trySendDatagram(Uint8Array.of(3, 4)), "sent");
+  assert.deepEqual(session.writes.map((chunk) => [...chunk]), [[3, 4]]);
+  client.close(12, "finished");
+});
+
 test("repeated client reliable streams cancel their unused reverse directions", async () => {
   class RepeatedBidiSession {
     ready = Promise.resolve();
