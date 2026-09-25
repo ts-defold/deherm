@@ -14,3 +14,18 @@ index d1402d7..e0010c1 100644
          IF (DTRACE_RESULT EQUAL 0)
              MESSAGE(STATUS "Detecting USDT support - found")
              SET(HAVE_DTRACE "ON" PARENT_SCOPE)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -12,2 +12,2 @@ PROJECT(picotls)
+-FIND_PACKAGE(PkgConfig REQUIRED)
++FIND_PACKAGE(PkgConfig QUIET)
+ INCLUDE(cmake/boringssl-adjust.cmake)
+@@ -74,3 +74,5 @@ ENDIF ()
+-PKG_CHECK_MODULES(BROTLI_DEC libbrotlidec)
+-PKG_CHECK_MODULES(BROTLI_ENC libbrotlienc)
++IF (PkgConfig_FOUND)
++    PKG_CHECK_MODULES(BROTLI_DEC libbrotlidec)
++    PKG_CHECK_MODULES(BROTLI_ENC libbrotlienc)
++ENDIF ()
+ IF (BROTLI_DEC_FOUND AND BROTLI_ENC_FOUND)

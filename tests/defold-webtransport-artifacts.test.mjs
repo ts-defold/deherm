@@ -294,4 +294,9 @@ test("CI publishes content-addressed rows immutably and release assembly consume
   const cmake = await readFile(path.join(repositoryRoot, "native/webtransport-cpp/CMakeLists.txt"), "utf8");
   assert.match(cmake, /LINK_GROUP:RESCAN,picohttp-core,picoquic-core,picoquic-log/u,
     "GNU static linking must rescan the mutually dependent picoquic archives");
+  const picotlsPatch = await readFile(path.join(repositoryRoot,
+    "native/webtransport-cpp/patches/picotls-dtrace-probe-output.patch"), "utf8");
+  assert.match(picotlsPatch, /FIND_PACKAGE\(PkgConfig QUIET\)/u);
+  assert.match(picotlsPatch, /IF \(PkgConfig_FOUND\)[\s\S]*PKG_CHECK_MODULES/u,
+    "optional Brotli discovery must not make pkg-config a Windows build prerequisite");
 });
