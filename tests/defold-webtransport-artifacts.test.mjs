@@ -323,4 +323,6 @@ test("CI publishes content-addressed rows immutably and release assembly consume
     "Picotls' public header must remain valid when consumed by MSVC C++");
   assert.match(cmake, /target_compile_definitions\(deherm_webtransport_cpp PRIVATE NOMINMAX WIN32_LEAN_AND_MEAN\)/u,
     "the Windows SDK min/max macros must not rewrite bounded C++ calls");
+  assert.match(cmake, /if\(CMAKE_CONFIGURATION_TYPES\)[\s\S]*CMAKE_CFG_INTDIR[\s\S]*MBEDTLS_LIBRARY/u,
+    "multi-config generators must link Mbed TLS archives from their configuration directory");
 });

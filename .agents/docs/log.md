@@ -3330,3 +3330,15 @@ Full-width network and simulation seeds are still uint32 values after entering
 TypeScript. The successful marker proves the generated component executed the
 non-default tile projection without a rejected engine diagnostic; it does not
 claim human visual inspection or browser/GPU parity.
+
+## 2026-09-25 - Windows native WebTransport links multi-config dependency outputs
+
+The first full native-artifact matrix after the QUIC replication wave compiled
+the WebTransport core on Windows but failed while linking its C++ runtime test.
+MSBuild placed the pinned Mbed TLS archives under `library/Release`, while the
+picoquic discovery variables named the single-config `library` path. The root
+CMake graph now includes `CMAKE_CFG_INTDIR` only for multi-config generators,
+so MSBuild resolves its selected configuration and Ninja/Make retain their
+existing paths. A source-level contract test guards the distinction. Local
+single-config native compilation and tests remain separate evidence; the
+replacement Windows matrix is the authority for the MSBuild path.
