@@ -126,8 +126,10 @@ jobs:
         with: { node-version: '22', cache: 'pnpm' }
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - run: node scripts/manage-defold-webtransport-artifacts.mjs plan --describe-row "android=${{ matrix.row }}" --github-env "$GITHUB_ENV"
-      - uses: android-actions/setup-android@v3
-      - run: sdkmanager 'ndk;${{ needs.plan.outputs.android_ndk_version }}'
+      # ubuntu-24.04 already provides the Android command-line tools. Calling
+      # setup-android here makes that action request the retired `tools`
+      # package, so install only Defold's pinned NDK directly.
+      - run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;${{ needs.plan.outputs.android_ndk_version }}'
       - run: |
           api="$(node -e 'const s=require("./packages/toolchains/defold-bundle-targets.json").sdk; process.stdout.write(process.env.ABI === "armeabi-v7a" ? s.androidNdkApiVersion : s.android64NdkApiVersion)')"
           ndk="$ANDROID_HOME/ndk/${{ needs.plan.outputs.android_ndk_version }}"

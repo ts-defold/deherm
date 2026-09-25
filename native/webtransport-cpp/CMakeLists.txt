@@ -110,6 +110,10 @@ target_link_libraries(deherm_webtransport_cpp
   PUBLIC
     picohttp-core
     picoquic-core
+    # GNU ld resolves static archives from left to right. picoquic-core calls
+    # picoquic_set_qlog, so the log archive must also appear after core even
+    # though picohttp-core already exposes it in its interface.
+    picoquic-log
   PRIVATE
     mbedtls
     mbedcrypto

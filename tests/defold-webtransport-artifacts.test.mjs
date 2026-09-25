@@ -276,6 +276,8 @@ test("CI publishes content-addressed rows immutably and release assembly consume
   assert.match(uploadHelper, /--target "\$release_target"/u);
   assert.match(nativeWorkflow, /androidNdkVersion/u);
   assert.match(nativeWorkflow, /No sdkmanager NDK mapping for pinned Defold NDK/u);
+  assert.match(nativeWorkflow, /cmdline-tools\/latest\/bin\/sdkmanager/u);
+  assert.doesNotMatch(nativeWorkflow, /android-actions\/setup-android/u);
   assert.doesNotMatch(nativeWorkflow, /ndk;25\.2\.9519653/u);
   assert.doesNotMatch(nativeWorkflow, /--clobber/u);
   assert.match(nativeWorkflow, /permissions:\n  contents: read/u);
@@ -288,4 +290,8 @@ test("CI publishes content-addressed rows immutably and release assembly consume
   assert.match(releaseWorkflow, /pnpm test:native-webtransport-jsi/u);
   assert.match(releaseWorkflow, /pnpm test:static-native-module-exact/u);
   assert.match(releaseWorkflow, /pnpm test:static-webtransport-facade-exact/u);
+
+  const cmake = await readFile(path.join(repositoryRoot, "native/webtransport-cpp/CMakeLists.txt"), "utf8");
+  assert.match(cmake, /picoquic-core[\s\S]*picoquic-log/u,
+    "GNU static linking must keep picoquic-log after the core archive that references it");
 });
