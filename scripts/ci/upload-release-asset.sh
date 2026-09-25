@@ -38,7 +38,7 @@
 # that is where provenance is asserted.
 #
 # Usage: upload-release-asset.sh <tag> <repo> <file> <asset-name>
-#   env: RELEASE_TITLE, RELEASE_FINGERPRINT, RELEASE_NOTES
+#   env: RELEASE_TITLE, RELEASE_FINGERPRINT, RELEASE_NOTES, RELEASE_TARGET
 set -euo pipefail
 
 tag="$1"
@@ -49,6 +49,7 @@ asset_name="$4"
 release_title="${RELEASE_TITLE:?RELEASE_TITLE is required; the plan job derives it with the tag}"
 release_fingerprint="${RELEASE_FINGERPRINT:?RELEASE_FINGERPRINT is required; it is the full digest the tag truncates}"
 release_notes="${RELEASE_NOTES:-Input fingerprint (SHA-256): \`${release_fingerprint}\`}"
+release_target="${RELEASE_TARGET:-}"
 
 if [[ ! -f "$file" ]]; then
   echo "upload-release-asset: $file does not exist" >&2
@@ -77,10 +78,15 @@ ensure_release() {
   if gh release view "$tag" --repo "$repo" >/dev/null 2>&1; then
     return 0
   fi
+  local target_args=()
+  if [[ -n "$release_target" ]]; then
+    target_args=(--target "$release_target")
+  fi
   gh release create "$tag" \
     --repo "$repo" \
     --title "$release_title" \
     --notes "$release_notes" \
+    "${target_args[@]}" \
     --prerelease >/dev/null 2>&1 || true
   gh release view "$tag" --repo "$repo" >/dev/null 2>&1
 }
@@ -100,7 +106,29 @@ asset_exists() {
     | grep -Fxq "$asset_name"
 }
 
+verify_existing_asset() {
+  if [[ "${VERIFY_EXISTING_ASSET:-0}" != "1" ]]; then
+    return 0
+  fi
+  local existing_dir="$staging/existing"
+  mkdir -p "$existing_dir"
+  gh release download "$tag" --repo "$repo" --pattern "$asset_name" --dir "$existing_dir"
+  if cmp --silent "$staged" "$existing_dir/$asset_name"; then
+    echo "$tag already carries byte-identical immutable $asset_name"
+    return 0
+  fi
+  local local_sha published_sha
+  local_sha="$(sha256sum "$staged" | awk '{print $1}')"
+  published_sha="$(sha256sum "$existing_dir/$asset_name" | awk '{print $1}')"
+  echo "$tag already carries corrupt/foreign immutable $asset_name" >&2
+  echo "local SHA-256:     $local_sha" >&2
+  echo "published SHA-256: $published_sha" >&2
+  echo "The asset will not be overwritten. Quarantine/delete the bad release asset or rotate a real fingerprint input before publishing." >&2
+  return 1
+}
+
 if asset_exists; then
+  verify_existing_asset
   echo "$tag already carries $asset_name; fingerprinted row is current, skipping upload"
   exit 0
 fi
@@ -113,7 +141,8 @@ for attempt in $(seq 1 "$attempts"); do
   # If another publisher won the exact-name race, its immutable asset is now
   # authoritative. Do not delete and replace it with --clobber.
   if asset_exists; then
-    echo "$tag acquired $asset_name while this upload was in flight; keeping the published asset"
+    verify_existing_asset
+    echo "$tag acquired byte-identical $asset_name while this upload was in flight; keeping the published asset"
     exit 0
   fi
 

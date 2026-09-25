@@ -60,8 +60,11 @@ test("scaffold resolves its default from Defold's moving stable channel, not a p
   const format = JSON.parse(await readFile(path.join(projectRoot, ".oxfmtrc.json"), "utf8"));
   assert.equal(lint.categories.correctness, "error");
   assert.equal(lint.options.denyWarnings, true);
+  assert.ok(lint.ignorePatterns.includes("defold_webtransport/**"));
   assert.equal(format.printWidth, 120);
   assert.equal(format.sortPackageJson, false);
+  assert.ok(format.ignorePatterns.includes("defold_webtransport/**"));
+  assert.match(await readFile(path.join(projectRoot, ".gitignore"), "utf8"), /^defold_webtransport\/$/mu);
 });
 
 test("an explicit scaffold revision is authoritative and requires no channel lookup", async (t) => {

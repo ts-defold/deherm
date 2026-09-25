@@ -8,7 +8,7 @@ import test from "node:test";
 
 import { strToU8, zipSync } from "fflate";
 
-import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, generatedProjectCacheMatches, installNativeExtension, shouldResolvePublishedPolicy, typecheckGeneratedProject as typecheckGeneratedProjectCore, verifyGeneratedProject as verifyGeneratedProjectCore, writeGeneratedProject as writeGeneratedProjectCore } from "../packages/cli/src/generate.mjs";
+import { buildProjectBindingIr as compileProjectBindingIr, buildScriptContextCapabilities, generateExtensionTypes as renderExtensionTypes, generatedProjectCacheMatches, installNativeExtension, installProjectWebTransportExtension, shouldResolvePublishedPolicy, typecheckGeneratedProject as typecheckGeneratedProjectCore, verifyGeneratedProject as verifyGeneratedProjectCore, writeGeneratedProject as writeGeneratedProjectCore } from "../packages/cli/src/generate.mjs";
 import { materializeDmSdkUsageFile } from "../packages/cli/src/dmsdk.mjs";
 import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } from "../packages/cli/src/native-extension-api.mjs";
 import { writeProjectDmSdkCallSymbolIndex, writeProjectResourceSymbols, writeProjectRouteSymbolIndex } from "../packages/cli/src/resource-symbols.mjs";
@@ -20,6 +20,8 @@ import { generateComponentProxies } from "../packages/compiler/src/component-pro
 import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 import { createIncrementalCompiler } from "../packages/cli/src/dev/compiler.mjs";
 import { recordBundleBuild } from "../packages/cli/src/build-artifacts.mjs";
+import { nativeArtifactAbiSha256 } from "../packages/cli/src/webtransport-artifacts.mjs";
+import { installConfiguredProjectWebTransport } from "../packages/cli/src/cli.mjs";
 
 // Every fixture states the Defold revision it targets. Generation resolves the
 // revision from the project rather than assuming the packaged one, so a fixture
@@ -156,6 +158,161 @@ test("managed native extension install is content-keyed and replaces through a s
   assert.equal(await readFile(path.join(project, "defold_hermes", "src", "extension.cpp"), "utf8"), "// v2\n");
   assert.deepEqual((await readdir(project)).filter((name) => name.includes(".deherm-stage-") || name.includes(".deherm-backup-")), []);
   assert.equal((await inspectDefoldProject({ project })).extensions.length, 0, "managed runtime must not feed its own project API inventory");
+});
+
+test("managed WebTransport source override materializes the same descriptor inventoried by project generation", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-project-"));
+  const source = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-source-"));
+  t.after(() => Promise.all([rm(project, { recursive: true, force: true }), rm(source, { recursive: true, force: true })]));
+  await mkdir(path.join(source, "include"), { recursive: true });
+  await mkdir(path.join(source, "webtransport/typescript"), { recursive: true });
+  await writeFile(path.join(project, "game.project"), "[project]\ntitle = WebTransport managed\n");
+  await writeFile(path.join(source, "ext.manifest"), "name: ManagedWebTransport\n");
+  await writeFile(path.join(source, "include/client.h"), "uint32_t managed_open(void);\n");
+  await writeFile(path.join(source, "webtransport/typescript/WebTransport.ts"), "export const WebTransport = class {};\n");
+  await writeFile(path.join(source, "defold-hermes.bindings.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    headers: [{ path: "client.h", language: "c", symbols: ["managed_open"] }],
+    nativeModules: [{ name: "NativeManaged", abiVersion: 1, methods: [{ id: 1, name: "open", args: [], returns: "u32" }] }],
+    typescriptFacades: [{ name: "WebTransport", source: "webtransport/typescript/WebTransport.ts", nativeModule: "NativeManaged" }]
+  })}\n`);
+  const installed = await installProjectWebTransportExtension(project, { source, version: "0.1.0" });
+  assert.equal(installed.installed, true);
+  const inventory = await inspectDefoldProject({ project });
+  const extension = inventory.extensions.find(({ name }) => name === "ManagedWebTransport");
+  assert.equal(extension.typescriptFacades[0].name, "WebTransport");
+  assert.match(extension.typescriptFacades[0].sha256, /^[a-f0-9]{64}$/u);
+  assert.equal((await installProjectWebTransportExtension(project, { source, version: "0.1.0" })).installed, false);
+  assert.equal(JSON.parse(await readFile(path.join(project, "defold_webtransport/.deherm-webtransport-managed.json"), "utf8")).version, "0.1.0");
+});
+
+test("dev and generate share the configured WebTransport installer", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-configured-project-"));
+  const source = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-configured-source-"));
+  t.after(() => Promise.all([project, source].map((directory) => rm(directory, { recursive: true, force: true }))));
+  await mkdir(path.join(source, "webtransport/typescript"), { recursive: true });
+  await writeFile(path.join(source, "ext.manifest"), "name: ConfiguredWebTransport\n");
+  await writeFile(path.join(source, "webtransport/typescript/WebTransport.ts"), "export const WebTransport = class {};\n");
+  await writeFile(path.join(project, "game.project"), [
+    "[project]",
+    "title = Configured WebTransport",
+    "",
+    "[defold_webtransport]",
+    "version = 0.1.0",
+    `source = ${path.relative(project, source)}`,
+    "artifact_target = web",
+    ""
+  ].join("\n"));
+
+  const installed = await installConfiguredProjectWebTransport(project, { environment: {} });
+  assert.equal(installed.installed, true);
+  assert.equal(installed.source, "managed-local");
+  assert.equal(
+    await readFile(path.join(project, "defold_webtransport/webtransport/typescript/WebTransport.ts"), "utf8"),
+    "export const WebTransport = class {};\n"
+  );
+  const managed = JSON.parse(await readFile(path.join(project, "defold_webtransport/.deherm-webtransport-managed.json"), "utf8"));
+  assert.deepEqual(
+    { ...managed, sourceTreeSha256: "<sha256>" },
+    { schemaVersion: 2, owner: "defold-webtransport", version: "0.1.0", sourceTreeSha256: "<sha256>", artifacts: null }
+  );
+  assert.match(managed.sourceTreeSha256, /^[0-9a-f]{64}$/u);
+  assert.equal((await installConfiguredProjectWebTransport(project, { environment: {} })).installed, false);
+});
+
+test("packaged WebTransport config installs package source for a web-only project", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-package-config-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  await writeFile(path.join(project, "game.project"), [
+    "[project]",
+    "title = Packaged WebTransport",
+    "",
+    "[defold_webtransport]",
+    "version = 0.1.0",
+    "artifact_target = web",
+    ""
+  ].join("\n"));
+  const installed = await installConfiguredProjectWebTransport(project, { environment: {} });
+  assert.equal(installed.installed, true);
+  assert.equal(installed.source, "managed-local");
+  assert.match(await readFile(path.join(project, "defold_webtransport/ext.manifest"), "utf8"), /defold_webtransport/u);
+  assert.equal((await installConfiguredProjectWebTransport(project, { environment: {} })).installed, false);
+});
+
+test("managed WebTransport install overlays and content-keys validated native artifacts", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-artifact-project-"));
+  const source = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-artifact-source-"));
+  const artifacts = await mkdtemp(path.join(tmpdir(), "deherm-webtransport-artifact-overlay-"));
+  t.after(() => Promise.all([project, source, artifacts].map((directory) => rm(directory, { recursive: true, force: true }))));
+  await writeFile(path.join(project, "game.project"), "[project]\ntitle = Native artifact overlay\n");
+  await mkdir(path.join(source, "include/defold_webtransport"), { recursive: true });
+  await mkdir(path.join(source, "webtransport"), { recursive: true });
+  await mkdir(path.join(source, "lib/web"), { recursive: true });
+  await writeFile(path.join(source, "ext.manifest"), "name: defold_webtransport\nplatforms:\n  arm64-osx:\n    context:\n      libs: [defold_webtransport_core]\n");
+  await writeFile(path.join(source, "include/defold_webtransport/native_v1.h"), "#pragma once\n");
+  await writeFile(path.join(source, "lib/web/library_defold_webtransport.js"), "// trusted HTML5 backend\n");
+  const fingerprint = "a".repeat(64);
+  const abiSha256 = await nativeArtifactAbiSha256(source);
+  await writeFile(path.join(source, "webtransport/native-artifacts.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    repository: "ts-defold/deherm",
+    tag: `defold-webtransport-native-${fingerprint.slice(0, 12)}`,
+    fingerprint,
+    abiSha256,
+    assets: [{ target: "arm64-osx", asset: "defold-webtransport-native-arm64-osx.zip" }]
+  }, null, 2)}\n`);
+  const targetDirectory = path.join(artifacts, "lib", "arm64-osx");
+  await mkdir(targetDirectory, { recursive: true });
+  const bytes = Buffer.from("synthetic arm64 archive\n");
+  await writeFile(path.join(targetDirectory, "libdefold_webtransport_core.a"), bytes);
+  const manifest = {
+    schemaVersion: 1,
+    tag: `defold-webtransport-native-${fingerprint.slice(0, 12)}`,
+    fingerprint,
+    abiSha256,
+    artifacts: [{
+      target: "arm64-osx",
+      asset: "defold-webtransport-native-arm64-osx.zip",
+      sha256: "b".repeat(64),
+      files: [{ name: "libdefold_webtransport_core.a", bytes: bytes.byteLength, sha256: createHash("sha256").update(bytes).digest("hex") }]
+    }]
+  };
+  await writeFile(path.join(artifacts, ".defold-webtransport-native-artifacts.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+
+  const first = await installProjectWebTransportExtension(project, { source, artifacts, version: "0.1.0" });
+  assert.equal(first.source, "managed-local+native-artifacts:local");
+  assert.deepEqual(await readFile(path.join(project, "defold_webtransport/lib/arm64-osx/libdefold_webtransport_core.a")), bytes);
+  const identity = JSON.parse(await readFile(path.join(project, "defold_webtransport/.deherm-webtransport-managed.json"), "utf8"));
+  assert.equal(identity.schemaVersion, 2);
+  assert.equal(identity.artifacts.fingerprint, fingerprint);
+  assert.match(identity.artifacts.manifestSha256, /^[0-9a-f]{64}$/u);
+  assert.equal((await installProjectWebTransportExtension(project, { source, artifacts, version: "0.1.0" })).installed, false);
+
+  await writeFile(path.join(targetDirectory, "libdefold_webtransport_core.a"), "tampered\n");
+  await assert.rejects(
+    installProjectWebTransportExtension(project, { source, artifacts, version: "0.1.0", force: true }),
+    /does not match the overlay manifest/u
+  );
+
+  await writeFile(path.join(targetDirectory, "libdefold_webtransport_core.a"), bytes);
+  const foreign = { ...manifest, tag: "defold-webtransport-native-bbbbbbbbbbbb", fingerprint: "b".repeat(64) };
+  await writeFile(path.join(artifacts, ".defold-webtransport-native-artifacts.json"), `${JSON.stringify(foreign, null, 2)}\n`);
+  await assert.rejects(
+    installProjectWebTransportExtension(project, { source, artifacts, version: "0.1.0", force: true }),
+    /does not match selected extension release/u
+  );
+
+  await writeFile(path.join(artifacts, ".defold-webtransport-native-artifacts.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  await mkdir(path.join(artifacts, "lib/web"), { recursive: true });
+  await writeFile(path.join(artifacts, "lib/web/library_defold_webtransport.js"), "// hostile overwrite\n");
+  await assert.rejects(
+    installProjectWebTransportExtension(project, { source, artifacts, version: "0.1.0", force: true }),
+    /uninventoried members/u
+  );
+  assert.equal(
+    await readFile(path.join(project, "defold_webtransport/lib/web/library_defold_webtransport.js"), "utf8"),
+    "// trusted HTML5 backend\n"
+  );
 });
 
 test("managed native extension installation never copies target artifacts from a checkout", async () => {
@@ -517,6 +674,7 @@ test("local and dependency binding schemas select C/C++ entry headers through pr
   const project = await mkdtemp(path.join(tmpdir(), "deherm-extension-binding-schema-"));
   t.after(() => rm(project, { recursive: true, force: true }));
   await mkdir(path.join(project, "cpp_math", "include"), { recursive: true });
+  await mkdir(path.join(project, "cpp_math", "typescript"), { recursive: true });
   await mkdir(path.join(project, ".internal", "lib"), { recursive: true });
   await writeFile(path.join(project, "game.project"), `[project]\ntitle = Binding schema\n\n[defold_hermes]\ndefold_sdk = ${bundledDefoldRevision}\n`);
   await writeFile(path.join(project, "cpp_math", "ext.manifest"), "name: CppMath\n");
@@ -528,23 +686,50 @@ struct Counter { uint32_t step(uint32_t amount) const; };
 }
 `);
   await writeFile(path.join(project, "cpp_math", "include", "detail.hpp"), "namespace cppmath { uint32_t internal(); }\n");
+  await writeFile(path.join(project, "cpp_math", "include", "native.h"), "int32_t clipboard_native_v1_write(const char* text, uint32_t text_length);\n");
+  await writeFile(path.join(project, "cpp_math", "typescript", "ClipboardClient.ts"), `
+import { NativeClipboard } from "./NativeClipboard.js";
+export const ClipboardClient = { native: NativeClipboard } as const;
+`);
+  await writeFile(path.join(project, "cpp_math", "typescript", "ClipboardClient.static.ts"), `
+import { NativeClipboard } from "./NativeClipboard.js";
+export const ClipboardClient = { native: NativeClipboard };
+`);
   await writeFile(path.join(project, "cpp_math", "defold-hermes.bindings.json"), `${JSON.stringify({
     schemaVersion: 1,
     headers: [{
       path: "cpp_math.hpp",
       language: "c++",
       symbols: ["cppmath::Counter::step", "cppmath::add"]
-    }]
+    }],
+    nativeModules: [{
+      name: "NativeClipboard",
+      abiVersion: 1,
+      cProvider: { header: "native.h", symbolPrefix: "clipboard_native_v1_", argumentExpansion: "pointer-length-v1" },
+      methods: [{ id: 1, name: "write", args: [{ name: "text", type: "utf8" }], returns: "status" }]
+    }],
+    typescriptFacades: [{ name: "ClipboardClient", source: "typescript/ClipboardClient.ts", staticSource: "typescript/ClipboardClient.static.ts", nativeModule: "NativeClipboard" }]
   }, null, 2)}\n`);
 
   const remoteSchema = `${JSON.stringify({
     schemaVersion: 1,
-    headers: [{ path: "remote.h", language: "c", symbolPrefix: "remote_", symbols: ["remote_add"] }]
+    headers: [{ path: "remote.h", language: "c", symbolPrefix: "remote_", symbols: ["remote_add"] }],
+    nativeModules: [{
+      name: "NativeRemoteTransport",
+      abiVersion: 1,
+      methods: [{ id: 1, name: "open", args: [{ name: "url", type: "utf8" }], returns: "u32" }]
+    }],
+    typescriptFacades: [{ name: "WebTransport", source: "typescript/WebTransport.ts", nativeModule: "NativeRemoteTransport" }]
   }, null, 2)}\n`;
   await writeFile(path.join(project, ".internal", "lib", "remote.zip"), zipSync({
     "remote/ext.manifest": strToU8("name: RemoteMath\n"),
     "remote/include/remote.h": strToU8("#include <stdint.h>\nuint32_t remote_add(uint32_t left, uint32_t right);\n"),
-    "remote/defold-hermes.bindings.json": strToU8(remoteSchema)
+    "remote/defold-hermes.bindings.json": strToU8(remoteSchema),
+    "remote/typescript/WebTransport.ts": strToU8(`
+import { registerNativeModulePump } from "@deherm/project/module-runtime";
+import { NativeRemoteTransport } from "./NativeRemoteTransport.js";
+export const WebTransport = { native: NativeRemoteTransport, registerNativeModulePump } as const;
+`)
   }));
 
   const inventory = await inspectDefoldProject({ project });
@@ -557,27 +742,85 @@ struct Counter { uint32_t step(uint32_t amount) const; };
       schemaVersion: 1,
       headers: [{
         path: "cpp_math.hpp",
-        language: "c++",
-        symbolPrefix: null,
-        symbols: ["cppmath::Counter::step", "cppmath::add"]
-      }]
+      language: "c++",
+      symbolPrefix: null,
+      symbols: ["cppmath::Counter::step", "cppmath::add"]
+      }],
+      nativeModules: [{
+        name: "NativeClipboard",
+        abiVersion: 1,
+        cProvider: { header: "native.h", symbolPrefix: "clipboard_native_v1_", argumentExpansion: "pointer-length-v1" },
+        methods: [{ id: 1, name: "write", args: [{ name: "text", type: "utf8" }], returns: "status" }]
+      }],
+      typescriptFacades: [{ name: "ClipboardClient", source: "typescript/ClipboardClient.ts", staticSource: "typescript/ClipboardClient.static.ts", nativeModule: "NativeClipboard" }]
     },
     {
       schemaVersion: 1,
-      headers: [{ path: "remote.h", language: "c", symbolPrefix: "remote_", symbols: ["remote_add"] }]
+      headers: [{ path: "remote.h", language: "c", symbolPrefix: "remote_", symbols: ["remote_add"] }],
+      nativeModules: [{
+        name: "NativeRemoteTransport",
+        abiVersion: 1,
+        methods: [{ id: 1, name: "open", args: [{ name: "url", type: "utf8" }], returns: "u32" }]
+      }],
+      typescriptFacades: [{ name: "WebTransport", source: "typescript/WebTransport.ts", nativeModule: "NativeRemoteTransport" }]
     }
   ]);
   assert.deepEqual(inventory.diagnostics, []);
 
+  const reservedBridge = path.join(project, "deherm_project_native_modules");
+  await mkdir(reservedBridge, { recursive: true });
+  await writeFile(path.join(reservedBridge, "user-owned.txt"), "do not delete\n");
+  await assert.rejects(writeGeneratedProject(inventory), /Refusing to replace unmanaged reserved native-module bridge/u);
+  assert.equal(await readFile(path.join(reservedBridge, "user-owned.txt"), "utf8"), "do not delete\n");
+  await rm(reservedBridge, { recursive: true, force: true });
   const generated = await writeGeneratedProject(inventory);
   const index = JSON.parse(await readFile(path.join(generated.root, "generated", "native-extensions", "index.json"), "utf8"));
   assert.equal(index.headerCount, 2);
   assert.equal(index.generatedRouteCount, 2);
+  assert.equal(index.nativeModuleCount, 2);
+  const clipboardModule = index.nativeModules.find(({ name }) => name === "NativeClipboard");
+  const nativeModuleRoot = path.join(generated.root, "generated", "native-extensions", ...clipboardModule.output.split("/"));
+  assert.match(await readFile(path.join(nativeModuleRoot, "provider.h"), "utf8"), /DEHERM_NATIVE_CLIPBOARD_METHOD_WRITE/);
+  assert.match(await readFile(path.join(nativeModuleRoot, "NativeClipboard.ts"), "utf8"), /interface NativeClipboardSpec/);
+  const generatedFacade = await readFile(path.join(generated.root, "sdk/generated/native/WebTransport.ts"), "utf8");
+  assert.match(generatedFacade, /from "\.\.\/\.\.\/module-runtime\.js"/u);
+  assert.doesNotMatch(generatedFacade, /@deherm\/project\//u);
+  assert.match(await readFile(path.join(generated.root, "sdk/index.ts"), "utf8"), /generated\/native\/WebTransport\.js/u);
+  assert.match(await readFile(path.join(generated.root, "sdk/contexts/game-object.ts"), "utf8"), /generated\/native\/WebTransport\.js/u);
+  assert.match(await readFile(path.join(generated.root, "static-hermes/generated/native/NativeClipboard.ts"), "utf8"), /extern_c/u);
+  assert.match(await readFile(path.join(generated.root, "static-hermes/generated/native/ClipboardClient.ts"), "utf8"), /NativeClipboard/u);
+  assert.match(await readFile(path.join(generated.root, "static-hermes/generated/module-runtime.ts"), "utf8"), /__dehermNativeModulePumpStateV1/u);
+  assert.match(await readFile(path.join(generated.root, "static-hermes/generated/module-runtime.ts"), "utf8"), /native module pump tick v1 is already owned/u);
+  assert.match(await readFile(path.join(project, "deherm_project_native_modules/src/native_clipboard_provider.cpp"), "utf8"), /clipboard_native_v1_write/u);
+  assert.match(await readFile(path.join(project, "deherm_project_native_modules/src/extension.cpp"), "utf8"), /deherm_register_native_clipboard_provider_v1/u);
+  const bridgeSentinel = JSON.parse(await readFile(path.join(project, "deherm_project_native_modules/.deherm-managed.json"), "utf8"));
+  assert.equal(bridgeSentinel.kind, "project-native-module-bridge");
+  assert.deepEqual(bridgeSentinel.modules, [{ name: "NativeClipboard", abiVersion: 1 }]);
+  const convergedInventory = await inspectDefoldProject({ project });
+  assert.deepEqual(convergedInventory.extensions.map(({ name }) => name), ["CppMath", "RemoteMath"],
+    "the generated managed bridge must not perturb the project inventory after the first generate");
+  assert.equal((await writeGeneratedProject(convergedInventory)).cached, true,
+    "a clean project must converge after one generation even when it gains a managed provider bridge");
+  await writeFile(path.join(generated.root, "facade-consumer.ts"), `import { WebTransport } from "@deherm/project";\nvoid WebTransport;\n`);
+  const facadeTsconfig = path.join(project, "facade-tsconfig.json");
+  await writeFile(facadeTsconfig, `${JSON.stringify({
+    compilerOptions: {
+      target: "ES2022", module: "ESNext", moduleResolution: "Bundler", strict: true, noEmit: true,
+      skipLibCheck: true, paths: { "@deherm/project": ["./.deherm/sdk/index.ts"] }
+    },
+    files: [".deherm/facade-consumer.ts"]
+  }, null, 2)}\n`);
+  const facadeTypecheck = spawnSync(path.resolve("node_modules/.bin/tsc"), ["-p", facadeTsconfig], { encoding: "utf8" });
+  assert.equal(facadeTypecheck.status, 0, `${facadeTypecheck.stdout}\n${facadeTypecheck.stderr}`);
   assert.equal(index.blockedRouteCount, 1);
-  assert.equal(index.ignoredHeaderCount, 1);
+  assert.equal(index.ignoredHeaderCount, 2);
   assert.deepEqual(index.ignoredHeaders.map(({ extension, includePath, reason }) => ({ extension, includePath, reason })), [{
     extension: "CppMath",
     includePath: "detail.hpp",
+    reason: "not-selected-by-binding-schema"
+  }, {
+    extension: "CppMath",
+    includePath: "native.h",
     reason: "not-selected-by-binding-schema"
   }]);
   const cpp = index.headers.find(({ extension }) => extension === "CppMath");
@@ -595,6 +838,39 @@ struct Counter { uint32_t step(uint32_t amount) const; };
   assert.equal(remote.language, "c");
   const remoteRoot = path.join(generated.root, "generated", "native-extensions", ...remote.output.split("/"));
   assert.match(await readFile(path.join(remoteRoot, "remote_math_glue.cpp"), "utf8"), /remote_add/);
+});
+
+test("provider-only extension schemas generate native modules without projecting ergonomic C headers", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-provider-only-schema-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  await mkdir(path.join(project, "transport", "include"), { recursive: true });
+  await writeFile(path.join(project, "game.project"), `[project]\ntitle = Provider only\n\n[defold_hermes]\ndefold_sdk = ${bundledDefoldRevision}\n`);
+  await writeFile(path.join(project, "transport", "ext.manifest"), "name: ProviderOnly\n");
+  await writeFile(path.join(project, "transport", "include", "client.h"), "int ergonomic_client(void);\n");
+  await writeFile(path.join(project, "transport", "include", "native.h"), "int32_t provider_native_v1_open(const char* url, uint32_t url_length);\n");
+  await writeFile(path.join(project, "transport", "defold-hermes.bindings.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    headers: [],
+    nativeModules: [{
+      name: "NativeProviderOnly",
+      abiVersion: 1,
+      cProvider: { header: "native.h", symbolPrefix: "provider_native_v1_", argumentExpansion: "pointer-length-v1" },
+      methods: [{ id: 1, name: "open", args: [{ name: "url", type: "utf8" }], returns: "status" }]
+    }]
+  }, null, 2)}\n`);
+
+  const inventory = await inspectDefoldProject({ project });
+  assert.equal(inventory.extensions[0].bindingStatus, "native-schema");
+  const generated = await writeGeneratedProject(inventory);
+  const index = JSON.parse(await readFile(path.join(generated.root, "generated", "native-extensions", "index.json"), "utf8"));
+  assert.equal(index.nativeModuleCount, 1);
+  assert.equal(index.headerCount, 0);
+  assert.equal(index.generatedRouteCount, 0);
+  assert.equal(index.blockedRouteCount, 0);
+  assert.deepEqual(index.ignoredHeaders.map(({ includePath, reason }) => ({ includePath, reason })), [
+    { includePath: "client.h", reason: "not-selected-by-binding-schema" },
+    { includePath: "native.h", reason: "not-selected-by-binding-schema" }
+  ]);
 });
 
 test("invalid native binding schemas fail closed in project inventory", async (t) => {
@@ -710,10 +986,24 @@ test("project native generation excludes deherm runtime implementation headers",
   );
 });
 
-test("the real War Battles project excludes its managed runtime and typed-native infrastructure", async () => {
-  const inventory = await inspectDefoldProject({ project: path.resolve("examples/war-battles-online/defold") });
+test("provider metadata inventory is independent of a gitignored example installation", async (t) => {
+  const project = await mkdtemp(path.join(tmpdir(), "deherm-provider-inventory-"));
+  t.after(() => rm(project, { recursive: true, force: true }));
+  await writeFile(path.join(project, "game.project"), "[project]\ntitle = Provider fixture\n");
+  await mkdir(path.join(project, "defold_hermes_typed_native/include"), { recursive: true });
+  await writeFile(path.join(project, "defold_hermes_typed_native/ext.manifest"), "name: defold_hermes_typed_native\n");
+  await writeFile(path.join(project, "defold_hermes_typed_native/include/runtime.h"), "#pragma once\n");
+  await mkdir(path.join(project, "defold_webtransport/webtransport"), { recursive: true });
+  await writeFile(path.join(project, "defold_webtransport/ext.manifest"), "name: defold_webtransport\n");
+  await writeFile(path.join(project, "defold_webtransport/webtransport/defold-hermes.bindings.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    headers: [],
+    nativeModules: [{ name: "NativeFixture", abiVersion: 1, methods: [{ id: 1, name: "state", args: [], returns: "u32" }] }]
+  })}\n`);
+  const inventory = await inspectDefoldProject({ project });
   assert.deepEqual(inventory.extensions.map(({ name }) => name), [
-    "defold_hermes_typed_native"
+    "defold_hermes_typed_native",
+    "defold_webtransport"
   ]);
   let clangInvoked = false;
   assert.deepEqual(resolveNativeExtensionClang({
@@ -1096,11 +1386,11 @@ test("extension script APIs produce deterministic TypeScript declarations", asyn
   assert.equal(baseConfig.compilerOptions.plugins[0].enabled, true);
   const guiConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.gui.json"), "utf8"));
   assert.deepEqual(guiConfig.include, ["**/*.ts", ".deherm/**/*.ts"]);
-  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts", ".deherm/cache/**/*.ts", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
+  assert.deepEqual(guiConfig.exclude, ["**/*.script.ts", "**/*.render.ts", "node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/generated/components/registry.ts", ".deherm/cache/**/*.ts", ".deherm/static-hermes/**/*.ts", ".deherm/generated/native-extensions/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
   assert.deepEqual(guiConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/contexts/gui.ts"]);
   const bundleConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.bundle.json"), "utf8"));
   assert.deepEqual(bundleConfig.compilerOptions.paths["@deherm/project"], ["./.deherm/sdk/index.ts"]);
-  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/cache/**/*.ts", ".deherm/static-hermes/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
+  assert.deepEqual(bundleConfig.exclude, ["node_modules/**", ".internal/**", "build/**", "dist/**", ".deherm/cache/**/*.ts", ".deherm/static-hermes/**/*.ts", ".deherm/generated/native-extensions/**/*.ts", ".deherm/build/generated/typed-native/**/*.ts"]);
   const releaseConfig = JSON.parse(await readFile(path.join(project, "tsconfig.deherm.release.json"), "utf8"));
   assert.equal(releaseConfig.compilerOptions.plugins[0].profile, "release");
   assert.equal(releaseConfig.compilerOptions.plugins[0].dmsdkSymbols,

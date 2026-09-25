@@ -11,6 +11,10 @@ import {
   renderNativeExtensionBindings
 } from "../../compiler/src/native-extension-generator.mjs";
 import {
+  renderNativeModuleProviderHeader,
+  renderNativeModuleTypescript
+} from "../../compiler/src/native-module-provider-generator.mjs";
+import {
   PUBLIC_EXTENSION_ZIP_LIMITS,
   assertSafeArchiveEntryName,
   publicIncludeRoot,
@@ -24,7 +28,8 @@ const ignoredIncludeDirectories = new Set([".git", ".internal", "build", "node_m
 // second extension with either name without colliding with the runtime anyway.
 const infrastructureExtensionNames = new Set([
   "defold_hermes",
-  "defold_hermes_typed_native"
+  "defold_hermes_typed_native",
+  "deherm_project_native_modules"
 ]);
 
 export function isDehermInfrastructureExtension(extension) {
@@ -62,7 +67,10 @@ function safeArchiveEntry(value) {
 
 export function resolveNativeExtensionClang({ inventory, clang = process.env.CLANG ?? "clang", execFile = execFileSync }) {
   const required = inventory.extensions.some((extension) =>
-    !isDehermInfrastructureExtension(extension) && extension.publicHeaders?.length);
+    !isDehermInfrastructureExtension(extension) &&
+    (extension.bindingSchema
+      ? extension.bindingSchema.document.headers.length > 0
+      : Boolean(extension.publicHeaders?.length)));
   if (!required) return { required: false };
   let version;
   try {
@@ -291,6 +299,7 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
   try {
     await mkdir(keyedRoot, { recursive: true });
     const headers = [];
+    const nativeModules = [];
     const ignoredHeaders = [];
     const ignoredExtensions = inventory.extensions
       .filter(isDehermInfrastructureExtension)
@@ -302,6 +311,23 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
       }));
     for (const [extensionIndex, extension] of inventory.extensions.entries()) {
       if (isDehermInfrastructureExtension(extension)) continue;
+      for (const descriptor of extension.bindingSchema?.document?.nativeModules ?? []) {
+        const relative = path.posix.join("native-modules", String(extensionIndex).padStart(3, "0"), descriptor.name);
+        const destination = path.join(keyedRoot, ...relative.split("/"));
+        await mkdir(destination, { recursive: true });
+        await Promise.all([
+          writeFile(path.join(destination, "provider.h"), renderNativeModuleProviderHeader(descriptor)),
+          writeFile(path.join(destination, `${descriptor.name}.ts`), renderNativeModuleTypescript(descriptor))
+        ]);
+        nativeModules.push({
+          extension: extension.name,
+          schema: extension.bindingSchema.path,
+          name: descriptor.name,
+          abiVersion: descriptor.abiVersion,
+          methodCount: descriptor.methods.length,
+          output: path.posix.join(defoldRevision, generationKey, relative)
+        });
+      }
       const details = [...(extension.publicHeaderDetails ?? [])].sort((left, right) => compare(left.path, right.path));
       if (details.length !== (extension.publicHeaders ?? []).length ||
           details.some((detail, index) => detail.path !== [...extension.publicHeaders].sort(compare)[index])) {
@@ -453,6 +479,8 @@ export async function materializeProjectNativeExtensionApis({ inventory, outputR
       ignoredExtensions,
       ignoredHeaderCount: ignoredHeaders.length,
       ignoredHeaders,
+      nativeModuleCount: nativeModules.length,
+      nativeModules,
       headers
     };
     await writeFile(path.join(keyedRoot, "report.json"), `${JSON.stringify(report, null, 2)}\n`);

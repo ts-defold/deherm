@@ -4,6 +4,7 @@ import path from "node:path";
 
 import { unzipSync } from "fflate";
 import { parse as parseYaml } from "yaml";
+import { parseNativeModuleDescriptorJson } from "../../compiler/src/native-module-provider-generator.mjs";
 
 const ignoredDirectories = new Set([".git", ".internal", "build", "node_modules"]);
 const projectDiscoveryIgnoredDirectories = new Set([
@@ -448,12 +449,10 @@ export function normalizeNativeExtensionBindingSchema(document) {
   if (!document || Array.isArray(document) || typeof document !== "object") {
     throw new Error("the root must be a JSON object");
   }
-  const unknownRootKeys = Object.keys(document).filter((key) => !["schemaVersion", "headers"].includes(key));
+  const unknownRootKeys = Object.keys(document).filter((key) => !["schemaVersion", "headers", "nativeModules", "typescriptFacades"].includes(key));
   if (unknownRootKeys.length) throw new Error(`unknown root field(s): ${unknownRootKeys.sort().join(", ")}`);
   if (document.schemaVersion !== 1) throw new Error("schemaVersion must be 1");
-  if (!Array.isArray(document.headers) || !document.headers.length) {
-    throw new Error("headers must be a non-empty array");
-  }
+  if (!Array.isArray(document.headers)) throw new Error("headers must be an array");
   const seenHeaders = new Set();
   const headers = document.headers.map((entry, index) => {
     if (!entry || Array.isArray(entry) || typeof entry !== "object") {
@@ -496,7 +495,135 @@ export function normalizeNativeExtensionBindingSchema(document) {
       ...(symbols === null ? {} : { symbols: [...symbols].sort() })
     };
   }).sort((left, right) => left.path.localeCompare(right.path));
-  return { schemaVersion: 1, headers };
+  const nativeModules = document.nativeModules === undefined ? [] : document.nativeModules;
+  if (!Array.isArray(nativeModules)) throw new Error("nativeModules must be an array");
+  const moduleNames = new Set();
+  const normalizedModules = nativeModules.map((module, moduleIndex) => {
+    if (!module || Array.isArray(module) || typeof module !== "object") {
+      throw new Error(`nativeModules[${moduleIndex}] must be an object`);
+    }
+    const allowedModule = ["name", "abiVersion", "description", "constants", "cProvider", "methods"];
+    const unknown = Object.keys(module).filter((key) => !allowedModule.includes(key));
+    if (unknown.length) throw new Error(`nativeModules[${moduleIndex}] has unknown field(s): ${unknown.sort().join(", ")}`);
+    if (typeof module.name !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(module.name) || moduleNames.has(module.name)) {
+      throw new Error(`nativeModules[${moduleIndex}].name must be a unique identifier`);
+    }
+    moduleNames.add(module.name);
+    if (!Number.isInteger(module.abiVersion) || module.abiVersion < 1) {
+      throw new Error(`nativeModules[${moduleIndex}].abiVersion must be a positive integer`);
+    }
+    if (!Array.isArray(module.methods) || !module.methods.length || module.methods.length > 32) {
+      throw new Error(`nativeModules[${moduleIndex}].methods must contain 1..32 methods`);
+    }
+    const ids = new Set(), names = new Set();
+    const methods = module.methods.map((method, methodIndex) => {
+      if (!method || Array.isArray(method) || typeof method !== "object") {
+        throw new Error(`nativeModules[${moduleIndex}].methods[${methodIndex}] must be an object`);
+      }
+      const unknownMethod = Object.keys(method).filter((key) => !["id", "name", "args", "returns"].includes(key));
+      if (unknownMethod.length) throw new Error(`nativeModules[${moduleIndex}].methods[${methodIndex}] has unknown field(s): ${unknownMethod.sort().join(", ")}`);
+      if (!Number.isInteger(method.id) || method.id < 1 || ids.has(method.id)) throw new Error(`native module method id must be unique and positive`);
+      if (typeof method.name !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(method.name) || names.has(method.name)) throw new Error(`native module method name must be unique and valid`);
+      ids.add(method.id); names.add(method.name);
+      if (!Array.isArray(method.args) || method.args.length > 8) throw new Error(`native module method args must contain at most 8 arguments`);
+      const args = method.args.map((argument) => {
+        if (!argument || typeof argument !== "object" || Array.isArray(argument) ||
+            typeof argument.name !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(argument.name) ||
+            !["u32", "utf8", "bytes", "mutableBytes", "bool"].includes(argument.type)) {
+          throw new Error(`native module arguments require a valid name and supported type`);
+        }
+        const unknownArgument = Object.keys(argument).filter((key) => !["name", "type", "copyBack"].includes(key));
+        if (unknownArgument.length) throw new Error(`native module argument has unknown field(s): ${unknownArgument.sort().join(", ")}`);
+        if (argument.copyBack === undefined) return { name: argument.name, type: argument.type };
+        const copyBack = argument.copyBack;
+        if (argument.type !== "mutableBytes" || !copyBack || typeof copyBack !== "object" || Array.isArray(copyBack) ||
+            Object.keys(copyBack).some((key) => !["mode", "okStatus", "headerBytes", "payloadLengthOffset"].includes(key)) ||
+            copyBack.mode !== "framedPayload" || !Number.isInteger(copyBack.okStatus) ||
+            !Number.isInteger(copyBack.headerBytes) || copyBack.headerBytes < 1 ||
+            !Number.isInteger(copyBack.payloadLengthOffset) || copyBack.payloadLengthOffset < 0 ||
+            copyBack.payloadLengthOffset + 4 > copyBack.headerBytes) {
+          throw new Error(`native mutableBytes copyBack requires a valid framedPayload recipe`);
+        }
+        return { name: argument.name, type: argument.type, copyBack: { ...copyBack } };
+      });
+      if (!["u32", "status"].includes(method.returns)) throw new Error(`native module result must be u32 or status`);
+      return { id: method.id, name: method.name, args, returns: method.returns };
+    });
+    let cProvider;
+    if (module.cProvider !== undefined) {
+      if (!module.cProvider || Array.isArray(module.cProvider) || typeof module.cProvider !== "object") {
+        throw new Error(`nativeModules[${moduleIndex}].cProvider must be an object`);
+      }
+      const unknownProvider = Object.keys(module.cProvider).filter((key) => !["header", "symbolPrefix", "argumentExpansion"].includes(key));
+      if (unknownProvider.length) throw new Error(`nativeModules[${moduleIndex}].cProvider has unknown field(s): ${unknownProvider.sort().join(", ")}`);
+      if (typeof module.cProvider.header !== "string" || !module.cProvider.header) {
+        throw new Error(`nativeModules[${moduleIndex}].cProvider.header must be a canonical include-relative C header`);
+      }
+      const header = assertSafeArchiveEntryName(module.cProvider.header);
+      if (header !== module.cProvider.header || header.includes(":") || !/\.h$/u.test(header)) {
+        throw new Error(`nativeModules[${moduleIndex}].cProvider.header must be a canonical include-relative C header`);
+      }
+      if (typeof module.cProvider.symbolPrefix !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*_$/u.test(module.cProvider.symbolPrefix)) {
+        throw new Error(`nativeModules[${moduleIndex}].cProvider.symbolPrefix must be a C identifier prefix ending in underscore`);
+      }
+      if (module.cProvider.argumentExpansion !== "pointer-length-v1") {
+        throw new Error(`nativeModules[${moduleIndex}].cProvider.argumentExpansion must be pointer-length-v1`);
+      }
+      cProvider = { header, symbolPrefix: module.cProvider.symbolPrefix, argumentExpansion: module.cProvider.argumentExpansion };
+    }
+    return {
+      name: module.name,
+      abiVersion: module.abiVersion,
+      ...(typeof module.description === "string" ? { description: module.description } : {}),
+      ...(module.constants && typeof module.constants === "object" && !Array.isArray(module.constants) ? { constants: module.constants } : {}),
+      ...(cProvider ? { cProvider } : {}),
+      methods
+    };
+  });
+  if (headers.length === 0 && normalizedModules.length === 0) {
+    throw new Error("the schema must select at least one header or declare one native module");
+  }
+  const typescriptFacades = document.typescriptFacades === undefined ? [] : document.typescriptFacades;
+  if (!Array.isArray(typescriptFacades)) throw new Error("typescriptFacades must be an array");
+  const facadeNames = new Set();
+  const normalizedFacades = typescriptFacades.map((facade, facadeIndex) => {
+    if (!facade || Array.isArray(facade) || typeof facade !== "object") {
+      throw new Error(`typescriptFacades[${facadeIndex}] must be an object`);
+    }
+    const unknown = Object.keys(facade).filter((key) => !["name", "source", "staticSource", "nativeModule"].includes(key));
+    if (unknown.length) throw new Error(`typescriptFacades[${facadeIndex}] has unknown field(s): ${unknown.sort().join(", ")}`);
+    if (typeof facade.name !== "string" || !/^[A-Za-z_][A-Za-z0-9_]*$/u.test(facade.name) || facadeNames.has(facade.name)) {
+      throw new Error(`typescriptFacades[${facadeIndex}].name must be a unique identifier`);
+    }
+    facadeNames.add(facade.name);
+    if (typeof facade.source !== "string" || !facade.source) {
+      throw new Error(`typescriptFacades[${facadeIndex}].source must be a non-empty canonical relative TypeScript path`);
+    }
+    const source = assertSafeArchiveEntryName(facade.source);
+    if (source !== facade.source || source.includes(":") || !source.endsWith(".ts")) {
+      throw new Error(`typescriptFacades[${facadeIndex}].source must be a canonical relative .ts path`);
+    }
+    let staticSource;
+    if (facade.staticSource !== undefined) {
+      if (typeof facade.staticSource !== "string" || !facade.staticSource) {
+        throw new Error(`typescriptFacades[${facadeIndex}].staticSource must be a canonical relative .ts path`);
+      }
+      staticSource = assertSafeArchiveEntryName(facade.staticSource);
+      if (staticSource !== facade.staticSource || staticSource.includes(":") || !staticSource.endsWith(".ts") || staticSource === source) {
+        throw new Error(`typescriptFacades[${facadeIndex}].staticSource must be a distinct canonical relative .ts path`);
+      }
+    }
+    if (typeof facade.nativeModule !== "string" || !moduleNames.has(facade.nativeModule)) {
+      throw new Error(`typescriptFacades[${facadeIndex}].nativeModule must reference a declared native module`);
+    }
+    return { name: facade.name, source, ...(staticSource ? { staticSource } : {}), nativeModule: facade.nativeModule };
+  }).sort((left, right) => left.name.localeCompare(right.name));
+  return {
+    schemaVersion: 1,
+    headers,
+    ...(normalizedModules.length ? { nativeModules: normalizedModules } : {}),
+    ...(normalizedFacades.length ? { typescriptFacades: normalizedFacades } : {})
+  };
 }
 
 function parseBindingSchema(bytes, displayPath, diagnostics) {
@@ -509,7 +636,8 @@ function parseBindingSchema(bytes, displayPath, diagnostics) {
     return { path: displayPath, sha256: sha256(bytes), document: null };
   }
   try {
-    const document = normalizeNativeExtensionBindingSchema(JSON.parse(textDecoder.decode(bytes)));
+    const document = normalizeNativeExtensionBindingSchema(
+      parseNativeModuleDescriptorJson(textDecoder.decode(bytes)));
     return { path: displayPath, sha256: sha256(bytes), document };
   } catch (error) {
     diagnostics.push({ severity: "error", path: displayPath, message: `Invalid native binding schema: ${error.message}` });
@@ -553,9 +681,39 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
     bytes: await readFile(file)
   }))));
   const publicIncludeRoots = [...new Set(includeFiles.map((file) => publicIncludeRoot(portable(path.relative(root, file)))))].sort();
-  const schemaPath = path.join(root, NATIVE_EXTENSION_BINDING_SCHEMA);
-  const bindingSchema = await readFile(schemaPath)
-    .then((bytes) => parseBindingSchema(bytes, portable(path.relative(projectRoot, schemaPath)), diagnostics), () => null);
+  const schemaPaths = await walk(root, (file) => path.basename(file) === NATIVE_EXTENSION_BINDING_SCHEMA, false, diagnostics);
+  if (schemaPaths.length > 1) {
+    diagnostics.push({ severity: "error", path: relativeRoot, message: "Extension declares multiple defold-hermes.bindings.json schemas" });
+  }
+  const schemaPath = schemaPaths.length === 1 ? schemaPaths[0] : null;
+  const bindingSchema = schemaPath
+    ? await readFile(schemaPath).then((bytes) => parseBindingSchema(bytes, portable(path.relative(projectRoot, schemaPath)), diagnostics))
+    : null;
+  const typescriptFacades = [];
+  for (const facade of bindingSchema?.document?.typescriptFacades ?? []) {
+    const sourceFile = path.join(root, ...facade.source.split("/"));
+    const displayPath = portable(path.relative(projectRoot, sourceFile));
+    try {
+      const status = await stat(sourceFile);
+      if (!status.isFile() || status.size > PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes) {
+        throw new Error("must be a regular TypeScript file within the selected-entry size limit");
+      }
+      const bytes = await readFile(sourceFile);
+      let staticDetail = {};
+      if (facade.staticSource) {
+        const staticFile = path.join(root, ...facade.staticSource.split("/"));
+        const staticDisplayPath = portable(path.relative(projectRoot, staticFile));
+        const staticStatus = await stat(staticFile);
+        if (!staticStatus.isFile() || staticStatus.size > PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes) {
+          throw new Error("static facade must be a regular TypeScript file within the selected-entry size limit");
+        }
+        staticDetail = { staticPath: staticDisplayPath, staticSha256: sha256(await readFile(staticFile)) };
+      }
+      typescriptFacades.push({ ...facade, path: displayPath, sha256: sha256(bytes), ...staticDetail });
+    } catch (error) {
+      diagnostics.push({ severity: "error", path: displayPath, message: `Declared TypeScript facade is unavailable: ${error.message}` });
+    }
+  }
   return {
     kind: "local",
     name: typeof manifest.name === "string" ? manifest.name : path.basename(root),
@@ -569,6 +727,7 @@ async function localExtension(projectRoot, manifestPath, diagnostics) {
     publicIncludeRoots,
     sourceFiles,
     bindingSchema,
+    typescriptFacades,
     bindingStatus: bindingStatus(scriptApis, publicHeaders, bindingSchema)
   };
 }
@@ -613,6 +772,47 @@ function zipEntries(bytes) {
     const name = assertSafeArchiveEntryName(rawName);
     if (Object.hasOwn(canonicalEntries, name)) throw new Error(`Dependency archive contains duplicate canonical entry: ${name}`);
     canonicalEntries[name] = value;
+  }
+  const facadeEntryNames = new Set();
+  const manifestRoots = listing
+    .filter((name) => path.posix.basename(name) === "ext.manifest")
+    .map((name) => path.posix.dirname(name) === "." ? "" : path.posix.dirname(name));
+  for (const [schemaName, value] of Object.entries(canonicalEntries)) {
+    if (path.posix.basename(schemaName) !== NATIVE_EXTENSION_BINDING_SCHEMA) continue;
+    try {
+      const document = JSON.parse(textDecoder.decode(value));
+      const root = manifestRoots
+        .filter((candidate) => !candidate || schemaName.startsWith(`${candidate}/`))
+        .sort((left, right) => right.length - left.length)[0] ?? "";
+      for (const facade of document?.typescriptFacades ?? []) {
+        if (typeof facade?.source !== "string") continue;
+        for (const candidate of [facade.source, facade.staticSource].filter((value) => typeof value === "string")) {
+          const source = assertSafeArchiveEntryName(candidate);
+          if (source !== candidate || !source.endsWith(".ts")) continue;
+          facadeEntryNames.add(root ? `${root}/${source}` : source);
+        }
+      }
+    } catch { /* schema diagnostics are emitted by parseBindingSchema */ }
+  }
+  if (facadeEntryNames.size > 0) {
+    const facadeEntries = unzipSync(new Uint8Array(bytes), {
+      filter(file) {
+        const name = assertSafeArchiveEntryName(file.name);
+        if (!facadeEntryNames.has(name)) return false;
+        if (file.originalSize > PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes) {
+          throw new Error(`Dependency archive entry ${name} exceeds ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedEntryBytes} bytes`);
+        }
+        selectedBytes += file.originalSize;
+        if (selectedBytes > PUBLIC_EXTENSION_ZIP_LIMITS.selectedTotalBytes) {
+          throw new Error(`Selected dependency archive entries exceed ${PUBLIC_EXTENSION_ZIP_LIMITS.selectedTotalBytes} bytes`);
+        }
+        return true;
+      }
+    });
+    for (const [rawName, value] of Object.entries(facadeEntries)) {
+      const name = assertSafeArchiveEntryName(rawName);
+      canonicalEntries[name] = value;
+    }
   }
   return { entries: canonicalEntries, listing };
 }
@@ -687,12 +887,34 @@ async function dependencyExtensions(projectRoot, diagnostics) {
       const sourceFiles = names
         .filter((name) => withinExtension(name) && isNativeSource(relativeToExtension(name)))
         .map((name) => `${archive}:${name}`);
-      const schemaEntry = root
-        ? `${root}/${NATIVE_EXTENSION_BINDING_SCHEMA}`
-        : NATIVE_EXTENSION_BINDING_SCHEMA;
+      const schemaCandidates = names.filter((name) =>
+        withinExtension(name) && path.posix.basename(name) === NATIVE_EXTENSION_BINDING_SCHEMA);
+      if (schemaCandidates.length > 1) {
+        diagnostics.push({ severity: "error", path: displayManifest, message: "Extension declares multiple defold-hermes.bindings.json schemas" });
+      }
+      const schemaEntry = schemaCandidates.length === 1 ? schemaCandidates[0] : null;
       const bindingSchema = entries[schemaEntry]
         ? parseBindingSchema(entries[schemaEntry], `${archive}:${schemaEntry}`, diagnostics)
         : null;
+      const typescriptFacades = [];
+      for (const facade of bindingSchema?.document?.typescriptFacades ?? []) {
+        const sourceEntry = root ? `${root}/${facade.source}` : facade.source;
+        const displayPath = `${archive}:${sourceEntry}`;
+        if (!entries[sourceEntry]) {
+          diagnostics.push({ severity: "error", path: displayPath, message: "Declared TypeScript facade is absent from the dependency archive" });
+          continue;
+        }
+        let staticDetail = {};
+        if (facade.staticSource) {
+          const staticEntry = root ? `${root}/${facade.staticSource}` : facade.staticSource;
+          if (!entries[staticEntry]) {
+            diagnostics.push({ severity: "error", path: `${archive}:${staticEntry}`, message: "Declared Static TypeScript facade is absent from the dependency archive" });
+            continue;
+          }
+          staticDetail = { staticPath: `${archive}:${staticEntry}`, staticSha256: sha256(entries[staticEntry]) };
+        }
+        typescriptFacades.push({ ...facade, path: displayPath, sha256: sha256(entries[sourceEntry]), ...staticDetail });
+      }
       extensions.push({
         kind: "dependency",
         name: typeof manifest.name === "string" ? manifest.name : path.posix.basename(root || archive),
@@ -707,6 +929,7 @@ async function dependencyExtensions(projectRoot, diagnostics) {
         publicIncludeRoots,
         sourceFiles,
         bindingSchema,
+        typescriptFacades,
         bindingStatus: bindingStatus(scriptApis, publicHeaders, bindingSchema)
       });
     }

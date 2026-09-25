@@ -142,6 +142,8 @@ add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/generated_dmsdk_universal.cpp
   defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp
   defold/defold_hermes/src/generated_jsi.cpp
+  defold/defold_hermes/src/generated_native_module_jsi.cpp
+  defold/defold_hermes/src/generated_native_module_registry.cpp
   # script_jsi_bridge.cpp reads the generated universal operation catalog to
   # decide result arity. The catalog has no Lua dependency, so it belongs to the
   # standalone runtime rather than only to the Lua-facing libraries.
@@ -198,6 +200,14 @@ add_executable(defold-hermes-dmsdk-universal-jsi-e2e
 )
 target_compile_features(defold-hermes-dmsdk-universal-jsi-e2e PRIVATE cxx_std_17)
 target_link_libraries(defold-hermes-dmsdk-universal-jsi-e2e PRIVATE defold-hermes-runtime)
+
+add_executable(defold-hermes-native-webtransport-jsi-e2e
+  native/native_webtransport_jsi_e2e.cpp
+)
+target_compile_features(defold-hermes-native-webtransport-jsi-e2e PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-native-webtransport-jsi-e2e PRIVATE
+  extensions/defold-webtransport/defold_webtransport/include)
+target_link_libraries(defold-hermes-native-webtransport-jsi-e2e PRIVATE defold-hermes-runtime)
 
 find_program(DEFOLD_HERMES_NODE_EXECUTABLE node REQUIRED)
 set(DEFOLD_HERMES_STATIC_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated/static-hermes")
@@ -328,6 +338,76 @@ target_include_directories(defold-hermes-static-script-exact-test PRIVATE
   tests/fixtures
   "${DEFOLD_HERMES_STATIC_SCRIPT_EXACT_DIR}")
 target_link_libraries(defold-hermes-static-script-exact-test PRIVATE
+  defold-hermes-runtime)
+
+set(DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_DIR
+  "${CMAKE_CURRENT_BINARY_DIR}/generated/static-native-module-exact")
+set(DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_C
+  "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_DIR}/static-native-module-exact.c")
+set(DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_H
+  "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_DIR}/static_native_module_exact_fixture.h")
+add_custom_command(
+  OUTPUT
+    "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_C}"
+    "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_H}"
+  COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-native-module-exact.mjs"
+    --shermes "$<TARGET_FILE:shermes>"
+    --output-dir "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_DIR}"
+  DEPENDS
+    shermes
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-native-module-exact.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.h"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  VERBATIM)
+set_source_files_properties(
+  "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_C}"
+  "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_H}"
+  PROPERTIES GENERATED TRUE)
+add_executable(defold-hermes-static-native-module-exact-test
+  native/static_native_module_exact_test.cpp
+  tests/fixtures/generated_native_webtransport_provider_adapter.cpp
+  extensions/defold-webtransport/defold_webtransport/webtransport/static/deherm_static_native_web_transport.cpp
+  "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_C}")
+target_compile_features(defold-hermes-static-native-module-exact-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-static-native-module-exact-test PRIVATE
+  extensions/defold-webtransport/defold_webtransport/include
+  extensions/defold-webtransport/defold_webtransport/webtransport/static
+  "${DEFOLD_HERMES_STATIC_NATIVE_MODULE_EXACT_DIR}")
+target_link_libraries(defold-hermes-static-native-module-exact-test PRIVATE
+  defold-hermes-runtime)
+
+set(DEFOLD_HERMES_STATIC_WEBTRANSPORT_FACADE_EXACT_DIR
+  "${CMAKE_CURRENT_BINARY_DIR}/generated/static-webtransport-facade-exact")
+set(DEFOLD_HERMES_STATIC_WEBTRANSPORT_FACADE_EXACT_C
+  "${DEFOLD_HERMES_STATIC_WEBTRANSPORT_FACADE_EXACT_DIR}/static-webtransport-facade-exact.c")
+add_custom_command(
+  OUTPUT
+    "${DEFOLD_HERMES_STATIC_WEBTRANSPORT_FACADE_EXACT_C}"
+  COMMAND "${DEFOLD_HERMES_NODE_EXECUTABLE}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-webtransport-facade-exact.mjs"
+    --shermes "$<TARGET_FILE:shermes>"
+    --output-dir "${DEFOLD_HERMES_STATIC_WEBTRANSPORT_FACADE_EXACT_DIR}"
+  DEPENDS
+    shermes
+    "${CMAKE_CURRENT_SOURCE_DIR}/scripts/build-static-webtransport-facade-exact.mjs"
+    "${CMAKE_CURRENT_SOURCE_DIR}/extensions/defold-webtransport/defold_webtransport/webtransport/static/NativeWebTransport.ts"
+    "${CMAKE_CURRENT_SOURCE_DIR}/extensions/defold-webtransport/defold_webtransport/webtransport/static/WebTransport.ts"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  VERBATIM)
+set_source_files_properties(
+  "${DEFOLD_HERMES_STATIC_WEBTRANSPORT_FACADE_EXACT_C}"
+  PROPERTIES GENERATED TRUE)
+add_executable(defold-hermes-static-webtransport-facade-exact-test
+  native/static_webtransport_facade_exact_test.cpp
+  tests/fixtures/generated_native_webtransport_provider_adapter.cpp
+  "${DEFOLD_HERMES_STATIC_WEBTRANSPORT_FACADE_EXACT_C}")
+target_compile_features(defold-hermes-static-webtransport-facade-exact-test PRIVATE cxx_std_17)
+target_include_directories(defold-hermes-static-webtransport-facade-exact-test PRIVATE
+  extensions/defold-webtransport/defold_webtransport/include
+  extensions/defold-webtransport/defold_webtransport/webtransport/static)
+target_link_libraries(defold-hermes-static-webtransport-facade-exact-test PRIVATE
   defold-hermes-runtime)
 
 set(DEFOLD_HERMES_STATIC_DMSDK_EXACT_DIR

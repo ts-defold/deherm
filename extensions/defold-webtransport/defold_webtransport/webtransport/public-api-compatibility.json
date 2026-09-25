@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "contractVersion": "0.1.0",
+  "authority": {
+    "w3c": {
+      "status": "Candidate Recommendation Snapshot",
+      "published": "2026-07-30",
+      "url": "https://www.w3.org/TR/2026/CR-webtransport-20260730/"
+    },
+    "deno": {
+      "version": "2.9.7",
+      "url": "https://docs.deno.com/api/web/platform/"
+    },
+    "runtimeEvidence": "examples/war-battles-online/evidence/webtransport-quic-loopback.json"
+  },
+  "policy": {
+    "required-now": "Public 0.1 facade required for the proven Chrome-to-Deno War Battles path.",
+    "compatibility-required": "Pre-CR browser and Deno shape retained until createWritable is deployed across the exercised runtimes.",
+    "forward-compatible": "Reserved WebTransport shape; addition must be capability-tested and must not be silently emulated with different semantics."
+  },
+  "generation": {
+    "recipe": "webtransport-community-v1",
+    "descriptor": "webtransport/defold-hermes.bindings.json",
+    "outputs": {
+      "lua": "script/defold_webtransport.script_api",
+      "luaRegistration": "include/defold_webtransport/generated_lua_methods.inc",
+      "c": "include/defold_webtransport/client.h",
+      "nativeC": "include/defold_webtransport/native_v1.h",
+      "typescript": "webtransport/typescript/WebTransport.ts",
+      "typescriptStatic": "webtransport/static/WebTransport.ts"
+    },
+    "nativeStreams": {
+      "implementation": "extension-local-bounded-structural",
+      "requiresGlobalReadableStream": false,
+      "requiresGlobalWritableStream": false,
+      "maximumQueuedItemsPerQueue": 64,
+      "maximumStreamsPerSession": 64,
+      "maximumQueuedBytesPerSession": 1048576
+    },
+    "nativeTrust": {
+      "mode": "single-sha-256-certificate-hash-required",
+      "browserMayUseRootTrust": true
+    },
+    "nativePump": {
+      "registration": "registerNativeModulePump",
+      "public": false,
+      "browserRegistration": false,
+      "lifetime": "module-singleton",
+      "maximumSessions": 32
+    }
+  },
+  "families": [
+    {
+      "id": "session-lifecycle",
+      "requiredNow": ["constructor(url, options?)", "ready", "closed", "close(closeInfo?)", "WebTransportCloseInfo.closeCode", "WebTransportCloseInfo.reason"],
+      "forwardCompatible": ["draining", "reliability", "congestionControl", "responseHeaders", "protocol", "WebTransport.anticipatedConcurrentIncomingUnidirectionalStreams", "WebTransport.anticipatedConcurrentIncomingBidirectionalStreams", "WebTransport.supportsReliableOnly"]
+    },
+    {
+      "id": "datagrams",
+      "requiredNow": ["datagrams.readable", "datagrams.maxDatagramSize"],
+      "compatibilityRequired": ["datagrams.writable"],
+      "forwardCompatible": ["datagrams.createWritable(options?)", "datagrams.incomingMaxAge", "datagrams.outgoingMaxAge", "datagrams.incomingMaxBufferedDatagrams", "datagrams.outgoingMaxBufferedDatagrams", "WebTransportDatagramsWritable.sendGroup", "WebTransportDatagramsWritable.sendOrder"]
+    },
+    {
+      "id": "unidirectional-streams",
+      "requiredNow": ["createUnidirectionalStream(options?)", "incomingUnidirectionalStreams", "WebTransportSendStream", "WebTransportReceiveStream"],
+      "forwardCompatible": ["WebTransportSendStream.sendGroup", "WebTransportSendStream.sendOrder", "WebTransportWriter.atomicWrite", "WebTransportWriter.commit"]
+    },
+    {
+      "id": "bidirectional-streams",
+      "requiredNow": ["createBidirectionalStream(options?)", "incomingBidirectionalStreams", "WebTransportBidirectionalStream.readable", "WebTransportBidirectionalStream.writable"],
+      "forwardCompatible": []
+    },
+    {
+      "id": "constructor-options",
+      "requiredNow": ["WebTransportOptions.serverCertificateHashes", "WebTransportHash.algorithm", "WebTransportHash.value", "WebTransportOptions.anticipatedConcurrentIncomingUnidirectionalStreams", "WebTransportOptions.anticipatedConcurrentIncomingBidirectionalStreams"],
+      "forwardCompatible": ["WebTransportOptions.allowPooling", "WebTransportOptions.requireUnreliable", "WebTransportOptions.headers", "WebTransportOptions.congestionControl", "WebTransportOptions.protocols", "WebTransportOptions.datagramsReadableType"]
+    },
+    {
+      "id": "stream-options",
+      "requiredNow": [],
+      "forwardCompatible": ["WebTransportSendStreamOptions.sendGroup", "WebTransportSendStreamOptions.sendOrder", "WebTransportSendStreamOptions.waitUntilAvailable"]
+    },
+    {
+      "id": "statistics",
+      "requiredNow": [],
+      "forwardCompatible": ["WebTransport.getStats", "WebTransportSendStream.getStats", "WebTransportReceiveStream.getStats", "WebTransportSendGroup.getStats"]
+    },
+    {
+      "id": "send-groups",
+      "requiredNow": [],
+      "forwardCompatible": ["createSendGroup", "WebTransportSendGroup"]
+    },
+    {
+      "id": "tls-exporter",
+      "requiredNow": [],
+      "forwardCompatible": ["exportKeyingMaterial(label, context, outputLength)"]
+    },
+    {
+      "id": "errors",
+      "requiredNow": [],
+      "forwardCompatible": ["WebTransportError.source", "WebTransportError.streamErrorCode"]
+    }
+  ],
+  "warBattlesExercise": {
+    "source": "examples/war-battles-online/core/browser-webtransport.ts",
+    "symbols": [
+      "ready",
+      "closed",
+      "close",
+      "datagrams.readable",
+      "datagrams.writable",
+      "datagrams.maxDatagramSize",
+      "createUnidirectionalStream",
+      "incomingUnidirectionalStreams",
+      "createBidirectionalStream",
+      "incomingBidirectionalStreams",
+      "serverCertificateHashes",
+      "anticipatedConcurrentIncomingUnidirectionalStreams",
+      "anticipatedConcurrentIncomingBidirectionalStreams"
+    ]
+  }
+}

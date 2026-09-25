@@ -1,0 +1,6 @@
+[project]
+title = Defold WebTransport
+version = 0.1.0
+
+[library]
+include_dirs = defold_webtransport

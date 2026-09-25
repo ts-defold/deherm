@@ -1,0 +1,49 @@
+name: "defold_webtransport"
+
+platforms:
+    arm64-osx:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    x86_64-osx:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    arm64-ios:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    arm64_sim-ios:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    x86_64-linux:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    arm64-linux:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    x86_64-win32:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m", "ws2_32", "bcrypt"]
+            flags: ["-std=c++17", "-fexceptions"]
+    armv7-android:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    arm64-android:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    x86_64-android:
+        context:
+            libs: ["defold_webtransport_core", "picohttp-core", "picoquic-core", "picoquic-log", "picotls-core", "picotls-minicrypto", "mbedtls", "mbedx509", "mbedcrypto", "everest", "p256m"]
+            flags: ["-std=c++17", "-fexceptions"]
+    wasm-web:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]
+    wasm_pthread-web:
+        context:
+            flags: ["-std=c++17", "-fexceptions"]

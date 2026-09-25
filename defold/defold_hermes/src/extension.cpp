@@ -1172,6 +1172,11 @@ dmExtension::Result UpdateExtension(dmExtension::Params*) {
 #endif
   if (gBundleResource) ActivateBundle(false);
 #if !defined(DM_PLATFORM_HTML5)
+  try {
+    if (gRuntime) gRuntime->pumpNativeModules(0.0);
+  } catch (const std::exception& error) {
+    dmLogError("Native module pump failed: %s", error.what());
+  }
   gInspector.pump();
   EmitTelemetry();
 #endif

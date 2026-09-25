@@ -1,0 +1,21 @@
+diff --git a/picohttp/webtransport.c b/picohttp/webtransport.c
+index 5f59b33d..eb212891 100644
+--- a/picohttp/webtransport.c
++++ b/picohttp/webtransport.c
+@@ -362,6 +362,14 @@ int picowt_webtransport_requirements_met(picoquic_cnx_t* cnx, h3zero_callback_c
+         has_webtransport_settings &&
+         has_connect_settings &&
+         remote_tp != NULL &&
+-        remote_tp->max_datagram_frame_size > 0 &&
+-        remote_tp->is_reset_stream_at_enabled;
++        remote_tp->max_datagram_frame_size > 0 && (
++            remote_tp->is_reset_stream_at_enabled ||
++            /* Deno 2.9 and the browser-compatible draft advertise the legacy
++             * MAX_WEBTRANSPORT_SESSIONS setting and Extended CONNECT, but not
++             * RESET_STREAM_AT. Keep the new webtransport-h3 path strict while
++             * allowing the already-supported legacy "webtransport" path to
++             * interoperate. The client still requires H3 datagrams and QUIC
++             * datagram transport parameters above. */
++            (ctx->settings.webtransport_enabled == 0 &&
++             ctx->settings.webtransport_max_sessions > 0));
+ }

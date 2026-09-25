@@ -2,12 +2,14 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 import tarfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ENGINE = ROOT / "upstream" / "defold" / "engine"
 EXTENSION = ROOT / "defold" / "defold_hermes"
+WEBTRANSPORT_EXTENSION = ROOT / "extensions" / "defold-webtransport" / "defold_webtransport"
 CHECK_SDK = ROOT / "build" / "check-extension-sdk"
 
 
@@ -28,6 +30,7 @@ def include_roots() -> list[Path]:
         roots.add(packaged_sdk / "sdk" / "include")
     roots.add(ENGINE / "sdk" / "src")
     roots.add(EXTENSION / "include")
+    roots.add(WEBTRANSPORT_EXTENSION / "include")
     roots.add(CHECK_SDK / "include")
     return sorted(roots)
 
@@ -60,6 +63,16 @@ def compile_source(source: Path, platform: str, extra_flags: list[str] | None = 
 
 def main() -> None:
     ensure_support_headers()
+    webtransport_only = "--webtransport-only" in sys.argv[1:]
+    unknown = [argument for argument in sys.argv[1:] if argument != "--webtransport-only"]
+    if unknown:
+        raise SystemExit(f"unknown arguments: {', '.join(unknown)}")
+    webtransport_source = WEBTRANSPORT_EXTENSION / "src" / "extension.cpp"
+    compile_source(webtransport_source, "OSX")
+    compile_source(webtransport_source, "HTML5")
+    if webtransport_only:
+        print("Defold WebTransport extension syntax check passed (native + HTML5)")
+        return
     generated_dmsdk = sorted((EXTENSION / "src").glob("generated_dmsdk_*.cpp"))
     common = [
         EXTENSION / "src" / "bundle_resource.cpp",
@@ -86,6 +99,8 @@ def main() -> None:
     ]
     native = [
         *common,
+        EXTENSION / "src" / "generated_native_module_jsi.cpp",
+        EXTENSION / "src" / "generated_native_module_registry.cpp",
         EXTENSION / "src" / "component_hermes_backend.cpp",
         EXTENSION / "src" / "runtime.cpp",
         EXTENSION / "src" / "script_jsi_bridge.cpp",
@@ -102,7 +117,7 @@ def main() -> None:
     )
     for source in common:
         compile_source(source, "HTML5")
-    print(f"Extension syntax check passed ({len(native)} native + debug inspector, {len(common)} HTML5 translation units)")
+    print(f"Extension syntax check passed ({len(native)} native + debug inspector, {len(common)} HTML5, 2 WebTransport translation units)")
 
 
 if __name__ == "__main__":

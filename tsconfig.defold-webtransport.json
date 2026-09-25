@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "lib": ["ES2022", "DOM"],
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "paths": {
+      "@deherm/project/module-runtime": ["./packages/sdk/src/module-runtime.ts"]
+    }
+  },
+  "include": [
+    "extensions/defold-webtransport/defold_webtransport/webtransport/typescript/*.ts",
+    "packages/sdk/src/package.ts"
+  ]
+}

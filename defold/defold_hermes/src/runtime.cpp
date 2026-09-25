@@ -1,6 +1,7 @@
 #include <defold_hermes/runtime.hpp>
 #include <defold_hermes/callback_registry.hpp>
 #include <defold_hermes/generated_jsi.hpp>
+#include <defold_hermes/generated_native_module_jsi.hpp>
 #include <defold_hermes/script_jsi_bridge.hpp>
 
 #if !defined(DM_PLATFORM_HTML5)
@@ -366,6 +367,24 @@ class Runtime::Impl {
   }
 
   void init() { callOptional("init"); }
+
+  void pumpNativeModules(double dt) {
+    const jsi::Value argument(dt);
+    auto nativeTick = runtime_->global().getProperty(*runtime_, "__dehermNativeModulesTickV1");
+    if (!nativeTick.isUndefined() && !nativeTick.isNull()) {
+      if (!nativeTick.isObject() || !nativeTick.asObject(*runtime_).isFunction(*runtime_)) {
+        throw jsi::JSError(*runtime_, "__dehermNativeModulesTickV1 must be a function");
+      }
+      nativeTick.asObject(*runtime_).asFunction(*runtime_).call(*runtime_, argument);
+    }
+    // Native-module facades deliberately resolve their public Promise surface
+    // from the engine-frame pump. Hermes does not perform a microtask
+    // checkpoint automatically after a JSI host call, so without this drain a
+    // provider can deliver `ready` while the corresponding continuation never
+    // becomes observable. Keep the checkpoint on the same engine-owned JS
+    // thread immediately after the bounded native-module tick.
+    runtime_->drainMicrotasks();
+  }
 
   void update(double dt) {
     const jsi::Value argument(dt);
@@ -1091,6 +1110,7 @@ class Runtime::Impl {
 
     jsi::Object modules(*runtime_);
     installGeneratedModules(*runtime_, modules, *callbacks_);
+    installGeneratedNativeModuleProviders(*runtime_, modules);
     runtime_->global().setProperty(
         *runtime_, "__defoldModulesV1", std::move(modules));
     scriptBridgeLifetime_ = installScriptJsiBridge(*runtime_);
@@ -1176,6 +1196,7 @@ void Runtime::reloadComponentBundle(const std::string& source, const std::string
 }
 bool Runtime::componentOnly() const noexcept { return impl_->componentOnly(); }
 void Runtime::init() { impl_->pumpInspector(); impl_->init(); impl_->pumpInspector(); }
+void Runtime::pumpNativeModules(double dt) { impl_->pumpNativeModules(dt); }
 void Runtime::update(double dt) { impl_->pumpInspector(); impl_->update(dt); impl_->pumpInspector(); }
 void Runtime::onMessage(const std::string& message) { impl_->pumpInspector(); impl_->onMessage(message); impl_->pumpInspector(); }
 void Runtime::finalize() { impl_->pumpInspector(); impl_->finalize(); impl_->pumpInspector(); }

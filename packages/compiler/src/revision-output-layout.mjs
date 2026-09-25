@@ -21,7 +21,11 @@ export const STABLE_GENERATED_OUTPUTS = Object.freeze(new Set([
   "defold/defold_hermes/include/defold_hermes/generated_runtime_variant.h",
   "defold/defold_hermes/include/defold_hermes/generated_component_proxy_capability.hpp",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
+  "defold/defold_hermes/include/defold_hermes/generated_native_module_jsi.hpp",
+  "defold/defold_hermes/include/defold_hermes/native_module_provider.h",
   "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
+  "defold/defold_hermes/src/generated_native_module_jsi.cpp",
+  "defold/defold_hermes/src/generated_native_module_registry.cpp",
   "packages/static-hermes/src/generated/dmsdk-universal.ts"
 ]));
 

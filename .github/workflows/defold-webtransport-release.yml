@@ -1,0 +1,145 @@
+name: defold-webtransport-release
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Expected standalone extension version; defaults to extensions/defold-webtransport/VERSION
+        required: false
+        type: string
+    outputs:
+      version:
+        description: Published standalone extension version
+        value: ${{ jobs.package-and-release.outputs.version }}
+      tag:
+        description: GitHub release tag
+        value: ${{ jobs.package-and-release.outputs.tag }}
+      asset:
+        description: Defold dependency ZIP asset name
+        value: ${{ jobs.package-and-release.outputs.asset }}
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Expected standalone extension version; defaults to extensions/defold-webtransport/VERSION
+        required: false
+        type: string
+  push:
+    tags:
+      - defold-webtransport-v*
+
+permissions:
+  contents: write
+
+concurrency:
+  group: defold-webtransport-release
+  cancel-in-progress: false
+
+jobs:
+  native-artifacts:
+    uses: ./.github/workflows/defold-webtransport-native-artifacts.yml
+    permissions:
+      contents: write
+
+  package-and-release:
+    needs: native-artifacts
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      tag: ${{ steps.release.outputs.tag }}
+      asset: ${{ steps.release.outputs.asset }}
+    steps:
+      - uses: actions/checkout@v7
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Resolve the independently versioned release
+        id: release
+        env:
+          REQUESTED_VERSION: ${{ inputs.version }}
+        run: |
+          version="$(tr -d '[:space:]' < extensions/defold-webtransport/VERSION)"
+          if [[ -n "$REQUESTED_VERSION" && "$REQUESTED_VERSION" != "$version" ]]; then
+            echo "Requested version $REQUESTED_VERSION does not match VERSION $version" >&2
+            exit 1
+          fi
+          tag="defold-webtransport-v${version}"
+          asset="defold-webtransport-${version}.zip"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "$tag" ]]; then
+            echo "Tag $GITHUB_REF_NAME does not match VERSION-derived tag $tag" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "asset=$asset" >> "$GITHUB_OUTPUT"
+      - name: Test deterministic standalone packaging
+        run: >-
+          node --test
+          tests/webtransport-artifacts.test.mjs
+          tests/defold-webtransport-artifacts.test.mjs
+          tests/defold-webtransport-package.test.mjs
+          tests/defold-webtransport-public-api.test.mjs
+          tests/defold-webtransport-community-api.test.mjs
+      - name: Verify generated community API surfaces and strict types
+        run: |
+          pnpm check:defold-webtransport-community-api
+          node scripts/manage-defold-webtransport-artifacts.mjs check-index
+      - name: Verify generic, JSI, and Static provider compatibility gates
+        run: |
+          pnpm test:native-webtransport-jsi
+          pnpm test:static-native-module-exact
+          pnpm test:static-webtransport-facade-exact
+      - name: Download every immutable native target archive
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NATIVE_TAG: ${{ needs.native-artifacts.outputs.tag }}
+        run: |
+          mkdir -p build/webtransport-native-downloads
+          gh release download "$NATIVE_TAG" --repo "$GITHUB_REPOSITORY" \
+            --pattern 'defold-webtransport-native-*.zip' --dir build/webtransport-native-downloads
+      - name: Assemble all native targets and package the Defold dependency archive
+        run: |
+          node scripts/manage-defold-webtransport-artifacts.mjs assemble \
+            --archives build/webtransport-native-downloads \
+            --output build/defold-webtransport-release-source
+          node scripts/package-defold-webtransport.mjs \
+            --source build/defold-webtransport-release-source \
+            --version "${{ steps.release.outputs.version }}" \
+            --output build/releases \
+            --stage build/defold-webtransport-dogfood
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ${{ steps.release.outputs.asset }}
+          path: build/releases/${{ steps.release.outputs.asset }}
+          if-no-files-found: error
+      - name: Attach immutable asset to the standalone extension release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+          ASSET: ${{ steps.release.outputs.asset }}
+        run: |
+          local_asset="build/releases/$ASSET"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets \
+              --jq ".assets[] | select(.name == \"$ASSET\") | .name" | grep -Fxq "$ASSET"; then
+              mkdir -p build/published-release
+              gh release download "$TAG" --repo "$GITHUB_REPOSITORY" \
+                --pattern "$ASSET" --dir build/published-release
+              cmp --silent "$local_asset" "build/published-release/$ASSET" || {
+                echo "$TAG already has a different immutable $ASSET" >&2
+                exit 1
+              }
+              echo "$TAG already carries the byte-identical $ASSET"
+              exit 0
+            fi
+            gh release upload "$TAG" "$local_asset" --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$TAG" "$local_asset" --repo "$GITHUB_REPOSITORY" \
+              --target "$GITHUB_SHA" \
+              --title "Defold WebTransport v$VERSION" \
+              --notes "Standalone Defold WebTransport extension v$VERSION. Add the release ZIP as an ordinary Defold project dependency; déherm is optional."
+          fi

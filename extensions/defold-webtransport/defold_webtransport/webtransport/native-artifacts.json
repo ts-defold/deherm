@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "repository": "ts-defold/deherm",
+  "tag": "defold-webtransport-native-37418cd807e4",
+  "fingerprint": "37418cd807e4b5af049b4a0fd2ffd4d778059ad331308852c7d957e127eb500c",
+  "abiSha256": "544a26fded780ef78910acb8ad39fb1bd76fe9c7af0c12151c49be3fcfb65543",
+  "assets": [
+    {
+      "target": "arm64-android",
+      "asset": "defold-webtransport-native-arm64-android.zip"
+    },
+    {
+      "target": "arm64-ios",
+      "asset": "defold-webtransport-native-arm64-ios.zip"
+    },
+    {
+      "target": "arm64-linux",
+      "asset": "defold-webtransport-native-arm64-linux.zip"
+    },
+    {
+      "target": "arm64-osx",
+      "asset": "defold-webtransport-native-arm64-osx.zip"
+    },
+    {
+      "target": "arm64_sim-ios",
+      "asset": "defold-webtransport-native-arm64_sim-ios.zip"
+    },
+    {
+      "target": "armv7-android",
+      "asset": "defold-webtransport-native-armv7-android.zip"
+    },
+    {
+      "target": "x86_64-android",
+      "asset": "defold-webtransport-native-x86_64-android.zip"
+    },
+    {
+      "target": "x86_64-linux",
+      "asset": "defold-webtransport-native-x86_64-linux.zip"
+    },
+    {
+      "target": "x86_64-osx",
+      "asset": "defold-webtransport-native-x86_64-osx.zip"
+    },
+    {
+      "target": "x86_64-win32",
+      "asset": "defold-webtransport-native-x86_64-win32.zip"
+    }
+  ]
+}

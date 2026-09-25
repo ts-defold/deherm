@@ -10,6 +10,7 @@ import { build } from "esbuild";
 
 import { emitDmSdkUniversalStaticFrame } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
 import { renderBuildConfig } from "./assemble-typed-native-extension.mjs";
+import { WEBTRANSPORT_SCHEMA, generateNativeModuleProviderArtifacts, repositoryNativeModuleArtifactPath } from "./generate-native-module-providers.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -36,10 +37,29 @@ export const stableGeneratedExceptions = Object.freeze({
   "packages/static-hermes/src/generated/dmsdk-universal.ts": Object.freeze({
     group: "compiler-owned-static-frame",
     provenance: "packages/compiler/src/dmsdk-universal-static-frame.mjs package ABI constants"
+  }),
+  "defold/defold_hermes/include/defold_hermes/generated_native_module_jsi.hpp": Object.freeze({
+    group: "compiler-owned-native-provider",
+    provenance: "scripts/generate-native-module-providers.mjs generic provider ABI"
+  }),
+  "defold/defold_hermes/include/defold_hermes/native_module_provider.h": Object.freeze({
+    group: "compiler-owned-native-provider",
+    provenance: "scripts/generate-native-module-providers.mjs generic provider ABI"
+  }),
+  "defold/defold_hermes/src/generated_native_module_jsi.cpp": Object.freeze({
+    group: "compiler-owned-native-provider",
+    provenance: "scripts/generate-native-module-providers.mjs generic provider ABI"
+  }),
+  "defold/defold_hermes/src/generated_native_module_registry.cpp": Object.freeze({
+    group: "compiler-owned-native-provider",
+    provenance: "scripts/generate-native-module-providers.mjs generic provider ABI"
   })
 });
 
 const forbiddenRules = Object.freeze([
+  ["webtransport-target-native-artifact", (file) =>
+    file.startsWith("extensions/defold-webtransport/defold_webtransport/lib/") &&
+    (file.endsWith(".a") || file.endsWith(".lib"))],
   ["target-native-config", (file) => file === "defold/defold_hermes/include/libhermesvm-config.h"],
   ["target-native-install-receipt", (file) =>
     file.startsWith("defold/defold_hermes/lib/") && file.endsWith("/.deherm-artifact.json")],
@@ -92,6 +112,7 @@ const stableRules = Object.freeze([
   ["typescript-runtime-template", (file) =>
     file.startsWith("packages/sdk/src/") || file.startsWith("packages/static-hermes/src/")],
   ["native-runtime-template", (file) => file.startsWith("defold/defold_hermes/")],
+  ["webtransport-extension-template", (file) => file.startsWith("extensions/defold-webtransport/")],
   ["package-metadata", (file) => ["LICENSE", "README.md", "package.json"].includes(file)],
   ["package-binary", (file) => file.startsWith("bin/")]
 ]);
@@ -295,11 +316,15 @@ export async function verifyNoPinnedDefoldRevisionBytes(inventory, root = reposi
 
 export async function verifyStableGeneratedExceptionBytes(root = repositoryRoot) {
   const emitted = emitDmSdkUniversalStaticFrame();
+  const nativeProviderSchema = JSON.parse(await readFile(
+    path.join(root, WEBTRANSPORT_SCHEMA), "utf8"));
+  const nativeProviderArtifacts = generateNativeModuleProviderArtifacts(nativeProviderSchema, { artifactPath: repositoryNativeModuleArtifactPath });
   const expected = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_build_config.h", renderBuildConfig(false)],
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h", emitted.header],
     ["defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp", emitted.source],
-    ["packages/static-hermes/src/generated/dmsdk-universal.ts", emitted.staticHermes]
+    ["packages/static-hermes/src/generated/dmsdk-universal.ts", emitted.staticHermes],
+    ...nativeProviderArtifacts
   ]);
   for (const [relative, source] of expected) {
     if (await readFile(path.join(root, relative), "utf8") !== source) {

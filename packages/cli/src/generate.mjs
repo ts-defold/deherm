@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { isDeepStrictEqual } from "node:util";
 
+import { unzipSync } from "fflate";
 import { API as TypeScriptApi } from "typescript/unstable/sync";
 
 import {
@@ -18,6 +19,14 @@ import {
   isTargetNativeOutput
 } from "../../compiler/src/revision-output-layout.mjs";
 import { BINDING_LOWERING_RECIPE_EMITTER } from "../../compiler/src/binding-lowering-plan-recipe.mjs";
+import {
+  renderNativeModuleProviderAdapterSource,
+  renderNativeModuleProviderHeader,
+  renderNativeModuleStaticHeader,
+  renderNativeModuleStaticSource,
+  renderNativeModuleStaticTypescript,
+  renderNativeModuleTypescript
+} from "../../compiler/src/native-module-provider-generator.mjs";
 import { verifyProjectBuildArtifacts } from "./build-artifacts.mjs";
 import {
   assertResolvedDefoldRevision,
@@ -28,6 +37,7 @@ import { parseGameProject, resolveEngineProfiles } from "./project.mjs";
 import {
   assertResolvedDefoldSurface,
   buildGenerationMerkle,
+  defoldSurfaceCacheHome,
   resolveDefoldSurface
 } from "./defold-surface.mjs";
 import { safeParameterIdentifier } from "./names.mjs";
@@ -35,6 +45,10 @@ import { hostDefoldPlatform } from "./toolchains.mjs";
 import { checkProject, loadDehermPluginConfig } from "./transform-compiler.mjs";
 import { materializeProjectNativeExtensionApis, resolveNativeExtensionClang } from "./native-extension-api.mjs";
 import { reconcileBobProjectBoundary } from "./bob-project-boundary.mjs";
+import {
+  fetchWebTransportArtifactOverlay,
+  validateWebTransportArtifactOverlay
+} from "./webtransport-artifacts.mjs";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const require = createRequire(import.meta.url);
@@ -215,7 +229,8 @@ async function projectGenerationIdentity({ inventory, outputDirectory, core, eng
   const projectGeneratorSha256 = sha256(await readFile(fileURLToPath(import.meta.url)));
   const nativeExtensionGeneratorSha256 = sha256(Buffer.concat(await Promise.all([
     readFile(path.join(packageRoot, "packages", "cli", "src", "native-extension-api.mjs")),
-    readFile(path.join(packageRoot, "packages", "compiler", "src", "native-extension-generator.mjs"))
+    readFile(path.join(packageRoot, "packages", "compiler", "src", "native-extension-generator.mjs")),
+    readFile(path.join(packageRoot, "packages", "compiler", "src", "native-module-provider-generator.mjs"))
   ])));
   const cacheKey = sha256(JSON.stringify({
     schemaVersion: 1,
@@ -751,6 +766,7 @@ function generatedCompilerOnlyGlobs(generated) {
     // to native assembly, not authored TypeScript modules for ttsc.
     `${generated}/cache/**/*.ts`,
     `${generated}/static-hermes/**/*.ts`,
+    `${generated}/generated/native-extensions/**/*.ts`,
     // Typed-native assembly deliberately stages at this stable project path so
     // shermes source locations are reproducible, independent of --out-dir.
     ".deherm/build/generated/typed-native/**/*.ts"
@@ -951,7 +967,192 @@ export function buildScriptContextCapabilities(scriptIr, loweringPlan) {
   };
 }
 
-function contextSdkSource(context, modules) {
+function projectNativeModules(inventory) {
+  const modules = [];
+  for (const extension of inventory.extensions) {
+    for (const module of extension.bindingSchema?.document?.nativeModules ?? []) {
+      modules.push({ extension: extension.name, ...module });
+    }
+  }
+  modules.sort((left, right) => compareCodeUnits(left.name, right.name));
+  const seen = new Set();
+  for (const module of modules) {
+    if (seen.has(module.name)) throw new Error(`Duplicate project native module name: ${module.name}`);
+    seen.add(module.name);
+  }
+  return modules;
+}
+
+function projectTypescriptFacades(inventory, nativeModules) {
+  const facades = [];
+  const moduleNames = new Set(nativeModules.map(({ name }) => name));
+  for (const extension of inventory.extensions) {
+    const declared = extension.bindingSchema?.document?.typescriptFacades ?? [];
+    const details = extension.typescriptFacades ?? [];
+    if (declared.length !== details.length || declared.some((facade) =>
+      !details.some((detail) => detail.name === facade.name && detail.source === facade.source && detail.nativeModule === facade.nativeModule))) {
+      throw new Error(`Declared TypeScript facade inventory is incomplete for ${extension.manifestPath}`);
+    }
+    for (const detail of details) {
+      if (!moduleNames.has(detail.nativeModule)) {
+        throw new Error(`TypeScript facade ${detail.name} references unavailable native module ${detail.nativeModule}`);
+      }
+      facades.push({ extension: extension.name, kind: extension.kind, archive: extension.archive, ...detail });
+    }
+  }
+  facades.sort((left, right) => compareCodeUnits(left.name, right.name));
+  const names = new Set(nativeModules.map(({ name }) => name));
+  for (const facade of facades) {
+    if (names.has(facade.name)) throw new Error(`Duplicate project native TypeScript export name: ${facade.name}`);
+    names.add(facade.name);
+  }
+  return facades;
+}
+
+function projectTypescriptFacadeCompilerInputs(inventory) {
+  const inputs = new Set();
+  for (const extension of inventory.extensions) {
+    if (extension.kind !== "local") continue;
+    if (extension.bindingSchema?.path) {
+      const schemaDirectory = path.posix.dirname(extension.bindingSchema.path);
+      inputs.add(schemaDirectory === "." ? "**/*.ts" : `${schemaDirectory}/**/*.ts`);
+    }
+    for (const facade of extension.typescriptFacades ?? []) {
+      if (facade.path) inputs.add(facade.path);
+      if (facade.staticPath) inputs.add(facade.staticPath);
+    }
+  }
+  return [...inputs].sort(compareCodeUnits);
+}
+
+async function readProjectTypescriptFacade(inventory, facade, target = "dynamic") {
+  const selectedPath = target === "static" ? facade.staticPath : facade.path;
+  const selectedSha256 = target === "static" ? facade.staticSha256 : facade.sha256;
+  if (!selectedPath || !selectedSha256) throw new Error(`TypeScript facade ${facade.name} has no ${target} source`);
+  let bytes;
+  if (facade.kind === "local") {
+    bytes = await readFile(path.join(inventory.projectRoot, ...selectedPath.split("/")));
+  } else {
+    const separator = selectedPath.indexOf(":");
+    if (separator < 1 || !facade.archive) throw new Error(`Invalid dependency TypeScript facade location: ${selectedPath}`);
+    const entry = selectedPath.slice(separator + 1);
+    const archiveBytes = await readFile(path.join(inventory.projectRoot, ...facade.archive.split("/")));
+    const extracted = unzipSync(new Uint8Array(archiveBytes), {
+      filter: (file) => file.name.replace(/^(?:\.\/)+/u, "") === entry
+    });
+    bytes = extracted[entry] ?? extracted[`./${entry}`];
+    if (!bytes) throw new Error(`Dependency TypeScript facade is missing: ${selectedPath}`);
+  }
+  if (sha256(bytes) !== selectedSha256) throw new Error(`TypeScript facade changed after project inspection: ${selectedPath}`);
+  return Buffer.from(bytes).toString("utf8");
+}
+
+async function materializeProjectTypescriptFacades(inventory, facades, destination, target = "dynamic") {
+  for (const facade of facades) {
+    if (target === "static" && !facade.staticPath) continue;
+    let source = await readProjectTypescriptFacade(inventory, facade, target);
+    source = source.replace(
+      /from\s+(["'])@deherm\/project\/module-runtime\1/gu,
+      target === "static" ? 'from "../module-runtime.js"' : 'from "../../module-runtime.js"'
+    );
+    if (/@deherm\/project\//u.test(source)) {
+      throw new Error(`TypeScript facade ${facade.name} contains an unsupported private project SDK import`);
+    }
+    if (!new RegExp(`export\\s+(?:const|class|function)\\s+${facade.name}\\b`, "u").test(source)) {
+      throw new Error(`TypeScript facade ${facade.name} does not export its declared value`);
+    }
+    await writeFile(path.join(destination, `${facade.name}.ts`), source);
+  }
+}
+
+function staticNativeModuleRuntimeSource() {
+  return `// Generated by deherm. Do not edit.
+type NativeModulePump=(deltaSeconds:number)=>void;
+type NativeModulePumpStateV1={version:number,pumps:Array<NativeModulePump|undefined>,tick:NativeModulePump};
+const pumpGlobal:any=globalThis as any;
+function pumpState():NativeModulePumpStateV1{const existing:NativeModulePumpStateV1|undefined=pumpGlobal.__dehermNativeModulePumpStateV1;if(existing!==undefined){if(existing.version!==1||existing.pumps.length!==32||typeof existing.tick!=="function")throw "invalid native module pump state v1";if(pumpGlobal.__dehermNativeModulesTickV1!==undefined&&pumpGlobal.__dehermNativeModulesTickV1!==existing.tick)throw "native module pump tick v1 is already owned";if(pumpGlobal.__dehermNativeModulesTickV1===undefined)pumpGlobal.__dehermNativeModulesTickV1=existing.tick;return existing;}if(pumpGlobal.__dehermNativeModulesTickV1!==undefined)throw "native module pump tick v1 exists without shared state";const pumps:Array<NativeModulePump|undefined>=new Array<NativeModulePump|undefined>(32);const state:NativeModulePumpStateV1={version:1,pumps:pumps,tick:(deltaSeconds:number):void=>{for(let index=0;index<pumps.length;++index){const callback=pumps[index];if(callback!==undefined)callback(deltaSeconds);}}};pumpGlobal.__dehermNativeModulePumpStateV1=state;pumpGlobal.__dehermNativeModulesTickV1=state.tick;return state;}
+export function registerNativeModulePump(callback:NativeModulePump):()=>void{const state=pumpState();let slot=-1;for(let index=0;index<state.pumps.length;++index){if(state.pumps[index]===undefined){slot=index;break;}}if(slot<0)throw "native module pump capacity exceeded (32)";state.pumps[slot]=callback;let active=true;return ()=>{if(active){active=false;state.pumps[slot]=undefined;}};}
+export function pumpStaticNativeModules(deltaSeconds:number):void{pumpState().tick(deltaSeconds);}
+`;
+}
+
+async function materializeProjectNativeModuleBridge(inventory, nativeModules) {
+  const modules = nativeModules.filter((module) => module.cProvider);
+  const root = path.join(inventory.projectRoot, "deherm_project_native_modules");
+  try {
+    const status = await lstat(root);
+    if (!status.isDirectory() || status.isSymbolicLink()) {
+      throw new Error(`Refusing to replace unmanaged reserved native-module bridge at ${root}`);
+    }
+    let sentinel;
+    try { sentinel = JSON.parse(await readFile(path.join(root, ".deherm-managed.json"), "utf8")); }
+    catch { throw new Error(`Refusing to replace unmanaged reserved native-module bridge at ${root}`); }
+    if (sentinel?.schemaVersion !== 1 || sentinel.owner !== "@ts-defold/deherm" ||
+        sentinel.kind !== "project-native-module-bridge") {
+      throw new Error(`Refusing to replace unmanaged reserved native-module bridge at ${root}`);
+    }
+  } catch (error) {
+    if (error?.code !== "ENOENT") throw error;
+  }
+  await rm(root, { recursive: true, force: true });
+  if (modules.length === 0) return null;
+  const includeRoot = path.join(root, "include", "deherm_project_native_modules");
+  const sourceRoot = path.join(root, "src");
+  await mkdir(includeRoot, { recursive: true });
+  await mkdir(sourceRoot, { recursive: true });
+  const registrations = [];
+  const unregistrations = [];
+  for (const module of modules) {
+    const stem = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
+    const providerHeader = `${stem}_provider.h`;
+    await writeFile(path.join(includeRoot, providerHeader), renderNativeModuleProviderHeader(module));
+    const adapter = renderNativeModuleProviderAdapterSource(
+      module, `deherm_project_native_modules/${providerHeader}`);
+    await writeFile(path.join(sourceRoot, `${stem}_provider.cpp`),
+      `#if !defined(DM_PLATFORM_HTML5)\n${adapter}#endif\n`);
+    registrations.push(`  if (deherm_register_${stem}_provider_v1() != 0) return dmExtension::RESULT_INIT_ERROR;`);
+    unregistrations.push(`  deherm_unregister_${stem}_provider_v1();`);
+  }
+  const declarations = modules.map((module) => {
+    const stem = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
+    return `extern "C" int32_t deherm_register_${stem}_provider_v1(void);\nextern "C" int32_t deherm_unregister_${stem}_provider_v1(void);`;
+  }).join("\n");
+  await writeFile(path.join(root, "ext.manifest"),
+    '# Generated by deherm. Do not edit.\nname: "deherm_project_native_modules"\n');
+  await writeFile(path.join(root, ".deherm-managed.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    owner: "@ts-defold/deherm",
+    kind: "project-native-module-bridge",
+    modules: modules.map(({ name, abiVersion }) => ({ name, abiVersion }))
+  }, null, 2)}\n`);
+  await writeFile(path.join(sourceRoot, "extension.cpp"), `// Generated by deherm. Do not edit.
+#define LIB_NAME "deherm_project_native_modules"
+#include <dmsdk/extension/extension.hpp>
+#if !defined(DM_PLATFORM_HTML5)
+${declarations}
+#endif
+namespace {
+dmExtension::Result AppInitialize(dmExtension::AppParams*) {
+#if !defined(DM_PLATFORM_HTML5)
+${registrations.join("\n")}
+#endif
+  return dmExtension::RESULT_OK;
+}
+dmExtension::Result AppFinalize(dmExtension::AppParams*) {
+#if !defined(DM_PLATFORM_HTML5)
+${unregistrations.join("\n")}
+#endif
+  return dmExtension::RESULT_OK;
+}
+dmExtension::Result Initialize(dmExtension::Params*) { return dmExtension::RESULT_OK; }
+dmExtension::Result Finalize(dmExtension::Params*) { return dmExtension::RESULT_OK; }
+}
+DM_DECLARE_EXTENSION(deherm_project_native_modules, LIB_NAME, AppInitialize, AppFinalize, Initialize, 0, 0, Finalize)
+`);
+  return root;
+}
+
+function contextSdkSource(context, modules, nativeModules = [], nativeFacades = []) {
   const lines = [
     "// Generated by deherm. Do not edit.",
     'import * as ScriptModules from "../generated/script/modules.js";',
@@ -968,6 +1169,8 @@ function contextSdkSource(context, modules) {
     'export * from "../address.js";',
     'export * from "../component.js";',
     'export * from "../hmr-state.js";',
+    ...nativeModules.map((module) => `export * from "../generated/native/${module.name}.js";`),
+    ...nativeFacades.map((facade) => `export * from "../generated/native/${facade.name}.js";`),
     'export type * from "../generated/script/types.js";',
     'export { installDefoldScriptBridge, type DefoldScriptBridge } from "../generated/script/runtime.js";',
     'export * from "../generated/dmsdk/index.js";',
@@ -1021,12 +1224,13 @@ function projectBaseConfig(outputDirectory, profile = "development") {
   };
 }
 
-function contextProjectConfig(outputDirectory, context) {
+function contextProjectConfig(outputDirectory, context, compilerInputs = []) {
   const generated = outputDirectory.split(path.sep).join("/");
   const excludes = [
     ...context.excludes,
     `${generated}/generated/components/registry.ts`,
-    ...generatedCompilerOnlyGlobs(generated)
+    ...generatedCompilerOnlyGlobs(generated),
+    ...compilerInputs
   ];
   return {
     extends: "./tsconfig.deherm.base.json",
@@ -1043,7 +1247,7 @@ function contextProjectConfig(outputDirectory, context) {
   };
 }
 
-function bundleProjectConfig(outputDirectory) {
+function bundleProjectConfig(outputDirectory, compilerInputs = []) {
   const generated = outputDirectory.split(path.sep).join("/");
   return {
     extends: "./tsconfig.deherm.base.json",
@@ -1054,11 +1258,11 @@ function bundleProjectConfig(outputDirectory) {
       }
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated)]
+    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated), ...compilerInputs]
   };
 }
 
-function releaseProjectConfig(outputDirectory) {
+function releaseProjectConfig(outputDirectory, compilerInputs = []) {
   const generated = outputDirectory.split(path.sep).join("/");
   const base = projectBaseConfig(outputDirectory, "release");
   return {
@@ -1070,7 +1274,7 @@ function releaseProjectConfig(outputDirectory) {
       }
     },
     include: ["**/*.ts", `${generated}/**/*.ts`],
-    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated)]
+    exclude: [...ignoredAuthoredGlobs, ...generatedCompilerOnlyGlobs(generated), ...compilerInputs]
   };
 }
 
@@ -1543,6 +1747,94 @@ export async function installNativeExtension(projectRoot, options = {}) {
   return { root: destination, installed: true, source: surfaceSource ? "package+policy-surface" : "package" };
 }
 
+export async function installProjectWebTransportExtension(projectRoot, options = {}) {
+  const resolvedProject = path.resolve(projectRoot);
+  const destination = path.join(resolvedProject, "defold_webtransport");
+  const selectedSource = options.source ?? (options.packageSource || options.artifacts || options.artifactTarget
+    ? path.join(packageRoot, "extensions", "defold-webtransport", "defold_webtransport")
+    : null);
+  if (!selectedSource) {
+    try {
+      await access(path.join(destination, "ext.manifest"));
+      return { root: destination, installed: false, source: "project" };
+    } catch {
+      return { root: destination, installed: false, source: "none" };
+    }
+  }
+  const source = path.resolve(resolvedProject, selectedSource);
+  if (source === destination) return { root: destination, installed: false, source: "workspace" };
+  await access(path.join(source, "ext.manifest"));
+  let artifactRoot = options.artifacts ? path.resolve(resolvedProject, options.artifacts) : null;
+  let artifactSource = "local";
+  if (!artifactRoot && options.artifactTarget) {
+    const fetched = await fetchWebTransportArtifactOverlay({
+      extensionSource: source,
+      target: options.artifactTarget,
+      cacheRoot: options.artifactCacheRoot ?? path.join(
+        defoldSurfaceCacheHome(options.environment ?? process.env),
+        "webtransport-artifacts"
+      ),
+      fetchImpl: options.fetchImpl
+    });
+    artifactRoot = fetched.root;
+    artifactSource = fetched.source;
+  }
+  const artifactOverlay = artifactRoot
+    ? await validateWebTransportArtifactOverlay({ extensionSource: source, overlayRoot: artifactRoot })
+    : null;
+  const sentinelName = ".deherm-webtransport-managed.json";
+  const identity = {
+    schemaVersion: 2,
+    owner: "defold-webtransport",
+    version: options.version ?? null,
+    sourceTreeSha256: await directoryDigest(source, { ignore: new Set([sentinelName]) }),
+    artifacts: artifactOverlay?.identity ?? null
+  };
+  let current;
+  try { current = JSON.parse(await readFile(path.join(destination, sentinelName), "utf8")); }
+  catch (error) {
+    if (error?.code !== "ENOENT" && !(error instanceof SyntaxError)) throw error;
+    try {
+      await lstat(destination);
+      throw new Error(`Refusing to replace unmanaged WebTransport extension at ${destination}`);
+    } catch (destinationError) {
+      if (destinationError?.code !== "ENOENT") throw destinationError;
+    }
+  }
+  if (options.force !== true && current && JSON.stringify(current) === JSON.stringify(identity)) {
+    return { root: destination, installed: false, source: "managed-local" };
+  }
+  const nonce = `${process.pid}-${randomBytes(8).toString("hex")}`;
+  const stage = `${destination}.deherm-stage-${nonce}`;
+  const backup = `${destination}.deherm-backup-${nonce}`;
+  let movedCurrent = false;
+  try {
+    await cp(source, stage, { recursive: true, errorOnExist: true, force: false });
+    if (artifactOverlay) {
+      for (const target of artifactOverlay.targets) {
+        await rm(path.join(stage, "lib", target), { recursive: true, force: true });
+      }
+      for (const file of artifactOverlay.files) {
+        const destinationFile = path.join(stage, "lib", file.target, file.name);
+        await mkdir(path.dirname(destinationFile), { recursive: true });
+        await writeFile(destinationFile, await readFile(file.source));
+      }
+    }
+    await writeFile(path.join(stage, sentinelName), `${JSON.stringify(identity, null, 2)}\n`, { flag: "wx" });
+    try { await rename(destination, backup); movedCurrent = true; }
+    catch (error) { if (error?.code !== "ENOENT") throw error; }
+    await rename(stage, destination);
+    if (movedCurrent) await rm(backup, { recursive: true, force: true });
+  } catch (error) {
+    await rm(stage, { recursive: true, force: true });
+    if (movedCurrent) {
+      try { await rename(backup, destination); } catch { /* preserve original error */ }
+    }
+    throw error;
+  }
+  return { root: destination, installed: true, source: artifactOverlay ? `managed-local+native-artifacts:${artifactSource}` : "managed-local" };
+}
+
 export async function writeGeneratedProject(inventory, outputDirectory = ".deherm", options = {}) {
   if (typeof outputDirectory !== "string" || !outputDirectory || path.isAbsolute(outputDirectory)) {
     throw new Error("Generated output must be a relative subdirectory of the Defold project");
@@ -1701,6 +1993,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await cp(path.join(core.sdkTemplateRoot, "component.ts"), path.join(sdkRoot, "component.ts"));
   await cp(path.join(core.sdkTemplateRoot, "host.ts"), path.join(sdkRoot, "host.ts"));
   await cp(path.join(core.sdkTemplateRoot, "hmr-state.ts"), path.join(sdkRoot, "hmr-state.ts"));
+  await cp(path.join(core.sdkTemplateRoot, "module-runtime.ts"), path.join(sdkRoot, "module-runtime.ts"));
   await cp(
     path.join(core.sdkSourceRoot, "generated", "script"),
     path.join(sdkRoot, "generated", "script"),
@@ -1711,6 +2004,15 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     path.join(sdkRoot, "generated", "dmsdk"),
     { recursive: true }
   );
+  const nativeModules = projectNativeModules(inventory);
+  const nativeFacades = projectTypescriptFacades(inventory, nativeModules);
+  await materializeProjectNativeModuleBridge(inventory, nativeModules);
+  const nativeModuleRoot = path.join(sdkRoot, "generated", "native");
+  await mkdir(nativeModuleRoot, { recursive: true });
+  for (const module of nativeModules) {
+    await writeFile(path.join(nativeModuleRoot, `${module.name}.ts`), renderNativeModuleTypescript(module));
+  }
+  await materializeProjectTypescriptFacades(inventory, nativeFacades, nativeModuleRoot);
   const scriptModulesSource = await readFile(path.join(sdkRoot, "generated", "script", "modules.ts"), "utf8");
   const scriptNamespaces = scriptModuleNames(scriptModulesSource);
   const defoldSource = projectDefoldSource(scriptModuleMembers(scriptModulesSource, "defold"));
@@ -1724,6 +2026,21 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
       path.join(staticHermesRoot, name)
     );
   }
+  const staticNativeRoot = path.join(staticHermesRoot, "native");
+  const staticNativeCppRoot = path.join(staticHermesRoot, "native-cpp");
+  await mkdir(staticNativeRoot, { recursive: true });
+  await mkdir(staticNativeCppRoot, { recursive: true });
+  await writeFile(path.join(staticHermesRoot, "module-runtime.ts"), staticNativeModuleRuntimeSource());
+  for (const module of nativeModules) {
+    const stem = module.name.replace(/([a-z0-9])([A-Z])/gu, "$1_$2").toLowerCase();
+    const headerName = `deherm_static_${stem}.h`;
+    await writeFile(path.join(staticNativeRoot, `${module.name}.ts`),
+      renderNativeModuleStaticTypescript(module, headerName));
+    await writeFile(path.join(staticNativeCppRoot, headerName), renderNativeModuleStaticHeader(module));
+    await writeFile(path.join(staticNativeCppRoot, `deherm_static_${stem}.cpp`),
+      renderNativeModuleStaticSource(module, headerName));
+  }
+  await materializeProjectTypescriptFacades(inventory, nativeFacades, staticNativeRoot, "static");
   await writeFile(path.join(sdkRoot, "runtime.ts"), runtimeSource());
   const extensionNamespaceNames = new Set(modules.map((module) => module.jsName));
   const exports = [
@@ -1731,6 +2048,8 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     'export * from "./address.js";',
     'export * from "./component.js";',
     'export * from "./hmr-state.js";',
+    ...nativeModules.map((module) => `export * from "./generated/native/${module.name}.js";`),
+    ...nativeFacades.map((facade) => `export * from "./generated/native/${facade.name}.js";`),
     'export { installDefoldScriptBridge, type DefoldScriptBridge } from "./generated/script/runtime.js";',
     'export * from "./generated/script/handle-lowering.js";',
     'export type * from "./generated/script/types.js";',
@@ -1752,7 +2071,7 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
   await writeFile(path.join(root, "script-contexts.json"), scriptContextsSource);
   const contextSources = {};
   for (const context of authoredContexts) {
-    const source = contextSdkSource(scriptContexts.contexts[context.id], modules);
+    const source = contextSdkSource(scriptContexts.contexts[context.id], modules, nativeModules, nativeFacades);
     contextSources[`sdk/contexts/${context.id}.ts`] = source;
     await writeFile(
       path.join(contextsRoot, `${context.id}.ts`),
@@ -1760,14 +2079,15 @@ export async function writeGeneratedProject(inventory, outputDirectory = ".deher
     );
   }
   const relativeOutput = path.relative(inventory.projectRoot, root) || ".deherm";
+  const compilerInputs = projectTypescriptFacadeCompilerInputs(inventory);
   const projectConfigSources = {
     "tsconfig.deherm.base.json": `${JSON.stringify(projectBaseConfig(relativeOutput), null, 2)}\n`,
     ...Object.fromEntries(authoredContexts.map((context) => [
       `tsconfig.deherm.${context.id}.json`,
-      `${JSON.stringify(contextProjectConfig(relativeOutput, context), null, 2)}\n`
+      `${JSON.stringify(contextProjectConfig(relativeOutput, context, compilerInputs), null, 2)}\n`
     ])),
-    "tsconfig.deherm.bundle.json": `${JSON.stringify(bundleProjectConfig(relativeOutput), null, 2)}\n`,
-    "tsconfig.deherm.release.json": `${JSON.stringify(releaseProjectConfig(relativeOutput), null, 2)}\n`,
+    "tsconfig.deherm.bundle.json": `${JSON.stringify(bundleProjectConfig(relativeOutput, compilerInputs), null, 2)}\n`,
+    "tsconfig.deherm.release.json": `${JSON.stringify(releaseProjectConfig(relativeOutput, compilerInputs), null, 2)}\n`,
     "tsconfig.deherm.json": `${JSON.stringify(rootProjectConfig(), null, 2)}\n`
   };
   for (const [relative, source] of Object.entries(projectConfigSources)) {

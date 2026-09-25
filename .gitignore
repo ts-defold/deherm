@@ -17,6 +17,8 @@ defold/defold_hermes/lib/armv7-android/
 defold/defold_hermes/lib/arm64-android/
 defold/defold_hermes/lib/x86_64-android/
 examples/war-battles-online/defold/defold_hermes/
+examples/war-battles-online/defold/defold_webtransport/
+examples/war-battles-online/defold/deherm_project_native_modules/
 toolchains/host-compilers/*/bin/
 defold/.internal/
 .deherm/

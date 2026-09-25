@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "typescriptFacades": [
+    {
+      "name": "WebTransport",
+      "source": "webtransport/typescript/WebTransport.ts",
+      "staticSource": "webtransport/static/WebTransport.ts",
+      "nativeModule": "NativeWebTransport"
+    }
+  ],
+  "headers": [],
+  "nativeModules": [
+    {
+      "name": "NativeWebTransport",
+      "abiVersion": 1,
+      "description": "Protocol-generic WebTransport byte streams supplied by the project extension.",
+      "cProvider": {
+        "header": "defold_webtransport/native_v1.h",
+        "symbolPrefix": "defold_webtransport_native_v1_",
+        "argumentExpansion": "pointer-length-v1"
+      },
+      "constants": {
+        "pollHeaderBytes": 32,
+        "pollEvent": {
+          "headerVersion": 1,
+          "initialPayloadBytes": 65536,
+          "maximumPayloadBytes": 1048576,
+          "bufferTooSmallStatus": -4,
+          "retainsEventOnBufferTooSmall": true,
+          "fields": [
+            { "name": "kind", "offset": 0, "type": "u32le" },
+            { "name": "flags", "offset": 4, "type": "u32le" },
+            { "name": "code", "offset": 8, "type": "i32le" },
+            { "name": "requestId", "offset": 12, "type": "u32le" },
+            { "name": "streamHandle", "offset": 16, "type": "u32le" },
+            { "name": "payloadLength", "offset": 20, "type": "u32le" },
+            { "name": "reserved", "offset": 24, "type": "u32le" },
+            { "name": "headerVersion", "offset": 28, "type": "u32le" }
+          ]
+        },
+        "status": { "ok": 0, "wouldBlock": 1, "noEvent": 2, "invalidArgument": -1, "invalidState": -2, "tooLarge": -3, "bufferTooSmall": -4, "closed": -5, "internalError": -6, "providerUnavailable": -7 },
+        "state": { "connecting": 1, "connected": 2, "closing": 3, "closed": 4, "failed": 5 },
+        "eventKind": { "ready": 1, "streamOpened": 2, "streamData": 3, "datagram": 4, "streamReset": 5, "streamStopSending": 6, "close": 7 },
+        "eventFlag": { "streamFin": 1, "streamBidirectional": 2, "streamIncoming": 4 }
+      },
+      "methods": [
+        { "id": 1, "name": "open", "args": [{ "name": "url", "type": "utf8" }, { "name": "certificateSha256", "type": "bytes" }, { "name": "anticipatedIncomingUnidirectionalStreams", "type": "u32" }, { "name": "anticipatedIncomingBidirectionalStreams", "type": "u32" }], "returns": "u32" },
+        { "id": 2, "name": "state", "args": [{ "name": "handle", "type": "u32" }], "returns": "u32" },
+        { "id": 3, "name": "maxDatagramBytes", "args": [{ "name": "handle", "type": "u32" }], "returns": "u32" },
+        { "id": 4, "name": "openBidirectionalStream", "args": [{ "name": "handle", "type": "u32" }, { "name": "requestId", "type": "u32" }], "returns": "status" },
+        { "id": 5, "name": "openUnidirectionalStream", "args": [{ "name": "handle", "type": "u32" }, { "name": "requestId", "type": "u32" }], "returns": "status" },
+        { "id": 6, "name": "writeStream", "args": [{ "name": "handle", "type": "u32" }, { "name": "streamHandle", "type": "u32" }, { "name": "bytes", "type": "bytes" }, { "name": "fin", "type": "bool" }], "returns": "status" },
+        { "id": 7, "name": "resetStream", "args": [{ "name": "handle", "type": "u32" }, { "name": "streamHandle", "type": "u32" }, { "name": "code", "type": "u32" }], "returns": "status" },
+        { "id": 8, "name": "stopSending", "args": [{ "name": "handle", "type": "u32" }, { "name": "streamHandle", "type": "u32" }, { "name": "code", "type": "u32" }], "returns": "status" },
+        { "id": 9, "name": "trySendDatagram", "args": [{ "name": "handle", "type": "u32" }, { "name": "payload", "type": "bytes" }], "returns": "status" },
+        { "id": 10, "name": "poll", "args": [{ "name": "handle", "type": "u32" }, { "name": "output", "type": "mutableBytes", "copyBack": { "mode": "framedPayload", "okStatus": 0, "headerBytes": 32, "payloadLengthOffset": 20 } }], "returns": "status" },
+        { "id": 11, "name": "close", "args": [{ "name": "handle", "type": "u32" }, { "name": "errorCode", "type": "u32" }, { "name": "reason", "type": "utf8" }], "returns": "status" },
+        { "id": 12, "name": "destroy", "args": [{ "name": "handle", "type": "u32" }], "returns": "status" }
+      ]
+    }
+  ]
+}

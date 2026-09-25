@@ -297,8 +297,16 @@ int main(int argc, char** argv) {
   // recreated: Runtime swaps only the definition object, so authored `self`
   // state and the lifecycle ownership remain in place.
   defold_hermes::Runtime hmrRuntime(host);
-  hmrRuntime.load(componentSource, "deherm://compiler-generated-components-hmr.js");
+  const std::string componentSourceWithNativePump =
+      "globalThis.__dehermNativeModulesTickV1=function(){__defoldHostV1.log('info','native-pump:component-only');};\n" +
+      componentSource;
+  hmrRuntime.load(componentSourceWithNativePump, "deherm://compiler-generated-components-hmr.js");
   if (!hmrRuntime.componentOnly()) Fail("component-only fixture was not identified as such");
+  const size_t beforeNativePump = host.transcript.size();
+  hmrRuntime.pumpNativeModules(0.0);
+  if (host.transcript.size() != beforeNativePump + 1 ||
+      host.transcript.back() != "info:native-pump:component-only")
+    Fail("component-only extension-frame native module pump did not advance");
   const auto hmrHandle = hmrRuntime.attachComponent(
       argv[2], argv[3], defold_hermes::Runtime::ComponentContext::kGameObject);
   defold_hermes::Runtime::ComponentValue speed{};

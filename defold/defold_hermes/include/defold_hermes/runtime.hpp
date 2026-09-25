@@ -109,6 +109,8 @@ class Runtime {
   /** Whether this runtime currently owns a registry-only (no application) bundle. */
   bool componentOnly() const noexcept;
   void init();
+  /** Drive hidden native-module facades once from the extension frame hook. */
+  void pumpNativeModules(double dt);
   void update(double dt);
   void onMessage(const std::string& message);
   void finalize();

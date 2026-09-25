@@ -1,0 +1,256 @@
+name: defold-webtransport-native-artifacts
+
+on:
+  workflow_dispatch:
+  workflow_call:
+    outputs:
+      tag:
+        description: Content-addressed native artifact release tag
+        value: ${{ jobs.plan.outputs.tag }}
+      fingerprint:
+        description: Full native artifact input fingerprint
+        value: ${{ jobs.plan.outputs.fingerprint }}
+  push:
+    branches: [main]
+    paths:
+      - native/webtransport-cpp/**
+      - extensions/defold-webtransport/defold_webtransport/ext.manifest
+      - extensions/defold-webtransport/defold_webtransport/include/**
+      - packages/toolchains/defold-bundle-targets.json
+      - pnpm-lock.yaml
+      - scripts/lib/defold-webtransport-artifacts.mjs
+      - scripts/manage-defold-webtransport-artifacts.mjs
+      - scripts/ci/upload-release-asset.sh
+      - .github/workflows/defold-webtransport-native-artifacts.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: defold-webtransport-native-artifacts
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      tag: ${{ steps.plan.outputs.tag }}
+      fingerprint: ${{ steps.plan.outputs.fingerprint }}
+      title: ${{ steps.plan.outputs.title }}
+      linux_rows: ${{ steps.plan.outputs.linux_rows }}
+      windows_rows: ${{ steps.plan.outputs.windows_rows }}
+      android_rows: ${{ steps.plan.outputs.android_rows }}
+      apple_rows: ${{ steps.plan.outputs.apple_rows }}
+      linux_any: ${{ steps.plan.outputs.linux_any }}
+      windows_any: ${{ steps.plan.outputs.windows_any }}
+      android_any: ${{ steps.plan.outputs.android_any }}
+      apple_any: ${{ steps.plan.outputs.apple_any }}
+      android_ndk_version: ${{ steps.plan.outputs.android_ndk_version }}
+    steps:
+      - uses: actions/checkout@v7
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          metadata="$(node scripts/manage-defold-webtransport-artifacts.mjs release-metadata)"
+          node -e '
+            const fs = require("node:fs");
+            const value = JSON.parse(process.argv[1]);
+            const pins = require("./packages/toolchains/defold-bundle-targets.json");
+            const sdkManagerVersions = { "25b": "25.2.9519653" };
+            const androidNdkVersion = sdkManagerVersions[pins.sdk.androidNdkVersion];
+            if (!androidNdkVersion) throw new Error(`No sdkmanager NDK mapping for pinned Defold NDK ${pins.sdk.androidNdkVersion}`);
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,
+              `tag=${value.tag}\nfingerprint=${value.fingerprint}\ntitle=${value.title}\nandroid_ndk_version=${androidNdkVersion}\n`);
+          ' "$metadata"
+          tag="$(node -e 'process.stdout.write(JSON.parse(process.argv[1]).tag)' "$metadata")"
+          mkdir -p build
+          if gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release view "$tag" --repo "${{ github.repository }}" --json assets --jq '.assets[].name' | sort -u > build/webtransport-present.txt
+            mkdir -p build/published-native-assets
+            gh release download "$tag" --repo "${{ github.repository }}" \
+              --pattern 'defold-webtransport-native-*.zip' --dir build/published-native-assets || true
+            node scripts/manage-defold-webtransport-artifacts.mjs audit-present \
+              --archives build/published-native-assets
+          else
+            : > build/webtransport-present.txt
+          fi
+          node scripts/manage-defold-webtransport-artifacts.mjs plan \
+            --present build/webtransport-present.txt --github-output "$GITHUB_OUTPUT"
+
+  linux:
+    needs: plan
+    if: needs.plan.outputs.linux_any == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.linux_rows) }}
+    runs-on: ${{ fromJSON('["ubuntu-24.04","ubuntu-24.04-arm"]')[matrix.row] }}
+    steps:
+      - uses: actions/checkout@v7
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node scripts/manage-defold-webtransport-artifacts.mjs plan --describe-row "linux=${{ matrix.row }}" --github-env "$GITHUB_ENV"
+      - run: |
+          cmake -S native/webtransport-cpp -B "build/webtransport/$TARGET" -G Ninja -DCMAKE_BUILD_TYPE=Release
+          cmake --build "build/webtransport/$TARGET" --target deherm_webtransport_cpp deherm_webtransport_cpp_test --parallel
+          ctest --test-dir "build/webtransport/$TARGET" --output-on-failure
+          node scripts/manage-defold-webtransport-artifacts.mjs package --target "$TARGET" --input "build/webtransport/$TARGET" --output build/native-assets
+      - uses: actions/upload-artifact@v6
+        with:
+          name: defold-webtransport-native-build-linux-${{ matrix.row }}
+          path: build/native-assets/*.zip
+          if-no-files-found: error
+
+  android:
+    needs: plan
+    if: needs.plan.outputs.android_any == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.android_rows) }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node scripts/manage-defold-webtransport-artifacts.mjs plan --describe-row "android=${{ matrix.row }}" --github-env "$GITHUB_ENV"
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'ndk;${{ needs.plan.outputs.android_ndk_version }}'
+      - run: |
+          api="$(node -e 'const s=require("./packages/toolchains/defold-bundle-targets.json").sdk; process.stdout.write(process.env.ABI === "armeabi-v7a" ? s.androidNdkApiVersion : s.android64NdkApiVersion)')"
+          ndk="$ANDROID_HOME/ndk/${{ needs.plan.outputs.android_ndk_version }}"
+          cmake -S native/webtransport-cpp -B "build/webtransport/$TARGET" -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$ndk/build/cmake/android.toolchain.cmake" \
+            -DANDROID_ABI="$ABI" -DANDROID_PLATFORM="android-$api"
+          cmake --build "build/webtransport/$TARGET" --target deherm_webtransport_cpp --parallel 2
+          node scripts/manage-defold-webtransport-artifacts.mjs package --target "$TARGET" --input "build/webtransport/$TARGET" --output build/native-assets
+      - uses: actions/upload-artifact@v6
+        with:
+          name: defold-webtransport-native-build-android-${{ matrix.row }}
+          path: build/native-assets/*.zip
+          if-no-files-found: error
+
+  apple:
+    needs: plan
+    if: needs.plan.outputs.apple_any == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.apple_rows) }}
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node scripts/manage-defold-webtransport-artifacts.mjs plan --describe-row "apple=${{ matrix.row }}" --github-env "$GITHUB_ENV"
+      - run: |
+          ios_min="$(node -e 'process.stdout.write(require("./packages/toolchains/defold-bundle-targets.json").sdk.iphoneosVersionMin)')"
+          mac_min="$(node -e 'process.stdout.write(require("./packages/toolchains/defold-bundle-targets.json").sdk.macosxVersionMin)')"
+          case "$TARGET" in
+            arm64-osx) sdk=macosx; arch=arm64; system=Darwin; flags="-arch arm64 -mmacosx-version-min=$mac_min"; run_tests=1 ;;
+            x86_64-osx) sdk=macosx; arch=x86_64; system=Darwin; flags="-arch x86_64 -mmacosx-version-min=$mac_min"; run_tests=1 ;;
+            arm64-ios) sdk=iphoneos; arch=arm64; system=iOS; flags="-arch arm64 -miphoneos-version-min=$ios_min"; run_tests=0 ;;
+            arm64_sim-ios) sdk=iphonesimulator; arch=arm64; system=iOS; flags="-arch arm64 -mios-simulator-version-min=$ios_min"; run_tests=0 ;;
+          esac
+          sysroot="$(xcrun --sdk "$sdk" --show-sdk-path)"
+          cmake -S native/webtransport-cpp -B "build/webtransport/$TARGET" -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_NAME="$system" -DCMAKE_OSX_SYSROOT="$sysroot" \
+            -DCMAKE_OSX_ARCHITECTURES="$arch" -DCMAKE_C_FLAGS="$flags" -DCMAKE_CXX_FLAGS="$flags"
+          cmake --build "build/webtransport/$TARGET" --target deherm_webtransport_cpp --parallel 2
+          if [ "$run_tests" = 1 ]; then
+            cmake --build "build/webtransport/$TARGET" --target deherm_webtransport_cpp_test --parallel 2
+            ctest --test-dir "build/webtransport/$TARGET" --output-on-failure
+          fi
+          node scripts/manage-defold-webtransport-artifacts.mjs package --target "$TARGET" --input "build/webtransport/$TARGET" --output build/native-assets
+      - uses: actions/upload-artifact@v6
+        with:
+          name: defold-webtransport-native-build-apple-${{ matrix.row }}
+          path: build/native-assets/*.zip
+          if-no-files-found: error
+
+  windows:
+    needs: plan
+    if: needs.plan.outputs.windows_any == 'true'
+    strategy:
+      matrix:
+        row: ${{ fromJSON(needs.plan.outputs.windows_rows) }}
+    runs-on: windows-2025
+    defaults:
+      run: { shell: bash }
+    steps:
+      - uses: actions/checkout@v7
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: node scripts/manage-defold-webtransport-artifacts.mjs plan --describe-row "windows=${{ matrix.row }}" --github-env "$GITHUB_ENV"
+      - run: |
+          cmake -S native/webtransport-cpp -B "build/webtransport/$TARGET" -A x64 -DCMAKE_BUILD_TYPE=Release
+          cmake --build "build/webtransport/$TARGET" --config Release --target deherm_webtransport_cpp deherm_webtransport_cpp_test --parallel 2
+          ctest --test-dir "build/webtransport/$TARGET" -C Release --output-on-failure
+          node scripts/manage-defold-webtransport-artifacts.mjs package --target "$TARGET" --input "build/webtransport/$TARGET" --output build/native-assets
+      - uses: actions/upload-artifact@v6
+        with:
+          name: defold-webtransport-native-build-windows-${{ matrix.row }}
+          path: build/native-assets/*.zip
+          if-no-files-found: error
+
+  publish:
+    needs: [plan, linux, android, apple, windows]
+    if: >-
+      ${{ always() && needs.plan.result == 'success' &&
+          (needs.linux.result == 'success' || needs.linux.result == 'skipped') &&
+          (needs.android.result == 'success' || needs.android.result == 'skipped') &&
+          (needs.apple.result == 'success' || needs.apple.result == 'skipped') &&
+          (needs.windows.result == 'success' || needs.windows.result == 'skipped') }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with: { persist-credentials: false }
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with: { node-version: '22', cache: 'pnpm' }
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - uses: actions/download-artifact@v7
+        with:
+          pattern: defold-webtransport-native-build-*
+          path: build/native-assets
+          merge-multiple: true
+        continue-on-error: true
+      - name: Publish only newly built immutable rows
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TITLE: ${{ needs.plan.outputs.title }}
+          RELEASE_FINGERPRINT: ${{ needs.plan.outputs.fingerprint }}
+          RELEASE_TAG: ${{ needs.plan.outputs.tag }}
+          RELEASE_TARGET: ${{ github.sha }}
+        run: |
+          shopt -s nullglob
+          for archive in build/native-assets/*.zip; do
+            asset="$(basename "$archive")"
+            VERIFY_EXISTING_ASSET=1 bash scripts/ci/upload-release-asset.sh \
+              "$RELEASE_TAG" "${{ github.repository }}" "$archive" "$asset"
+          done
+          mkdir -p build/published-native-assets
+          gh release download "$RELEASE_TAG" --repo "${{ github.repository }}" \
+            --pattern 'defold-webtransport-native-*.zip' --dir build/published-native-assets
+          node scripts/manage-defold-webtransport-artifacts.mjs audit \
+            --archives build/published-native-assets

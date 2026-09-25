@@ -9,10 +9,11 @@ import {
   writeProjectResourceSymbols,
   writeProjectRouteSymbolIndex
 } from "./resource-symbols.mjs";
-import { discoverProjectRoots, findProjectRoot, inspectDefoldProject } from "./project.mjs";
-import { installNativeExtension, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
+import { discoverProjectRoots, findProjectRoot, inspectDefoldProject, parseGameProject } from "./project.mjs";
+import { installNativeExtension, installProjectWebTransportExtension, typecheckGeneratedProject, verifyGeneratedProject, writeGeneratedProject } from "./generate.mjs";
 import { createDefoldProject } from "./scaffold.mjs";
 import { materializeDmSdkUsageFile } from "./dmsdk.mjs";
+import { resolveWebTransportArtifactRoot, selectWebTransportArtifactTarget } from "./webtransport-artifacts.mjs";
 import { ingestNativeExtensionHeader, renderNativeExtensionBindings } from "../../compiler/src/native-extension-generator.mjs";
 
 const help = `deherm <command> [options]
@@ -232,6 +233,39 @@ async function scaffoldProject(options) {
     nativeExtensionRoot: nativeExtension.root,
     componentCount: components.manifest.components.length
   };
+}
+
+export async function installConfiguredProjectWebTransport(projectRoot, options = {}) {
+  const resolvedProject = path.resolve(projectRoot);
+  const environment = options.environment ?? process.env;
+  const properties = parseGameProject(await readFile(path.join(resolvedProject, "game.project"), "utf8"));
+  const configuration = properties.defold_webtransport;
+  const source = environment.DEHERM_WEBTRANSPORT_SOURCE ?? configuration?.source;
+  const artifacts = resolveWebTransportArtifactRoot({
+    environmentValue: environment.DEHERM_WEBTRANSPORT_ARTIFACT_ROOT,
+    projectValue: configuration?.artifacts,
+    projectRoot: resolvedProject
+  });
+  const configuredTarget = environment.DEHERM_WEBTRANSPORT_ARTIFACT_TARGET ?? configuration?.artifact_target;
+  const artifactTarget = selectWebTransportArtifactTarget({
+    configuredTarget,
+    hasSource: Boolean(source || configuration),
+    hasArtifactRoot: Boolean(artifacts)
+  });
+  if (!configuration && !source && !artifacts && !artifactTarget) {
+    return { root: path.join(resolvedProject, "defold_webtransport"), installed: false, source: "unconfigured" };
+  }
+  return await installProjectWebTransportExtension(resolvedProject, {
+    source,
+    packageSource: Boolean(configuration) && !source,
+    artifacts,
+    artifactTarget,
+    artifactCacheRoot: options.artifactCacheRoot,
+    version: configuration?.version,
+    force: options.force,
+    environment,
+    fetchImpl: options.fetchImpl
+  });
 }
 
 function printExtensions(inventory) {
@@ -573,6 +607,11 @@ export async function run(argv = process.argv.slice(2)) {
     // satisfy the project-readiness gate. The policy surface is overlaid after
     // generation below.
     await installNativeExtension(options.project);
+    // `dev` is a complete project entry point, not a thinner alias for the
+    // compiler watcher. Materialize the same configured WebTransport source
+    // and target artifact overlay as `generate` before inventory so extension
+    // bindings, Bob inputs, native launch, and HTML5 all observe one tree.
+    await installConfiguredProjectWebTransport(options.project, { force: options.force });
     const inventory = await inspectDefoldProject({ project: options.project, requireDehermRuntime: true });
     const errors = inventory.diagnostics.filter(({ severity }) => severity === "error");
     if (errors.length) {
@@ -745,6 +784,7 @@ export async function run(argv = process.argv.slice(2)) {
     // A generated project consumes a managed copy of the package extension;
     // it must never alias and mutate the package or contributor checkout.
     await installNativeExtension(options.project);
+    await installConfiguredProjectWebTransport(options.project, { force: options.force });
   }
   const inventory = await inspectDefoldProject({
     project: options.project,

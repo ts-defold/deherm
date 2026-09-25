@@ -267,16 +267,26 @@ test("packed npm artifact loads its CLI and one-shot dev compiler", async (t) =>
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h",
     "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
     "packages/static-hermes/src/generated/dmsdk-universal.ts",
+    "packages/sdk/src/module-runtime.ts",
+    "defold/defold_hermes/include/defold_hermes/generated_native_module_jsi.hpp",
+    "defold/defold_hermes/include/defold_hermes/native_module_provider.h",
+    "defold/defold_hermes/src/generated_native_module_jsi.cpp",
+    "defold/defold_hermes/src/generated_native_module_registry.cpp",
   ]) {
     assert.equal(packedFiles.has(relative), true, `packed npm artifact is missing ${relative}`);
   }
+  const stableGeneratedSdk = new Set();
   for (const relative of packedFiles) {
     assert.equal(
       relative.startsWith("packages/bindings/generated/"),
       false,
       `${relative} leaked a fixed policy/binding surface`,
     );
-    assert.equal(relative.startsWith("packages/sdk/src/generated/"), false, `${relative} leaked a fixed SDK surface`);
+    assert.equal(
+      relative.startsWith("packages/sdk/src/generated/") && !stableGeneratedSdk.has(relative),
+      false,
+      `${relative} leaked a fixed SDK surface`,
+    );
     assert.equal(relative.startsWith("packages/abi/src/generated/"), false, `${relative} leaked a fixed ABI surface`);
     assert.equal(/\.(?:a|lib)$/u.test(relative), false, `${relative} leaked a target archive into the npm package`);
   }
