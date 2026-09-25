@@ -281,6 +281,11 @@ test("the built project is the arena, and the mockup stays out of the build", as
   assert.match(arenaSource, /spawnEffect\(self, false, self\.event\.x, self\.event\.y\)/);
   assert.match(arenaSource, /msg\.post\(CAMERA, CAMERA_IMPACT, self\.impact\)/);
   assert.match(arenaSource, /self\.impact\.strength = 0/);
+  assert.match(
+    arenaSource,
+    /onWelcome: \(welcome\) => \{[^]*self\.players = Math\.max\(2, Math\.min\(32, Math\.trunc\(welcome\.maximumPlayers\)\)\)/u,
+    "the native scene must adopt the authoritative online roster before spawning presentation objects",
+  );
   assert.equal((arenaSource.match(/msg\.post\(CAMERA, CAMERA_IMPACT/g) ?? []).length, 1);
   const muzzleObject = await readFile(fromExample("defold/main/arena-muzzle.go"), "utf8");
   assert.match(muzzleObject, /type: "sprite"/);

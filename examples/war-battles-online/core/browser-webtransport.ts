@@ -206,7 +206,10 @@ export class WebTransportGameClient implements GameTransport {
     void client.receiveReliableStreams();
     void client.receiveDatagrams();
     void session.closed.then(
-      (close) => client.finishClose(close.closeCode ?? 0, close.reason ?? "transport closed", false),
+      (close) => {
+        const normalized = normalizeRemoteClose(close);
+        client.finishClose(normalized.closeCode, normalized.reason, false);
+      },
       (error: unknown) => client.finishClose(1, error instanceof Error ? error.message : "transport failed"),
     );
     return client;
@@ -797,4 +800,30 @@ function browserWebTransportConstructor(): WebTransportConstructorLike {
   const candidate = (globalThis as typeof globalThis & { WebTransport?: WebTransportConstructorLike }).WebTransport;
   if (candidate === undefined) throw new Error("WebTransport is unavailable in this browser/runtime");
   return candidate;
+}
+
+function normalizeRemoteClose(close: { readonly closeCode?: number; readonly reason?: string }): {
+  readonly closeCode: number;
+  readonly reason: string;
+} {
+  const code = close.closeCode ?? 0;
+  // Deno's unstable server WebTransport API has exposed malformed peer-close
+  // metadata under teardown pressure. A WebTransport close code is uint32;
+  // never let an impossible host value or binary-looking reason cross into the
+  // match lifecycle/logs as if it were authenticated application metadata.
+  if (!Number.isInteger(code) || code < 0 || code > 0xffff_ffff) {
+    return { closeCode: 1, reason: "invalid peer close metadata" };
+  }
+  const reason = close.reason ?? "transport closed";
+  if (typeof reason !== "string" || reason.includes("\uFFFD")) {
+    return { closeCode: 1, reason: "invalid peer close metadata" };
+  }
+  let safeReason = "";
+  for (const character of reason) {
+    if (safeReason.length + character.length > 256) break;
+    const value = character.codePointAt(0) ?? 0;
+    safeReason +=
+      value <= 0x1f || (value >= 0x7f && value <= 0x9f) || value === 0x2028 || value === 0x2029 ? " " : character;
+  }
+  return { closeCode: code, reason: safeReason };
 }

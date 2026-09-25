@@ -152,6 +152,7 @@ export class MatchServer {
   /** World ticks restart at zero; admission ticks continue from the checkpoint. */
   private sessionTickBase: number;
   private readonly onSessionStateChange: (reason: "commit" | "release", tick: number) => void;
+  private nextSessionId = 1;
   private closed = false;
 
   readonly stats: MatchServerStats = {
@@ -213,7 +214,8 @@ export class MatchServer {
    * `session.attach` so the session can answer.
    */
   createSession(): ServerSession {
-    const session = new ServerSession(this);
+    const session = new ServerSession(this, this.nextSessionId);
+    this.nextSessionId += 1;
     this.sessions.add(session);
     return session;
   }
@@ -419,6 +421,7 @@ export class ServerSession implements TransportReceiver {
   resumeCommitted = false;
   ready = false;
   closed = false;
+  readonly diagnosticId: number;
 
   private transport?: GameTransport;
   private readonly hello: HelloMessage = {
@@ -468,8 +471,9 @@ export class ServerSession implements TransportReceiver {
   private stagedResumeGeneration = 0;
   private welcomeAckDeadline = 0;
 
-  constructor(server: MatchServer) {
+  constructor(server: MatchServer, diagnosticId: number) {
     this.server = server;
+    this.diagnosticId = diagnosticId;
     this.command = createInputCommand(server.world.matchId, 1);
     this.acceptedInputTicks.fill(-1);
     this.lateInputTicks.fill(-1);
@@ -551,7 +555,7 @@ export class ServerSession implements TransportReceiver {
     this.clearReliableDispatch();
     this.preReadyInputBytes = 0;
     this.ready = false;
-    this.server.log(`session-closed:${code}:${reason}`);
+    this.server.log(`session-closed:${code}:${reason}:session=${this.diagnosticId}:slot=${this.slot + 1}`);
     this.server.releaseSlot(this);
   }
 
@@ -738,7 +742,13 @@ export class ServerSession implements TransportReceiver {
         else throw new Error(`client sent an unexpected reliable channel ${channel}`);
       }
     } catch (error: unknown) {
-      this.server.report(error);
+      const detail = error instanceof Error ? error.message : String(error);
+      this.server.report(
+        new Error(
+          `reliable-dispatch:session=${this.diagnosticId}:slot=${this.slot + 1}:ready=${this.ready}:` +
+            `awaiting-ack=${this.awaitingWelcomeAck}:${detail}`,
+        ),
+      );
       this.close(4_003, "protocol error");
     } finally {
       this.reliableDispatchActive = false;

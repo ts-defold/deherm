@@ -1,10 +1,17 @@
 #!/usr/bin/env node
 
 import { execFileSync, spawn } from "node:child_process";
-import { access, readFile } from "node:fs/promises";
+import { access, readFile, rm } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  connectCdp,
+  defaultChromeBinary,
+  freeLoopbackPort,
+  launchChrome,
+  waitFor as waitForBrowser,
+} from "../../../packages/cli/src/dev/browser-host.mjs";
 import { createDefoldBuilder } from "../../../packages/cli/src/dev/defold-builder.mjs";
 
 const exampleRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -14,15 +21,18 @@ if (process.argv.includes("--help") || process.argv.includes("-h")) {
 Starts the Deno HTTP/3 match server, packaged native game, and browser bot dashboard.
 
   --bots <0-31>          browser network bots (default: roster - 1)
-  --roster <2-32>        authoritative roster size (default: 8)
+  --roster <2-32>        authoritative roster size (default: 32)
   --skill <0-3>          server and network bot difficulty (default: 1)
   --quic-port <port>     WebTransport port (default: 4433)
   --health-port <port>   HTTP health/WebSocket port (default: 8080)
   --dashboard-port <p>   bot dashboard port (default: 8090)
   --build-server <url>   local Defold Extender (default: http://127.0.0.1:9010)
   --deno <path>          Deno executable (default: DEHERM_DENO or deno)
+  --chrome <path>        Chrome executable (default: DEHERM_CHROME or host default)
   --no-build             explicitly reuse an existing packaged native game
-  --no-browser           do not open the bot dashboard`);
+  --no-browser           do not launch Chrome; requires --bots 0
+  --headless             launch the bot browser without a visible window
+  --exit-when-ready      stop after the native game and every bot prove motion`);
   process.exit(0);
 }
 const options = parseArguments(process.argv.slice(2));
@@ -35,6 +45,7 @@ const healthUrl = `http://localhost:${options.healthPort}/health`;
 const dashboardUrl = `http://127.0.0.1:${options.dashboardPort}/?autostart=${options.bots}&skill=${options.skill}`;
 const children = new Set();
 const childOutput = new WeakMap();
+const browserHandles = [];
 let stopping = false;
 
 try {
@@ -114,25 +125,61 @@ try {
       const response = await fetch(healthUrl).catch(() => undefined);
       if (!response?.ok) return false;
       const health = await response.json();
-      return saw(game, "war-battles:net:client-welcome:") && health.stats?.humans >= 1;
+      // Browser bots do not exist yet. Any accepted input at this point can
+      // only have crossed the packaged native Defold client's datagram lane.
+      return (
+        saw(game, "war-battles:net:client-welcome:") && health.stats?.humans === 1 && health.stats?.inputsAccepted > 0
+      );
     },
     "native game admission",
     game,
   );
 
-  if (!options.noBrowser) openBrowser(dashboardUrl);
+  if (!options.noBrowser) {
+    await openBotDashboard(dashboardUrl, options.chrome, options.bots, options.headless);
+  }
+  await waitFor(
+    async () => {
+      const response = await fetch(healthUrl).catch(() => undefined);
+      if (!response?.ok) return false;
+      const health = await response.json();
+      return (
+        health.stats?.humans === options.bots + 1 &&
+        health.stats?.bots === options.roster - options.bots - 1 &&
+        health.stats?.inputsAccepted > 0 &&
+        saw(game, `war-battles:arena-engaged:players=${options.roster}:`)
+      );
+    },
+    `${options.roster}-player native presentation and authoritative input`,
+    game,
+  );
   console.log(`war-battles-stack:ready:game=1:bots=${options.bots}:server=${webTransportUrl}`);
   console.log(`war-battles-stack:dashboard:${dashboardUrl}`);
-  console.log("Press Ctrl-C or close the game to stop the complete stack.");
+  if (options.exitWhenReady) {
+    console.log(
+      `war-battles-stack:verified:roster=${options.roster}:humans=${options.bots + 1}:moving=${options.bots}`,
+    );
+    process.exitCode = 0;
+    await stopAll();
+  } else {
+    console.log("Press Ctrl-C or close the game to stop the complete stack.");
 
-  const result = await exited(game);
-  if (!stopping && result.code !== 0) process.exitCode = result.code ?? 1;
+    const result = await exited(game);
+    if (!stopping && result.code !== 0) process.exitCode = result.code ?? 1;
+  }
 } finally {
   await stopAll();
 }
 
 function start(name, command, arguments_) {
-  const child = spawn(command, arguments_, { cwd: exampleRoot, stdio: ["ignore", "pipe", "pipe"] });
+  // Each stack service owns a process group on POSIX. The packaged launcher
+  // spawns dmengine; signalling only the Node parent otherwise orphans the game
+  // with the inherited log pipe still open and makes an automated gate hang.
+  const child = spawn(command, arguments_, {
+    cwd: exampleRoot,
+    detached: process.platform !== "win32",
+    stdio: ["ignore", "pipe", "pipe"],
+  });
   children.add(child);
   const output = [];
   childOutput.set(child, output);
@@ -223,17 +270,54 @@ function exited(child) {
 async function stopAll() {
   if (stopping) return;
   stopping = true;
-  for (const child of children) {
-    if (child.exitCode === null && child.signalCode === null) child.kill("SIGTERM");
+  for (const browser of browserHandles) {
+    if (browser.client === undefined) continue;
+    await Promise.race([browser.client.close().catch(() => undefined), new Promise((done) => setTimeout(done, 500))]);
   }
+  await Promise.all(
+    [...children].map((child) =>
+      child.exitCode === null && child.signalCode === null ? signalOwnedProcess(child, "SIGTERM") : undefined,
+    ),
+  );
   await Promise.all(
     [...children].map((child) =>
       Promise.race([exited(child).catch(() => undefined), new Promise((done) => setTimeout(done, 2_000))]),
     ),
   );
-  for (const child of children) {
-    if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL");
+  await Promise.all(
+    [...children].map((child) =>
+      child.exitCode === null && child.signalCode === null ? signalOwnedProcess(child, "SIGKILL") : undefined,
+    ),
+  );
+  await Promise.all(
+    [...children].map((child) =>
+      Promise.race([exited(child).catch(() => undefined), new Promise((done) => setTimeout(done, 500))]),
+    ),
+  );
+  await Promise.all(
+    browserHandles.map((browser) =>
+      rm(browser.profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }).catch(() => undefined),
+    ),
+  );
+}
+
+function signalOwnedProcess(child, signal) {
+  if (child.pid === undefined) return Promise.resolve();
+  if (process.platform === "win32") {
+    return new Promise((done) => {
+      const arguments_ = ["/PID", String(child.pid), "/T"];
+      if (signal === "SIGKILL") arguments_.push("/F");
+      const killer = spawn("taskkill", arguments_, { stdio: "ignore", windowsHide: true });
+      killer.once("error", () => done());
+      killer.once("exit", () => done());
+    });
   }
+  try {
+    process.kill(-child.pid, signal);
+  } catch {
+    child.kill(signal);
+  }
+  return Promise.resolve();
 }
 
 async function waitFor(predicate, description, child) {
@@ -248,15 +332,56 @@ async function waitFor(predicate, description, child) {
   throw new Error(`Timed out waiting for ${description}`);
 }
 
-function openBrowser(url) {
-  const command =
-    process.platform === "darwin"
-      ? ["open", [url]]
-      : process.platform === "win32"
-        ? ["cmd", ["/c", "start", "", url]]
-        : ["xdg-open", [url]];
-  const child = spawn(command[0], command[1], { detached: true, stdio: "ignore" });
-  child.unref();
+async function openBotDashboard(url, chromeBinary, expectedBots, headless) {
+  const debuggingPort = await freeLoopbackPort();
+  const browser = await launchChrome({
+    binary: chromeBinary,
+    url,
+    debuggingPort,
+    headless,
+  });
+  children.add(browser.child);
+  const handle = { ...browser, client: undefined };
+  browserHandles.push(handle);
+  const target = await waitForBrowser(
+    async () => {
+      const response = await fetch(`http://127.0.0.1:${debuggingPort}/json/list`).catch(() => undefined);
+      if (!response?.ok) return false;
+      const targets = await response.json();
+      return targets.find((candidate) => candidate.type === "page" && candidate.url.startsWith(url));
+    },
+    { timeoutMs: 30_000, intervalMs: 100, what: "the visible Chrome bot dashboard" },
+  );
+  const client = await connectCdp(target.webSocketDebuggerUrl, { retain: false });
+  handle.client = client;
+  await client.send("Runtime.enable");
+  const summary = await waitForBrowser(
+    async () => {
+      const result = await client.send("Runtime.evaluate", {
+        expression: "globalThis.__warBattlesNetworkBots?.summary()",
+        returnByValue: true,
+      });
+      const value = result.result.value;
+      if (value?.failed > 0) {
+        const error = new Error(`network bot admission failed: ${JSON.stringify(value)}`);
+        error.fatal = true;
+        throw error;
+      }
+      if (value?.requested !== expectedBots || value.ready !== expectedBots) return false;
+      if (expectedBots === 0) return value;
+      return value.bots.every(
+        (bot) =>
+          bot.snapshotsApplied > 0 && bot.inputsSent > 0 && bot.nonIdleCommands > 0 && bot.observedTravelUnits > 0,
+      )
+        ? value
+        : false;
+    },
+    { timeoutMs: 60_000, intervalMs: 100, what: `${expectedBots} admitted and moving network bots` },
+  );
+  console.log(
+    `war-battles-stack:bots-ready:count=${summary.ready}:snapshots=${summary.snapshotsApplied}:inputs=${summary.inputsSent}`,
+  );
+  return handle;
 }
 
 function parseArguments(arguments_) {
@@ -271,8 +396,10 @@ function parseArguments(arguments_) {
     }
     return parsed;
   };
-  const roster = integer("--roster", 8, 2, 32);
-  const bots = integer("--bots", roster - 1, 0, roster - 1);
+  const noBrowser = arguments_.includes("--no-browser");
+  const roster = integer("--roster", 32, 2, 32);
+  const bots = integer("--bots", noBrowser ? 0 : roster - 1, 0, roster - 1);
+  if (noBrowser && bots !== 0) throw new Error("--no-browser requires --bots 0 because browser bots run in Chrome");
   return {
     roster,
     bots,
@@ -282,15 +409,18 @@ function parseArguments(arguments_) {
     dashboardPort: integer("--dashboard-port", 8090, 1, 65_535),
     buildServer: value("--build-server", process.env.DEHERM_BUILD_SERVER ?? "http://127.0.0.1:9010"),
     deno: value("--deno", process.env.DEHERM_DENO ?? "deno"),
+    chrome: value("--chrome", process.env.DEHERM_CHROME ?? defaultChromeBinary),
     noBuild: arguments_.includes("--no-build"),
-    noBrowser: arguments_.includes("--no-browser"),
+    noBrowser,
+    headless: arguments_.includes("--headless"),
+    exitWhenReady: arguments_.includes("--exit-when-ready"),
   };
 }
 
-for (const signal of ["SIGINT", "SIGTERM"]) {
+for (const signal of ["SIGHUP", "SIGINT", "SIGTERM"]) {
   process.on(signal, () => {
     void stopAll().then(() => {
-      process.exitCode = signal === "SIGINT" ? 130 : 143;
+      process.exitCode = signal === "SIGHUP" ? 129 : signal === "SIGINT" ? 130 : 143;
     });
   });
 }

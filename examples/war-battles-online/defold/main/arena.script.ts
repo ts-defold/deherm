@@ -702,7 +702,11 @@ function connectOnline(self: ArenaSelf): boolean {
     onClose: (close) => {
       if (!close.welcomed) fallback(`close:${close.code}:${close.reason}`);
     },
-    onWelcome: () => {
+    onWelcome: (welcome) => {
+      // The authoritative roster is selected by the server. Adopt it before
+      // spawning presentation objects so native Defold renders every admitted
+      // network player rather than retaining the editor's offline default.
+      self.players = Math.max(2, Math.min(32, Math.trunc(welcome.maximumPlayers)));
       self.match.mode = "online";
       engage(self);
     },

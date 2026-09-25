@@ -6,7 +6,7 @@
     "clock": "performance.now",
     "clockUnit": "milliseconds",
     "wallClockObserved": true,
-    "elapsedMilliseconds": 2188.230834
+    "elapsedMilliseconds": 2067.5154159999997
   },
   "workload": {
     "sourceKind": "war-battles.authoritative-32-player-load",
@@ -31,21 +31,21 @@
     "scope": "MatchServer.step only; transport queue advancement and client update are outside this timer",
     "samples": {
       "samples": 540,
-      "minimum": 0.023333000000093307,
-      "mean": 0.2265172277777823,
-      "p50": 0.031665999999859196,
-      "p95": 0.6535410000000184,
-      "p99": 0.6878339999999525,
-      "maximum": 1.1234580000000278
+      "minimum": 0.020750000000134605,
+      "mean": 0.22172321481481982,
+      "p50": 0.029790999999931955,
+      "p95": 0.6572499999999764,
+      "p99": 0.7075409999999351,
+      "maximum": 0.7997499999999036
     },
     "allSamples": {
       "samples": 600,
-      "minimum": 0.023333000000093307,
-      "mean": 0.2424561233333371,
-      "p50": 0.03283400000009351,
-      "p95": 0.6709160000000338,
-      "p99": 1.1695839999999862,
-      "maximum": 2.3998750000000086
+      "minimum": 0.020750000000134605,
+      "mean": 0.23440944000000413,
+      "p50": 0.03129199999989396,
+      "p95": 0.6872919999999567,
+      "p99": 0.7997499999999036,
+      "maximum": 3.5561659999999904
     }
   },
   "memory": {
@@ -57,42 +57,42 @@
       "rssBytes": {
         "observed": true,
         "samples": 602,
-        "first": 122241024,
-        "last": 200261632,
-        "peak": 206077952,
-        "delta": 78020608
+        "first": 126468096,
+        "last": 204128256,
+        "peak": 210583552,
+        "delta": 77660160
       },
       "heapTotalBytes": {
         "observed": true,
         "samples": 602,
-        "first": 17301504,
-        "last": 37748736,
-        "peak": 37748736,
-        "delta": 20447232
+        "first": 17563648,
+        "last": 37486592,
+        "peak": 37486592,
+        "delta": 19922944
       },
       "heapUsedBytes": {
         "observed": true,
         "samples": 602,
-        "first": 13850480,
-        "last": 21685200,
-        "peak": 28276848,
-        "delta": 7834720
+        "first": 13802056,
+        "last": 27791912,
+        "peak": 28161680,
+        "delta": 13989856
       },
       "externalBytes": {
         "observed": true,
         "samples": 602,
-        "first": 8676920,
-        "last": 55718040,
-        "peak": 57099227,
-        "delta": 47041120
+        "first": 8679944,
+        "last": 57586299,
+        "peak": 57586299,
+        "delta": 48906355
       },
       "arrayBuffersBytes": {
         "observed": true,
         "samples": 602,
         "first": 150327,
-        "last": 47539619,
-        "peak": 48920806,
-        "delta": 47389292
+        "last": 49407878,
+        "peak": 49407878,
+        "delta": 49257551
       }
     },
     "unavailable": null
@@ -116,8 +116,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 373091,
-      "sha256": "418b71380075d7522d0ca7165a0485dee32e322a5ca2dec33ae7a86d31e850cd"
+      "bytes": 376115,
+      "sha256": "23836bf2ccd3ebbff0db1e667c6a11041394dcbefeff71ced3eee4f73ec3f15c"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
@@ -150,6 +150,6 @@
       "sha256": "319fd69662113942123ff9a1a8ad2d5b8228fe5d14709766f613e16476d96e3d"
     }
   ],
-  "sourceKey": "cfd6598457cdbe7cdc3f73a8a72c017115416a396023654f354d4ad79da5e376",
+  "sourceKey": "7fd7ed929029df6ae4701f6999cae4e79e1b7f771e7813699a0ca3b7b58062be",
   "evidenceBoundary": "Owner-observed host wall-clock and memory snapshots; deterministic work units remain in performance-operability.json; no allocation-free or cross-runtime equivalence claim."
 }

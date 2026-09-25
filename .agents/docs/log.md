@@ -1,5 +1,43 @@
 # Defold Hermes knowledge log
 
+## 2026-09-25 - The 32-player native stack gates admission, motion, and teardown metadata
+
+The full-stack launcher now waits for evidence instead of reporting requested
+configuration as success. A passing run requires the native Defold process to
+log `arena-engaged` with the server's exact roster, the health endpoint to
+report one native client plus every requested browser bot as humans, accepted
+authoritative input, and every bot dashboard session to apply snapshots, emit
+non-idle commands, send inputs, and observe reconciled movement. The native
+arena adopts `WELCOME.maximumPlayers` before it creates presentation objects;
+the editor's offline default of eight no longer truncates a 32-player online
+match. `--headless --exit-when-ready` makes the same command an automated gate.
+
+The reported `session-closed:91141958510812:<binary>` value is outside the
+WebTransport uint32 close-code domain. The shared transport adapter now maps an
+impossible host close code or replacement-character reason to deterministic
+`1:invalid peer close metadata` before it reaches the match. Server close and
+reliable-dispatch diagnostics carry a monotonic session id and slot so two
+concurrent failures cannot look like one causal chain. The client also remains
+`connecting` until its ordered `WELCOME_ACK` write reports `sent`; control,
+ping, input, and the gameplay welcome callback remain unavailable during that
+write.
+
+Focused protocol coverage is 103/103 green, and the complete War Battles gate
+is 207/207 green, including the exact 14-digit close value and a control attempt
+while `WELCOME_ACK` is pending. A rebuilt arm64
+Defold game plus Deno HTTP/3 server plus headless Chrome admitted one native
+client and 31 independent network bots: Defold logged
+`arena-engaged:players=32`, the dashboard reported 31 moving clients with 503
+applied snapshots and 1,559 input sends, and the server health gate reported 32
+humans with authoritative input. This is local arm64-macOS loopback evidence;
+it does not prove WAN impairment or other host platforms. The first automated
+shutdown exposed that the launcher signalled only the Node wrapper and could
+orphan dmengine; POSIX stack children now own process groups, `SIGHUP` joins
+the existing interrupt/termination cleanup path, and Windows uses bounded
+`taskkill /T` escalation for the complete owned tree. A subsequent
+finite native-plus-browser run passed the gameplay gate and exited with no
+remaining session, proving bounded cleanup for that local composition.
+
 ## 2026-09-25 - Cross-lane admission and signed tick storage are bounded
 
 The ordered reliable admission fix did not by itself order QUIC datagrams:

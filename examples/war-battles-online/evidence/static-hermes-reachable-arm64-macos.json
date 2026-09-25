@@ -39,7 +39,7 @@
       "main/ui.gui.ts",
       "reference/battle.gui.ts"
     ],
-    "authoredSourceTreeSha256": "6ceb4319fb1bbbb2a2c303fdc8d982074a4029076d4ac95e5f6a26cb3ce4c179",
+    "authoredSourceTreeSha256": "78ad56668c71de1136933b3f2c82949f53ab60d8fe4dc2aa281f044429795244",
     "loweringPlan": "packages/bindings/generated/defold-binding-lowering-plan.json",
     "loweringPlanSha256": "5d4b93e60d6393840da5b02271ba42978d685a59c59464eea234fd592f837195",
     "typedNativeBridge": "packages/bindings/generated/defold-typed-native-bridge.json",
@@ -241,5 +241,5 @@
     "gameplay": "not-claimed; packaged gameplay belongs to the native Dynamic Hermes projection",
     "blockers": "blocked reachable routes remain explicit and fail closed"
   },
-  "recordSha256": "2bb352a489f9218b0c2b9dc6598476f1b9089a0d88c52bf38d26857f5e13fc56"
+  "recordSha256": "1d2438bef43d42f80b73fbe82d13b5bf43efa7a3b23fb716e1e36f4449134352"
 }

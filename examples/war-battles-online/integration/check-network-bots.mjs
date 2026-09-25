@@ -22,8 +22,8 @@ const here = dirname(fileURLToPath(import.meta.url));
 const exampleRoot = resolve(here, "..");
 const denoBinary = process.env.DEHERM_DENO ?? "deno";
 const chromeBinary = process.env.DEHERM_CHROME ?? defaultChromeBinary;
-const botCount = Number.parseInt(process.env.DEHERM_NETWORK_BOTS ?? "4", 10);
-const rosterSize = Math.max(8, botCount);
+const botCount = Number.parseInt(process.env.DEHERM_NETWORK_BOTS ?? "32", 10);
+const rosterSize = Math.max(2, botCount);
 if (!Number.isInteger(botCount) || botCount < 1 || botCount > 32) {
   throw new RangeError("DEHERM_NETWORK_BOTS must be an integer in [1, 32]");
 }

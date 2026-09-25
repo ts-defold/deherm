@@ -41,11 +41,16 @@ tests, generated-art tools, and editor configuration.
 fill every slot not occupied by a human. `pnpm stack` reuses or creates the
 local WebTransport certificate, starts the authoritative Deno HTTP/3 server,
 launches the native game with its certificate pin, hosts and opens the browser
-bot command plane, and deploys seven real network bots after the game takes the
-first slot. Closing the game or pressing Ctrl-C tears the owned processes down.
+bot command plane, and fills every slot after the native game takes the first.
+The default is now the complete 32-player roster: one native client
+plus 31 real browser WebTransport clients. It reports ready only after Defold
+renders that authoritative roster, the server accepts input, and every browser
+bot has applied snapshots and observed movement. Closing the game or pressing
+Ctrl-C tears the owned process groups down.
 Pass `-- --bots 0 --no-browser` for only the server and game. `pnpm dev` builds,
 launches, watches, and hot-reloads through the TUI by default; run it once when
-the packaged native game has not been built yet.
+the packaged native game has not been built yet. CI-style local proof is
+`pnpm stack -- --headless --exit-when-ready`.
 
 | Keys          | Action                                                                              |
 | ------------- | ----------------------------------------------------------------------------------- |

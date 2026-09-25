@@ -1521,8 +1521,12 @@ test("client gates control until WELCOME_ACK and preserves ordered control write
   await new Promise((done) => setImmediate(done));
   assert.equal(calls.length, 2, "welcome acknowledgement is the first post-hello frame");
   assert.equal(calls[1].channel, TRANSPORT_CHANNEL_SESSION);
+  assert.equal(client.state, "connecting", "welcome is not admission until its acknowledgement enters the stream");
+  client.sendChassis(CHASSIS_BULWARK);
+  assert.equal(calls.length, 2, "control remains gated while the welcome acknowledgement is pending");
   calls[1].resolve("sent");
   await new Promise((done) => setImmediate(done));
+  assert.equal(client.state, "ready");
 
   client.sendChassis(CHASSIS_BULWARK);
   client.sendWeaponUpgrade(WEAPON_UPGRADE_CANNON_BLAST);
@@ -1535,6 +1539,72 @@ test("client gates control until WELCOME_ACK and preserves ordered control write
   assert.equal(calls.length, 4);
   assert.deepEqual([...calls[3].payload.subarray(4, 6)], [CONTROL_SET_WEAPON_UPGRADE, WEAPON_UPGRADE_CANNON_BLAST]);
   calls[3].resolve("sent");
+});
+
+test("a reconnect is not blocked by the previous transport's pending acknowledgement", async () => {
+  const makeTransport = () => {
+    const calls = [];
+    return {
+      calls,
+      capabilities: {
+        protocol: "webtransport-h3",
+        reliableStreams: true,
+        datagrams: true,
+        maxDatagramBytes: 1_200,
+      },
+      sendReliable(channel, payload) {
+        let resolve;
+        const completed = new Promise((done) => {
+          resolve = done;
+        });
+        calls.push({ channel, payload: payload.slice(), resolve });
+        return completed;
+      },
+      async trySendDatagram() {
+        return "sent";
+      },
+      close() {},
+    };
+  };
+  const welcome = new Uint8Array(WELCOME_BYTES);
+  writeWelcome(welcome, {
+    matchId: 77,
+    playerId: 1,
+    team: 1,
+    maximumPlayers: 8,
+    botCount: 7,
+    mapSeed: DEFAULT_ARENA_SEED,
+    serverTick: 0,
+    tickRate: 60,
+    snapshotIntervalTicks: 3,
+    resumeToken: new Uint8Array(RESUME_TOKEN_BYTES).fill(7),
+  });
+  const client = new BattleClient();
+  const first = makeTransport();
+  client.attach(first);
+  await new Promise((done) => setImmediate(done));
+  first.calls[0].resolve("sent");
+  await new Promise((done) => setImmediate(done));
+  client.onReliable(TRANSPORT_CHANNEL_SESSION, welcome);
+  await new Promise((done) => setImmediate(done));
+  assert.equal(first.calls.length, 2);
+
+  const second = makeTransport();
+  client.attach(second);
+  await new Promise((done) => setImmediate(done));
+  assert.equal(second.calls.length, 1, "the new HELLO does not wait on the old transport's ACK");
+  second.calls[0].resolve("sent");
+  await new Promise((done) => setImmediate(done));
+  client.onReliable(TRANSPORT_CHANNEL_SESSION, welcome);
+  await new Promise((done) => setImmediate(done));
+  assert.equal(second.calls.length, 2);
+  second.calls[1].resolve("sent");
+  await new Promise((done) => setImmediate(done));
+  assert.equal(client.state, "ready");
+
+  first.calls[1].resolve("sent");
+  await new Promise((done) => setImmediate(done));
+  assert.equal(client.state, "ready", "the stale ACK completion cannot mutate the replacement connection");
 });
 
 test("bots fight, score, stay out of cover and pick their arena up", () => {
@@ -3963,6 +4033,93 @@ test("a remote WebTransport close is observed without issuing a second close", a
   await new Promise((resolve) => setImmediate(resolve));
   assert.equal(session.closeCalls, 0);
   assert.deepEqual(events, [[7, "peer closed"]]);
+});
+
+test("malformed host close metadata is normalized before it reaches the match", async () => {
+  class RemotelyClosedSession {
+    ready = Promise.resolve();
+    incomingUnidirectionalStreams = new ReadableStream();
+    incomingBidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closedResolve;
+    closed = new Promise((resolve) => {
+      this.closedResolve = resolve;
+    });
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    close() {
+      throw new Error("a remote close must not issue a second close");
+    }
+  }
+  const session = new RemotelyClosedSession();
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
+  const events = [];
+  await WebTransportGameClient.connect(
+    "https://example.invalid",
+    {
+      onReliable() {},
+      onDatagram() {},
+      onClose(code, reason) {
+        events.push([code, reason]);
+      },
+    },
+    FakeConstructor,
+  );
+  session.closedResolve({ closeCode: 91_141_958_510_812, reason: "y\uFFFDB\uFFFDK" });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.deepEqual(events, [[1, "invalid peer close metadata"]]);
+});
+
+test("peer close reasons are single-line and bounded before logging", async () => {
+  class RemotelyClosedSession {
+    ready = Promise.resolve();
+    incomingUnidirectionalStreams = new ReadableStream();
+    incomingBidirectionalStreams = new ReadableStream();
+    datagrams = { maxDatagramSize: 8, readable: new ReadableStream(), writable: new WritableStream() };
+    closedResolve;
+    closed = new Promise((resolve) => {
+      this.closedResolve = resolve;
+    });
+    createUnidirectionalStream() {
+      throw new Error("not used");
+    }
+    createBidirectionalStream() {
+      throw new Error("not used");
+    }
+    close() {}
+  }
+  const session = new RemotelyClosedSession();
+  class FakeConstructor {
+    constructor() {
+      return session;
+    }
+  }
+  const events = [];
+  await WebTransportGameClient.connect(
+    "https://example.invalid",
+    {
+      onReliable() {},
+      onDatagram() {},
+      onClose(code, reason) {
+        events.push([code, reason]);
+      },
+    },
+    FakeConstructor,
+  );
+  session.closedResolve({ closeCode: 7, reason: `line-one\nline-two${"x".repeat(300)}` });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(events[0][0], 7);
+  assert.equal(events[0][1].length, 256);
+  assert.doesNotMatch(events[0][1], /[\r\n]/u);
+  assert.match(events[0][1], /^line-one line-two/u);
 });
 
 test("server snapshot streams are independently cancellable under backpressure", async () => {

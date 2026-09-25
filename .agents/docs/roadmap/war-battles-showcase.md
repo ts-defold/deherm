@@ -391,6 +391,44 @@ acknowledgement, so this work does not claim Deno consumed the application code
 or reason. A future generic/poolable client should prefer an observed peer
 CONNECT FIN/reset before teardown while retaining the bounded deadline.
 
+## 32-player full-stack admission and teardown diagnostics tranche
+
+`pnpm stack` is now an evidence-bearing launcher rather than a process starter
+that prints its requested bot count. Before `war-battles-stack:ready`, it must
+observe all of the following:
+
+- native Defold logs `arena-engaged:players=<authoritative roster>` after
+  adopting `WELCOME.maximumPlayers` and building that complete presentation;
+- the server health endpoint reports the native client and every requested
+  browser bot as human-owned slots, the remaining bot count exactly, and at
+  least one accepted authoritative input;
+- each dashboard bot has applied a server snapshot, emitted a non-idle shared
+  bot-brain command, sent input, and observed nonzero reconciled travel.
+
+`--headless --exit-when-ready` runs that same composition as a finite local
+acceptance gate. The verified arm64-macOS run used the complete 32-player
+roster: one packaged native Defold/Dynamic-Hermes client and 31 independent
+Chrome WebTransport sessions. It observed 503 bot snapshot applications and
+1,559 bot input sends before success.
+
+Admission now has an explicit client-side commit point. Receiving WELCOME
+builds bounded client state but does not expose `ready` or call gameplay's
+`onWelcome` until the ordered WELCOME_ACK write returns `sent`; controls and
+pings stay gated during the write. Server sessions carry a monotonic diagnostic
+id through close and reliable-dispatch errors, preserving the existing strict
+pre-HELLO/pre-ACK rejection while making concurrent failures distinguishable.
+
+The Deno host boundary also validates peer close metadata before forwarding it.
+Codes outside uint32 or binary-looking decoded reasons are host corruption, not
+application close facts, and become `1:invalid peer close metadata`. This is a
+containment rule around an unstable host API, not evidence that Deno consumed a
+WT_CLOSE_SESSION capsule. POSIX launcher services use owned process groups so
+the packaged Node wrapper and its dmengine child can be terminated together,
+including on `SIGHUP`; Windows uses bounded `taskkill /T` escalation for the
+complete owned tree. Bounded cleanup remains part of the executable gate. The
+focused protocol suite is 103/103 green and the complete War Battles gate is
+207/207 green.
+
 ## Reliable WebSocket fallback tranche
 
 The browser now has an executable fallback on the Deno server's existing TCP

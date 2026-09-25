@@ -135,8 +135,11 @@ pnpm stack
 
 It starts this server, launches the packaged native game with the local
 certificate pin, hosts the Deno dashboard, opens it in the default browser, and
-autodeploys the remaining seven real browser clients. Closing the game or
-pressing Ctrl-C stops the server and dashboard.
+autodeploys the remaining 31 real browser clients for a 32-player match. It
+waits for native roster presentation, authoritative input, and movement from
+every browser client before reporting ready. Closing the game or pressing
+Ctrl-C stops the complete owned process tree. Use
+`pnpm stack -- --headless --exit-when-ready` for a finite local acceptance run.
 
 The repeatable synthetic-browser acceptance for this same production adapter is
 `pnpm runtime:multiplayer`. It opens two independent Chrome pages, verifies

@@ -65,6 +65,7 @@ import {
   sendTickInput,
   type GameTransport,
   type ReliableChannel,
+  type SendDisposition,
   type TransportReceiver,
 } from "./transport";
 import { BattleWorld } from "./world";
@@ -231,6 +232,7 @@ export class BattleClient implements TransportReceiver {
   private pendingSnapshotKeyframe = false;
   private awaitingSnapshotKeyframe = false;
   private welcomed = false;
+  private welcomeAcknowledging = false;
 
   private moveX = 0;
   private moveY = 0;
@@ -262,6 +264,12 @@ export class BattleClient implements TransportReceiver {
   attach(transport: GameTransport): void {
     this.transport = transport;
     this.state = "connecting";
+    // A transport from the previous attempt may have closed while its ordered
+    // write promise was still pending. The new connection owns a new stream
+    // and admission transaction; neither that promise nor its ACK guard may
+    // serialize or reject the new HELLO/WELCOME pair.
+    this.reliableSendTail = Promise.resolve();
+    this.welcomeAcknowledging = false;
     // A transport reconnect starts a fresh snapshot stream. Keep the resume
     // credential and predicted world until the new welcome arrives, but make
     // any late frame from the old connection unable to seed the new baseline.
@@ -419,13 +427,16 @@ export class BattleClient implements TransportReceiver {
   // --- internals ------------------------------------------------------------
 
   private handleWelcome(payload: Uint8Array): void {
+    if (this.state !== "connecting" || this.welcomeAcknowledging) {
+      throw new Error("unexpected or duplicate welcome");
+    }
+    this.welcomeAcknowledging = true;
     readWelcome(payload, this.welcome);
     this.playerId = this.welcome.playerId;
     this.team = this.welcome.team;
     this.rosterSize = this.welcome.maximumPlayers;
     this.resumeToken.set(this.welcome.resumeToken);
     writeWelcomeAck(this.welcomeAckBuffer, { resumeToken: this.resumeToken });
-    void this.send(TRANSPORT_CHANNEL_SESSION, this.welcomeAckBuffer);
     this.remoteInterpolationTicks =
       payload.byteLength >= WELCOME_BYTES
         ? clamp(Math.trunc(this.welcome.snapshotIntervalTicks ?? REMOTE_INTERPOLATION_TICKS), 1, 30)
@@ -477,6 +488,20 @@ export class BattleClient implements TransportReceiver {
     this.localCorrectionX = 0;
     this.localCorrectionY = 0;
     this.localCorrectionMilliseconds = 0;
+    void this.acknowledgeWelcome();
+  }
+
+  private async acknowledgeWelcome(): Promise<void> {
+    const transport = this.transport;
+    const disposition = await this.send(TRANSPORT_CHANNEL_SESSION, this.welcomeAckBuffer);
+    if (this.transport !== transport || this.state !== "connecting") return;
+    this.welcomeAcknowledging = false;
+    if (disposition !== "sent") {
+      this.options.onError?.(new Error(`welcome acknowledgement was not sent: ${disposition ?? "detached"}`));
+      transport?.close(4_003, "welcome acknowledgement failed");
+      this.state = "closed";
+      return;
+    }
     this.state = "ready";
     this.welcomed = true;
     this.options.onWelcome?.(this.welcome);
@@ -773,22 +798,25 @@ export class BattleClient implements TransportReceiver {
     this.localCorrectionMilliseconds = remaining;
   }
 
-  private async send(channel: ReliableChannel, payload: Uint8Array): Promise<void> {
+  private async send(channel: ReliableChannel, payload: Uint8Array): Promise<SendDisposition | undefined> {
     const transport = this.transport;
-    if (transport === undefined) return;
+    if (transport === undefined) return undefined;
     // QUIC only orders bytes within one stream. The browser transport uses an
     // independent stream per reliable message, so preserve the program order
     // of hello, acknowledgement, control and ping messages here. Own the bytes
     // before queueing because every protocol buffer above is reused in place.
     const ownedPayload = payload.slice();
+    let disposition: SendDisposition | undefined;
     const pending = this.reliableSendTail.then(async () => {
       if (this.transport !== transport || this.state === "closed") return;
-      await transport.sendReliable(channel, ownedPayload);
+      disposition = await transport.sendReliable(channel, ownedPayload);
     });
-    this.reliableSendTail = pending.catch((error: unknown) => {
+    const settled = pending.catch((error: unknown) => {
       this.options.onError?.(error);
     });
-    await this.reliableSendTail;
+    this.reliableSendTail = settled;
+    await settled;
+    return disposition;
   }
 }
 
