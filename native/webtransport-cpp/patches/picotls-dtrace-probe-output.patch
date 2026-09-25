@@ -36,7 +36,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 +    LIST(APPEND CORE_FILES picotlsvs/picotls/wintimeofday.c)
 +ENDIF ()
  SET(CORE_TEST_FILES
-@@ -74,3 +74,5 @@ ENDIF ()
+@@ -74,3 +80,5 @@ ENDIF ()
 -PKG_CHECK_MODULES(BROTLI_DEC libbrotlidec)
 -PKG_CHECK_MODULES(BROTLI_ENC libbrotlienc)
 +IF (PkgConfig_FOUND)
