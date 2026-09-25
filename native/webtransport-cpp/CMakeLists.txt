@@ -106,14 +106,19 @@ target_include_directories(deherm_webtransport_cpp
   PRIVATE src "${picotls_SOURCE_DIR}/include")
 target_compile_features(deherm_webtransport_cpp PUBLIC cxx_std_17)
 set_target_properties(deherm_webtransport_cpp PROPERTIES OUTPUT_NAME defold_webtransport_core)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" OR ANDROID)
+  # picohttp and picoquic carry a circular static dependency through the qlog
+  # helper. GNU ld resolves each archive only when it is encountered, while
+  # CMake de-duplicates an explicit trailing picoquic-log. RESCAN is the
+  # allocation-free, deterministic equivalent of --start-group/--end-group.
+  set(DEHERM_PICOQUIC_LINK "$<LINK_GROUP:RESCAN,picohttp-core,picoquic-core,picoquic-log>")
+else()
+  set(DEHERM_PICOQUIC_LINK picohttp-core picoquic-core picoquic-log)
+endif()
+
 target_link_libraries(deherm_webtransport_cpp
   PUBLIC
-    picohttp-core
-    picoquic-core
-    # GNU ld resolves static archives from left to right. picoquic-core calls
-    # picoquic_set_qlog, so the log archive must also appear after core even
-    # though picohttp-core already exposes it in its interface.
-    picoquic-log
+    ${DEHERM_PICOQUIC_LINK}
   PRIVATE
     mbedtls
     mbedcrypto
