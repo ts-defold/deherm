@@ -10,13 +10,14 @@ import {
   sys,
   tilemap,
   vmath,
+  WebTransport,
   type DefoldHash,
 } from "@deherm/project";
 
 import {
   BattleClient,
   BrowserWebSocketClient,
-  BrowserWebTransportClient,
+  WebTransportGameClient,
   DEFAULT_ARENA_SEED,
   EVENT_EXPLOSION,
   EVENT_FIRE,
@@ -64,6 +65,8 @@ interface WarBattlesRuntimeTelemetry {
   state: string;
   /** The protocol selected by the arena's ordered online dial. */
   transport: "webtransport-h3-quic" | "websocket-tcp" | null;
+  /** Concrete adapter behind the selected wire protocol. */
+  transportBackend: "browser" | "native" | null;
   /** The lane used for tick inputs by the selected transport. */
   inputLane: "datagram" | "reliable-fallback" | null;
   playerId: number;
@@ -210,6 +213,7 @@ function attachOnlineTransport(
   transport: GameTransport,
   attempts: OnlineConnectionAttempts,
   generation: number,
+  backend: "browser" | "native",
 ): void {
   // A dial can settle after a newer fallback has won, or after the match has
   // already detached its connecting client for offline play. Close that
@@ -226,6 +230,7 @@ function attachOnlineTransport(
   const protocol = transport.capabilities.protocol;
   self.telemetry.transport =
     protocol === "webtransport-h3" ? "webtransport-h3-quic" : protocol === "websocket-tcp" ? "websocket-tcp" : null;
+  self.telemetry.transportBackend = backend;
   self.telemetry.inputLane = transport.capabilities.datagrams ? "datagram" : "reliable-fallback";
   client.attach(transport);
 }
@@ -637,6 +642,7 @@ function connectOnline(self: ArenaSelf): boolean {
   }
   const url = runtimeConfig?.server ?? sys.getConfigString("war_battles.server", "") ?? "";
   if (url === "") return false;
+  const nativeRuntime = defold.runtime() === "hermes";
   let client: BattleClient;
   let websocketAttempted = false;
   const attempts: OnlineConnectionAttempts = { generation: 0, winner: 0, detached: false };
@@ -674,7 +680,7 @@ function connectOnline(self: ArenaSelf): boolean {
         defold.log("info", "war-battles:net:transport=websocket-tcp");
         // The owner call is guarded by the generation/winner arguments below:
         // attachOnlineTransport(self, client, transport)
-        attachOnlineTransport(self, client, transport, attempts, generation);
+        attachOnlineTransport(self, client, transport, attempts, generation, "browser");
       },
       (error: unknown) => {
         if (attempts.detached || attempts.generation !== generation) return;
@@ -685,7 +691,8 @@ function connectOnline(self: ArenaSelf): boolean {
   const fallback = (reason: string, expectedGeneration?: number): void => {
     if (!client || self.match.client !== client || self.match.mode !== "offline" || attempts.detached) return;
     if (expectedGeneration !== undefined && attempts.generation !== expectedGeneration) return;
-    dialWebSocket(reason);
+    if (nativeRuntime) fallbackOffline(reason);
+    else dialWebSocket(reason);
   };
   client = new BattleClient({
     name: "defold",
@@ -710,14 +717,15 @@ function connectOnline(self: ArenaSelf): boolean {
   }
   const options = hash === undefined ? undefined : { serverCertificateHashes: [{ algorithm: "sha-256", value: hash }] };
   const generation = beginOnlineAttempt(attempts);
-  void BrowserWebTransportClient.connect(url, attemptReceiver(client, attempts, generation), undefined, options).then(
+  void WebTransportGameClient.connect(url, attemptReceiver(client, attempts, generation), WebTransport, options).then(
     (transport) => {
       if (attempts.detached || attempts.generation !== generation) {
         transport.close(1000, "stale connection attempt");
         return;
       }
-      defold.log("info", "war-battles:net:transport=webtransport-h3-quic");
-      attachOnlineTransport(self, client, transport, attempts, generation);
+      const backend = nativeRuntime ? "native" : "browser";
+      defold.log("info", `war-battles:net:transport=webtransport-h3-quic:backend=${backend}`);
+      attachOnlineTransport(self, client, transport, attempts, generation, backend);
     },
     (error: unknown) => {
       if (attempts.detached || attempts.generation !== generation) return;
@@ -773,6 +781,7 @@ export default defineComponent({
       mode: "offline",
       state: "initializing",
       transport: null,
+      transportBackend: null,
       inputLane: null,
       playerId: 0,
       rosterSize: 0,
@@ -811,6 +820,9 @@ export default defineComponent({
   update(self: ArenaSelf, dt: number): void {
     self.elapsed += dt;
     syncArenaVisualMap(self);
+    // Native transports are poll-driven because their worker threads may not
+    // call Hermes, Lua, or Defold. Pump before the engagement gate: receiving
+    // the welcome is what changes a dialing arena into an engaged online one.
     if (!self.engaged) {
       if (self.autoEngageSeconds > 0 && self.elapsed >= self.autoEngageSeconds) engage(self);
       updateTelemetry(self);

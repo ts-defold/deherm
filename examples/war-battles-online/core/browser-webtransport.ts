@@ -7,9 +7,12 @@ import {
   type TransportCapabilities,
   type TransportReceiver,
 } from "./transport.ts";
-
-const RELIABLE_HEADER_BYTES = 5;
-const MAX_RELIABLE_MESSAGE_BYTES = 64 * 1024;
+import {
+  MAX_RELIABLE_MESSAGE_BYTES,
+  RELIABLE_FRAME_HEADER_BYTES,
+  ReliableFrameDecoder,
+  encodeReliableFrame,
+} from "./webtransport-framing.ts";
 const DATAGRAM_STAGING_SLOTS = 4;
 // Reliable control/session frames are events: unlike snapshots, they cannot
 // be replaced. Keep their userland queue deliberately small and fail closed
@@ -24,23 +27,53 @@ interface PendingServerReliableFrame {
 }
 
 export interface WebTransportDatagramsLike {
-  readonly readable: ReadableStream<Uint8Array>;
-  readonly writable: WritableStream<Uint8Array>;
+  readonly readable: ReadableStreamLike<Uint8Array>;
+  readonly writable: WritableStreamLike<Uint8Array>;
   readonly maxDatagramSize?: number;
 }
 
+export type ReadResultLike<T> =
+  | { readonly done: true; readonly value?: undefined }
+  | { readonly done: false; readonly value: T };
+
+export interface ReadableStreamReaderLike<T> {
+  read(): Promise<ReadResultLike<T>>;
+  cancel(reason?: unknown): Promise<void>;
+  releaseLock(): void;
+}
+
+export interface ReadableStreamLike<T> {
+  cancel(reason?: unknown): Promise<void>;
+  getReader(): ReadableStreamReaderLike<T>;
+}
+
+export interface WritableStreamWriterLike<T> {
+  readonly ready: Promise<void>;
+  readonly desiredSize: number | null;
+  write(chunk: T): Promise<void>;
+  close(): Promise<void>;
+  abort(reason?: unknown): Promise<void>;
+  releaseLock(): void;
+}
+
+export interface WritableStreamLike<T> {
+  abort(reason?: unknown): Promise<void>;
+  close(): Promise<void>;
+  getWriter(): WritableStreamWriterLike<T>;
+}
+
 export interface WebTransportBidirectionalStreamLike {
-  readonly readable: ReadableStream<Uint8Array>;
-  readonly writable: WritableStream<Uint8Array>;
+  readonly readable: ReadableStreamLike<Uint8Array>;
+  readonly writable: WritableStreamLike<Uint8Array>;
 }
 
 export interface WebTransportSessionLike {
   readonly ready: Promise<void>;
   readonly closed: Promise<{ closeCode?: number; reason?: string }>;
   readonly datagrams: WebTransportDatagramsLike;
-  readonly incomingUnidirectionalStreams: ReadableStream<ReadableStream<Uint8Array>>;
-  readonly incomingBidirectionalStreams: ReadableStream<WebTransportBidirectionalStreamLike>;
-  createUnidirectionalStream(): Promise<WritableStream<Uint8Array>>;
+  readonly incomingUnidirectionalStreams: ReadableStreamLike<ReadableStreamLike<Uint8Array>>;
+  readonly incomingBidirectionalStreams: ReadableStreamLike<WebTransportBidirectionalStreamLike>;
+  createUnidirectionalStream(): Promise<WritableStreamLike<Uint8Array>>;
   createBidirectionalStream(): Promise<WebTransportBidirectionalStreamLike>;
   close(options?: { closeCode?: number; reason?: string }): void;
 }
@@ -58,23 +91,24 @@ export interface WebTransportConstructorLike {
 }
 
 /**
- * Browser-facing WebTransport adapter. Client-originated reliable messages use
+ * WebTransport-shaped game adapter shared by browser and native Defold. The
+ * selected constructor owns the platform implementation. Client-originated reliable messages use
  * independent QUIC bidirectional streams. Server-originated reliable messages
  * share one persistent unidirectional stream, with the existing five-byte
  * frames repeated on that stream. Tick inputs use datagrams only when the
  * negotiated session exposes them and the writable queue can accept data
  * immediately.
  */
-export class BrowserWebTransportClient implements GameTransport {
+export class WebTransportGameClient implements GameTransport {
   readonly capabilities: TransportCapabilities;
-  private readonly datagramWriter: WritableStreamDefaultWriter<Uint8Array>;
+  private readonly datagramWriter: WritableStreamWriterLike<Uint8Array>;
   private readonly datagramStaging: Uint8Array[];
   private readonly datagramStagingBusy: boolean[];
   private readonly session: WebTransportSessionLike;
   private readonly receiver: TransportReceiver;
   private readonly reliableStreamMode: ReliableStreamMode;
-  private serverReliableWriter?: WritableStreamDefaultWriter<Uint8Array>;
-  private serverReliableWriterPromise?: Promise<WritableStreamDefaultWriter<Uint8Array> | undefined>;
+  private serverReliableWriter?: WritableStreamWriterLike<Uint8Array>;
+  private serverReliableWriterPromise?: Promise<WritableStreamWriterLike<Uint8Array> | undefined>;
   private serverReliableWrite?: Promise<void>;
   private readonly pendingServerReliable: PendingServerReliableFrame[] = [];
   private pendingServerReliableBytes = 0;
@@ -119,7 +153,7 @@ export class BrowserWebTransportClient implements GameTransport {
     receiver: TransportReceiver,
     constructorOverride?: WebTransportConstructorLike,
     options?: WebTransportConnectionOptions,
-  ): Promise<BrowserWebTransportClient> {
+  ): Promise<WebTransportGameClient> {
     const Constructor = constructorOverride ?? browserWebTransportConstructor();
     const session = new Constructor(url, {
       // WebTransport session stream credits are separate from the QUIC
@@ -130,15 +164,15 @@ export class BrowserWebTransportClient implements GameTransport {
       ...options,
     });
     await session.ready;
-    return BrowserWebTransportClient.adopt(session, receiver, "client");
+    return WebTransportGameClient.adopt(session, receiver, "client");
   }
 
   private static adopt(
     session: WebTransportSessionLike,
     receiver: TransportReceiver,
     reliableStreamMode: ReliableStreamMode,
-  ): BrowserWebTransportClient {
-    const client = new BrowserWebTransportClient(session, receiver, reliableStreamMode);
+  ): WebTransportGameClient {
+    const client = new WebTransportGameClient(session, receiver, reliableStreamMode);
     void client.receiveReliableStreams();
     void client.receiveDatagrams();
     void session.closed.then(
@@ -148,8 +182,8 @@ export class BrowserWebTransportClient implements GameTransport {
     return client;
   }
 
-  static adoptServer(session: WebTransportSessionLike, receiver: TransportReceiver): BrowserWebTransportClient {
-    return BrowserWebTransportClient.adopt(session, receiver, "server");
+  static adoptServer(session: WebTransportSessionLike, receiver: TransportReceiver): WebTransportGameClient {
+    return WebTransportGameClient.adopt(session, receiver, "server");
   }
 
   async sendReliable(channel: ReliableChannel, payload: Uint8Array, signal?: AbortSignal): Promise<SendDisposition> {
@@ -169,25 +203,26 @@ export class BrowserWebTransportClient implements GameTransport {
     // returns a promise.
     const ownedPayload = payload.slice();
 
-    let reverseReadable: ReadableStream<Uint8Array> | undefined;
-    let writable: WritableStream<Uint8Array>;
-    if (this.reliableStreamMode === "client") {
-      const stream = await this.session.createBidirectionalStream();
-      reverseReadable = stream.readable;
-      writable = stream.writable;
-    } else {
-      writable = await this.session.createUnidirectionalStream();
-    }
-    const writer = writable.getWriter();
-    const header = new Uint8Array(RELIABLE_HEADER_BYTES);
-    const view = new DataView(header.buffer);
-    view.setUint8(0, channel);
-    view.setUint32(1, ownedPayload.byteLength, true);
+    let reverseReadable: ReadableStreamLike<Uint8Array> | undefined;
+    let writer: WritableStreamWriterLike<Uint8Array> | undefined;
     const abort = (): void => {
-      void writer.abort(signal?.reason);
+      void writer?.abort(signal?.reason);
     };
     signal?.addEventListener("abort", abort, { once: true });
     try {
+      let writable: WritableStreamLike<Uint8Array>;
+      if (this.reliableStreamMode === "client") {
+        const stream = await this.session.createBidirectionalStream();
+        reverseReadable = stream.readable;
+        writable = stream.writable;
+      } else {
+        writable = await this.session.createUnidirectionalStream();
+      }
+      writer = writable.getWriter();
+      const header = new Uint8Array(RELIABLE_FRAME_HEADER_BYTES);
+      const view = new DataView(header.buffer);
+      view.setUint8(0, channel);
+      view.setUint32(1, ownedPayload.byteLength, true);
       await writer.ready;
       await writer.write(header);
       await writer.write(ownedPayload);
@@ -197,7 +232,7 @@ export class BrowserWebTransportClient implements GameTransport {
       return "closed";
     } finally {
       signal?.removeEventListener("abort", abort);
-      writer.releaseLock();
+      writer?.releaseLock();
       if (reverseReadable !== undefined) {
         try {
           void reverseReadable.cancel().catch(() => undefined);
@@ -252,7 +287,7 @@ export class BrowserWebTransportClient implements GameTransport {
         if (next.done) break;
         const stream =
           this.reliableStreamMode === "client"
-            ? (next.value as ReadableStream<Uint8Array>)
+            ? (next.value as ReadableStreamLike<Uint8Array>)
             : (next.value as WebTransportBidirectionalStreamLike).readable;
         const reverseWritable =
           this.reliableStreamMode === "server"
@@ -268,11 +303,11 @@ export class BrowserWebTransportClient implements GameTransport {
   }
 
   private async readReliableStream(
-    stream: ReadableStream<Uint8Array>,
-    reverseWritable?: WritableStream<Uint8Array>,
+    stream: ReadableStreamLike<Uint8Array>,
+    reverseWritable?: WritableStreamLike<Uint8Array>,
   ): Promise<void> {
     const reader = stream.getReader();
-    let reverseWriter: WritableStreamDefaultWriter<Uint8Array> | undefined;
+    let reverseWriter: WritableStreamWriterLike<Uint8Array> | undefined;
     if (reverseWritable !== undefined) {
       try {
         reverseWriter = reverseWritable.getWriter();
@@ -280,63 +315,17 @@ export class BrowserWebTransportClient implements GameTransport {
         // A peer may reset the reverse direction before the stream is read.
       }
     }
-    const header = new Uint8Array(RELIABLE_HEADER_BYTES);
-    let headerBytes = 0;
-    let expectedPayloadBytes = -1;
-    let frameChannel: ReliableChannel | undefined;
-    let payload: Uint8Array | undefined;
-    let payloadBytes = 0;
+    const decoder = new ReliableFrameDecoder();
     let receivedBytes = false;
     try {
       while (true) {
         const next = await reader.read();
         if (next.done) break;
         if (next.value.byteLength > 0) receivedBytes = true;
-        let offset = 0;
-        while (offset < next.value.byteLength) {
-          if (headerBytes < RELIABLE_HEADER_BYTES) {
-            const count = Math.min(RELIABLE_HEADER_BYTES - headerBytes, next.value.byteLength - offset);
-            header.set(next.value.subarray(offset, offset + count), headerBytes);
-            headerBytes += count;
-            offset += count;
-            if (headerBytes < RELIABLE_HEADER_BYTES) continue;
-
-            const channel = header[0]!;
-            validateReliableChannel(channel);
-            frameChannel = channel;
-            expectedPayloadBytes = new DataView(header.buffer).getUint32(1, true);
-            if (expectedPayloadBytes > MAX_RELIABLE_MESSAGE_BYTES) {
-              throw new Error("reliable message exceeds fixed protocol limit");
-            }
-            payload = new Uint8Array(expectedPayloadBytes);
-            payloadBytes = 0;
-            if (expectedPayloadBytes === 0) {
-              this.receiver.onReliable(frameChannel, payload);
-              headerBytes = 0;
-              expectedPayloadBytes = -1;
-              frameChannel = undefined;
-              payload = undefined;
-            }
-          }
-
-          if (headerBytes === RELIABLE_HEADER_BYTES && expectedPayloadBytes > 0) {
-            const target = payload!;
-            const count = Math.min(expectedPayloadBytes - payloadBytes, next.value.byteLength - offset);
-            target.set(next.value.subarray(offset, offset + count), payloadBytes);
-            payloadBytes += count;
-            offset += count;
-            if (payloadBytes === expectedPayloadBytes) {
-              this.receiver.onReliable(frameChannel!, target);
-              headerBytes = 0;
-              expectedPayloadBytes = -1;
-              frameChannel = undefined;
-              payload = undefined;
-              payloadBytes = 0;
-            }
-          }
-        }
+        decoder.push(next.value, (channel, payload) => this.receiver.onReliable(channel, payload));
       }
-      if (!receivedBytes || headerBytes !== 0) throw new Error("truncated reliable message");
+      if (!receivedBytes) throw new Error("truncated reliable message");
+      decoder.finish();
     } catch (error: unknown) {
       this.finishClose(2, error instanceof Error ? error.message : "invalid reliable message");
     } finally {
@@ -411,11 +400,7 @@ export class BrowserWebTransportClient implements GameTransport {
   }
 
   private async sendServerReliable(channel: ReliableChannel, payload: Uint8Array): Promise<SendDisposition> {
-    const frame = new Uint8Array(RELIABLE_HEADER_BYTES + payload.byteLength);
-    const view = new DataView(frame.buffer);
-    view.setUint8(0, channel);
-    view.setUint32(1, payload.byteLength, true);
-    frame.set(payload, RELIABLE_HEADER_BYTES);
+    const frame = encodeReliableFrame(channel, payload);
 
     if (this.closed) return "closed";
 
@@ -461,7 +446,7 @@ export class BrowserWebTransportClient implements GameTransport {
     return this.writeServerFrame(this.serverReliableWriter!, frame);
   }
 
-  private async serverReliableWriterOrClosed(): Promise<WritableStreamDefaultWriter<Uint8Array> | undefined> {
+  private async serverReliableWriterOrClosed(): Promise<WritableStreamWriterLike<Uint8Array> | undefined> {
     if (this.closed) return undefined;
     if (this.serverReliableWriter !== undefined) return this.serverReliableWriter;
     if (this.serverReliableWriterPromise === undefined) {
@@ -489,7 +474,7 @@ export class BrowserWebTransportClient implements GameTransport {
   }
 
   private async writeServerFrame(
-    writer: WritableStreamDefaultWriter<Uint8Array>,
+    writer: WritableStreamWriterLike<Uint8Array>,
     frame: Uint8Array,
   ): Promise<SendDisposition> {
     let write: Promise<void>;
@@ -580,7 +565,7 @@ export async function adoptServerWebTransportSession(
   receiver: TransportReceiver,
 ): Promise<GameTransport> {
   await session.ready;
-  return BrowserWebTransportClient.adoptServer(session, receiver);
+  return WebTransportGameClient.adoptServer(session, receiver);
 }
 
 function browserWebTransportConstructor(): WebTransportConstructorLike {

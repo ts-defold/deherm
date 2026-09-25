@@ -111,6 +111,7 @@ export interface ClientStats {
   inputsDropped: number;
   lastServerTick: number;
   lastRoundTripMilliseconds: number;
+  pongsReceived: number;
 }
 
 export class BattleClient implements TransportReceiver {
@@ -130,6 +131,7 @@ export class BattleClient implements TransportReceiver {
     inputsDropped: 0,
     lastServerTick: 0,
     lastRoundTripMilliseconds: 0,
+    pongsReceived: 0,
   };
 
   private transport?: GameTransport;
@@ -203,6 +205,7 @@ export class BattleClient implements TransportReceiver {
   private weapon = 0;
   private aimX = DIRECTION_SCALE;
   private aimY = 0;
+  private reliableSendTail: Promise<void> = Promise.resolve();
 
   constructor(options: BattleClientOptions = {}) {
     this.options = options;
@@ -469,6 +472,7 @@ export class BattleClient implements TransportReceiver {
     const clientTime = view.getUint32(4, true);
     this.stats.lastServerTick = view.getUint32(8, true);
     this.stats.lastRoundTripMilliseconds = ((Date.now() & 0xffff_ffff) - clientTime) >>> 0;
+    this.stats.pongsReceived += 1;
   }
 
   private applyPendingSnapshot(): void {
@@ -621,11 +625,19 @@ export class BattleClient implements TransportReceiver {
   private async send(channel: ReliableChannel, payload: Uint8Array): Promise<void> {
     const transport = this.transport;
     if (transport === undefined) return;
-    try {
-      await transport.sendReliable(channel, payload);
-    } catch (error: unknown) {
+    // QUIC only orders bytes within one stream. The browser transport uses an
+    // independent stream per reliable message, so preserve the program order
+    // of hello, acknowledgement, control and ping messages here. Own the bytes
+    // before queueing because every protocol buffer above is reused in place.
+    const ownedPayload = payload.slice();
+    const pending = this.reliableSendTail.then(async () => {
+      if (this.transport !== transport || this.state === "closed") return;
+      await transport.sendReliable(channel, ownedPayload);
+    });
+    this.reliableSendTail = pending.catch((error: unknown) => {
       this.options.onError?.(error);
-    }
+    });
+    await this.reliableSendTail;
   }
 }
 

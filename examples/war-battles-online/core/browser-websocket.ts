@@ -6,9 +6,7 @@ import {
   type TransportCapabilities,
   type TransportReceiver,
 } from "./transport.ts";
-
-const RELIABLE_HEADER_BYTES = 5;
-const MAX_RELIABLE_MESSAGE_BYTES = 64 * 1024;
+import { MAX_RELIABLE_MESSAGE_BYTES, decodeReliableFrame, encodeReliableFrame } from "./webtransport-framing.ts";
 const MAX_BUFFERED_BYTES = 256 * 1024;
 const WEBSOCKET_OPEN = 1;
 
@@ -103,11 +101,7 @@ export class BrowserWebSocketClient implements GameTransport {
     if (payload.byteLength > MAX_RELIABLE_MESSAGE_BYTES) return "too-large";
     if ((this.socket.bufferedAmount ?? 0) > MAX_BUFFERED_BYTES) return "backpressured";
 
-    const frame = new Uint8Array(RELIABLE_HEADER_BYTES + payload.byteLength);
-    const view = new DataView(frame.buffer);
-    view.setUint8(0, channel);
-    view.setUint32(1, payload.byteLength, true);
-    frame.set(payload, RELIABLE_HEADER_BYTES);
+    const frame = encodeReliableFrame(channel, payload);
     try {
       this.socket.send(frame);
       return "sent";
@@ -159,15 +153,8 @@ export class BrowserWebSocketClient implements GameTransport {
     try {
       const bytes = await websocketBytes(data);
       if (this.closed) return;
-      if (bytes.byteLength < RELIABLE_HEADER_BYTES) throw new Error("websocket frame is shorter than its header");
-      const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-      const channel = view.getUint8(0);
-      const payloadBytes = view.getUint32(1, true);
-      if (payloadBytes > MAX_RELIABLE_MESSAGE_BYTES || payloadBytes !== bytes.byteLength - RELIABLE_HEADER_BYTES) {
-        throw new Error("websocket reliable frame length is invalid");
-      }
-      validateReliableChannel(channel);
-      this.receiver.onReliable(channel, bytes.slice(RELIABLE_HEADER_BYTES));
+      const frame = decodeReliableFrame(bytes);
+      this.receiver.onReliable(frame.channel, frame.payload);
     } catch (error: unknown) {
       this.finishClose(1_001, error instanceof Error ? error.message : "invalid websocket frame", true);
     }

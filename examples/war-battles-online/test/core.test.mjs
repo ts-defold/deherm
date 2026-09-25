@@ -10,7 +10,7 @@ import {
   cellOfY,
   BattleWorld,
   BotController,
-  BrowserWebTransportClient,
+  WebTransportGameClient,
   DenoWebTransportServer,
   CELL_FLOOR,
   CONTROL_BUY_UPGRADE,
@@ -36,6 +36,7 @@ import {
   COVER_MAX_HEALTH,
   MAX_PLAYERS,
   MatchServer,
+  NetworkBotDriver,
   PICKUP_HEALTH,
   REJECT_BAD_RESUME,
   PlayableBattle,
@@ -65,6 +66,7 @@ import {
   createInputCommand,
   createObjectiveView,
   createPlayerView,
+  encodeReliableFrame,
   OBJECTIVE_CAPTURE_TICKS,
   PLAYER_MODE_DEAD,
   PLAYER_MODE_INFANTRY,
@@ -1175,6 +1177,131 @@ test("bots use selected branch splash safety instead of base weapon tactics", ()
 
 // --- bots -------------------------------------------------------------------
 
+test("network bots adapt the shared bot brain through ordinary client controls", () => {
+  const world = new BattleWorld(71, 0xace0);
+  world.addPlayer(1);
+  world.addPlayer(2);
+  world.playerX[0] = 10 * TILE_UNITS;
+  world.playerY[0] = 10 * TILE_UNITS;
+  world.playerX[1] = 16 * TILE_UNITS;
+  world.playerY[1] = 10 * TILE_UNITS;
+  world.setBotSkill(1, 2);
+
+  const expected = createInputCommand(world.matchId, 1);
+  new BotController().stage(world, expected, 1, world.tick + 1);
+  let controls;
+  let aim;
+  const chassisRequests = [];
+  const weaponUpgradeRequests = [];
+  const client = {
+    state: "ready",
+    world,
+    playerId: 1,
+    setControls(value) {
+      controls = { ...value };
+    },
+    setAim(x, y) {
+      aim = { x, y };
+    },
+    sendChassis(chassisId) {
+      chassisRequests.push(chassisId);
+    },
+    sendWeaponUpgrade(upgradeId) {
+      weaponUpgradeRequests.push(upgradeId);
+    },
+    update(elapsed, maximumSteps) {
+      assert.equal(elapsed, 17);
+      assert.equal(maximumSteps, 4);
+      return 3;
+    },
+  };
+  const driver = new NetworkBotDriver(client, { skill: 2 });
+
+  assert.equal(driver.update(17, 4), 3);
+  assert.deepEqual(controls, {
+    moveX: expected.moveX,
+    moveY: expected.moveY,
+    fire: (expected.buttons & INPUT_BUTTON_FIRE) !== 0,
+    boost: (expected.buttons & INPUT_BUTTON_BOOST) !== 0,
+    weapon: expected.weaponRequest,
+  });
+  assert.deepEqual(aim, { x: expected.aimX, y: expected.aimY });
+  assert.equal(driver.stats.commandsStaged, 1);
+  assert.equal(driver.stats.nonIdleCommands, 1);
+  assert.deepEqual(chassisRequests, []);
+  assert.deepEqual(weaponUpgradeRequests, []);
+});
+
+test("network bots send predicted weapon purchases over the authoritative control lane", () => {
+  const world = new BattleWorld(72, 0xace1);
+  world.addPlayer(1);
+  world.addPlayer(2);
+  world.grantCredits(1, 1_000);
+  const weaponUpgradeRequests = [];
+  const client = {
+    state: "ready",
+    world,
+    playerId: 1,
+    setControls() {},
+    setAim() {},
+    sendChassis() {},
+    sendWeaponUpgrade(upgradeId) {
+      weaponUpgradeRequests.push(upgradeId);
+    },
+    update() {
+      return 1;
+    },
+  };
+  const driver = new NetworkBotDriver(client, { skill: 2 });
+
+  assert.equal(driver.update(17, 4), 1);
+  assert.equal(weaponUpgradeRequests.length, 1);
+  assert.ok(weaponUpgradeRequests[0] > 0);
+  assert.equal(driver.stats.weaponUpgradeRequests, 1);
+});
+
+test("client reliable control messages preserve program order across independent QUIC streams", async () => {
+  const calls = [];
+  const transport = {
+    capabilities: {
+      protocol: "webtransport-h3",
+      reliableStreams: true,
+      datagrams: true,
+      maxDatagramBytes: 1_200,
+    },
+    sendReliable(channel, payload) {
+      let resolve;
+      const completed = new Promise((done) => {
+        resolve = done;
+      });
+      calls.push({ channel, payload: payload.slice(), resolve });
+      return completed;
+    },
+    async trySendDatagram() {
+      return "sent";
+    },
+    close() {},
+  };
+  const client = new BattleClient();
+  client.attach(transport);
+  await new Promise((done) => setImmediate(done));
+  assert.equal(calls.length, 1, "hello starts first");
+  calls[0].resolve("sent");
+  await new Promise((done) => setImmediate(done));
+
+  client.sendChassis(CHASSIS_BULWARK);
+  client.sendWeaponUpgrade(WEAPON_UPGRADE_CANNON_BLAST);
+  await new Promise((done) => setImmediate(done));
+  assert.equal(calls.length, 2, "the second control waits for the first stream to finish");
+  assert.deepEqual([...calls[1].payload.subarray(4, 6)], [CONTROL_SET_CHASSIS, CHASSIS_BULWARK]);
+
+  calls[1].resolve("sent");
+  await new Promise((done) => setImmediate(done));
+  assert.equal(calls.length, 3);
+  assert.deepEqual([...calls[2].payload.subarray(4, 6)], [CONTROL_SET_WEAPON_UPGRADE, WEAPON_UPGRADE_CANNON_BLAST]);
+  calls[2].resolve("sent");
+});
+
 test("bots fight, score, stay out of cover and pick their arena up", () => {
   const world = new BattleWorld(77);
   const bots = new BotController();
@@ -2257,7 +2384,7 @@ test("the browser adapter frames streams, handles fragmented reads, and checks d
     }
   }
   const events = [];
-  const client = await BrowserWebTransportClient.connect(
+  const client = await WebTransportGameClient.connect(
     "https://example.invalid",
     {
       onReliable(channel, payload) {
@@ -2368,7 +2495,7 @@ test("datagram staging owns caller bytes and has fixed in-flight capacity", asyn
       return session;
     }
   }
-  const client = await BrowserWebTransportClient.connect(
+  const client = await WebTransportGameClient.connect(
     "https://example.invalid",
     {
       onReliable() {},
@@ -2435,7 +2562,7 @@ test("repeated client reliable streams cancel their unused reverse directions", 
       return session;
     }
   }
-  const client = await BrowserWebTransportClient.connect(
+  const client = await WebTransportGameClient.connect(
     "https://example.invalid",
     {
       onReliable() {},
@@ -2591,7 +2718,7 @@ test("the persistent reliable decoder handles coalesced frames and rejects overs
     }
   }
   const events = [];
-  const client = await BrowserWebTransportClient.connect(
+  const client = await WebTransportGameClient.connect(
     "https://example.invalid",
     {
       onReliable(channel, payload) {
@@ -2664,7 +2791,7 @@ test("a remote WebTransport close is observed without issuing a second close", a
     }
   }
   const events = [];
-  await BrowserWebTransportClient.connect(
+  await WebTransportGameClient.connect(
     "https://example.invalid",
     {
       onReliable() {},

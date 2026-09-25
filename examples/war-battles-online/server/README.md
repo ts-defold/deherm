@@ -94,6 +94,41 @@ resume token; the remaining six tanks stay bots. There is no matchmaking, so
 both simply connect to the same URL. To watch the join and the handover, tail
 the server: it prints `session-joined:<name>:slot=<n>` and the bot count drops.
 
+**Network bots:** keep the match server running, then start the separate bot
+command dashboard:
+
+```sh
+pnpm bots:dashboard
+```
+
+Open `http://127.0.0.1:8090`, choose a count and difficulty, and deploy. Every
+row is a separate browser WebTransport session that takes an authoritative
+player slot and drives the same `BotController` used by local/server bots
+through the ordinary predictive `BattleClient`. The dashboard reports live
+slots, snapshots, inputs, drops, protocol-ping RTT, and errors. Changing bot
+count or skill against the same endpoint retains existing sessions instead of
+replacing the whole wave; saved resume tokens cover an explicit stop/restart.
+The same adapter forwards bot-selected chassis and weapon upgrades through the
+authoritative reliable control lane; focused client and server tests prove that
+mapping because the short live gate does not inject purchase credits.
+`pnpm runtime:network-bots` proves every
+bot independently receives snapshots, sends inputs, and makes non-idle shared
+brain decisions, then proves a same-endpoint redeploy keeps its player slots;
+`DEHERM_NETWORK_BOTS=32 pnpm runtime:network-bots` fills and proves the complete
+32-player network roster.
+
+For the ordinary local demo, the single supervisor command owns all of those
+pieces and their teardown:
+
+```sh
+pnpm stack
+```
+
+It starts this server, launches the packaged native game with the local
+certificate pin, hosts the Deno dashboard, opens it in the default browser, and
+autodeploys the remaining seven real browser clients. Closing the game or
+pressing Ctrl-C stops the server and dashboard.
+
 The repeatable synthetic-browser acceptance for this same production adapter is
 `pnpm runtime:multiplayer`. It opens two independent Chrome pages, verifies
 distinct player ids and one shared match id, applies authoritative snapshots,
@@ -112,9 +147,9 @@ multi-session admission, respectively.
 
 HTML5 prefers browser WebTransport/HTTP3 and now falls back explicitly to
 WebSocket/TCP; both paths are exercised against the Bob-produced game. Native
-Defold remains offline until a native WebTransport or WebSocket adapter is
-provided, and then plays the same match against bots without mislabelling that
-path as networked.
+Defold selects the generated WebTransport-shaped façade backed by the managed
+`defold_webtransport` extension, while HTML5 selects the browser constructor;
+game code does not contain a platform transport split.
 
 When `--world-checkpoint` (or `WAR_BATTLES_WORLD_CHECKPOINT`) is configured,
 the host restores the fixed authoritative world image before opening either

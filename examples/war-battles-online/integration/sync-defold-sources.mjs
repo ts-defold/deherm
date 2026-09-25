@@ -21,6 +21,7 @@ const sources = [
   ["core/protocol.ts", "protocol.ts"],
   ["core/snapshot.ts", "snapshot.ts"],
   ["core/transport.ts", "transport.ts"],
+  ["core/webtransport-framing.ts", "webtransport-framing.ts"],
   ["core/world.ts", "world.ts"],
   ["integration/transport-selection.ts", "transport-selection.ts"],
 ];
@@ -52,6 +53,7 @@ generated.set(
     'export * from "./playable";',
     'export * from "./protocol";',
     'export * from "./transport";',
+    'export * from "./webtransport-framing";',
     'export * from "./world";',
     "",
   ].join("\n"),

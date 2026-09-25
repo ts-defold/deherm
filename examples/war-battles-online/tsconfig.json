@@ -10,5 +10,5 @@
     "allowImportingTsExtensions": true,
     "noUncheckedIndexedAccess": true
   },
-  "include": ["core/**/*.ts", "integration/**/*.ts", "headless/**/*.ts", "server/**/*.ts"]
+  "include": ["bot-dashboard/**/*.ts", "core/**/*.ts", "integration/**/*.ts", "headless/**/*.ts", "server/**/*.ts"]
 }

@@ -2,7 +2,7 @@
 // Real multi-client WebTransport acceptance.
 //
 // Each client below is a synthetic browser BattleClient (the same production
-// BrowserWebTransportClient used by the game bundle), not the packaged Defold
+// WebTransportGameClient used by the game bundle), not the packaged Defold
 // engine. The gate proves two independent WebTransport sessions join one
 // authoritative MatchServer and that both receive snapshots/send datagrams.
 // It deliberately does not claim packaged-engine or WAN evidence.
@@ -95,7 +95,7 @@ function makeCertificate(directory) {
 
 function browserEntry(url, digest) {
   return `
-    import { BattleClient, BrowserWebTransportClient } from "./core/index.ts";
+    import { BattleClient, WebTransportGameClient } from "./core/index.ts";
     const name = globalThis.__warBattlesClientName;
     const evidence = globalThis.__warBattlesMultiplayerEvidence = {
       name, state: "connecting", errors: [], playerId: 0, rosterSize: 0,
@@ -109,7 +109,7 @@ function browserEntry(url, digest) {
       onReject: (reject) => evidence.errors.push(\`rejected:\${reject.code}:\${reject.reason}\`),
     });
     globalThis.__warBattlesMultiplayerClose = () => client.close(1000, "acceptance complete");
-    BrowserWebTransportClient.connect(
+    WebTransportGameClient.connect(
       ${JSON.stringify(url)}, client, undefined,
       { serverCertificateHashes: [{ algorithm: "sha-256", value: digest.buffer }] },
     ).then((transport) => {

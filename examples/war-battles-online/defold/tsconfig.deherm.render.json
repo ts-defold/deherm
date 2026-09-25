@@ -25,6 +25,10 @@
     ".deherm/generated/components/registry.ts",
     ".deherm/cache/**/*.ts",
     ".deherm/static-hermes/**/*.ts",
-    ".deherm/build/generated/typed-native/**/*.ts"
+    ".deherm/generated/native-extensions/**/*.ts",
+    ".deherm/build/generated/typed-native/**/*.ts",
+    "defold_webtransport/webtransport/**/*.ts",
+    "defold_webtransport/webtransport/static/WebTransport.ts",
+    "defold_webtransport/webtransport/typescript/WebTransport.ts"
   ]
 }

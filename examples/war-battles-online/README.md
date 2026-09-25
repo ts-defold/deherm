@@ -29,6 +29,7 @@ cd examples/war-battles-online
 pnpm generate                     # SDK, component proxies, synced sources
 pnpm check                        # generated state, art, tilemap, types, focused tests
 pnpm play                         # the built arm64-macOS engine
+pnpm stack                        # server + native game + browser network-bot dashboard
 ```
 
 Open `war-battles-online.code-workspace` (or this directory) in VS Code. Do not
@@ -37,9 +38,14 @@ project, while this directory owns `package.json`, the simulation, server,
 tests, generated-art tools, and editor configuration.
 
 `pnpm play` launches the already-built game in offline authoritative mode; bots
-fill every slot not occupied by a human. `pnpm dev` builds, launches, watches,
-and hot-reloads through the TUI by default. `pnpm serve` is separate and is only
-needed for networked WebTransport/QUIC play.
+fill every slot not occupied by a human. `pnpm stack` reuses or creates the
+local WebTransport certificate, starts the authoritative Deno HTTP/3 server,
+launches the native game with its certificate pin, hosts and opens the browser
+bot command plane, and deploys seven real network bots after the game takes the
+first slot. Closing the game or pressing Ctrl-C tears the owned processes down.
+Pass `-- --bots 0 --no-browser` for only the server and game. `pnpm dev` builds,
+launches, watches, and hot-reloads through the TUI by default; run it once when
+the packaged native game has not been built yet.
 
 | Keys          | Action                                                                              |
 | ------------- | ----------------------------------------------------------------------------------- |

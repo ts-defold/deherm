@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="icon" href="data:," />
+    <title>War Battles · Network Bot Command</title>
+    <style>
+      :root {
+        color: #e8e2d4;
+        background: #0b0d10;
+        font:
+          14px/1.45 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(circle at 70% -20%, #482515 0, transparent 42%), #0b0d10;
+      }
+      main {
+        width: min(1180px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 36px 0 64px;
+      }
+      header {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 24px;
+        border-bottom: 2px solid #e06b32;
+        padding-bottom: 18px;
+      }
+      h1 {
+        margin: 0;
+        color: #f1c35d;
+        font-size: clamp(24px, 4vw, 48px);
+        letter-spacing: -0.08em;
+        text-transform: uppercase;
+      }
+      .eyebrow {
+        color: #7bc7d6;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+      }
+      .panel {
+        margin-top: 24px;
+        border: 1px solid #4b4f55;
+        background: #111419e8;
+        box-shadow: 8px 8px 0 #050607;
+      }
+      .controls {
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) 110px 160px auto auto;
+        gap: 12px;
+        padding: 16px;
+      }
+      label {
+        color: #8d949c;
+        font-size: 11px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        margin-top: 5px;
+        border: 1px solid #555b63;
+        background: #090b0e;
+        color: inherit;
+        padding: 10px 12px;
+        font: inherit;
+      }
+      button {
+        align-self: end;
+        cursor: pointer;
+        border-color: #e06b32;
+        color: #ffd98a;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+      button:hover {
+        background: #2a1710;
+      }
+      button:disabled {
+        cursor: default;
+        opacity: 0.45;
+      }
+      #status {
+        margin: 0;
+        padding: 12px 16px;
+        border-top: 1px solid #34383e;
+        color: #aeb6bf;
+      }
+      .table-wrap {
+        overflow: auto;
+        max-height: 65vh;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        white-space: nowrap;
+      }
+      th,
+      td {
+        padding: 9px 12px;
+        border-bottom: 1px solid #292d32;
+        text-align: right;
+      }
+      th:first-child,
+      td:first-child,
+      th:nth-child(2),
+      td:nth-child(2),
+      th:last-child,
+      td:last-child {
+        text-align: left;
+      }
+      th {
+        position: sticky;
+        top: 0;
+        background: #191d22;
+        color: #858d96;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+      tr.ready td:nth-child(2) {
+        color: #7fd197;
+      }
+      tr.failed td:nth-child(2),
+      tr.failed td:last-child {
+        color: #ff756d;
+      }
+      footer {
+        margin-top: 18px;
+        color: #626971;
+      }
+      @media (max-width: 800px) {
+        .controls {
+          grid-template-columns: 1fr 1fr;
+        }
+        .controls label:first-child {
+          grid-column: 1 / -1;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <div class="eyebrow">HTTP/3 · QUIC · Same bot brain</div>
+          <h1>Network Bot Command</h1>
+        </div>
+        <div class="eyebrow">War Battles Online</div>
+      </header>
+      <section class="panel">
+        <div class="controls">
+          <label>WebTransport URL<input id="url" value="https://localhost:4433" /></label>
+          <label>Bots<input id="count" type="number" min="1" max="32" value="7" /></label>
+          <label
+            >Skill<select id="skill">
+              <option value="0">Recruit</option>
+              <option value="1" selected>Regular</option>
+              <option value="2">Veteran</option>
+              <option value="3">Nightmare</option>
+            </select></label
+          >
+          <button id="start" type="button">Deploy</button>
+          <button id="stop" type="button" disabled>Recall</button>
+        </div>
+        <p id="status">Loading configuration…</p>
+      </section>
+      <section class="panel table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Unit</th>
+              <th>State</th>
+              <th>Player</th>
+              <th>Server tick</th>
+              <th>Snapshots</th>
+              <th>Inputs</th>
+              <th>Dropped</th>
+              <th>RTT ms</th>
+              <th>Last error</th>
+            </tr>
+          </thead>
+          <tbody id="bots"></tbody>
+        </table>
+      </section>
+      <footer>
+        Deno only hosts this command plane. Each row is a real browser WebTransport session running the shared
+        TypeScript BotController and replacing one authoritative server bot. No simulated transport shortcuts.
+      </footer>
+    </main>
+    <script src="/client.js"></script>
+  </body>
+</html>

@@ -182,7 +182,17 @@ test("Defold-local deterministic sources are fresh copies of the canonical core"
     cwd: repositoryRoot,
     encoding: "utf8",
   });
-  assert.match(result, /17 generated Defold sources are fresh/);
+  assert.match(result, /18 generated Defold sources are fresh/);
+});
+
+test("all targets consume the generated WebTransport constructor without a game-level native split", async () => {
+  const arena = await readFile(fromExample("defold/main/arena.script.ts"), "utf8");
+  const adapter = await readFile(fromExample("core/browser-webtransport.ts"), "utf8");
+  assert.match(arena, /defold\.runtime\(\) === "hermes"/u);
+  assert.match(arena, /WebTransportGameClient\.connect\([^]*WebTransport/u);
+  assert.doesNotMatch(arena, /NativeWebTransportClient|NativeWebTransport,/u);
+  assert.match(adapter, /class WebTransportGameClient/u);
+  assert.doesNotMatch(adapter, /callScriptApi|callExtension|dispatchScript|\.pump\(/u);
 });
 
 test("the built project is the arena, and the mockup stays out of the build", async () => {

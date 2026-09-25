@@ -31,3 +31,7 @@ include_dirs = defold_hermes
 
 [defold_hermes]
 app = /deherm/app.dehermc
+
+[defold_webtransport]
+version = 0.1.0
+source = ../../../extensions/defold-webtransport/defold_webtransport

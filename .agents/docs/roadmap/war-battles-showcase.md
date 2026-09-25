@@ -185,6 +185,53 @@ versions, and explicitly excludes WAN, ingress, native Defold, impairment,
 load, persistent-stream runtime, and allocation claims. Those remain separate
 gates rather than implied by loopback transport success.
 
+## Network bot dashboard tranche
+
+The bot load/demo client is a browser dashboard hosted by a second, ordinary
+Deno HTTP process. Browser ownership is intentional: Deno 2.9 exposes the
+server-side QUIC/WebTransport upgrade but does not expose a working client
+constructor in the installed runtime, while Chromium already provides the
+production WebTransport surface the HTML5 game uses. The dashboard therefore
+opens one genuine HTTP/3/WebTransport session per bot without adding a Node
+native-addon dependency or inventing a Deno-only protocol.
+
+`core/network-bot.ts` is the only adaptation seam. It feeds the existing
+`BotController` from each `BattleClient`'s predicted/reconciled `BattleWorld`,
+then copies the staged intent into the ordinary client controls. Local,
+authoritative-server, and network bots share the same difficulty rows and
+decision code; only the ownership of the resulting input packet changes. When
+the shared brain predicts a chassis or weapon-branch purchase, the adapter also
+sends that request over the ordinary reliable authoritative control lane. A
+focused exact-call test proves the adapter mapping and an independent server
+control test proves authoritative application; the short real-QUIC bot gate
+does not manufacture credits and therefore does not claim to observe a purchase.
+
+`pnpm bots:dashboard` builds and hosts the operator UI. It reports per-session
+slot, state, server tick, snapshots, inputs, drops, RTT, and last error, with
+count and skill controls up to the 32-player cap. `pnpm runtime:network-bots`
+is the executable acceptance gate: it starts the Deno HTTP/3 server and a fresh
+headless Chrome, admits four independent dashboard sessions, observes unique
+authoritative slots and replacement of four server bots, applies snapshots,
+sends inputs, and requires `MatchServer` to accept those inputs. The gate checks
+every bot independently for snapshots, inputs, and a non-idle decision instead
+of accepting aggregate traffic as proof. A same-endpoint skill redeploy must
+retain the live sessions and their authoritative player slots; explicit stops
+retain resume credentials for a later restart. The dashboard sends periodic
+protocol pings so its RTT column is live telemetry rather than decoration.
+This is real loopback browser-to-Deno QUIC evidence; it does not claim WAN
+behavior, long-duration load, packet
+impairment, or native-Defold client coverage.
+
+`pnpm stack` is the local operator entry point for the complete playable path.
+One supervisor reuses or creates the pinned localhost certificate, starts the
+Deno HTTP/3 match server, launches the packaged native Defold client with that
+pin, hosts and opens the browser dashboard, autodeploys the remaining seven
+network bots, and tears down its owned server/dashboard processes when the game
+closes or the operator presses Ctrl-C. A local smoke observed native
+`webtransport-h3-quic`, authoritative slot admission, accepted inputs, and live
+Hermes telemetry; it did not claim a clean-machine native build because the
+command intentionally consumes the already packaged game.
+
 ## Reliable WebSocket fallback tranche
 
 The browser now has an executable fallback on the Deno server's existing TCP
@@ -251,8 +298,8 @@ separate runtime scenario.
 ## Bounded compact snapshot tranche
 
 Authoritative snapshots now use a session-local fixed-capacity baseline. A
-joining or recovering session receives a complete 17,840-byte keyframe (the
-16-byte protocol/codec header plus the 17,824-byte raw world image). Established
+joining or recovering session receives a complete 17,904-byte keyframe (the
+16-byte protocol/codec header plus the 17,888-byte raw world image). Established
 sessions receive sorted, non-overlapping changed-byte runs against their last
 sent baseline, with a keyframe at least every 20 snapshot frames. The browser
 transport's latest-only backpressure path forces the next frame to be a
@@ -402,7 +449,7 @@ the same authoritative world path using a stable tick/slot hash. Defold exposes
 branch one/two as Q/E and keeps the active branch in the compact HUD status.
 Focused tests cover data rows, meaningful fire-time effects, one-time purchase,
 free reselection, invalid IDs, reliable control, and snapshot restoration. The
-raw world image is now 17,824 bytes and the keyframe is 17,840 bytes after
+raw world image is now 17,888 bytes and the keyframe is 17,904 bytes after
 the fixed cover-health extension. Persistent destructible cover is documented
 in the bounded tranche below; this content tranche does not claim final
 accessibility or a VM allocation benchmark.
@@ -586,8 +633,8 @@ fixture over the real `BattleWorld` and snapshot codec. It records p50/p95/p99
 simulation and frame operation-cost percentiles after a 60-tick warm-up, plus
 keyframe/delta counts, total and per-simulated-second snapshot bytes, and
 reconciliation drift immediately before authoritative restore. The current
-record contains 540 measured ticks, 200 snapshot frames (one 17,840-byte
-keyframe followed by 199 deltas), 440,267 total snapshot bytes, and a maximum
+record contains 540 measured ticks, 200 snapshot frames (one 17,904-byte
+keyframe followed by 199 deltas), 463,860 total snapshot bytes, and a maximum
 42 fixed-point-unit pre-restore error; post-restore error is zero.
 
 The same run reports observable high-water/failure counters for all 32 player
@@ -626,7 +673,8 @@ slot; it never promotes that transport to WebTransport or datagrams.
 `integration/check-packaged-online.mjs` closes a different boundary: the actual
 Bob-produced Defold/Wasm game runs in Chrome, the generated browser host loads
 the deherm bundle, `arena.script.ts` connects through the production
-`BrowserWebTransportClient`, and its fixed-shape live telemetry reports the
+target-neutral `WebTransportGameClient` over the generated `WebTransport`
+constructor, and its fixed-shape live telemetry reports the
 selected transport/input lane, online state, received snapshots, and sent
 inputs. A development-only browser configuration object supplies the loopback
 URL, optional WebSocket endpoint, and certificate hash before engine startup,
@@ -636,7 +684,15 @@ makes only QUIC unavailable and proves the same packaged game selects
 `websocket-tcp` plus the reliable `input-fallback` lane. Both modes require an
 authoritative welcome, snapshots, and server-accepted input.
 
-This tranche does not claim native Defold networking, WAN deployment,
+The game source no longer imports a provider-specific native adapter or pumps
+transport events itself. Browser and native builds share the same structural
+streams/datagrams consumer; browser construction delegates to the host global,
+while native construction is supplied by the generated extension facade and
+its hidden once-per-frame runtime pump. The focused game transport suite proves
+that source-level convergence, but packaged native Defold/QUIC evidence remains
+pending until the standalone extension archive is linked into a real Bob build.
+
+This tranche does not yet claim packaged native Defold networking, WAN deployment,
 matchmaking/account identity, network failover, or dedicated-server failover.
 Authenticated resume credentials, fail-closed durable admission, and local
 Docker process-restart resume are now proven at their named boundaries.
@@ -658,8 +714,8 @@ ownership, fsync-backed atomic replacement, and wrap-safe deadlines are now
 implemented and covered by focused owner tests. Compose uses a bounded root-only
 volume migrator and runs the long-lived server as uid/gid 10001. These are
 control-plane correctness claims; a trusted public certificate, application
-identity/matchmaking, secret management, WAN failover, and native Defold
-transport remain separate deployment frontiers.
+identity/matchmaking, secret management, WAN failover, and packaged native
+Defold transport evidence remain separate deployment frontiers.
 
 # Verification
 

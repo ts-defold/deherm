@@ -129,7 +129,7 @@ function makeCertificate(directory) {
 
 function browserEntry(url, digest) {
   return `
-    import { BattleClient, BrowserWebTransportClient } from "./core/index.ts";
+    import { BattleClient, WebTransportGameClient } from "./core/index.ts";
 
     const evidence = globalThis.__warBattlesQuicEvidence = {
       ok: false,
@@ -157,7 +157,7 @@ function browserEntry(url, digest) {
       if (timer !== undefined) clearInterval(timer);
       client.close(1000, "loopback gate complete");
     };
-    BrowserWebTransportClient.connect(
+    WebTransportGameClient.connect(
       ${JSON.stringify(url)},
       client,
       undefined,
@@ -197,6 +197,7 @@ async function run() {
   try {
     const { cert, key, digest } = makeCertificate(scratch);
     const quicPort = Number.parseInt(process.env.DEHERM_WAR_BATTLES_QUIC_PORT ?? "", 10) || (await freeLoopbackPort());
+    const healthPort = await freeLoopbackPort();
     const pagePort = await freeLoopbackPort();
     const debuggingPort = await freeLoopbackPort();
     // Deno's unstable upgrade API currently expects the root WebTransport URL;
@@ -236,6 +237,8 @@ async function run() {
         "localhost",
         "--port",
         String(quicPort),
+        "--health-port",
+        String(healthPort),
         "--cert",
         cert,
         "--key",
