@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -115,6 +115,20 @@ test("pinned dependency patches are idempotent but still fail closed on foreign 
 
   await writeFile(path.join(root, "value.txt"), "foreign\n");
   assert.throws(apply, /neither applicable nor already applied/u);
+});
+
+test("every pinned dependency patch is structurally valid before FetchContent runs", async () => {
+  const patchRoot = path.join(repositoryRoot, "native/webtransport-cpp/patches");
+  const patches = (await readdir(patchRoot)).filter((name) => name.endsWith(".patch")).sort();
+  assert.ok(patches.length > 0);
+  for (const name of patches) {
+    const output = execFileSync("git", ["apply", "--numstat", path.join(patchRoot, name)], {
+      cwd: repositoryRoot,
+      encoding: "utf8",
+      stdio: "pipe"
+    });
+    assert.match(output, /\S/u, `${name} must contain at least one structurally valid diff`);
+  }
 });
 
 test("artifact identity ignores unrelated Defold revision metadata but rotates for consumed SDK settings", async (t) => {
@@ -269,6 +283,8 @@ test("CI publishes content-addressed rows immutably and release assembly consume
   const releaseWorkflow = await readFile(path.join(repositoryRoot, ".github/workflows/defold-webtransport-release.yml"), "utf8");
   const uploadHelper = await readFile(path.join(repositoryRoot, "scripts/ci/upload-release-asset.sh"), "utf8");
   assert.match(nativeWorkflow, /manage-defold-webtransport-artifacts\.mjs release-metadata/u);
+  assert.match(nativeWorkflow, /Validate native artifact graph and dependency patches[\s\S]*node --test tests\/defold-webtransport-artifacts\.test\.mjs/u,
+    "the plan job must reject malformed dependency patches before allocating matrix runners");
   assert.match(nativeWorkflow, /deherm_webtransport_cpp_test/u);
   assert.match(nativeWorkflow, /ctest --test-dir/u);
   assert.match(nativeWorkflow, /upload-release-asset\.sh/u);

@@ -43,6 +43,12 @@ that the native build consumes: Android NDK/version floors and Apple deployment
 targets. It excludes the package-manager lock and unrelated Defold revision
 metadata, so an API-policy refresh cannot rotate byte-identical transport
 archives.
+Every checked-in dependency patch must also pass `git apply --numstat` in the
+focused artifact suite before FetchContent is allowed to exercise it. This
+catches malformed hunk lengths deterministically on the host instead of
+failing every platform matrix row during dependency population; clean pinned
+source applicability and exact reverse applicability remain enforced by the
+FetchContent patch helper itself.
 Assets are uploaded through the repository's immutable release helper: an
 existing exact-name asset is retained and is never overwritten with
 `--clobber`. A partial failed release is repairable because planning schedules

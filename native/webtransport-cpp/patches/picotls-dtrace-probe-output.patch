@@ -47,7 +47,7 @@ diff --git a/CMakeLists.txt b/CMakeLists.txt
 diff --git a/include/picotls.h b/include/picotls.h
 --- a/include/picotls.h
 +++ b/include/picotls.h
-@@ -1420,7 +1420,10 @@ typedef struct st_ptls_log_getsni_t {
+@@ -1420,6 +1420,9 @@ typedef struct st_ptls_log_getsni_t {
          body                                                                                                                       \
      }                                                                                                                              \
      static inline ptls_log_getsni_t ptls_log_getsni_##suffix(type arg)                                                             \
