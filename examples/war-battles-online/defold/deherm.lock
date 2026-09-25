@@ -468,9 +468,9 @@
       "deherm/app.dehermc": {
         "kind": "bundle",
         "resource": "/deherm/app.dehermc",
-        "fingerprint": "fc3bb12948473ac4003dd962f9eeaf8ee53c40c1b56793710dd4b1fb833b1b18",
+        "fingerprint": "902cf5e604afc7a235d130c609ec0269be6be875c716439c55b480bf583c579c",
         "outputs": {
-          "deherm/app.dehermc": "8cf85206f38afbe7b3ee0073bae3b536327bcf904a740349c2d402c45e2825ea"
+          "deherm/app.dehermc": "2482eddf70bbe30c8d7a4efae0f1375374812d0d2c0bf4d63b97f50eb31399d1"
         },
         "build": {
           "entryPoint": "main/player.script.ts",
@@ -491,7 +491,7 @@
           "syntheticInputCount": 1
         },
         "sources": {
-          "digest": "bcb2bb9409a7397090c1f42d244f55b26322199edd4d84bce3ce8feebb19773f",
+          "digest": "5cfbbddad3c981692b002f0dc9ece6d073aa76a09cefc7531bdc6349e3af175e",
           "fileCount": 78,
           "files": {
             ".deherm/generated/components/registry.ts": "2d47bf26dadbbaebd9a26053188c4237d03b32f4bf64c3b486aa66339887889c",
@@ -556,7 +556,7 @@
             "src/generated-war-battles/arena.ts": "462c66b4d25ba9725f09434c6581ad8a59e717b009904deecb9d66359374320e",
             "src/generated-war-battles/bots.ts": "f12c0319704ca45f10e2257d91af9642c89f46bec634ed5c8676869f2b858cc8",
             "src/generated-war-battles/browser-websocket.ts": "aff36c8e49dbf1415922702b6f7bc0cba0b83cc3c91e965e9515733205781528",
-            "src/generated-war-battles/browser-webtransport.ts": "3a149407d0acbd617016134c3ec2f006613e4d0495283dfc3b695253821f18bb",
+            "src/generated-war-battles/browser-webtransport.ts": "8fd2e18d64a7980dc28af6b456c54d9a576d576d450fa829f093a990118c9497",
             "src/generated-war-battles/client.ts": "8da085f247a8fa9e67518d248cedaefa2af2a0eb4881a0a136e874f7906306c2",
             "src/generated-war-battles/constants.ts": "c04b520288cf03663abd2a26f36de86187166bb3456e54245c2b57bb5266bbe6",
             "src/generated-war-battles/content.ts": "b95ef0175eea497ba6f3689686ce848e875d439bd4ac5865fae6da190d1e322b",
