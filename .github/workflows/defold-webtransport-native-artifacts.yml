@@ -129,7 +129,8 @@ jobs:
       # ubuntu-24.04 already provides the Android command-line tools. Calling
       # setup-android here makes that action request the retired `tools`
       # package, so install only Defold's pinned NDK directly.
-      - run: "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;${{ needs.plan.outputs.android_ndk_version }}'
+      - run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'ndk;${{ needs.plan.outputs.android_ndk_version }}'
       - run: |
           api="$(node -e 'const s=require("./packages/toolchains/defold-bundle-targets.json").sdk; process.stdout.write(process.env.ABI === "armeabi-v7a" ? s.androidNdkApiVersion : s.android64NdkApiVersion)')"
           ndk="$ANDROID_HOME/ndk/${{ needs.plan.outputs.android_ndk_version }}"
