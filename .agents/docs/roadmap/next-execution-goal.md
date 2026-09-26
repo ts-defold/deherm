@@ -3,7 +3,7 @@ type: Roadmap
 title: Ordered execution goal after the generated-verification decision
 description: Complete ordered backlog from exact generated call verification through policy realization, cross-target delivery, developer tooling, War Battles, and reserved product frontiers.
 tags: [roadmap, goal, verification, policy, ci, tooling, war-battles]
-status: active
+status: superseded
 generated: { by: codex, at: 2026-09-20T01:09:30-04:00 }
 sources:
   - id: generated-verification
@@ -17,6 +17,11 @@ sources:
 ---
 
 # Goal
+
+> Superseded on 2026-09-26 by
+> [Semantic Surface IR v2](semantic-surface-ir-v2.md). Completed evidence in
+> this document remains authoritative; unfinished work yields to the new
+> compiler-simplification order rather than being relabelled complete.
 
 Finish déherm as a deterministic, policy-driven TypeScript binding compiler and
 runtime integration that emits the complete Defold Lua and dmSDK surfaces,
