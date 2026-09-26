@@ -655,7 +655,7 @@ export async function runAuthoritativeLoadHarness(
       uplinkBitsPerSecond: config.uplinkBitsPerSecond,
       downlinkBitsPerSecond: config.downlinkBitsPerSecond,
       capBoundary:
-        "application payload serialization; workload utilization counts bytes admitted during its exact ten-second window and excludes QUIC/HTTP3/TLS/UDP/IP framing and congestion control",
+        "application payload serialization; workload demand counts bytes admitted during its exact ten-second window even when serialization completes or is cancelled later, so it is not delivered throughput or observed link utilization; excludes QUIC/HTTP3/TLS/UDP/IP framing and congestion control",
       modeledDurationMilliseconds: network.time(),
       workload: {
         durationMilliseconds: workloadDurationMilliseconds,

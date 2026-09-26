@@ -136,7 +136,7 @@ Projectile damage changes one authoritative health byte per panel; destroying a
 panel opens collision and sightlines for players, projectiles, and bots. Static
 terrain still comes from the four-byte seed, while the 64 health bytes are
 versioned in rollback, reconnect, and checkpoint snapshots. The codec keeps a
-bounded changed-byte delta and sends a keyframe at least every 20 snapshots.
+bounded delta and sends a keyframe at least every 40 snapshots.
 
 **Bots that are worth fighting.** A bot is a client, not a special case: it reads
 the world and emits the same 32-byte input packet a keyboard does, which is why
@@ -197,12 +197,12 @@ The local world starts `leadTicks` ahead, and commands keep that exact tick on
 the wire so prediction and authority run the same timeline. On each
 authoritative snapshot it restores and replays newer local inputs.
 Simulation accepts the correction immediately, local presentation decays its
-visual error over 100 ms, and remote tanks interpolate between 15 Hz samples.
+visual error over 100 ms, and remote tanks interpolate between 10 Hz samples.
 Both talk to `GameTransport` and nothing else, so the same
 code runs over the in-memory pair in a unit test, over Deno's QUIC endpoint, or
 over anything else implementing four methods.
 
-The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 14.
+The protocol was extended rather than replaced: `PROTOCOL_VERSION` is now 15.
 It carries 40-byte authenticated resume credentials and requires the client to
 acknowledge the exact welcome credential before the server commits its rotation,
 alongside the authoritative chassis, weapon-branch, and command-beacon state.
@@ -215,11 +215,12 @@ four-byte envelope whose kind fixes the lane it is allowed on. Full table in
 [`server/README.md`](./server/README.md).
 
 Snapshot state is partially reliable rather than ordered behind old state. Each
-15 Hz packet gets an independent WebTransport stream; an unsettled packet is
-reset after 300 ms, and at most eight can exist per session. Deltas are built
+10 Hz packet gets an independent WebTransport stream; at most two unfinished
+writes can exist per session, and their stale deadline is sized from admitted
+bytes at the minimum supported link rate plus one second of grace. Deltas are built
 only against the exact snapshot tick the client applied and acknowledged. The
-server and client retain a fixed 64-snapshot exact-base history (about 4.27 seconds at
-15 Hz), so WAN acknowledgements and several independently completed deltas may
+server and client retain a fixed 64-snapshot exact-base history (about 6.4 seconds at
+10 Hz), so WAN acknowledgements and several independently completed deltas may
 safely name an older applied base. A complete one-frame state stream is retired
 as soon as its payload is consumed; an acknowledgement, stale deadline, or peer
 reset retires the matching replaceable packet without closing the session.
@@ -272,16 +273,18 @@ session ledger, preventing the restored world tick from being counted twice.
 Docker mounts this beside the resume ledger as `server/state/world.bin`.
 
 The compact snapshot tests independently prove the codec against the broad
-17,888-byte rollback image. Protocol 14 projects that image into an exact
+17,888-byte rollback image. Protocol 15 projects that image into an exact
 10,144-byte network image and a bounded 10,160-byte recovery frame. Each player
 uses a schema-aware 62-byte record (including two checked reserved bits).
 Velocity uses the simulation's exact 3× impulse-speed bound; countdowns carry
 stable expiry phases and accepted input tick/sequence values are relative to
 the enclosing snapshot tick. Projectile records encode fixed-point trajectory phase and expiry tick, so
 straight flight is byte-identical across snapshots and the delta stream carries
-only spawn, trajectory-change, and despawn state. The measured 15 Hz bot trace
-uses 14,466 application payload bytes/second/client with an 858-byte median,
-1,968-byte p95, and 3,621-byte largest keyframe. Tests also prove exact reconstruction across all 32 player
+only spawn, trajectory-change, and despawn state. Established sessions encode
+player changes as a slot mask, exact field mask, and modular signed varints
+against the acknowledged baseline instead of generic changed-byte runs. The
+measured 10 Hz bot trace uses 7,756.7 application payload bytes/second/client
+with a 705-byte median, 921-byte p95, and 3,300-byte largest keyframe. Tests also prove exact reconstruction across all 32 player
 slots at field boundaries, exact-base enforcement, sorted run bounds, all-512-
 projectile recovery capacity, and rejection of corrupt or baseline-free deltas.
 This is protocol and in-process evidence; it is not a WAN compression,
@@ -385,9 +388,9 @@ runtime. It deliberately describes semantics instead of naming a vendor:
   its current resume token, then the server either restores the player slot and
   sends a fresh full snapshot or refuses the resume. A transport connection
   itself is never assumed resumable. Version 7 carries command-beacon state;
-  version 6 introduced the 40-byte HMAC resume credential. Current protocol 12
-  additionally fixes simulation ticks as wrap-safe uint32 serials while
-  retaining bounded redundant input datagrams. The Deno host accepts an
+  version 6 introduced the 40-byte HMAC resume credential. Current protocol 15
+  additionally fixes simulation ticks as wrap-safe uint32 serials, retains
+  bounded redundant input datagrams, and schema-encodes player deltas. The Deno host accepts an
   explicit 32-byte secret and persists a fixed-capacity generation ledger at
   lifecycle checkpoints.
 
@@ -395,10 +398,11 @@ The WebTransport adapter places replaceable snapshot state on independent,
 cancellable unidirectional streams. Client-originated session/control events
 share one ordered bidirectional stream, while server session/control events
 share their ordered bounded lane. This avoids QUIC stream-order head-of-line
-blocking; the streams still share connection congestion capacity. A newer
-authoritative frame resets every older unfinished snapshot write. Settled writes
-leave the fixed eight-slot tracker immediately, while a cancellation-ignoring
-host remains bounded by those slots and the 300 ms stale deadline. Its stream
+blocking; the streams still share connection congestion capacity. Two
+unfinished writes may pipeline; newer cadence samples are coalesced while both
+slots are occupied. Settled writes leave the fixed tracker immediately, while a
+cancellation-ignoring host remains bounded by those slots and the size-aware
+minimum-link-rate stale deadline. Its stream
 receive path buffers arbitrary read fragmentation and validates a fixed length
 prefix before delivery. When WebTransport is unavailable, the browser adapter
 connects to the Deno health/control listener's `/ws` endpoint. WebSocket is

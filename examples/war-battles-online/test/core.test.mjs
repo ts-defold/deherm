@@ -54,7 +54,7 @@ import {
   RESUME_TOKEN_BYTES,
   SNAPSHOT_BYTES,
   SNAPSHOT_BASE_HISTORY_FRAMES,
-  SNAPSHOT_DELTA,
+  SNAPSHOT_SCHEMA_DELTA,
   SNAPSHOT_FRAME_HEADER_BYTES,
   SNAPSHOT_KEYFRAME,
   SNAPSHOT_KEYFRAME_INTERVAL,
@@ -431,9 +431,9 @@ test("the bounded 32-player bot trace keeps snapshot bandwidth reproducible", ()
   lengths.sort((left, right) => left - right);
   assert.equal(lengths.length, 200);
   assert.equal(lengths[0], 1_268);
-  assert.equal(lengths.at(-1), 4_748);
-  assert.equal(lengths[Math.floor(lengths.length / 2)], 1_496);
-  assert.equal(keyframes, 10);
+  assert.equal(lengths.at(-1), 4_228);
+  assert.equal(lengths[Math.floor(lengths.length / 2)], 1_493);
+  assert.equal(keyframes, 5);
   normal.sort((left, right) => left - right);
   assert.equal(normal.at(-1), 1_902);
 });
@@ -2582,6 +2582,59 @@ test("independent deltas sharing one acknowledged base coalesce without losing t
   server.close();
 });
 
+test("a malformed newer frame cannot corrupt an older pending snapshot or its accepted base", async () => {
+  const errors = [];
+  const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 3 });
+  const client = join(server, "atomic-snapshot", errors, { leadTicks: 0 });
+  await settle();
+  for (let tick = 0; tick < 3; tick += 1) server.step();
+  await settle();
+  client.update(0);
+
+  const root = new Uint8Array(SNAPSHOT_BYTES);
+  server.world.writeSnapshot(root);
+  const candidate = new BattleWorld(server.world.matchId, server.world.mapSeed);
+  candidate.restoreSnapshot(root);
+  candidate.playerX[0] += 17;
+  const accepted = new Uint8Array(SNAPSHOT_BYTES);
+  candidate.writeSnapshot(accepted);
+  candidate.playerX[0] += 101;
+  const rejected = new Uint8Array(SNAPSHOT_BYTES);
+  candidate.writeSnapshot(rejected);
+  candidate.playerY[0] -= 29;
+  const following = new Uint8Array(SNAPSHOT_BYTES);
+  candidate.writeSnapshot(following);
+
+  const frame = new Uint8Array(SNAPSHOT_MESSAGE_BYTES);
+  const acceptedLength = writeClientKeyframe(frame, 6, accepted);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, acceptedLength));
+  const rejectedLength = writeClientKeyframe(frame, 9, rejected);
+  const malformed = new Uint8Array(rejectedLength + 1);
+  malformed.set(frame.subarray(0, rejectedLength));
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, malformed);
+  const invalidCover = accepted.slice();
+  invalidCover[invalidCover.length - 1] = COVER_MAX_HEALTH + 1;
+  const invalidCoverLength = writeClientKeyframe(frame, 10, invalidCover);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, invalidCoverLength));
+  const invalidHeader = accepted.slice();
+  invalidHeader[0] ^= 1;
+  const invalidHeaderLength = writeClientKeyframe(frame, 11, invalidHeader);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, invalidHeaderLength));
+  client.update(0);
+
+  assert.equal(errors.length, 3);
+  assert.equal(client.stats.snapshotsApplied, 2, "the older complete pending snapshot applies exactly once");
+  const followingLength = writeClientDelta(frame, 12, 6, accepted, following);
+  client.onReliable(TRANSPORT_CHANNEL_SNAPSHOT, frame.subarray(0, followingLength));
+  client.update(0);
+
+  assert.equal(client.world.playerX[0], candidate.playerX[0], "the accepted compact bytes become the next delta base");
+  assert.equal(client.world.playerY[0], candidate.playerY[0], "the following delta applies against that accepted base");
+  assert.equal(client.stats.snapshotsApplied, 3);
+  assert.equal(errors.length, 3);
+  server.close();
+});
+
 test("snapshot restore failures are reported without escaping update and recover by keyframe", async () => {
   const errors = [];
   const server = new MatchServer({ rosterSize: 2, snapshotIntervalTicks: 3 });
@@ -2642,7 +2695,7 @@ test("two clients join one authoritative match, replace bots and stay in sync", 
   alpha.world.readPlayer(alpha.playerId, predicted);
   assert.equal(predicted.x, authoritative.x);
   assert.equal(predicted.y, authoritative.y);
-  assert.ok(alpha.stats.snapshotsApplied > 50);
+  assert.ok(alpha.stats.snapshotsApplied >= 40);
   assert.ok(server.stats.inputsAccepted > 500);
   assert.equal(server.stats.inputsRejected, 0);
   assert.deepEqual(errors, []);
@@ -2876,7 +2929,7 @@ test("server deltas use the latest client-applied snapshot as their exact base",
   await settle();
   for (let tick = 0; tick < 3; tick += 1) server.step();
   await settle();
-  assert.equal(frames[1][8], SNAPSHOT_DELTA);
+  assert.equal(frames[1][8], SNAPSHOT_SCHEMA_DELTA);
   assert.equal(new DataView(frames[1].buffer, frames[1].byteOffset).getUint32(10, true), 3);
   assert.deepEqual(errors, []);
   server.close();

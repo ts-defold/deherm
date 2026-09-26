@@ -3687,3 +3687,54 @@ the source sync first. The browser gate rejected the old wasm archive by
 fingerprint; a pinned Bob/local-Extender `wasm-web` bundle then passed in Chrome,
 and a rebuilt arm64-macOS archive passed the packaged Defold 1.14.0 runtime with
 the expected gameplay and graceful-exit markers.
+
+## 2026-09-26 - Protocol 15 closes the eight-kilobyte snapshot target
+
+The player region and generic run headers still owned 123,637 of the prior
+144,660 ten-second snapshot bytes. Protocol 15 now compares the exact 494-bit
+player schema at its 49 declared field boundaries. A delta carries one 32-slot
+mask, seven mask bytes for each changed player, and canonical modular signed
+varints against that session's acknowledged baseline. All 32-bit transitions,
+including the signed half-range boundary, reconstruct exactly. Non-player
+world, projectile, pickup, and cover state retains the sorted sparse-run codec;
+keyframes retain the bounded sparse/raw recovery forms. The decoder rejects
+reserved field-mask bits, named zero deltas, over-wide or noncanonical field
+and run varints, foreign bases, generic runs overlapping the schema-owned
+player region, invalid rollback headers/objective/cursors/cover, and foreign
+match or arena identities. Client receipt decodes and expands into fixed candidate buffers,
+then copies into the accepted pending buffers only after both stages succeed;
+a rejected newer stream therefore cannot mutate an older complete pending
+snapshot or the history base stored under its tick. Encode/decode use
+caller-owned fixed buffers and introduce no per-frame container or heap table.
+
+The default snapshot cadence is now 10 Hz while simulation and input sampling
+remain 60 Hz, input datagrams remain 30 Hz, and remote presentation uses the
+welcome-advertised cadence. Periodic recovery moves to 40 snapshots, preserving
+a four-second interval and a 6.4-second exact-base history. The deterministic
+32-player trace falls from 14,466 to 7,756.7 application payload bytes/second/
+client, a 46.38% reduction. Median/p95/largest frames move from
+858/1,968/3,621 to 705/921/3,300 bytes. The ordinary eight-kilobyte stretch and
+1,100-byte p95 targets are now green. The hard admitted ceiling falls from
+53,168 to 37,808 bytes/second/client because only nine ordinary frames plus one
+recovery frame can be admitted per second.
+
+The production 32-client matrix was tightened rather than left at the old caps:
+128/32, 96/24, and 64/20 Kbit/s downlink/uplink. Every client is still driven by
+the shared production bot brain for 600 decisions, every final world converges,
+and no protocol error occurs. Broadband applies 100-101 snapshots at 12.45
+KB/s/client admitted demand; mobile applies 86-88 at 11.75 KB/s; edge
+deliberately admits 8.10 KB/s of demand through an 8 KB/s cap, records datagram
+backpressure and 49.07%
+snapshot cadence shedding, and still applies 51-54 snapshots. The edge input
+acceptance ratio is 88.74%; this is a named consequence of the 70 +/- 35 ms,
+10% loss, 20 Kbit/s uplink profile, not promoted into a healthy-link claim.
+
+These are deterministic application-payload codec and impaired-transport
+measurements. Demand counts bytes admitted during the exact ten-second window;
+serialization can finish or be cancelled afterward, so it is not delivered
+throughput or observed link utilization. The figures exclude WebTransport/
+HTTP3 framing, QUIC ACK/retransmission and congestion-controller bytes, TLS,
+UDP/IP, and link-layer overhead. The same revision was then exercised through
+real Chrome-to-Deno HTTP/3/WebTransport, a Bob wasm-web browser product, and a
+packaged arm64-macos Defold 1.14.0 + Hermes runtime; all three product gates
+completed and refreshed their source-bound evidence independently.

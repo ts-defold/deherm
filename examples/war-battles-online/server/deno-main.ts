@@ -72,7 +72,7 @@ function parseArguments(argv: readonly string[]): Options {
     keyPath: "server/certs/localhost.key",
     rosterSize: 8,
     botSkill: 2,
-    snapshotIntervalTicks: 3,
+    snapshotIntervalTicks: 6,
     teams: false,
     worldCheckpointIntervalTicks: TICK_RATE,
     allowedOrigins: [],

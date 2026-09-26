@@ -43,8 +43,8 @@ test("performance evidence keeps observable and unobservable boundaries explicit
     evidence.snapshotBandwidth.totalBytes,
   );
   assert.equal(evidence.snapshotBandwidth.targets.downstreamTargetSatisfied, true);
-  assert.equal(evidence.snapshotBandwidth.targets.downstreamStretchTargetSatisfied, false);
-  assert.equal(evidence.snapshotBandwidth.targets.snapshotP95TargetSatisfied, false);
+  assert.equal(evidence.snapshotBandwidth.targets.downstreamStretchTargetSatisfied, true);
+  assert.equal(evidence.snapshotBandwidth.targets.snapshotP95TargetSatisfied, true);
   assert.equal(evidence.snapshotBandwidth.targets.keyframeTargetSatisfied, true);
   assert.equal(evidence.snapshotBandwidth.targets.worstCaseDownstreamTargetSatisfied, true);
   assert.equal(evidence.snapshotBandwidth.targets.upstreamTargetSatisfied, true);

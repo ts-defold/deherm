@@ -332,7 +332,7 @@ test("a transport-rejected recovery frame retains its one-second retry credit", 
   await Promise.resolve();
   nowMilliseconds = 67;
   assert.equal(session.sendSnapshot(source, 8), false);
-  assert.equal(attempts, 1, "backpressure must not turn a recovery frame into a 15 Hz retry loop");
+  assert.equal(attempts, 1, "backpressure must not turn a recovery frame into a 10 Hz retry loop");
   nowMilliseconds = 1_000;
   assert.equal(session.sendSnapshot(source, 12), true);
   assert.equal(attempts, 2);

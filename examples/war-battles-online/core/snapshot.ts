@@ -41,6 +41,7 @@ import {
   SNAPSHOT_DELTA,
   SNAPSHOT_FRAME_HEADER_BYTES,
   SNAPSHOT_KEYFRAME,
+  SNAPSHOT_SCHEMA_DELTA,
   SNAPSHOT_MESSAGE_BYTES,
 } from "./protocol.ts";
 import type { BattleWorld } from "./world.ts";
@@ -69,6 +70,17 @@ const RAW_PICKUP_OFFSET = RAW_PROJECTILE_OFFSET + MAX_PROJECTILES * PROJECTILE_S
 const NETWORK_PICKUP_OFFSET = NETWORK_PROJECTILE_OFFSET + MAX_PROJECTILES * NETWORK_PROJECTILE_SNAPSHOT_BYTES;
 const RAW_COVER_OFFSET = RAW_PICKUP_OFFSET + MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES;
 const NETWORK_COVER_OFFSET = NETWORK_PICKUP_OFFSET + MAX_PICKUPS * PICKUP_SNAPSHOT_BYTES;
+
+// The exact 494-bit player projection, split at its semantic field boundaries.
+// A field-aware delta can therefore send one small modular difference without
+// paying for every byte touched by an unaligned packed field. The final two
+// bits of the 62-byte player record remain reserved and are never delta fields.
+const NETWORK_PLAYER_FIELD_WIDTHS = Object.freeze([
+  1, 8, 3, 2, 2, 2, 16, 15, 15, 18, 18, 10, 10, 10, 10, 10, 10, 8, 7, 8, 8, 8, 10, 1, 7, 16, 32, 32, 32, 32, 1, 8, 8, 8,
+  8, 2, 3, 8, 3, 4, 12, 12, 2, 9, 9, 9, 9, 9, 9,
+]);
+const NETWORK_PLAYER_FIELD_MASK_BYTES = 7;
+const NETWORK_PLAYER_SLOT_MASK_BYTES = 4;
 
 /**
  * Projects the broad rollback image into the exact fixed-point network image.
@@ -156,9 +168,38 @@ export function compactNetworkSnapshot(source: Uint8Array, target: Uint8Array): 
 }
 
 /** Expands and validates one compact network image into the rollback layout. */
-export function expandNetworkSnapshot(source: Uint8Array, target: Uint8Array, expectedTick?: number): number {
+export function expandNetworkSnapshot(
+  source: Uint8Array,
+  target: Uint8Array,
+  expectedTick?: number,
+  expectedMatchId?: number,
+  expectedMapSeed?: number,
+): number {
   if (source.byteLength < NETWORK_SNAPSHOT_BYTES) throw new RangeError("network snapshot source is truncated");
   if (target.byteLength < SNAPSHOT_BYTES) throw new RangeError("rollback snapshot target is truncated");
+  const sourceView = new DataView(source.buffer, source.byteOffset, NETWORK_SNAPSHOT_BYTES);
+  if (sourceView.getUint32(0, true) !== SNAPSHOT_MAGIC) throw new Error("snapshot magic mismatch");
+  if (sourceView.getUint16(4, true) !== SNAPSHOT_VERSION) throw new Error("snapshot version mismatch");
+  if (sourceView.getUint16(6, true) !== SNAPSHOT_BYTES) throw new Error("snapshot size mismatch");
+  if (expectedMatchId !== undefined && sourceView.getUint32(12, true) !== expectedMatchId >>> 0) {
+    throw new Error("snapshot match id mismatch");
+  }
+  if (expectedMapSeed !== undefined && sourceView.getUint32(28, true) !== expectedMapSeed >>> 0) {
+    throw new Error("snapshot arena seed mismatch");
+  }
+  const objectiveProgress = sourceView.getInt16(18, true);
+  if (objectiveProgress < -OBJECTIVE_CAPTURE_TICKS || objectiveProgress > OBJECTIVE_CAPTURE_TICKS) {
+    throw new Error("snapshot objective progress is invalid");
+  }
+  if (sourceView.getUint8(20) > 2 || sourceView.getUint8(21) !== 0 || sourceView.getUint16(26, true) !== 0) {
+    throw new Error("snapshot objective header is invalid");
+  }
+  if (sourceView.getUint16(16, true) >= MAX_PROJECTILES) throw new Error("snapshot projectile cursor is invalid");
+  for (let panel = 0; panel < COVER_SNAPSHOT_BYTES; panel += 1) {
+    if (source[NETWORK_COVER_OFFSET + panel]! > COVER_MAX_HEALTH) {
+      throw new Error("snapshot cover health is invalid");
+    }
+  }
   copyBytes(target, 0, source, 0, SNAPSHOT_HEADER_BYTES);
   const targetView = new DataView(target.buffer, target.byteOffset, SNAPSHOT_BYTES);
   const snapshotTick = targetView.getUint32(8, true);
@@ -708,15 +749,82 @@ export function writeNetworkSnapshotDelta(
   baseline: Uint8Array,
   current: Uint8Array,
 ): number {
-  return writeSnapshotDeltaSized(
+  return writeNetworkSchemaDelta(target, tick, baselineTick, baseline, current);
+}
+
+/**
+ * Encodes the dominant player region by schema field and leaves the world
+ * header/projectile/pickup/cover regions on the existing sparse byte-run
+ * codec. Each changed field is a modular signed delta from the acknowledged
+ * baseline, so small fixed-point motion normally costs one or two bytes while
+ * every possible 32-bit transition still round-trips exactly.
+ */
+function writeNetworkSchemaDelta(
+  target: Uint8Array,
+  tick: number,
+  baselineTick: number,
+  baseline: Uint8Array,
+  current: Uint8Array,
+): number {
+  if (baseline.byteLength < NETWORK_SNAPSHOT_BYTES || current.byteLength < NETWORK_SNAPSHOT_BYTES) {
+    throw new RangeError("snapshot delta source is truncated");
+  }
+  requireFrameCapacity(target, NETWORK_SNAPSHOT_MESSAGE_BYTES);
+  frameHeader(target, tick, SNAPSHOT_SCHEMA_DELTA, baselineTick);
+  let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
+  const slotMaskOffset = cursor;
+  for (let byte = 0; byte < NETWORK_PLAYER_SLOT_MASK_BYTES; byte += 1) target[cursor++] = 0;
+
+  for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+    const packed = NETWORK_PLAYER_OFFSET + slot * NETWORK_PLAYER_SNAPSHOT_BYTES;
+    if (packedRecordHasNonZeroBits(baseline, packed, 494, 2) || packedRecordHasNonZeroBits(current, packed, 494, 2)) {
+      throw new Error("snapshot player reserved bits are nonzero");
+    }
+    let bit = 0;
+    let changed = false;
+    for (let field = 0; field < NETWORK_PLAYER_FIELD_WIDTHS.length; field += 1) {
+      const width = NETWORK_PLAYER_FIELD_WIDTHS[field]!;
+      if (readPackedBits(current, packed, bit, width) !== readPackedBits(baseline, packed, bit, width)) {
+        changed = true;
+        break;
+      }
+      bit += width;
+    }
+    if (!changed) continue;
+    target[slotMaskOffset + (slot >>> 3)]! |= 1 << (slot & 7);
+    if (cursor + NETWORK_PLAYER_FIELD_MASK_BYTES > NETWORK_SNAPSHOT_MESSAGE_BYTES) return -1;
+    const fieldMaskOffset = cursor;
+    for (let byte = 0; byte < NETWORK_PLAYER_FIELD_MASK_BYTES; byte += 1) target[cursor++] = 0;
+    bit = 0;
+    for (let field = 0; field < NETWORK_PLAYER_FIELD_WIDTHS.length; field += 1) {
+      const width = NETWORK_PLAYER_FIELD_WIDTHS[field]!;
+      const previous = readPackedBits(baseline, packed, bit, width);
+      const next = readPackedBits(current, packed, bit, width);
+      if (previous !== next) {
+        target[fieldMaskOffset + (field >>> 3)]! |= 1 << (field & 7);
+        const encoded = encodeModularDelta(next, previous, width);
+        const encodedBytes = varUint32ByteLength(encoded);
+        if (cursor + encodedBytes > NETWORK_SNAPSHOT_MESSAGE_BYTES) return -1;
+        cursor = writeVarUint32(target, cursor, encoded);
+      }
+      bit += width;
+    }
+  }
+
+  const length = writeSnapshotRuns(
     target,
-    tick,
-    baselineTick,
-    baseline,
     current,
     NETWORK_SNAPSHOT_BYTES,
     NETWORK_SNAPSHOT_MESSAGE_BYTES,
+    baseline,
+    cursor,
+    NETWORK_PLAYER_OFFSET,
+    NETWORK_PROJECTILE_OFFSET,
   );
+  return length >= 0 &&
+    length < Math.min(snapshotRunLength(current, NETWORK_SNAPSHOT_BYTES), NETWORK_SNAPSHOT_MESSAGE_BYTES)
+    ? length
+    : -1;
 }
 
 function writeSnapshotDeltaSized(
@@ -746,19 +854,22 @@ function writeSnapshotRuns(
   imageBytes: number,
   messageBytes: number,
   baseline?: Uint8Array,
+  initialCursor = SNAPSHOT_FRAME_HEADER_BYTES,
+  skipStart = -1,
+  skipEnd = -1,
 ): number {
-  let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
+  let cursor = initialCursor;
   let runCount = 0;
   let index = 0;
   let previousEnd = 0;
   while (index < imageBytes) {
-    while (index < imageBytes && current[index] === (baseline?.[index] ?? 0)) index += 1;
+    while (index < imageBytes && snapshotByteMatches(current, baseline, index, skipStart, skipEnd)) index += 1;
     if (index === imageBytes) break;
     const start = index;
     let lastChanged = index;
     let unchanged = 0;
     while (index < imageBytes && index - start < 0xffff) {
-      if (current[index] !== (baseline?.[index] ?? 0)) {
+      if (!snapshotByteMatches(current, baseline, index, skipStart, skipEnd)) {
         lastChanged = index;
         unchanged = 0;
       } else {
@@ -780,6 +891,16 @@ function writeSnapshotRuns(
   }
   writeUint16LE(target, 14, runCount);
   return cursor;
+}
+
+function snapshotByteMatches(
+  current: Uint8Array,
+  baseline: Uint8Array | undefined,
+  index: number,
+  skipStart: number,
+  skipEnd: number,
+): boolean {
+  return (index >= skipStart && index < skipEnd) || current[index] === (baseline?.[index] ?? 0);
 }
 
 function snapshotRunLength(current: Uint8Array, imageBytes: number): number {
@@ -850,6 +971,7 @@ function readSnapshotFrameSized(
     throw new RangeError("snapshot decode storage is truncated");
   }
   let rawKeyframe = false;
+  let schemaDelta = false;
   if (kind === SNAPSHOT_KEYFRAME) {
     if (baseTick !== 0) throw new Error("invalid snapshot keyframe");
     rawKeyframe = runCount === 0 && payload.byteLength === messageBytes;
@@ -860,10 +982,52 @@ function readSnapshotFrameSized(
       throw new Error("snapshot delta base is unavailable");
     }
     scratch.decoded.set(scratch.baseline);
+  } else if (kind === SNAPSHOT_SCHEMA_DELTA && imageBytes === NETWORK_SNAPSHOT_BYTES) {
+    if (scratch.baselineTick < 0 || baseTick !== scratch.baselineTick >>> 0) {
+      throw new Error("snapshot delta base is unavailable");
+    }
+    scratch.decoded.set(scratch.baseline);
+    schemaDelta = true;
   } else {
     throw new Error("unknown snapshot frame kind");
   }
   let cursor = rawKeyframe ? payload.byteLength : SNAPSHOT_FRAME_HEADER_BYTES;
+  if (schemaDelta) {
+    if (cursor + NETWORK_PLAYER_SLOT_MASK_BYTES > payload.byteLength) {
+      throw new Error("snapshot player slot mask is truncated");
+    }
+    const slotMaskOffset = cursor;
+    cursor += NETWORK_PLAYER_SLOT_MASK_BYTES;
+    for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+      if ((payload[slotMaskOffset + (slot >>> 3)]! & (1 << (slot & 7))) === 0) continue;
+      if (cursor + NETWORK_PLAYER_FIELD_MASK_BYTES > payload.byteLength) {
+        throw new Error("snapshot player field mask is truncated");
+      }
+      const fieldMaskOffset = cursor;
+      cursor += NETWORK_PLAYER_FIELD_MASK_BYTES;
+      if ((payload[fieldMaskOffset + NETWORK_PLAYER_FIELD_MASK_BYTES - 1]! & 0xfe) !== 0) {
+        throw new Error("snapshot player field mask has reserved bits");
+      }
+      const packed = NETWORK_PLAYER_OFFSET + slot * NETWORK_PLAYER_SNAPSHOT_BYTES;
+      let bit = 0;
+      let changedField = false;
+      for (let field = 0; field < NETWORK_PLAYER_FIELD_WIDTHS.length; field += 1) {
+        const width = NETWORK_PLAYER_FIELD_WIDTHS[field]!;
+        if ((payload[fieldMaskOffset + (field >>> 3)]! & (1 << (field & 7))) !== 0) {
+          changedField = true;
+          const packedDelta = readVarUint32(payload, cursor);
+          cursor = packedDelta % 0x1_0000;
+          const encoded = Math.floor(packedDelta / 0x1_0000);
+          if (encoded === 0) throw new Error("snapshot player field delta names no change");
+          if (encoded >= 2 ** width) throw new Error("snapshot player field delta is out of range");
+          const previous = readPackedBits(scratch.decoded, packed, bit, width);
+          replacePackedBits(scratch.decoded, packed, bit, decodeModularDelta(encoded, previous, width), width);
+        }
+        bit += width;
+      }
+      if (!changedField) throw new Error("snapshot player slot mask names no changed fields");
+    }
+  }
   let previousEnd = 0;
   for (let run = 0; run < runCount; run += 1) {
     const packedGap = readVarUint(payload, cursor);
@@ -875,6 +1039,9 @@ function readSnapshotFrameSized(
     const offset = previousEnd + gap;
     if (length === 0 || offset < previousEnd || offset + length > imageBytes) {
       throw new Error("snapshot run is invalid");
+    }
+    if (schemaDelta && offset < NETWORK_PROJECTILE_OFFSET && offset + length > NETWORK_PLAYER_OFFSET) {
+      throw new Error("snapshot generic run overlaps schema player region");
     }
     if (cursor + length > payload.byteLength) throw new Error("snapshot run is truncated");
     copyBytes(scratch.decoded, offset, payload, cursor, length);
@@ -892,6 +1059,43 @@ function readSnapshotFrameSized(
 function varUintByteLength(value: number): number {
   if (!Number.isInteger(value) || value < 0 || value > 0xffff) throw new RangeError("snapshot run value is invalid");
   return value < 0x80 ? 1 : value < 0x4000 ? 2 : 3;
+}
+
+function varUint32ByteLength(value: number): number {
+  if (!Number.isInteger(value) || value < 0 || value > 0xffff_ffff) {
+    throw new RangeError("snapshot field delta is invalid");
+  }
+  return value < 0x80 ? 1 : value < 0x4000 ? 2 : value < 0x20_0000 ? 3 : value < 0x1000_0000 ? 4 : 5;
+}
+
+function writeVarUint32(target: Uint8Array, offset: number, value: number): number {
+  let remaining = value;
+  do {
+    const chunk = remaining % 0x80;
+    remaining = Math.floor(remaining / 0x80);
+    requireFrameRange(target, offset, 1);
+    target[offset++] = chunk | (remaining === 0 ? 0 : 0x80);
+  } while (remaining !== 0);
+  return offset;
+}
+
+/** Returns `value * 65536 + nextOffset`; snapshot frames are bounded below 64 KiB. */
+function readVarUint32(source: Uint8Array, offset: number): number {
+  let value = 0;
+  let multiplier = 1;
+  for (let byte = 0; byte < 5; byte += 1) {
+    if (offset >= source.byteLength) throw new Error("snapshot field delta is truncated");
+    const current = source[offset++]!;
+    const chunk = current & 0x7f;
+    if (byte === 4 && chunk > 0x0f) throw new Error("snapshot field delta is invalid");
+    value += chunk * multiplier;
+    if ((current & 0x80) === 0) {
+      if (byte > 0 && chunk === 0) throw new Error("snapshot field delta is noncanonical");
+      return value * 0x1_0000 + offset;
+    }
+    multiplier *= 0x80;
+  }
+  throw new Error("snapshot field delta is invalid");
 }
 
 function writeVarUint(target: Uint8Array, offset: number, value: number): number {
@@ -913,6 +1117,7 @@ function readVarUint(source: Uint8Array, offset: number): number {
     const current = source[offset++]!;
     value |= (current & 0x7f) << (byte * 7);
     if ((current & 0x80) === 0) {
+      if (byte > 0 && (current & 0x7f) === 0) throw new Error("snapshot run value is noncanonical");
       if (value > 0xffff) throw new Error("snapshot run value is invalid");
       return ((value << 16) | offset) >>> 0;
     }
@@ -1004,6 +1209,18 @@ function positiveModulo(value: number, modulus: number): number {
   return remainder < 0 ? remainder + modulus : remainder;
 }
 
+function encodeModularDelta(current: number, baseline: number, width: number): number {
+  const modulus = 2 ** width;
+  let delta = positiveModulo(current - baseline, modulus);
+  if (delta >= modulus / 2) delta -= modulus;
+  return delta >= 0 ? delta * 2 : -delta * 2 - 1;
+}
+
+function decodeModularDelta(encoded: number, baseline: number, width: number): number {
+  const delta = encoded % 2 === 0 ? encoded / 2 : -((encoded + 1) / 2);
+  return positiveModulo(baseline + delta, 2 ** width);
+}
+
 function writePackedBits(target: Uint8Array, base: number, bitOffset: number, value: number, width: number): number {
   requirePackedUnsigned(value, width, "packed value");
   let remaining = width;
@@ -1038,6 +1255,24 @@ function readPackedBits(source: Uint8Array, base: number, bitOffset: number, wid
     remaining -= count;
   }
   return result;
+}
+
+function replacePackedBits(target: Uint8Array, base: number, bitOffset: number, value: number, width: number): void {
+  requirePackedUnsigned(value, width, "packed value");
+  let remaining = width;
+  let source = value;
+  let cursor = bitOffset;
+  while (remaining > 0) {
+    const byteOffset = base + (cursor >>> 3);
+    const shift = cursor & 7;
+    const count = Math.min(remaining, 8 - shift);
+    const valueMask = (1 << count) - 1;
+    const targetMask = valueMask << shift;
+    target[byteOffset] = (target[byteOffset]! & ~targetMask) | ((source % 2 ** count) << shift);
+    source = Math.floor(source / 2 ** count);
+    cursor += count;
+    remaining -= count;
+  }
 }
 
 function packedRecordHasNonZeroBits(source: Uint8Array, base: number, bitOffset: number, width: number): boolean {

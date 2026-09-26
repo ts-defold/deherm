@@ -20,6 +20,9 @@ import {
   WORLD_MIN_X,
   compactNetworkSnapshot,
   expandNetworkSnapshot,
+  readNetworkSnapshotFrame,
+  SNAPSHOT_SCHEMA_DELTA,
+  writeNetworkSnapshotDelta,
   writeNetworkSnapshotKeyframe,
 } from "../core/index.ts";
 
@@ -329,4 +332,185 @@ test("an adversarial all-projectile keyframe stays inside the fixed recovery fra
   const length = writeNetworkSnapshotKeyframe(frame, world.tick, network);
   assert.ok(length <= NETWORK_SNAPSHOT_MESSAGE_BYTES);
   assert.ok(length <= 12 * 1_024);
+});
+
+test("schema player deltas round-trip exact modular field changes", () => {
+  const { world } = fixture();
+  const baselineRaw = new Uint8Array(SNAPSHOT_BYTES);
+  const currentRaw = new Uint8Array(SNAPSHOT_BYTES);
+  const baseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const current = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const decoded = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const expanded = new Uint8Array(SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
+
+  world.writeSnapshot(baselineRaw);
+  compactNetworkSnapshot(baselineRaw, baseline);
+  world.tick = 6;
+  world.playerX[0] += 17;
+  world.playerVelocityX[0] = -127;
+  world.playerHullX[0] = -181;
+  world.playerScore[0] = -0x8000_0000;
+  world.playerLastMoveX[0] = -1;
+  world.playerAmmo[1] = 399;
+  world.writeSnapshot(currentRaw);
+  compactNetworkSnapshot(currentRaw, current);
+
+  const length = writeNetworkSnapshotDelta(frame, world.tick, 0, baseline, current);
+  assert.ok(length > 0 && length < NETWORK_SNAPSHOT_MESSAGE_BYTES);
+  assert.equal(frame[8], SNAPSHOT_SCHEMA_DELTA);
+  const scratch = { baseline, decoded, baselineTick: 0 };
+  assert.equal(readNetworkSnapshotFrame(frame.subarray(0, length), scratch, false), world.tick);
+  assert.deepEqual(decoded, current);
+  expandNetworkSnapshot(decoded, expanded, world.tick);
+  assert.deepEqual(expanded, currentRaw);
+});
+
+test("schema player delta masks fail closed on reserved fields", () => {
+  const { world } = fixture();
+  const raw = new Uint8Array(SNAPSHOT_BYTES);
+  const baseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const current = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
+  world.writeSnapshot(raw);
+  compactNetworkSnapshot(raw, baseline);
+  world.playerX[0] += 1;
+  world.writeSnapshot(raw);
+  compactNetworkSnapshot(raw, current);
+  const length = writeNetworkSnapshotDelta(frame, 0, 0, baseline, current);
+  assert.equal(frame[8], SNAPSHOT_SCHEMA_DELTA);
+  // Header (16) + player slot mask (4) + final byte of player-zero's
+  // seven-byte field mask. Only bit zero names field 48; the rest are reserved.
+  frame[26] |= 0x80;
+  const scratch = { baseline, decoded: new Uint8Array(NETWORK_SNAPSHOT_BYTES), baselineTick: 0 };
+  assert.throws(
+    () => readNetworkSnapshotFrame(frame.subarray(0, length), scratch, false),
+    /field mask has reserved bits/u,
+  );
+});
+
+test("schema player delta masks reject a named zero delta", () => {
+  const { world } = fixture();
+  const raw = new Uint8Array(SNAPSHOT_BYTES);
+  const baseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const current = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
+  world.writeSnapshot(raw);
+  compactNetworkSnapshot(raw, baseline);
+  world.playerX[0] += 1;
+  world.writeSnapshot(raw);
+  compactNetworkSnapshot(raw, current);
+  const length = writeNetworkSnapshotDelta(frame, 1, 0, baseline, current);
+  // Header (16), slot mask (4), field mask (7), then the first named delta.
+  frame[27] = 0;
+  const scratch = { baseline, decoded: new Uint8Array(NETWORK_SNAPSHOT_BYTES), baselineTick: 0 };
+  assert.throws(
+    () => readNetworkSnapshotFrame(frame.subarray(0, length), scratch, false),
+    /field delta names no change/u,
+  );
+});
+
+test("schema generic runs reject noncanonical gap and length varints", () => {
+  const baseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const record = baseline.subarray(SNAPSHOT_HEADER_BYTES, SNAPSHOT_HEADER_BYTES + NETWORK_PLAYER_SNAPSHOT_BYTES);
+  record.fill(0x55);
+  record[record.length - 1] &= 0x3f;
+  const current = baseline.slice();
+  current[networkProjectileOffset] = 1;
+  const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
+  const length = writeNetworkSnapshotDelta(frame, 1, 0, baseline, current);
+  assert.ok(length > 0);
+
+  const overlongAt = (offset) => {
+    let terminal = offset;
+    while ((frame[terminal] & 0x80) !== 0) terminal += 1;
+    const malformed = new Uint8Array(length + 1);
+    malformed.set(frame.subarray(0, terminal), 0);
+    malformed[terminal] = frame[terminal] | 0x80;
+    malformed[terminal + 1] = 0;
+    malformed.set(frame.subarray(terminal + 1, length), terminal + 2);
+    return { malformed, next: terminal + 2 };
+  };
+  const gap = overlongAt(20);
+  const scratch = { baseline, decoded: new Uint8Array(NETWORK_SNAPSHOT_BYTES), baselineTick: 0 };
+  assert.throws(() => readNetworkSnapshotFrame(gap.malformed, scratch, false), /run value is noncanonical/u);
+
+  let lengthOffset = 20;
+  while ((frame[lengthOffset++] & 0x80) !== 0) {}
+  const runLength = overlongAt(lengthOffset);
+  assert.throws(() => readNetworkSnapshotFrame(runLength.malformed, scratch, false), /run value is noncanonical/u);
+});
+
+test("schema player deltas round-trip every exact field width", () => {
+  const widths = [
+    1, 8, 3, 2, 2, 2, 16, 15, 15, 18, 18, 10, 10, 10, 10, 10, 10, 8, 7, 8, 8, 8, 10, 1, 7, 16, 32, 32, 32, 32, 1, 8, 8,
+    8, 8, 2, 3, 8, 3, 4, 12, 12, 2, 9, 9, 9, 9, 9, 9,
+  ];
+  const byteLength = (value) =>
+    value < 0x80 ? 1 : value < 0x4000 ? 2 : value < 0x20_0000 ? 3 : value < 0x1000_0000 ? 4 : 5;
+  let bitOffset = 0;
+  for (const width of widths) {
+    const modulus = 2 ** width;
+    const maximum = modulus - 1;
+    const half = modulus / 2;
+    const transitions = [
+      [0, maximum],
+      [maximum, 0],
+      [0, half],
+      [half, 0],
+    ];
+    for (const [previous, next] of transitions) {
+      const baseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+      const record = baseline.subarray(SNAPSHOT_HEADER_BYTES, SNAPSHOT_HEADER_BYTES + NETWORK_PLAYER_SNAPSHOT_BYTES);
+      record.fill(0x55);
+      record[record.length - 1] &= 0x3f;
+      const current = baseline.slice();
+      writeNetworkPlayerBits(baseline, 0, bitOffset, width, previous);
+      writeNetworkPlayerBits(current, 0, bitOffset, width, next);
+
+      let delta = (((next - previous) % modulus) + modulus) % modulus;
+      if (delta >= half) delta -= modulus;
+      const encoded = delta >= 0 ? delta * 2 : -delta * 2 - 1;
+      const frame = new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES);
+      const length = writeNetworkSnapshotDelta(frame, 0xffff_ffff, 0xffff_fffe, baseline, current);
+      assert.equal(length, 27 + byteLength(encoded), `field width ${width} should have one canonical delta`);
+      const decoded = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+      const scratch = { baseline, decoded, baselineTick: 0xffff_fffe };
+      assert.equal(readNetworkSnapshotFrame(frame.subarray(0, length), scratch, false), 0xffff_ffff);
+      assert.deepEqual(decoded, current, `field width ${width} transition ${previous} -> ${next} should round-trip`);
+    }
+    bitOffset += width;
+  }
+  assert.equal(bitOffset, 494);
+});
+
+test("a dense schema delta falls back when a sparse keyframe is smaller", () => {
+  const baseline = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  const current = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  let state = 0x50a1_5eed;
+  for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+    const offset = SNAPSHOT_HEADER_BYTES + slot * NETWORK_PLAYER_SNAPSHOT_BYTES;
+    for (let byte = 0; byte < NETWORK_PLAYER_SNAPSHOT_BYTES; byte += 1) {
+      state ^= state << 13;
+      state ^= state >>> 17;
+      state ^= state << 5;
+      baseline[offset + byte] = state >>> 24;
+      state ^= state << 13;
+      state ^= state >>> 17;
+      state ^= state << 5;
+      current[offset + byte] = state >>> 24;
+    }
+    baseline[offset + NETWORK_PLAYER_SNAPSHOT_BYTES - 1] &= 0x3f;
+    current[offset + NETWORK_PLAYER_SNAPSHOT_BYTES - 1] &= 0x3f;
+  }
+  assert.equal(
+    writeNetworkSnapshotDelta(
+      new Uint8Array(NETWORK_SNAPSHOT_MESSAGE_BYTES),
+      0xffff_ffff,
+      0xffff_fffe,
+      baseline,
+      current,
+    ),
+    -1,
+  );
 });

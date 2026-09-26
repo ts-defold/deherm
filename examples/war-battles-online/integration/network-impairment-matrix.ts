@@ -23,10 +23,10 @@ export const NETWORK_IMPAIRMENT_PROFILES: readonly NetworkProfile[] = Object.fre
       jitterMilliseconds: 15,
       datagramLossPercent: 5,
       uplinkBitsPerSecond: 32_000,
-      downlinkBitsPerSecond: 256_000,
+      downlinkBitsPerSecond: 128_000,
       minimumInputAcceptanceRatio: 0.95,
     }),
-    minimumSnapshotsApplied: 120,
+    minimumSnapshotsApplied: 90,
     maximumSnapshotSkipRatio: 0.05,
   }),
   Object.freeze({
@@ -34,10 +34,11 @@ export const NETWORK_IMPAIRMENT_PROFILES: readonly NetworkProfile[] = Object.fre
     config: Object.freeze({
       ...LOAD_HARNESS_CONFIG,
       seed: 0xc011_5eed,
-      minimumInputAcceptanceRatio: 0.93,
+      downlinkBitsPerSecond: 96_000,
+      minimumInputAcceptanceRatio: 0.92,
     }),
-    minimumSnapshotsApplied: 110,
-    maximumSnapshotSkipRatio: 0.15,
+    minimumSnapshotsApplied: 80,
+    maximumSnapshotSkipRatio: 0.2,
   }),
   Object.freeze({
     name: "edge-congested",
@@ -48,11 +49,11 @@ export const NETWORK_IMPAIRMENT_PROFILES: readonly NetworkProfile[] = Object.fre
       jitterMilliseconds: 35,
       datagramLossPercent: 10,
       uplinkBitsPerSecond: 20_000,
-      downlinkBitsPerSecond: 128_000,
-      minimumInputAcceptanceRatio: 0.9,
+      downlinkBitsPerSecond: 64_000,
+      minimumInputAcceptanceRatio: 0.85,
     }),
-    minimumSnapshotsApplied: 75,
-    maximumSnapshotSkipRatio: 0.45,
+    minimumSnapshotsApplied: 45,
+    maximumSnapshotSkipRatio: 0.5,
   }),
 ]);
 
@@ -92,10 +93,12 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
     const modeledSeconds = workload.durationMilliseconds / 1_000;
     const uplinkCapacityBytesPerSecond = profile.config.uplinkBitsPerSecond / 8;
     const downlinkCapacityBytesPerSecond = profile.config.downlinkBitsPerSecond / 8;
-    const serializedUplinkBytesPerSecondPerClient =
+    const admittedUplinkPayloadBytesPerSecondPerClient =
       workload.bytes.clientToServerSerialized / profile.config.players / modeledSeconds;
-    const serializedDownlinkBytesPerSecondPerClient =
+    const admittedDownlinkPayloadBytesPerSecondPerClient =
       workload.bytes.serverToClientSerialized / profile.config.players / modeledSeconds;
+    const uplinkDemandRatio = admittedUplinkPayloadBytesPerSecondPerClient / uplinkCapacityBytesPerSecond;
+    const downlinkDemandRatio = admittedDownlinkPayloadBytesPerSecondPerClient / downlinkCapacityBytesPerSecond;
     const snapshotSkipRatio =
       server.snapshotFramesSkippedByBudget! / (server.snapshotsSent! + server.snapshotFramesSkippedByBudget!);
     const minimumSnapshotsApplied = Math.min(...clients.rows.map((row) => row.snapshotsApplied));
@@ -125,12 +128,14 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
           peakQueuedBytes: observed.peakQueuedBytes,
           queueBound: transport.queueBound,
           maximumSerializationDelayMilliseconds: observed.maximumSerializationDelayMilliseconds,
-          serializedUplinkBytesPerSecondPerClient,
+          admittedUplinkPayloadBytesPerSecondPerClient,
           uplinkCapacityBytesPerSecond,
-          uplinkCapacityUtilization: serializedUplinkBytesPerSecondPerClient / uplinkCapacityBytesPerSecond,
-          serializedDownlinkBytesPerSecondPerClient,
+          uplinkDemandRatio,
+          uplinkAdmittedDemandSaturation: Math.min(1, uplinkDemandRatio),
+          admittedDownlinkPayloadBytesPerSecondPerClient,
           downlinkCapacityBytesPerSecond,
-          downlinkCapacityUtilization: serializedDownlinkBytesPerSecondPerClient / downlinkCapacityBytesPerSecond,
+          downlinkDemandRatio,
+          downlinkAdmittedDemandSaturation: Math.min(1, downlinkDemandRatio),
         }),
         server: Object.freeze({
           finalTick: server.tick,
@@ -164,6 +169,6 @@ export async function runNetworkImpairmentMatrix(): Promise<NetworkImpairmentMat
     kind: "war-battles.32-player-network-impairment-matrix",
     profiles: Object.freeze(rows),
     evidenceBoundary:
-      "The production MatchServer, BattleClient, shared NetworkBotDriver brain, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
+      "The production MatchServer, BattleClient, shared NetworkBotDriver brain, prediction, reconciliation, snapshot and input codecs run for 32 clients through a deterministic per-link application-payload serializer with latency, jitter, loss, reordering, backpressure and speed caps. Demand fields count payload admitted during the exact workload window; serialization may finish or be cancelled after that window, so they are not delivered throughput or observed link utilization. This is not a QUIC packet capture and excludes HTTP/3, TLS, UDP, IP, link-layer and congestion-control overhead.",
   });
 }

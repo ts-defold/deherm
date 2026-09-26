@@ -24,14 +24,15 @@ import { WEAPON_COUNT } from "./content";
  * protocol bump so older peers fail closed rather than interpreting a frame
  * with the wrong layout.
  */
-// Version 14 makes countdown expiries and accepted-input coordinates stable
+// Version 15 carries player deltas as schema fields instead of generic changed-
+// byte runs. Version 14 makes countdown expiries and accepted-input coordinates stable
 // against the enclosing snapshot tick, so ordinary sparse deltas carry state
 // changes rather than deterministic clock motion. Version 13 packs a four-
 // command unreliable input window behind one common identity, acknowledgement,
 // tick, and sequence header. Version 12 separated the compact fixed-point
 // network image from the broad rollback image and packed each projectile into
 // an exact 15-byte record.
-export const PROTOCOL_VERSION = 14;
+export const PROTOCOL_VERSION = 15;
 export const INPUT_PACKET_BYTES = 32;
 /**
  * One unreliable transport datagram carries the two commands sampled since the
@@ -313,8 +314,11 @@ export const PING_BYTES = ENVELOPE_BYTES + 8;
 export const SNAPSHOT_FRAME_HEADER_BYTES = ENVELOPE_BYTES + 12;
 export const SNAPSHOT_KEYFRAME = 0;
 export const SNAPSHOT_DELTA = 1;
+/** Exact field-aware player delta plus generic non-player runs. */
+export const SNAPSHOT_SCHEMA_DELTA = 2;
 /** A keyframe is required often enough to bound late-join/recovery cost. */
-export const SNAPSHOT_KEYFRAME_INTERVAL = 20;
+/** Four seconds at the default 10 Hz cadence; ACK-driven recovery may keyframe sooner. */
+export const SNAPSHOT_KEYFRAME_INTERVAL = 40;
 export const SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_FRAME_HEADER_BYTES + SNAPSHOT_BYTES;
 export const NETWORK_SNAPSHOT_MESSAGE_BYTES = SNAPSHOT_FRAME_HEADER_BYTES + NETWORK_SNAPSHOT_BYTES;
 /** Ordinary latest-state packets above this size consume recovery credit. */
@@ -438,7 +442,7 @@ export function writeWelcome(target: Uint8Array, message: Readonly<WelcomeMessag
   view.setUint32(12, message.mapSeed >>> 0, true);
   view.setUint32(16, message.serverTick >>> 0, true);
   target.set(message.resumeToken, 20);
-  view.setUint8(WELCOME_BASE_BYTES, message.snapshotIntervalTicks ?? 4);
+  view.setUint8(WELCOME_BASE_BYTES, message.snapshotIntervalTicks ?? 6);
   return WELCOME_BYTES;
 }
 

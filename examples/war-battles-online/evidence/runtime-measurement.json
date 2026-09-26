@@ -6,7 +6,7 @@
     "clock": "performance.now",
     "clockUnit": "milliseconds",
     "wallClockObserved": true,
-    "elapsedMilliseconds": 3704.102542
+    "elapsedMilliseconds": 3451.854625
   },
   "workload": {
     "sourceKind": "war-battles.authoritative-32-player-load",
@@ -35,21 +35,21 @@
     "scope": "MatchServer.step only; transport queue advancement and client update are outside this timer",
     "samples": {
       "samples": 540,
-      "minimum": 0.02812499999998863,
-      "mean": 0.5928851944444363,
-      "p50": 0.03837500000008731,
-      "p95": 2.529541999999992,
-      "p99": 2.6798750000002656,
-      "maximum": 3.9614580000002206
+      "minimum": 0.023832999999740423,
+      "mean": 0.7956913499999957,
+      "p50": 0.03862499999991087,
+      "p95": 4.603499999999713,
+      "p99": 5.61545799999999,
+      "maximum": 7.9376250000000255
     },
     "allSamples": {
       "samples": 600,
-      "minimum": 0.018915999999990163,
-      "mean": 0.606610976666659,
-      "p50": 0.037959000000228116,
-      "p95": 2.542916999999761,
-      "p99": 2.932457999999997,
-      "maximum": 6.178459000000004
+      "minimum": 0.02054100000000858,
+      "mean": 0.8216144366666627,
+      "p50": 0.038625000000024556,
+      "p95": 4.614792000000307,
+      "p99": 6.63900000000001,
+      "maximum": 8.996667000000002
     }
   },
   "memory": {
@@ -61,42 +61,42 @@
       "rssBytes": {
         "observed": true,
         "samples": 602,
-        "first": 125616128,
-        "last": 181026816,
-        "peak": 184893440,
-        "delta": 55410688
+        "first": 126550016,
+        "last": 185417728,
+        "peak": 190005248,
+        "delta": 58867712
       },
       "heapTotalBytes": {
         "observed": true,
         "samples": 602,
         "first": 18087936,
-        "last": 42467328,
-        "peak": 42467328,
-        "delta": 24379392
+        "last": 42729472,
+        "peak": 42729472,
+        "delta": 24641536
       },
       "heapUsedBytes": {
         "observed": true,
         "samples": 602,
-        "first": 12723600,
-        "last": 25902464,
-        "peak": 32583888,
-        "delta": 13178864
+        "first": 12828824,
+        "last": 29008728,
+        "peak": 32386520,
+        "delta": 16179904
       },
       "externalBytes": {
         "observed": true,
         "samples": 602,
-        "first": 8702407,
-        "last": 43006805,
-        "peak": 43845418,
-        "delta": 34304398
+        "first": 8714198,
+        "last": 44088616,
+        "peak": 44387523,
+        "delta": 35374418
       },
       "arrayBuffersBytes": {
         "observed": true,
         "samples": 602,
-        "first": 150003,
-        "last": 34894313,
-        "peak": 35732926,
-        "delta": 34744310
+        "first": 150147,
+        "last": 35976124,
+        "peak": 36275031,
+        "delta": 35825977
       }
     },
     "unavailable": null
@@ -120,14 +120,14 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 439952,
-      "sha256": "f5537a5e2acd5cee8f9eecd4eeb7cf41b0ac83d91d888d98d62d7c194b372849"
+      "bytes": 451599,
+      "sha256": "1b1a1ba9ed699576ae2a4fd219368c1d41bddc8969e0e6f315a74a1b85d7ed20"
     },
     {
       "path": "examples/war-battles-online/integration/authoritative-load-harness.ts",
       "kind": "file",
-      "bytes": 32430,
-      "sha256": "3cc8696867dfec8a857baf3f0f70a9dec44eeb58f2aff0e9b78788fff85cb3c5"
+      "bytes": 32542,
+      "sha256": "e391e8ba49e6e9d6e04524cab92541e914c538f7886ec8d4fd22815f681827f8"
     },
     {
       "path": "examples/war-battles-online/integration/runtime-measurement-harness.ts",
@@ -154,6 +154,6 @@
       "sha256": "319fd69662113942123ff9a1a8ad2d5b8228fe5d14709766f613e16476d96e3d"
     }
   ],
-  "sourceKey": "95b2ec8c7f4b5d5e6320b32f5fe5941926a58141afd22c16e7ad220aad4268ee",
+  "sourceKey": "fe0a29ce1621c603b757e5f1a2d8e247b1dd86e529826948369dd4a3c58957a4",
   "evidenceBoundary": "Owner-observed host wall-clock and memory snapshots; deterministic work units remain in performance-operability.json; no allocation-free or cross-runtime equivalence claim."
 }

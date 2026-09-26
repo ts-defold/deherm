@@ -21,6 +21,7 @@ import {
   SNAPSHOT_DELTA,
   SNAPSHOT_FRAME_HEADER_BYTES,
   SNAPSHOT_KEYFRAME,
+  SNAPSHOT_SCHEMA_DELTA,
   SNAPSHOT_KEYFRAME_INTERVAL,
   SNAPSHOT_NORMAL_MAX_BYTES,
   SNAPSHOT_RECOVERY_MAX_BYTES,
@@ -52,7 +53,7 @@ export const PERFORMANCE_HARNESS_CONFIG = Object.freeze({
   seed: 0x51_4f_50_53,
   matchId: 0x50_45_52_46,
   mapSeed: 0x0bad_cafe,
-  snapshotIntervalTicks: 4,
+  snapshotIntervalTicks: 6,
 });
 
 /**
@@ -160,8 +161,28 @@ function attributeSnapshotFrame(frame: Uint8Array, length: number, attribution: 
     addRegionBytes(attribution, 0, NETWORK_SNAPSHOT_BYTES);
     return;
   }
-  if (kind !== SNAPSHOT_KEYFRAME && kind !== SNAPSHOT_DELTA) throw new Error(`unknown snapshot frame kind ${kind}`);
+  if (kind !== SNAPSHOT_KEYFRAME && kind !== SNAPSHOT_DELTA && kind !== SNAPSHOT_SCHEMA_DELTA) {
+    throw new Error(`unknown snapshot frame kind ${kind}`);
+  }
   let cursor = SNAPSHOT_FRAME_HEADER_BYTES;
+  if (kind === SNAPSHOT_SCHEMA_DELTA) {
+    const playerStart = cursor;
+    const slotMaskOffset = cursor;
+    cursor += 4;
+    for (let slot = 0; slot < MAX_PLAYERS; slot += 1) {
+      if ((frame[slotMaskOffset + (slot >>> 3)]! & (1 << (slot & 7))) === 0) continue;
+      const fieldMaskOffset = cursor;
+      cursor += 7;
+      for (let field = 0; field < 49; field += 1) {
+        if ((frame[fieldMaskOffset + (field >>> 3)]! & (1 << (field & 7))) === 0) continue;
+        for (;;) {
+          if (cursor >= length) throw new Error("snapshot attribution found a truncated field delta");
+          if ((frame[cursor++]! & 0x80) === 0) break;
+        }
+      }
+    }
+    attribution.players += cursor - playerStart;
+  }
   let previousEnd = 0;
   for (let run = 0; run < runCount; run += 1) {
     const headerStart = cursor;

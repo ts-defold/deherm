@@ -79,7 +79,7 @@ export interface MatchServerOptions {
   readonly mapSeed?: number;
   /** Slots the match uses in total, humans plus bots. */
   readonly rosterSize?: number;
-  /** Ticks between authoritative snapshots. 4 is 15 Hz at a 60 Hz tick. */
+  /** Ticks between authoritative snapshots. 6 is 10 Hz at a 60 Hz tick. */
   readonly snapshotIntervalTicks?: number;
   readonly botSkill?: number;
   readonly teams?: boolean;
@@ -190,7 +190,7 @@ export class MatchServer {
     const matchId = (options.matchId ?? 77) >>> 0;
     this.world = new BattleWorld(matchId, options.mapSeed);
     this.rosterSize = clampInteger(options.rosterSize ?? 8, 2, MAX_PLAYERS);
-    this.snapshotIntervalTicks = clampInteger(options.snapshotIntervalTicks ?? 4, 1, 30);
+    this.snapshotIntervalTicks = clampInteger(options.snapshotIntervalTicks ?? 6, 1, 30);
     this.botSkill = clampInteger(options.botSkill ?? 2, 0, 3);
     this.teams = options.teams ?? false;
     this.inputBudgetPerTick = clampInteger(options.inputBudgetPerTick ?? 8, 1, 64);

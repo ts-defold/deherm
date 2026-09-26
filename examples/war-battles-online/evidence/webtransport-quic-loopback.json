@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 4,
-  "lastServerTick": 84,
-  "lastLocalTick": 87,
+  "observedInputsSent": 13,
+  "lastServerTick": 114,
+  "lastLocalTick": 126,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -50,22 +50,22 @@
   },
   "inputsDropped": 0,
   "presentation": {
-    "localCorrectionMagnitude": 869,
-    "maximumLocalCorrectionMagnitude": 3597,
+    "localCorrectionMagnitude": 19,
+    "maximumLocalCorrectionMagnitude": 5229,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
     "remoteLifecycleHardSnaps": 0
   },
   "prediction": {
-    "inputLeadTicks": 3,
+    "inputLeadTicks": 5,
     "inputLeadDecreases": 0
   },
   "server": {
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:63033",
+      "war-battles-server:health:http://localhost:49457",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -85,8 +85,8 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 439952,
-      "sha256": "f5537a5e2acd5cee8f9eecd4eeb7cf41b0ac83d91d888d98d62d7c194b372849"
+      "bytes": 451599,
+      "sha256": "1b1a1ba9ed699576ae2a4fd219368c1d41bddc8969e0e6f315a74a1b85d7ed20"
     },
     {
       "path": "examples/war-battles-online/integration/check-real-webtransport.mjs",
@@ -116,7 +116,7 @@
       "path": "examples/war-battles-online/server/deno-main.ts",
       "kind": "file",
       "bytes": 20947,
-      "sha256": "bb207c651de94e9860d4d9965128edbb3d63650c5ecd98397f598117592d0f29"
+      "sha256": "4da3495d2b0771fd0dd5b37a27f548494c0a45ac72cbe29909e3e02068f2967d"
     },
     {
       "path": "package.json",
@@ -137,6 +137,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "9df38a158c2e19e8c19b59f166bed2629df1d7a84531d634cd793d07705229a7",
+  "sourceKey": "2547acc1768250b2c58b9f3edcd44d7c39bb79132532048be8e7bbb616961c93",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

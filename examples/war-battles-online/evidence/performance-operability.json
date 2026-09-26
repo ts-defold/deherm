@@ -9,7 +9,7 @@
     "seed": 1364152403,
     "matchId": 1346720326,
     "mapSeed": 195939070,
-    "snapshotIntervalTicks": 4
+    "snapshotIntervalTicks": 6
   },
   "timings": {
     "unit": "deterministic-work-units",
@@ -23,57 +23,57 @@
     },
     "frame": {
       "samples": 540,
-      "p50": 885,
-      "p95": 2763,
-      "p99": 5852,
-      "maximum": 8149
+      "p50": 878,
+      "p95": 2402,
+      "p99": 2665,
+      "maximum": 7419
     },
     "evidenceBoundary": "Percentiles are source-bound operation-cost signals, not wall-clock milliseconds or VM/JIT timings."
   },
   "snapshotBandwidth": {
-    "intervalTicks": 4,
-    "frames": 150,
-    "keyframes": 8,
-    "deltas": 142,
-    "totalBytes": 144660,
-    "bytesPerSimulatedSecond": 14466,
-    "bitsPerSimulatedSecond": 115728,
-    "aggregateServerPayloadBytesPerSecond": 462912,
-    "aggregateServerPayloadBitsPerSecond": 3703296,
+    "intervalTicks": 6,
+    "frames": 100,
+    "keyframes": 3,
+    "deltas": 97,
+    "totalBytes": 77567,
+    "bytesPerSimulatedSecond": 7756.7,
+    "bitsPerSimulatedSecond": 62053.6,
+    "aggregateServerPayloadBytesPerSecond": 248214.4,
+    "aggregateServerPayloadBitsPerSecond": 1985715.2,
     "inputPayloadBytesPerSecondPerClient": 1500,
     "inputPayloadBitsPerSecondPerClient": 12000,
     "aggregateInputPayloadBytesPerSecond": 48000,
     "frameBytes": {
-      "samples": 150,
-      "p50": 858,
-      "p95": 1968,
-      "p99": 3275,
-      "maximum": 3621
+      "samples": 100,
+      "p50": 705,
+      "p95": 921,
+      "p99": 2573,
+      "maximum": 3300
     },
-    "keyframeBytes": 3621,
+    "keyframeBytes": 3300,
     "fixedFrameCapacity": 10160,
-    "normalFrames": 147,
-    "recoveryFrames": 3,
+    "normalFrames": 99,
+    "recoveryFrames": 1,
     "normalFrameMaximumBytes": 3072,
     "recoveryFrameMaximumBytes": 12288,
     "worstCaseBound": {
       "assumption": "One recovery frame per second replaces one normal frame; every admitted frame reaches its enforced ceiling.",
-      "framesPerSecond": 15,
-      "normalFramesPerSecond": 14,
+      "framesPerSecond": 10,
+      "normalFramesPerSecond": 9,
       "recoveryFramesPerSecond": 1,
-      "bytesPerSecondPerClient": 53168,
-      "bitsPerSecondPerClient": 425344,
-      "aggregateServerBytesPerSecond": 1701376,
-      "aggregateServerBitsPerSecond": 13611008
+      "bytesPerSecondPerClient": 37808,
+      "bitsPerSecondPerClient": 302464,
+      "aggregateServerBytesPerSecond": 1209856,
+      "aggregateServerBitsPerSecond": 9678848
     },
     "byteAttribution": {
-      "frameHeaders": 2400,
-      "runHeaders": 37395,
-      "worldHeader": 398,
-      "players": 86242,
-      "projectiles": 15287,
-      "pickups": 2518,
-      "cover": 420
+      "frameHeaders": 1600,
+      "runHeaders": 4644,
+      "worldHeader": 234,
+      "players": 57169,
+      "projectiles": 12683,
+      "pickups": 1077,
+      "cover": 160
     },
     "targets": {
       "downstreamBytesPerSecondPerClient": 24000,
@@ -83,9 +83,9 @@
       "keyframeBytes": 8000,
       "worstCaseDownstreamBytesPerSecondPerClient": 64000,
       "downstreamTargetSatisfied": true,
-      "downstreamStretchTargetSatisfied": false,
+      "downstreamStretchTargetSatisfied": true,
       "upstreamTargetSatisfied": true,
-      "snapshotP95TargetSatisfied": false,
+      "snapshotP95TargetSatisfied": true,
       "keyframeTargetSatisfied": true,
       "worstCaseDownstreamTargetSatisfied": true,
       "requiredDownstreamReductionRatio": 0
@@ -93,16 +93,16 @@
     "evidenceBoundary": "Application payload bytes only. QUIC, HTTP/3, TLS, UDP, IP, Ethernet, retransmission, acknowledgement, and congestion overhead are not observed by this deterministic codec harness."
   },
   "reconciliation": {
-    "samples": 150,
+    "samples": 100,
     "errorUnit": "sum of absolute fixed-point position units across all players before authoritative restore",
     "error": {
-      "samples": 150,
+      "samples": 100,
       "p50": 0,
-      "p95": 30,
-      "p99": 52,
-      "maximum": 53
+      "p95": 42,
+      "p99": 75,
+      "maximum": 75
     },
-    "maximumError": 53,
+    "maximumError": 75,
     "correctedSnapshots": 18,
     "postRestoreError": 0
   },
@@ -131,7 +131,7 @@
     },
     "snapshotFrame": {
       "capacity": 10160,
-      "highWater": 3621,
+      "highWater": 3300,
       "failures": 0
     },
     "arena": {
@@ -169,14 +169,14 @@
       "path": "examples/war-battles-online/core",
       "kind": "tree",
       "fileCount": 24,
-      "bytes": 439952,
-      "sha256": "f5537a5e2acd5cee8f9eecd4eeb7cf41b0ac83d91d888d98d62d7c194b372849"
+      "bytes": 451599,
+      "sha256": "1b1a1ba9ed699576ae2a4fd219368c1d41bddc8969e0e6f315a74a1b85d7ed20"
     },
     {
       "path": "examples/war-battles-online/integration/performance-harness.ts",
       "kind": "file",
-      "bytes": 21288,
-      "sha256": "f7b3710a5d6a69484104c1da488007593ec6f7259c266c3ca0e42f77e0bd3de5"
+      "bytes": 22078,
+      "sha256": "f153fbd104f56789f07f4a8a478f0b2cec63e98e37e3e7e3a9ba983bf0b7f764"
     },
     {
       "path": "examples/war-battles-online/integration/performance-evidence.mjs",
@@ -191,6 +191,6 @@
       "sha256": "b8709891a96f1b3aabc8c65ef4aa48860d630b3b5bfc286e4e00663e15a7a19a"
     }
   ],
-  "sourceKey": "6525aaad826a0026f3f45d0eb7f6d9a4e460123495ff35c763bc892e955ea29e",
+  "sourceKey": "ed9d3f526177542c247a9ae703065c999a67d02ed748f01579d87c040f7ce798",
   "evidenceBoundary": "Deterministic in-process simulation/codec operability evidence; no wall-clock, VM allocation, Defold engine, browser, native heap, or WAN claim."
 }

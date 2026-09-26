@@ -250,13 +250,19 @@ export class BattleClient implements TransportReceiver {
   private snapshotAckBits = 0;
   private sequence = 0;
   private lastInputSendSequence = -1;
+  /** Fully validated broad snapshot waiting for the next simulation update. */
   private readonly pendingSnapshot = new Uint8Array(SNAPSHOT_BYTES);
+  /** Broad decode candidate; never exposed until expansion succeeds completely. */
+  private readonly snapshotCandidate = new Uint8Array(SNAPSHOT_BYTES);
   private readonly snapshotHistory = Array.from(
     { length: SNAPSHOT_BASE_HISTORY_FRAMES },
     () => new Uint8Array(NETWORK_SNAPSHOT_BYTES),
   );
   private readonly snapshotHistoryTicks = new Float64Array(SNAPSHOT_BASE_HISTORY_FRAMES);
   private snapshotHistoryCursor = 0;
+  /** Fully validated compact snapshot paired with pendingSnapshot. */
+  private readonly pendingNetworkSnapshot = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
+  /** Compact decode candidate; malformed frames may mutate only this buffer. */
   private readonly snapshotDecoded = new Uint8Array(NETWORK_SNAPSHOT_BYTES);
   private readonly snapshotScratch: SnapshotFrameScratch = {
     baseline: this.snapshotHistory[0]!,
@@ -532,7 +538,9 @@ export class BattleClient implements TransportReceiver {
     this.snapshotHistoryTicks.fill(-1);
     this.snapshotHistoryCursor = 0;
     this.snapshotDecoded.fill(0);
+    this.pendingNetworkSnapshot.fill(0);
     this.pendingSnapshot.fill(0);
+    this.snapshotCandidate.fill(0);
     this.snapshotScratch.baselineTick = -1;
     this.pendingSnapshotReady = false;
     this.pendingSnapshotTick = -1;
@@ -636,6 +644,7 @@ export class BattleClient implements TransportReceiver {
         this.stats.snapshotsIgnored += 1;
         return;
       }
+      if (this.world === undefined) throw new Error("snapshot arrived before welcome");
       // Decode into fixed caller-owned storage: the transport's buffer belongs
       // to the transport, and the snapshot is applied on the next `update`.
       // Decode against the last *applied* authoritative state. Independent
@@ -650,15 +659,16 @@ export class BattleClient implements TransportReceiver {
         this.snapshotScratch.baselineTick = baseTick;
       }
       readNetworkSnapshotFrame(payload, this.snapshotScratch, false);
-      // The decoded keyframe is now the exact base for any following frames
-      // already buffered by the transport. Restore remains guarded below; if
-      // it fails, applyPendingSnapshot re-latches the stream before exposing
-      // any state to the simulation.
-      if (isKeyframe) this.awaitingSnapshotKeyframe = false;
-      expandNetworkSnapshot(this.snapshotDecoded, this.pendingSnapshot, tick);
+      // Expansion and compact decoding are one acceptance transaction. A
+      // malformed newer frame may partially mutate the candidate buffers, but
+      // it cannot corrupt an older complete frame already waiting to apply.
+      expandNetworkSnapshot(this.snapshotDecoded, this.snapshotCandidate, tick, this.world.matchId, this.world.mapSeed);
+      this.pendingNetworkSnapshot.set(this.snapshotDecoded);
+      this.pendingSnapshot.set(this.snapshotCandidate);
       this.pendingSnapshotReady = true;
       this.pendingSnapshotTick = tick;
       this.pendingSnapshotKeyframe = isKeyframe;
+      if (isKeyframe) this.awaitingSnapshotKeyframe = false;
     } catch (error: unknown) {
       // A malformed or wrong-base independent stream cannot invalidate a
       // newer complete frame already copied into pendingSnapshot.
@@ -708,7 +718,7 @@ export class BattleClient implements TransportReceiver {
       return;
     }
     const historyIndex = this.snapshotHistoryCursor;
-    this.snapshotHistory[historyIndex]!.set(this.snapshotDecoded);
+    this.snapshotHistory[historyIndex]!.set(this.pendingNetworkSnapshot);
     this.snapshotHistoryTicks[historyIndex] = snapshotTick;
     this.snapshotHistoryCursor = (historyIndex + 1) % this.snapshotHistory.length;
     this.snapshotScratch.baseline = this.snapshotHistory[historyIndex]!;

@@ -63,12 +63,14 @@ export function assertNetworkImpairmentEvidence(document, expectedSources) {
     assert.ok(profile.transport.peakQueue <= profile.transport.queueBound);
     assert.ok(profile.transport.peakQueuedBytes > 0);
     assert.ok(profile.transport.serializedBytes > profile.transport.deliveredBytes);
-    assert.ok(profile.transport.serializedUplinkBytesPerSecondPerClient > 0);
-    assert.ok(profile.transport.uplinkCapacityUtilization > 0);
-    assert.ok(profile.transport.uplinkCapacityUtilization <= 1);
-    assert.ok(profile.transport.serializedDownlinkBytesPerSecondPerClient > 0);
-    assert.ok(profile.transport.downlinkCapacityUtilization > 0);
-    assert.ok(profile.transport.downlinkCapacityUtilization <= 1);
+    assert.ok(profile.transport.admittedUplinkPayloadBytesPerSecondPerClient > 0);
+    assert.ok(profile.transport.uplinkAdmittedDemandSaturation > 0);
+    assert.ok(profile.transport.uplinkAdmittedDemandSaturation <= 1);
+    assert.ok(profile.transport.uplinkDemandRatio > 0);
+    assert.ok(profile.transport.admittedDownlinkPayloadBytesPerSecondPerClient > 0);
+    assert.ok(profile.transport.downlinkAdmittedDemandSaturation > 0);
+    assert.ok(profile.transport.downlinkAdmittedDemandSaturation <= 1);
+    assert.ok(profile.transport.downlinkDemandRatio > 0);
   }
   const edge = document.profiles[2];
   assert.ok(
@@ -77,17 +79,18 @@ export function assertNetworkImpairmentEvidence(document, expectedSources) {
   );
   assert.ok(edge.server.snapshotFramesSkippedByBudget > 0);
   assert.ok(edge.transport.backpressuredDatagrams > 0);
+  assert.ok(edge.transport.downlinkDemandRatio > 1);
   // The edge scheduler sheds snapshot cadence once the cap is saturated, so
-  // utilization need not rise monotonically. Instead prove the tighter cap
+  // admitted-demand saturation need not rise monotonically. Instead prove the tighter cap
   // admitted fewer bytes while forcing more cadence shedding than mobile.
   assert.ok(
-    edge.transport.serializedDownlinkBytesPerSecondPerClient <
-      document.profiles[1].transport.serializedDownlinkBytesPerSecondPerClient,
+    edge.transport.admittedDownlinkPayloadBytesPerSecondPerClient <
+      document.profiles[1].transport.admittedDownlinkPayloadBytesPerSecondPerClient,
   );
   assert.ok(edge.server.snapshotSkipRatio > document.profiles[1].server.snapshotSkipRatio);
   assert.ok(
-    document.profiles[1].transport.downlinkCapacityUtilization >
-      document.profiles[0].transport.downlinkCapacityUtilization,
+    document.profiles[1].transport.downlinkAdmittedDemandSaturation >
+      document.profiles[0].transport.downlinkAdmittedDemandSaturation,
   );
 }
 

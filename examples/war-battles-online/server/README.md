@@ -42,7 +42,7 @@ or, from this package, `pnpm serve`.
 | `--cert`, `--key`             | PEM paths; default `server/certs/localhost.{crt,key}`               |
 | `--roster`                    | Total tanks, humans plus bots. Default 8, maximum 32                |
 | `--bot-skill`                 | 0 recruit, 1 regular, 2 veteran, 3 nightmare                        |
-| `--snapshot-interval`         | Ticks between authoritative snapshots; default 4 is 15 Hz           |
+| `--snapshot-interval`         | Ticks between authoritative snapshots; default 6 is 10 Hz           |
 | `--teams`                     | Two teams instead of a free-for-all                                 |
 | `--world-checkpoint`          | Fixed authoritative state file; also `WAR_BATTLES_WORLD_CHECKPOINT` |
 | `--world-checkpoint-interval` | Ticks between control-plane world writes; default 60                |
@@ -92,9 +92,9 @@ The wire lanes are deliberately asymmetric. Client hello, welcome-ack, and
 control frames share one ordered bidirectional QUIC stream; input commands use
 unreliable datagrams. Server welcome/control frames share one ordered
 unidirectional stream, while every replaceable snapshot owns a separate stream
-that is retired after its one frame or reset after 300 ms. Both peers keep a
-64-entry acknowledged snapshot history (about 4.27 seconds at 15 Hz), while the server
-allows at most eight unsettled snapshot streams. Several out-of-order deltas
+that is retired after its one frame or a size-aware minimum-link-rate deadline.
+Both peers keep a 64-entry acknowledged snapshot history (about 6.4 seconds at
+10 Hz), while the server allows at most two unfinished snapshot streams. Several out-of-order deltas
 can therefore use the same exact base without making the stream window grow.
 
 **Two clients:** open the bundle in two browser windows, or two separate Chrome
@@ -197,7 +197,7 @@ WAN ingress, native Defold transport, adverse-network behavior, 32 human
 clients, or production certificate policy.
 
 Snapshot state is sent on independent cancellable WebTransport streams, capped
-at eight unsettled packets per session with a 300 ms stale deadline. This gives
+at two unfinished packets per session with a size-aware stale deadline. This gives
 state partial-reliability semantics: a delayed packet may be reset and a newer
 packet may complete first. Delta frames use only a snapshot tick the client has
 applied and acknowledged. Session and control messages remain reliable ordered
@@ -205,7 +205,7 @@ events; input bundles remain unreliable QUIC datagrams.
 
 ## Protocol
 
-Tick input is one datagram per 60 Hz simulation tick on the unreliable lane.
+Tick input is one datagram per two 60 Hz simulation ticks on the unreliable lane.
 Each datagram carries one to four compact commands: the two newly sampled
 commands plus the previous two-command window. It is dropped rather than queued when backpressured and never
 silently promoted into the reliable lane. The server stages still-future
@@ -223,7 +223,7 @@ whose kind fixes the lane it is allowed on:
 | `control`       | control  | client → server | 8                                           |
 | `snapshot`      | snapshot | server → client | ≤ 10,160 recovery; compact delta after join |
 
-`PROTOCOL_VERSION` is 14: bounded input-command redundancy remains on the wire,
+`PROTOCOL_VERSION` is 15: bounded input-command redundancy remains on the wire,
 simulation tick ordering plus last-input validity are unambiguously uint32
 across wrap, and player countdown/input coordinates are stable against the
 snapshot tick. Snapshots carry the authoritative command-beacon
@@ -237,14 +237,15 @@ version 1 reserved byte 15 and wrote zero there, and that byte is now the weapon
 request, so every other field kept its offset.
 
 Snapshot frames have a 16-byte envelope/codec header. A keyframe projects the
-17,888-byte rollback image into an exact 10,144-byte network image. Established sessions receive sorted,
-non-overlapping changed-byte runs against their own fixed-capacity baseline;
-the server emits a keyframe at least every 20 snapshots. The client rejects a delta
+17,888-byte rollback image into an exact 10,144-byte network image. Established sessions receive a
+changed-player mask, exact player-field masks, modular signed field deltas, and
+sorted non-overlapping changed-byte runs for non-player state against their own
+fixed-capacity baseline. The server emits a keyframe at least every 40 snapshots. The client rejects a delta
 whose base tick is unavailable, so loss or late join cannot silently apply a
 partial world. The match retains 64 exact broad rollback bases (1,144,832
 bytes), while each predicting client retains 64 compact network bases (649,216
 bytes). Each server session owns fixed current, baseline, and frame buffers plus
-eight bounded stream slots. The codec's encode/decode loops allocate no typed-array views or heap
+two bounded unfinished stream slots. The codec's encode/decode loops allocate no typed-array views or heap
 objects after setup; transport streams still have their explicitly bounded
 host resources.
 The final transport call still creates one bounded payload view at the send

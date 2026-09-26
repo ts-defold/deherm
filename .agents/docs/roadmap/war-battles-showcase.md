@@ -178,7 +178,7 @@ of adding bespoke application bindings.
 
 The online client now keeps a fixed-capacity pair of transform samples for all
 32 slots and samples remote hull/turret transforms across the authoritative
-snapshot interval advertised by the server (four ticks / 15 Hz by default).
+snapshot interval advertised by the server (six ticks / 10 Hz by default).
 An incoming sample starts from the pose that was actually rendered, not the
 previous authoritative target, so jittered or bunched streams do not jump an
 in-flight interpolation forward. Generation or player-mode changes hard-snap
@@ -274,14 +274,14 @@ impairment, or native-Defold client coverage.
 ## Arena-shooter replication and navigation wave
 
 The authoritative simulation remains 60 Hz. Human and network-bot clients
-predict at that same rate and submit one unreliable datagram per tick. Protocol
-10 repeats up to three complete commands oldest-first in each datagram; the
+predict at that same rate and submit one unreliable datagram every two ticks.
+Protocol 15 carries two new compact commands plus the prior two-command window; the
 server ignores consumed copies and stages every still-future command. This is a
 bounded loss-recovery window, not a retransmission queue. The deterministic
 loss test drops every second datagram and still observes continuous
 authoritative travel with zero protocol rejections.
 
-Server state is 15 Hz by default. Prediction now advances the local world
+Server state is 10 Hz by default. Prediction now advances the local world
 by `leadTicks` and preserves every command's tick on the wire. The former path
 predicted command N locally but retimestamped it to N + leadTicks for the
 server, which guaranteed repeated corrections. Local simulation accepts each
@@ -300,10 +300,11 @@ visual quality outside the deterministic and bounded loopback profiles that
 record them.
 
 Snapshot delivery is replaceable state, not an ordered event log. Each packet
-owns an independent WebTransport stream, up to eight unsettled streams; streams
-still pending after 300 ms are reset, acknowledged streams are reset before
-leaving the fixed window, and newer state is dropped while all eight slots are
-occupied. A reset is stream-local and never closes the session.
+owns an independent WebTransport stream, with at most two unfinished writes;
+the stale deadline accounts for all admitted bytes at the minimum supported
+link rate plus one second of grace. Acknowledged streams are reset before
+leaving the fixed window, and newer cadence samples are coalesced while both
+slots are occupied. A reset is stream-local and never closes the session.
 This intentionally provides unreliable/partial-reliability semantics without
 putting large fragmented snapshots into the browser datagram queue. Inputs
 remain true unreliable QUIC datagrams. Session/control events remain reliable
@@ -311,8 +312,8 @@ and ordered.
 
 `latestSnapshotTick` now selects the server delta base only after the client
 applied that exact snapshot and returned the acknowledgement in an input. The
-server and client retain a fixed 64-snapshot exact-base history (about 4.27 seconds at
-15 Hz) and the server emits a keyframe whenever the acknowledged base is
+server and client retain a fixed 64-snapshot exact-base history (about 6.4 seconds at
+10 Hz) and the server emits a keyframe whenever the acknowledged base is
 absent. Receiving a frame does not mutate the client's decode base; applying
 it does. Consequently independently completing streams
 may arrive out of order, a bad stream cannot discard a newer complete pending
@@ -942,9 +943,9 @@ client-originated hello/control frames used separate QUIC streams and could be
 delivered out of order; they now share one ordered bidirectional lane. Second,
 one-stream-per-snapshot exhausted the native facade's 64 active stream handles;
 the client now retires a complete one-frame snapshot immediately and the server
-treats that peer retirement as packet-local backpressure. The server caps eight
-outstanding state streams with a 300 ms stale deadline, aborts acknowledged
-streams before releasing their slots, and both sides retain a 64-snapshot
+treats that peer retirement as packet-local backpressure. The server caps two
+unfinished state streams with a size-aware minimum-link-rate deadline, aborts
+acknowledged streams before releasing their slots, and both sides retain a 64-snapshot
 exact-base history so WAN acknowledgements and sibling deltas may complete out
 of order.
 Focused exact-wire/core tests passed, real Chrome-to-Deno WebTransport passed,
@@ -966,7 +967,7 @@ sub-unit scale. The initial network codec nevertheless treated the complete
 17,888-byte rollback image as its keyframe and byte-diff source. That made
 unused capacity—not gameplay state—part of the bandwidth bill.
 
-Protocol 14 keeps the fixed rollback image in memory but projects an exact
+Protocol 15 keeps the fixed rollback image in memory but projects an exact
 10,144-byte network image before emitting sparse keyframes and gap/length-
 varint deltas. Each player record is an exact 62-byte schema projection rather
 than a copied 96-byte rollback record. Velocity uses the simulation's explicit
@@ -978,10 +979,17 @@ stale pool bytes are not logical world state. Projectile trajectory phase makes
 straight flight byte-identical across snapshots, so the delta codec carries
 lifecycle/trajectory changes rather than repeated `x/y/life` updates.
 
-The deterministic 32-player, 15 Hz trace records 14,466 application payload
-bytes/second/client (115,728 bit/s), an 858-byte median, a 1,968-byte p95,
-and a 3,621-byte largest keyframe. Projectile attribution remains 15,287 bytes
-per ten-second trace. Local input remains sampled and predicted at 60 Hz, while
+Established-session player changes use a 32-slot mask, a 49-field exact mask,
+and wrap-safe signed modular varints against the acknowledged baseline. This
+removes generic byte-run metadata from the dominant region without quantizing
+or dropping rollback state. Named zero deltas, noncanonical field/run varints,
+reserved masks, generic player-region overlaps, invalid rollback header/objective/
+cursor/cover state, and foreign match or arena identities fail closed. Decode and
+expansion happen in fixed candidate buffers and are promoted atomically, so a
+malformed newer stream cannot corrupt an older accepted pending frame or its
+history base. The deterministic 32-player, 10 Hz trace records
+7,756.7 application payload bytes/second/client (62,053.6 bit/s), a 705-byte
+median, a 921-byte p95, and a 3,300-byte largest keyframe. Local input remains sampled and predicted at 60 Hz, while
 the unreliable lane emits at 30 Hz. Its two new commands plus prior two-command
 window share one identity, acknowledgement, tick, and sequence header and cost
 50 bytes instead of four 32-byte packets. This reduces upstream application
@@ -998,12 +1006,12 @@ accumulates them behind the `cl_maxpackets` throttle; the stock
 are 30 and 1 respectively.
 
 The runtime enforces a 3,072-byte ordinary-frame ceiling plus at most one
-10,160-byte recovery frame per second. At 15 Hz that is a hard application-
-payload admission bound of 53,168 bytes/second/client (425,344 bit/s), or
-1,701,376 bytes/second for 32 clients. Run metadata (37,395 bytes) and player
-changes (86,242 bytes) dominate the ten-second trace; projectiles are no
-longer the primary target. A field-aware player delta with separate exact owner
-correction and remote presentation state is the next useful compression step.
+10,160-byte recovery frame per second. At 10 Hz that is a hard application-
+payload admission bound of 37,808 bytes/second/client (302,464 bit/s), or
+1,209,856 bytes/second for 32 clients. Player deltas still dominate the ordinary
+trace, but field-aware encoding reduces generic run metadata to 4,644 bytes
+over ten seconds. Separate exact owner correction versus explicitly bounded
+remote presentation quantization remains a possible later compression step.
 Any further narrowing or presentation quantization still requires an explicit
 range and error budget rather than an unchecked cast.
 
@@ -1022,25 +1030,23 @@ Evidence owner: `integration/check-performance.mjs`; checked artifact:
 `evidence/performance-operability.json`. Current targets are 24,000 ordinary
 and 64,000 adversarial payload bytes/second/client, p95 at 1,100 bytes, and an
 8,000-byte keyframe. Ordinary downlink, adversarial bound, keyframe, and
-upstream targets pass; the 8,000-byte stretch and 1,100-byte p95 remain open.
+upstream targets pass, including the 8,000-byte stretch and 1,100-byte p95.
 
 The production `MatchServer` and `BattleClient` also run through a deterministic
 32-client capped-link matrix owned by
 `integration/check-network-impairment.mjs`. It models per-client application-
 payload serialization in both directions plus latency, jitter, datagram loss,
 reordering, bounded queue backpressure, and stale-stream cancellation. The
-three checked profiles are 256/32 Kbit/s broadband-adverse, 160/24 Kbit/s
-mobile-congested, and 128/20 Kbit/s edge-congested downlink/uplink. All 32
+three checked profiles are 128/32 Kbit/s broadband-adverse, 96/24 Kbit/s
+mobile-congested, and 64/20 Kbit/s edge-congested downlink/uplink. All 32
 clients are driven by the production `NetworkBotDriver` and shared bot brain,
 stage all 600 decisions, produce non-idle play, and converge without protocol
-errors; their input acceptance ratios are 97.32%, 94.81%, and 92.74%
-respectively. During the ten-second workload the three profiles consume
-55.37%, 87.80%, and 87.72% of their modeled downlink
-application-payload caps; admitted packets that are later lost or cancelled
-still consume serialization capacity. The edge profile applies 70 +/- 35 ms
-one-way latency, 10% seeded datagram loss, records datagram backpressure, and
-applies 93-101 authoritative snapshots during the ten-second workload plus
-final convergence probe (the regression floor is 75).
+errors; their input acceptance ratios are 96.22%, 93.23%, and 88.74%
+respectively. Their admitted downlink demand is 12.45, 11.75, and 8.10
+KB/s/client. The edge profile deliberately exceeds its 8 KB/s application-
+payload cap by 1.21%, applies 70 +/- 35 ms one-way latency and 10% seeded
+datagram loss, records datagram backpressure, sheds stale snapshot cadence, and
+still applies 51-54 authoritative snapshots plus the final convergence probe.
 
 That matrix exposed snapshot starvation under a speed cap: superseding every
 unfinished independent stream could cancel each frame before its serialization
@@ -1058,14 +1064,13 @@ framing, encryption, ACK,
 retransmission, IP, link-layer, or congestion-controller bytes; real wire
 capture remains a separate gate.
 
-The fixed two-write window preserves 15 Hz while write completion stays below
-about 133 ms, but a transport that resolves only after peer acknowledgement can
-reduce cadence on higher RTT paths (measured: 10 Hz at 150 ms, 6 Hz at 300 ms,
-and 5.2 Hz at 400 ms). Before changing the bound, pin the native and Deno
+The fixed two-write window preserves the default 10 Hz while write completion
+stays below about 200 ms, but a transport that resolves only after peer
+acknowledgement can reduce cadence on higher RTT paths. Before changing the bound, pin the native and Deno
 adapters' completion semantics and feed an observed RTT/serialization estimate
 into a byte-based bandwidth-delay window. The current count remains fixed and
 allocation-bounded; this is a throughput optimization frontier, not a claim of
-15 Hz at arbitrary RTT.
+10 Hz at arbitrary RTT.
 
 Authenticated resume credentials, fail-closed durable admission, and local
 Docker process-restart resume are now proven at their named boundaries.
