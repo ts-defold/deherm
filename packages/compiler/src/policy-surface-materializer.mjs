@@ -26,7 +26,13 @@ import {
   generateScriptUniversalValue,
   generateScriptValueTargetSupport
 } from "./sdk/support-sdk.mjs";
-import { DEFOLD_REVISION_TOKEN, restoreDefoldRevision, sealObject } from "./api-policy.mjs";
+import {
+  canonicalize,
+  DEFOLD_REVISION_TOKEN,
+  hashBytes,
+  restoreDefoldRevision,
+  sealObject
+} from "./api-policy.mjs";
 import { stableBindingId } from "./binding-identity.mjs";
 import { assertDmSdkUniversalStaticFrameCapacity } from "./dmsdk-universal-static-frame.mjs";
 import { isRevisionOutput } from "./revision-output-layout.mjs";
@@ -77,6 +83,67 @@ const SDK_RECIPES = Object.freeze({
   "script/url-target-support.ts": "sdk.script.url-target-support.render.v1",
   "script/value-target-support.ts": "sdk.script.value-target-support.render.v1"
 });
+
+function digestCanonical(value) {
+  return hashBytes(Buffer.from(JSON.stringify(canonicalize(value))));
+}
+
+export function policySurfaceArtifactsSha256(artifacts) {
+  return artifacts ? digestCanonical(artifacts) : null;
+}
+
+export function policySurfaceRealizationIdentity({ entry, packageVersion, artifacts = null }) {
+  const compiler = {
+    package: "@ts-defold/deherm",
+    version: packageVersion,
+    generator: entry.generator,
+    capabilities: [...entry.realizer.requiredCapabilities].sort()
+  };
+  const options = {
+    artifactsSha256: policySurfaceArtifactsSha256(artifacts)
+  };
+  const compilerIdentity = digestCanonical(compiler);
+  const optionsSha256 = digestCanonical(options);
+  const realizationId = digestCanonical({
+    schemaVersion: 1,
+    policyRoot: entry.policyRoot,
+    compilerIdentity,
+    optionsSha256
+  });
+  return Object.freeze({
+    schemaVersion: 1,
+    kind: "deherm.policy-surface-realization",
+    realizationId,
+    policyRoot: entry.policyRoot,
+    compilerIdentity,
+    optionsSha256,
+    compiler,
+    options
+  });
+}
+
+export function assertPolicySurfaceRealizationIdentity(realization, expected = {}) {
+  if (realization?.schemaVersion !== 1 || realization.kind !== "deherm.policy-surface-realization" ||
+      !/^[0-9a-f]{64}$/u.test(realization.policyRoot ?? "") ||
+      !/^[0-9a-f]{64}$/u.test(realization.compilerIdentity ?? "") ||
+      !/^[0-9a-f]{64}$/u.test(realization.optionsSha256 ?? "") ||
+      digestCanonical(realization.compiler) !== realization.compilerIdentity ||
+      digestCanonical(realization.options) !== realization.optionsSha256) {
+    throw new Error("Materialized surface has an invalid realization identity");
+  }
+  const realizationId = digestCanonical({
+    schemaVersion: 1,
+    policyRoot: realization.policyRoot,
+    compilerIdentity: realization.compilerIdentity,
+    optionsSha256: realization.optionsSha256
+  });
+  if (realization.realizationId !== realizationId ||
+      (expected.realizationId && expected.realizationId !== realizationId) ||
+      (expected.policyRoot && expected.policyRoot !== realization.policyRoot)) {
+    throw new Error("Materialized surface realization identity does not match its authenticated inputs");
+  }
+  return realization;
+}
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
@@ -512,6 +579,7 @@ export async function materializePolicySurface(resolvedPolicy, options = {}) {
     defoldRevision: revision,
     policyRoot: declaredPolicyRoot,
     compilerObjectSha256: resolvedPolicy.policy.subtrees?.["@compiler"] ?? null,
+    realization: options.realization ?? null,
     documents: Object.keys(documents).sort(),
     ir: Object.fromEntries(Object.entries(documents).sort(([left], [right]) => left.localeCompare(right))
       .map(([name, value]) => [name, { sha256: sha256(json(value)) }])),

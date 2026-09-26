@@ -1,11 +1,15 @@
 import assert from "node:assert/strict";
-import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
 import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../packages/compiler/src/api-policy.mjs";
-import { resolvePublishedPolicy } from "../packages/cli/src/policy-client.mjs";
+import {
+  policySurfaceRealizationIdentity,
+  publishPolicySurface,
+  resolvePublishedPolicy
+} from "../packages/cli/src/policy-client.mjs";
 
 const revision = "1".repeat(40);
 
@@ -92,6 +96,85 @@ function fixture({ tamper = false, entryRealizer, rootRealizer, defoldRevision =
   };
   return { index, fetchImpl, policyRoot, documentHash, unusedHash, requests, materializeImpl: false };
 }
+
+async function verifyFixtureSurface(root) {
+  const descriptor = JSON.parse(await readFile(path.join(root, "surface.json"), "utf8"));
+  return { ok: true, descriptor };
+}
+
+test("surface realization identity binds policy, compiler, and relevant options", () => {
+  const base = {
+    policyRoot: "e".repeat(64),
+    generator: `sha256:${"2".repeat(64)}`,
+    realizer: {
+      minimumPackageVersion: "0.0.0",
+      requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES]
+    }
+  };
+  const first = policySurfaceRealizationIdentity({ entry: base, packageVersion: "1.2.3" });
+  const reordered = policySurfaceRealizationIdentity({
+    entry: { ...base, realizer: { ...base.realizer, requiredCapabilities: [...base.realizer.requiredCapabilities].reverse() } },
+    packageVersion: "1.2.3"
+  });
+  assert.equal(first.realizationId, reordered.realizationId, "capability discovery order must not change identity");
+  assert.notEqual(first.realizationId, policySurfaceRealizationIdentity({
+    entry: { ...base, policyRoot: "f".repeat(64) }, packageVersion: "1.2.3"
+  }).realizationId);
+  assert.notEqual(first.realizationId, policySurfaceRealizationIdentity({
+    entry: base, packageVersion: "1.2.4"
+  }).realizationId);
+  assert.notEqual(first.realizationId, policySurfaceRealizationIdentity({
+    entry: base,
+    packageVersion: "1.2.3",
+    artifacts: { kind: "deherm.policy.artifacts", release: "next" }
+  }).realizationId);
+});
+
+test("immutable publication refuses a symlink winner and cleans a failed stage", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-policy-client-publish-safety-"));
+  const surfaceBase = path.join(root, "surfaces", revision);
+  const entry = {
+    policyRoot: "e".repeat(64),
+    generator: `sha256:${"2".repeat(64)}`,
+    realizer: { minimumPackageVersion: "0.0.0", requiredCapabilities: [...POLICY_REALIZER_CAPABILITIES] }
+  };
+  const realization = policySurfaceRealizationIdentity({ entry, packageVersion: "1.2.3" });
+  const parent = path.join(surfaceBase, "r");
+  const target = path.join(root, "outside");
+  await mkdir(target, { recursive: true });
+  await mkdir(parent, { recursive: true });
+  await symlink(target, path.join(parent, realization.realizationId.slice(0, 32)), "dir");
+  await assert.rejects(
+    publishPolicySurface({ entry }, {
+      revision,
+      realization,
+      surfaceBase,
+      surfaceBoundary: root,
+      materialize: async () => { throw new Error("must not materialize through a symlink"); },
+      artifacts: null
+    }),
+    /must not be a symlink/u
+  );
+
+  const cleanBase = path.join(root, "clean", "surfaces", revision);
+  await assert.rejects(
+    publishPolicySurface({ entry }, {
+      revision,
+      realization,
+      surfaceBase: cleanBase,
+      surfaceBoundary: root,
+      materialize: async (_policy, options) => {
+        await mkdir(options.outputRoot, { recursive: true });
+        await writeFile(path.join(options.outputRoot, "partial"), "partial\n");
+        throw new Error("synthetic materializer failure");
+      },
+      artifacts: null
+    }),
+    /synthetic materializer failure/u
+  );
+  assert.ok(!(await readdir(path.join(cleanBase, "r"))).some((name) => name.startsWith(".s-")),
+    "a failed materializer must not leave a staging directory");
+});
 
 test("cold policy resolution transfers only the authenticated realization closure", async () => {
   const cacheHome = await mkdtemp(path.join(tmpdir(), "deherm-policy-client-"));
@@ -224,27 +307,79 @@ test("shared authenticated evidence realizes two project caches offline and stay
   const source = fixture();
   const materializeImpl = async (_policy, options) => {
     const file = path.join(options.outputRoot, "surface.json");
-    const bytes = `${JSON.stringify({ kind: "fixture-surface", defoldRevision: options.revision })}\n`;
+    const bytes = `${JSON.stringify({
+      kind: "fixture-surface",
+      defoldRevision: options.revision,
+      policyRoot: options.realization.policyRoot,
+      realization: options.realization
+    })}\n`;
     const current = await readFile(file, "utf8").catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
     if (current === bytes) return { outputRoot: options.outputRoot, written: [] };
     await mkdir(options.outputRoot, { recursive: true });
     await writeFile(file, bytes);
     return { outputRoot: options.outputRoot, written: ["surface.json"] };
   };
-  const cold = await resolvePublishedPolicy(revision, { ...source, cacheHome, surfaceRoot: projectOne, materializeImpl });
+  const cold = await resolvePublishedPolicy(revision, {
+    ...source, cacheHome, surfaceRoot: projectOne, materializeImpl, verifySurfaceImpl: verifyFixtureSurface
+  });
   assert.deepEqual(cold.surface.written, ["surface.json"]);
   const offlineSource = {
     ...source,
     cacheHome,
     offline: true,
     fetchImpl: async () => { throw new Error("cross-project reuse attempted network I/O"); },
-    materializeImpl
+    materializeImpl,
+    verifySurfaceImpl: verifyFixtureSurface
   };
   const reused = await resolvePublishedPolicy(revision, { ...offlineSource, surfaceRoot: projectTwo });
-  assert.deepEqual(reused.transfer, { cacheHits: 5, cacheMisses: 0, cacheWrites: 0, transferBytes: 0 });
+  assert.deepEqual(reused.transfer, { cacheHits: 5, cacheMisses: 0, cacheWrites: 1, transferBytes: 0 });
   assert.deepEqual(reused.surface.written, ["surface.json"]);
   const idempotent = await resolvePublishedPolicy(revision, { ...offlineSource, surfaceRoot: projectTwo });
   assert.deepEqual(idempotent.surface.written, []);
+  assert.equal(idempotent.surface.outputRoot, reused.surface.outputRoot);
+  const pointer = JSON.parse(await readFile(path.join(projectTwo, "current.json"), "utf8"));
+  assert.equal(pointer.realizationId, reused.realization.realizationId);
+  assert.deepEqual(
+    (await readdir(path.join(projectTwo, "r"))).filter((name) => !name.startsWith(".s-")),
+    [reused.realization.realizationId.slice(0, 32)],
+    "one policy/compiler/options identity must publish one immutable realization directory"
+  );
+});
+
+test("a replaced policy publishes a new immutable realization and atomically moves only the pointer", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "deherm-policy-client-realizations-"));
+  const cacheHome = path.join(root, "shared");
+  const surfaceRoot = path.join(root, "project", ".deherm", "cache", "surfaces", revision);
+  const materializeImpl = async (_policy, options) => {
+    await mkdir(options.outputRoot, { recursive: true });
+    const descriptor = {
+      schemaVersion: 2,
+      kind: "deherm.materialized-defold-surface",
+      defoldRevision: options.revision,
+      policyRoot: options.realization.policyRoot,
+      realization: options.realization
+    };
+    await writeFile(path.join(options.outputRoot, "surface.json"), `${JSON.stringify(descriptor)}\n`);
+    return { outputRoot: options.outputRoot, descriptor, written: ["surface.json"] };
+  };
+
+  const first = await resolvePublishedPolicy(revision, {
+    ...fixture({ fixtureValue: "first" }), cacheHome, surfaceRoot, materializeImpl,
+    verifySurfaceImpl: verifyFixtureSurface
+  });
+  const second = await resolvePublishedPolicy(revision, {
+    ...fixture({ fixtureValue: "second" }), cacheHome, surfaceRoot, materializeImpl,
+    verifySurfaceImpl: verifyFixtureSurface
+  });
+  assert.notEqual(second.realization.realizationId, first.realization.realizationId);
+  assert.notEqual(second.surface.outputRoot, first.surface.outputRoot);
+  const pointer = JSON.parse(await readFile(path.join(surfaceRoot, "current.json"), "utf8"));
+  assert.equal(pointer.realizationId, second.realization.realizationId);
+  assert.deepEqual(
+    (await readdir(path.join(surfaceRoot, "r"))).sort(),
+    [first.realization.realizationId.slice(0, 32), second.realization.realizationId.slice(0, 32)].sort(),
+    "publishing a replacement must preserve the prior immutable realization"
+  );
 });
 
 test("an incompatible package version is rejected before the policy root is fetched", async () => {

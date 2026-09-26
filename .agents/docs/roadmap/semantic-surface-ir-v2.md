@@ -144,7 +144,7 @@ classify, emit, or faithfully report the selected revision.
 - [x] Reseal revision-abstracted toolchain facts against the policy root's
   `@toolchain` digest.
 - [x] Regenerate and compare lowering products from authenticated recipe input.
-- [ ] Key realized surfaces by policy root, compiler identity, and relevant
+- [x] Key realized surfaces by policy root, compiler identity, and relevant
   options; stage and atomically publish complete immutable directories.
 - [x] Add negative mutation tests for every completed class above.
 
@@ -152,8 +152,13 @@ Cache reopening now authenticates exact SDK and repository-output inventories
 and bytes, reseals revision-abstracted toolchain facts, and regenerates the
 lowering plan and sentinel from retained authenticated recipe facts. Tests also
 prove that self-consistently editing a local descriptor cannot bless any of
-those mutations. The remaining P0 item is immutable, atomic publication under
-the complete realization identity.
+those mutations. Realizations are keyed by policy root, package/compiler
+identity, capability set, and artifact options; a complete staged directory is
+atomically renamed before a revision-local pointer can select it. Replacing a
+policy or relevant option publishes a sibling and preserves the prior immutable
+realization. Rejected immutable directories are quarantined and rebuilt, dead
+staging directories are reclaimed, and readers recompute the full realization
+identity. P0 is complete.
 
 ## 1. Define canonical Surface IR v2
 

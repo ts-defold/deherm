@@ -1,12 +1,19 @@
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, readdir, symlink, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { materializePolicySurface } from "../packages/compiler/src/policy-surface-materializer.mjs";
-import { resolveDefoldSurface } from "../packages/cli/src/defold-surface.mjs";
+import {
+  materializePolicySurface,
+  policySurfaceRealizationIdentity
+} from "../packages/compiler/src/policy-surface-materializer.mjs";
+import {
+  resolveDefoldSurface,
+  verifyMaterializedSurfaceRoot
+} from "../packages/cli/src/defold-surface.mjs";
+import { publishPolicySurface } from "../packages/cli/src/policy-client.mjs";
 import {
   BINDING_LOWERING_RECIPE_CAPABILITY,
   BINDING_LOWERING_RECIPE_EMITTER,
@@ -272,6 +279,106 @@ test("authenticated policy materializes the complete generated SDK without a Def
   });
   assert.ok(refusedPlanTamper.blocker, "self-consistent lowering output must remain bound to authenticated recipe facts");
   assert.match(refusedPlanTamper.searched[0].reason, /not derived from its authenticated recipe/u);
+
+  const pointerCacheRoot = path.join(cacheRoot, "pointer-layout");
+  const realization = policySurfaceRealizationIdentity({
+    entry: {
+      policyRoot: policy.entry.policyRoot,
+      generator: policy.policy.generator,
+      realizer: policy.policy.realizer
+    },
+    packageVersion: "0.0.0"
+  });
+  const realizationId = realization.realizationId;
+  const immutableRoot = path.join(pointerCacheRoot, "surfaces", policy.revision, "r", realizationId.slice(0, 32));
+  await materializePolicySurface(policy, { outputRoot: immutableRoot, realization });
+  await writeFile(path.join(pointerCacheRoot, "surfaces", policy.revision, "current.json"), `${JSON.stringify({
+    schemaVersion: 1,
+    kind: "deherm.materialized-defold-surface-pointer",
+    defoldRevision: policy.revision,
+    realizationId,
+    policyRoot: policy.entry.policyRoot
+  }, null, 2)}\n`);
+  const resolvedImmutable = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: pointerCacheRoot }
+  });
+  assert.equal(resolvedImmutable.layer, "user-cache");
+  assert.equal(resolvedImmutable.descriptor.realization.realizationId, realizationId);
+  const pointerPath = path.join(pointerCacheRoot, "surfaces", policy.revision, "current.json");
+  const validPointer = JSON.parse(await readFile(pointerPath, "utf8"));
+  await writeFile(pointerPath, `${JSON.stringify({
+    ...validPointer,
+    realizationId: `${realizationId.slice(0, 32)}${"f".repeat(32)}`
+  }, null, 2)}\n`);
+  const refusedPointerDisagreement = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: pointerCacheRoot }
+  });
+  assert.ok(refusedPointerDisagreement.blocker, "a pointer may not select a same-prefix foreign realization");
+  assert.match(refusedPointerDisagreement.searched[0].reason, /pointer and descriptor identities disagree/u);
+  await writeFile(pointerPath, `${JSON.stringify(validPointer, null, 2)}\n`);
+  const immutableDescriptorPath = path.join(immutableRoot, "surface.json");
+  const forgedRealizationDescriptor = JSON.parse(await readFile(immutableDescriptorPath, "utf8"));
+  forgedRealizationDescriptor.realization.compiler.version = "forged";
+  await writeFile(immutableDescriptorPath, `${JSON.stringify(forgedRealizationDescriptor, null, 2)}\n`);
+  const refusedForgedIdentity = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: pointerCacheRoot }
+  });
+  assert.ok(refusedForgedIdentity.blocker, "a locally self-contradictory realization identity must be refused");
+  assert.match(refusedForgedIdentity.searched[0].reason, /invalid realization identity/u);
+  await writeFile(pointerPath, "{not-json\n");
+  const corruptPointerFallback = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: pointerCacheRoot },
+    packageRoot: repositoryRoot
+  });
+  assert.equal(corruptPointerFallback.layer, "repository-checkout",
+    "a corrupt cache pointer must fail closed locally and permit the repository fallback");
+
+  const publicationBase = path.join(cacheRoot, "real-publication", "surfaces", policy.revision);
+  const publishedRealization = policySurfaceRealizationIdentity({
+    entry: {
+      policyRoot: policy.entry.policyRoot,
+      generator: policy.policy.generator,
+      realizer: policy.policy.realizer
+    },
+    packageVersion: "0.0.0"
+  });
+  const publicationOptions = {
+    revision: policy.revision,
+    realization: publishedRealization,
+    surfaceBase: publicationBase,
+    surfaceBoundary: cacheRoot,
+    materialize: materializePolicySurface,
+    artifacts: null
+  };
+  const publicationParent = path.join(publicationBase, "r");
+  const abandonedStage = path.join(
+    publicationParent,
+    `.s-${publishedRealization.realizationId.slice(0, 16)}-2147483647-${"0".repeat(12)}`
+  );
+  await mkdir(abandonedStage, { recursive: true });
+  const staleTime = new Date(Date.now() - 7 * 60 * 60 * 1_000);
+  await utimes(abandonedStage, staleTime, staleTime);
+  const concurrent = await Promise.all([
+    publishPolicySurface(policy, publicationOptions),
+    publishPolicySurface(policy, publicationOptions)
+  ]);
+  assert.equal(concurrent.filter((result) => result.reused).length, 1,
+    "one of two concurrent publishers must verify and reuse the immutable winner");
+  assert.ok(!(await readdir(publicationParent)).some((name) => name.startsWith(".s-")),
+    "successful publication must remove its own and abandoned dead-process staging directories");
+  const publishedRoot = concurrent[0].outputRoot;
+  const publishedSdk = path.join(publishedRoot, "sdk", "generated", "script", "runtime.ts");
+  await writeFile(publishedSdk, `${await readFile(publishedSdk, "utf8")}\n// corrupt immutable cache\n`);
+  const repaired = await publishPolicySurface(policy, publicationOptions);
+  assert.equal(repaired.reused, undefined, "a rejected immutable directory must be rebuilt, not reused");
+  assert.ok((await readdir(publicationParent)).some((name) => name.startsWith(".bad-")),
+    "a rejected immutable directory must be quarantined rather than overwritten or deleted");
+  const verifiedRepair = await verifyMaterializedSurfaceRoot(
+    repaired.outputRoot,
+    policy.revision,
+    publishedRealization
+  );
+  assert.ok(verifiedRepair.ok, verifiedRepair.error);
 });
 
 test("policy materialization fails closed when the dmSDK catalog exceeds the package frame", async () => {

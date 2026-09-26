@@ -3,18 +3,28 @@
 // output is written to a separate, explicitly selected surface root.
 
 import { randomBytes } from "node:crypto";
-import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { lstat, mkdir, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { hashBytes, POLICY_REALIZER_CAPABILITIES } from "../../compiler/src/api-policy.mjs";
-import { materializePolicySurface } from "../../compiler/src/policy-surface-materializer.mjs";
+import {
+  assertPolicySurfaceRealizationIdentity,
+  materializePolicySurface,
+  policySurfaceRealizationIdentity
+} from "../../compiler/src/policy-surface-materializer.mjs";
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
-import { defoldSurfaceCacheHome } from "./defold-surface.mjs";
+import {
+  defoldSurfaceCacheHome,
+  verifyMaterializedSurfaceRoot
+} from "./defold-surface.mjs";
 
 const defaultSiteConfig = new URL("../../bindings/policy-site.json", import.meta.url);
 const DIGEST_PATTERN = /^[0-9a-f]{64}$/u;
 const DEFAULT_FETCH_RETRY_DELAYS_MS = Object.freeze([250, 500, 1_000, 2_000, 4_000, 8_000]);
 const MAX_RETRY_AFTER_MS = 8_000;
+const ABANDONED_STAGE_MIN_AGE_MS = 6 * 60 * 60 * 1_000;
+
+export { policySurfaceRealizationIdentity };
 
 export function policyLocatorFromSiteConfig(config) {
   if (config?.schemaVersion !== 1 || typeof config.baseUrl !== "string" ||
@@ -149,6 +159,7 @@ async function assertCompatibleRealizer(revision, realizer, options) {
       upgradePrompt()
     );
   }
+  return packageVersion;
 }
 
 async function atomicWrite(file, bytes) {
@@ -193,6 +204,99 @@ function retryAfterMilliseconds(response) {
   if (/^\d+$/u.test(value)) return Math.min(MAX_RETRY_AFTER_MS, Number(value) * 1_000);
   const date = Date.parse(value);
   return Number.isFinite(date) ? Math.min(MAX_RETRY_AFTER_MS, Math.max(0, date - Date.now())) : null;
+}
+
+function processIsAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch (error) {
+    return error?.code === "EPERM";
+  }
+}
+
+async function reapAbandonedRealizationStages(parent) {
+  await mkdir(parent, { recursive: true });
+  for (const entry of await readdir(parent, { withFileTypes: true })) {
+    const match = /^\.s-[0-9a-f]{16}-(\d+)-[0-9a-f]{12}$/u.exec(entry.name);
+    if (!match || processIsAlive(Number(match[1]))) continue;
+    const stage = path.join(parent, entry.name);
+    const information = await lstat(stage).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+    if (!information || Date.now() - information.mtimeMs < ABANDONED_STAGE_MIN_AGE_MS) continue;
+    await rm(stage, { recursive: true, force: true });
+  }
+}
+
+export async function publishPolicySurface(resolvedPolicy, options) {
+  const { revision, realization, surfaceBase, materialize, artifacts } = options;
+  const verifySurface = options.verifySurface ?? verifyMaterializedSurfaceRoot;
+  assertPolicySurfaceRealizationIdentity(realization, {
+    realizationId: realization.realizationId,
+    policyRoot: resolvedPolicy.entry.policyRoot
+  });
+  const parent = path.join(surfaceBase, "r");
+  const leaf = realization.realizationId.slice(0, 32);
+  const realizationRoot = path.join(parent, leaf);
+  await reapAbandonedRealizationStages(parent);
+
+  const existing = await lstat(realizationRoot).catch((error) => error?.code === "ENOENT" ? null : Promise.reject(error));
+  if (existing?.isSymbolicLink()) throw new Error(`Immutable materialized surface must not be a symlink: ${realizationRoot}`);
+  if (existing) {
+    const verified = await verifySurface(realizationRoot, revision, realization);
+    if (verified.ok) {
+      return {
+        revision,
+        outputRoot: realizationRoot,
+        descriptor: verified.descriptor,
+        written: [],
+        reused: true
+      };
+    }
+    const quarantine = path.join(
+      parent,
+      `.bad-${leaf}-${process.pid}-${randomBytes(6).toString("hex")}`
+    );
+    try {
+      await rename(realizationRoot, quarantine);
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+    }
+  }
+
+  const stagingRoot = path.join(
+    parent,
+    `.s-${realization.realizationId.slice(0, 16)}-${process.pid}-${randomBytes(6).toString("hex")}`
+  );
+  try {
+    let surface = await materialize(resolvedPolicy, {
+      revision,
+      outputRoot: stagingRoot,
+      outputBoundary: path.resolve(options.surfaceBoundary),
+      artifacts,
+      realization
+    });
+    await mkdir(parent, { recursive: true });
+    try {
+      await rename(stagingRoot, realizationRoot);
+      surface = { ...surface, outputRoot: realizationRoot };
+    } catch (error) {
+      const winnerStatus = await lstat(realizationRoot)
+        .catch((readError) => readError?.code === "ENOENT" ? null : Promise.reject(readError));
+      if (!winnerStatus || winnerStatus.isSymbolicLink()) throw error;
+      const winner = await verifySurface(realizationRoot, revision, realization);
+      if (!winner.ok) throw new Error(`Concurrent materialized-surface winner failed verification: ${winner.error}`);
+      surface = {
+        revision,
+        outputRoot: realizationRoot,
+        descriptor: winner.descriptor,
+        written: [],
+        reused: true
+      };
+    }
+    return surface;
+  } finally {
+    await rm(stagingRoot, { recursive: true, force: true });
+  }
 }
 
 async function fetchBytes(url, fetchImpl, options = {}) {
@@ -337,7 +441,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     }
   });
   const entry = entryResult.value;
-  await assertCompatibleRealizer(revision, entry.realizer, options);
+  const packageVersion = await assertCompatibleRealizer(revision, entry.realizer, options);
   const shipped = index.entries?.find((candidate) => candidate.defoldRevision === revision);
   if (shipped && (shipped.policyRoot !== entry.policyRoot || shipped.generator !== entry.generator ||
       !sameRealizer(shipped.realizer, entry.realizer))) {
@@ -433,16 +537,31 @@ export async function resolvePublishedPolicy(revision, options = {}) {
   // smaller realization-closure inventory introduced by schema 2.
   if (!priorReceipt && await atomicWrite(receiptFile, receiptBytes)) transfer.cacheWrites += 1;
 
-  const surfaceRoot = path.resolve(options.surfaceRoot ?? path.join(cacheHome, "surfaces", revision));
+  const surfaceBase = path.resolve(options.surfaceRoot ?? path.join(cacheHome, "surfaces", revision));
   const materialize = options.materializeImpl === false ? null : options.materializeImpl ?? materializePolicySurface;
-  const surface = materialize
-    ? await materialize({ revision, entry, policy, objects }, {
-        revision,
-        outputRoot: surfaceRoot,
-        outputBoundary: path.resolve(options.surfaceBoundary ?? cacheHome),
-        artifacts
-      })
-    : null;
+  const realization = policySurfaceRealizationIdentity({ entry, packageVersion, artifacts });
+  let surface = null;
+  if (materialize) {
+    surface = await publishPolicySurface({ revision, entry, policy, objects }, {
+      revision,
+      realization,
+      surfaceBase,
+      surfaceBoundary: path.resolve(options.surfaceBoundary ?? cacheHome),
+      materialize,
+      artifacts,
+      verifySurface: options.verifySurfaceImpl ?? verifyMaterializedSurfaceRoot
+    });
+    const pointer = {
+      schemaVersion: 1,
+      kind: "deherm.materialized-defold-surface-pointer",
+      defoldRevision: revision,
+      realizationId: realization.realizationId,
+      policyRoot: realization.policyRoot
+    };
+    if (await atomicReplace(path.join(surfaceBase, "current.json"), Buffer.from(`${JSON.stringify(pointer, null, 2)}\n`))) {
+      transfer.cacheWrites += 1;
+    }
+  }
 
   return {
     revision,
@@ -451,6 +570,7 @@ export async function resolvePublishedPolicy(revision, options = {}) {
     objects,
     artifacts,
     cacheRoot,
+    realization,
     receipt: receiptFile,
     surface,
     transfer,

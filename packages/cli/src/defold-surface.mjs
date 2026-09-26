@@ -29,7 +29,9 @@ import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { DEFOLD_REVISION_TOKEN, sealObject } from "../../compiler/src/api-policy.mjs";
 import { BINDING_LOWERING_RECIPE_NAME } from "../../compiler/src/binding-lowering-plan-recipe.mjs";
 import {
+  assertPolicySurfaceRealizationIdentity,
   manifestTreeSha256,
+  policySurfaceArtifactsSha256,
   realizeCompilerDocuments
 } from "../../compiler/src/policy-surface-materializer.mjs";
 
@@ -173,6 +175,7 @@ function cacheSurfaceLayer(layer, cacheHome, revision) {
   return {
     layer,
     root,
+    pointer: path.join(root, "current.json"),
     irRoot: path.join(root, "ir"),
     sdkRoot: path.join(root, "sdk"),
     repositoryRoot: path.join(root, "repository"),
@@ -205,6 +208,7 @@ export function defoldSurfaceSearchPath(revision, options = {}) {
     layers.push({
       layer: "project-cache",
       root,
+      pointer: path.join(root, "current.json"),
       irRoot: path.join(root, "ir"),
       sdkRoot: path.join(root, "sdk"),
       repositoryRoot: path.join(root, "repository"),
@@ -226,7 +230,37 @@ export function defoldSurfaceSearchPath(revision, options = {}) {
   return layers;
 }
 
+async function resolveRealizedCandidate(candidate, revision) {
+  if (!candidate.pointer) return candidate;
+  const source = await readFile(candidate.pointer, "utf8").catch((error) => {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  });
+  if (!source) return candidate;
+  const pointer = JSON.parse(source);
+  if (pointer.schemaVersion !== 1 || pointer.kind !== "deherm.materialized-defold-surface-pointer" ||
+      pointer.defoldRevision !== revision || !/^[0-9a-f]{64}$/u.test(pointer.realizationId ?? "") ||
+      !/^[0-9a-f]{64}$/u.test(pointer.policyRoot ?? "")) {
+    throw new Error("invalid materialized surface pointer");
+  }
+  const root = path.join(candidate.root, "r", pointer.realizationId.slice(0, 32));
+  return {
+    ...candidate,
+    root,
+    irRoot: path.join(root, "ir"),
+    sdkRoot: path.join(root, "sdk"),
+    repositoryRoot: path.join(root, "repository"),
+    descriptor: path.join(root, "surface.json"),
+    expectedRealization: pointer
+  };
+}
+
 async function layerProvides(candidate, revision) {
+  try {
+    candidate = await resolveRealizedCandidate(candidate, revision);
+  } catch (error) {
+    return { ok: false, missing: [], error: error.message };
+  }
   const missing = [];
   let descriptor = null;
   let toolchain = null;
@@ -260,6 +294,21 @@ async function layerProvides(candidate, revision) {
     }
     if (descriptor.schemaVersion !== 2 || descriptor.kind !== "deherm.materialized-defold-surface" || descriptor.defoldRevision !== revision) {
       return { ok: false, missing: [], revision: descriptor.defoldRevision, error: "invalid surface descriptor" };
+    }
+    if (candidate.expectedRealization &&
+        (descriptor.policyRoot !== candidate.expectedRealization.policyRoot ||
+         descriptor.realization?.realizationId !== candidate.expectedRealization.realizationId)) {
+      return { ok: false, missing: [], error: "materialized surface pointer and descriptor identities disagree" };
+    }
+    if (candidate.expectedRealization) {
+      try {
+        assertPolicySurfaceRealizationIdentity(descriptor.realization, candidate.expectedRealization);
+        if (descriptor.realization.policyRoot !== descriptor.policyRoot) {
+          return { ok: false, missing: [], error: "materialized surface realization does not name its descriptor policy root" };
+        }
+      } catch (error) {
+        return { ok: false, missing: [], error: error.message };
+      }
     }
     if (!/^[0-9a-f]{64}$/u.test(descriptor.policyRoot ?? "") ||
         !/^[0-9a-f]{64}$/u.test(descriptor.compilerObjectSha256 ?? "")) {
@@ -408,6 +457,10 @@ async function layerProvides(candidate, revision) {
         return { ok: false, missing: ["defold-artifacts.json"], error: error.message };
       }
     }
+    if (candidate.expectedRealization &&
+        policySurfaceArtifactsSha256(artifacts) !== descriptor.realization.options.artifactsSha256) {
+      return { ok: false, missing: [], error: "surface artifact mapping does not match its realization identity" };
+    }
   }
   let declared;
   try {
@@ -435,6 +488,18 @@ async function layerProvides(candidate, revision) {
     }
   }
   return { ok: true, missing: [], descriptor, toolchain, artifacts };
+}
+
+export async function verifyMaterializedSurfaceRoot(root, revision, expectedRealization) {
+  return layerProvides({
+    layer: "materialized-cache",
+    root,
+    irRoot: path.join(root, "ir"),
+    sdkRoot: path.join(root, "sdk"),
+    repositoryRoot: path.join(root, "repository"),
+    descriptor: path.join(root, "surface.json"),
+    expectedRealization
+  }, revision);
 }
 
 export class DefoldSurfaceError extends Error {

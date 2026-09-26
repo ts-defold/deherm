@@ -183,11 +183,34 @@ lowering products. The focused materializer suite passes 4/4 and the broader
 policy, hydration, revision, package-smoke, and materialization suite passes
 100/100.
 
-The next boundary is immutable publication: realized directories must be keyed
-by policy root, package compiler identity, and realization options, staged in a
-temporary sibling, then atomically renamed. Until that is complete, reopening
-continues to perform full content authentication rather than trusting directory
-placement alone.
+Realized surfaces are immutable directories below
+`surfaces/<revision>/r/<realization-prefix>`. The 32-hex path component is a
+local 128-bit addressing prefix; the descriptor retains the full 256-bit
+identity, and readers recompute and compare that full identity before accepting
+the directory. The shorter internal name keeps the measured default Windows
+surface path below the classic path limit without weakening authenticated
+identity checks.
+
+The realization identity binds the authenticated policy root, policy generator
+identity, installed package version, required capability set, and artifact
+options. Materialization writes a unique short staging sibling, then atomically
+renames the complete directory; only afterward does an atomically replaced
+`current.json` select it for that revision. Concurrent writers authenticate and
+reuse an identical winner, but never overwrite it. Dead-process staging
+directories older than six hours are reclaimed across identities before a
+retry. The age guard prevents a PID-namespace disagreement on a shared cache
+from deleting a live writer. A replacement policy or artifact mapping publishes
+a new sibling while the prior realization remains intact.
+
+Cache reopening still performs full content authentication: immutable placement
+prevents mixed publication, but is not treated as proof that local bytes were
+not corrupted. If an existing immutable directory fails that same verifier, it
+is atomically quarantined under `.bad-*` and rebuilt through staging. This makes
+`deherm policy` a recovery path again without ever repairing or deleting an
+immutable directory in place. The real-content test concurrently publishes one
+policy through both writers, verifies the winning directory, reclaims an
+abandoned stage, corrupts a generated SDK file, and proves the retry quarantines
+and reconstructs the authenticated surface.
 
 ## Compiler document inventory
 
