@@ -43,7 +43,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const cacheRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-surface-test-"));
   const outputRoot = path.join(cacheRoot, "surfaces", policy.revision);
   const first = await materializePolicySurface(policy, { outputRoot });
-  assert.equal(first.descriptor.documents.length, 21);
+  assert.equal(first.descriptor.documents.length, 22);
   assert.equal(first.descriptor.schemaVersion, 2);
   assert.match(first.descriptor.policyRoot, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.compilerObjectSha256, /^[0-9a-f]{64}$/u);
@@ -76,6 +76,8 @@ test("authenticated policy materializes the complete generated SDK without a Def
   const documentEntries = compiler.value.documents.entries;
   assert.ok(documentEntries[BINDING_LOWERING_RECIPE_NAME],
     "policy must carry compact lowering recipe facts");
+  assert.ok(first.descriptor.documents.includes(BINDING_LOWERING_RECIPE_NAME),
+    "materialized surfaces must retain authenticated lowering recipe facts for cache verification");
   assert.equal(documentEntries["defold-binding-lowering-plan.json"], undefined,
     "policy must not copy the derived lowering plan");
   assert.equal(documentEntries["defold-binding-lowering-plan.sentinel.json"], undefined,
@@ -201,6 +203,75 @@ test("authenticated policy materializes the complete generated SDK without a Def
   });
   assert.ok(refusedUnsafePath.blocker, "descriptor paths may not escape the materialized surface");
   assert.match(refusedUnsafePath.searched[0].reason, /unsafe path/u);
+
+  await materializePolicySurface(policy, { outputRoot });
+  const sdkRelative = "script/runtime.ts";
+  const sdkPath = path.join(outputRoot, "sdk", "generated", sdkRelative);
+  const forgedSdk = `${await readFile(sdkPath, "utf8")}\n// forged cache source\n`;
+  await writeFile(sdkPath, forgedSdk);
+  const forgedSdkDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  forgedSdkDescriptor.sdk[sdkRelative].sha256 = sha256(forgedSdk);
+  forgedSdkDescriptor.sdkTreeSha256 = "1".repeat(64);
+  await writeFile(descriptorPath, `${JSON.stringify(forgedSdkDescriptor, null, 2)}\n`);
+  const refusedSdkTamper = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refusedSdkTamper.blocker, "a descriptor must not bless modified SDK source");
+  assert.match(refusedSdkTamper.searched[0].reason, /SDK descriptor contradicts|SDK content is not authenticated/u);
+
+  await materializePolicySurface(policy, { outputRoot });
+  const outputRelative = "packages/static-hermes/src/generated/script-vmath.ts";
+  const outputPath = path.join(outputRoot, "repository", outputRelative);
+  const forgedOutput = `${await readFile(outputPath, "utf8")}\n// forged cache output\n`;
+  await writeFile(outputPath, forgedOutput);
+  const forgedOutputDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  forgedOutputDescriptor.outputs[outputRelative].sha256 = sha256(forgedOutput);
+  forgedOutputDescriptor.outputTreeSha256 = "2".repeat(64);
+  await writeFile(descriptorPath, `${JSON.stringify(forgedOutputDescriptor, null, 2)}\n`);
+  const refusedOutputTamper = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refusedOutputTamper.blocker, "a descriptor must not bless modified repository output");
+  assert.match(refusedOutputTamper.searched[0].reason, /repository output descriptor contradicts|repository output content is not authenticated/u);
+
+  await materializePolicySurface(policy, { outputRoot });
+  const toolchainPath = path.join(outputRoot, "ir", "defold-toolchain.json");
+  const forgedToolchain = JSON.parse(await readFile(toolchainPath, "utf8"));
+  forgedToolchain.pins.EMSCRIPTEN_VERSION_STR = "forged";
+  const forgedToolchainSource = `${JSON.stringify(forgedToolchain, null, 2)}\n`;
+  await writeFile(toolchainPath, forgedToolchainSource);
+  const forgedToolchainDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  forgedToolchainDescriptor.toolchainSha256 = sha256(forgedToolchainSource);
+  await writeFile(descriptorPath, `${JSON.stringify(forgedToolchainDescriptor, null, 2)}\n`);
+  const refusedToolchainTamper = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refusedToolchainTamper.blocker, "a descriptor must not bless modified toolchain facts");
+  assert.match(refusedToolchainTamper.searched[0].reason, /toolchain is not authenticated by policy/u);
+
+  await materializePolicySurface(policy, { outputRoot });
+  const planPath = path.join(outputRoot, "ir", "defold-binding-lowering-plan.json");
+  const forgedPlan = JSON.parse(await readFile(planPath, "utf8"));
+  forgedPlan.forged = true;
+  const { planSha256: _oldPlanSha256, ...forgedPlanBody } = forgedPlan;
+  forgedPlan.planSha256 = sha256(JSON.stringify(forgedPlanBody));
+  const forgedPlanSource = `${JSON.stringify(forgedPlan, null, 2)}\n`;
+  await writeFile(planPath, forgedPlanSource);
+  const forgedSentinel = JSON.parse(await readFile(sentinelPath, "utf8"));
+  forgedSentinel.outputBytes = Buffer.byteLength(forgedPlanSource);
+  forgedSentinel.outputSha256 = sha256(forgedPlanSource);
+  forgedSentinel.planSha256 = forgedPlan.planSha256;
+  const forgedSentinelSource = `${JSON.stringify(forgedSentinel, null, 2)}\n`;
+  await writeFile(sentinelPath, forgedSentinelSource);
+  const forgedPlanDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
+  forgedPlanDescriptor.ir["defold-binding-lowering-plan.json"].sha256 = sha256(forgedPlanSource);
+  forgedPlanDescriptor.ir["defold-binding-lowering-plan.sentinel.json"].sha256 = sha256(forgedSentinelSource);
+  await writeFile(descriptorPath, `${JSON.stringify(forgedPlanDescriptor, null, 2)}\n`);
+  const refusedPlanTamper = await resolveDefoldSurface(policy.revision, {
+    env: { DEHERM_CACHE_HOME: cacheRoot }
+  });
+  assert.ok(refusedPlanTamper.blocker, "self-consistent lowering output must remain bound to authenticated recipe facts");
+  assert.match(refusedPlanTamper.searched[0].reason, /not derived from its authenticated recipe/u);
 });
 
 test("policy materialization fails closed when the dmSDK catalog exceeds the package frame", async () => {

@@ -139,14 +139,21 @@ classify, emit, or faithfully report the selected revision.
 
 ## 0. Repair the current authenticated cache boundary
 
-- [ ] Verify cached SDK and repository-output bytes against authenticated
+- [x] Verify cached SDK and repository-output bytes against authenticated
   manifest entries rather than existence plus mutable descriptor hashes.
-- [ ] Reseal revision-abstracted toolchain facts against the policy root's
+- [x] Reseal revision-abstracted toolchain facts against the policy root's
   `@toolchain` digest.
-- [ ] Regenerate and compare lowering products from authenticated recipe input.
+- [x] Regenerate and compare lowering products from authenticated recipe input.
 - [ ] Key realized surfaces by policy root, compiler identity, and relevant
   options; stage and atomically publish complete immutable directories.
-- [ ] Add negative mutation tests for every class above.
+- [x] Add negative mutation tests for every completed class above.
+
+Cache reopening now authenticates exact SDK and repository-output inventories
+and bytes, reseals revision-abstracted toolchain facts, and regenerates the
+lowering plan and sentinel from retained authenticated recipe facts. Tests also
+prove that self-consistently editing a local descriptor cannot bless any of
+those mutations. The remaining P0 item is immutable, atomic publication under
+the complete realization identity.
 
 ## 1. Define canonical Surface IR v2
 

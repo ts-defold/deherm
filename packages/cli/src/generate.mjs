@@ -1377,10 +1377,28 @@ async function coreSdkForRevision(requestedRevision, options = {}) {
   let unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
   if (shouldResolvePublishedPolicy(unresolved, options)) {
     const { readPolicyLocator, resolvePublishedPolicy } = await import("./policy-client.mjs");
-    await resolvePublishedPolicy(requestedRevision, {
-      index: await readPolicyLocator(),
-      env: options.env
-    });
+    try {
+      await resolvePublishedPolicy(requestedRevision, {
+        index: await readPolicyLocator(),
+        env: options.env
+      });
+    } catch (error) {
+      // A cache miss may still be recoverable from an authenticated published
+      // policy, including in an offline session whose policy objects were
+      // fetched earlier. If that recovery is unavailable, preserve the typed
+      // surface blocker as the public CLI contract instead of leaking the
+      // policy client's transport/cache implementation detail.
+      if ((options.env ?? process.env).DEHERM_OFFLINE === "1" && unresolved.blocker) {
+        assertResolvedDefoldSurface({
+          ...unresolved,
+          blocker: {
+            ...unresolved.blocker,
+            message: `${unresolved.blocker.message}\nAuthenticated policy cache lookup also failed: ${error.message}`
+          }
+        });
+      }
+      throw error;
+    }
     unresolved = await resolveDefoldSurface(requestedRevision, surfaceOptions);
   }
   const surface = assertResolvedDefoldSurface(unresolved);

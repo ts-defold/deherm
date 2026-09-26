@@ -86,7 +86,7 @@ function json(value) {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
-function manifestTreeSha256(entries) {
+export function manifestTreeSha256(entries) {
   return sha256(JSON.stringify(Object.entries(entries)
     .sort(([left], [right]) => left.localeCompare(right))
     .map(([name, value]) => [name, value.sha256])));
@@ -332,7 +332,7 @@ async function writeStable(file, source, boundary) {
   return true;
 }
 
-async function realizeCompilerDocuments(input) {
+export async function realizeCompilerDocuments(input) {
   const documents = structuredClone(input);
   const planName = "defold-binding-lowering-plan.json";
   const sentinelName = "defold-binding-lowering-plan.sentinel.json";
@@ -340,7 +340,6 @@ async function realizeCompilerDocuments(input) {
   if (recipeFacts) {
     const emitted = emitBindingLoweringPlan(recipeFacts);
     const emitterSource = await readFile(new URL("./binding-lowering-plan-recipe.mjs", import.meta.url));
-    delete documents[BINDING_LOWERING_RECIPE_NAME];
     documents[planName] = emitted.plan;
     documents[sentinelName] = emitBindingLoweringPlanSentinel(recipeFacts, emitted, emitterSource);
     return documents;

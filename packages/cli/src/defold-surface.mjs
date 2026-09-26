@@ -21,12 +21,17 @@
 // mismatch resolves down to the leaf that actually moved.
 
 import { createHash } from "node:crypto";
-import { readFile, stat } from "node:fs/promises";
+import { lstat, readFile, readdir, stat } from "node:fs/promises";
 import { homedir } from "node:os";
 import path from "node:path";
 
 import { DEFOLD_REVISION_PATTERN } from "./defold-revision.mjs";
 import { DEFOLD_REVISION_TOKEN, sealObject } from "../../compiler/src/api-policy.mjs";
+import { BINDING_LOWERING_RECIPE_NAME } from "../../compiler/src/binding-lowering-plan-recipe.mjs";
+import {
+  manifestTreeSha256,
+  realizeCompilerDocuments
+} from "../../compiler/src/policy-surface-materializer.mjs";
 
 // Every file a surface layer must provide, by the key the generator uses for it.
 // `ir` files are the version-specific binding IR; `sdk` is the generated
@@ -73,6 +78,63 @@ function canonical(value) {
 
 function digestOf(value) {
   return sha256(JSON.stringify(canonical(value)));
+}
+
+function json(value) {
+  return `${JSON.stringify(value, null, 2)}\n`;
+}
+
+function sameKeys(left, right) {
+  return JSON.stringify(Object.keys(left ?? {}).sort()) === JSON.stringify(Object.keys(right ?? {}).sort());
+}
+
+function compareCodeUnits(left, right) {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
+async function relativeRegularFiles(root, relative = "") {
+  const directory = path.join(root, relative);
+  const entries = await readdir(directory, { withFileTypes: true });
+  entries.sort((left, right) => compareCodeUnits(left.name, right.name));
+  const files = [];
+  for (const entry of entries) {
+    const child = relative ? path.join(relative, entry.name) : entry.name;
+    const absolute = path.join(root, child);
+    const information = await lstat(absolute);
+    if (information.isSymbolicLink()) throw new Error(`surface contains symbolic link ${child}`);
+    if (information.isDirectory()) files.push(...await relativeRegularFiles(root, child));
+    else if (information.isFile()) files.push(child.split(path.sep).join("/"));
+    else throw new Error(`surface contains unsupported filesystem entry ${child}`);
+  }
+  return files;
+}
+
+async function verifyManifestTree({ root, manifest, descriptor, revision, label, includeRecipe = false }) {
+  if (!manifest || typeof manifest !== "object" || Array.isArray(manifest) ||
+      !descriptor || typeof descriptor !== "object" || Array.isArray(descriptor) ||
+      !sameKeys(manifest, descriptor)) {
+    throw new Error(`${label} inventory does not match the authenticated compiler manifest`);
+  }
+  const actualFiles = (await relativeRegularFiles(root)).sort(compareCodeUnits);
+  const expectedFiles = Object.keys(manifest).sort(compareCodeUnits);
+  if (JSON.stringify(actualFiles) !== JSON.stringify(expectedFiles)) {
+    throw new Error(`${label} filesystem inventory does not match the authenticated compiler manifest`);
+  }
+  for (const relative of expectedFiles) {
+    if (!safeRelativePath(relative)) throw new Error(`${label} record has an unsafe path: ${relative}`);
+    const expected = manifest[relative];
+    const described = descriptor[relative];
+    if (!/^[0-9a-f]{64}$/u.test(expected?.sha256 ?? "") || described?.sha256 !== expected.sha256 ||
+        described?.mode !== expected.mode || (includeRecipe && described?.recipe !== expected.recipe)) {
+      throw new Error(`${label} descriptor contradicts the authenticated manifest for ${relative}`);
+    }
+    const source = await readFile(path.join(root, relative), "utf8");
+    const canonicalSource = source.split(revision).join(DEFOLD_REVISION_TOKEN);
+    if (sha256(canonicalSource) !== expected.sha256) {
+      throw new Error(`${label} content is not authenticated by policy for ${relative}`);
+    }
+  }
+  return manifestTreeSha256(manifest);
 }
 
 export function defoldSurfaceCacheHome(env = process.env, platform = process.platform, userHome = homedir()) {
@@ -169,6 +231,8 @@ async function layerProvides(candidate, revision) {
   let descriptor = null;
   let toolchain = null;
   let artifacts = null;
+  let authenticatedPolicy = null;
+  let authenticatedCompiler = null;
   if (candidate.repositoryMarker) {
     try {
       const information = await stat(candidate.repositoryMarker);
@@ -206,16 +270,15 @@ async function layerProvides(candidate, revision) {
       if (sha256(policyBytes) !== descriptor.policyRoot) {
         return { ok: false, missing: [], error: "surface policy root digest mismatch" };
       }
-      const policy = JSON.parse(policyBytes);
-      if (policy.subtrees?.["@compiler"] !== descriptor.compilerObjectSha256) {
+      authenticatedPolicy = JSON.parse(policyBytes);
+      if (authenticatedPolicy.subtrees?.["@compiler"] !== descriptor.compilerObjectSha256) {
         return { ok: false, missing: [], error: "surface compiler object is not authenticated by its policy root" };
       }
       const compilerBytes = await readFile(path.join(candidate.root, "compiler-object.json"));
       if (sha256(compilerBytes) !== descriptor.compilerObjectSha256) {
         return { ok: false, missing: [], error: "surface compiler object digest mismatch" };
       }
-      descriptor._authenticatedPolicy = policy;
-      descriptor._authenticatedCompiler = JSON.parse(compilerBytes);
+      authenticatedCompiler = JSON.parse(compilerBytes);
     } catch (error) {
       return { ok: false, missing: ["policy-root.json", "compiler-object.json"], error: error.message };
     }
@@ -234,10 +297,10 @@ async function layerProvides(candidate, revision) {
         if (sha256(bytes) !== record.sha256) {
           return { ok: false, missing: [], error: `surface IR digest mismatch for ${relative}` };
         }
-        const compilerEntry = descriptor._authenticatedCompiler.documents?.entries?.[relative];
+        const compilerEntry = authenticatedCompiler.documents?.entries?.[relative];
         if (compilerEntry) {
           const namespace = compilerEntry.object;
-          const expectedObjectSha256 = descriptor._authenticatedPolicy.subtrees?.[namespace];
+          const expectedObjectSha256 = authenticatedPolicy.subtrees?.[namespace];
           if (!/^[0-9a-f]{64}$/u.test(expectedObjectSha256 ?? "")) {
             return { ok: false, missing: [], error: `surface policy does not authenticate ${relative}` };
           }
@@ -257,8 +320,6 @@ async function layerProvides(candidate, revision) {
         return { ok: false, missing: [relative], error: error.message };
       }
     }
-    delete descriptor._authenticatedPolicy;
-    delete descriptor._authenticatedCompiler;
     for (const relative of Object.values(surfaceIrFiles)) {
       if (relative === surfaceIrFiles.toolchainPath) continue;
       if (!descriptor.ir[relative]) {
@@ -275,32 +336,45 @@ async function layerProvides(candidate, revision) {
     } catch (error) {
       return { ok: false, missing: [surfaceIrFiles.scriptProfilesPath], error: error.message };
     }
-    for (const relative of Object.keys(descriptor.sdk ?? {})) {
-      if (!safeRelativePath(relative)) {
-        return { ok: false, missing: [], error: `surface SDK record has an unsafe path: ${relative}` };
+    try {
+      const sdkTreeSha256 = await verifyManifestTree({
+        root: path.join(candidate.sdkRoot, "generated"),
+        manifest: authenticatedCompiler.sdk?.entries,
+        descriptor: descriptor.sdk,
+        revision,
+        label: "surface SDK"
+      });
+      if (descriptor.sdkTreeSha256 !== sdkTreeSha256) {
+        return { ok: false, missing: [], error: "surface SDK tree digest is not authenticated by policy" };
       }
-      try {
-        const information = await stat(path.join(candidate.sdkRoot, "generated", relative));
-        if (!information.isFile()) missing.push(`sdk/generated/${relative}`);
-      } catch {
-        missing.push(`sdk/generated/${relative}`);
+      const outputTreeSha256 = await verifyManifestTree({
+        root: candidate.repositoryRoot,
+        manifest: authenticatedCompiler.outputs?.entries,
+        descriptor: descriptor.outputs,
+        revision,
+        label: "surface repository output",
+        includeRecipe: true
+      });
+      if (descriptor.outputTreeSha256 !== outputTreeSha256) {
+        return { ok: false, missing: [], error: "surface output tree digest is not authenticated by policy" };
       }
+    } catch (error) {
+      return { ok: false, missing: [], error: error.message };
     }
-    for (const relative of Object.keys(descriptor.outputs ?? {})) {
-      if (!safeRelativePath(relative)) {
-        return { ok: false, missing: [], error: `surface output record has an unsafe path: ${relative}` };
-      }
+    const loweringRecipeEntry = authenticatedCompiler.documents?.entries?.[BINDING_LOWERING_RECIPE_NAME];
+    if (loweringRecipeEntry) {
       try {
-        const information = await stat(path.join(candidate.repositoryRoot, relative));
-        if (!information.isFile()) missing.push(`repository/${relative}`);
-      } catch {
-        missing.push(`repository/${relative}`);
+        const recipeFacts = JSON.parse(await readFile(path.join(candidate.irRoot, BINDING_LOWERING_RECIPE_NAME), "utf8"));
+        const realized = await realizeCompilerDocuments({ [BINDING_LOWERING_RECIPE_NAME]: recipeFacts });
+        for (const relative of [surfaceIrFiles.loweringPlanPath, surfaceIrFiles.loweringPlanSentinelPath]) {
+          const actual = await readFile(path.join(candidate.irRoot, relative), "utf8");
+          if (actual !== json(realized[relative])) {
+            return { ok: false, missing: [], error: `surface ${relative} is not derived from its authenticated recipe` };
+          }
+        }
+      } catch (error) {
+        return { ok: false, missing: [BINDING_LOWERING_RECIPE_NAME], error: error.message };
       }
-    }
-    if (missing.length) return { ok: false, missing };
-    if (!/^[0-9a-f]{64}$/u.test(descriptor.sdkTreeSha256 ?? "") ||
-        !/^[0-9a-f]{64}$/u.test(descriptor.outputTreeSha256 ?? "")) {
-      return { ok: false, missing: [], error: "surface descriptor has no authenticated tree digests" };
     }
     if (!/^[0-9a-f]{64}$/u.test(descriptor.toolchainSha256 ?? "")) {
       return { ok: false, missing: [], error: "surface descriptor has no authenticated toolchain digest" };
@@ -313,6 +387,12 @@ async function layerProvides(candidate, revision) {
       toolchain = JSON.parse(bytes);
       if (toolchain.kind !== "deherm.policy.toolchain") {
         return { ok: false, missing: [], error: "surface toolchain object has invalid kind" };
+      }
+      const expectedToolchainSha256 = authenticatedPolicy.subtrees?.["@toolchain"];
+      const abstractToolchain = JSON.parse(bytes.toString("utf8").split(revision).join(DEFOLD_REVISION_TOKEN));
+      if (!/^[0-9a-f]{64}$/u.test(expectedToolchainSha256 ?? "") ||
+          sealObject(abstractToolchain).hash !== expectedToolchainSha256) {
+        return { ok: false, missing: [], error: "surface toolchain is not authenticated by policy" };
       }
     } catch (error) {
       return { ok: false, missing: [surfaceIrFiles.toolchainPath], error: error.message };

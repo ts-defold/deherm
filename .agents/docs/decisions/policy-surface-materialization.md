@@ -163,6 +163,32 @@ source belongs in the final policy schema. Each becomes package-side emitter
 code as its generator is extracted. The mode is recorded per file so local
 generation and authenticated materialization cannot be conflated.
 
+## Cache reopen authentication
+
+A cached `surface.json` is an index and receipt, not an authority. Reopening a
+materialized surface authenticates every SDK and repository-output path against
+the compiler manifests sealed into the selected policy root. The filesystem
+inventory must match exactly, symlinks and unsupported entries are rejected,
+and every file is revision-abstracted before its content digest is checked.
+Changing both a cached file and its mutable descriptor therefore cannot bless
+the mutation.
+
+The materialized IR retains the authenticated lowering-recipe facts. On every
+cache reopen, package compiler code regenerates the lowering plan and sentinel
+from those facts and compares the exact bytes. Toolchain facts are likewise
+revision-abstracted, resealed, and compared with the policy root's
+`@toolchain` object identity. Negative tests cover self-consistent descriptor
+forgeries for SDK sources, repository outputs, toolchain facts, and both
+lowering products. The focused materializer suite passes 4/4 and the broader
+policy, hydration, revision, package-smoke, and materialization suite passes
+100/100.
+
+The next boundary is immutable publication: realized directories must be keyed
+by policy root, package compiler identity, and realization options, staged in a
+temporary sibling, then atomically renamed. Until that is complete, reopening
+continues to perform full content authentication rather than trusting directory
+placement alone.
+
 ## Compiler document inventory
 
 The manifest references these revision-derived documents. “Copied” means the
