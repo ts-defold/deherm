@@ -1,5 +1,28 @@
 # Defold Hermes knowledge log
 
+## 2026-09-27 - Arena cstring policy reduced to a stable transport recipe
+
+- Removed the pinned Defold revision, six report identities, four concrete ABI
+  shapes, the `dmURI::Result` name, and copied source comments from the shipped
+  arena-cstring recipe.
+- Added four structural compiler patterns. Their semantic tokens are derived
+  from revision IR documentation and their call shapes are matched by result,
+  parameter role, direction, and arity.
+- Regenerated the current surface without a semantic delta: five bounded
+  adapters, five exact twins, sixty specialized-lane blockers, and a universal
+  fallback for every declaration.
+- Focused C/C++ compilation, ASan/UBSan exact-call execution, overlap and
+  reentrancy cases, clean-room regeneration, and 100,000 warmed calls with zero
+  observed heap allocations pass.
+- The same compiler completed the current, 1.13.1, 1.12.0, and 1.11.0 revision
+  matrix. Historical IR selected the same structural patterns where the
+  callables existed, then correctly retained universal-only emission because
+  those revisions' symbol census did not prove all-target linkage.
+- The complete `pnpm check` gate passed after policy publication and surface
+  fixture regeneration, including Static Hermes/direct-memory, Dynamic Hermes
+  JSI, browser/Wasm, clean-room, package-boundary, WebTransport, LSP, and War
+  Battles checks. The resulting policy root is `41a5a3340e77`.
+
 ## 2026-09-25 - The 32-player native stack gates admission, motion, and teardown metadata
 
 The full-stack launcher now waits for evidence instead of reporting requested

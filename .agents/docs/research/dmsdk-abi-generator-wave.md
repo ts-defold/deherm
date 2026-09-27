@@ -49,6 +49,33 @@ The earlier scalar report said `dmGraphics::Finalize` was blocked because `graph
 
 This is host and arm64-macOS evidence only. HTML5 remains fail-closed for the enum-value family pending the Emscripten BigInt ABI and linked-symbol matrix. Graphics and sound behavior still needs packaged-engine probes.
 
+## Revision-derived arena cstrings
+
+The arena-cstring package recipe now contains only its stable counted-input,
+caller-owned-output transport contract and the 4095/4096-byte scratch limits.
+It no longer pins a Defold revision, generated-report identities, concrete
+Defold enum names, declaration shapes, headers, lines, or copied comments.
+Candidate names and headers come from the revision IR; the generator derives
+error-string, trimmed-string, canonical-path, and URI-encoding semantics from
+the public descriptions and ABI roles, then selects the adapter with the shared
+compiler pattern selector.
+
+The current revision retains five generated adapters, five exact-call twins,
+and sixty specialized-lane blockers. The bounded thread-local input arena,
+same-thread reentrancy rejection, output clearing, termination checks, overlap
+support, sanitizer execution, and 100,000 warmed calls with zero heap
+allocations are unchanged. Withheld or changed documentation now declines only
+the optimized arena adapter; the usage-materialized universal recipe and its
+Static Hermes direct C-ABI path remain available for every declaration.
+
+The same compiler completed policy materialization and compile verification for
+Defold 1.13.1, 1.12.0, and 1.11.0. Their IR selected the same canonical-path,
+error-string, and URI-encoding patterns where those callables existed, but the
+historical symbol census did not prove all-target/all-variant linkage, so those
+optimized adapters stayed fail-closed. The universal recipes still materialized
+and compiled. That is a version-survival result, not a claim that the historical
+specialized lanes are engine-linked.
+
 ## Clean-room registry inputs and outputs
 
 `scripts/lib/dmsdk-generator-pipeline.mjs` is the single ownership and ordering

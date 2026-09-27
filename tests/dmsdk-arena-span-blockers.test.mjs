@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -16,6 +17,40 @@ function withJson(text, mutate) {
   mutate(value);
   return `${JSON.stringify(value, null, 2)}\n`;
 }
+
+function withIrMutation(inputs, mutate) {
+  const irText = withJson(inputs.irText, mutate);
+  const hash = createHash("sha256").update(irText).digest("hex");
+  const shapesText = withJson(inputs.shapesText, (shapes) => { shapes.sourceHashes.ir = hash; });
+  const shapesHash = createHash("sha256").update(shapesText).digest("hex");
+  const priorWaveTexts = new Map([...inputs.priorWaveTexts].map(([path, text]) => [
+    path,
+    withJson(text, (report) => {
+      report.sourceHashes.ir = hash;
+      report.sourceHashes.shapes = shapesHash;
+    }),
+  ]));
+  return { ...inputs, irText, shapesText, priorWaveTexts };
+}
+
+test("arena-cstring policy contains a transport recipe, not Defold revision facts", async () => {
+  const text = await readFile(
+    new URL("packages/bindings/overrides/dmsdk-arena-span-blockers.json", root),
+    "utf8",
+  );
+  const value = JSON.parse(text);
+  assert.deepEqual(Object.keys(value).sort(), ["family", "recipe", "schemaVersion"]);
+  assert.deepEqual(Object.keys(value.recipe).sort(), [
+    "candidateSource",
+    "fallback",
+    "maximumInputBytes",
+    "maximumOutputBytes",
+    "semanticSource",
+    "sourceGrouping",
+    "transport",
+  ]);
+  assert.doesNotMatch(text, /(?:defoldRevision|dmURI|upstream\/defold|dmsdk:|policyVersion|priorWaveReports|sourceEvidence|shape)/u);
+});
 
 test("arena-span census deterministically promotes bounded cstring arenas and preserves blockers", async () => {
   execFileSync(process.execPath, ["scripts/generate-dmsdk-arena-span-blockers.mjs", "--check"], {
@@ -61,6 +96,9 @@ test("arena-span census deterministically promotes bounded cstring arenas and pr
     assert.equal(declaration.universalFallback, "retained-usage-materialized-recipe");
     assert.equal(declaration.stages.generated, "production-and-exact-from-one-recipe");
     assert.ok(declaration.sourceEvidence.length > 0);
+    assert.equal(declaration.sourceEvidence[0].source, "revision-ir-public-documentation");
+    assert.equal(declaration.patternDecision.fallback, false);
+    assert.equal(declaration.patternDecision.patternId, `arena-cstring.${declaration.recipe.kind}`);
     assert.equal(declaration.symbolEvidence.path, "packages/bindings/generated/defold-dmsdk-symbol-evidence.json");
     assert.ok(declaration.symbolEvidence.linkage === "header-only" ||
       (declaration.symbolEvidence.linkage === "external" && declaration.symbolEvidence.availability === "all-targets-all-variants"));
@@ -135,16 +173,16 @@ test("arena cstring generation is clean-room deterministic and allocation bounde
   }
 });
 
-test("arena-span blocker generator rejects schema, revision, provenance, and duplicate drift", async () => {
+test("arena-span blocker generator rejects recipe, provenance, and duplicate drift", async () => {
   const inputs = await loadInputs();
   assert.throws(() => generate({
     ...inputs,
-    policyText: withJson(inputs.policyText, (policy) => { policy.schemaVersion = 2; })
+    recipeText: withJson(inputs.recipeText, (recipe) => { recipe.schemaVersion = 2; })
   }), /schemaVersion must be 1/);
   assert.throws(() => generate({
     ...inputs,
-    policyText: withJson(inputs.policyText, (policy) => { policy.defoldRevision = "0".repeat(40); })
-  }), /was reviewed against Defold .* but .* is being generated/);
+    recipeText: withJson(inputs.recipeText, (recipe) => { recipe.defoldRevision = "0".repeat(40); })
+  }), /unsupported schema keys: .*defoldRevision/);
   assert.throws(() => generate({
     ...inputs,
     shapesText: withJson(inputs.shapesText, (shapes) => { shapes.sourceHashes.ir = "0".repeat(64); })
@@ -184,34 +222,34 @@ test("arena-span historical counts do not gate a new revision", async () => {
   assert.throws(() => generate({ ...inputs, priorWaveTexts: corruptPriorWaveTexts }), /ABI-shape provenance drifted/);
 });
 
-test("arena-span recipes follow semantic evidence when lines move and decline only the specialization when evidence disappears", async () => {
+test("arena-span recipes follow revision IR semantics and decline only the specialization when evidence disappears", async () => {
   const inputs = await loadInputs();
-  const evidenceTexts = new Map(inputs.evidenceTexts);
-  const [path, source] = evidenceTexts.entries().next().value;
-  evidenceTexts.set(path, `// upstream inserted a line\n${source}`);
-  const moved = generate({ ...inputs, evidenceTexts }).report;
-  const movedEvidence = moved.generatedDeclarations.flatMap(({ sourceEvidence }) => sourceEvidence)
-    .filter((evidence) => evidence.path === path);
-  assert.ok(movedEvidence.length > 0);
-  for (const evidence of movedEvidence) {
-    const original = JSON.parse(inputs.policyText).cstringArena.recipes
-      .flatMap(({ sourceEvidence }) => sourceEvidence)
-      .find((candidate) => candidate.path === evidence.path && candidate.text === evidence.text);
-    assert.equal(evidence.line, original.line + 1);
-  }
-
-  const withdrawnTexts = new Map(inputs.evidenceTexts);
-  withdrawnTexts.set(path, source.replace(" * If the size of the buffer is too small, the message will be truncated to fit the buffer.", " * changed upstream wording"));
-  const withdrawn = generate({ ...inputs, evidenceTexts: withdrawnTexts }).report;
-  assert.ok(withdrawn.coverage.generatedCStringArena < 5);
-  assert.ok(withdrawn.declarations.some(({ blocker }) => blocker === "cstring-arena-specialization-unverified"));
+  const generatedId = generate(inputs).report.generatedDeclarations.find(({ recipe }) => recipe.kind === "error-string").id;
+  const changed = withIrMutation(inputs, (ir) => {
+    const declaration = ir.declarations.find(({ id }) => id === generatedId);
+    declaration.description = "The upstream documentation no longer proves the bounded output contract.";
+    declaration.returnDescription = "";
+  });
+  const withdrawn = generate(changed).report;
+  assert.equal(withdrawn.coverage.generatedCStringArena, 4);
+  const declined = withdrawn.declarations.find(({ id }) => id === generatedId);
+  assert.equal(declined.blocker, "cstring-arena-specialization-unverified");
+  assert.equal(declined.specializationEvidence.semantics, "revision-documentation-insufficient");
+  assert.equal(declined.specializationEvidence.pattern, "universal.default");
   assert.equal(withdrawn.coverage.unaccounted, 0);
 });
 
 test("a revision with no applicable arena specialization still emits a valid universal-only surface", async () => {
   const inputs = await loadInputs();
-  const evidenceTexts = new Map([...inputs.evidenceTexts].map(([path]) => [path, null]));
-  const generated = generate({ ...inputs, evidenceTexts });
+  const generatedIds = new Set(generate(inputs).report.generatedDeclarations.map(({ id }) => id));
+  const changed = withIrMutation(inputs, (ir) => {
+    for (const declaration of ir.declarations.filter(({ id }) => generatedIds.has(id))) {
+      declaration.description = "";
+      declaration.returnDescription = "";
+      for (const parameter of declaration.parameters) parameter.description = "";
+    }
+  });
+  const generated = generate(changed);
   assert.equal(generated.report.coverage.generatedCStringArena, 0);
   assert.equal(generated.report.coverage.unaccounted, 0);
   assert.ok(generated.report.declarations.every(({ stages }) => stages.generated === "not-applicable"));

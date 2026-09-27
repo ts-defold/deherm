@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "arena-span-cstring-v2",
+  "policyVersion": "arena-span-cstring-v3",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
     "symbolEvidence": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-    "policy": "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
+    "recipe": "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
     "output": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
     "priorWaveReports": [
       "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
@@ -21,7 +21,7 @@
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
-    "policy": "2c8fb512df8fa42b90153afc637f129772e87ae4031824c1d0eea819f55d6846",
+    "recipe": "682a7812ccc3f472eae17640355f1187c5732aa25fc949b0227f2375ba31d773",
     "priorWaveReports": {
       "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "1178cf005cf8b9b694e3e8c43ffc9d5d4691e398f6a84261dbe570e096a9faa0",
       "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "627c0d0aa8b2474521612ebd7e32f984195cb9ecd5a2a685a6c789e9e727808a",
@@ -29,12 +29,6 @@
       "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "11447acedf678260135821075db63f9107019001ac580b7f1c18b4b1ff8ba46b",
       "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "09ac857ffcdfb39a52105e3e5f18f72f4f8615d5c55d1aa6d1800eddd1971b1f",
       "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json": "4ecaaa411b0a0cee555a33445c08dc3ec3e12dedd7d5ade089d28f9a57079c24"
-    },
-    "evidence": {
-      "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h": "c31d7f9f6408120e88cd0b3257720ed4cb98e6670ce9ebd15d30adbb3a8896fc",
-      "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h": "d9837d4db3c7212c83e4329e2f10068c138bfc226b8b0a2335d34a9b99aeb71c",
-      "upstream/defold/engine/resource/src/dmsdk/resource/resource.h": "c1ea1bbdde3576040d712fe837bd074a35c86090e974a5bef92f51375a097579",
-      "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp": "382d79cd16296229092883822a93a41ae896103923ef05f1901202736cfc50d7"
     }
   },
   "scope": "Complete arena-backed-spans census with deterministic counted-input/caller-output cstring adapters",
@@ -243,22 +237,79 @@
         "kind": "canonical-path",
         "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)"
       },
+      "patternDecision": {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
+        "patternId": "arena-cstring.canonical-path",
+        "family": "arena-cstring.canonical-path",
+        "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+        "fallback": false,
+        "priority": 790,
+        "cost": 8,
+        "trace": [
+          {
+            "patternId": "arena-cstring.error-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:0:in:cstring-in",
+              "parameter-position:1:inout:cstring-mutable",
+              "parameter-position:2:value:scalar:u32",
+              "result-role:scalar:u32",
+              "semantic-token-missing:error-string",
+              "semantic-token-missing:null-terminated-output",
+              "semantic-token-missing:synchronous-noescape"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.trimmed-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:0:in:cstring-in",
+              "parameter-position:1:inout:cstring-mutable",
+              "parameter-position:2:value:scalar:u32",
+              "result-role:scalar:u32",
+              "semantic-token-missing:null-terminated-output",
+              "semantic-token-missing:trimmed-string"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.canonical-path",
+            "applicable": true,
+            "blockers": []
+          },
+          {
+            "patternId": "arena-cstring.uri-encode",
+            "applicable": false,
+            "blockers": [
+              "parameter-count:3",
+              "parameter-position-count:3",
+              "result-role:scalar:u32",
+              "semantic-token-missing:output-byte-count",
+              "semantic-token-missing:uri-encode"
+            ]
+          }
+        ]
+      },
       "universalFallback": "retained-usage-materialized-recipe",
       "sourceEvidence": [
         {
-          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
-          "line": 148,
-          "text": "    * @param buf_len [type: uint32_t] the size of the output buffer"
-        },
-        {
-          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
-          "line": 149,
-          "text": "    * @return length [type: uint32_t] the length of the output string"
-        },
-        {
-          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
-          "line": 321,
-          "text": " * @param buf_len [type: uint32_t] the size of the output buffer"
+          "source": "revision-ir-public-documentation",
+          "description": "Gets the normalized resource path: \"/my//icon.texturec\" -&gt; \"/my/icon.texturec\". \"my/icon.texturec\" -&gt; \"/my/icon.texturec\".",
+          "returnDescription": "the length of the output string",
+          "parameters": [
+            {
+              "name": "path",
+              "description": "the relative dir of the resource"
+            },
+            {
+              "name": "buf",
+              "description": "(out) the output of the normalization"
+            },
+            {
+              "name": "buf_len",
+              "description": "the size of the output buffer"
+            }
+          ]
         }
       ],
       "symbolEvidence": {
@@ -376,17 +427,78 @@
         "kind": "error-string",
         "shape": "scalar:void(out:cstring-mutable,value:scalar:usize,value:scalar:i32)"
       },
+      "patternDecision": {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
+        "patternId": "arena-cstring.error-string",
+        "family": "arena-cstring.error-string",
+        "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+        "fallback": false,
+        "priority": 790,
+        "cost": 8,
+        "trace": [
+          {
+            "patternId": "arena-cstring.error-string",
+            "applicable": true,
+            "blockers": []
+          },
+          {
+            "patternId": "arena-cstring.trimmed-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:2:value:scalar:i32",
+              "result-role:scalar:void",
+              "semantic-token-missing:counted-cstring-input",
+              "semantic-token-missing:trimmed-string"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.canonical-path",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:0:out:cstring-mutable",
+              "parameter-position:1:value:scalar:usize",
+              "parameter-position:2:value:scalar:i32",
+              "result-role:scalar:void",
+              "semantic-token-missing:canonical-path",
+              "semantic-token-missing:counted-cstring-input",
+              "semantic-token-missing:output-length-result"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.uri-encode",
+            "applicable": false,
+            "blockers": [
+              "parameter-count:3",
+              "parameter-position-count:3",
+              "result-role:scalar:void",
+              "semantic-token-missing:counted-cstring-input",
+              "semantic-token-missing:output-byte-count",
+              "semantic-token-missing:uri-encode"
+            ]
+          }
+        ]
+      },
       "universalFallback": "retained-usage-materialized-recipe",
       "sourceEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
-          "line": 160,
-          "text": " * If the size of the buffer is too small, the message will be truncated to fit the buffer."
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
-          "line": 166,
-          "text": " * @return a null-terminated error message"
+          "source": "revision-ir-public-documentation",
+          "description": "Error code to string representation. Wrapper for thread-safe strerror_s/r variants.\nIf the size of the buffer is too small, the message will be truncated to fit the buffer.\nIf the buffer is null, or if size is zero, nothing will happen.",
+          "returnDescription": "null-terminated error message",
+          "parameters": [
+            {
+              "name": "dst",
+              "description": "Destination string that carries the error message"
+            },
+            {
+              "name": "size",
+              "description": "Max size of destination string in bytes"
+            },
+            {
+              "name": "err",
+              "description": ""
+            }
+          ]
         }
       ],
       "symbolEvidence": {
@@ -504,17 +616,76 @@
         "kind": "trimmed-string",
         "shape": "scalar:usize(out:cstring-mutable,value:scalar:usize,in:cstring-in)"
       },
+      "patternDecision": {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
+        "patternId": "arena-cstring.trimmed-string",
+        "family": "arena-cstring.trimmed-string",
+        "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+        "fallback": false,
+        "priority": 790,
+        "cost": 8,
+        "trace": [
+          {
+            "patternId": "arena-cstring.error-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:2:in:cstring-in",
+              "result-role:scalar:usize",
+              "semantic-token-missing:error-string",
+              "semantic-token-missing:synchronous-noescape"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.trimmed-string",
+            "applicable": true,
+            "blockers": []
+          },
+          {
+            "patternId": "arena-cstring.canonical-path",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:0:out:cstring-mutable",
+              "parameter-position:1:value:scalar:usize",
+              "parameter-position:2:in:cstring-in",
+              "result-role:scalar:usize",
+              "semantic-token-missing:canonical-path",
+              "semantic-token-missing:output-length-result"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.uri-encode",
+            "applicable": false,
+            "blockers": [
+              "parameter-count:3",
+              "parameter-position-count:3",
+              "result-role:scalar:usize",
+              "semantic-token-missing:output-byte-count",
+              "semantic-token-missing:uri-encode"
+            ]
+          }
+        ]
+      },
       "universalFallback": "retained-usage-materialized-recipe",
       "sourceEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
-          "line": 122,
-          "text": " * The destination is null-terminated when `dst_size` is greater than zero."
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h",
-          "line": 128,
-          "text": " * @return Length of the trimmed source string. If the return value is greater"
+          "source": "revision-ir-public-documentation",
+          "description": "Copies a string while removing leading and trailing whitespace. Internal\nwhitespace is preserved. The source and destination may be the same buffer.\nThe destination is null-terminated when <code>dst_size</code> is greater than zero.",
+          "returnDescription": "of the trimmed source string. If the return value is greater\nthan or equal to <code>dst_size</code>, the destination was truncated.",
+          "parameters": [
+            {
+              "name": "dst",
+              "description": "Destination buffer"
+            },
+            {
+              "name": "dst_size",
+              "description": "Size of the destination buffer"
+            },
+            {
+              "name": "src",
+              "description": "Null-terminated source string"
+            }
+          ]
         }
       ],
       "symbolEvidence": {
@@ -641,22 +812,81 @@
         "kind": "uri-encode",
         "shape": "enum:dmURI::Result(in:cstring-in,out:cstring-mutable,value:scalar:u32,inout:pointer:scalar:u32)"
       },
+      "patternDecision": {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
+        "patternId": "arena-cstring.uri-encode",
+        "family": "arena-cstring.uri-encode",
+        "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+        "fallback": false,
+        "priority": 790,
+        "cost": 8,
+        "trace": [
+          {
+            "patternId": "arena-cstring.error-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-count:4",
+              "parameter-position-count:4",
+              "result-role:enum:dmURI::Result",
+              "semantic-token-missing:error-string",
+              "semantic-token-missing:null-terminated-output",
+              "semantic-token-missing:synchronous-noescape"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.trimmed-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-count:4",
+              "parameter-position-count:4",
+              "result-role:enum:dmURI::Result",
+              "semantic-token-missing:null-terminated-output",
+              "semantic-token-missing:trimmed-string"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.canonical-path",
+            "applicable": false,
+            "blockers": [
+              "parameter-count:4",
+              "parameter-position-count:4",
+              "result-role:enum:dmURI::Result",
+              "semantic-token-missing:canonical-path",
+              "semantic-token-missing:output-length-result"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.uri-encode",
+            "applicable": true,
+            "blockers": []
+          }
+        ]
+      },
       "universalFallback": "retained-usage-materialized-recipe",
       "sourceEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
-          "line": 92,
-          "text": "     * @param dst_size [type:uint32_t] size of the provided out buffer"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
-          "line": 93,
-          "text": "     * @param bytes_written[out] [type:uint32_t] number of bytes written"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h",
-          "line": 94,
-          "text": "     * @note If dst=0 the bytes_written will return the number of required bytes (including null character)"
+          "source": "revision-ir-public-documentation",
+          "description": "Performs URL encoding of the supplied buffer",
+          "returnDescription": "",
+          "parameters": [
+            {
+              "name": "src",
+              "description": "string to encode"
+            },
+            {
+              "name": "dst",
+              "description": "the destination buffer"
+            },
+            {
+              "name": "dst_size",
+              "description": "size of the provided out buffer"
+            },
+            {
+              "name": "bytes_written",
+              "description": ""
+            }
+          ]
         }
       ],
       "symbolEvidence": {
@@ -774,22 +1004,79 @@
         "kind": "canonical-path",
         "shape": "scalar:u32(in:cstring-in,inout:cstring-mutable,value:scalar:u32)"
       },
+      "patternDecision": {
+        "schemaVersion": 1,
+        "declarationId": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
+        "patternId": "arena-cstring.canonical-path",
+        "family": "arena-cstring.canonical-path",
+        "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+        "fallback": false,
+        "priority": 790,
+        "cost": 8,
+        "trace": [
+          {
+            "patternId": "arena-cstring.error-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:0:in:cstring-in",
+              "parameter-position:1:inout:cstring-mutable",
+              "parameter-position:2:value:scalar:u32",
+              "result-role:scalar:u32",
+              "semantic-token-missing:error-string",
+              "semantic-token-missing:null-terminated-output",
+              "semantic-token-missing:synchronous-noescape"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.trimmed-string",
+            "applicable": false,
+            "blockers": [
+              "parameter-position:0:in:cstring-in",
+              "parameter-position:1:inout:cstring-mutable",
+              "parameter-position:2:value:scalar:u32",
+              "result-role:scalar:u32",
+              "semantic-token-missing:null-terminated-output",
+              "semantic-token-missing:trimmed-string"
+            ]
+          },
+          {
+            "patternId": "arena-cstring.canonical-path",
+            "applicable": true,
+            "blockers": []
+          },
+          {
+            "patternId": "arena-cstring.uri-encode",
+            "applicable": false,
+            "blockers": [
+              "parameter-count:3",
+              "parameter-position-count:3",
+              "result-role:scalar:u32",
+              "semantic-token-missing:output-byte-count",
+              "semantic-token-missing:uri-encode"
+            ]
+          }
+        ]
+      },
       "universalFallback": "retained-usage-materialized-recipe",
       "sourceEvidence": [
         {
-          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
-          "line": 148,
-          "text": "    * @param buf_len [type: uint32_t] the size of the output buffer"
-        },
-        {
-          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp",
-          "line": 149,
-          "text": "    * @return length [type: uint32_t] the length of the output string"
-        },
-        {
-          "path": "upstream/defold/engine/resource/src/dmsdk/resource/resource.h",
-          "line": 321,
-          "text": " * @param buf_len [type: uint32_t] the size of the output buffer"
+          "source": "revision-ir-public-documentation",
+          "description": "Gets the normalized resource path: \"/my//icon.texturec\" -&gt; \"/my/icon.texturec\". \"my/icon.texturec\" -&gt; \"/my/icon.texturec\".",
+          "returnDescription": "the length of the output string",
+          "parameters": [
+            {
+              "name": "path",
+              "description": "the relative dir of the resource"
+            },
+            {
+              "name": "buf",
+              "description": "the output of the normalization"
+            },
+            {
+              "name": "buf_len",
+              "description": "the size of the output buffer"
+            }
+          ]
         }
       ],
       "symbolEvidence": {

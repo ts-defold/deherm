@@ -57,8 +57,8 @@
     "scriptUniversalValue": "a335c0cff8f6f96aefbc889168e03ec4126c461c00c165cfbe84aa2843621b5c",
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
-    "dmsdkProjection": "8e500db80e6a7e265808c08e06d7ec77dc7b4fdb4c43554b20264d49c0beae66",
-    "dmsdkUniversal": "8c35d7596ecd6b451fc80d908748f379ff574818444f8fa71b507368b85a6487",
+    "dmsdkProjection": "939955112710196311895a2713e2bada91c3269e65042c1b301d646efbca6466",
+    "dmsdkUniversal": "8d796183bf563552c52484adbae7c165ccf742e1f2833772f35a1240bd86155f",
     "dmsdkScalarThunks": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0",
     "dmsdkEnumValues": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6",
     "dmsdkNamedScalars": "fcf97a985ce897a14e1c42832c8197bc040414e9bcb0eeb97885c88d3334a549",
@@ -67,9 +67,9 @@
     "dmsdkAstcProbes": "1e7ae0dd04715916b943c75f22749628a8a4447f9cf4200d389ab0e1706478dd",
     "dmsdkXteaSpans": "11447acedf678260135821075db63f9107019001ac580b7f1c18b4b1ff8ba46b",
     "dmsdkHashSpans": "09ac857ffcdfb39a52105e3e5f18f72f4f8615d5c55d1aa6d1800eddd1971b1f",
-    "dmsdkArenaSpanBlockers": "e954cdc4ce0f8e8fd370aeccd0b14154ab5ff5cfbc66d1b230ef8f53f4fa340a",
-    "dmsdkCStringValue": "c5140176ab786f32cd4131c4b4a596b301b45177ab729e4e2d895cfc6cf1f498",
-    "dmsdkBorrowedHandle": "5e76de5423b8f173d1a83530d65be2fd78e8057b776db4f037e2a7a7e6680086",
+    "dmsdkArenaSpanBlockers": "0aa0757191bf179ef2916cbc398055fa1c13f504db00f6fb45a921b500c70720",
+    "dmsdkCStringValue": "62b49f5eb75519d93fc344be9648e52fd55c064858c94089c8cef885d1348a27",
+    "dmsdkBorrowedHandle": "b7677326d70731235c34374b6e00fef13c2946499eac1d51d05cd877d73d11f3",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
@@ -78,9 +78,9 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "1f1e52e8c43b19e9fca225e281de2f83b428d0f45bd45b9eb5b68ffe005b608e",
+  "cacheKey": "c4ddb300cff1b91b1a387c0a5c69a66993f4fe77dd2f5c4dcff01a572d80fad6",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
   "outputBytes": 17792204,
-  "outputSha256": "78d7f2a14193f2003612252bb02ff45f5ac7535f307daa01019a8b06aaae0af0",
-  "planSha256": "36595010fd007a33912707d7aded1aac470900dd3e5fdce2db252385b1cd12eb"
+  "outputSha256": "10943bb84e4ef02d9fe525913f8ba47b3792804353692582f63d763f805314c0",
+  "planSha256": "6588583c874b8f7560a0b5931d519d3cef0462565f3c462efdb4f5d53a504b8e"
 }

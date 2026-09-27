@@ -9245,12 +9245,12 @@
   "productionCatalogSha256": "d597cf86477719a5115004b5aee863916bbd779494d41e11692058a45526a4cc",
   "exactCatalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0",
   "sourceHashes": {
-    "productionCatalog": "8c35d7596ecd6b451fc80d908748f379ff574818444f8fa71b507368b85a6487",
+    "productionCatalog": "8d796183bf563552c52484adbae7c165ccf742e1f2833772f35a1240bd86155f",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "familyReports": {
       "arenaCString": {
         "path": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
-        "sha256": "e954cdc4ce0f8e8fd370aeccd0b14154ab5ff5cfbc66d1b230ef8f53f4fa340a"
+        "sha256": "0aa0757191bf179ef2916cbc398055fa1c13f504db00f6fb45a921b500c70720"
       },
       "scalar": {
         "path": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
@@ -9282,7 +9282,7 @@
       },
       "cstringValue": {
         "path": "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
-        "sha256": "c5140176ab786f32cd4131c4b4a596b301b45177ab729e4e2d895cfc6cf1f498"
+        "sha256": "62b49f5eb75519d93fc344be9648e52fd55c064858c94089c8cef885d1348a27"
       },
       "hashState": {
         "path": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
@@ -9290,5 +9290,5 @@
       }
     }
   },
-  "corpusSha256": "9a9b74b7e6d25f6289553ad4a4b13edd451a6d9a83939aaa265bd0be4e1518d8"
+  "corpusSha256": "0b054f4d467264fc72d88c4771f01c74c06c0526cc71bf1c89e04394ca4a5ab2"
 }

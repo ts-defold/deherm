@@ -4,15 +4,43 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { assertReviewedRevision } from "./lib/reviewed-revision.mjs";
+import {
+  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  compactDmSdkPatternDecision,
+  defineDmSdkPattern,
+  selectDmSdkPattern,
+} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   symbolEvidence: "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
-  policy: "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
+  recipe: "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
   output: "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
+});
+const policyVersion = "arena-span-cstring-v3";
+const arenaTranche = "arena-backed-spans";
+const priorWaveReports = Object.freeze([
+  { path: "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json", policyVersion: "fixed-digest-v2" },
+  { path: "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json", policyVersion: "base64-span-v2" },
+  { path: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json", policyVersion: "astc-probe-v2" },
+  { path: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json", policyVersion: "xtea-span-v2" },
+  { path: "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json", policyVersion: "hash-span-v2" },
+  { path: "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json", policyVersion: "hash-state-v2" },
+]);
+const blockerDefinitions = Object.freeze({
+  "handle-provenance-or-engine-context": "The ABI consumes or returns an engine handle whose provenance, context, ownership, nullability, or teardown contract is not encoded by the arena.",
+  "opaque-byte-pointee-unit-or-lifetime": "The void pointer's pointee unit, mutability, returned lifetime, allocation source, or ownership is not fully represented by the mechanical span shape.",
+  "record-layout-or-borrowed-record-lifetime": "The ABI crosses a record pointer whose exact layout, nested fields, borrowed lifetime, or engine-context relationship is not yet verified.",
+  "template-element-layout-or-specialization": "The template element type or specialization is unresolved, so the arena cannot prove element size, alignment, copying, or native linkage.",
+});
+const arenaContract = Object.freeze({
+  input: "The public bridge takes a counted byte span, rejects embedded NUL, copies at most maximumInputBytes into bounded thread-local scratch, and appends one terminator.",
+  output: "The caller supplies non-null storage with capacity 1..maximumOutputBytes. Generated glue clears it before entry, requires an in-bounds terminator afterward, and clears it on transport or native failure.",
+  reentrancy: "Same-thread nested dispatch is rejected before touching shared scratch.",
+  ownership: "Input scratch and output storage are borrowed only for the synchronous native call; neither pointer may escape.",
+  fallback: "Every declaration retains its universal usage-materialized recipe; the arena adapter is an additional preferred concrete path.",
 });
 const artifacts = Object.freeze({
   header: "defold/defold_hermes/include/defold_hermes/generated_dmsdk_arena_cstring.h",
@@ -51,37 +79,113 @@ function blockerFor(row) {
 const specializationBlocker = "cstring-arena-specialization-unverified";
 const specializationBlockerReason = "The declaration remains available through the universal dmSDK route, but this revision did not prove the bounded cstring-arena specialization recipe.";
 
-function resolveSourceEvidence(recipe, evidenceTexts) {
-  const resolved = [];
-  for (const evidence of recipe.sourceEvidence) {
-    const source = evidenceTexts.get(evidence.path);
-    if (typeof source !== "string") return null;
-    const matchingLines = source.split("\n")
-      .map((text, index) => ({ text, line: index + 1 }))
-      .filter(({ text }) => text === evidence.text)
-      .sort((left, right) => Math.abs(left.line - evidence.line) - Math.abs(right.line - evidence.line) || left.line - right.line);
-    if (!matchingLines.length) return null;
-    resolved.push({ ...evidence, line: matchingLines[0].line });
-  }
-  return resolved;
+function validateRecipe(value) {
+  exactKeys(value, ["schemaVersion", "family", "recipe"], "arena-cstring recipe");
+  assert(value.schemaVersion === 1, "arena-cstring recipe schemaVersion must be 1");
+  assert(value.family === "arena-cstring", "arena-cstring recipe family is unsupported");
+  exactKeys(value.recipe, ["transport", "maximumInputBytes", "maximumOutputBytes", "candidateSource", "semanticSource", "sourceGrouping", "fallback"], "arena-cstring recipe.recipe");
+  assert(value.recipe.transport === "bounded-counted-input-caller-output", "arena-cstring transport is unsupported");
+  assert(Number.isSafeInteger(value.recipe.maximumInputBytes) && value.recipe.maximumInputBytes > 0, "maximumInputBytes must be positive");
+  assert(Number.isSafeInteger(value.recipe.maximumOutputBytes) && value.recipe.maximumOutputBytes > 0, "maximumOutputBytes must be positive");
+  assert(value.recipe.candidateSource === "revision-ir-arena-backed-cstring-abi", "arena-cstring candidateSource is unsupported");
+  assert(value.recipe.semanticSource === "revision-ir-public-documentation", "arena-cstring semanticSource is unsupported");
+  assert(value.recipe.sourceGrouping === "single-revision-derived-translation-unit", "arena-cstring sourceGrouping is unsupported");
+  assert(value.recipe.fallback === "universal-recipe", "arena-cstring fallback is unsupported");
 }
-function validatePolicy(policy) {
-  exactKeys(policy, ["schemaVersion", "policyVersion", "defoldRevision", "tranche", "priorWaveReports", "blockerDefinitions", "cstringArena"], "arena-span policy");
-  assert(policy.schemaVersion === 1, "arena-span policy schemaVersion must be 1");
-  assert(policy.policyVersion === "arena-span-cstring-v2", "arena-span policyVersion is unsupported");
-  assert(/^[0-9a-f]{40}$/.test(policy.defoldRevision), "arena-span policy must pin a Defold revision");
-  assert(policy.tranche === "arena-backed-spans", "arena-span policy tranche is unsupported");
-  assert(Array.isArray(policy.priorWaveReports) && policy.priorWaveReports.length === 6, "arena-span policy must name six prior waves");
-  unique(policy.priorWaveReports, ({ path }) => path, "priorWaveReports");
-  exactKeys(policy.cstringArena, ["maximumInputBytes", "maximumOutputBytes", "selection", "recipes", "contract"], "cstringArena");
-  assert(Number.isSafeInteger(policy.cstringArena.maximumInputBytes) && policy.cstringArena.maximumInputBytes > 0, "maximumInputBytes must be positive");
-  assert(Number.isSafeInteger(policy.cstringArena.maximumOutputBytes) && policy.cstringArena.maximumOutputBytes > 0, "maximumOutputBytes must be positive");
-  unique(policy.cstringArena.recipes, ({ shape }) => shape, "cstringArena recipes");
-  for (const recipe of policy.cstringArena.recipes) {
-    exactKeys(recipe, ["shape", "kind", "sourceEvidence"], "cstringArena recipe");
-    assert(["error-string", "trimmed-string", "canonical-path", "uri-encode"].includes(recipe.kind), `${recipe.shape}: unsupported recipe kind`);
-    assert(Array.isArray(recipe.sourceEvidence) && recipe.sourceEvidence.length, `${recipe.shape}: source evidence is required`);
+
+function pattern(id, kind, result, positions, semanticTokens) {
+  return defineDmSdkPattern({
+    schemaVersion: 1,
+    id,
+    family: `arena-cstring.${kind}`,
+    emitter: "scripts/generate-dmsdk-arena-span-blockers.mjs",
+    priority: 790,
+    cost: 8,
+    fallback: false,
+    when: {
+      declarationKinds: ["function"],
+      result,
+      parameters: { count: { exact: positions.length }, positions },
+      requireSemanticTokens: semanticTokens,
+    },
+  });
+}
+
+function arenaPatterns() {
+  return [
+    pattern("arena-cstring.error-string", "error-string", { roles: ["scalar:void"] }, [
+      { roles: ["cstring-mutable"], directions: ["out"] },
+      { roles: ["scalar:usize"], directions: ["value"] },
+      { roles: ["scalar:i32"], directions: ["value"] },
+    ], ["bounded-cstring-output", "error-string", "null-terminated-output", "synchronous-noescape"]),
+    pattern("arena-cstring.trimmed-string", "trimmed-string", { roles: ["scalar:usize"] }, [
+      { roles: ["cstring-mutable"], directions: ["out"] },
+      { roles: ["scalar:usize"], directions: ["value"] },
+      { roles: ["cstring-in"], directions: ["in"] },
+    ], ["bounded-cstring-output", "counted-cstring-input", "null-terminated-output", "trimmed-string"]),
+    pattern("arena-cstring.canonical-path", "canonical-path", { roles: ["scalar:u32"] }, [
+      { roles: ["cstring-in"], directions: ["in"] },
+      { roles: ["cstring-mutable"], directions: ["inout"] },
+      { roles: ["scalar:u32"], directions: ["value"] },
+    ], ["bounded-cstring-output", "canonical-path", "counted-cstring-input", "output-length-result"]),
+    pattern("arena-cstring.uri-encode", "uri-encode", { rolePrefixes: ["enum:"] }, [
+      { roles: ["cstring-in"], directions: ["in"] },
+      { roles: ["cstring-mutable"], directions: ["out"] },
+      { roles: ["scalar:u32"], directions: ["value"] },
+      { roles: ["pointer:scalar:u32"], directions: ["inout"] },
+    ], ["bounded-cstring-output", "counted-cstring-input", "output-byte-count", "uri-encode"]),
+    DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  ];
+}
+
+function patternFacts(row, semanticTokens = []) {
+  return {
+    id: row.id,
+    kind: "function",
+    result: row.result,
+    parameters: row.parameters,
+    families: [arenaTranche],
+    semanticTokens,
+  };
+}
+
+const normalizedText = (value) => String(value ?? "").replace(/<[^>]+>/gu, " ").replace(/\s+/gu, " ").trim().toLowerCase();
+
+export function inferArenaCStringSemantics(declaration, row) {
+  if (!declaration || declaration.kind !== "function") return null;
+  const description = normalizedText(declaration.description);
+  const returnDescription = normalizedText(declaration.returnDescription);
+  const parameters = declaration.parameters.map((parameter) => normalizedText(parameter.description));
+  const evidence = {
+    source: "revision-ir-public-documentation",
+    description: declaration.description ?? null,
+    returnDescription: declaration.returnDescription ?? null,
+    parameters: declaration.parameters.map(({ name, description: detail }) => ({ name, description: detail ?? null })),
+  };
+  if (row.result.role === "scalar:void"
+      && description.includes("error code to string representation")
+      && description.includes("buffer")
+      && returnDescription.includes("null-terminated error message")) {
+    return { kind: "error-string", semanticTokens: ["bounded-cstring-output", "error-string", "null-terminated-output", "synchronous-noescape"], evidence };
   }
+  if (row.result.role === "scalar:usize"
+      && description.includes("removing leading and trailing whitespace")
+      && description.includes("null-terminated")
+      && returnDescription.includes("trimmed source string")) {
+    return { kind: "trimmed-string", semanticTokens: ["bounded-cstring-output", "counted-cstring-input", "null-terminated-output", "trimmed-string"], evidence };
+  }
+  if (row.result.role === "scalar:u32"
+      && description.includes("normalized resource path")
+      && parameters.some((detail) => detail.includes("size of the output buffer"))
+      && returnDescription.includes("length of the output string")) {
+    return { kind: "canonical-path", semanticTokens: ["bounded-cstring-output", "canonical-path", "counted-cstring-input", "output-length-result"], evidence };
+  }
+  if (row.result.role.startsWith("enum:")
+      && description.includes("url encoding")
+      && parameters.some((detail) => detail.includes("destination buffer"))) {
+    return { kind: "uri-encode", semanticTokens: ["bounded-cstring-output", "counted-cstring-input", "output-byte-count", "uri-encode"], evidence };
+  }
+  return null;
 }
 function includePath(source) {
   const marker = "/src/dmsdk/";
@@ -104,8 +208,8 @@ function exactNativeType(value) {
   return value.nativeType;
 }
 
-function renderHeader(entries, policy) {
-  return `// Generated by scripts/generate-dmsdk-arena-span-blockers.mjs. Do not edit.\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_ARENA_CSTRING_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_ARENA_CSTRING_H\n#include <stdint.h>\n#define DEHERM_DMSDK_ARENA_CSTRING_MAX_INPUT UINT32_C(${policy.cstringArena.maximumInputBytes})\n#define DEHERM_DMSDK_ARENA_CSTRING_MAX_OUTPUT UINT32_C(${policy.cstringArena.maximumOutputBytes})\ntypedef enum DehermDmSdkArenaCStringStatus { DEHERM_DMSDK_ARENA_CSTRING_OK=0, DEHERM_DMSDK_ARENA_CSTRING_UNKNOWN_ID=1, DEHERM_DMSDK_ARENA_CSTRING_NULL_STORAGE=2, DEHERM_DMSDK_ARENA_CSTRING_INPUT_TOO_LARGE=3, DEHERM_DMSDK_ARENA_CSTRING_OUTPUT_TOO_LARGE=4, DEHERM_DMSDK_ARENA_CSTRING_EMBEDDED_NUL=5, DEHERM_DMSDK_ARENA_CSTRING_REENTRANT=6, DEHERM_DMSDK_ARENA_CSTRING_NATIVE_FAILURE=7, DEHERM_DMSDK_ARENA_CSTRING_UNTERMINATED_OUTPUT=8, DEHERM_DMSDK_ARENA_CSTRING_INVALID_SCALAR=9, DEHERM_DMSDK_ARENA_CSTRING_UNEXPECTED_INPUT=10 } DehermDmSdkArenaCStringStatus;\ntypedef enum DehermDmSdkArenaCStringKind { DEHERM_DMSDK_ARENA_CSTRING_ERROR=1, DEHERM_DMSDK_ARENA_CSTRING_TRIM=2, DEHERM_DMSDK_ARENA_CSTRING_CANONICAL=3, DEHERM_DMSDK_ARENA_CSTRING_URI_ENCODE=4 } DehermDmSdkArenaCStringKind;\ntypedef struct DehermDmSdkArenaCStringDescriptor { uint16_t id; uint8_t kind; uint8_t requires_input; const char* declaration_id; } DehermDmSdkArenaCStringDescriptor;\ntypedef struct DehermDmSdkArenaCStringResult { uint64_t native_result; uint32_t output_length; uint32_t required_length; } DehermDmSdkArenaCStringResult;\n#ifdef __cplusplus\nextern \"C\" {\n#endif\nuint32_t deherm_dmsdk_arena_cstring_count(void);\nconst DehermDmSdkArenaCStringDescriptor* deherm_dmsdk_arena_cstring_descriptors(void);\nDehermDmSdkArenaCStringStatus deherm_dmsdk_arena_cstring_dispatch(uint16_t id,const uint8_t* input,uint32_t input_length,uint64_t scalar_argument,char* output,uint32_t output_capacity,DehermDmSdkArenaCStringResult* result);\n#if defined(DEHERM_DMSDK_ARENA_CSTRING_EXACT)\nDehermDmSdkArenaCStringStatus deherm_dmsdk_arena_cstring_exact_dispatch(uint16_t id,const uint8_t* input,uint32_t input_length,uint64_t scalar_argument,char* output,uint32_t output_capacity,DehermDmSdkArenaCStringResult* result);\nuint32_t deherm_dmsdk_arena_cstring_exact_call_count(uint16_t id);\nuint32_t deherm_dmsdk_arena_cstring_exact_failure_count(uint16_t id);\nvoid deherm_dmsdk_arena_cstring_exact_reset(void);\nint deherm_dmsdk_arena_cstring_exact_verify(void);\n#endif\n#ifdef __cplusplus\n}\n#endif\n#endif\n// descriptor-count:${entries.length}\n`;
+function renderHeader(entries, recipe) {
+  return `// Generated by scripts/generate-dmsdk-arena-span-blockers.mjs. Do not edit.\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_ARENA_CSTRING_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_ARENA_CSTRING_H\n#include <stdint.h>\n#define DEHERM_DMSDK_ARENA_CSTRING_MAX_INPUT UINT32_C(${recipe.maximumInputBytes})\n#define DEHERM_DMSDK_ARENA_CSTRING_MAX_OUTPUT UINT32_C(${recipe.maximumOutputBytes})\ntypedef enum DehermDmSdkArenaCStringStatus { DEHERM_DMSDK_ARENA_CSTRING_OK=0, DEHERM_DMSDK_ARENA_CSTRING_UNKNOWN_ID=1, DEHERM_DMSDK_ARENA_CSTRING_NULL_STORAGE=2, DEHERM_DMSDK_ARENA_CSTRING_INPUT_TOO_LARGE=3, DEHERM_DMSDK_ARENA_CSTRING_OUTPUT_TOO_LARGE=4, DEHERM_DMSDK_ARENA_CSTRING_EMBEDDED_NUL=5, DEHERM_DMSDK_ARENA_CSTRING_REENTRANT=6, DEHERM_DMSDK_ARENA_CSTRING_NATIVE_FAILURE=7, DEHERM_DMSDK_ARENA_CSTRING_UNTERMINATED_OUTPUT=8, DEHERM_DMSDK_ARENA_CSTRING_INVALID_SCALAR=9, DEHERM_DMSDK_ARENA_CSTRING_UNEXPECTED_INPUT=10 } DehermDmSdkArenaCStringStatus;\ntypedef enum DehermDmSdkArenaCStringKind { DEHERM_DMSDK_ARENA_CSTRING_ERROR=1, DEHERM_DMSDK_ARENA_CSTRING_TRIM=2, DEHERM_DMSDK_ARENA_CSTRING_CANONICAL=3, DEHERM_DMSDK_ARENA_CSTRING_URI_ENCODE=4 } DehermDmSdkArenaCStringKind;\ntypedef struct DehermDmSdkArenaCStringDescriptor { uint16_t id; uint8_t kind; uint8_t requires_input; const char* declaration_id; } DehermDmSdkArenaCStringDescriptor;\ntypedef struct DehermDmSdkArenaCStringResult { uint64_t native_result; uint32_t output_length; uint32_t required_length; } DehermDmSdkArenaCStringResult;\n#ifdef __cplusplus\nextern \"C\" {\n#endif\nuint32_t deherm_dmsdk_arena_cstring_count(void);\nconst DehermDmSdkArenaCStringDescriptor* deherm_dmsdk_arena_cstring_descriptors(void);\nDehermDmSdkArenaCStringStatus deherm_dmsdk_arena_cstring_dispatch(uint16_t id,const uint8_t* input,uint32_t input_length,uint64_t scalar_argument,char* output,uint32_t output_capacity,DehermDmSdkArenaCStringResult* result);\n#if defined(DEHERM_DMSDK_ARENA_CSTRING_EXACT)\nDehermDmSdkArenaCStringStatus deherm_dmsdk_arena_cstring_exact_dispatch(uint16_t id,const uint8_t* input,uint32_t input_length,uint64_t scalar_argument,char* output,uint32_t output_capacity,DehermDmSdkArenaCStringResult* result);\nuint32_t deherm_dmsdk_arena_cstring_exact_call_count(uint16_t id);\nuint32_t deherm_dmsdk_arena_cstring_exact_failure_count(uint16_t id);\nvoid deherm_dmsdk_arena_cstring_exact_reset(void);\nint deherm_dmsdk_arena_cstring_exact_verify(void);\n#endif\n#ifdef __cplusplus\n}\n#endif\n#endif\n// descriptor-count:${entries.length}\n`;
 }
 function renderCall(entry, callee) {
   if (entry.recipe.kind === "error-string") return `${callee}(output,static_cast<size_t>(output_capacity),static_cast<int>(static_cast<int32_t>(scalar_argument)));result->native_result=UINT64_C(0);result->required_length=UINT32_C(0);`;
@@ -219,32 +323,35 @@ function renderSource(entries, exact) {
 }
 
 export async function loadInputs(root = repositoryRoot) {
-  const [irText, shapesText, symbolEvidenceText, policyText] = await Promise.all([readFile(resolve(root, paths.ir), "utf8"), readFile(resolve(root, paths.shapes), "utf8"), readFile(resolve(root, paths.symbolEvidence), "utf8"), readFile(resolve(root, paths.policy), "utf8")]);
-  const policy = JSON.parse(policyText);
-  validatePolicy(policy);
-  const priorWaveTexts = new Map(await Promise.all(policy.priorWaveReports.map(async ({ path }) => [path, await readFile(resolve(root, path), "utf8")])));
-  const evidencePaths = [...new Set(policy.cstringArena.recipes.flatMap(({ sourceEvidence }) => sourceEvidence.map(({ path }) => path)))];
-  const evidenceTexts = new Map(await Promise.all(evidencePaths.map(async (path) => [path, await readFile(resolve(root, path), "utf8").catch(() => null)])));
-  return { irText, shapesText, symbolEvidenceText, policyText, priorWaveTexts, evidenceTexts };
+  const [irText, shapesText, symbolEvidenceText, recipeText] = await Promise.all([
+    readFile(resolve(root, paths.ir), "utf8"),
+    readFile(resolve(root, paths.shapes), "utf8"),
+    readFile(resolve(root, paths.symbolEvidence), "utf8"),
+    readFile(resolve(root, paths.recipe), "utf8"),
+  ]);
+  validateRecipe(JSON.parse(recipeText));
+  const priorWaveTexts = new Map(await Promise.all(priorWaveReports.map(async ({ path }) => [path, await readFile(resolve(root, path), "utf8")])));
+  return { irText, shapesText, symbolEvidenceText, recipeText, priorWaveTexts };
 }
 export function generate(inputs) {
   const ir = JSON.parse(inputs.irText);
   const shapes = JSON.parse(inputs.shapesText);
   const symbolEvidence = JSON.parse(inputs.symbolEvidenceText);
-  const policy = JSON.parse(inputs.policyText);
-  validatePolicy(policy);
+  const recipeDocument = JSON.parse(inputs.recipeText);
+  validateRecipe(recipeDocument);
+  const recipe = recipeDocument.recipe;
   assert(ir.schemaVersion === 1 && shapes.schemaVersion === 1, "unsupported dmSDK input schemaVersion");
   assert(shapes.defoldRevision === ir.defoldRevision, "arena-span inputs use different Defold revisions");
   assert(symbolEvidence.schemaVersion === 2 && symbolEvidence.defoldRevision === ir.defoldRevision && object(symbolEvidence.declarations), "arena-span symbol evidence is invalid or revision-mismatched");
-  assertReviewedRevision({ input: paths.policy, reviewed: policy.defoldRevision, derived: ir.defoldRevision, detail: "the reviewed arena/span cstring tranche" });
   assert(shapes.sourceIr === paths.ir && shapes.sourceHashes?.ir === sha256(inputs.irText), "IR hash does not match ABI-shape census provenance");
   unique(ir.declarations, ({ id }) => id, "dmSDK IR declarations");
   unique(shapes.rows, ({ id }) => id, "dmSDK ABI-shape rows");
-  const census = shapes.rows.filter(({ tranche }) => tranche === policy.tranche).sort((a, b) => compare(a.id, b.id));
+  const irById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
+  const census = shapes.rows.filter(({ tranche }) => tranche === arenaTranche).sort((a, b) => compare(a.id, b.id));
   const censusIds = new Set(census.map(({ id }) => id));
   const priorDeclarations = [];
   const priorWaves = [];
-  for (const expected of policy.priorWaveReports) {
+  for (const expected of priorWaveReports) {
     const text = inputs.priorWaveTexts.get(expected.path);
     const report = JSON.parse(text);
     assert(report.policyVersion === expected.policyVersion && report.defoldRevision === ir.defoldRevision, `${expected.path}: prior-wave identity drifted`);
@@ -255,25 +362,20 @@ export function generate(inputs) {
     priorWaves.push({ report: expected.path, policyVersion: report.policyVersion, sha256: sha256(text), declarationCount: applicable.length });
   }
   const priorIds = unique(priorDeclarations, ({ id }) => id, "combined prior-wave declarations");
-  const recipes = new Map(policy.cstringArena.recipes.map((recipe) => [recipe.shape, recipe]));
-  const resolvedRecipes = new Map([...recipes].map(([shape, recipe]) => [shape, {
-    ...recipe,
-    resolvedSourceEvidence: resolveSourceEvidence(recipe, inputs.evidenceTexts),
-  }]));
   const available = census.filter(({ id }) => !priorIds.has(id));
-  const selected = available.filter((row) => blockerFor(row) === policy.cstringArena.selection.blocker);
+  const selected = available.filter((row) => blockerFor(row) === "cstring-termination-or-capacity-policy");
   const declined = [];
   const entries = [];
+  const patterns = arenaPatterns();
   for (const candidate of selected) {
-    const recipe = resolvedRecipes.get(candidate.shape);
+    const semantics = inferArenaCStringSemantics(irById.get(candidate.id), candidate);
+    const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);
+    const kind = decision.fallback ? null : decision.family.slice("arena-cstring.".length);
     const linkage = symbolEvidence.declarations[candidate.id];
-    const recipeApplies = recipe?.resolvedSourceEvidence
-      && policy.cstringArena.selection.allowedResultRoles.includes(candidate.result.role)
-      && candidate.parameters.every(({ role }) => policy.cstringArena.selection.allowedParameterRoles.includes(role));
     const linkageApplies = linkage?.name === candidate.symbol
       && linkage.header === candidate.header
       && (linkage.linkage === "header-only" || (linkage.linkage === "external" && linkage.availability === "all-targets-all-variants"));
-    if (!recipeApplies || !linkageApplies) {
+    if (!kind || kind !== semantics?.kind || !linkageApplies) {
       declined.push({
         ...candidate,
         disposition: "blocked",
@@ -281,32 +383,32 @@ export function generate(inputs) {
         blockerReason: specializationBlockerReason,
         universalFallback: "retained",
         specializationEvidence: {
-          recipe: recipe ? (recipe.resolvedSourceEvidence ? "holds" : "source-evidence-withdrawn") : "missing",
-          roles: recipe && policy.cstringArena.selection.allowedResultRoles.includes(candidate.result.role)
-            && candidate.parameters.every(({ role }) => policy.cstringArena.selection.allowedParameterRoles.includes(role)) ? "holds" : "unsupported",
+          semantics: semantics ? "holds" : "revision-documentation-insufficient",
+          pattern: compactDmSdkPatternDecision(decision),
           linkage: linkageApplies ? "holds" : "unavailable",
         },
+        patternDecision: decision,
         stages: { generated: "not-applicable", compiled: "not-claimed", linked: "not-claimed", runtime: "not-claimed", allocation: "not-claimed" },
       });
       continue;
     }
-    entries.push({ bindingId: entries.length, candidate, recipe, linkage });
+    entries.push({ bindingId: entries.length, candidate, recipe: { kind, shape: candidate.shape }, semantics, decision, linkage });
   }
   const selectedIds = new Set(entries.map(({ candidate }) => candidate.id));
   const declinedIds = new Set(declined.map(({ id }) => id));
   const declarations = available.filter(({ id }) => !selectedIds.has(id) && !declinedIds.has(id)).map((row) => {
     const blocker = blockerFor(row);
-    return { ...row, disposition: "blocked", blocker, blockerReason: policy.blockerDefinitions[blocker] ?? "No specialized arena-span lowering recipe currently applies; the universal dmSDK route remains available.", stages: { generated: "not-applicable", compiled: "not-claimed", linked: "not-claimed", runtime: "not-claimed", allocation: "not-claimed" } };
+    return { ...row, disposition: "blocked", blocker, blockerReason: blockerDefinitions[blocker] ?? "No specialized arena-span lowering recipe currently applies; the universal dmSDK route remains available.", stages: { generated: "not-applicable", compiled: "not-claimed", linked: "not-claimed", runtime: "not-claimed", allocation: "not-claimed" } };
   });
   declarations.push(...declined);
   declarations.sort((a, b) => compare(a.id, b.id));
   const partitionSummary = Object.fromEntries([...new Set(declarations.map(({ blocker }) => blocker))].sort(compare).map((blocker) => [blocker, declarations.filter((row) => row.blocker === blocker).length]));
   const coverage = { arenaSpanCensus: census.length, coveredByPriorWaves: priorDeclarations.length, generatedCStringArena: entries.length, blocked: declarations.length, executableAdaptersEmitted: entries.length, exactCallTwinsEmitted: entries.length, overlap: 0, unaccounted: census.length - priorDeclarations.length - entries.length - declarations.length };
   assert(coverage.unaccounted === 0, "arena-span partition is incomplete");
-  const generated = new Map([[artifacts.header, renderHeader(entries, policy)], [artifacts.production, renderSource(entries, false)], [artifacts.exact, renderSource(entries, true)]]);
-  const generatedDeclarations = entries.map(({ bindingId, candidate, recipe, linkage }) => ({ ...candidate, disposition: "generated", preferredLowering: true, denseId: bindingId, wrapper: "deherm_dmsdk_arena_cstring_dispatch", exactWrapper: "deherm_dmsdk_arena_cstring_exact_dispatch", exactCallee: exactCallee({ bindingId }), recipe: { kind: recipe.kind, shape: recipe.shape }, universalFallback: "retained-usage-materialized-recipe", sourceEvidence: recipe.resolvedSourceEvidence, symbolEvidence: { path: paths.symbolEvidence, linkage: linkage.linkage, availability: linkage.availability, linkedIn: linkage.linkedIn }, stages: { generated: "production-and-exact-from-one-recipe", compiled: "pinned-header-production-and-exact-object-tests", linked: "all-target-all-variant-symbol-census-plus-exact-recording-callee", runtime: "exact-dispatch-all-vectors", allocation: "bounded-thread-local-input-scratch-no-heap-primitives" } }));
-  const sourceHashes = { ir: sha256(inputs.irText), shapes: sha256(inputs.shapesText), symbolEvidence: sha256(inputs.symbolEvidenceText), policy: sha256(inputs.policyText), priorWaveReports: Object.fromEntries(priorWaves.map(({ report, sha256: hash }) => [report, hash])), evidence: Object.fromEntries([...inputs.evidenceTexts].sort(([a], [b]) => compare(a, b)).map(([path, text]) => [path, text === null ? null : sha256(text)])) };
-  const report = { schemaVersion: 1, policyVersion: policy.policyVersion, defoldRevision: ir.defoldRevision, sources: { ...paths, priorWaveReports: policy.priorWaveReports.map(({ path }) => path) }, sourceHashes, scope: "Complete arena-backed-spans census with deterministic counted-input/caller-output cstring adapters", policy: { disposition: "generated-cstring-arena-plus-explicit-blockers", ...policy.cstringArena.contract, maximumInputBytes: policy.cstringArena.maximumInputBytes, maximumOutputBytes: policy.cstringArena.maximumOutputBytes }, coverage, priorWaves, coveredByPriorWaves: priorDeclarations.map(({ id, symbol, sourceReport }) => ({ id, symbol, sourceReport })).sort((a, b) => compare(a.id, b.id)), partitionSummary, artifactHashes: Object.fromEntries([...generated].map(([path, content]) => [path, sha256(content)])), artifacts: [...generated.keys()].sort(compare), generatedDeclarations, declarations };
+  const generated = new Map([[artifacts.header, renderHeader(entries, recipe)], [artifacts.production, renderSource(entries, false)], [artifacts.exact, renderSource(entries, true)]]);
+  const generatedDeclarations = entries.map(({ bindingId, candidate, recipe: selectedRecipe, semantics, decision, linkage }) => ({ ...candidate, disposition: "generated", preferredLowering: true, denseId: bindingId, wrapper: "deherm_dmsdk_arena_cstring_dispatch", exactWrapper: "deherm_dmsdk_arena_cstring_exact_dispatch", exactCallee: exactCallee({ bindingId }), recipe: selectedRecipe, patternDecision: decision, universalFallback: "retained-usage-materialized-recipe", sourceEvidence: [semantics.evidence], symbolEvidence: { path: paths.symbolEvidence, linkage: linkage.linkage, availability: linkage.availability, linkedIn: linkage.linkedIn }, stages: { generated: "production-and-exact-from-one-recipe", compiled: "pinned-header-production-and-exact-object-tests", linked: "all-target-all-variant-symbol-census-plus-exact-recording-callee", runtime: "exact-dispatch-all-vectors", allocation: "bounded-thread-local-input-scratch-no-heap-primitives" } }));
+  const sourceHashes = { ir: sha256(inputs.irText), shapes: sha256(inputs.shapesText), symbolEvidence: sha256(inputs.symbolEvidenceText), recipe: sha256(inputs.recipeText), priorWaveReports: Object.fromEntries(priorWaves.map(({ report, sha256: hash }) => [report, hash])) };
+  const report = { schemaVersion: 1, policyVersion, defoldRevision: ir.defoldRevision, sources: { ...paths, priorWaveReports: priorWaveReports.map(({ path }) => path) }, sourceHashes, scope: "Complete arena-backed-spans census with deterministic counted-input/caller-output cstring adapters", policy: { disposition: "generated-cstring-arena-plus-explicit-blockers", ...arenaContract, maximumInputBytes: recipe.maximumInputBytes, maximumOutputBytes: recipe.maximumOutputBytes }, coverage, priorWaves, coveredByPriorWaves: priorDeclarations.map(({ id, symbol, sourceReport }) => ({ id, symbol, sourceReport })).sort((a, b) => compare(a.id, b.id)), partitionSummary, artifactHashes: Object.fromEntries([...generated].map(([path, content]) => [path, sha256(content)])), artifacts: [...generated.keys()].sort(compare), generatedDeclarations, declarations };
   generated.set(paths.output, `${JSON.stringify(report, null, 2)}\n`);
   return { report, artifacts: generated };
 }
