@@ -4,13 +4,15 @@
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "valuePlan": "packages/bindings/generated/defold-dmsdk-value-plan.json",
     "scalarReport": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
     "overrides": "packages/bindings/overrides/dmsdk-enum-value-bindings.json"
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "scalarReport": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0",
+    "valuePlan": "4dc392035674cdcc5531d3c268441d55aac8049bd172531dae86c4a59b299990",
+    "scalarReport": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
     "overrides": "b8bcc3c14556bab5625014ffb6f295986057987e94b546235bb3941149f707c5"
   },
   "policy": {

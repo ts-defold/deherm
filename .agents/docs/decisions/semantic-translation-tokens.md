@@ -153,14 +153,30 @@ and cannot change pattern selection.
 
 Pattern selection is a compiler-owned phase, not an emitter side effect. The
 bounded-span planner authenticates the ABI census, implementation-fact graph,
-and all four stable recipes; joins their structural and causal facts; and emits
-one ranked decision per relevant declaration. Fixed digest, Base64, ASTC, and
-XTEA emitters consume that decision and cannot invoke the selector themselves.
+and five stable recipes; joins their structural and causal facts; and emits one
+ranked decision per relevant declaration. Fixed digest, Base64, ASTC, XTEA, and
+fixed-width hash emitters consume that decision and cannot invoke the selector
+themselves. A separate value planner authenticates the same revision IR and ABI
+census plus the scalar, enum, and named-scalar recipes, then owns all direct
+primitive, declared enum-domain, and source-resolved alias selections. Those
+three emitters likewise render assignments without importing the selector or
+constructing a shadow registry.
 The plan retains the complete rejection trace and universal fallback, so a
 withdrawn source fact changes one explicit decision without suppressing the
 public API. The same contract is the migration target for the remaining dmSDK
 families: collect facts first, select once, then let each emitter render only
 the declarations assigned to it.
+
+Compiler-owned fact requests precede a plan without becoming a second
+selection authority. The bounded C/C++ implementation collector consumes the
+planner's exported structural candidate predicate; it neither carries a
+private family catalog nor reads the final plan whose inputs it produces.
+Provider-boundary migration remains deliberately separate: borrowed handles
+and scratch scalar-outs still use historical tranche labels to exclude owned
+finalizers, producers, atomics, and persistent pointers that share their raw
+ABI shapes. Those families may move to a shared plan only after ownership and
+effect facts replace that label dependency; scanning the broad shape alone is
+not sufficient evidence.
 
 Generated-family census checks are structural, not optimization-count locks.
 For a family report, `declarations.length` must equal the revision's

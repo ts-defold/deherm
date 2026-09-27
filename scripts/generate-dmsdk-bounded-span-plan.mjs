@@ -18,6 +18,7 @@ const sources = Object.freeze({
   base64: "packages/bindings/overrides/dmsdk-base64-span-bindings.json",
   astc: "packages/bindings/overrides/dmsdk-astc-probe-bindings.json",
   xtea: "packages/bindings/overrides/dmsdk-xtea-span-bindings.json",
+  hashSpan: "packages/bindings/overrides/dmsdk-hash-span-bindings.json",
 });
 const output = "packages/bindings/generated/defold-dmsdk-bounded-span-plan.json";
 
@@ -34,6 +35,7 @@ export async function generateDmSdkBoundedSpanPlan({ root = repositoryRoot, chec
       base64: JSON.parse(texts.base64),
       astc: JSON.parse(texts.astc),
       xtea: JSON.parse(texts.xtea),
+      hashSpan: JSON.parse(texts.hashSpan),
     },
     texts,
   });

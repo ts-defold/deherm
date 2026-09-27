@@ -4,6 +4,7 @@ import {
   analyzeAstcProbeRecipe,
   analyzeBase64SpanRecipe,
   analyzeFixedDigestRecipe,
+  analyzeHashSpanRecipe,
   analyzeXteaSpanRecipe,
 } from "./dmsdk-bounded-span-recipes.mjs";
 import { indexCppSemanticFactArtifact } from "./cpp-semantic-facts.mjs";
@@ -11,6 +12,7 @@ import {
   astcProbePattern,
   base64SpanPattern,
   fixedDigestPattern,
+  fixedWidthHashPattern,
   xteaSpanPattern,
 } from "./dmsdk-pattern-catalog.mjs";
 import {
@@ -30,6 +32,7 @@ export const DMSDK_BOUNDED_SPAN_FAMILIES = Object.freeze([
     policySource: "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
     pattern: fixedDigestPattern(),
     policyVersion: "fixed-digest-v4",
+    requiresSourceFacts: true,
     analyze({ declaration, candidate, policy, sourceFact }) {
       return analyzeFixedDigestRecipe(declaration, candidate, policy.recipe, sourceFact);
     },
@@ -40,6 +43,7 @@ export const DMSDK_BOUNDED_SPAN_FAMILIES = Object.freeze([
     policySource: "packages/bindings/overrides/dmsdk-base64-span-bindings.json",
     pattern: base64SpanPattern(),
     policyVersion: "base64-span-v5",
+    requiresSourceFacts: true,
     analyze({ declaration, candidate, policy, sourceFact }) {
       return analyzeBase64SpanRecipe(declaration, candidate, policy.recipe, sourceFact);
     },
@@ -50,6 +54,7 @@ export const DMSDK_BOUNDED_SPAN_FAMILIES = Object.freeze([
     policySource: "packages/bindings/overrides/dmsdk-astc-probe-bindings.json",
     pattern: astcProbePattern(),
     policyVersion: "astc-probe-v4",
+    requiresSourceFacts: true,
     analyze({ declaration, candidate, policy, sourceFact }) {
       return analyzeAstcProbeRecipe(declaration, candidate, policy.recipe, sourceFact);
     },
@@ -60,8 +65,20 @@ export const DMSDK_BOUNDED_SPAN_FAMILIES = Object.freeze([
     policySource: "packages/bindings/overrides/dmsdk-xtea-span-bindings.json",
     pattern: xteaSpanPattern(),
     policyVersion: "xtea-span-v4",
+    requiresSourceFacts: true,
     analyze({ declaration, candidate, policy, sourceFact, enumDeclarations }) {
       return analyzeXteaSpanRecipe(declaration, candidate, enumDeclarations, policy.recipe, sourceFact);
+    },
+  }),
+  Object.freeze({
+    key: "hashSpan",
+    family: "hash-span",
+    policySource: "packages/bindings/overrides/dmsdk-hash-span-bindings.json",
+    pattern: fixedWidthHashPattern(),
+    policyVersion: "hash-span-v3",
+    requiresSourceFacts: false,
+    analyze({ declaration, candidate, policy }) {
+      return analyzeHashSpanRecipe(declaration, candidate, policy.recipe);
     },
   }),
 ]);
@@ -85,6 +102,12 @@ function structurallyEligible(candidate, pattern) {
   const decision = selectDmSdkPattern(patternFacts(candidate), [pattern, DMSDK_UNIVERSAL_FALLBACK_PATTERN]);
   const trace = decision.trace.find(({ patternId }) => patternId === pattern.id);
   return trace !== undefined && trace.blockers.every((blocker) => blocker.startsWith("semantic-token-missing:"));
+}
+
+export function isDmSdkBoundedSpanSourceFactCandidate(candidate) {
+  return DMSDK_BOUNDED_SPAN_FAMILIES.some(
+    ({ pattern, requiresSourceFacts }) => requiresSourceFacts && structurallyEligible(candidate, pattern),
+  );
 }
 
 function validateInputs({ ir, shapes, sourceFacts, policies, texts }) {

@@ -23,11 +23,11 @@
     "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
     "recipe": "682a7812ccc3f472eae17640355f1187c5732aa25fc949b0227f2375ba31d773",
     "priorWaveReports": {
-      "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "2ceed2c69df3f2b6df3de93eb42baeed7d3956b5ae9c1b90fa076fa272175206",
-      "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "ae45d7962ba28aeadca98c50172dee6c96e9737919345d7a1e1d222ae5ae5b7e",
-      "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "a525671e2fa3b1b8f0ddcd36e525c1a03e7b7ab4d43ea4edb92391d3cd27566b",
-      "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "94e02ab4f884e5828c49e0d6f856cf412a9075e8ddd9363cd50447a01750b7f4",
-      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "140976814df7caec7d86490699db79723c4e028d3d4856fac91c084ac06f73cc",
+      "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "dfb5adf5b7a7421191397a4d1e27bf2ac08c2e3da96fe5ff8473ce9eaf939dcb",
+      "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "e8603b1789f77c90eef3d12c007766f0331d57a724668bc51e473ab361464e51",
+      "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
+      "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
+      "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
       "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json": "10c311d6ded6edb05f00b39f7cc781a0d2c2b81fc2e25e6e5b94d9114a78df32"
     }
   },
@@ -56,31 +56,31 @@
     {
       "report": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
       "policyVersion": "fixed-digest-v4",
-      "sha256": "2ceed2c69df3f2b6df3de93eb42baeed7d3956b5ae9c1b90fa076fa272175206",
+      "sha256": "dfb5adf5b7a7421191397a4d1e27bf2ac08c2e3da96fe5ff8473ce9eaf939dcb",
       "declarationCount": 4
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
       "policyVersion": "base64-span-v5",
-      "sha256": "ae45d7962ba28aeadca98c50172dee6c96e9737919345d7a1e1d222ae5ae5b7e",
+      "sha256": "e8603b1789f77c90eef3d12c007766f0331d57a724668bc51e473ab361464e51",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
       "policyVersion": "astc-probe-v4",
-      "sha256": "a525671e2fa3b1b8f0ddcd36e525c1a03e7b7ab4d43ea4edb92391d3cd27566b",
+      "sha256": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
       "policyVersion": "xtea-span-v4",
-      "sha256": "94e02ab4f884e5828c49e0d6f856cf412a9075e8ddd9363cd50447a01750b7f4",
+      "sha256": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
       "declarationCount": 2
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
       "policyVersion": "hash-span-v3",
-      "sha256": "140976814df7caec7d86490699db79723c4e028d3d4856fac91c084ac06f73cc",
+      "sha256": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
       "declarationCount": 2
     },
     {

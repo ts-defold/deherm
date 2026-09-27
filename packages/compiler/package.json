@@ -26,6 +26,8 @@
     "./dmsdk-fallback-audit": "./src/dmsdk-fallback-audit.mjs",
     "./cpp-semantic-facts": "./src/cpp-semantic-facts.mjs",
     "./dmsdk-bounded-span-recipes": "./src/dmsdk-bounded-span-recipes.mjs",
+    "./dmsdk-bounded-span-plan": "./src/dmsdk-bounded-span-plan.mjs",
+    "./dmsdk-value-plan": "./src/dmsdk-value-plan.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"

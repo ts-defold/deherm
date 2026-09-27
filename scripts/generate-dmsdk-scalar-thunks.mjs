@@ -3,17 +3,16 @@ import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
-import { directPrimitiveScalarPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+  indexDmSdkValuePlan,
+  inferScalarThunkSemantics,
+} from "../packages/compiler/src/dmsdk-value-plan.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
 const paths = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  valuePlan: "packages/bindings/generated/defold-dmsdk-value-plan.json",
   recipe: "packages/bindings/overrides/dmsdk-scalar-thunks.json",
 };
 
@@ -103,32 +102,7 @@ function publicInclude(header) {
   return `dmsdk/${header.slice(index + marker.length)}`;
 }
 
-export function inferScalarThunkSemantics(declaration, row) {
-  if (!declaration || declaration.kind !== "function") return null;
-  const nativeTypes = [declaration.returns ?? "void", ...(declaration.parameters ?? []).map(({ type }) => type)];
-  if (!nativeTypes.every((type) => ABI_TYPES[type])) return null;
-  const roles = [row.result.role, ...row.parameters.map(({ role }) => role)];
-  if (!roles.every((role) => role.startsWith("scalar:"))) return null;
-  const leaf = declaration.name.split("::").at(-1);
-  const description = `${declaration.description ?? ""} ${declaration.returnDescription ?? ""}`.trim();
-  const lifecycleOperation =
-    declaration.parameters.length === 0 && declaration.returns === "void" && /(?:initialize|finalize)$/iu.test(leaf);
-  const mayBlock = /(?:^|\b)(?:sleep|block(?:s|ing)?)(?:\b|$)/iu.test(`${leaf} ${description}`);
-  return {
-    semanticTokens: ["direct-native-primitive", "fixed-width-cell-codec", "synchronous-noescape"],
-    capabilityBlocker: lifecycleOperation ? "lifecycle-capability-required" : null,
-    lifecycleOperation,
-    mayBlock,
-    pureValueTransform:
-      declaration.parameters.length > 0 && declaration.returns !== "void" && !lifecycleOperation && !mayBlock,
-    evidence: {
-      source: "revision-ir-abi+public-documentation",
-      nativeTypes,
-      description: declaration.description ?? null,
-      returnDescription: declaration.returnDescription ?? null,
-    },
-  };
-}
+export { inferScalarThunkSemantics };
 
 function declarationEvidence(content, declaration) {
   const lines = content.split(/\r?\n/);
@@ -356,26 +330,27 @@ export async function build() {
   );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
+  const valuePlan = JSON.parse(contents.valuePlan);
   const recipe = JSON.parse(contents.recipe);
   const declarationsById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  const patterns = [directPrimitiveScalarPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const planById = indexDmSdkValuePlan(valuePlan, {
+    revision: ir.defoldRevision,
+    sourceHashes: {
+      ir: sha256(contents.ir),
+      shapes: sha256(contents.shapes),
+      scalar: sha256(contents.recipe),
+    },
+  });
+  const patterns = valuePlan.patternRegistry.filter(({ id }) =>
+    id === "value.direct-primitive-scalar" || id === "universal.default",
+  );
   const candidates = shapes.rows
     .map((row) => {
       const declaration = declarationsById.get(row.id);
-      const semantics = inferScalarThunkSemantics(declaration, row);
-      if (!semantics) return null;
-      const decision = selectDmSdkPattern(
-        {
-          id: row.id,
-          kind: declaration.kind,
-          result: row.result,
-          parameters: row.parameters,
-          families: row.families,
-          semanticTokens: semantics.semanticTokens,
-        },
-        patterns,
-      );
-      return decision.patternId === "value.direct-primitive-scalar" ? { declaration, row, semantics, decision } : null;
+      const decision = planById.get(row.id);
+      return decision?.patternId === "value.direct-primitive-scalar"
+        ? { declaration, row, semantics: decision.semantics, decision }
+        : null;
     })
     .filter(Boolean)
     .sort((left, right) => left.declaration.id.localeCompare(right.declaration.id));
@@ -399,7 +374,7 @@ export async function build() {
       nativeSignature: declaration.type,
       headerEvidence,
       definitionEvidence: [headerEvidence],
-      patternDecision: compactDmSdkPatternDecision(decision),
+      patternDecision: decision.patternId,
       semanticEvidence: semantics.evidence,
     };
     if (semantics.capabilityBlocker) {
@@ -515,6 +490,7 @@ export async function build() {
     defoldRevision: ir.defoldRevision,
     sourceIr: "packages/bindings/generated/defold-sdk-ir.json",
     sourceShapes: paths.shapes,
+    sourceValuePlan: paths.valuePlan,
     sourceRecipe: paths.recipe,
     scope: `The ${reportEntries.length} declarations selected structurally as direct native primitive functions. Stage counts describe this generated family only, not overall dmSDK coverage.`,
     abiPolicy: {
@@ -566,6 +542,7 @@ export async function build() {
     sourceHashes: {
       ir: sha256(contents.ir),
       shapes: sha256(contents.shapes),
+      valuePlan: sha256(contents.valuePlan),
       recipe: sha256(contents.recipe),
     },
     artifactHashes: Object.fromEntries(

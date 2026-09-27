@@ -7,17 +7,13 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
-import { namedScalarPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+import { indexDmSdkValuePlan } from "../packages/compiler/src/dmsdk-value-plan.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
 const defaultIrPath = "packages/bindings/generated/defold-sdk-ir.json";
 const defaultShapesPath = "packages/bindings/generated/defold-dmsdk-abi-shapes.json";
+const defaultValuePlanPath = "packages/bindings/generated/defold-dmsdk-value-plan.json";
 const defaultSymbolEvidencePath = "packages/bindings/generated/defold-dmsdk-symbol-evidence.json";
 const defaultPolicyPath = "packages/bindings/overrides/dmsdk-named-scalar-policies.json";
 const outputReportPath = "packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json";
@@ -43,8 +39,6 @@ const builtinTypes = Object.freeze({
   float: Object.freeze({ c: "float", lane: "f32" }),
   double: Object.freeze({ c: "double", lane: "f64" }),
 });
-const scalarRoles = new Set(Object.values(builtinTypes).map(({ lane }) => `scalar:${lane}`));
-
 const digest = (content) => createHash("sha256").update(content).digest("hex");
 export const orderedBlockingReasons = ({ symbolBlocker = null, resultBlocker = null, parameterBlockers = [] }) => [
   ...new Set([symbolBlocker, resultBlocker, ...parameterBlockers].filter(Boolean)),
@@ -70,6 +64,7 @@ function parseArguments(argv) {
     outRoot: repositoryRoot,
     irPath: defaultIrPath,
     shapesPath: defaultShapesPath,
+    valuePlanPath: defaultValuePlanPath,
     symbolEvidencePath: defaultSymbolEvidencePath,
     policyPath: defaultPolicyPath,
     check: false,
@@ -79,6 +74,7 @@ function parseArguments(argv) {
     else if (argv[index] === "--out-root") options.outRoot = resolve(argv[++index]);
     else if (argv[index] === "--ir") options.irPath = resolve(argv[++index]);
     else if (argv[index] === "--shapes") options.shapesPath = resolve(argv[++index]);
+    else if (argv[index] === "--value-plan") options.valuePlanPath = resolve(argv[++index]);
     else if (argv[index] === "--symbol-evidence") options.symbolEvidencePath = resolve(argv[++index]);
     else if (argv[index] === "--policy") options.policyPath = resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argv[index]}`);
@@ -180,19 +176,6 @@ async function typeSpec(type, role, declaration, index, evidenceCache, seen = ne
     underlying: alias.type,
     native: alias.name,
     evidence: await aliasEvidence(alias, evidenceCache),
-  };
-}
-
-function namedScalarSemantics(declaration, row, typeIndex) {
-  if (!declaration || declaration.kind !== "function") return null;
-  const roles = [row.result.role, ...row.parameters.map(({ role }) => role)];
-  if (!roles.every((role) => scalarRoles.has(role))) return null;
-  const sourceTypes = [declaration.returns, ...declaration.parameters.map(({ type }) => type)];
-  const aliases = sourceTypes.map((type) => resolveTypeAlias(type, declaration.name, typeIndex)).filter(Boolean);
-  if (aliases.length === 0) return null;
-  return {
-    semanticTokens: ["fixed-width-cell-codec", "source-resolved-named-scalar", "synchronous-noescape"],
-    aliases: [...new Set(aliases.map(({ id }) => id))].sort(),
   };
 }
 
@@ -530,17 +513,20 @@ function validateProvenance(ir, irContent, shapes) {
 export async function build({
   irPath = defaultIrPath,
   shapesPath = defaultShapesPath,
+  valuePlanPath = defaultValuePlanPath,
   symbolEvidencePath = defaultSymbolEvidencePath,
   policyPath = defaultPolicyPath,
 } = {}) {
-  const [irContent, shapesContent, symbolEvidenceContent, policyContent] = await Promise.all([
+  const [irContent, shapesContent, valuePlanContent, symbolEvidenceContent, policyContent] = await Promise.all([
     readFile(resolve(repositoryRoot, irPath), "utf8"),
     readFile(resolve(repositoryRoot, shapesPath), "utf8"),
+    readFile(resolve(repositoryRoot, valuePlanPath), "utf8"),
     readFile(resolve(repositoryRoot, symbolEvidencePath), "utf8"),
     readFile(resolve(repositoryRoot, policyPath), "utf8"),
   ]);
   const ir = JSON.parse(irContent);
   const shapes = JSON.parse(shapesContent);
+  const valuePlan = JSON.parse(valuePlanContent);
   const symbolEvidence = JSON.parse(symbolEvidenceContent);
   const policy = JSON.parse(policyContent);
   const reportedSymbolEvidencePath = normalizedInputPath(symbolEvidencePath);
@@ -556,24 +542,24 @@ export async function build({
     throw new Error("Invalid named-scalar structural policy");
   const byId = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const aliases = buildTypeIndex(ir);
-  const patterns = [namedScalarPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const planById = indexDmSdkValuePlan(valuePlan, {
+    revision: ir.defoldRevision,
+    sourceHashes: {
+      ir: digest(irContent),
+      shapes: digest(shapesContent),
+      namedScalar: digest(policyContent),
+    },
+  });
+  const patterns = valuePlan.patternRegistry.filter(({ id }) =>
+    id === "value.named-scalar-direct" || id === "universal.default",
+  );
   const candidates = shapes.rows
     .map((shape) => {
       const declaration = byId.get(shape.id);
-      const semantics = namedScalarSemantics(declaration, shape, aliases);
-      if (!semantics) return null;
-      const decision = selectDmSdkPattern(
-        {
-          id: shape.id,
-          kind: declaration.kind,
-          result: shape.result,
-          parameters: shape.parameters,
-          families: shape.families,
-          semanticTokens: semantics.semanticTokens,
-        },
-        patterns,
-      );
-      return decision.patternId === "value.named-scalar-direct" ? { shape, declaration, semantics, decision } : null;
+      const decision = planById.get(shape.id);
+      return decision?.patternId === "value.named-scalar-direct"
+        ? { shape, declaration, semantics: decision.semantics, decision }
+        : null;
     })
     .filter(Boolean)
     .sort((a, b) => a.declaration.id.localeCompare(b.declaration.id));
@@ -613,7 +599,7 @@ export async function build({
       shape: shape.shape,
       include: includeFor(declaration.header),
       aliases: semantics.aliases,
-      patternDecision: compactDmSdkPatternDecision(decision),
+      patternDecision: decision.patternId,
       headerEvidence: { path: declaration.header, ...declarationEvidence(header, declaration), sha256: headerHash },
       symbolEvidence: {
         path: reportedSymbolEvidencePath,
@@ -736,6 +722,7 @@ export async function build({
     sourceHashes: {
       ir: digest(irContent),
       shapes: digest(shapesContent),
+      valuePlan: digest(valuePlanContent),
       symbolEvidence: digest(symbolEvidenceContent),
       policy: digest(policyContent),
     },
@@ -761,8 +748,14 @@ async function writeOrCheck(outRoot, relativePath, content, check) {
 }
 
 export async function run(argv = process.argv.slice(2)) {
-  const { outRoot, check, irPath, shapesPath, symbolEvidencePath, policyPath } = parseArguments(argv);
-  const { artifacts, report } = await build({ irPath, shapesPath, symbolEvidencePath, policyPath });
+  const { outRoot, check, irPath, shapesPath, valuePlanPath, symbolEvidencePath, policyPath } = parseArguments(argv);
+  const { artifacts, report } = await build({
+    irPath,
+    shapesPath,
+    valuePlanPath,
+    symbolEvidencePath,
+    policyPath,
+  });
   for (const [path, content] of artifacts) await writeOrCheck(outRoot, path, content, check);
   process.stdout.write(
     `${check ? "Verified" : "Generated"} ${report.coverage.generated}/${report.coverage.reviewed} named-scalar bindings; ${report.coverage.policyBlocked} ABI-blocked.\n`,

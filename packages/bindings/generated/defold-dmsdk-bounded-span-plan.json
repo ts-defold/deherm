@@ -10,7 +10,8 @@
       "fixedDigest": "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
       "base64": "packages/bindings/overrides/dmsdk-base64-span-bindings.json",
       "astc": "packages/bindings/overrides/dmsdk-astc-probe-bindings.json",
-      "xtea": "packages/bindings/overrides/dmsdk-xtea-span-bindings.json"
+      "xtea": "packages/bindings/overrides/dmsdk-xtea-span-bindings.json",
+      "hashSpan": "packages/bindings/overrides/dmsdk-hash-span-bindings.json"
     }
   },
   "sourceHashes": {
@@ -20,7 +21,8 @@
     "fixedDigest": "9e5447e859698463cc676be96b454fa19871d17e265adf16e93eb3844595cf70",
     "base64": "52a25ca0a83b7410dd0dbadb4847c4de8e922a56c93b46857c37f2696de2e31c",
     "astc": "9bb907d3f928ae3e61b1e648e4bb52fa308487e7129a629590259f37b458da9c",
-    "xtea": "d8892d2c631b3e35ca535724b82b81fe12a0ff6c3c619456f617417adabe9625"
+    "xtea": "d8892d2c631b3e35ca535724b82b81fe12a0ff6c3c619456f617417adabe9625",
+    "hashSpan": "780a70923ff79376373288e54c735559bd595811b718ec8f06dfca728d1732de"
   },
   "patternRegistry": [
     {
@@ -292,6 +294,54 @@
     },
     {
       "schemaVersion": 1,
+      "id": "span.fixed-width-hash",
+      "family": "hash-span",
+      "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+      "priority": 860,
+      "cost": 4,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "scalar:u32",
+            "scalar:u64"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 2
+          },
+          "positions": [
+            {
+              "roles": [
+                "opaque-pointer"
+              ],
+              "directions": [
+                "in"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "bounded-input-span",
+          "fixed-width-scalar-result",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
       "id": "universal.default",
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
@@ -302,8 +352,8 @@
     }
   ],
   "coverage": {
-    "structurallyRelevant": 10,
-    "selected": 10,
+    "structurallyRelevant": 12,
+    "selected": 12,
     "universalFallback": 0
   },
   "decisions": [
@@ -396,6 +446,17 @@
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
           ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:bool",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
+          ]
         }
       ]
     },
@@ -481,6 +542,17 @@
             "semantic-token-missing:bounded-key-span",
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:bool",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
           ]
         }
       ]
@@ -578,6 +650,17 @@
           "patternId": "span.in-place-keyed-transform",
           "applicable": true,
           "blockers": []
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
+          ]
         }
       ]
     },
@@ -674,6 +757,17 @@
           "patternId": "span.in-place-keyed-transform",
           "applicable": true,
           "blockers": []
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmCrypt::Result",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
+          ]
         }
       ]
     },
@@ -753,6 +847,17 @@
             "semantic-token-missing:bounded-key-span",
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
           ]
         }
       ]
@@ -834,6 +939,17 @@
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
           ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
+          ]
         }
       ]
     },
@@ -913,6 +1029,17 @@
             "semantic-token-missing:bounded-key-span",
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
           ]
         }
       ]
@@ -994,6 +1121,181 @@
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
           ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:scalar:void",
+            "semantic-token-missing:bounded-input-span",
+            "semantic-token-missing:fixed-width-scalar-result"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
+      "patternId": "span.fixed-width-hash",
+      "family": "hash-span",
+      "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+      "fallback": false,
+      "priority": 860,
+      "cost": 4,
+      "semanticTokens": [
+        "bounded-input-span",
+        "fixed-width-scalar-result",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "resultBits": 32,
+        "semanticTokens": [
+          "bounded-input-span",
+          "fixed-width-scalar-result",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "declarationLine": 69,
+          "semanticSource": "revision-ir-abi-shape",
+          "resultBits": 32
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-width-hash"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u32",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u32",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u32",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u32",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
+      "patternId": "span.fixed-width-hash",
+      "family": "hash-span",
+      "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+      "fallback": false,
+      "priority": 860,
+      "cost": 4,
+      "semanticTokens": [
+        "bounded-input-span",
+        "fixed-width-scalar-result",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "resultBits": 64,
+        "semanticTokens": [
+          "bounded-input-span",
+          "fixed-width-scalar-result",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "declarationLine": 79,
+          "semanticSource": "revision-ir-abi-shape",
+          "resultBits": 64
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "span.fixed-width-hash"
+      ],
+      "trace": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u64",
+            "semantic-token-missing:fixed-output-byte-count"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u64",
+            "semantic-token-missing:bounded-output-capacity",
+            "semantic-token-missing:zero-capacity-size-query"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u64",
+            "semantic-token-missing:fixed-three-u32-output"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:u64",
+            "semantic-token-missing:bounded-key-span",
+            "semantic-token-missing:in-place-byte-transform",
+            "semantic-token-missing:single-algorithm-enum"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": true,
+          "blockers": []
         }
       ]
     },
@@ -1076,6 +1378,16 @@
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
           ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:scalar:bool",
+            "semantic-token-missing:fixed-width-scalar-result"
+          ]
         }
       ]
     },
@@ -1157,6 +1469,16 @@
             "semantic-token-missing:bounded-key-span",
             "semantic-token-missing:in-place-byte-transform",
             "semantic-token-missing:single-algorithm-enum"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:scalar:bool",
+            "semantic-token-missing:fixed-width-scalar-result"
           ]
         }
       ]

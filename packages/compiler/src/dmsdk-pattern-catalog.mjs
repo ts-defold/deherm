@@ -1,12 +1,6 @@
 import { BOUNDED_SPAN_SEMANTIC_TOKENS } from "./dmsdk-bounded-span-recipes.mjs";
 import { defineDmSdkPattern, DMSDK_UNIVERSAL_FALLBACK_PATTERN } from "./dmsdk-pattern-selector.mjs";
 
-const HASH_SPAN_SEMANTIC_TOKENS = Object.freeze([
-  "bounded-input-span",
-  "fixed-width-scalar-result",
-  "synchronous-noescape",
-]);
-
 const HASH_STATE_SEMANTIC_TOKENS = Object.freeze([
   "generation-checked-state",
   "incremental-hash-lifecycle",
@@ -188,7 +182,7 @@ export function fixedWidthHashPattern() {
           { roles: ["scalar:u32"], directions: ["value"] },
         ],
       },
-      requireSemanticTokens: HASH_SPAN_SEMANTIC_TOKENS,
+      requireSemanticTokens: BOUNDED_SPAN_SEMANTIC_TOKENS.hashSpan,
     },
   });
 }

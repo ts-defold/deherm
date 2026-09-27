@@ -254,6 +254,24 @@ lifecycle operation withdraws that optimized family as a unit; the universal
 recipe remains available. The package retains only the stable generation-token,
 bounded-registry, counted-byte-input, and consume-operation recipe.
 
+The compiler now materializes two authenticated decision products before any
+covered emitter runs. The bounded-span plan owns fixed digest, Base64, ASTC,
+XTEA, and fixed-width buffer hashes. The value plan owns direct primitive
+scalars, declared enum domains, and source-resolved named scalar aliases. The
+eight emitters consume their plan rows and cannot import the selector or define
+a private registry. Plan tests canonicalize shuffled inputs, withdraw semantic
+facts to the universal fallback, reject forged owners, and join every emitted
+row back to its authenticated decision. One compiler rebuilt current, 1.13.1,
+1.12.0, and 1.11.0 after this migration; all four completed materialization,
+TypeScript and native generation, compilation, linkage, and exact-call harness
+execution.
+
+Borrowed-handle and scratch-scalar-out planning is intentionally not included
+in that claim. Removing their current tranche prefilter exposes structurally
+similar owned finalizers/producers and atomics. Their next prerequisite is a
+revision-derived ownership/effect taxonomy plus negative synthetic fixtures;
+moving the selector first would broaden the fast path unsafely.
+
 ## 4. Make every product a projection
 
 - [ ] Emit TypeScript SDK and TSDoc.

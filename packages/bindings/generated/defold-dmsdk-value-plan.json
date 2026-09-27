@@ -1,0 +1,3672 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-value-plan",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "packages/bindings/generated/defold-sdk-ir.json",
+    "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "scalar": "packages/bindings/overrides/dmsdk-scalar-thunks.json",
+    "enumValue": "packages/bindings/overrides/dmsdk-enum-value-bindings.json",
+    "namedScalar": "packages/bindings/overrides/dmsdk-named-scalar-policies.json"
+  },
+  "sourceHashes": {
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "scalar": "85ee43cc45019d2bb5bdbf838f583012862504fd7e84be34b6646ce7933cf79c",
+    "enumValue": "b8bcc3c14556bab5625014ffb6f295986057987e94b546235bb3941149f707c5",
+    "namedScalar": "0993c36e00a02fa1547d344365b3b2e64eb0362d1479ddee34a4ad1dff01e586"
+  },
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "priority": 820,
+      "cost": 4,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "rolePrefixes": [
+            "scalar:"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "rolePrefixes": [
+                "scalar:"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "priority": 810,
+      "cost": 6,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "rolePrefixes": [
+            "enum:",
+            "scalar:"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "rolePrefixes": [
+                "enum:",
+                "scalar:"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "priority": 820,
+      "cost": 5,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "rolePrefixes": [
+            "scalar:"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "rolePrefixes": [
+                "scalar:"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
+  "coverage": {
+    "structurallyRelevant": 62,
+    "selected": 62,
+    "universalFallback": 0
+  },
+  "decisions": [
+    {
+      "declarationId": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint16_t",
+            "uint16_t"
+          ],
+          "description": "swap bytes in a 16-bit value",
+          "returnDescription": "Byte-swapped value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint32_t",
+            "uint32_t"
+          ],
+          "description": "swap bytes in a 32-bit value",
+          "returnDescription": "Byte-swapped value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t",
+            "uint64_t"
+          ],
+          "description": "swap bytes in a 64-bit value",
+          "returnDescription": "Byte-swapped value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint16_t",
+            "uint16_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Host-order value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint32_t",
+            "uint32_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Host-order value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t",
+            "uint64_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Host-order value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint16_t",
+            "uint16_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Network-order (big-endian) value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint32_t",
+            "uint32_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Network-order (big-endian) value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t",
+            "uint64_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Network-order (big-endian) value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfileFinalize@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:334:530",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "lifecycle-capability-required",
+        "lifecycleOperation": true,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "void"
+          ],
+          "description": "Finalize the profiling system",
+          "returnDescription": ""
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfileInitialize@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:329:529",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "lifecycle-capability-required",
+        "lifecycleOperation": true,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "void"
+          ],
+          "description": "Initialize the profiling system",
+          "returnDescription": ""
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "bool"
+          ],
+          "description": "Finalize the profiling system",
+          "returnDescription": "Returns non zero if the profiler is initialized"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:480",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:492",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:472",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:484",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:476",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertyAddU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:488",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertySetBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:467",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertySetF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:479",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertySetF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:491",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertySetS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:471",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertySetS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:483",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertySetU32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:475",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfilePropertySetU64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:487",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:ProfileIdx@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:33:457"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": "Gets the size of a value type",
+          "result": "The size in bytes",
+          "enumRoles": [
+            "enum:dmBuffer::ValueType"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:dmBuffer::ValueType",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:dmBuffer::ValueType",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint16_t",
+            "uint16_t"
+          ],
+          "description": "swap bytes in a 16-bit value",
+          "returnDescription": "Byte-swapped value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint32_t",
+            "uint32_t"
+          ],
+          "description": "swap bytes in a 16-bit value",
+          "returnDescription": "Byte-swapped value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t",
+            "uint64_t"
+          ],
+          "description": "swap bytes in a 16-bit value",
+          "returnDescription": "Byte-swapped value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint32_t",
+            "uint32_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Host-order value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t",
+            "uint64_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Host-order value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint16_t",
+            "uint16_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Host-order value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t",
+            "uint64_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Network-order (big-endian) value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint16_t",
+            "uint16_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Network-order (big-endian) value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint32_t",
+            "uint32_t"
+          ],
+          "description": "Network byte order is big-endian.",
+          "returnDescription": "Network-order (big-endian) value"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::CreateInstanceId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:598:1005",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:dmhash_t@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:56:211"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameSystem::CompGuiUnregisterGetPropertyFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h:84:1146",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "extension-registry-capability-required",
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": null,
+          "result": null,
+          "enumRoles": [
+            "enum:dmGameObject::Result"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmGameObject::Result",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmGameObject::Result",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGameSystem::CompGuiUnregisterSetPropertyFn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_gui.h:77:1145",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "extension-registry-capability-required",
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": null,
+          "result": null,
+          "enumRoles": [
+            "enum:dmGameObject::Result"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmGameObject::Result",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmGameObject::Result",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::Finalize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1759:1460",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "lifecycle-capability-required",
+        "lifecycleOperation": true,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "void"
+          ],
+          "description": "Finalizes the graphics system.\nCleans up global graphics resources and shuts down the graphics system.\nThis should be called when the application is exiting.",
+          "returnDescription": ""
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": "Get installed graphics adapter family",
+          "result": "Installed adapter family",
+          "enumRoles": [
+            "enum:dmGraphics::AdapterFamily"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmGraphics::AdapterFamily",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmGraphics::AdapterFamily",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::InstallAdapter@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1711:1455",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "engine-lifecycle-capability-required",
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": "Installs a graphics adapter.\nInitializes the specified graphics backend (OpenGL, Vulkan, etc.).\nThis must be called before creating any graphics context.",
+          "result": "True if the adapter was successfully installed, false otherwise",
+          "enumRoles": [
+            "enum:dmGraphics::AdapterFamily"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:dmGraphics::AdapterFamily",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:dmGraphics::AdapterFamily",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmLog::LogFinalize@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:335:394",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "lifecycle-capability-required",
+        "lifecycleOperation": true,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "void"
+          ],
+          "description": null,
+          "returnDescription": null
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": null,
+          "result": null,
+          "enumRoles": [
+            "enum:LogSeverity"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:LogSeverity",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:LogSeverity",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmLogFinalize@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:270:387",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": "lifecycle-capability-required",
+        "lifecycleOperation": true,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "void"
+          ],
+          "description": "finalize the logging system.",
+          "returnDescription": ""
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": "Get log system severity level.",
+          "result": "Current log system severity level",
+          "enumRoles": [
+            "enum:LogSeverity"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:LogSeverity",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:LogSeverity",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": "Set log system severity level.",
+          "result": "",
+          "enumRoles": [
+            "enum:LogSeverity"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:LogSeverity",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "parameter-role:0:value:enum:LogSeverity",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmSound::IsGroupMuted@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:108:2140",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:dmhash_t@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:56:211"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": "Temporarily mute or restore an individual mixer group.",
+          "result": "RESULT_OK on success",
+          "enumRoles": [
+            "enum:dmSound::Result"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmSound::Result",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmSound::Result",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
+      "patternId": "value.enum-domain-direct",
+      "family": "enum-value",
+      "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+      "fallback": false,
+      "priority": 810,
+      "cost": 6,
+      "semanticTokens": [
+        "declared-enum-domain",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "declared-enum-domain",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "summary": "Convenience toggle for <code>SetGroupMute</code>.",
+          "result": "RESULT_OK on success",
+          "enumRoles": [
+            "enum:dmSound::Result"
+          ]
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.enum-domain-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmSound::Result",
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmSound::Result",
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmThread::AllocTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:119:608",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:dmThread::TlsKey@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:33:603"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmThread::Detach@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:112:607",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmThread::FreeTls@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:126:609",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:dmThread::TlsKey@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:33:603"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmThread::GetCurrentThread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:148:612",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmThread::Join@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:102:606",
+      "patternId": "value.named-scalar-direct",
+      "family": "named-scalar",
+      "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 5,
+      "semanticTokens": [
+        "fixed-width-cell-codec",
+        "source-resolved-named-scalar",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "fixed-width-cell-codec",
+          "source-resolved-named-scalar",
+          "synchronous-noescape"
+        ],
+        "aliases": [
+          "dmsdk:dmThread::Thread@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:32:602"
+        ]
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:direct-native-primitive"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t"
+          ],
+          "description": "Get monotonic time in microseconds since some unspecified starting point.",
+          "returnDescription": "Monotonic time in microseconds"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "uint64_t"
+          ],
+          "description": "Get current time in microseconds since Jan. 1, 1970.",
+          "returnDescription": "Current time in microseconds"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": true,
+        "pureValueTransform": false,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "void",
+            "uint32_t"
+          ],
+          "description": "Sleep thread with low precision (~10 milliseconds).",
+          "returnDescription": ""
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "float",
+            "float"
+          ],
+          "description": "Returns the cosine of the given angle from a lookup table.",
+          "returnDescription": "The cosine of the angle"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "float",
+            "float"
+          ],
+          "description": "Returns the sine of the given angle from a lookup table.",
+          "returnDescription": "The sine of the angle"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "bool",
+            "uint32_t"
+          ],
+          "description": "Checks if a codepoint is a breaking whitespace",
+          "returnDescription": "true if it's a breaking whitespace"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
+      "patternId": "value.direct-primitive-scalar",
+      "family": "scalar-thunk",
+      "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+      "fallback": false,
+      "priority": 820,
+      "cost": 4,
+      "semanticTokens": [
+        "direct-native-primitive",
+        "fixed-width-cell-codec",
+        "synchronous-noescape"
+      ],
+      "semantics": {
+        "semanticTokens": [
+          "direct-native-primitive",
+          "fixed-width-cell-codec",
+          "synchronous-noescape"
+        ],
+        "capabilityBlocker": null,
+        "lifecycleOperation": false,
+        "mayBlock": false,
+        "pureValueTransform": true,
+        "evidence": {
+          "source": "revision-ir-abi+public-documentation",
+          "nativeTypes": [
+            "bool",
+            "uint32_t"
+          ],
+          "description": "Checks if a codepoint is a whitespace",
+          "returnDescription": "true if it's a whitespace"
+        }
+      },
+      "missingFacts": [],
+      "structuralCandidates": [
+        "value.direct-primitive-scalar",
+        "value.enum-domain-direct",
+        "value.named-scalar-direct"
+      ],
+      "trace": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:declared-enum-domain"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:source-resolved-named-scalar"
+          ]
+        }
+      ]
+    }
+  ]
+}

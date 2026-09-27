@@ -3,21 +3,20 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { indexDmSdkBoundedSpanPlan } from "../packages/compiler/src/dmsdk-bounded-span-plan.mjs";
 import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
-import { fixedWidthHashPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+  analyzeHashSpanRecipe,
+  createDmSdkFallbackAudit,
+} from "../packages/compiler/src/dmsdk-bounded-span-recipes.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  plan: "packages/bindings/generated/defold-dmsdk-bounded-span-plan.json",
   policy: "packages/bindings/overrides/dmsdk-hash-span-bindings.json",
 };
 const previouslyGeneratedAdapters = 43;
-const hashSpanSemanticTokens = fixedWidthHashPattern().when.requireSemanticTokens;
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
 const snake = (value) =>
@@ -32,7 +31,7 @@ function parseArgs(argv) {
     const argument = argv[index];
     if (argument === "--check") {
       options.check = true;
-    } else if (["--ir", "--shapes", "--policy", "--out-root"].includes(argument)) {
+    } else if (["--ir", "--shapes", "--plan", "--policy", "--out-root"].includes(argument)) {
       const key = argument.slice(2).replace(/-([a-z])/g, (_, character) => character.toUpperCase());
       const value = argv[index + 1];
       if (value === undefined) throw new Error(`${argument} requires a path`);
@@ -46,38 +45,8 @@ function parseArgs(argv) {
   return options;
 }
 
-function patternFacts(row, semanticTokens = []) {
-  return {
-    id: row.id,
-    kind: row.kind,
-    result: row.result,
-    parameters: row.parameters,
-    families: row.families,
-    semanticTokens,
-  };
-}
-
 export function extractHashSpanSemantics(declaration, candidate, recipe) {
-  if (!declaration || declaration.kind !== "function" || declaration.parameters?.length !== 2) return null;
-  const resultBits = Number(candidate.result.role.match(/^scalar:u(32|64)$/u)?.[1]);
-  if (!recipe.resultWidths.includes(resultBits)) return null;
-  if (
-    candidate.parameters.length !== 2 ||
-    candidate.parameters[0].role !== "opaque-pointer" ||
-    candidate.parameters[0].direction !== "in" ||
-    candidate.parameters[1].role !== "scalar:u32" ||
-    candidate.parameters[1].direction !== "value"
-  )
-    return null;
-  return {
-    resultBits,
-    semanticTokens: [...hashSpanSemanticTokens].sort(),
-    evidence: {
-      header: declaration.header,
-      semanticSource: "revision-ir-abi-shape",
-      declarationLine: declaration.line,
-    },
-  };
+  return analyzeHashSpanRecipe(declaration, candidate, recipe).semantics;
 }
 
 function validateProvenance(ir, shapes, contents) {
@@ -94,26 +63,32 @@ function validateProvenance(ir, shapes, contents) {
   }
 }
 
-function createEntries(rows, declarations, policy) {
-  const patterns = [fixedWidthHashPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+function createEntries(rows, declarations, plan, planById) {
+  const patterns = plan.patternRegistry.filter(({ id }) =>
+    id === "span.fixed-width-hash" || id === "universal.default",
+  );
   const entries = [];
   const blocked = [];
   let structurallyEligible = 0;
   for (const candidate of [...rows].sort((left, right) => left.id.localeCompare(right.id))) {
-    const initial = selectDmSdkPattern(patternFacts(candidate), patterns);
-    const trace = initial.trace.find(({ patternId }) => patternId === "span.fixed-width-hash");
-    if (!trace || trace.blockers.some((blocker) => !blocker.startsWith("semantic-token-missing:"))) continue;
+    const decision = planById.get(candidate.id);
+    if (!decision?.structuralCandidates.includes("span.fixed-width-hash")) continue;
     structurallyEligible += 1;
     const declaration = declarations.get(candidate.id);
     if (!declaration) throw new Error(`Hash-span candidate is absent from dmSDK IR: ${candidate.id}`);
-    const semantics = extractHashSpanSemantics(declaration, candidate, policy.recipe);
-    const decision = selectDmSdkPattern(patternFacts(candidate, semantics?.semanticTokens), patterns);
-    if (decision.patternId !== "span.fixed-width-hash") {
+    const semantics = decision.patternId === "span.fixed-width-hash" ? decision.semantics : null;
+    if (!semantics) {
       blocked.push({
         ...candidate,
         emitted: false,
         blocker: "hash-span-evidence-withdrawn",
-        patternDecision: compactDmSdkPatternDecision(decision),
+        fallbackAudit: createDmSdkFallbackAudit({
+          candidate,
+          family: "hash-span",
+          patternId: "span.fixed-width-hash",
+          emitter: "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          missingFacts: decision.missingFacts,
+        }),
       });
       continue;
     }
@@ -123,7 +98,7 @@ function createEntries(rows, declarations, policy) {
       declaration,
       resultBits: semantics.resultBits,
       evidence: semantics.evidence,
-      patternDecision: compactDmSdkPatternDecision(decision),
+      patternDecision: decision.patternId,
       wrapper: `deherm_dmsdk_hash_span_${snake(declaration.name)}`,
     });
   }
@@ -252,6 +227,7 @@ export async function build(options) {
   );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
+  const plan = JSON.parse(contents.plan);
   const policy = JSON.parse(contents.policy);
   validateProvenance(ir, shapes, contents);
   if (
@@ -266,7 +242,20 @@ export async function build(options) {
     throw new Error("Unsupported hash-span semantic policy");
   }
   const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
-  const { entries, blocked, structurallyEligible, patterns } = createEntries(shapes.rows, declarations, policy);
+  const planById = indexDmSdkBoundedSpanPlan(plan, {
+    revision: ir.defoldRevision,
+    sourceHashes: {
+      ir: sha256(contents.ir),
+      shapes: sha256(contents.shapes),
+      hashSpan: sha256(contents.policy),
+    },
+  });
+  const { entries, blocked, structurallyEligible, patterns } = createEntries(
+    shapes.rows,
+    declarations,
+    plan,
+    planById,
+  );
   const artifacts = new Map([
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span.h", renderHeader(entries)],
     ["defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h", renderRuntimeHeader()],

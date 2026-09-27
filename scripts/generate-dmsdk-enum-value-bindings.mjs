@@ -4,16 +4,15 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
-import { enumValuePattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+  indexDmSdkValuePlan,
+  inferEnumValueSemantics,
+} from "../packages/compiler/src/dmsdk-value-plan.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = {
   ir: "packages/bindings/generated/defold-sdk-ir.json",
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  valuePlan: "packages/bindings/generated/defold-dmsdk-value-plan.json",
   scalarReport: "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
   overrides: "packages/bindings/overrides/dmsdk-enum-value-bindings.json",
 };
@@ -97,28 +96,7 @@ function sourceGroup(header) {
   return { name, include };
 }
 
-export function inferEnumValueSemantics(declaration, row) {
-  if (!declaration || declaration.kind !== "function") return null;
-  const roles = [row.result.role, ...row.parameters.map(({ role }) => role)];
-  if (!roles.every((role) => role.startsWith("scalar:") || role.startsWith("enum:"))) return null;
-  if (!roles.some((role) => role.startsWith("enum:"))) return null;
-  const leafName = declaration.name.split("::").at(-1);
-  const description = `${declaration.description ?? ""} ${declaration.returnDescription ?? ""}`.toLowerCase();
-  let capabilityBlocker = null;
-  if (/unregister/iu.test(leafName)) capabilityBlocker = "extension-registry-capability-required";
-  else if (/install/iu.test(leafName) && /before creating|initializ(?:e|es).*backend/iu.test(description))
-    capabilityBlocker = "engine-lifecycle-capability-required";
-  return {
-    semanticTokens: ["declared-enum-domain", "fixed-width-cell-codec", "synchronous-noescape"],
-    capabilityBlocker,
-    evidence: {
-      source: "revision-ir-abi+public-documentation",
-      summary: declaration.description ?? null,
-      result: declaration.returnDescription ?? null,
-      enumRoles: roles.filter((role) => role.startsWith("enum:")).sort(),
-    },
-  };
-}
+export { inferEnumValueSemantics };
 
 function cArguments(entry) {
   return entry.parameters
@@ -257,30 +235,31 @@ export async function build() {
   );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
+  const valuePlan = JSON.parse(contents.valuePlan);
   const scalarReport = JSON.parse(contents.scalarReport);
   const overrides = JSON.parse(contents.overrides);
   if (overrides.schemaVersion !== 2 || overrides.family !== "enum-value" || !overrides.recipe)
     throw new Error("Invalid enum-value structural policy");
   const declarationById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const index = typeIndex(ir);
-  const patterns = [enumValuePattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const planById = indexDmSdkValuePlan(valuePlan, {
+    revision: ir.defoldRevision,
+    sourceHashes: {
+      ir: sha256(contents.ir),
+      shapes: sha256(contents.shapes),
+      enumValue: sha256(contents.overrides),
+    },
+  });
+  const patterns = valuePlan.patternRegistry.filter(({ id }) =>
+    id === "value.enum-domain-direct" || id === "universal.default",
+  );
   const candidates = shapes.rows
     .map((candidate) => {
       const declaration = declarationById.get(candidate.id);
-      const semantics = inferEnumValueSemantics(declaration, candidate);
-      if (!semantics) return null;
-      const decision = selectDmSdkPattern(
-        {
-          id: candidate.id,
-          kind: declaration.kind,
-          result: candidate.result,
-          parameters: candidate.parameters,
-          families: candidate.families,
-          semanticTokens: semantics.semanticTokens,
-        },
-        patterns,
-      );
-      return decision.patternId === "value.enum-domain-direct" ? { candidate, declaration, semantics, decision } : null;
+      const decision = planById.get(candidate.id);
+      return decision?.patternId === "value.enum-domain-direct"
+        ? { candidate, declaration, semantics: decision.semantics, decision }
+        : null;
     })
     .filter(Boolean)
     .sort((left, right) => left.candidate.id.localeCompare(right.candidate.id));
@@ -289,7 +268,7 @@ export async function build() {
   for (const { candidate, declaration, semantics, decision } of candidates) {
     const common = {
       ...candidate,
-      patternDecision: compactDmSdkPatternDecision(decision),
+      patternDecision: decision.patternId,
       semanticEvidence: semantics.evidence,
     };
     if (semantics.capabilityBlocker) {

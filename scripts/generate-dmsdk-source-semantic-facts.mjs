@@ -7,13 +7,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { extractCppImplementationFacts } from "../packages/compiler/src/cpp-semantic-facts.mjs";
-import {
-  astcProbePattern,
-  base64SpanPattern,
-  fixedDigestPattern,
-  xteaSpanPattern,
-} from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
-import { DMSDK_UNIVERSAL_FALLBACK_PATTERN, selectDmSdkPattern } from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
+import { isDmSdkBoundedSpanSourceFactCandidate } from "../packages/compiler/src/dmsdk-bounded-span-plan.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const defaults = Object.freeze({
@@ -44,26 +38,8 @@ function parseArguments(argv) {
   return options;
 }
 
-const boundedSpanPatterns = Object.freeze([
-  fixedDigestPattern(),
-  base64SpanPattern(),
-  astcProbePattern(),
-  xteaSpanPattern(),
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-]);
-
 function isBoundedSpanCandidate(row) {
-  const decision = selectDmSdkPattern({
-    id: row.id,
-    kind: row.kind,
-    result: row.result,
-    parameters: row.parameters,
-    families: row.families,
-    semanticTokens: [],
-  }, boundedSpanPatterns);
-  return decision.trace.some(({ blockers }) =>
-    blockers.length > 0 && blockers.every((blocker) => blocker.startsWith("semantic-token-missing:")),
-  );
+  return isDmSdkBoundedSpanSourceFactCandidate(row);
 }
 
 async function filesBelow(directory) {

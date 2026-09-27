@@ -5,6 +5,7 @@ export const BOUNDED_SPAN_SEMANTIC_TOKENS = Object.freeze({
   base64: Object.freeze(["bounded-output-capacity", "synchronous-noescape", "zero-capacity-size-query"]),
   astc: Object.freeze(["bounded-input-span", "fixed-three-u32-output", "synchronous-noescape"]),
   xtea: Object.freeze(["bounded-key-span", "in-place-byte-transform", "single-algorithm-enum", "synchronous-noescape"]),
+  hashSpan: Object.freeze(["bounded-input-span", "fixed-width-scalar-result", "synchronous-noescape"]),
 });
 
 function result(semantics, missingFacts = []) {
@@ -173,6 +174,32 @@ export function analyzeFixedDigestRecipe(declaration, candidate, recipe, sourceF
         })),
       },
       "revision-implementation-ast+abi-shape",
+    ),
+  });
+}
+
+export function analyzeHashSpanRecipe(declaration, candidate, recipe) {
+  if (!declaration || declaration.kind !== "function") return result(null, ["function-declaration"]);
+  const resultBits = Number(candidate?.result?.role?.match(/^scalar:u(32|64)$/u)?.[1]);
+  if (
+    !recipe.resultWidths?.includes(resultBits) ||
+    !matchesAbi(
+      candidate,
+      [`scalar:u${resultBits}`],
+      [
+        { roles: ["opaque-pointer"], directions: ["in"] },
+        { roles: ["scalar:u32"], directions: ["value"] },
+      ],
+    )
+  )
+    return result(null, ["fixed-width-hash-abi-shape"]);
+  return result({
+    resultBits,
+    semanticTokens: [...BOUNDED_SPAN_SEMANTIC_TOKENS.hashSpan].sort(),
+    evidence: evidence(
+      declaration,
+      { resultBits },
+      "revision-ir-abi-shape",
     ),
   });
 }

@@ -5,12 +5,12 @@
   "generator": "sha256:c13ed6aff42ed7174f7ea891e15a69220bab78abc48b0cb41a05b6248a23fcee",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "34d2c98c0d70027d0558c700e13811454114205f17e4356a621679a10566f2b1",
+  "policyRoot": "d1605b01b89ccffdf0c523dd255314fbca494120018153312fc80a3b09e7badf",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 189,
     "namespaces": 52,
-    "objectBytes": 25316661,
+    "objectBytes": 25316817,
     "indexEntries": 1
   },
   "toolchainPins": {
@@ -59,7 +59,7 @@
       "bytes": 65240
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
-      "hash": "ef19596e2038787c9761e4ee1d17b327aed366be6a89c388b505983a0504f6f0",
+      "hash": "1c218d567a200aca0d0278a34d0cbb2a0c619b8cfc69a43e427bfc6f4d8819ec",
       "bytes": 2691436
     },
     "@compiler:document:defold-component-proxy-contract.json": {
@@ -71,15 +71,15 @@
       "bytes": 770816
     },
     "@compiler:document:defold-dmsdk-scalar-thunks.json": {
-      "hash": "589328834112e3b67a230e223e49b68fcfc5a8aed05c3f5e4b29ab82227b1528",
-      "bytes": 87157
+      "hash": "9587309e9479edd09f1ae74952b4d84c74059743edd411a4a4de4b2b78037a8f",
+      "bytes": 87313
     },
     "@compiler:document:defold-dmsdk-sdk-documentation.json": {
       "hash": "18164c195eb5dcbb87226ecec1c557cd00d5e7bfe77719f2fcfb0f724aedfef0",
       "bytes": 26072
     },
     "@compiler:document:defold-dmsdk-universal-bindings.json": {
-      "hash": "aba7454ecdb91e681cbca136f3473aaf50fb00ceeeae41d9f0b5c849e53af8ac",
+      "hash": "f20c06898f210fd5999c2cc6232716bd5f28120c0e3f1a781a7e30a0baf5c389",
       "bytes": 3479307
     },
     "@compiler:document:defold-resource-declaration-schema.json": {

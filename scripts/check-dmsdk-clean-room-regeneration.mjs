@@ -225,7 +225,7 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (
-      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
+      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
         file,
       )
     ) {

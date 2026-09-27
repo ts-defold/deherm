@@ -14,6 +14,7 @@ const familyReports = Object.freeze([
   ["span.bounded-byte-transform", "defold-dmsdk-base64-span-bindings.json"],
   ["span.fixed-three-u32-probe", "defold-dmsdk-astc-probe-bindings.json"],
   ["span.in-place-keyed-transform", "defold-dmsdk-xtea-span-bindings.json"],
+  ["span.fixed-width-hash", "defold-dmsdk-hash-span-bindings.json"],
 ]);
 
 test("one authenticated bounded-span plan owns every family emitter decision", async () => {
@@ -21,9 +22,7 @@ test("one authenticated bounded-span plan owns every family emitter decision", a
   const plan = JSON.parse(planText);
   const planHash = createHash("sha256").update(planText).digest("hex");
   const index = indexDmSdkBoundedSpanPlan(plan, { revision: plan.defoldRevision });
-  assert.equal(plan.coverage.structurallyRelevant, 10);
-  assert.equal(plan.coverage.selected, 10);
-  assert.equal(plan.coverage.universalFallback, 0);
+  const emitted = new Set();
 
   for (const [patternId, reportName] of familyReports) {
     const report = await readJson(reportName);
@@ -32,9 +31,15 @@ test("one authenticated bounded-span plan owns every family emitter decision", a
       assert.ok(decision, `${entry.id} has no compiler-owned decision`);
       assert.equal(decision.patternId, patternId);
       assert.equal(entry.patternDecision, decision.patternId);
+      assert.equal(emitted.has(entry.id), false, `${entry.id} is emitted by multiple bounded-span families`);
+      emitted.add(entry.id);
     }
     assert.equal(report.sourceHashes.plan, planHash);
   }
+  assert.deepEqual(
+    [...emitted].sort(),
+    plan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId).sort(),
+  );
 });
 
 test("bounded-span family emitters cannot independently invoke the selector", async () => {
@@ -43,11 +48,16 @@ test("bounded-span family emitters cannot independently invoke the selector", as
     "scripts/generate-dmsdk-base64-span-bindings.mjs",
     "scripts/generate-dmsdk-astc-probe-bindings.mjs",
     "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+    "scripts/generate-dmsdk-hash-span-bindings.mjs",
   ]) {
     const text = await readFile(new URL(source, root), "utf8");
     assert.doesNotMatch(text, /selectDmSdkPattern|compactDmSdkPatternDecision/u, source);
     assert.match(text, /indexDmSdkBoundedSpanPlan/u, source);
   }
+  const factSource = "scripts/generate-dmsdk-source-semantic-facts.mjs";
+  const factText = await readFile(new URL(factSource, root), "utf8");
+  assert.doesNotMatch(factText, /selectDmSdkPattern|dmsdk-pattern-catalog/u, factSource);
+  assert.match(factText, /isDmSdkBoundedSpanSourceFactCandidate/u, factSource);
 });
 
 test("bounded-span plan verification rejects a forged selected pattern", async () => {

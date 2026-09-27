@@ -46,15 +46,15 @@
       "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
       "targetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
       "loweringEvidence": {
-        "scalar": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0",
-        "enumValue": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6",
-        "namedScalar": "fcf97a985ce897a14e1c42832c8197bc040414e9bcb0eeb97885c88d3334a549",
-        "fixedDigest": "2ceed2c69df3f2b6df3de93eb42baeed7d3956b5ae9c1b90fa076fa272175206",
-        "base64Span": "ae45d7962ba28aeadca98c50172dee6c96e9737919345d7a1e1d222ae5ae5b7e",
-        "astcProbe": "a525671e2fa3b1b8f0ddcd36e525c1a03e7b7ab4d43ea4edb92391d3cd27566b",
-        "xteaSpan": "94e02ab4f884e5828c49e0d6f856cf412a9075e8ddd9363cd50447a01750b7f4",
-        "hashSpan": "140976814df7caec7d86490699db79723c4e028d3d4856fac91c084ac06f73cc",
-        "arenaSpan": "2a4101fa0f5314b37eb78d6d6712ee757a75c0412784a7ee964bd0777331bc1f"
+        "scalar": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
+        "enumValue": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
+        "namedScalar": "8e9b149acbf3ab77cb7835329cac4f9f5deed61c1b1a64e113247159dfc6b5cc",
+        "fixedDigest": "dfb5adf5b7a7421191397a4d1e27bf2ac08c2e3da96fe5ff8473ce9eaf939dcb",
+        "base64Span": "e8603b1789f77c90eef3d12c007766f0331d57a724668bc51e473ab361464e51",
+        "astcProbe": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
+        "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
+        "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
+        "arenaSpan": "9fddd259d84aceb3ec5f400dd36aabb961a3a2fbb73748cef929f7976ff9e92c"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",

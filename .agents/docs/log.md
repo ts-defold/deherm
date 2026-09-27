@@ -4127,3 +4127,34 @@ partitions and reject structural declaration drift. The repeated four-revision
 matrix then passed. This evidence proves generation, materialization,
 compilation, linkage, and exact-call harness execution; it does not claim a
 packaged engine or every target runtime for the historical lanes.
+
+## 2026-09-27 - Compiler-owned bounded and value selection plans
+
+The bounded-span plan now also owns the two fixed-width buffer-hash routes.
+Their emitter no longer calls the selector or reconstructs a pattern registry;
+the pre-plan C/C++ fact collector likewise consumes a compiler-owned structural
+request helper instead of maintaining a private four-family catalog. Current
+behavior remains two generated hash-span adapters, including native exact-call
+behavior and zero heap primitives.
+
+A new compiler-owned value plan now owns all 62 current structural decisions
+across direct primitive scalars (31), declared enum-domain values (10), and
+source-resolved named scalar aliases (21). The three family emitters only
+authenticate and render their assigned rows. Tests prove canonical output under
+input reordering, local fallback when source semantics are withdrawn, exact
+report-to-plan identity, forged-owner rejection, and absence of selector or
+catalog imports in covered emitters. The complete dmSDK clean room reproduced
+1,361 declarations across 117 byte-identical artifacts; focused native compile,
+link, behavior, sanitizer, and warmed zero-allocation evidence for the existing
+families remains green.
+
+The same working-tree compiler then rebuilt current Defold, 1.13.1, 1.12.0,
+and 1.11.0 from their pinned sources. All four passed policy materialization,
+generated TypeScript compilation, specialized dmSDK and Lua exact-call
+compilation, universal C ABI execution, and ready exact-call execution. This is
+cross-revision generation evidence, not packaged-engine or every-target runtime
+evidence. An adversarial inventory also established the next safety boundary:
+borrowed-handle and scratch-scalar-out broad shape matches include owned
+finalizers/producers and atomics outside their current tranches, so those
+families require derived ownership/effect facts before their selectors can move
+without broadening semantics.

@@ -10,6 +10,7 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "plan": "55acd6b45fd94254dcfa08e6b97c03f96b450cdbcd5b53aaf895be0a3ed29afc",
     "policy": "780a70923ff79376373288e54c735559bd595811b718ec8f06dfca728d1732de"
   },
   "policy": {
@@ -152,8 +153,9 @@
       "resultBits": 32,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "declarationLine": 69,
         "semanticSource": "revision-ir-abi-shape",
-        "declarationLine": 69
+        "resultBits": 32
       },
       "patternDecision": "span.fixed-width-hash",
       "wrapper": "deherm_dmsdk_hash_span_dm_hash_buffer32",
@@ -208,8 +210,9 @@
       "resultBits": 64,
       "evidence": {
         "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "declarationLine": 79,
         "semanticSource": "revision-ir-abi-shape",
-        "declarationLine": 79
+        "resultBits": 64
       },
       "patternDecision": "span.fixed-width-hash",
       "wrapper": "deherm_dmsdk_hash_span_dm_hash_buffer64",

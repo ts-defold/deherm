@@ -3,6 +3,7 @@
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceIr": "packages/bindings/generated/defold-sdk-ir.json",
   "sourceShapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  "sourceValuePlan": "packages/bindings/generated/defold-dmsdk-value-plan.json",
   "sourceRecipe": "packages/bindings/overrides/dmsdk-scalar-thunks.json",
   "scope": "The 31 declarations selected structurally as direct native primitive functions. Stage counts describe this generated family only, not overall dmSDK coverage.",
   "abiPolicy": {
@@ -89,6 +90,7 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "valuePlan": "4dc392035674cdcc5531d3c268441d55aac8049bd172531dae86c4a59b299990",
     "recipe": "85ee43cc45019d2bb5bdbf838f583012862504fd7e84be34b6646ce7933cf79c"
   },
   "artifactHashes": {

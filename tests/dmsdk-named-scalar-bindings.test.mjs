@@ -7,6 +7,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { buildDmSdkValuePlan } from "../packages/compiler/src/dmsdk-value-plan.mjs";
 import { build, orderedBlockingReasons } from "../scripts/generate-dmsdk-named-scalar-bindings.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -18,6 +19,32 @@ function run(command, args) {
 }
 function sha256(content) {
   return createHash("sha256").update(content).digest("hex");
+}
+
+async function writeValuePlan(directory, irPath, shapesPath) {
+  const paths = {
+    ir: irPath,
+    shapes: shapesPath,
+    scalar: join(repositoryRoot, "packages/bindings/overrides/dmsdk-scalar-thunks.json"),
+    enumValue: join(repositoryRoot, "packages/bindings/overrides/dmsdk-enum-value-bindings.json"),
+    namedScalar: join(repositoryRoot, "packages/bindings/overrides/dmsdk-named-scalar-policies.json"),
+  };
+  const texts = Object.fromEntries(await Promise.all(
+    Object.entries(paths).map(async ([key, path]) => [key, await readFile(path, "utf8")]),
+  ));
+  const plan = buildDmSdkValuePlan({
+    ir: JSON.parse(texts.ir),
+    shapes: JSON.parse(texts.shapes),
+    policies: {
+      scalar: JSON.parse(texts.scalar),
+      enumValue: JSON.parse(texts.enumValue),
+      namedScalar: JSON.parse(texts.namedScalar),
+    },
+    texts,
+  });
+  const valuePlanPath = join(directory, "value-plan.json");
+  await writeFile(valuePlanPath, `${JSON.stringify(plan, null, 2)}\n`);
+  return valuePlanPath;
 }
 
 test("named-scalar blocker reporting preserves symbol and structural causes", () => {
@@ -207,7 +234,8 @@ test("named-scalar source census changes do not require package policy count edi
     shapes.trancheSummary["next-named-scalar-direct"] -= 1;
     const shapesPath = join(directory, "shapes.json");
     await writeFile(shapesPath, `${JSON.stringify(shapes, null, 2)}\n`);
-    const { report } = await build({ irPath, shapesPath });
+    const valuePlanPath = await writeValuePlan(directory, irPath, shapesPath);
+    const { report } = await build({ irPath, shapesPath, valuePlanPath });
     assert.equal(report.coverage.reviewed, 20);
     assert.equal(report.coverage.generated + report.coverage.policyBlocked, 20);
   } finally {
@@ -228,7 +256,8 @@ test("named-scalar discovery does not depend on ABI-tranche labels", async () =>
     delete shapes.trancheSummary["next-named-scalar-direct"];
     const shapesPath = join(directory, "shapes.json");
     await writeFile(shapesPath, `${JSON.stringify(shapes, null, 2)}\n`);
-    const { report } = await build({ irPath, shapesPath });
+    const valuePlanPath = await writeValuePlan(directory, irPath, shapesPath);
+    const { report } = await build({ irPath, shapesPath, valuePlanPath });
     assert.deepEqual(report.coverage, {
       reviewed: 21,
       generated: 20,
