@@ -88,7 +88,7 @@ function validateInputs({ ir, shapes, projection, policy, effectFacts, texts }) 
   assert(ir?.schemaVersion === 1 && Array.isArray(ir.declarations), "scratch plan has invalid dmSDK IR");
   assert(shapes?.schemaVersion === 1 && Array.isArray(shapes.rows), "scratch plan has invalid ABI shapes");
   assert(projection?.schemaVersion === 1 && Array.isArray(projection.rows), "scratch plan has invalid projection IR");
-  assert(effectFacts?.schemaVersion === 2 && Array.isArray(effectFacts.functions), "scratch plan has invalid C++ effect facts");
+  assert(effectFacts?.schemaVersion === 3 && Array.isArray(effectFacts.functions), "scratch plan has invalid C++ effect facts");
   assert(ir.defoldRevision === shapes.defoldRevision && ir.defoldRevision === projection.defoldRevision, "scratch plan inputs use different Defold revisions");
   assert(shapes.sourceHashes?.ir === sha256(texts.ir), "scratch shapes do not authenticate the IR");
   assert(projection.sources?.hashes?.ir === sha256(texts.ir), "scratch projection does not authenticate the IR");
@@ -108,6 +108,7 @@ function factsFor(shape, projected, effectFacts) {
   if (!object(extracted)) {
     return { ownership: "unknown", memory: "unknown", write: "unknown", completion: "unknown", source: "none" };
   }
+  const completeEffect = Array.isArray(extracted.diagnostics) && extracted.diagnostics.length === 0;
   const pointerParameters = shape.parameters
     .map((parameter, index) => ({ parameter, index }))
     .filter(({ parameter }) => parameter.role.startsWith("pointer:"));
@@ -115,12 +116,14 @@ function factsFor(shape, projected, effectFacts) {
   const pointerFacts = pointerParameters.map(({ index }) => effectParameters.get(index));
   const facts = {
     ownership:
+      completeEffect &&
       extracted.ownershipEffect === "none" &&
       extracted.resultProvenance === "plain-value" &&
       (extracted.parameters ?? []).every(({ ownershipEffect }) => ownershipEffect === "none" || ownershipEffect === "borrowed")
         ? "borrowed-handle-or-scalar-no-transfer"
         : "unknown",
     memory:
+      completeEffect &&
       pointerFacts.length > 0 &&
       pointerFacts.every(
         (fact) =>
@@ -130,6 +133,7 @@ function factsFor(shape, projected, effectFacts) {
         ? "exact-one-scalar-no-alias-no-span"
         : "unknown",
     write:
+      completeEffect &&
       pointerFacts.length > 0 &&
       pointerFacts.every(
         (fact) =>
@@ -138,7 +142,10 @@ function factsFor(shape, projected, effectFacts) {
       )
         ? "success-path-output-defined"
         : "unknown",
-    completion: extracted.completion === "synchronous" && extracted.escape === "noescape" ? "synchronous-noescape" : "unknown",
+    completion:
+      completeEffect && extracted.completion === "synchronous" && extracted.escape === "noescape"
+        ? "synchronous-noescape"
+        : "unknown",
     source: "cpp-ownership-effect-facts",
   };
   void projected;

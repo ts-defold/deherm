@@ -156,6 +156,14 @@ shipping revision facts in the package. The package owns only the stable
 `engine/<module>/src[/dmsdk]` layout recipe; each pinned revision supplies the
 actual include names, source paths, and bytes. Those aliases are recursively
 derived, content-addressed, and authenticated beside the source/TU identities.
+Quoted module-relative includes are resolved through per-translation-unit
+`-iquote` roots so they cannot shadow system headers. Generated protobuf/build
+headers are mapped from pinned SDK bytes into their revision-owned virtual
+build paths with an authenticated Clang VFS overlay; projected headers also
+retain their recursively discovered source-local include closure. Large Clang
+ASTs may be recovered with qualified-namespace filters, but a filtered or full
+observation containing any compiler diagnostic cannot positively admit a
+specialization.
 Only stable include roots are passed to Clang: adding every header leaf is
 forbidden because it can make a Defold header such as `dlib/math.h` shadow a
 system header. A definition joins the public SDK declaration by exact mangled
@@ -191,10 +199,12 @@ universal APIs. Positive rows are explicitly labeled as a trusted Defold
 public by-value-resource convention, not implementation proof. A separate
 compiler-owned C++ ownership/effect extractor now provides the causal taxonomy
 and alpha-renaming fixtures needed to replace that trust default incrementally.
-Scratch scalar-outs still use their historical tranche label because atomics,
-spans, persistent rebinding, owned-resource outputs, and exact-one scalar slots
-share the same raw ABI. Scanning that broad shape alone is not sufficient
-evidence.
+The scratch scalar-out audit plan applies that extractor over the complete
+structural envelope and admits only diagnostic-free exact-one, success-written,
+synchronous, non-escaping scalar slots. Atomics, spans, persistent rebinding,
+owned-resource outputs, and exact-one scalar slots share the same raw ABI, so
+scanning that broad shape alone remains insufficient evidence. The audit plan
+does not replace the separately runtime-tested production provider boundary.
 
 Generated-family census checks are structural, not optimization-count locks.
 For a family report, `declarations.length` must equal the revision's

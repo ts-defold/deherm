@@ -321,7 +321,7 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
     "dmSDK C++ ownership/effect report",
   );
   assert(
-    report.schemaVersion === 2 && report.kind === DMSDK_CPP_OWNERSHIP_EFFECT_REPORT_KIND,
+    report.schemaVersion === 3 && report.kind === DMSDK_CPP_OWNERSHIP_EFFECT_REPORT_KIND,
     "invalid ownership/effect report identity",
   );
   assert(
@@ -342,16 +342,21 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
   assert(Array.isArray(report.inputs.includeAliases), "ownership/effect include aliases are invalid");
   let previousAlias = "";
   for (const alias of report.inputs.includeAliases) {
-    exactKeys(alias, ["include", "source", "sourceSha256"], "ownership/effect include alias");
-    assert(alias.include > previousAlias, "ownership/effect include aliases are not canonical");
-    previousAlias = alias.include;
+    exactKeys(alias, ["kind", "include", "source", "sourceSha256"], "ownership/effect include alias");
+    assert(
+      ["include-search", "source-local", "virtual-file"].includes(alias.kind),
+      "ownership/effect include alias kind is invalid",
+    );
+    const aliasKey = `${alias.kind}\0${alias.include}`;
+    assert(aliasKey > previousAlias, "ownership/effect include aliases are not canonical");
+    previousAlias = aliasKey;
     assert(/^[a-f0-9]{64}$/u.test(alias.sourceSha256), "ownership/effect include alias hash is invalid");
   }
   assert(Array.isArray(report.sources), "ownership/effect report sources are invalid");
   for (const source of report.sources) {
     exactKeys(
       source,
-      ["path", "sourceSha256", "translationUnitSha256", "astState", "blockers"],
+      ["path", "sourceSha256", "translationUnitSha256", "astState", "astProfile", "blockers"],
       "ownership/effect source",
     );
     assert(/^[a-f0-9]{64}$/u.test(source.sourceSha256), "ownership/effect source hash is invalid");
@@ -362,6 +367,10 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
     assert(
       ["complete", "rejected-with-diagnostics"].includes(source.astState),
       "ownership/effect source state is invalid",
+    );
+    assert(
+      ["full", "qualified-namespace-filter"].includes(source.astProfile),
+      "ownership/effect source AST profile is invalid",
     );
     assert(
       Array.isArray(source.blockers) &&

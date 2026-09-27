@@ -16,6 +16,7 @@ import {
 } from "./lib/dmsdk-generator-pipeline.mjs";
 import { validateDmSdkCppOwnershipEffectReport } from "../packages/compiler/src/dmsdk-cpp-ownership-effect-frontend.mjs";
 import { indexDmSdkScratchScalarOutPlan } from "../packages/compiler/src/dmsdk-scratch-scalar-out-plan.mjs";
+import { deriveDefoldSourceIncludeAliases } from "../packages/compiler/src/defold-source-include-aliases.mjs";
 
 const execFileAsync = promisify(execFile);
 const repositoryRootDefault = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -137,7 +138,8 @@ export async function dmSdkCleanRoomEvidencePaths(repositoryRoot, defoldRevision
     inventory.defoldRevision === defoldRevision,
     `dmSDK inventory revision ${inventory.defoldRevision} does not match upstream.lock ${defoldRevision}`,
   );
-  const result = new Set(await discoverDmSdkImplementationEvidence(repositoryRoot, ir));
+  const implementationSources = await discoverDmSdkImplementationEvidence(repositoryRoot, ir);
+  const result = new Set(implementationSources);
   // The selected translation units are compiled with the engine root as an
   // include root. Their complete header closure therefore belongs to the proof
   // input, not just headers whose path happens to contain `dmsdk`. Copying all
@@ -181,6 +183,21 @@ export async function dmSdkCleanRoomEvidencePaths(repositoryRoot, defoldRevision
   for (const evidence of [...(cstringPolicy.sourceEvidence ?? []), ...(cstringPolicy.blockerSourceEvidence ?? [])]) {
     result.add(confined(evidence.path, `${evidence.id}.evidence.path`));
   }
+  const engineRoot = path.join(repositoryRoot, "upstream/defold/engine");
+  const aliases = await deriveDefoldSourceIncludeAliases({
+    repositoryRoot,
+    engineRoot,
+    sdkIncludeRoots: ["sdk/include", "include", "ext/include"].map((relative) =>
+      path.join(repositoryRoot, sdkRoot, relative),
+    ),
+    sources: await Promise.all(
+      implementationSources.map(async (sourcePath) => ({
+        path: sourcePath,
+        text: await readFile(path.join(repositoryRoot, sourcePath), "utf8"),
+      })),
+    ),
+  });
+  for (const alias of aliases) result.add(alias.source);
   return [...result].sort();
 }
 
@@ -474,8 +491,8 @@ async function validateReports(root) {
   assert(
     cppOwnershipEffects.defoldRevision === ir.defoldRevision &&
       cppOwnershipEffects.coverage.requested === 212 &&
-      cppOwnershipEffects.coverage.observed === 160 &&
-      cppOwnershipEffects.coverage.unknown === 52 &&
+      cppOwnershipEffects.coverage.observed === 198 &&
+      cppOwnershipEffects.coverage.unknown === 14 &&
       cppOwnershipEffects.admission === "audit-only-single-profile",
     "C++ ownership/effect report does not preserve its exhaustive audit-only partition",
   );
@@ -673,8 +690,8 @@ async function validateReports(root) {
   );
   assert(
     scratchScalarOutPlan.coverage.structurallyRelevant === 30 &&
-      scratchScalarOutPlan.coverage.selected === 4 &&
-      scratchScalarOutPlan.coverage.universalFallback === 26 &&
+      scratchScalarOutPlan.coverage.selected === 6 &&
+      scratchScalarOutPlan.coverage.universalFallback === 24 &&
       scratchScalarOut.coverage.candidates === 79 &&
       scratchScalarOut.coverage.generated === 7 &&
       scratchScalarOut.coverage.blocked === 72 &&

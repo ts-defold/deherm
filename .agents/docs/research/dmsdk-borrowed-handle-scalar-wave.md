@@ -131,7 +131,12 @@ symbol identity or the naturally included header declaration. It does not force
 unrelated public headers into implementation translation units. Package-owned
 layout rules reconstruct Defold's build-time module include aliases into a
 content-addressed overlay; the revision-owned alias names, source paths, and
-source hashes are authenticated in the report. Source and translation-unit
+source hashes are authenticated in the report. Module-local quoted includes
+use per-translation-unit `-iquote` roots, generated protobuf/build paths use a
+Clang VFS overlay backed by pinned SDK bytes, and projected headers retain
+their source-local include closure. Large translation units retry with a
+qualified-namespace AST profile instead of exhausting Node's string bound.
+Source and translation-unit
 hashes plus the Clang profile are also recorded. Rejected translation units
 retain categorical, machine-readable blockers; raw compiler diagnostics are
 deliberately ephemeral rather than policy inputs because include-stack
@@ -144,9 +149,11 @@ specializations.
 The current artifact is
 `packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json`.
 It covers 212 deduplicated structural rows (182 borrowed + 30 scratch), with
-160 observed and 52 unknown under the host-only profile. The borrowed envelope
-is 142 observed / 40 unknown; the scratch envelope is 18 observed / 12 unknown.
-The authenticated artifact is approximately 658 KB rather than the earlier
+198 observed and 14 unknown under the host-only profile. The borrowed envelope
+is 168 observed / 14 unknown; the scratch envelope is 30 observed / 0 unknown.
+The 14 unknowns remain explicit target/backend conflicts or missing/rejected
+implementation joins; they are not hidden by a route allowlist. The
+authenticated artifact is approximately 731 KB rather than the earlier
 multi-megabyte Cartesian source/route join because a route now retains only
 lexically relevant source observations. This artifact is
 currently marked `audit-only-single-profile`; it is not evidence for a

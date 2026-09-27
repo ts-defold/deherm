@@ -4305,3 +4305,27 @@ selects four source-proven exact-one scalar-out contracts and preserves 26
 universal fallbacks. The existing production scratch emitter remains 7/79 and
 no production Defold provider is installed, so this is source/plan evidence,
 not packaged-engine runtime evidence or an emitter cutover.
+
+## 2026-09-27 - Generated-header VFS and bounded AST recovery
+
+The source-effect frontend now reconstructs two additional deterministic
+Defold build seams without route or header allowlists. Per-translation-unit
+`-iquote` roots resolve module-local quoted includes without allowing Defold
+headers to shadow system angle includes. A content-addressed Clang VFS overlay
+maps missing generated protobuf/build-tree paths to matching pinned SDK bytes,
+while recursive source-local closure preserves sibling includes of projected
+module headers. Translation units whose full JSON AST exceeds the bounded
+buffer retry with exact qualified-namespace filters; the report records which
+profile produced each observation.
+
+The pinned host profile now observes 198/212 structural rows: 168/182 borrowed
+and 30/30 scratch. The remaining 14 are explicit missing implementation joins,
+one rejected join, or conflicting target/backend definitions. The report is
+approximately 731 KB, covers 349 relevant sources, and authenticates 410
+derived dependencies (121 search aliases, 286 source-local files, and three
+virtual generated-file mappings). The scratch
+audit planner additionally refuses positive admission from any observation
+with compiler diagnostics. It now selects six diagnostic-free exact-one
+scalar-out contracts and retains 24 universal fallbacks. This is source and
+audit-plan evidence only: the production scratch provider remains unchanged,
+and no packaged-engine or cross-target runtime claim is made.

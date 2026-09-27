@@ -37,8 +37,8 @@ test("scratch plan covers every structural match and preserves universal fallbac
   const plan = buildDmSdkScratchScalarOutPlan(value);
   indexDmSdkScratchScalarOutPlan(plan, value);
   assert.equal(plan.coverage.structurallyRelevant, 30);
-  assert.equal(plan.coverage.selected, 4);
-  assert.equal(plan.coverage.universalFallback, 26);
+  assert.equal(plan.coverage.selected, 6);
+  assert.equal(plan.coverage.universalFallback, 24);
   assert.equal(plan.decisions.length, 30);
   assert.ok(plan.decisions.every((decision) => decision.universalFallback.preserved));
   assert.ok(plan.decisions.filter((decision) => decision.fallback).every((decision) => decision.blockers.length > 0));

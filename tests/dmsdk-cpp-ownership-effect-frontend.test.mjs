@@ -171,15 +171,15 @@ test("generated revision artifact is authenticated, exhaustive, and remains audi
     ),
   );
   validateDmSdkCppOwnershipEffectReport(report);
-  assert.equal(report.schemaVersion, 2);
+  assert.equal(report.schemaVersion, 3);
   assert.equal(report.admission, "audit-only-single-profile");
   assert.deepEqual(report.coverage, {
     requested: 212,
-    observed: 160,
-    unknown: 52,
+    observed: 198,
+    unknown: 14,
     envelopes: {
-      "borrowed-handle": { requested: 182, observed: 142, unknown: 40 },
-      "scratch-scalar-out": { requested: 30, observed: 18, unknown: 12 },
+      "borrowed-handle": { requested: 182, observed: 168, unknown: 14 },
+      "scratch-scalar-out": { requested: 30, observed: 30, unknown: 0 },
     },
   });
   assert.ok(

@@ -112,8 +112,8 @@ public SDK barrel until those provider gates exist.
 The package-owned frontend also inventories this envelope from pinned Defold
 implementations and inline headers. Its neutral artifact is the shared
 `defold-dmsdk-cpp-ownership-effect-facts.json` report, whose current host-only
-profile observes 18 of the 30 scratch structural rows and routes the remaining
-12 to explicit unknowns. The report is audit-only until the same exact AST
+profile observes all 30 scratch structural rows. The report is audit-only until
+the same exact AST
 facts are collected for every supported target/build macro profile; no
 single-host observation may unlock a release specialization.
 
@@ -127,13 +127,17 @@ and rejected-family facts; it does not use the historical
 requires authenticated ownership, exact-one memory, success-path write, and
 synchronous/no-escape facts from the C++ effect artifact. Missing or unsafe
 facts produce explicit machine-readable blockers and retain the universal
-fallback.
+fallback. An otherwise positive observation carrying any compiler diagnostic
+is treated as unknown, so filtered AST recovery cannot silently weaken the
+fail-closed boundary.
 
-The current effect artifact has facts for 18/30 structural candidates. Four
+The current effect artifact observes all 30 structural candidates. Six
 mechanically prove all four requirements in the audit plan:
 `dmBuffer::GetCount`, `dmBuffer::GetStreamType`,
-`dmBuffer::GetContentVersion`, and `TextLayoutGetBounds`. The audit plan is
-therefore 30 structural candidates, 4 selected, and 26 universal fallbacks. The shipped
+`dmBuffer::GetContentVersion`, `TextLayoutGetBounds`,
+`dmGameObject::GetPropertyOptionsIndex`, and
+`dmGameObject::GetPropertyOptionsKey`. The audit plan is therefore 30
+structural candidates, 6 selected, and 24 universal fallbacks. The shipped
 scratch emitter remains byte-identical at its proven 7/79 provider boundary;
 this wave does not claim an emitter cutover or trade away an existing
 optimization. In particular, neither the audit plan nor the existing emitted

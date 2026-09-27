@@ -12,6 +12,7 @@ import {
   validateDmSdkCppOwnershipEffectReport,
 } from "../packages/compiler/src/dmsdk-cpp-ownership-effect-frontend.mjs";
 import {
+  defoldSourceQuoteRoots,
   deriveDefoldSourceIncludeAliases,
   materializeDefoldSourceIncludeAliases,
 } from "../packages/compiler/src/defold-source-include-aliases.mjs";
@@ -53,13 +54,18 @@ async function includeRoots(engineRoot) {
   // system headers (for example dmsdk/dlib/math.h over <math.h>).
   const roots = new Set([engineRoot]);
   roots.add(path.join(engineRoot, "dlib", "src"));
+  const sdkIncludeRoots = [];
   const lock = await readFile(path.join(root, "upstream.lock"), "utf8");
   const revision = lock.match(/^DEFOLD_REV=(.+)$/mu)?.[1]?.trim();
   if (revision) {
     const sdkRoot = path.join(root, "upstream", "extender", "server", "app", "sdk", revision, "defoldsdk");
-    for (const relative of ["sdk/include", "include", "ext/include"]) roots.add(path.join(sdkRoot, relative));
+    for (const relative of ["sdk/include", "include", "ext/include"]) {
+      const includeRoot = path.join(sdkRoot, relative);
+      roots.add(includeRoot);
+      sdkIncludeRoots.push(includeRoot);
+    }
   }
-  return [...roots].sort(compareCodeUnits);
+  return { roots: [...roots].sort(compareCodeUnits), sdkIncludeRoots: sdkIncludeRoots.sort(compareCodeUnits) };
 }
 
 async function filesBelow(directory) {
@@ -91,7 +97,7 @@ async function discoverHeaderSources(engineRoot, names) {
   return matches;
 }
 
-function clangArguments(file, roots) {
+function clangArguments(file, roots, vfsOverlay = null, astFilter = null) {
   const extension = path.extname(file).toLowerCase();
   const language = extension === ".mm" ? "objective-c++" : extension === ".c" ? "c" : "c++";
   return [
@@ -103,28 +109,107 @@ function clangArguments(file, roots) {
     "-ferror-limit=0",
     "-Xclang",
     "-ast-dump=json",
+    ...(astFilter ? ["-Xclang", `-ast-dump-filter=${astFilter}`] : []),
+    ...(vfsOverlay ? ["-ivfsoverlay", vfsOverlay] : []),
     ...roots.map((directory) => `-I${directory}`),
     file,
   ];
 }
 
-async function clangAst(file, roots, headers = []) {
+function clangArgumentsWithQuoteRoots(file, roots, quoteRoots, vfsOverlay = null, astFilter = null) {
+  const arguments_ = clangArguments(file, roots, vfsOverlay, astFilter);
+  const sourceIndex = arguments_.lastIndexOf(file);
+  arguments_.splice(sourceIndex, 0, ...quoteRoots.flatMap((directory) => ["-iquote", directory]));
+  return arguments_;
+}
+
+function parseJsonSequence(value) {
+  const rows = [];
+  let start = -1;
+  let depth = 0;
+  let quoted = false;
+  let escaped = false;
+  for (let index = 0; index < value.length; index += 1) {
+    const character = value[index];
+    if (quoted) {
+      if (escaped) escaped = false;
+      else if (character === "\\") escaped = true;
+      else if (character === '"') quoted = false;
+      continue;
+    }
+    if (character === '"') {
+      quoted = true;
+      continue;
+    }
+    if (character === "{") {
+      if (depth === 0) start = index;
+      depth += 1;
+    } else if (character === "}") {
+      depth -= 1;
+      if (depth === 0 && start >= 0) {
+        rows.push(JSON.parse(value.slice(start, index + 1)));
+        start = -1;
+      }
+    }
+  }
+  if (quoted || depth !== 0 || start !== -1) throw new Error("filtered Clang AST JSON sequence is incomplete");
+  return rows;
+}
+
+async function runClangAst(file, roots, quoteRoots, vfsOverlay, headers, astFilter = null) {
+  const arguments_ = clangArgumentsWithQuoteRoots(file, roots, quoteRoots, vfsOverlay, astFilter);
+  const sourceIndex = arguments_.lastIndexOf(file);
+  arguments_.splice(sourceIndex, 0, ...headers.flatMap((header) => ["-include", header]));
+  return execFileAsync("clang++", arguments_, {
+    cwd: root,
+    encoding: "utf8",
+    maxBuffer: 256 * 1024 * 1024,
+  });
+}
+
+async function clangAst(file, roots, quoteRoots, vfsOverlay = null, headers = [], declarations = []) {
   try {
-    const arguments_ = clangArguments(file, roots);
-    const sourceIndex = arguments_.lastIndexOf(file);
-    arguments_.splice(sourceIndex, 0, ...headers.flatMap((header) => ["-include", header]));
-    const result = await execFileAsync("clang++", arguments_, {
-      cwd: root,
-      encoding: "utf8",
-      // A translation unit that expands beyond this bound is not a usable
-      // clean-room AST input. Treat it as unknown instead of allowing a
-      // pathological include/template expansion to exhaust Node's string
-      // representation.
-      maxBuffer: 256 * 1024 * 1024,
-    });
-    return { ast: JSON.parse(result.stdout), diagnostics: result.stderr, complete: true };
+    const result = await runClangAst(file, roots, quoteRoots, vfsOverlay, headers);
+    return { ast: JSON.parse(result.stdout), diagnostics: result.stderr, complete: true, profile: "full" };
   } catch (error) {
-    return { ast: null, diagnostics: String(error.stderr ?? error.message ?? "clang failed"), complete: false };
+    const diagnostics = String(error.stderr ?? error.message ?? "clang failed");
+    const capacityFailure =
+      error.code === "ERR_CHILD_PROCESS_STDIO_MAXBUFFER" ||
+      /maxBuffer|stdout maxBuffer|ENOBUFS|too large|Invalid string length/iu.test(`${error.message ?? ""}\n${diagnostics}`);
+    const toolFailure = !/(?:^|\n)[^\n]*error:/u.test(diagnostics);
+    if (declarations.length > 0 && (capacityFailure || toolFailure)) {
+      try {
+        const filters = [
+          ...new Set(
+            declarations.map(({ name }) => {
+              const parts = name.split("::");
+              return parts.length > 1 ? parts.slice(0, -1).join("::") : name;
+            }),
+          ),
+        ].sort(compareCodeUnits);
+        const nodes = [];
+        const diagnosticRows = [];
+        for (const filter of filters) {
+          const result = await runClangAst(file, roots, quoteRoots, vfsOverlay, headers, filter);
+          nodes.push(...parseJsonSequence(result.stdout));
+          diagnosticRows.push(result.stderr);
+        }
+        return {
+          ast: { kind: "TranslationUnitDecl", inner: nodes },
+          diagnostics: diagnosticRows.join("\n"),
+          complete: true,
+          profile: "qualified-namespace-filter",
+        };
+      } catch (filteredError) {
+        return {
+          ast: null,
+          diagnostics: String(filteredError.stderr ?? filteredError.message ?? "filtered clang failed"),
+          complete: false,
+          profile: "qualified-namespace-filter",
+        };
+      }
+    }
+    return { ast: null, diagnostics, complete: false, profile: "full" };
   }
 }
 
@@ -305,10 +390,11 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
   const sourceMatches = discoveredMatches
     .map((entry) => ({ ...entry, relevant: sourceCandidates(candidates, entry.source) }))
     .filter(({ relevant }) => relevant.length > 0);
-  const roots = await includeRoots(engineRoot);
+  const { roots, sdkIncludeRoots } = await includeRoots(engineRoot);
   const includeAliases = await deriveDefoldSourceIncludeAliases({
     repositoryRoot: outputRoot,
     engineRoot,
+    sdkIncludeRoots,
     sources: sourceMatches.map(({ file, source }) => ({
       path: path.relative(outputRoot, file).replaceAll(path.sep, "/"),
       text: source,
@@ -323,17 +409,19 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
   const sourceRecords = [];
   for (const { file, source, relevant } of sourceMatches) {
     const relative = path.relative(outputRoot, file).replaceAll(path.sep, "/");
-    const profileArguments = clangArguments(file, roots);
+    const quoteRoots = defoldSourceQuoteRoots(file, engineRoot);
+    const profileArguments = clangArgumentsWithQuoteRoots(file, roots, quoteRoots, aliasOverlay.vfsOverlay);
     const canonicalArguments = profileArguments.map((argument) => {
       if (argument === `-I${aliasOverlay.directory}`) return "-I<source-alias-overlay>";
+      if (argument === aliasOverlay.vfsOverlay) return "<source-vfs-overlay>";
       if (argument.startsWith(`-I${outputRoot}`)) {
         return `-I${path.relative(outputRoot, argument.slice(2)).replaceAll(path.sep, "/")}`;
       }
       if (argument.startsWith(outputRoot)) return path.relative(outputRoot, argument).replaceAll(path.sep, "/");
       return argument;
     });
-    const translationUnitText = `${canonicalArguments.join("\0")}\0${source}`;
-    const result = await clangAst(file, roots);
+    const result = await clangAst(file, roots, quoteRoots, aliasOverlay.vfsOverlay, [], relevant);
+    const translationUnitText = `${canonicalArguments.join("\0")}\0ast-profile=${result.profile}\0${source}`;
     const artifact = result.complete
       ? deriveDmSdkCppOwnershipEffectFacts({
           ast: result.ast,
@@ -354,6 +442,7 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
       sourceSha256: artifact.sourceSha256,
       translationUnitSha256: artifact.translationUnitSha256,
       astState: result.complete ? "complete" : "rejected-with-diagnostics",
+      astProfile: result.profile,
       blockers: translationUnitBlockers(result),
     });
     observations.push(artifact);
@@ -375,10 +464,10 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
     }),
   );
   const report = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     kind: "deherm.dmsdk-cpp-ownership-effect-facts",
     defoldRevision: revision,
-    extraction: "clang-json-ast/cpp-ownership-effect-v2",
+    extraction: "clang-json-ast/cpp-ownership-effect-v3",
     admission: "audit-only-single-profile",
     targetProfiles: [{ id: "host-clang-c++17", defines: [], compiler: "clang++" }],
     inputs: {
