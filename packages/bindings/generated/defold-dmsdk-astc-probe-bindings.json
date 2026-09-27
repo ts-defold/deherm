@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "astc-probe-v1",
+  "policyVersion": "astc-probe-v2",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -10,19 +10,111 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "0b9ad9f3d7a22709254de8f9f6d603f1e9506e12c94e1e7db2cc0f4b5faca0cd",
-    "headers": {
-      "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h": "cd1d701fd48d98dab9c5794ed0b96d278ba3dfb79ceb295ba0aa017d74728419",
-      "upstream/defold/engine/dlib/src/dlib/image.cpp": "4d1e6532b053eaa26689dc0df4b02da28c604042e50d30d14109c9bdf6280733"
-    }
+    "policy": "a340bcfde2de0c0c46715e45c8eaa2b56972fb320ca173b042f316cc4c7cdccc"
   },
   "policy": {
-    "candidateSelector": {
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-      "symbolPrefix": "dmImage::GetAstc",
-      "shape": "scalar:bool(in:opaque-pointer,value:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)",
-      "rationale": "These are synchronous ASTC-header parsers over a bounded byte span, returning only three fixed-width scalar outputs."
+    "documentationContract": {
+      "summaryPattern": "^Get the (block|astc image) size$",
+      "inputDescription": "the .astc memory (including the header)",
+      "inputLengthDescription": "the length of the memory blob",
+      "outputDescriptions": [
+        "(out) the block width",
+        "(out) the block height",
+        "(out) the block depth"
+      ],
+      "returnDescription": "true if it's an astc file",
+      "minimumHeaderBytes": 16,
+      "semantics": [
+        "bounded-input-span",
+        "fixed-three-u32-output",
+        "synchronous-noescape"
+      ],
+      "rationale": "The pinned public API describes a synchronous bounded ASTC memory probe with three caller-owned scalar outputs. The 16-byte preflight is a stable ASTC container-format recipe. Selection uses ABI shape plus structured documentation facts, never a header, symbol, prefix, or route allowlist."
     },
+    "patternRegistry": [
+      {
+        "id": "span.fixed-three-u32-probe",
+        "family": "astc-probe",
+        "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+        "priority": 880,
+        "cost": 8,
+        "fallback": false,
+        "when": {
+          "declarationKinds": [
+            "function"
+          ],
+          "result": {
+            "roles": [
+              "scalar:bool"
+            ]
+          },
+          "parameters": {
+            "count": {
+              "exact": 5
+            },
+            "positions": [
+              {
+                "roles": [
+                  "opaque-pointer"
+                ],
+                "directions": [
+                  "in"
+                ]
+              },
+              {
+                "roles": [
+                  "scalar:u32"
+                ],
+                "directions": [
+                  "value"
+                ]
+              },
+              {
+                "roles": [
+                  "pointer:scalar:u32"
+                ],
+                "directions": [
+                  "inout",
+                  "out"
+                ]
+              },
+              {
+                "roles": [
+                  "pointer:scalar:u32"
+                ],
+                "directions": [
+                  "inout",
+                  "out"
+                ]
+              },
+              {
+                "roles": [
+                  "pointer:scalar:u32"
+                ],
+                "directions": [
+                  "inout",
+                  "out"
+                ]
+              }
+            ]
+          },
+          "requireSemanticTokens": [
+            "bounded-input-span",
+            "fixed-three-u32-output",
+            "synchronous-noescape"
+          ]
+        }
+      },
+      {
+        "id": "universal.default",
+        "family": "universal-recipe",
+        "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+        "priority": 0,
+        "cost": 1000,
+        "fallback": true,
+        "when": null
+      }
+    ],
     "cAbi": "bounded uint8_t input span and caller-owned fixed three-u32 result",
     "ownership": "input is synchronously borrowed; only scalar results return",
     "safety": "generated preflight rejects null input and spans shorter than the pinned native 16-byte ASTC header minimum",
@@ -33,6 +125,7 @@
   "coverage": {
     "baselineRuntimePending": 1361,
     "discovered": 2,
+    "structurallyEligible": 2,
     "emitted": 2,
     "policyBlocked": 0,
     "hostBehaviorVerified": 2,
@@ -115,23 +208,22 @@
       ],
       "bindingId": 0,
       "mode": "block-size",
-      "evidence": [
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-          "line": 127,
-          "text": "     * @param memsize [type: uint32_t] the length of the memory blob"
-        },
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-          "line": 133,
-          "text": "    bool GetAstcBlockSize(const void* mem, uint32_t memsize, uint32_t* width, uint32_t* height, uint32_t* depth);"
-        },
-        {
-          "header": "upstream/defold/engine/dlib/src/dlib/image.cpp",
-          "line": 227,
-          "text": "        if (memsize < 16)"
-        }
-      ],
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+        "summary": "Get the block size",
+        "input": "the .astc memory (including the header)",
+        "inputLength": "the length of the memory blob",
+        "outputs": [
+          "(out) the block width",
+          "(out) the block height",
+          "(out) the block depth"
+        ],
+        "result": "true if it's an astc file",
+        "minimumHeaderBytes": 16,
+        "documentationSource": "clang-comment-ast+astc-format-recipe",
+        "declarationLine": 133
+      },
+      "patternDecision": "span.fixed-three-u32-probe",
       "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_block_size",
       "stages": {
         "generated": "complete",
@@ -205,23 +297,22 @@
       ],
       "bindingId": 1,
       "mode": "dimensions",
-      "evidence": [
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-          "line": 139,
-          "text": "     * @param memsize [type: uint32_t] the length of the memory blob"
-        },
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
-          "line": 145,
-          "text": "    bool GetAstcDimensions(const void* mem, uint32_t memsize, uint32_t* width, uint32_t* height, uint32_t* depth);"
-        },
-        {
-          "header": "upstream/defold/engine/dlib/src/dlib/image.cpp",
-          "line": 227,
-          "text": "        if (memsize < 16)"
-        }
-      ],
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/image.h",
+        "summary": "Get the astc image size",
+        "input": "the .astc memory (including the header)",
+        "inputLength": "the length of the memory blob",
+        "outputs": [
+          "(out) the block width",
+          "(out) the block height",
+          "(out) the block depth"
+        ],
+        "result": "true if it's an astc file",
+        "minimumHeaderBytes": 16,
+        "documentationSource": "clang-comment-ast+astc-format-recipe",
+        "declarationLine": 145
+      },
+      "patternDecision": "span.fixed-three-u32-probe",
       "wrapper": "deherm_dmsdk_astc_probe_dm_image_get_astc_dimensions",
       "stages": {
         "generated": "complete",

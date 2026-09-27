@@ -6,13 +6,28 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { extractHashSpanSemantics } from "../scripts/generate-dmsdk-hash-span-bindings.mjs";
+
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json");
-const sdkRoot = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+const sdkRoot = join(
+  repositoryRoot,
+  "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
+);
 const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
-function run(command, args) { return execFileSync(command, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe" }); }
-function includeArgs() { return [`-I${join(repositoryRoot, "defold/defold_hermes/include")}`, "-isystem", join(sdkRoot, "sdk/include"), "-isystem", join(sdkRoot, "include")]; }
+function run(command, args) {
+  return execFileSync(command, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe" });
+}
+function includeArgs() {
+  return [
+    `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
+    "-isystem",
+    join(sdkRoot, "sdk/include"),
+    "-isystem",
+    join(sdkRoot, "include"),
+  ];
+}
 
 test("hash-span generator is deterministic, census-derived, and policy complete", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-hash-span-"));
@@ -23,62 +38,160 @@ test("hash-span generator is deterministic, census-derived, and policy complete"
       baselineRuntimePending: 1361,
       previouslyGeneratedAdapters: 43,
       discovered: 2,
+      structurallyEligible: 2,
       emitted: 2,
       policyBlocked: 0,
       hostBehaviorVerified: 2,
       remainingWithoutGeneratedAdapters: 1316,
     });
-    assert.deepEqual(report.declarations.map(({ symbol }) => symbol), ["dmHashBuffer32", "dmHashBuffer64"]);
+    assert.deepEqual(
+      report.declarations.map(({ resultBits, patternDecision }) => ({ resultBits, patternDecision })),
+      [
+        { resultBits: 32, patternDecision: "span.fixed-width-hash" },
+        { resultBits: 64, patternDecision: "span.fixed-width-hash" },
+      ],
+    );
     for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json"]) {
-      assert.equal(await readFile(join(output, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
+      assert.equal(
+        await readFile(join(output, artifact), "utf8"),
+        await readFile(join(repositoryRoot, artifact), "utf8"),
+        artifact,
+      );
     }
     run(process.execPath, ["scripts/generate-dmsdk-hash-span-bindings.mjs", "--out-root", output, "--check"]);
-  } finally { await rm(output, { recursive: true, force: true }); }
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
 });
 
-test("hash-span generation rejects mixed provenance and withdraws only drifted specialization evidence", async () => {
+test("hash-span generation rejects mixed provenance", async () => {
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-hash-span-drift-"));
   try {
     const irPath = join(output, "ir.json");
-    await writeFile(irPath, `${await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8")}\n`);
-    assert.throws(() => run(process.execPath, ["scripts/generate-dmsdk-hash-span-bindings.mjs", "--ir", irPath, "--out-root", join(output, "out")]), /IR hash does not match ABI-shape census provenance/);
-    const policyPath = join(output, "policy.json");
-    await writeFile(policyPath, (await readFile(join(repositoryRoot, "packages/bindings/overrides/dmsdk-hash-span-bindings.json"), "utf8")).replace("Length of buffer", "Length drifted"));
-    const driftedRoot = join(output, "drifted");
-    run(process.execPath, ["scripts/generate-dmsdk-hash-span-bindings.mjs", "--policy", policyPath, "--out-root", driftedRoot]);
-    const report = JSON.parse(await readFile(join(driftedRoot, "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json"), "utf8"));
-    assert.equal(report.coverage.emitted, 1);
-    assert.equal(report.coverage.policyBlocked, 1);
-    assert.equal(report.declarations.find(({ emitted }) => emitted === false)?.blocker, "hash-span-evidence-withdrawn");
-  } finally { await rm(output, { recursive: true, force: true }); }
+    await writeFile(
+      irPath,
+      `${await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8")}\n`,
+    );
+    assert.throws(
+      () =>
+        run(process.execPath, [
+          "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "--ir",
+          irPath,
+          "--out-root",
+          join(output, "out"),
+        ]),
+      /IR hash does not match ABI-shape census provenance/,
+    );
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
+});
+
+test("hash-span semantics come from source documentation rather than route names", async () => {
+  const ir = JSON.parse(await readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
+  const shapes = JSON.parse(
+    await readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
+  );
+  const policyText = await readFile(
+    join(repositoryRoot, "packages/bindings/overrides/dmsdk-hash-span-bindings.json"),
+    "utf8",
+  );
+  const policy = JSON.parse(policyText);
+  assert.doesNotMatch(policyText, /candidateSelector|symbolPattern|hash\.h|"entries"/u);
+  const declarations = new Map(ir.declarations.map((item) => [item.id, item]));
+  const selected = shapes.rows
+    .map((candidate) => ({
+      candidate,
+      semantics: extractHashSpanSemantics(declarations.get(candidate.id), candidate, policy.documentationContract),
+    }))
+    .filter(({ semantics }) => semantics);
+  assert.equal(selected.length, 2);
+  for (const { candidate, semantics } of selected) {
+    assert.equal(candidate.result.role, `scalar:u${semantics.resultBits}`);
+    assert.equal(
+      extractHashSpanSemantics(
+        { ...declarations.get(candidate.id), returnDescription: "documentation drifted" },
+        candidate,
+        policy.documentationContract,
+      ),
+      null,
+    );
+  }
 });
 
 test("hash-span C ABI links to the packaged SDK, rejects invalid bounds, and matches Defold vectors", async (context) => {
   if (process.platform !== "darwin" || process.arch !== "arm64") {
-    context.skip(`pinned packaged-library runtime harness requires arm64-macos, got ${process.arch}-${process.platform}`);
+    context.skip(
+      `pinned packaged-library runtime harness requires arm64-macos, got ${process.arch}-${process.platform}`,
+    );
     return;
   }
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-hash-span-host-"));
   try {
     const cObject = join(output, "header.o");
-    run(cCompiler, ["-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", `-I${join(repositoryRoot, "defold/defold_hermes/include")}`, "-c", "native/dmsdk_hash_span_c_header_test.c", "-o", cObject]);
+    run(cCompiler, [
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
+      "-c",
+      "native/dmsdk_hash_span_c_header_test.c",
+      "-o",
+      cObject,
+    ]);
     const libraries = [
       join(sdkRoot, "lib/arm64-macos/libdlib.a"),
       join(sdkRoot, "lib/arm64-macos/libprofile_null.a"),
-      "-framework", "Security", "-framework", "CoreFoundation", "-framework", "Foundation",
+      "-framework",
+      "Security",
+      "-framework",
+      "CoreFoundation",
+      "-framework",
+      "Foundation",
     ];
     const cExecutable = join(output, "c-abi");
-    run(compiler, ["-std=c++17", ...includeArgs(), "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp", "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp", cObject, ...libraries, "-o", cExecutable]);
+    run(compiler, [
+      "-std=c++17",
+      ...includeArgs(),
+      "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp",
+      "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp",
+      cObject,
+      ...libraries,
+      "-o",
+      cExecutable,
+    ]);
     run(cExecutable, []);
     const executable = join(output, "host");
-    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includeArgs(), "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp", "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp", "native/dmsdk_hash_span_host_test.cpp", ...libraries, "-o", executable]);
+    run(compiler, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      ...includeArgs(),
+      "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp",
+      "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp",
+      "native/dmsdk_hash_span_host_test.cpp",
+      ...libraries,
+      "-o",
+      executable,
+    ]);
     run(executable, []);
-  } finally { await rm(output, { recursive: true, force: true }); }
+  } finally {
+    await rm(output, { recursive: true, force: true });
+  }
 });
 
 test("hash-span generated C++ owns no heap allocation primitive", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   for (const artifact of report.artifacts.filter((path) => path.endsWith(".cpp"))) {
-    assert.doesNotMatch(await readFile(join(repositoryRoot, artifact), "utf8"), /\b(?:new|delete|malloc|calloc|realloc|free)\b/, artifact);
+    assert.doesNotMatch(
+      await readFile(join(repositoryRoot, artifact), "utf8"),
+      /\b(?:new|delete|malloc|calloc|realloc|free)\b/,
+      artifact,
+    );
   }
 });

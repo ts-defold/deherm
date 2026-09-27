@@ -3814,3 +3814,26 @@ buffer contract and exact output byte count. Focused generation, clean-room
 comparison, native compile/link/runtime hashing, bounds rejection, and warmed
 zero-allocation tests pass. This is generator architecture evidence, not proof
 that every remaining name-selected family has already migrated.
+
+## 2026-09-27 - Structural span-family expansion
+
+The next four name-selected dmSDK fast paths now use the same total selector.
+Base64 encode/decode derives its mode, bounded destination, and zero-capacity
+query semantics from the revision's public comments. ASTC probes derive the
+three scalar outputs from Clang comment data and combine them with the stable
+16-byte ASTC container preflight recipe. XTEA derives operation mode, the sole
+algorithm enum member, and the zero-valued success enum member from the current
+IR, while its compiler recipe owns the algorithm's 128-bit key bound. Buffer
+hashes derive their 32/64-bit result width and borrowed input-span contract from
+ABI roles and public comments. None of the four policies retains a route ID,
+header selector, symbol selector, or handwritten entry list.
+
+Focused deterministic generation and native compile/link/runtime suites pass
+for all four families. The Base64, ASTC, XTEA, and hash-span harnesses preserve
+their bounds rejection and warmed zero-allocation evidence. The hash-span report
+now limits its allocation claim to generated glue plus the measured default
+engine configuration instead of treating one pinned implementation branch as a
+global promise. All declarations still retain their universal recipe, including
+the direct Static Hermes frame, beneath these specialized overlays. Hash-state
+and the remaining older specialized families are deliberately not claimed as
+migrated by this entry.

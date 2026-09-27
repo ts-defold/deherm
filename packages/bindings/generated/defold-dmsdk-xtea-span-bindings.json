@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "xtea-span-v1",
+  "policyVersion": "xtea-span-v2",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -10,15 +10,121 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "policy": "4c46725302c710ca2fc05e0fb83d43acc7b865dc8b3c67fcec865010b5be54fc"
+    "policy": "0063cd85604d3827adf0335bb72703cf12403d6534da589c381464657e807937"
   },
   "policy": {
-    "algorithm": "ALGORITHM_XTEA only",
-    "keyLength": "0..16 bytes checked before native assertion"
+    "documentationContract": {
+      "summaryPattern": "^(Encrypt|Decrypt) data in place$",
+      "parameterDescriptions": [
+        "algorithm",
+        "data",
+        "data length in bytes",
+        "key",
+        "key length"
+      ],
+      "returnPattern": "^the (encryption|decryption) result$",
+      "semantics": [
+        "bounded-key-span",
+        "in-place-byte-transform",
+        "single-algorithm-enum",
+        "synchronous-noescape"
+      ],
+      "rationale": "The pinned API describes an in-place byte transform with explicit data and key lengths. The algorithm enum has one value and the success result is the zero-valued enum member; both names are derived from that revision's type metadata instead of package constants."
+    },
+    "recipe": {
+      "maximumKeyBytes": 16,
+      "rationale": "XTEA consumes a 128-bit key. The adapter checks the format bound before entering Defold's implementation."
+    },
+    "patternRegistry": [
+      {
+        "id": "span.in-place-keyed-transform",
+        "family": "xtea-span",
+        "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+        "priority": 870,
+        "cost": 9,
+        "fallback": false,
+        "when": {
+          "declarationKinds": [
+            "function"
+          ],
+          "result": {
+            "rolePrefixes": [
+              "enum:"
+            ]
+          },
+          "parameters": {
+            "count": {
+              "exact": 5
+            },
+            "positions": [
+              {
+                "rolePrefixes": [
+                  "enum:"
+                ],
+                "directions": [
+                  "value"
+                ]
+              },
+              {
+                "roles": [
+                  "pointer:scalar:u8"
+                ],
+                "directions": [
+                  "inout",
+                  "out"
+                ]
+              },
+              {
+                "roles": [
+                  "scalar:u32"
+                ],
+                "directions": [
+                  "value"
+                ]
+              },
+              {
+                "roles": [
+                  "pointer:scalar:u8"
+                ],
+                "directions": [
+                  "in"
+                ]
+              },
+              {
+                "roles": [
+                  "scalar:u32"
+                ],
+                "directions": [
+                  "value"
+                ]
+              }
+            ]
+          },
+          "requireSemanticTokens": [
+            "bounded-key-span",
+            "in-place-byte-transform",
+            "single-algorithm-enum",
+            "synchronous-noescape"
+          ]
+        }
+      },
+      {
+        "id": "universal.default",
+        "family": "universal-recipe",
+        "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+        "priority": 0,
+        "cost": 1000,
+        "fallback": true,
+        "when": null
+      }
+    ],
+    "algorithm": "the revision's sole algorithm enum member",
+    "keyLength": "0..16 bytes checked before the native call"
   },
   "coverage": {
     "baselineRuntimePending": 1361,
     "discovered": 2,
+    "structurallyEligible": 2,
     "emitted": 2,
     "policyBlocked": 0,
     "hostBehaviorVerified": 2,
@@ -101,23 +207,31 @@
       ],
       "bindingId": 0,
       "mode": "decrypt",
-      "evidence": [
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-          "line": 40,
-          "text": "        ALGORITHM_XTEA"
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+        "summary": "Decrypt data in place",
+        "parameters": [
+          "algorithm",
+          "data",
+          "data length in bytes",
+          "key",
+          "key length"
+        ],
+        "result": "the decryption result",
+        "algorithmType": "dmCrypt::Algorithm",
+        "algorithmMember": {
+          "name": "ALGORITHM_XTEA",
+          "value": 0
         },
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-          "line": 76,
-          "text": "    Result Decrypt(Algorithm algo, uint8_t* data, uint32_t datalen, const uint8_t* key, uint32_t keylen);"
+        "resultType": "dmCrypt::Result",
+        "successMember": {
+          "name": "RESULT_OK",
+          "value": 0
         },
-        {
-          "header": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
-          "line": 44,
-          "text": "        assert(keylen <= 16);"
-        }
-      ],
+        "documentationSource": "clang-comment-ast+enum-metadata+xtea-format-recipe",
+        "declarationLine": 76
+      },
+      "patternDecision": "span.in-place-keyed-transform",
       "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_decrypt",
       "stages": {
         "generated": "complete",
@@ -191,23 +305,31 @@
       ],
       "bindingId": 1,
       "mode": "encrypt",
-      "evidence": [
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-          "line": 40,
-          "text": "        ALGORITHM_XTEA"
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
+        "summary": "Encrypt data in place",
+        "parameters": [
+          "algorithm",
+          "data",
+          "data length in bytes",
+          "key",
+          "key length"
+        ],
+        "result": "the encryption result",
+        "algorithmType": "dmCrypt::Algorithm",
+        "algorithmMember": {
+          "name": "ALGORITHM_XTEA",
+          "value": 0
         },
-        {
-          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h",
-          "line": 65,
-          "text": "    Result Encrypt(Algorithm algo, uint8_t* data, uint32_t datalen, const uint8_t* key, uint32_t keylen);"
+        "resultType": "dmCrypt::Result",
+        "successMember": {
+          "name": "RESULT_OK",
+          "value": 0
         },
-        {
-          "header": "upstream/defold/engine/dlib/src/dlib/crypt.cpp",
-          "line": 44,
-          "text": "        assert(keylen <= 16);"
-        }
-      ],
+        "documentationSource": "clang-comment-ast+enum-metadata+xtea-format-recipe",
+        "declarationLine": 65
+      },
+      "patternDecision": "span.in-place-keyed-transform",
       "wrapper": "deherm_dmsdk_xtea_span_dm_crypt_encrypt",
       "stages": {
         "generated": "complete",
