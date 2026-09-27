@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "policyVersion": "hash-state-v1",
+  "policyVersion": "hash-state-v2",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
@@ -12,15 +12,31 @@
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "symbols": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
-    "policy": "2d559cf0a02cc6d8e112ddca31c80281112093ffcf10e9a7469065b713f2718e"
+    "policy": "bd8b72d722845bc8d8c16f1934ff93b3fccfbba13f83ac0f154fb906851adca0"
   },
   "policy": {
-    "schemaVersion": 1,
-    "policyVersion": "hash-state-v1",
+    "schemaVersion": 2,
+    "policyVersion": "hash-state-v2",
     "family": "generation-checked-hash-state",
-    "candidateSelector": {
-      "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
-      "symbolPattern": "^dmHash(?:Init|Clone|UpdateBuffer|Final|Release)(?:32|64)$",
+    "documentationContract": {
+      "initPattern": "^Initialize hash-state for (32|64)-bit incremental hashing$",
+      "clonePattern": "^Clone (32|64)-bit incremental hash state$",
+      "updateSummary": "Incremental hashing",
+      "finalSummary": "Finalize incremental hashing and release associated resources",
+      "releaseSummaryPrefix": "Release incremental hashing resources",
+      "stateDescription": "Hash state",
+      "sourceStateDescription": "Source hash state",
+      "bufferDescription": "Buffer",
+      "bufferLengthDescription": "Length of buffer",
+      "finalResultPattern": "^[Tt]he hash value$",
+      "semantics": [
+        "generation-checked-state",
+        "incremental-hash-lifecycle",
+        "synchronous-noescape"
+      ],
+      "rationale": "Lifecycle operations are inferred from state-record ABI roles and public documentation. Width comes from result lanes or the state-record type; callable names are retained only as revision-derived linker identities."
+    },
+    "recipe": {
       "operations": [
         "Init",
         "Clone",
@@ -49,7 +65,54 @@
       "path": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
       "requiredLinkage": "external",
       "requiredAvailability": "all-targets-all-variants"
-    }
+    },
+    "patternRegistry": [
+      {
+        "id": "state.incremental-hash-lifecycle",
+        "family": "hash-state",
+        "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+        "priority": 850,
+        "cost": 12,
+        "fallback": false,
+        "when": {
+          "declarationKinds": [
+            "function"
+          ],
+          "result": {
+            "rolePrefixes": [
+              "scalar:"
+            ]
+          },
+          "parameters": {
+            "some": [
+              {
+                "rolePrefixes": [
+                  "pointer:record:"
+                ],
+                "directions": [
+                  "in",
+                  "inout"
+                ]
+              }
+            ]
+          },
+          "requireSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      },
+      {
+        "id": "universal.default",
+        "family": "universal-recipe",
+        "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+        "priority": 0,
+        "cost": 1000,
+        "fallback": true,
+        "when": null
+      }
+    ]
   },
   "coverage": {
     "discovered": 10,
@@ -66,7 +129,7 @@
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_state.h": "fa8817bdffc449a3dfc3624c8a6b16006ba09d5c8241a06031ff332af7ea1e10",
     "defold/defold_hermes/src/generated_dmsdk_hash_state.cpp": "819fd13607ae78ae18092ad024b080139a49a3906a2e8520298df20942efc846",
-    "tests/fixtures/generated_dmsdk_hash_state_exact.cpp": "f471fceab8092aa7037be2578f53298967ff83ca3052c7dfaf796dfacda33170"
+    "tests/fixtures/generated_dmsdk_hash_state_exact.cpp": "f87641255bba69222a0b7fae49066d246953589db2d4679ca738c84302720c9d"
   },
   "declarations": [
     {
@@ -116,6 +179,21 @@
       "denseId": 0,
       "operation": "Clone",
       "width": 32,
+      "stateType": "HashState32",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Clone 32-bit incremental hash state",
+        "parameters": [
+          "Hash state",
+          "Source hash state",
+          "true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH. Ignored if source state reverse hashing is disabled."
+        ],
+        "result": "",
+        "stateType": "HashState32",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 214
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashClone32"
     },
@@ -166,6 +244,21 @@
       "denseId": 1,
       "operation": "Clone",
       "width": 64,
+      "stateType": "HashState64",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Clone 64-bit incremental hash state",
+        "parameters": [
+          "Hash state",
+          "Source hash state",
+          "true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH. Ignored if source state reverse hashing is disabled."
+        ],
+        "result": "",
+        "stateType": "HashState64",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 256
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashClone64"
     },
@@ -202,6 +295,19 @@
       "denseId": 2,
       "operation": "Final",
       "width": 32,
+      "stateType": "HashState32",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Finalize incremental hashing and release associated resources",
+        "parameters": [
+          "Hash state"
+        ],
+        "result": "the hash value",
+        "stateType": "HashState32",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 231
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashFinal32"
     },
@@ -238,6 +344,19 @@
       "denseId": 3,
       "operation": "Final",
       "width": 64,
+      "stateType": "HashState64",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Finalize incremental hashing and release associated resources",
+        "parameters": [
+          "Hash state"
+        ],
+        "result": "The hash value",
+        "stateType": "HashState64",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 273
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashFinal64"
     },
@@ -281,6 +400,20 @@
       "denseId": 4,
       "operation": "Init",
       "width": 32,
+      "stateType": "HashState32",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Initialize hash-state for 32-bit incremental hashing",
+        "parameters": [
+          "Hash state",
+          "true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH"
+        ],
+        "result": "",
+        "stateType": "HashState32",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 204
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashInit32"
     },
@@ -324,6 +457,20 @@
       "denseId": 5,
       "operation": "Init",
       "width": 64,
+      "stateType": "HashState64",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Initialize hash-state for 64-bit incremental hashing",
+        "parameters": [
+          "Hash state",
+          "true to enable reverse hashing of buffers up to ::DMHASH_MAX_REVERSE_LENGTH"
+        ],
+        "result": "",
+        "stateType": "HashState64",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 247
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashInit64"
     },
@@ -360,6 +507,19 @@
       "denseId": 6,
       "operation": "Release",
       "width": 32,
+      "stateType": "HashState32",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Release incremental hashing resources\nUsed to release assocciated resources for intermediate incremental hash states.",
+        "parameters": [
+          "Hash state"
+        ],
+        "result": "",
+        "stateType": "HashState32",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 239
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashRelease32"
     },
@@ -396,6 +556,19 @@
       "denseId": 7,
       "operation": "Release",
       "width": 64,
+      "stateType": "HashState64",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Release incremental hashing resources\nUsed to release assocciated resources for intermediate incremental hash states.",
+        "parameters": [
+          "Hash state"
+        ],
+        "result": "",
+        "stateType": "HashState64",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 281
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashRelease64"
     },
@@ -448,6 +621,21 @@
       "denseId": 8,
       "operation": "UpdateBuffer",
       "width": 32,
+      "stateType": "HashState32",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Incremental hashing",
+        "parameters": [
+          "Hash state",
+          "Buffer",
+          "Length of buffer"
+        ],
+        "result": "",
+        "stateType": "HashState32",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 223
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashUpdateBuffer32"
     },
@@ -500,6 +688,21 @@
       "denseId": 9,
       "operation": "UpdateBuffer",
       "width": 64,
+      "stateType": "HashState64",
+      "evidence": {
+        "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+        "summary": "Incremental hashing",
+        "parameters": [
+          "Hash state",
+          "Buffer",
+          "Length of buffer"
+        ],
+        "result": "",
+        "stateType": "HashState64",
+        "documentationSource": "clang-comment-ast+abi-record-role",
+        "declarationLine": 265
+      },
+      "patternDecision": "state.incremental-hash-lifecycle",
       "disposition": "generated",
       "wrapper": "dmHashUpdateBuffer64"
     }

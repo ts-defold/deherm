@@ -21,14 +21,14 @@
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
-    "policy": "3339b2b1cd119fffb3dacc833a93ce11a5957cf6c8425958d04c9b98817ddaa9",
+    "policy": "2c8fb512df8fa42b90153afc637f129772e87ae4031824c1d0eea819f55d6846",
     "priorWaveReports": {
       "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json": "1178cf005cf8b9b694e3e8c43ffc9d5d4691e398f6a84261dbe570e096a9faa0",
       "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json": "627c0d0aa8b2474521612ebd7e32f984195cb9ecd5a2a685a6c789e9e727808a",
       "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "1e7ae0dd04715916b943c75f22749628a8a4447f9cf4200d389ab0e1706478dd",
       "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "11447acedf678260135821075db63f9107019001ac580b7f1c18b4b1ff8ba46b",
       "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "09ac857ffcdfb39a52105e3e5f18f72f4f8615d5c55d1aa6d1800eddd1971b1f",
-      "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json": "56a74c8a6829aff5c6f5356c20fd1b6f321a6bd53efdfba2982a9c076bb1219c"
+      "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json": "4ecaaa411b0a0cee555a33445c08dc3ec3e12dedd7d5ade089d28f9a57079c24"
     },
     "evidence": {
       "upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h": "c31d7f9f6408120e88cd0b3257720ed4cb98e6670ce9ebd15d30adbb3a8896fc",
@@ -91,8 +91,8 @@
     },
     {
       "report": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
-      "policyVersion": "hash-state-v1",
-      "sha256": "56a74c8a6829aff5c6f5356c20fd1b6f321a6bd53efdfba2982a9c076bb1219c",
+      "policyVersion": "hash-state-v2",
+      "sha256": "4ecaaa411b0a0cee555a33445c08dc3ec3e12dedd7d5ade089d28f9a57079c24",
       "declarationCount": 2
     }
   ],

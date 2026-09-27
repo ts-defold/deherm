@@ -3837,3 +3837,23 @@ global promise. All declarations still retain their universal recipe, including
 the direct Static Hermes frame, beneath these specialized overlays. Hash-state
 and the remaining older specialized families are deliberately not claimed as
 migrated by this entry.
+
+## 2026-09-27 - Structural hash-state lifecycle
+
+The incremental hash-state family no longer discovers operations with a
+`dmHash(Init|Clone|UpdateBuffer|Final|Release)(32|64)` symbol regex or a pinned
+header. The generator infers each operation from result and parameter ABI roles,
+compatible state-record identities, public summaries and parameter docs, then
+verifies the revision-derived callable through the all-target symbol-evidence
+matrix. The generated registry still has 10 operations across the 32- and
+64-bit state widths, fixed capacity, generation-checked opaque tokens,
+consuming final/release operations, fail-closed reentrancy, and no warmed heap
+allocation.
+
+The exact-call twin now emits the callable spellings and state-record types
+carried by the current IR instead of containing a second handwritten ten-symbol
+matrix. Focused sanitizer/runtime tests pass with 100,000 warmed iterations and
+zero observed allocations. The public report records the structural selector
+decision and source-derived documentation evidence per operation. This is a
+specialized overlay only; all 10 declarations retain their universal and Static
+Hermes recipes beneath it.
