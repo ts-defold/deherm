@@ -438,12 +438,13 @@ async function validateReports(root) {
   assert(
     enumValue.coverage.baselineRuntimePending === runtimePendingCount &&
       enumValue.coverage.previouslyEmittedScalar === scalar.coverage.generated &&
-      enumValue.coverage.discovered === 10 &&
-      enumValue.coverage.emitted === 7 &&
+      enumValue.coverage.discovered === enumValue.declarations.length &&
       enumValue.coverage.blocked === enumValue.coverage.discovered - enumValue.coverage.emitted &&
+      enumValue.declarations.filter(({ emitted }) => emitted).length === enumValue.coverage.emitted &&
+      enumValue.declarations.filter(({ emitted }) => !emitted).length === enumValue.coverage.blocked &&
       enumValue.coverage.remainingWithoutGeneratedAdapters ===
         runtimePendingCount - scalar.coverage.generated - enumValue.coverage.emitted,
-    "enum-value report does not have the pinned 7/10 disposition or 1,328 remainder",
+    "enum-value report does not have a complete structural disposition",
   );
   assert(
     namedScalar.coverage.reviewed === namedScalar.declarations.length &&

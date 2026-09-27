@@ -11,14 +11,66 @@
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "scalarReport": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
-    "overrides": "04c37e44300225c60101a0602f123fcf528d79c182082d91fd8ce141d83ff9b8"
+    "overrides": "b8bcc3c14556bab5625014ffb6f295986057987e94b546235bb3941149f707c5"
   },
   "policy": {
+    "transport": "fixed-width-cell-codec",
+    "enumDomainSource": "revision-ir",
+    "effectSource": "revision-ir-public-documentation",
+    "fallback": "universal-recipe",
     "cEnumRepresentation": "int32_t",
     "enumInputs": "generated exact-domain validation before native call",
     "uint64": "C uint64_t and native JSI bigint",
     "allocation": "stack-only fixed slots; no glue allocation or ownership transfer",
-    "html5": "fail-closed until Wasm BigInt and linked-symbol matrix are validated"
+    "html5": "fail-closed until Wasm BigInt and linked-symbol matrix are validated",
+    "patternRegistry": [
+      {
+        "id": "value.enum-domain-direct",
+        "family": "enum-value",
+        "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+        "priority": 810,
+        "cost": 6,
+        "fallback": false,
+        "when": {
+          "declarationKinds": [
+            "function"
+          ],
+          "result": {
+            "rolePrefixes": [
+              "enum:",
+              "scalar:"
+            ]
+          },
+          "parameters": {
+            "every": [
+              {
+                "rolePrefixes": [
+                  "enum:",
+                  "scalar:"
+                ],
+                "directions": [
+                  "value"
+                ]
+              }
+            ]
+          },
+          "requireSemanticTokens": [
+            "declared-enum-domain",
+            "fixed-width-cell-codec",
+            "synchronous-noescape"
+          ]
+        }
+      },
+      {
+        "id": "universal.default",
+        "family": "universal-recipe",
+        "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+        "priority": 0,
+        "cost": 1000,
+        "fallback": true,
+        "when": null
+      }
+    ]
   },
   "universalFallback": {
     "preserved": true,
@@ -90,6 +142,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": "Gets the size of a value type",
+        "result": "The size in bytes",
+        "enumRoles": [
+          "enum:dmBuffer::ValueType"
+        ]
+      },
       "emitted": true,
       "bindingId": 0,
       "wrapper": "deherm_dmsdk_enum_dm_buffer_get_size_for_value_type_i32",
@@ -143,6 +204,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": null,
+        "result": null,
+        "enumRoles": [
+          "enum:dmGameObject::Result"
+        ]
+      },
       "emitted": false,
       "blocker": "extension-registry-capability-required",
       "stages": {
@@ -182,6 +252,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": null,
+        "result": null,
+        "enumRoles": [
+          "enum:dmGameObject::Result"
+        ]
+      },
       "emitted": false,
       "blocker": "extension-registry-capability-required",
       "stages": {
@@ -213,6 +292,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": "Get installed graphics adapter family",
+        "result": "Installed adapter family",
+        "enumRoles": [
+          "enum:dmGraphics::AdapterFamily"
+        ]
+      },
       "emitted": true,
       "bindingId": 1,
       "wrapper": "deherm_dmsdk_enum_dm_graphics_get_installed_adapter_family_v",
@@ -254,6 +342,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": "Installs a graphics adapter.\nInitializes the specified graphics backend (OpenGL, Vulkan, etc.).\nThis must be called before creating any graphics context.",
+        "result": "True if the adapter was successfully installed, false otherwise",
+        "enumRoles": [
+          "enum:dmGraphics::AdapterFamily"
+        ]
+      },
       "emitted": false,
       "blocker": "engine-lifecycle-capability-required",
       "stages": {
@@ -293,6 +390,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": null,
+        "result": null,
+        "enumRoles": [
+          "enum:LogSeverity"
+        ]
+      },
       "emitted": true,
       "bindingId": 2,
       "wrapper": "deherm_dmsdk_enum_dm_log_setlevel_i32",
@@ -335,6 +441,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": "Get log system severity level.",
+        "result": "Current log system severity level",
+        "enumRoles": [
+          "enum:LogSeverity"
+        ]
+      },
       "emitted": true,
       "bindingId": 3,
       "wrapper": "deherm_dmsdk_enum_dm_log_get_level_v",
@@ -376,6 +491,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": "Set log system severity level.",
+        "result": "",
+        "enumRoles": [
+          "enum:LogSeverity"
+        ]
+      },
       "emitted": true,
       "bindingId": 4,
       "wrapper": "deherm_dmsdk_enum_dm_log_set_level_i32",
@@ -433,6 +557,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": "Temporarily mute or restore an individual mixer group.",
+        "result": "RESULT_OK on success",
+        "enumRoles": [
+          "enum:dmSound::Result"
+        ]
+      },
       "emitted": true,
       "bindingId": 5,
       "wrapper": "deherm_dmsdk_enum_dm_sound_set_group_mute_u64_bool",
@@ -474,6 +607,15 @@
         "enum-width-domain-validation-policy",
         "native-symbol-linkage-unverified"
       ],
+      "patternDecision": "value.enum-domain-direct",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "summary": "Convenience toggle for <code>SetGroupMute</code>.",
+        "result": "RESULT_OK on success",
+        "enumRoles": [
+          "enum:dmSound::Result"
+        ]
+      },
       "emitted": true,
       "bindingId": 6,
       "wrapper": "deherm_dmsdk_enum_dm_sound_toggle_group_mute_u64",

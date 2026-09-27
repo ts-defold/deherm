@@ -3875,3 +3875,21 @@ gate now verifies relational completeness rather than the current 20/21 count.
 The exact-call runtime remains zero-allocation when warm. Every declaration,
 including the blocked specialized route, retains its universal and Static
 Hermes recipe.
+
+## 2026-09-27 - Structural enum-value domains
+
+The enum-value package recipe no longer enumerates ten current-revision
+declaration IDs or assigns their emit/block dispositions. Discovery now uses
+function ABI roles and requires at least one declared enum domain from the
+revision IR. A generic source-semantic pass identifies registry-unregister and
+documented pre-context adapter-install effects as capability-gated; every other
+matching declaration receives the exact-domain fixed-cell codec. Public include
+paths and translation-unit group names are derived from each revision header.
+
+The current partition remains seven emitted and three capability-gated routes.
+All seven generated C++/JSI translation units compile, the host-safe packaged
+SDK routes execute with zero warmed allocations, and a focused test proves the
+ten candidates are found without consulting ABI-tranche labels. Clean-room
+validation now checks relational completeness instead of pinning 7/10. Every
+row retains its universal and Static Hermes recipe underneath this optimized
+lane.

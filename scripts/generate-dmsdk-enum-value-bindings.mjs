@@ -3,9 +3,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import { semanticDeclarationId, semanticEntryMap } from "./lib/dmsdk-semantic-id.mjs";
-
-export { semanticDeclarationId } from "./lib/dmsdk-semantic-id.mjs";
+import {
+  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  compactDmSdkPatternDecision,
+  defineDmSdkPattern,
+  selectDmSdkPattern,
+} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = {
@@ -17,7 +20,13 @@ const paths = {
 const KIND = { void: 0, bool: 1, u32: 2, u64: 3, i32: 4 };
 
 const sha256 = (value) => createHash("sha256").update(value).digest("hex");
-const snake = (value) => value.replace(/::/g, "_").replace(/([a-z0-9])([A-Z])/g, "$1_$2").replace(/[^A-Za-z0-9]+/g, "_").replace(/^_+|_+$/g, "").toLowerCase();
+const snake = (value) =>
+  value
+    .replace(/::/g, "_")
+    .replace(/([a-z0-9])([A-Z])/g, "$1_$2")
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
 const leaf = (value) => String(value).split("::").at(-1);
 
 function parseArgs(argv) {
@@ -44,7 +53,10 @@ function typeIndex(ir) {
 }
 
 function resolveType(type, symbol, index) {
-  const clean = String(type).replace(/\b(?:const|volatile|enum|struct|class)\b/g, "").replace(/\s+/g, " ").trim();
+  const clean = String(type)
+    .replace(/\b(?:const|volatile|enum|struct|class)\b/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
   if (index.exact.has(clean)) return index.exact.get(clean);
   const namespace = String(symbol).split("::").slice(0, -1).join("::");
   if (namespace && index.exact.has(`${namespace}::${clean}`)) return index.exact.get(`${namespace}::${clean}`);
@@ -53,7 +65,7 @@ function resolveType(type, symbol, index) {
 }
 
 function abiType(type, symbol, index, seen = new Set()) {
-  const direct = { void: "void", bool: "bool", uint32_t: "u32", uint64_t: "u64", dmhash_t: "u64" }[type];
+  const direct = { void: "void", bool: "bool", uint32_t: "u32", uint64_t: "u64" }[type];
   if (direct) return { kind: direct, native: type };
   const resolved = resolveType(type, symbol, index);
   if (!resolved || seen.has(resolved.id)) throw new Error(`Unresolved enum-value ABI type ${type} in ${symbol}`);
@@ -72,23 +84,73 @@ function wrapperName(declaration, parameters) {
 }
 
 function sourceGroup(header) {
-  if (header.includes("/buffer.h")) return { name: "buffer", include: "dmsdk/dlib/buffer.h" };
-  if (header.includes("/log.h")) return { name: "log", include: "dmsdk/dlib/log.h" };
-  if (header.includes("/graphics.h")) return { name: "graphics", include: "dmsdk/graphics/graphics.h" };
-  if (header.includes("/sound.h")) return { name: "sound", include: "dmsdk/sound/sound.h" };
-  throw new Error(`No source group for ${header}`);
+  const marker = "/dmsdk/";
+  const index = header.indexOf(marker);
+  if (index < 0) throw new Error(`No public dmSDK include path in ${header}`);
+  const include = `dmsdk/${header.slice(index + marker.length)}`;
+  const filename = include.split("/").at(-1);
+  const name = filename
+    .replace(/\.[^.]+$/u, "")
+    .replace(/[^A-Za-z0-9]+/gu, "_")
+    .toLowerCase();
+  if (!name) throw new Error(`No deterministic enum-value source group for ${header}`);
+  return { name, include };
+}
+
+function enumValuePattern() {
+  return defineDmSdkPattern({
+    schemaVersion: 1,
+    id: "value.enum-domain-direct",
+    family: "enum-value",
+    emitter: "scripts/generate-dmsdk-enum-value-bindings.mjs",
+    priority: 810,
+    cost: 6,
+    fallback: false,
+    when: {
+      declarationKinds: ["function"],
+      result: { rolePrefixes: ["scalar:", "enum:"] },
+      parameters: { every: [{ rolePrefixes: ["scalar:", "enum:"], directions: ["value"] }] },
+      requireSemanticTokens: ["declared-enum-domain", "fixed-width-cell-codec", "synchronous-noescape"],
+    },
+  });
+}
+
+export function inferEnumValueSemantics(declaration, row) {
+  if (!declaration || declaration.kind !== "function") return null;
+  const roles = [row.result.role, ...row.parameters.map(({ role }) => role)];
+  if (!roles.every((role) => role.startsWith("scalar:") || role.startsWith("enum:"))) return null;
+  if (!roles.some((role) => role.startsWith("enum:"))) return null;
+  const leafName = declaration.name.split("::").at(-1);
+  const description = `${declaration.description ?? ""} ${declaration.returnDescription ?? ""}`.toLowerCase();
+  let capabilityBlocker = null;
+  if (/unregister/iu.test(leafName)) capabilityBlocker = "extension-registry-capability-required";
+  else if (/install/iu.test(leafName) && /before creating|initializ(?:e|es).*backend/iu.test(description))
+    capabilityBlocker = "engine-lifecycle-capability-required";
+  return {
+    semanticTokens: ["declared-enum-domain", "fixed-width-cell-codec", "synchronous-noescape"],
+    capabilityBlocker,
+    evidence: {
+      source: "revision-ir-abi+public-documentation",
+      summary: declaration.description ?? null,
+      result: declaration.returnDescription ?? null,
+      enumRoles: roles.filter((role) => role.startsWith("enum:")).sort(),
+    },
+  };
 }
 
 function cArguments(entry) {
-  return entry.parameters.map(({ parameter, abi }) => {
-    if (abi.enum) return `static_cast<${abi.native}>(${parameter.name})`;
-    if (abi.kind === "bool") return `${parameter.name} != 0`;
-    return parameter.name;
-  }).join(", ");
+  return entry.parameters
+    .map(({ parameter, abi }) => {
+      if (abi.enum) return `static_cast<${abi.native}>(${parameter.name})`;
+      if (abi.kind === "bool") return `${parameter.name} != 0`;
+      return parameter.name;
+    })
+    .join(", ");
 }
 
 function cDefinition(entry) {
-  const parameters = entry.parameters.map(({ parameter, abi }) => `${cType(abi.kind)} ${parameter.name}`).join(", ") || "void";
+  const parameters =
+    entry.parameters.map(({ parameter, abi }) => `${cType(abi.kind)} ${parameter.name}`).join(", ") || "void";
   const call = `${entry.declaration.name}(${cArguments(entry)})`;
   let body = `    ${call};`;
   if (entry.result.kind === "bool") body = `    return ${call} ? UINT8_C(1) : UINT8_C(0);`;
@@ -98,7 +160,15 @@ function cDefinition(entry) {
 }
 
 function enumDomain(abi) {
-  return abi.enum ? [...new Set(abi.enum.members.filter(({ name }) => !/(?:^|_)(?:MAX|COUNT|NUM)(?:_|$)/.test(name)).map(({ value }) => value))].sort((a, b) => a - b) : undefined;
+  return abi.enum
+    ? [
+        ...new Set(
+          abi.enum.members
+            .filter(({ name }) => !/(?:^|_)(?:MAX|COUNT|NUM)(?:_|$)/.test(name))
+            .map(({ value }) => value),
+        ),
+      ].sort((a, b) => a - b)
+    : undefined;
 }
 
 function validateExpression(parameter, position) {
@@ -109,13 +179,17 @@ function validateExpression(parameter, position) {
 
 function rawCall(entry) {
   const validations = entry.parameters.map(validateExpression).filter(Boolean);
-  const args = entry.parameters.map(({ abi }, position) => {
-    if (abi.kind === "bool") return `arguments[${position}] != 0`;
-    if (abi.kind === "i32") return `unpack_i32(arguments[${position}])`;
-    return `static_cast<${cType(abi.kind)}>(arguments[${position}])`;
-  }).join(", ");
+  const args = entry.parameters
+    .map(({ abi }, position) => {
+      if (abi.kind === "bool") return `arguments[${position}] != 0`;
+      if (abi.kind === "i32") return `unpack_i32(arguments[${position}])`;
+      return `static_cast<${cType(abi.kind)}>(arguments[${position}])`;
+    })
+    .join(", ");
   const call = `${entry.wrapper}(${args})`;
-  const validation = validations.length ? `      if (!(${validations.join(" && ")})) return DEHERM_DMSDK_ENUM_INVALID_ENUM;\n` : "";
+  const validation = validations.length
+    ? `      if (!(${validations.join(" && ")})) return DEHERM_DMSDK_ENUM_INVALID_ENUM;\n`
+    : "";
   let result = `      ${call};\n      *out_result = UINT64_C(0);`;
   if (entry.result.kind === "i32") result = `      *out_result = static_cast<uint64_t>(static_cast<int64_t>(${call}));`;
   else if (entry.result.kind !== "void") result = `      *out_result = static_cast<uint64_t>(${call});`;
@@ -129,11 +203,22 @@ function tsType(abi) {
 
 function tsName(entry) {
   const words = snake(entry.declaration.name).split("_");
-  return words[0] + words.slice(1).map((word) => word[0].toUpperCase() + word.slice(1)).join("");
+  return (
+    words[0] +
+    words
+      .slice(1)
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join("")
+  );
 }
 
 function renderHeader(entries) {
-  const declarations = entries.map((entry) => `${cType(entry.result.kind)} ${entry.wrapper}(${entry.parameters.map(({ parameter, abi }) => `${cType(abi.kind)} ${parameter.name}`).join(", ") || "void"});`).join("\n");
+  const declarations = entries
+    .map(
+      (entry) =>
+        `${cType(entry.result.kind)} ${entry.wrapper}(${entry.parameters.map(({ parameter, abi }) => `${cType(abi.kind)} ${parameter.name}`).join(", ") || "void"});`,
+    )
+    .join("\n");
   return `// Generated by scripts/generate-dmsdk-enum-value-bindings.mjs. Do not edit.\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_ENUM_VALUE_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_ENUM_VALUE_H\n#include <stdint.h>\n#ifdef __cplusplus\nextern "C" {\n#endif\n${declarations}\n#ifdef __cplusplus\n}\n#endif\n#endif\n`;
 }
 
@@ -148,12 +233,16 @@ function renderRuntimeHeader(entries) {
 
 function renderRuntime(entries) {
   const maxArgs = Math.max(...entries.map(({ parameters }) => parameters.length));
-  const descriptors = entries.map((entry) => {
-    const kinds = entry.parameters.map(({ abi }) => KIND[abi.kind]);
-    while (kinds.length < maxArgs) kinds.push(0);
-    return `  { UINT16_C(${entry.id}), UINT8_C(${entry.parameters.length}), UINT8_C(${KIND[entry.result.kind]}), { ${kinds.map((kind) => `UINT8_C(${kind})`).join(", ")} }, ${JSON.stringify(entry.declaration.id)} }`;
-  }).join(",\n");
-  const cases = entries.map((entry) => `    case ${entry.id}:\n${rawCall(entry)}\n      return DEHERM_DMSDK_ENUM_OK;`).join("\n");
+  const descriptors = entries
+    .map((entry) => {
+      const kinds = entry.parameters.map(({ abi }) => KIND[abi.kind]);
+      while (kinds.length < maxArgs) kinds.push(0);
+      return `  { UINT16_C(${entry.id}), UINT8_C(${entry.parameters.length}), UINT8_C(${KIND[entry.result.kind]}), { ${kinds.map((kind) => `UINT8_C(${kind})`).join(", ")} }, ${JSON.stringify(entry.declaration.id)} }`;
+    })
+    .join(",\n");
+  const cases = entries
+    .map((entry) => `    case ${entry.id}:\n${rawCall(entry)}\n      return DEHERM_DMSDK_ENUM_OK;`)
+    .join("\n");
   return `// Generated by scripts/generate-dmsdk-enum-value-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_enum_value.h>\n#include <defold_hermes/generated_dmsdk_enum_value_runtime.h>\n#include <cstring>\nnamespace {\nconst DehermDmSdkEnumDescriptor kDescriptors[] = {\n${descriptors}\n};\nint32_t unpack_i32(uint64_t raw) { const uint32_t bits=static_cast<uint32_t>(raw); int32_t value=0; static_assert(sizeof(bits)==sizeof(value),"i32 width"); std::memcpy(&value,&bits,sizeof(value)); return value; }\n}\nextern "C" {\nuint32_t deherm_dmsdk_enum_count(void) { return UINT32_C(${entries.length}); }\nconst DehermDmSdkEnumDescriptor* deherm_dmsdk_enum_descriptors(void) { return kDescriptors; }\nDehermDmSdkEnumStatus deherm_dmsdk_enum_dispatch(uint16_t id, const uint64_t* arguments, uint32_t argument_count, uint64_t* out_result) {\n  if (id >= deherm_dmsdk_enum_count()) return DEHERM_DMSDK_ENUM_UNKNOWN_ID;\n  const DehermDmSdkEnumDescriptor& descriptor = kDescriptors[id];\n  if (argument_count != descriptor.argument_count) return DEHERM_DMSDK_ENUM_WRONG_ARITY;\n  if (out_result == nullptr || (argument_count && arguments == nullptr)) return DEHERM_DMSDK_ENUM_NULL_STORAGE;\n  switch (id) {\n${cases}\n    default: return DEHERM_DMSDK_ENUM_UNKNOWN_ID;\n  }\n}\n}\n`;
 }
 
@@ -167,63 +256,126 @@ function renderJsi() {
 
 function renderTs(entries) {
   const ids = entries.map((entry) => `  ${tsName(entry)}: ${entry.id}`).join(",\n");
-  const functions = entries.map((entry) => {
-    const name = tsName(entry);
-    const params = entry.parameters.map(({ parameter, abi }) => `${parameter.name}: ${tsType(abi)}`).join(", ");
-    const args = entry.parameters.map(({ parameter }) => parameter.name).join(", ");
-    return `/** Raw dmSDK binding for ${entry.declaration.name}. */\nexport function ${name}(${params}): ${tsType(entry.result)} {\n  return module().call(DmSdkEnumValueId.${name}${args ? `, ${args}` : ""}) as ${tsType(entry.result)};\n}`;
-  }).join("\n\n");
+  const functions = entries
+    .map((entry) => {
+      const name = tsName(entry);
+      const params = entry.parameters.map(({ parameter, abi }) => `${parameter.name}: ${tsType(abi)}`).join(", ");
+      const args = entry.parameters.map(({ parameter }) => parameter.name).join(", ");
+      return `/** Raw dmSDK binding for ${entry.declaration.name}. */\nexport function ${name}(${params}): ${tsType(entry.result)} {\n  return module().call(DmSdkEnumValueId.${name}${args ? `, ${args}` : ""}) as ${tsType(entry.result)};\n}`;
+    })
+    .join("\n\n");
   return `// Generated by scripts/generate-dmsdk-enum-value-bindings.mjs. Do not edit.\ninterface DmSdkEnumValueModule { call(id:number,...args:readonly (number|boolean|bigint)[]):unknown; }\ndeclare global { var __defoldModulesV1: Record<string,object>|undefined; }\nfunction module():DmSdkEnumValueModule { const value=globalThis.__defoldModulesV1?.DmSdkEnumValue as DmSdkEnumValueModule|undefined; if(!value) throw new Error("Defold module is not registered: DmSdkEnumValue"); return value; }\nexport const DmSdkEnumValueId = {\n${ids}\n} as const;\n\n${functions}\n`;
 }
 
-async function build() {
-  const contents = Object.fromEntries(await Promise.all(Object.entries(paths).map(async ([name, path]) => [name, await readFile(resolve(root, path), "utf8")])));
+export async function build() {
+  const contents = Object.fromEntries(
+    await Promise.all(
+      Object.entries(paths).map(async ([name, path]) => [name, await readFile(resolve(root, path), "utf8")]),
+    ),
+  );
   const ir = JSON.parse(contents.ir);
   const shapes = JSON.parse(contents.shapes);
   const scalarReport = JSON.parse(contents.scalarReport);
   const overrides = JSON.parse(contents.overrides);
-  const candidates = shapes.rows.filter(({ tranche }) => tranche === overrides.family);
-  const policiesBySemanticId = semanticEntryMap(overrides.entries, "enum-value policy");
+  if (overrides.schemaVersion !== 2 || overrides.family !== "enum-value" || !overrides.recipe)
+    throw new Error("Invalid enum-value structural policy");
   const declarationById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
   const index = typeIndex(ir);
+  const patterns = [enumValuePattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const candidates = shapes.rows
+    .map((candidate) => {
+      const declaration = declarationById.get(candidate.id);
+      const semantics = inferEnumValueSemantics(declaration, candidate);
+      if (!semantics) return null;
+      const decision = selectDmSdkPattern(
+        {
+          id: candidate.id,
+          kind: declaration.kind,
+          result: candidate.result,
+          parameters: candidate.parameters,
+          families: candidate.families,
+          semanticTokens: semantics.semanticTokens,
+        },
+        patterns,
+      );
+      return decision.patternId === "value.enum-domain-direct" ? { candidate, declaration, semantics, decision } : null;
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.candidate.id.localeCompare(right.candidate.id));
   const reportRows = [];
   const entries = [];
-  for (const candidate of candidates) {
-    const policy = policiesBySemanticId.get(semanticDeclarationId(candidate.id));
-    const declaration = declarationById.get(candidate.id);
-    if (!declaration) throw new Error(`Enum-value candidate is absent from dmSDK IR: ${candidate.id}`);
-    if (!policy) {
+  for (const { candidate, declaration, semantics, decision } of candidates) {
+    const common = {
+      ...candidate,
+      patternDecision: compactDmSdkPatternDecision(decision),
+      semanticEvidence: semantics.evidence,
+    };
+    if (semantics.capabilityBlocker) {
       reportRows.push({
-        ...candidate,
+        ...common,
         emitted: false,
-        blocker: "unreviewed-enum-value-optimization",
-        stages: { generated: "universal-fallback-retained", compiled: "not-applicable", linked: "not-applicable", runtime: "not-applicable" }
+        blocker: semantics.capabilityBlocker,
+        stages: {
+          generated: "blocked-by-policy",
+          compiled: "not-applicable",
+          linked: "not-applicable",
+          runtime: "not-applicable",
+        },
       });
       continue;
     }
-    if (policy.status === "blocked") {
-      reportRows.push({ ...candidate, emitted: false, blocker: policy.blocker, stages: { generated: "blocked-by-policy", compiled: "not-applicable", linked: "not-applicable", runtime: "not-applicable" } });
-      continue;
-    }
     const result = abiType(declaration.returns ?? "void", declaration.name, index);
-    const parameters = declaration.parameters.map((parameter) => ({ parameter, abi: abiType(parameter.type, declaration.name, index) }));
+    const parameters = declaration.parameters.map((parameter) => ({
+      parameter,
+      abi: abiType(parameter.type, declaration.name, index),
+    }));
     const group = sourceGroup(declaration.header);
-    const entry = { id: entries.length, declaration, result, parameters, group, wrapper: wrapperName(declaration, parameters) };
+    const entry = {
+      id: entries.length,
+      declaration,
+      result,
+      parameters,
+      group,
+      wrapper: wrapperName(declaration, parameters),
+    };
     entries.push(entry);
     const hostRuntime = group.name === "buffer" || group.name === "log";
-    reportRows.push({ ...candidate, emitted: true, bindingId: entry.id, wrapper: entry.wrapper, enumDomains: Object.fromEntries(parameters.filter(({ abi }) => abi.enum).map(({ parameter, abi }) => [parameter.name, enumDomain(abi)])), stages: { generated: "complete", compiled: "packaged-sdk-object-test", linked: hostRuntime ? "packaged-sdk-host-link-test" : "extension-link-pending", runtime: hostRuntime ? "packaged-sdk-host-runtime-test" : "engine-context-pending" } });
+    reportRows.push({
+      ...common,
+      emitted: true,
+      bindingId: entry.id,
+      wrapper: entry.wrapper,
+      enumDomains: Object.fromEntries(
+        parameters.filter(({ abi }) => abi.enum).map(({ parameter, abi }) => [parameter.name, enumDomain(abi)]),
+      ),
+      stages: {
+        generated: "complete",
+        compiled: "packaged-sdk-object-test",
+        linked: hostRuntime ? "packaged-sdk-host-link-test" : "extension-link-pending",
+        runtime: hostRuntime ? "packaged-sdk-host-runtime-test" : "engine-context-pending",
+      },
+    });
   }
   const artifacts = new Map();
   artifacts.set("defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value.h", renderHeader(entries));
   for (const group of [...new Set(entries.map(({ group }) => group.name))].sort()) {
     const selected = entries.filter((entry) => entry.group.name === group);
-    artifacts.set(`defold/defold_hermes/src/generated_dmsdk_enum_value_${group}.cpp`, renderSource(selected[0].group, selected));
+    artifacts.set(
+      `defold/defold_hermes/src/generated_dmsdk_enum_value_${group}.cpp`,
+      renderSource(selected[0].group, selected),
+    );
   }
-  artifacts.set("defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h", renderRuntimeHeader(entries));
+  artifacts.set(
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h",
+    renderRuntimeHeader(entries),
+  );
   artifacts.set("defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp", renderRuntime(entries));
   artifacts.set("defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_jsi.hpp", renderJsiHeader());
   const jsiSource = renderJsi()
-    .replace("if (!count || !integer(args[0]))", "if (!count || !integer(args[0]) || args[0].asNumber() < 0.0 || args[0].asNumber() > 65535.0)")
+    .replace(
+      "if (!count || !integer(args[0]))",
+      "if (!count || !integer(args[0]) || args[0].asNumber() < 0.0 || args[0].asNumber() > 65535.0)",
+    )
     .replace("static_cast<double>(static_cast<int32_t>(raw))", "static_cast<double>(static_cast<int64_t>(raw))")
     .replace("DmSdkEnumValue.call expects id", "DmSdkEnumValue.call expects u16 id");
   artifacts.set("defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp", jsiSource);
@@ -233,20 +385,59 @@ async function build() {
     defoldRevision: ir.defoldRevision,
     sources: paths,
     sourceHashes: Object.fromEntries(Object.entries(contents).map(([name, content]) => [name, sha256(content)])),
-    policy: { cEnumRepresentation: "int32_t", enumInputs: "generated exact-domain validation before native call", uint64: "C uint64_t and native JSI bigint", allocation: "stack-only fixed slots; no glue allocation or ownership transfer", html5: "fail-closed until Wasm BigInt and linked-symbol matrix are validated" },
-    universalFallback: { preserved: true, catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json", mutation: "none" },
-    coverage: { baselineRuntimePending: shapes.coverage.runtimePending, previouslyEmittedScalar: scalarReport.coverage.generated, discovered: candidates.length, emitted: entries.length, blocked: reportRows.filter(({ emitted }) => !emitted).length, hostRuntimeVerified: reportRows.filter(({ stages }) => stages.runtime === "packaged-sdk-host-runtime-test").length, engineContextPending: reportRows.filter(({ stages }) => stages.runtime === "engine-context-pending").length, remainingWithoutGeneratedAdapters: shapes.coverage.runtimePending - scalarReport.coverage.generated - entries.length },
-    artifactHashes: Object.fromEntries([...artifacts].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)])),
+    policy: {
+      ...overrides.recipe,
+      cEnumRepresentation: "int32_t",
+      enumInputs: "generated exact-domain validation before native call",
+      uint64: "C uint64_t and native JSI bigint",
+      allocation: "stack-only fixed slots; no glue allocation or ownership transfer",
+      html5: "fail-closed until Wasm BigInt and linked-symbol matrix are validated",
+      patternRegistry: patterns.map(({ id, family, emitter, priority, cost, fallback, when }) => ({
+        id,
+        family,
+        emitter,
+        priority,
+        cost,
+        fallback,
+        when,
+      })),
+    },
+    universalFallback: {
+      preserved: true,
+      catalog: "packages/bindings/generated/defold-dmsdk-universal-bindings.json",
+      mutation: "none",
+    },
+    coverage: {
+      baselineRuntimePending: shapes.coverage.runtimePending,
+      previouslyEmittedScalar: scalarReport.coverage.generated,
+      discovered: candidates.length,
+      emitted: entries.length,
+      blocked: reportRows.filter(({ emitted }) => !emitted).length,
+      hostRuntimeVerified: reportRows.filter(({ stages }) => stages.runtime === "packaged-sdk-host-runtime-test")
+        .length,
+      engineContextPending: reportRows.filter(({ stages }) => stages.runtime === "engine-context-pending").length,
+      remainingWithoutGeneratedAdapters:
+        shapes.coverage.runtimePending - scalarReport.coverage.generated - entries.length,
+    },
+    artifactHashes: Object.fromEntries(
+      [...artifacts].sort(([a], [b]) => a.localeCompare(b)).map(([path, content]) => [path, sha256(content)]),
+    ),
     artifacts: [...artifacts.keys()].sort(),
     declarations: reportRows,
   };
-  artifacts.set("packages/bindings/generated/defold-dmsdk-enum-value-bindings.json", `${JSON.stringify(report, null, 2)}\n`);
+  artifacts.set(
+    "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
+    `${JSON.stringify(report, null, 2)}\n`,
+  );
   return { artifacts, report };
 }
 
 async function writeOrCheck(outRoot, relative, content, check) {
   const path = resolve(outRoot, relative);
-  if (check) { if (await readFile(path, "utf8") !== content) throw new Error(`${relative} is stale`); return; }
+  if (check) {
+    if ((await readFile(path, "utf8")) !== content) throw new Error(`${relative} is stale`);
+    return;
+  }
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, content);
 }
@@ -255,7 +446,9 @@ export async function run(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
   const { artifacts, report } = await build();
   for (const [path, content] of artifacts) await writeOrCheck(options.outRoot, path, content, options.check);
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.emitted}/${report.coverage.discovered} enum-value dmSDK bindings; ${report.coverage.blocked} optimization-blocked.\n`);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.coverage.emitted}/${report.coverage.discovered} enum-value dmSDK bindings; ${report.coverage.blocked} optimization-blocked.\n`,
+  );
   return report;
 }
 

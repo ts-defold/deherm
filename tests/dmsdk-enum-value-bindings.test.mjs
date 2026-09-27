@@ -6,11 +6,14 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { semanticDeclarationId } from "../scripts/generate-dmsdk-enum-value-bindings.mjs";
+import { inferEnumValueSemantics } from "../scripts/generate-dmsdk-enum-value-bindings.mjs";
 
 const repositoryRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json");
-const sdkRoot = join(repositoryRoot, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+const sdkRoot = join(
+  repositoryRoot,
+  "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
+);
 const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
 
@@ -21,16 +24,46 @@ function run(command, args) {
 function includeArgs() {
   return [
     `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
-    "-isystem", join(sdkRoot, "sdk/include"),
-    "-isystem", join(sdkRoot, "include"),
-    "-DDLIB_LOG_DOMAIN=\"deherm\"",
+    "-isystem",
+    join(sdkRoot, "sdk/include"),
+    "-isystem",
+    join(sdkRoot, "include"),
+    '-DDLIB_LOG_DOMAIN="deherm"',
   ];
 }
 
-test("enum-value policy identity ignores revision-specific source positions", () => {
-  const current = "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99";
-  const moved = "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:97";
-  assert.equal(semanticDeclarationId(current), semanticDeclarationId(moved));
+test("enum-value policy contains codec recipes, not Defold revision facts", async () => {
+  const content = await readFile(
+    join(repositoryRoot, "packages/bindings/overrides/dmsdk-enum-value-bindings.json"),
+    "utf8",
+  );
+  assert.doesNotMatch(content, /"entries"|dmsdk:|dmBuffer|dmGraphics|dmLog|dmSound|comp_gui|expected/u);
+});
+
+test("enum-value discovery comes from ABI roles and revision semantics, not tranche labels", async () => {
+  const [ir, shapes] = await Promise.all([
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+  ]);
+  const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
+  const inferred = shapes.rows
+    .map((row) => ({
+      row,
+      semantics: inferEnumValueSemantics(declarations.get(row.id), { ...row, tranche: "ignored" }),
+    }))
+    .filter(({ semantics }) => semantics);
+  assert.equal(inferred.length, 10);
+  assert.deepEqual(
+    inferred
+      .filter(({ semantics }) => semantics.capabilityBlocker)
+      .map(({ semantics }) => semantics.capabilityBlocker)
+      .sort(),
+    [
+      "engine-lifecycle-capability-required",
+      "extension-registry-capability-required",
+      "extension-registry-capability-required",
+    ],
+  );
 });
 
 test("enum-value generator is byte deterministic", async () => {
@@ -39,7 +72,11 @@ test("enum-value generator is byte deterministic", async () => {
     run(process.execPath, ["scripts/generate-dmsdk-enum-value-bindings.mjs", "--out-root", output]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
     for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json"]) {
-      assert.equal(await readFile(join(output, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
+      assert.equal(
+        await readFile(join(output, artifact), "utf8"),
+        await readFile(join(repositoryRoot, artifact), "utf8"),
+        artifact,
+      );
     }
     run(process.execPath, ["scripts/generate-dmsdk-enum-value-bindings.mjs", "--out-root", output, "--check"]);
   } finally {
@@ -61,13 +98,26 @@ test("all ten mechanically discovered enum-value candidates have an honest dispo
   });
   assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 10);
   assert.equal(new Set(report.declarations.filter(({ emitted }) => emitted).map(({ bindingId }) => bindingId)).size, 7);
-  assert.deepEqual(report.declarations.filter(({ emitted }) => !emitted).map(({ blocker }) => blocker).sort(), [
-    "engine-lifecycle-capability-required",
-    "extension-registry-capability-required",
-    "extension-registry-capability-required",
-  ]);
+  assert.ok(report.declarations.every(({ patternDecision }) => patternDecision === "value.enum-domain-direct"));
+  assert.ok(
+    report.declarations.every(
+      ({ semanticEvidence }) => semanticEvidence.source === "revision-ir-abi+public-documentation",
+    ),
+  );
+  assert.deepEqual(
+    report.declarations
+      .filter(({ emitted }) => !emitted)
+      .map(({ blocker }) => blocker)
+      .sort(),
+    [
+      "engine-lifecycle-capability-required",
+      "extension-registry-capability-required",
+      "extension-registry-capability-required",
+    ],
+  );
   assert.equal(Object.keys(report.artifactHashes).length, report.artifacts.length);
-  for (const digest of [...Object.values(report.sourceHashes), ...Object.values(report.artifactHashes)]) assert.match(digest, /^[a-f0-9]{64}$/);
+  for (const digest of [...Object.values(report.sourceHashes), ...Object.values(report.artifactHashes)])
+    assert.match(digest, /^[a-f0-9]{64}$/);
 });
 
 test("every emitted C++ and JSI translation unit compiles against the complete pinned packaged SDK", async () => {
@@ -76,7 +126,18 @@ test("every emitted C++ and JSI translation unit compiles against the complete p
   try {
     const sources = report.artifacts.filter((path) => path.endsWith(".cpp"));
     for (const [index, source] of sources.entries()) {
-      run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includeArgs(), "-c", source, "-o", join(output, `${index}.o`)]);
+      run(compiler, [
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
+        ...includeArgs(),
+        "-c",
+        source,
+        "-o",
+        join(output, `${index}.o`),
+      ]);
     }
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -85,30 +146,64 @@ test("every emitted C++ and JSI translation unit compiles against the complete p
 
 test("C ABI links to the packaged dmSDK and host-safe routes execute with zero warmed allocations", async (context) => {
   if (process.platform !== "darwin" || process.arch !== "arm64") {
-    context.skip(`pinned packaged-library runtime harness requires arm64-macos, got ${process.arch}-${process.platform}`);
+    context.skip(
+      `pinned packaged-library runtime harness requires arm64-macos, got ${process.arch}-${process.platform}`,
+    );
     return;
   }
   const output = await mkdtemp(join(tmpdir(), "deherm-dmsdk-enum-host-"));
   try {
     const cObject = join(output, "c-caller.o");
-    run(cCompiler, ["-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", `-I${join(repositoryRoot, "defold/defold_hermes/include")}`, "-c", "native/dmsdk_enum_c_header_test.c", "-o", cObject]);
+    run(cCompiler, [
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
+      "-c",
+      "native/dmsdk_enum_c_header_test.c",
+      "-o",
+      cObject,
+    ]);
     const libraryArgs = [
       join(sdkRoot, "lib/arm64-macos/libdlib.a"),
       join(sdkRoot, "lib/arm64-macos/libprofile_null.a"),
-      "-framework", "CoreFoundation", "-framework", "Foundation", "-framework", "Security",
+      "-framework",
+      "CoreFoundation",
+      "-framework",
+      "Foundation",
+      "-framework",
+      "Security",
     ];
     const cExecutable = join(output, "c-abi");
-    run(compiler, ["-std=c++17", ...includeArgs(), "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp", cObject, ...libraryArgs, "-o", cExecutable]);
+    run(compiler, [
+      "-std=c++17",
+      ...includeArgs(),
+      "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp",
+      cObject,
+      ...libraryArgs,
+      "-o",
+      cExecutable,
+    ]);
     run(cExecutable, []);
 
     const executable = join(output, "host-runtime");
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includeArgs(),
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      ...includeArgs(),
       "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp",
       "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp",
       "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp",
-      "native/dmsdk_enum_pending_stubs.cpp", "native/dmsdk_enum_host_test.cpp",
-      ...libraryArgs, "-o", executable,
+      "native/dmsdk_enum_pending_stubs.cpp",
+      "native/dmsdk_enum_host_test.cpp",
+      ...libraryArgs,
+      "-o",
+      executable,
     ]);
     run(executable, []);
   } finally {
