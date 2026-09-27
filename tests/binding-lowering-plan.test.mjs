@@ -248,6 +248,27 @@ test("implementation lane joins fail closed on identity and census drift", () =>
   });
   assert.throws(() => generateBindingLoweringPlan(dmsdkCensus), /dmsdk-scalar-thunks: report census drifted/);
 
+  const boundedFallback = structuredClone(inputs);
+  boundedFallback.dmsdkFixedDigests = replaceJson(boundedFallback.dmsdkFixedDigests, (value) => {
+    value.coverage.discovered = 0;
+    value.coverage.emitted = 0;
+    value.coverage.policyBlocked = value.declarations.length;
+    for (const declaration of value.declarations) {
+      declaration.emitted = false;
+      declaration.blocker = "fixed-digest-semantic-recipe-missing";
+      delete declaration.bindingId;
+      delete declaration.wrapper;
+      delete declaration.stages;
+    }
+  });
+  assert.doesNotThrow(() => generateBindingLoweringPlan(boundedFallback));
+
+  const boundedCensus = structuredClone(inputs);
+  boundedCensus.dmsdkFixedDigests = replaceJson(boundedCensus.dmsdkFixedDigests, (value) => {
+    value.coverage.structurallyEligible -= 1;
+  });
+  assert.throws(() => generateBindingLoweringPlan(boundedCensus), /dmsdk-fixed-digests: report census drifted/);
+
   const overlap = structuredClone(inputs);
   const scalar = JSON.parse(overlap.scriptScalarDispatch).bindings[0];
   overlap.scriptUrlAddress = replaceJson(overlap.scriptUrlAddress, (value) => {

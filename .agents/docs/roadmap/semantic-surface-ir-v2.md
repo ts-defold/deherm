@@ -136,7 +136,7 @@ An API addition, removal, or deprecation in Defold is an expected fact delta,
 not a compatibility failure. A failure means the same compiler cannot parse,
 classify, emit, or faithfully report the selected revision.
 
-The 2026-09-26 clean matrix used one working-tree compiler and fresh isolated
+The 2026-09-27 clean matrix used one working-tree compiler and fresh isolated
 workspaces. It resolved each revision's source, `ref-doc.zip`, `defoldsdk.zip`,
 and Bob independently; materialized each authenticated policy twice (including
 reverse object enumeration); compared it byte-for-byte with its independently
@@ -147,6 +147,14 @@ exact twins. API counts were current `926/1361`, 1.13.1 `807/1336`, 1.12.0
 `571/1191`, and 1.11.0 `557/1063` for Script API/dmSDK respectively. These are
 generation, materialization, compilation, linkage, and exact-call execution
 claims. They are not packaged-engine or all-target runtime claims.
+
+That run also exercised a real optimization-evidence delta: Defold 1.12.0 had
+four structurally eligible fixed-digest declarations but selected zero fixed-
+digest specializations and retained all four through explicit universal
+fallback blockers. Lowering-plan validation now joins family declarations to
+`coverage.structurallyEligible`, not `coverage.discovered`. The matrix therefore
+proves the compiler tolerates revision-specific specialization loss without
+losing API surface, while a declaration-census mutation still fails closed.
 
 # Ordered implementation
 

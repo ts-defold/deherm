@@ -4105,3 +4105,25 @@ the plan, and prevent the four emitters from silently reintroducing independent
 selection. The dmSDK clean room owns the new plan and reproduced 116 artifacts
 byte-for-byte; focused compile, link, behavior, and zero-warmed-allocation tests
 remain unchanged.
+
+## 2026-09-27 - Relational lowering census across Defold revisions
+
+The current, 1.13.1, 1.12.0, and 1.11.0 lanes were rebuilt from their pinned
+sources with one working-tree compiler and all four completed policy
+materialization, generated TypeScript compilation, specialized dmSDK and Lua
+exact-call compilation, universal C ABI execution, and ready exact-call
+execution. Their Script API/dmSDK censuses were respectively `926/1361`,
+`807/1336`, `571/1191`, and `557/1063`; their lowering-family distributions
+also differed, so this is cross-revision reconstruction rather than replay of a
+current-revision inventory.
+
+The run reproduced one systemic defect at 1.12.0: the lowering-plan join
+required the fixed-digest report's declaration count to equal the number of
+optimized discoveries. That revision legitimately had four structurally
+eligible declarations, zero proven specializations, and four universal
+fallback blockers. Generated-family census validation now joins to
+`coverage.structurallyEligible`; focused tests accept complete fallback
+partitions and reject structural declaration drift. The repeated four-revision
+matrix then passed. This evidence proves generation, materialization,
+compilation, linkage, and exact-call harness execution; it does not claim a
+packaged engine or every target runtime for the historical lanes.

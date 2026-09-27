@@ -642,23 +642,23 @@
     },
     "dmsdk-fixed-digests": {
       "source": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
-      "scope": "Generated fixed-output digest span bindings."
+      "scope": "Generated or universally retained fixed-output digest span bindings."
     },
     "dmsdk-base64-spans": {
       "source": "packages/bindings/generated/defold-dmsdk-base64-span-bindings.json",
-      "scope": "Generated bounded Base64 span bindings."
+      "scope": "Generated or universally retained bounded Base64 span bindings."
     },
     "dmsdk-astc-probes": {
       "source": "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json",
-      "scope": "Generated bounded ASTC inspection bindings."
+      "scope": "Generated or universally retained bounded ASTC inspection bindings."
     },
     "dmsdk-xtea-spans": {
       "source": "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json",
-      "scope": "Generated bounded XTEA span bindings."
+      "scope": "Generated or universally retained bounded XTEA span bindings."
     },
     "dmsdk-hash-spans": {
       "source": "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json",
-      "scope": "Generated bounded hash span bindings."
+      "scope": "Generated or universally retained bounded hash span bindings."
     },
     "dmsdk-arena-span-blockers": {
       "source": "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json",
@@ -517489,5 +517489,5 @@
       }
     }
   ],
-  "planSha256": "f1582201f61c9840f5fb8a1484e145cb0e05f985a72f9b7bf1d8f9b2eb8379ed"
+  "planSha256": "5b57ba171c6986847f79eb90ffdf0ba331f171133a32328e81b0c52db18a5f58"
 }

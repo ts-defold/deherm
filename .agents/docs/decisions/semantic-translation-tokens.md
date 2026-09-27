@@ -162,6 +162,15 @@ public API. The same contract is the migration target for the remaining dmSDK
 families: collect facts first, select once, then let each emitter render only
 the declarations assigned to it.
 
+Generated-family census checks are structural, not optimization-count locks.
+For a family report, `declarations.length` must equal the revision's
+`coverage.structurallyEligible`; `coverage.discovered` and `coverage.emitted`
+may be smaller when that revision cannot prove the specialized recipe. Those
+remaining declarations must be represented by explicit policy blockers and
+the universal implementation. This relation prevents an older revision from
+being rejected merely because it supplies less optimization evidence, while a
+missing structurally eligible declaration still fails closed.
+
 # Claim protocol
 
 Every material review claim follows `observe -> reproduce -> classify -> act`:
