@@ -8,7 +8,7 @@
 #include <cstring>
 #include <memory>
 namespace jsi=facebook::jsi;
-namespace {uint32_t g_family=0,g_count=0;uint16_t g_id=0;uint64_t g_lanes[2]={};uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}void reset(){g_family=g_count=0;g_id=0;g_lanes[0]=g_lanes[1]=0;}
+namespace {uint32_t g_family=0,g_count=0;uint16_t g_id=0;uint64_t g_lanes[2]={};[[maybe_unused]] uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}void reset(){g_family=g_count=0;g_id=0;g_lanes[0]=g_lanes[1]=0;}
 const DehermDmSdkScalarDescriptor kScalar[]={ {UINT16_C(0),UINT8_C(1),DEHERM_DMSDK_SCALAR_U16,{DEHERM_DMSDK_SCALAR_U16},UINT8_C(1),"dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185","EndianSwap16"},
  {UINT16_C(1),UINT8_C(1),DEHERM_DMSDK_SCALAR_U32,{DEHERM_DMSDK_SCALAR_U32},UINT8_C(1),"dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186","EndianSwap32"},
  {UINT16_C(2),UINT8_C(1),DEHERM_DMSDK_SCALAR_U64,{DEHERM_DMSDK_SCALAR_U64},UINT8_C(1),"dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187","EndianSwap64"},

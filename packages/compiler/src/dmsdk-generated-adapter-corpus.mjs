@@ -305,7 +305,7 @@ ${headers.map((header) => `#include <${header}>`).join("\n")}
 ${sdkHeaders.map((header) => `#include <${header}>`).join("\n")}
 #include <stdint.h>
 #include <string.h>
-namespace {uint32_t g_calls[10][32]{};uint32_t g_failures[10][32]{};bool g_arena_uri_failure=false;uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
+namespace {uint32_t g_calls[10][32]{};uint32_t g_failures[10][32]{};[[maybe_unused]] bool g_arena_uri_failure=false;[[maybe_unused]] uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
 ${fakes}
 struct DehermDmSdkAdapterExactVector{uint32_t recipe_id;uint16_t adapter_id;const char* family;const char* sha256;};
 static const DehermDmSdkAdapterExactVector kVectors[]={
@@ -409,7 +409,7 @@ function renderJsiVerificationSource(generated) {
 #include <cstring>
 #include <memory>
 namespace jsi=facebook::jsi;
-namespace {uint32_t g_family=0,g_count=0;uint16_t g_id=0;uint64_t g_lanes[2]={};uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}void reset(){g_family=g_count=0;g_id=0;g_lanes[0]=g_lanes[1]=0;}
+namespace {uint32_t g_family=0,g_count=0;uint16_t g_id=0;uint64_t g_lanes[2]={};[[maybe_unused]] uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}void reset(){g_family=g_count=0;g_id=0;g_lanes[0]=g_lanes[1]=0;}
 const DehermDmSdkScalarDescriptor kScalar[]={${scalarRows}};
 const DehermDmSdkEnumDescriptor kEnum[]={${enumRows}};
 }

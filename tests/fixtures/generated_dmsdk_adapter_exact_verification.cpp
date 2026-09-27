@@ -28,7 +28,7 @@
 #include <dmsdk/resource/resource.hpp>
 #include <stdint.h>
 #include <string.h>
-namespace {uint32_t g_calls[10][32]{};uint32_t g_failures[10][32]{};bool g_arena_uri_failure=false;uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
+namespace {uint32_t g_calls[10][32]{};uint32_t g_failures[10][32]{};[[maybe_unused]] bool g_arena_uri_failure=false;[[maybe_unused]] uint64_t pack_f32(float value){uint32_t bits=0;memcpy(&bits,&value,sizeof(bits));return bits;}}
 const char * dmBuffer::GetResultString(dmBuffer::Result a0){++g_calls[7][0];if(a0!=static_cast<dmBuffer::Result>(0))++g_failures[7][0];return "result_0";}
 extern "C" uint32_t deherm_dmsdk_enum_dm_buffer_get_size_for_value_type_i32(int32_t a0){++g_calls[1][0];if(a0!=static_cast<int32_t>(0))++g_failures[1][0];return static_cast<uint32_t>(20736);}
 const char * dmBuffer::GetValueTypeString(dmBuffer::ValueType a0){++g_calls[7][1];if(a0!=static_cast<dmBuffer::ValueType>(1))++g_failures[7][1];return "result_1";}

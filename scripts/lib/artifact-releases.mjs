@@ -50,6 +50,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { serializeObject } from "../../packages/compiler/src/api-policy.mjs";
+import { parseLock, readLockKeys } from "./upstream-lock.mjs";
+
+export { parseLock, readLockKeys } from "./upstream-lock.mjs";
 
 export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -182,37 +185,6 @@ export function familyForHostTool(tool) {
  * old whole-file hash could not tell the two apart, and a fingerprint that
  * silently picks one of two conflicting pins is worse than one that refuses.
  */
-export function parseLock(text, label = "upstream.lock") {
-  const values = new Map();
-  const duplicates = [];
-  for (const line of text.split("\n")) {
-    const match = /^([A-Z0-9_]+)=(.*)$/.exec(line.trim());
-    if (!match) continue;
-    if (values.has(match[1])) duplicates.push(match[1]);
-    values.set(match[1], match[2]);
-  }
-  if (duplicates.length) throw new Error(`${label} declares ${[...new Set(duplicates)].join(", ")} more than once`);
-  return values;
-}
-
-/**
- * Read exactly the lock keys a family consumes.
- *
- * Missing keys are a hard error naming all of them at once, because the point
- * of hashing keys instead of the file is that the set is explicit - a typo that
- * silently dropped a key would produce a stable tag over an incomplete input
- * set, and the artifacts published under it would be unreproducible.
- */
-export async function readLockKeys(lockFile, keys) {
-  const label = path.basename(lockFile);
-  const values = parseLock(await readFile(lockFile, "utf8"), label);
-  const missing = keys.filter((key) => !values.has(key));
-  if (missing.length) {
-    throw new Error(`${label} does not declare ${missing.join(", ")}, which this artifact family consumes`);
-  }
-  return Object.fromEntries(keys.map((key) => [key, values.get(key)]));
-}
-
 /**
  * The content fingerprint of one family's inputs.
  *

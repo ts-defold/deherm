@@ -1,12 +1,32 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
 
 import {
   assertGeneratedDmSdkArtifactInventory,
   assertDmSdkSourceCensus,
+  dmSdkCleanRoomEvidencePaths,
   runDmSdkCleanRoomRegeneration
 } from "../scripts/check-dmsdk-clean-room-regeneration.mjs";
-import { generatedDmSdkArtifacts } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
+import { dmSdkGeneratorSources, generatedDmSdkArtifacts } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
+
+const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+test("the clean room owns the SDK extraction manifest and its verifier", async () => {
+  const lock = Object.fromEntries((await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"))
+    .split(/\r?\n/u)
+    .flatMap((line) => {
+      const match = line.match(/^([A-Z0-9_]+)=(.*)$/u);
+      return match ? [[match[1], match[2]]] : [];
+    }));
+  const evidence = await dmSdkCleanRoomEvidencePaths(repositoryRoot, lock.DEFOLD_REV);
+  assert.ok(evidence.includes(
+    `upstream/extender/server/app/sdk/${lock.DEFOLD_REV}/defoldsdk/.deherm-sdk-extraction-manifest.json`
+  ));
+  assert.ok(dmSdkGeneratorSources.includes("scripts/lib/defold-sdk-extraction-manifest.mjs"));
+});
 
 test("dmSDK artifact ownership rejects hand-authored generated output", () => {
   assert.throws(
@@ -64,9 +84,13 @@ test("all generated dmSDK runtime artifacts regenerate byte-for-byte from pinned
   assert.equal(report.namedScalarReviewedCount, 21);
   assert.equal(report.namedScalarGeneratedCount, 20);
   assert.equal(report.namedScalarBlockedCount, 1);
-  assert.equal(report.remainingWithoutGeneratedAdapters, 721);
+  assert.equal(report.remainingWithoutGeneratedAdapters, 730);
   assert.equal(report.universalRecipeCount, report.runtimePendingCount);
-  assert.equal(report.universalReadyExactVectorCount, 566);
+  assert.equal(report.universalReadyExactVectorCount, 557);
+  assert.equal(
+    74 + report.universalReadyExactVectorCount + report.remainingWithoutGeneratedAdapters,
+    report.runtimePendingCount
+  );
   assert.equal(report.uniqueShapeCount, 888);
   assert.equal(report.trancheCount, 15);
   assert.equal(report.artifactCount, generatedDmSdkArtifacts.length);

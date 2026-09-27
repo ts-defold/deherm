@@ -2,46 +2,47 @@
   "schemaVersion": 1,
   "kind": "deherm.policy.manifest",
   "comment": "A reviewable statement of what this checkout's policy store holds. It is NOT a policy object: it names the revision, which no content-addressed object may, and it records the reconciliation between upstream.lock's restated pins and Defold's own declaration.",
-  "generator": "sha256:0a2745dc46c4884cccb56c0e90367cb86ed3a9ba4cd91c85495f582b81104dbe",
+  "generator": "sha256:c13ed6aff42ed7174f7ea891e15a69220bab78abc48b0cb41a05b6248a23fcee",
   "producerPackageVersion": "0.0.0",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "policyRoot": "db772689d9b7306ddcb6d07bbbb11f3ddbb7e45f10cf9100460e5bc38c015ce4",
+  "policyRoot": "8ec12b3892b54b96fb8122defa71979869b21913c897e4867e361ae0e0a330db",
   "layoutVersion": "v1",
   "counts": {
     "subtrees": 194,
     "namespaces": 52,
-    "objectBytes": 25091367,
+    "objectBytes": 25249399,
     "indexEntries": 1
   },
   "toolchainPins": {
-    "VERSION_EDITOR_JDK": "25.0.4.1+1",
-    "VERSION_XCODE": "26.5",
-    "VERSION_XCODE_CLANG": "21.0.0",
-    "VERSION_MACOSX": "26.5",
-    "VERSION_IPHONEOS": "26.5",
-    "VERSION_IPHONESIMULATOR": "26.5",
-    "VERSION_IPHONEOS_MIN": "11.0",
-    "VERSION_MACOSX_MIN": "10.15",
-    "SWIFT_VERSION": "6.2",
-    "VERSION_LINUX_CLANG": "20.1.8",
-    "ANDROID_NDK_VERSION": "25b",
-    "ANDROID_NDK_API_VERSION": "19",
     "ANDROID_64_NDK_API_VERSION": "21",
-    "ANDROID_TARGET_API_LEVEL": "36",
     "ANDROID_BUILD_TOOLS_VERSION": "36.1.0",
+    "ANDROID_NDK_API_VERSION": "19",
+    "ANDROID_NDK_VERSION": "25b",
     "ANDROID_PACKAGE": "android-36",
-    "VERSION_WINDOWS_SDK": "10.0.28000.0",
-    "VERSION_WINDOWS_MSVC": "14.51.36231",
-    "VISUAL_STUDIO_VERSION": "2026",
-    "PACKAGES_WIN32_TOOLCHAIN": "Microsoft-Visual-Studio-2026-14.51.36231",
-    "PACKAGES_WIN32_SDK": "WindowsKits-10.0.28000.0",
-    "EMSCRIPTEN_VERSION_STR": "4.0.6",
+    "ANDROID_TARGET_API_LEVEL": "36",
     "EMSCRIPTEN_SDK": "sdk-4.0.6-64bit",
+    "EMSCRIPTEN_VERSION_STR": "4.0.6",
+    "MACOS_ASAN_PATH": "usr/lib/clang/%s/lib/darwin/libclang_rt.asan_osx_dynamic.dylib",
     "PACKAGES_EMSCRIPTEN_SDK": "emsdk-4.0.6",
     "PACKAGES_IOS_SDK": "iPhoneOS26.5.sdk",
     "PACKAGES_IOS_SIMULATOR_SDK": "iPhoneSimulator26.5.sdk",
     "PACKAGES_MACOS_SDK": "MacOSX26.5.sdk",
-    "PACKAGES_XCODE_TOOLCHAIN": "XcodeDefault26.5.xctoolchain"
+    "PACKAGES_WIN32_SDK": "WindowsKits-10.0.28000.0",
+    "PACKAGES_WIN32_TOOLCHAIN": "Microsoft-Visual-Studio-2026-14.51.36231",
+    "PACKAGES_XCODE_TOOLCHAIN": "XcodeDefault26.5.xctoolchain",
+    "SWIFT_VERSION": "6.2",
+    "VERSION_EDITOR_JDK": "25.0.4.1+1",
+    "VERSION_IPHONEOS": "26.5",
+    "VERSION_IPHONEOS_MIN": "11.0",
+    "VERSION_IPHONESIMULATOR": "26.5",
+    "VERSION_LINUX_CLANG": "20.1.8",
+    "VERSION_MACOSX": "26.5",
+    "VERSION_MACOSX_MIN": "10.15",
+    "VERSION_WINDOWS_MSVC": "14.51.36231",
+    "VERSION_WINDOWS_SDK": "10.0.28000.0",
+    "VERSION_XCODE": "26.5",
+    "VERSION_XCODE_CLANG": "21.0.0",
+    "VISUAL_STUDIO_VERSION": "2026"
   },
   "localPinReconciliation": [
     {
@@ -54,11 +55,11 @@
   ],
   "subtrees": {
     "@compiler": {
-      "hash": "e0ebfc2e94fdd7222cc5acdc1504cd98def212eea66ac60f0a7fbb9fdb9258ff",
+      "hash": "53cb8bfae426503dcd09205592ade4102c64e49ac8a05eb7ce3c7e458610766a",
       "bytes": 67380
     },
     "@compiler:document:defold-binding-lowering-recipe-facts.json": {
-      "hash": "a38e5d2c560ba312b51d2e4bf85632b65ccdc4636a1cd663b2b95626ea788f55",
+      "hash": "458b67dbc4cf2ab3ddab4801937ca96b7bb6498bbebf5c27f9f1a3cfdcd0d3b4",
       "bytes": 2689701
     },
     "@compiler:document:defold-component-proxy-contract.json": {
@@ -78,8 +79,8 @@
       "bytes": 26072
     },
     "@compiler:document:defold-dmsdk-universal-bindings.json": {
-      "hash": "fd3d64dda6cef0cc0cddb1bf195ce2b0419c384a717642ec5a7b6930e3a4b416",
-      "bytes": 3257247
+      "hash": "6d030aa334e869bfa17f31ea5e62d4b794b4d7d2ace069a6a1260796c5f6340b",
+      "bytes": 3414863
     },
     "@compiler:document:defold-resource-declaration-schema.json": {
       "hash": "8ad0bfd42a2f54c4ead38ba000df255f530ffa27d0f557bbab1d376fa1286c31",
@@ -322,7 +323,7 @@
       "bytes": 3850
     },
     "@compiler:output:defold/defold_hermes/lib/web/generated_dmsdk_universal.js": {
-      "hash": "22bcc2653316e9595ca5474566b91222de37dfdb863f868a6ef24bc646b0a59a",
+      "hash": "db9066e891ed5fb260659b8e7caa57b8b7fc0c071450bd2fb9f041615836eb16",
       "bytes": 423303
     },
     "@compiler:output:defold/defold_hermes/lib/web/generated_modules.js": {
@@ -462,11 +463,11 @@
       "bytes": 8739
     },
     "@compiler:output:defold/defold_hermes/src/generated_dmsdk_universal.cpp": {
-      "hash": "faf013698e0683ae87047a8787d8d990c1a985158370e98c7ba3332ba4e3091c",
+      "hash": "882db9eeb277312598aa1bb03c0d385bfddfb145e3190146e778f6a91e23b02d",
       "bytes": 79821
     },
     "@compiler:output:defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp": {
-      "hash": "dac2e5b411e8599e15e592a5fe0fb7983250aeb5a990a1cf915bce3959b1c20b",
+      "hash": "cb93007d37ef0e2d8d8ff7f0e61666427a019b6896627fe21faff52cd5ddb0a3",
       "bytes": 8769
     },
     "@compiler:output:defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp": {
@@ -618,8 +619,8 @@
       "bytes": 175894
     },
     "@toolchain": {
-      "hash": "71f9cbc6d6a0b837159977809e269bb299ae921ee6d392d057493720477fb850",
-      "bytes": 3676
+      "hash": "af2086417e56671ea8208289284fcb9a5fb2dcbed83cc5d8e55085e4a4ff7f46",
+      "bytes": 4092
     },
     "_G": {
       "hash": "b139e64154c54cb139b9de2af16c33eae0d866d7e5a950f2055145042c100ae3",

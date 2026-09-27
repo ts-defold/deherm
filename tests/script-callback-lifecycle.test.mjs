@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-import { generateScriptCallbackLifecycle, loadScriptCallbackLifecycleInputs } from "../scripts/generate-script-callback-lifecycle.mjs";
+import { generateScriptCallbackLifecycle, loadScriptCallbackLifecycleInputs, selectReviewedCallbackRoutes } from "../scripts/generate-script-callback-lifecycle.mjs";
 import { stableBindingId } from "../scripts/lib/binding-identity.mjs";
 
 const root = new URL("../", import.meta.url);
@@ -44,6 +44,26 @@ test("callback lifecycle generation reports source drift but rejects census and 
   patterns.bindings.find(({ id }) => id === "script:go.animate").parameterCodecs.find(({ name }) => name === "complete_function").codecs = ["nil"];
   shapeDrift.patternsText = JSON.stringify(patterns);
   assert.throws(() => generateScriptCallbackLifecycle(shapeDrift), /callback-coded/);
+});
+
+test("callback lifecycle route anchors fail closed normally and withdraw only during declared historical derivation", async () => {
+  const inputs = await loadScriptCallbackLifecycleInputs();
+  const policy = JSON.parse(inputs.policyText);
+  const route = policy.routes.find(({ id }) => id === "script:collectionproxy.load");
+  const texts = new Map(inputs.sourceTexts);
+  const evidence = route.evidence[0];
+  texts.set(evidence.path, texts.get(evidence.path).replace(evidence.anchors[0], "historical name"));
+
+  assert.throws(
+    () => selectReviewedCallbackRoutes(policy, texts, new Set(), {}),
+    /reviewed source anchor/
+  );
+  const historical = selectReviewedCallbackRoutes(policy, texts, new Set(), {
+    DEHERM_DERIVED_REVISION: "3206f699aaff89f357c9d549050b8453e080c5d2",
+    DEHERM_REVISION_AUDIT: "/dev/null"
+  });
+  assert.equal(historical.some(({ id }) => id === route.id), false);
+  assert.equal(historical.length, policy.routes.length - 1);
 });
 
 test("generated native route table and TypeScript surface remain metadata-only", async () => {

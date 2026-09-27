@@ -13,6 +13,8 @@ import {
   ROOTED_USERDATA_REPRESENTATION,
   semanticHandleKinds
 } from "./lib/semantic-handle-kinds.mjs";
+import { declaredDerivation } from "./lib/reviewed-revision.mjs";
+import { VOID, recordAudit } from "./lib/revision-audit.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relativePaths = Object.freeze({
@@ -2402,6 +2404,27 @@ export function generateUniversalValueBindings(inputs) {
     };
     assert(sized.resultSemanticKindId !== undefined,
       `${row.id}: declared result handle kind '${resultSemanticKind}' has no dense semantic identity`);
+    if (!callback && row.shapeKinds.includes("callback")) {
+      assert(declaredDerivation(), `${row.id}: universal callback route has no reviewed lifecycle entry`);
+      recordAudit({
+        input: relativePaths.callbacks,
+        id: row.id,
+        status: VOID,
+        reason: "unreviewed-callback-lifecycle",
+        detail: "The API and universal descriptor are emitted, but the browser callback transport stays fail-closed."
+      });
+      return {
+        ...sized,
+        browserCallback: {
+          registryEligible: false,
+          reviewedLifecycle: false,
+          lifetime: null,
+          owner: null,
+          threadAffinity: null,
+          machineBlock: "unreviewed-callback-lifecycle-for-revision"
+        }
+      };
+    }
     return callback ? {
       ...sized,
       browserCallback: {
@@ -2449,12 +2472,14 @@ export function generateUniversalValueBindings(inputs) {
     .sort((left, right) => left.stableId - right.stableId || compare(left.id, right.id));
   assert(new Set(selected.map(({ stableId }) => stableId)).size === selected.length,
     "script function and constant stable IDs collide");
-  assert(selected.filter(({ shapeKinds }) => shapeKinds.includes("callback")).length === callbacks.routeCount,
+  assert(selected.filter(({ shapeKinds, id }) => shapeKinds.includes("callback") && callbackById.has(id)).length === callbacks.routeCount,
     "universal callback census differs from the lifecycle ledger");
   const browserCallbackRoutes = selected.filter(({ browserCallback }) => browserCallback?.registryEligible);
   const blockedBrowserCallbackRoutes = selected.filter(({ browserCallback }) => browserCallback && !browserCallback.registryEligible);
+  const reviewedBlockedBrowserCallbackRoutes = blockedBrowserCallbackRoutes.filter(
+    ({ browserCallback }) => browserCallback.reviewedLifecycle !== false);
   assert(browserCallbackRoutes.length === callbacks.registryEligibleRouteCount &&
-    blockedBrowserCallbackRoutes.length === callbacks.higherOrderClosureRouteCount,
+    reviewedBlockedBrowserCallbackRoutes.length === callbacks.higherOrderClosureRouteCount,
   "universal browser callback partition differs from the lifecycle ledger");
   const frameProfileCensus = frameProfiles(selected).profiles.map((profile) => ({
     ...profile,

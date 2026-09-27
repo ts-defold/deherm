@@ -674,11 +674,25 @@ test("sdk.py pin parsing is independent of checkout newline encoding", () => {
   });
 });
 
-test("a pin that moves out of sdk.py is a hard failure, not a silent omission", () => {
+test("only ABI-critical artifact pins are required while revision-specific toolchain names are discovered", () => {
   assert.throws(
     () => buildToolchainPins({ sdkSource: 'VERSION_XCODE="26.5"', buildInputPlatforms: [] }),
     /no longer declares/
   );
+  const source = [
+    'VERSION_IPHONEOS_MIN="11.0"',
+    'VERSION_MACOSX_MIN="10.15"',
+    'ANDROID_NDK_VERSION="25b"',
+    'ANDROID_NDK_API_VERSION="19"',
+    'ANDROID_64_NDK_API_VERSION="21"',
+    'ANDROID_TARGET_API_LEVEL=35',
+    'VERSION_WINDOWS_SDK_10="10.0.20348.0"',
+    'PACKAGES_WIN32_SDK_10=f"WindowsKits-{VERSION_WINDOWS_SDK_10}"'
+  ].join("\n");
+  const historical = buildToolchainPins({ sdkSource: source, buildInputPlatforms: [] });
+  assert.equal(historical.pins.VERSION_WINDOWS_SDK, undefined);
+  assert.equal(historical.pins.VERSION_WINDOWS_SDK_10, "10.0.20348.0");
+  assert.equal(historical.pins.PACKAGES_WIN32_SDK_10, "WindowsKits-10.0.20348.0");
 });
 
 test("the real sdk.py yields every pin the decision names", async () => {
@@ -832,15 +846,20 @@ test("channel planning can use the accumulated published manifest instead of the
 test("pinning a revision records the digest the archive actually served", async () => {
   const { pinRevision } = await import("../scripts/track-defold-channels.mjs");
   const revision = "d".repeat(40);
-  const bodies = { "ref-doc.zip": "REFDOC", "bob.jar": "BOB" };
+  const bodies = { "ref-doc.zip": "REFDOC", "defoldsdk.zip": "SDK", "bob.jar": "BOB" };
   const fetchImpl = async (url) => ({
     ok: true,
-    arrayBuffer: async () => Buffer.from(url.endsWith("bob.jar") ? bodies["bob.jar"] : bodies["ref-doc.zip"])
+    arrayBuffer: async () => Buffer.from(
+      url.endsWith("bob.jar") ? bodies["bob.jar"] :
+        url.endsWith("defoldsdk.zip") ? bodies["defoldsdk.zip"] : bodies["ref-doc.zip"]
+    )
   });
   const lock = [
     "DEFOLD_REV=" + "e".repeat(40),
     "DEFOLD_REF_DOC_URL=old",
     "DEFOLD_REF_DOC_SHA256=old",
+    "DEFOLD_SDK_URL=old",
+    "DEFOLD_SDK_SHA256=old",
     "DEFOLD_BOB_URL=old",
     "DEFOLD_BOB_SHA256=old",
     "HERMES_REV=keepme"
@@ -848,6 +867,7 @@ test("pinning a revision records the digest the archive actually served", async 
   const { updated, replacements } = await pinRevision(revision, { fetchImpl, lock });
   assert.equal(replacements.DEFOLD_REV, revision);
   assert.equal(replacements.DEFOLD_REF_DOC_SHA256, createHash("sha256").update("REFDOC").digest("hex"));
+  assert.equal(replacements.DEFOLD_SDK_SHA256, createHash("sha256").update("SDK").digest("hex"));
   assert.equal(replacements.DEFOLD_BOB_SHA256, createHash("sha256").update("BOB").digest("hex"));
   assert.match(updated, /^HERMES_REV=keepme$/m, "pins that are a separate decision must not move");
   await assert.rejects(pinRevision("nope", { fetchImpl, lock }), /Not a Defold revision/);

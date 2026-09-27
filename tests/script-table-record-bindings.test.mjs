@@ -3,9 +3,18 @@ import { execFileSync } from "node:child_process";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-import { generate, loadInputs } from "../scripts/generate-script-table-record-bindings.mjs";
+import {
+  generate,
+  loadInputs,
+  maximumTableRecordFieldCount
+} from "../scripts/generate-script-table-record-bindings.mjs";
 
 const root = new URL("../", import.meta.url);
+
+test("an empty structural family has a valid zero-sized semantic capacity", () => {
+  assert.equal(maximumTableRecordFieldCount([]), 0);
+  assert.equal(maximumTableRecordFieldCount([{ fields: [] }, { fields: [{}, {}] }]), 2);
+});
 
 test("fixed-record wave is bounded to reviewed pure ASTC and physics-version records", async () => {
   execFileSync(process.execPath, ["scripts/generate-script-table-record-bindings.mjs", "--check"], { cwd: root, stdio: "pipe" });

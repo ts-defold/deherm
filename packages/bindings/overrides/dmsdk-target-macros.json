@@ -173,6 +173,14 @@
         "__ORDER_BIG_ENDIAN__": "4321"
       }
     },
+    "js": {
+      "predefines": {
+        "__SIZEOF_POINTER__": "4",
+        "__BYTE_ORDER__": "1234",
+        "__ORDER_LITTLE_ENDIAN__": "1234",
+        "__ORDER_BIG_ENDIAN__": "4321"
+      }
+    },
     "wasm": {
       "predefines": {
         "__wasm__": "1",

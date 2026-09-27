@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -16,6 +16,8 @@ import {
   assertDmSdkUniversalStaticFrameCapacity,
   emitDmSdkUniversalStaticFrame,
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
+import { readDefoldSdkExtractionManifest } from "./lib/defold-sdk-extraction-manifest.mjs";
+import { readLockKeys } from "./lib/upstream-lock.mjs";
 
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const defaultProjectionPath = "packages/bindings/generated/defold-dmsdk-projection-ir.json";
@@ -57,6 +59,15 @@ const valueKind = Object.freeze({
 });
 
 function sha256(value) { return createHash("sha256").update(value).digest("hex"); }
+
+export function selectEndianRoundTripRecipes(recipes) {
+  const selected = ["dmEndian::ToNetwork", "dmEndian::ToHost"].map((symbol) => {
+    const matches = recipes.filter((recipe) => recipe.symbol === symbol && recipe.abi.parameters[0]?.nativeType === "uint32_t");
+    if (matches.length > 1) throw new Error(`Expected at most one uint32_t ${symbol} recipe, got ${matches.length}`);
+    return matches[0] ?? null;
+  });
+  return selected.every(Boolean) ? selected : null;
+}
 
 function parseArguments(argv) {
   const options = { check: false, outRoot: repositoryRoot, projection: defaultProjectionPath, sdkIr: defaultSdkIrPath };
@@ -114,6 +125,147 @@ function ownerOf(row) {
 }
 
 function leafOf(symbol) { return symbol.split("::").at(-1); }
+
+function stripCppComments(source) {
+  return source.replace(/\/\*[\s\S]*?\*\//gu, " ").replace(/\/\/.*$/gmu, " ");
+}
+
+function regexpEscape(value) { return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&"); }
+
+function hasCallableMemberSpelling(code, member) {
+  // A word boundary cannot precede a C++ destructor spelling: both whitespace
+  // and `~` are non-word characters. Match the beginning of the complete
+  // member token instead, while still rejecting suffix matches such as
+  // `OtherTextLayoutFree(`.
+  return new RegExp(`(?:^|[^A-Za-z0-9_])${regexpEscape(member)}\\s*\\(`, "u").test(code);
+}
+
+export function classifyPublicSdkRecipe(recipe, source) {
+  if (typeof source !== "string") {
+    return { callable: false, reason: "public-sdk-header-absent" };
+  }
+  const code = stripCppComments(source);
+  const member = recipe.invocation.member ?? leafOf(recipe.invocation.nativeSymbol);
+  const declarationVisible = hasCallableMemberSpelling(code, member);
+  if (!declarationVisible) return { callable: false, reason: "public-sdk-declaration-absent" };
+  if (["placement-constructor", "member-function", "explicit-destructor"].includes(recipe.invocation.kind)) {
+    const owner = recipe.invocation.receiver?.nativeType ?? recipe.invocation.receiver?.owner;
+    if (owner) {
+      const leaf = leafOf(owner).replace(/<.*>$/u, "");
+      const complete = new RegExp(`\\b(?:struct|class)\\s+${regexpEscape(leaf)}(?:\\s*:[^{]+)?\\s*\\{`, "u").test(code);
+      if (!complete) return { callable: false, reason: "public-sdk-receiver-incomplete" };
+    }
+  }
+  return { callable: true, reason: "public-sdk-declaration-visible" };
+}
+
+async function requireDirectory(target, label) {
+  let metadata;
+  try {
+    metadata = await stat(target);
+  } catch (cause) {
+    throw new Error(`The pinned Defold SDK extraction is missing ${label}: ${target}`, { cause });
+  }
+  if (!metadata.isDirectory()) {
+    throw new Error(`The pinned Defold SDK extraction has a non-directory ${label}: ${target}`);
+  }
+}
+
+function validatePublicSdkInclude(include) {
+  if (typeof include !== "string" || include.length === 0 || path.isAbsolute(include) ||
+      include.includes("\\") || include.split("/").includes("..")) {
+    throw new Error(`Invalid public Defold SDK include path: ${JSON.stringify(include)}`);
+  }
+  return include;
+}
+
+export async function attachPublicSdkFacts(root, revision, recipes) {
+  const lockFile = path.join(root, "upstream.lock");
+  const lock = await readLockKeys(lockFile, ["DEFOLD_REV", "DEFOLD_SDK_URL", "DEFOLD_SDK_SHA256"]);
+  if (lock.DEFOLD_REV !== revision) {
+    throw new Error(`upstream.lock pins Defold ${lock.DEFOLD_REV}, but the dmSDK universal inputs describe ${revision}`);
+  }
+  if (!/^[0-9a-f]{64}$/u.test(lock.DEFOLD_SDK_SHA256)) {
+    throw new Error(`upstream.lock DEFOLD_SDK_SHA256 is not a lowercase SHA-256 digest: ${lock.DEFOLD_SDK_SHA256}`);
+  }
+
+  const sdkRoot = path.join(root, "upstream", "extender", "server", "app", "sdk", revision, "defoldsdk");
+  const sentinelPath = path.join(sdkRoot, ".deherm-sdk-sha256");
+  let observedDigest;
+  try {
+    observedDigest = (await readFile(sentinelPath, "utf8")).trim();
+  } catch (cause) {
+    throw new Error(`The pinned Defold SDK extraction has no readable digest sentinel: ${sentinelPath}`, { cause });
+  }
+  if (observedDigest !== lock.DEFOLD_SDK_SHA256) {
+    throw new Error(
+      `The pinned Defold SDK extraction digest is ${observedDigest || "empty"}, expected ${lock.DEFOLD_SDK_SHA256}`
+    );
+  }
+
+  const includeRoot = path.join(sdkRoot, "sdk", "include");
+  // The extraction sentinel is written only after the complete archive unzip.
+  // Validate the subtree this classifier actually consumes as well, then read
+  // every required header below. ENOENT is authoritative only after those
+  // extraction checks; every other read failure remains an input error.
+  await requireDirectory(includeRoot, "public include root");
+  const { members } = await readDefoldSdkExtractionManifest({
+    sdkRoot,
+    expectedArchiveSha256: lock.DEFOLD_SDK_SHA256,
+  });
+  const texts = new Map();
+  const requiredHeaders = [];
+  for (const include of [...new Set(recipes.map((recipe) => validatePublicSdkInclude(recipe.include)))].sort()) {
+    const memberPath = `sdk/include/${include}`;
+    const member = members.get(memberPath);
+    const headerPath = path.join(includeRoot, include);
+    let bytes;
+    try {
+      bytes = await readFile(headerPath);
+    } catch (cause) {
+      if (cause?.code === "ENOENT") {
+        if (member) {
+          throw new Error(`The pinned Defold SDK cache deleted archive member ${memberPath}: ${headerPath}`, { cause });
+        }
+        texts.set(include, null);
+        requiredHeaders.push({ header: include, state: "absent" });
+        continue;
+      }
+      throw new Error(`The pinned Defold SDK extraction has no readable required header ${include}: ${headerPath}`, { cause });
+    }
+    if (!member) {
+      throw new Error(`The pinned Defold SDK cache contains unmanifested archive member ${memberPath}: ${headerPath}`);
+    }
+    const observedSha256 = sha256(bytes);
+    if (bytes.byteLength !== member.size || observedSha256 !== member.sha256) {
+      throw new Error(
+        `The pinned Defold SDK cache modified archive member ${memberPath}: expected ${member.size} bytes/${member.sha256}, ` +
+        `got ${bytes.byteLength} bytes/${observedSha256}`
+      );
+    }
+    texts.set(include, bytes.toString("utf8"));
+    requiredHeaders.push({ header: include, state: "present", sha256: observedSha256 });
+  }
+
+  const provenance = {
+    revision,
+    archiveUrl: lock.DEFOLD_SDK_URL,
+    archiveSha256: lock.DEFOLD_SDK_SHA256,
+    requiredHeaderCount: requiredHeaders.length,
+    requiredHeaders,
+    requiredHeadersSha256: sha256(JSON.stringify(requiredHeaders)),
+  };
+  return {
+    recipes: recipes.map((recipe) => ({
+      ...recipe,
+      publicSdk: {
+        header: recipe.include,
+        ...classifyPublicSdkRecipe(recipe, texts.get(recipe.include)),
+      },
+    })),
+    provenance,
+  };
+}
 
 function invocationKind(kind) {
   return ({
@@ -399,6 +551,8 @@ export async function buildUniversalDmSdkBindings({
     if (!declaration) throw new Error(`Projection row is absent from SDK IR: ${row.id}`);
     return buildRecipe(row, declaration, numericId, specialized, context);
   });
+  const publicSdk = await attachPublicSdkFacts(root, projection.defoldRevision, recipes);
+  recipes = publicSdk.recipes;
   const expectedRuntimeDeclarations = ir.runtimeUnimplementedCount ?? projection.rows.length;
   if (recipes.length !== expectedRuntimeDeclarations) throw new Error(`Expected ${expectedRuntimeDeclarations} recipes, got ${recipes.length}`);
   if (new Set(recipes.map(({ declarationId }) => declarationId)).size !== recipes.length) throw new Error("Duplicate universal declaration recipe");
@@ -428,12 +582,24 @@ export async function buildUniversalDmSdkBindings({
   assertDmSdkUniversalStaticFrameCapacity({ abi: { maxArguments } });
   const staticFrame = emitDmSdkUniversalStaticFrame();
   const specializedSourceHashes = Object.fromEntries(specializedReports.map(([family, content]) => [family, sha256(content)]));
-  const sourceHash = sha256(projectionContent + irContent + specializedReports.map(([family, content]) => `${family}\0${content}`).join(""));
+  const publicSdkSource = JSON.stringify(publicSdk.provenance);
+  const sourceHash = sha256(
+    projectionContent + irContent +
+    specializedReports.map(([family, content]) => `${family}\0${content}`).join("") +
+    `public-sdk\0${publicSdkSource}`
+  );
   const catalogHash = sha256(JSON.stringify(recipes));
   const report = {
     schemaVersion: 1,
     defoldRevision: projection.defoldRevision,
-    sourceHashes: { projection: sha256(projectionContent), sdkIr: sha256(irContent), specialized: specializedSourceHashes, aggregate: sourceHash, catalog: catalogHash },
+    sourceHashes: {
+      projection: sha256(projectionContent),
+      sdkIr: sha256(irContent),
+      specialized: specializedSourceHashes,
+      publicSdk: publicSdk.provenance,
+      aggregate: sourceHash,
+      catalog: catalogHash,
+    },
     coverage: {
       declarations: recipes.length,
       recipes: recipes.length,
@@ -470,18 +636,19 @@ export async function buildUniversalDmSdkBindings({
     [dmSdkUniversalReadyCorpusArtifacts.productionSource, readyCorpus.generated.source],
     [dmSdkUniversalReadyCorpusArtifacts.verificationSource, readyCorpus.generated.verificationSource],
   ]);
-  const endianRecipes = ["dmEndian::ToNetwork", "dmEndian::ToHost"].map((symbol) => {
-    const matches = recipes.filter((recipe) => recipe.symbol === symbol && recipe.abi.parameters[0]?.nativeType === "uint32_t");
-    if (matches.length !== 1) throw new Error(`Expected one uint32_t ${symbol} recipe, got ${matches.length}`);
-    return matches[0];
-  });
-  const fixture = materializeDmSdkUsages(endianRecipes.map((recipe, index) => ({
-    declarationId: recipe.declarationId,
-    wrapper: index === 0 ? "deherm_test_to_network" : "deherm_test_to_host",
-    acknowledgements: { generatedAdapterBypass: { reason: "generated native JSI integration fixture", evidence: "round-trip through Hermes, C ABI dispatcher, and generated thunk" } },
-  })), { recipes, catalogSha256: catalogHash, providerName: "deherm_dmsdk_test_provider", installName: "deherm_dmsdk_test_provider_install" });
-  outputs.set(artifacts[10], fixture.source);
-  outputs.set(artifacts[11], `// ${banner}\n#pragma once\n#define DEHERM_TEST_TO_NETWORK_ID ${endianRecipes[0].numericId}\n#define DEHERM_TEST_TO_HOST_ID ${endianRecipes[1].numericId}\n#define DEHERM_TEST_DMSDK_CATALOG_SHA256 ${JSON.stringify(catalogHash)}\n`);
+  const endianRecipes = selectEndianRoundTripRecipes(recipes);
+  if (endianRecipes) {
+    const fixture = materializeDmSdkUsages(endianRecipes.map((recipe, index) => ({
+      declarationId: recipe.declarationId,
+      wrapper: index === 0 ? "deherm_test_to_network" : "deherm_test_to_host",
+      acknowledgements: { generatedAdapterBypass: { reason: "generated native JSI integration fixture", evidence: "round-trip through Hermes, C ABI dispatcher, and generated thunk" } },
+    })), { recipes, catalogSha256: catalogHash, providerName: "deherm_dmsdk_test_provider", installName: "deherm_dmsdk_test_provider_install" });
+    outputs.set(artifacts[10], fixture.source);
+    outputs.set(artifacts[11], `// ${banner}\n#pragma once\n#define DEHERM_TEST_TO_NETWORK_ID ${endianRecipes[0].numericId}\n#define DEHERM_TEST_TO_HOST_ID ${endianRecipes[1].numericId}\n#define DEHERM_TEST_DMSDK_CATALOG_SHA256 ${JSON.stringify(catalogHash)}\n`);
+  } else {
+    outputs.set(artifacts[10], `// ${banner}\n// The selected Defold revision has no uint32_t endian round-trip API.\nextern "C" void deherm_dmsdk_test_provider_install(void) {}\n`);
+    outputs.set(artifacts[11], `// ${banner}\n#pragma once\n#define DEHERM_TEST_DMSDK_ENDIAN_UNAVAILABLE 1\n#define DEHERM_TEST_TO_NETWORK_ID 0\n#define DEHERM_TEST_TO_HOST_ID 0\n#define DEHERM_TEST_DMSDK_CATALOG_SHA256 ${JSON.stringify(catalogHash)}\n`);
+  }
   for (const [relative, contents] of outputs) await writeArtifact(outRoot, relative, contents, false);
   return report;
 }

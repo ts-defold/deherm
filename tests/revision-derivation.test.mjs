@@ -24,6 +24,14 @@ import {
 } from "../scripts/lib/revision-audit.mjs";
 import { auditReviewedEvidence, evidencePath, reviewedClaims } from "../scripts/lib/reviewed-evidence.mjs";
 import { crossRevisionGenerationSteps } from "../scripts/check-cross-revision-derivation.mjs";
+import { validateRevisionMatrix } from "../scripts/check-defold-revision-matrix.mjs";
+import {
+  documentedSurface,
+  resolveDocumentedDuplication
+} from "../scripts/lib/documented-route-duplication.mjs";
+import { targetEnvironment } from "../scripts/generate-dmsdk-target-conditionals.mjs";
+import { classifyPublicSdkRecipe, selectEndianRoundTripRecipes } from "../scripts/generate-dmsdk-universal-bindings.mjs";
+import { buildApiTrees } from "../packages/compiler/src/sdk/script-sdk.mjs";
 import { dmSdkGenerationSteps } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
 import { scriptGenerationSteps } from "../scripts/lib/script-generator-pipeline.mjs";
 import {
@@ -40,6 +48,91 @@ import {
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
 const pinned = "7f0f554f41f9dce1e0ddff99bf08200657d1ee05";
 const other = "0123456789abcdef0123456789abcdef01234567";
+
+test("the historical matrix is immutable, unique, and data-driven", async () => {
+  const manifest = validateRevisionMatrix(JSON.parse(await readFile(path.join(
+    repositoryRoot, "packages", "bindings", "probes", "defold-revision-matrix.json"
+  ), "utf8")));
+  assert.deepEqual(manifest.lanes.map(({ id }) => id), ["current", "1.13.1", "1.12.0", "1.11.0"]);
+  assert.equal(manifest.lanes.filter(({ cadence }) => cadence === "blocking").length, 2);
+  assert.throws(() => validateRevisionMatrix({
+    ...manifest,
+    lanes: [...manifest.lanes, { ...manifest.lanes[0], id: "duplicate-revision" }]
+  }), /Invalid or duplicate/u);
+});
+
+test("historical editor documentation cannot shadow a game-runtime route", () => {
+  assert.equal(documentedSurface("doc/editor_doc.lua"), "editor");
+  assert.equal(documentedSurface("doc/editor.apidoc_doc.lua"), "editor");
+  assert.equal(documentedSurface("doc/scripts-script_http.cpp_doc.lua"), "game-runtime");
+  const runtime = { source: "doc/scripts-script_http.cpp_doc.lua", line: 56 };
+  assert.deepEqual(resolveDocumentedDuplication("http.request", [
+    { source: "doc/editor_doc.lua", line: 640 }, runtime
+  ]), { route: runtime, reason: "editor-surface", variants: [], overloads: [] });
+});
+
+test("the historical Emscripten JS target is modeled without inventing Wasm", async () => {
+  const macros = JSON.parse(await readFile(path.join(
+    repositoryRoot, "packages", "bindings", "overrides", "dmsdk-target-macros.json"
+  ), "utf8"));
+  const environment = targetEnvironment({
+    macros,
+    platforms: { common: {}, web: {}, "js-web": {} },
+    target: { target: "js-web", architecture: "js", group: "web" }
+  });
+  assert.equal(environment.defined.get("__EMSCRIPTEN__"), "1");
+  assert.equal(environment.defined.get("__SIZEOF_POINTER__"), "4");
+  assert.equal(environment.defined.has("__wasm__"), false);
+});
+
+test("an absent revision-local endian demo never blocks the universal catalog", () => {
+  assert.equal(selectEndianRoundTripRecipes([]), null);
+  const shape = { abi: { parameters: [{ nativeType: "uint32_t" }] } };
+  const pair = [
+    { ...shape, symbol: "dmEndian::ToNetwork", declarationId: "network" },
+    { ...shape, symbol: "dmEndian::ToHost", declarationId: "host" }
+  ];
+  assert.deepEqual(selectEndianRoundTripRecipes(pair).map(({ declarationId }) => declarationId), ["network", "host"]);
+});
+
+test("historical empty defold_api marker classes do not become invalid TypeScript namespaces", () => {
+  const trees = buildApiTrees({
+    functions: [],
+    classes: [{ name: "defold_api.", fields: [], description: "" }]
+  });
+  assert.equal(trees.has(""), false);
+  assert.equal(trees.size, 0);
+});
+
+test("public SDK facts distinguish comments, declarations, and incomplete constructor receivers", () => {
+  const direct = { invocation: { kind: "direct-function", nativeSymbol: "TextLayoutFree", member: null } };
+  assert.deepEqual(classifyPublicSdkRecipe(direct, "/* call TextLayoutFree() */"), {
+    callable: false, reason: "public-sdk-declaration-absent"
+  });
+  assert.deepEqual(classifyPublicSdkRecipe(direct, "void TextLayoutFree(HTextLayout value);"), {
+    callable: true, reason: "public-sdk-declaration-visible"
+  });
+  assert.deepEqual(classifyPublicSdkRecipe(direct, "void OtherTextLayoutFree();"), {
+    callable: false, reason: "public-sdk-declaration-absent"
+  });
+  const constructor = { invocation: {
+    kind: "placement-constructor", nativeSymbol: "dmGameObject::PropertyOptions::PropertyOptions",
+    member: "PropertyOptions", receiver: { nativeType: "dmGameObject::PropertyOptions" }
+  } };
+  assert.deepEqual(classifyPublicSdkRecipe(constructor, "typedef struct PropertyOptions* HPropertyOptions;"), {
+    callable: false, reason: "public-sdk-declaration-absent"
+  });
+  assert.deepEqual(classifyPublicSdkRecipe(constructor, "struct PropertyOptions { PropertyOptions(); };"), {
+    callable: true, reason: "public-sdk-declaration-visible"
+  });
+  const destructor = { invocation: {
+    kind: "explicit-destructor", nativeSymbol: "dmMutex::ScopedLock::~ScopedLock",
+    member: "~ScopedLock", receiver: { nativeType: "dmMutex::ScopedLock" }
+  } };
+  assert.deepEqual(classifyPublicSdkRecipe(destructor, "struct ScopedLock { ~ScopedLock(); };"), {
+    callable: true, reason: "public-sdk-declaration-visible"
+  });
+});
 
 // ── The reviewed-revision rule ──────────────────────────────────────────────
 
@@ -280,6 +373,13 @@ test("every derived revision hydrates its own digest-pinned Defold SDK before pa
   assert.deepEqual(revisionSupportSteps, [
     { runtime: "bash", script: "scripts/bootstrap-upstreams.sh", args: ["defold-sdk"] }
   ]);
+});
+
+test("Defold SDK bootstrap derives and requires an archive extraction manifest", async () => {
+  const source = await readFile(path.join(repositoryRoot, "scripts/bootstrap-upstreams.sh"), "utf8");
+  assert.match(source, /sdk_manifest="\$sdk_root\/\.deherm-sdk-extraction-manifest\.json"/u);
+  assert.match(source, /\[\[ -f "\$sdk_manifest" \]\][\s\S]*defold-sdk-extraction-manifest\.mjs" check/u);
+  assert.match(source, /unzip -q "\$sdk_archive" -d "\$sdk_parent"\s+[\s\S]*defold-sdk-extraction-manifest\.mjs" create/u);
 });
 
 test("package-owned dmSDK scalar emission resolves SDK evidence from the derived revision", async () => {

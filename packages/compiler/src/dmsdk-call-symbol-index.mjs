@@ -22,10 +22,26 @@ function compareCodeUnits(left, right) {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
+function constrainToPublicSdk(recipe, materialization) {
+  if (recipe.publicSdk?.callable !== false) return materialization;
+  const requirements = [...new Set([
+    ...(materialization.requirements ?? []),
+    "public-sdk-declaration",
+  ])].sort(compareCodeUnits);
+  const publicDiagnostic = `${recipe.declarationId} is not directly callable from the revision's public Defold SDK: ${recipe.publicSdk.reason}`;
+  return {
+    state: "specialization-required",
+    requirements,
+    diagnostic: materialization.diagnostic
+      ? `${publicDiagnostic}; ${materialization.diagnostic}`
+      : publicDiagnostic,
+  };
+}
+
 function bareMaterialization(recipe, catalog) {
   if (recipe.preferredLowering?.state === "generated-adapter") {
     const concrete = materializationFromDmSdkConcreteCallPlan(resolveDmSdkConcreteCallPlan(recipe));
-    if (concrete.state !== "specialization-required") return concrete;
+    if (concrete.state !== "specialization-required") return constrainToPublicSdk(recipe, concrete);
     try {
       materializeDmSdkUsages([{
         declarationId: recipe.declarationId,
@@ -39,9 +55,9 @@ function bareMaterialization(recipe, catalog) {
         catalog,
         catalogSha256: catalog.sourceHashes.catalog
       });
-      return { state: "universal-ready", requirements: [] };
+      return constrainToPublicSdk(recipe, { state: "universal-ready", requirements: [] });
     } catch {
-      return concrete;
+      return constrainToPublicSdk(recipe, concrete);
     }
   }
   try {
@@ -49,13 +65,13 @@ function bareMaterialization(recipe, catalog) {
       catalog,
       catalogSha256: catalog.sourceHashes.catalog
     });
-    return { state: "universal-ready", requirements: [] };
+    return constrainToPublicSdk(recipe, { state: "universal-ready", requirements: [] });
   } catch (error) {
-    return {
+    return constrainToPublicSdk(recipe, {
       state: "specialization-required",
       requirements: [...new Set(recipe.fallback?.requirements ?? [])].sort(compareCodeUnits),
       diagnostic: error instanceof Error ? error.message : String(error)
-    };
+    });
   }
 }
 

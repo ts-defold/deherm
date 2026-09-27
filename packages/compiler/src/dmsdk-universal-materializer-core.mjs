@@ -986,6 +986,7 @@ export function materializeDmSdkUsages(usages, options = {}) {
   // same reachable-only boundary the production linker relies on.
   for (const candidate of recipes) {
     if (!includes.has(`#include <${candidate.include}>`) ||
+        candidate.publicSdk?.callable === false ||
         candidate.invocation.kind !== "placement-constructor" ||
         candidate.invocation.sourceDefined || candidate.abi.parameters.length !== 0 ||
         candidate.invocation.receiver?.source !== "source-derived-nontemplate-owner") continue;

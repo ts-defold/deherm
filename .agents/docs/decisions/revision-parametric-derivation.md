@@ -65,6 +65,29 @@ workspace, and runs the unmodified chain there. The SDK step is mandatory: the
 source checkout does not contain generated DDF and third-party headers, and a
 scratch derivation must not accidentally read the repository pin's SDK.
 
+A completed historical workspace carries
+`.deherm/revision-derivation.json`. Its producer identity hashes the exact Git
+working-tree boundary copied by the derivation (tracked paths plus new,
+non-ignored paths, including tracked deletions and symlink targets), and binds
+that digest to the package version, Defold revision and emitted policy root.
+The compatibility matrix reuses a lane only when all of those identities still
+match the current compiler checkout. `--derive-missing` deletes and freshly
+derives a stale lane; without that flag, stale or legacy workspaces fail with a
+specific refresh instruction. A policy manifest by itself is never cache
+evidence, because it says which Defold revision produced the surface but not
+which compiler/generator implementation produced it.
+
+The universal dmSDK classifier authenticates that extraction again at its own
+input boundary. It requires `upstream.lock` to name the same revision, requires
+the post-unzip extraction sentinel to equal `DEFOLD_SDK_SHA256`, requires the
+public SDK include root, and reads every public header consumed by the revision
+without a best-effort fallback. Only `ENOENT` after those extraction checks is
+an authoritative `publicSdk.callable: false` fact; every other read failure is
+an input error. The universal catalog's source provenance records the SDK
+revision, archive URL and digest, plus a sorted inventory that explicitly marks
+each required header present (with its digest) or absent and a digest over that
+inventory.
+
 A scratch *output root* was the alternative and is worse. It would mean teaching
 roughly thirty generators, three ownership registries, two clean rooms and a
 content-addressed store about an output root none of them has, and a single

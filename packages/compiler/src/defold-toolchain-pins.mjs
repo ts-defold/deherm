@@ -16,38 +16,24 @@ import { createHash } from "node:crypto";
 // reader does not understand raises, rather than being silently dropped from the
 // policy that the native artifact matrix keys on.
 
-// Every pin the layered-policy decision names, plus the two the engine derives
-// them into. A revision that stops declaring one of these is a real event.
+// Only pins consumed directly by the native-artifact ABI key are mandatory.
+// Everything else is discovered mechanically below. Defold has renamed
+// Windows/JDK package constants between releases; treating today's spelling as
+// an eternal schema would make an npm compiler release necessary for ordinary
+// Defold source drift.
 export const REQUIRED_SDK_SYMBOLS = Object.freeze([
-  "VERSION_EDITOR_JDK",
-  "VERSION_XCODE",
-  "VERSION_XCODE_CLANG",
-  "VERSION_MACOSX",
-  "VERSION_IPHONEOS",
-  "VERSION_IPHONESIMULATOR",
   "VERSION_IPHONEOS_MIN",
   "VERSION_MACOSX_MIN",
-  "SWIFT_VERSION",
-  "VERSION_LINUX_CLANG",
   "ANDROID_NDK_VERSION",
   "ANDROID_NDK_API_VERSION",
   "ANDROID_64_NDK_API_VERSION",
-  "ANDROID_TARGET_API_LEVEL",
-  "ANDROID_BUILD_TOOLS_VERSION",
-  "ANDROID_PACKAGE",
-  "VERSION_WINDOWS_SDK",
-  "VERSION_WINDOWS_MSVC",
-  "VISUAL_STUDIO_VERSION",
-  "PACKAGES_WIN32_TOOLCHAIN",
-  "PACKAGES_WIN32_SDK",
-  "EMSCRIPTEN_VERSION_STR",
-  "EMSCRIPTEN_SDK",
-  "PACKAGES_EMSCRIPTEN_SDK",
-  "PACKAGES_IOS_SDK",
-  "PACKAGES_IOS_SIMULATOR_SDK",
-  "PACKAGES_MACOS_SDK",
-  "PACKAGES_XCODE_TOOLCHAIN"
+  "ANDROID_TARGET_API_LEVEL"
 ]);
+
+// sdk.py's module-level uppercase namespace is itself Defold's toolchain data.
+// Preserve it losslessly instead of predicting which prefix a future revision
+// will choose (VISUAL_STUDIO_VERSION is already an exception to the old set).
+const TOOLCHAIN_SYMBOL = /^[A-Z][A-Z0-9_]*$/u;
 
 const ASSIGNMENT = /^([A-Z][A-Z0-9_]*)\s*=\s*(.+?)\s*$/;
 
@@ -129,12 +115,18 @@ export function buildToolchainPins({ sdkSource, buildInputPlatforms }) {
       (blocked.length ? `\n  refused: ${blocked.map((row) => `${row.symbol}: ${row.reason}`).join("\n  refused: ")}` : "")
     );
   }
-  const pins = Object.fromEntries(REQUIRED_SDK_SYMBOLS.map((symbol) => [symbol, bound[symbol]]));
+  const pins = Object.fromEntries(Object.entries(bound)
+    .filter(([symbol]) => TOOLCHAIN_SYMBOL.test(symbol))
+    .sort(([left], [right]) => left.localeCompare(right)));
+  const unparsed = refusals
+    .filter(({ symbol }) => TOOLCHAIN_SYMBOL.test(symbol))
+    .sort((left, right) => left.symbol.localeCompare(right.symbol));
   return {
     source: "upstream/defold/build_tools/sdk.py",
     companion: "upstream/defold/share/extender/build_input.yml",
     authority: "Defold declares these; deherm never restates one as its own constant.",
     pins,
+    unparsed,
     platformKeys: [...buildInputPlatforms].sort()
   };
 }

@@ -38,9 +38,9 @@
   "minimumSnapshotsApplied": 3,
   "minimumInputsSent": 3,
   "observedSnapshotsApplied": 3,
-  "observedInputsSent": 13,
-  "lastServerTick": 114,
-  "lastLocalTick": 126,
+  "observedInputsSent": 14,
+  "lastServerTick": 120,
+  "lastLocalTick": 133,
   "input": {
     "moveX": 1,
     "moveY": 0,
@@ -50,8 +50,8 @@
   },
   "inputsDropped": 0,
   "presentation": {
-    "localCorrectionMagnitude": 19,
-    "maximumLocalCorrectionMagnitude": 5229,
+    "localCorrectionMagnitude": 28,
+    "maximumLocalCorrectionMagnitude": 4820,
     "remoteInterpolationRebases": 0,
     "maximumRemoteInterpolationRebaseDistance": 0,
     "maximumRemoteInterpolationDiscontinuity": 0,
@@ -65,7 +65,7 @@
     "inputsAcceptedAtLeast": 3,
     "markers": [
       "war-battles-server:listening:https://localhost:<port>",
-      "war-battles-server:health:http://localhost:49457",
+      "war-battles-server:health:http://localhost:59602",
       "war-battles-server:roster:32:bots:2",
       "war-battles-server:incoming:id=1",
       "war-battles-server:quic-accepted:id=1",
@@ -121,8 +121,8 @@
     {
       "path": "package.json",
       "kind": "file",
-      "bytes": 52000,
-      "sha256": "72a1cbfd0c7471659d4fdc7cf084f0c34a842b2eb61285e0738ebff211e5b6e1"
+      "bytes": 52277,
+      "sha256": "2b1736b68473a838b95ef53c5a4cf34a5144e810e634e2a16f2053bd57502ab5"
     },
     {
       "path": "pnpm-lock.yaml",
@@ -137,6 +137,6 @@
       "sha256": "6fd5533ae7b9ebb266685f8319dc4bcad914fbba15a26859921d8518ba6536b8"
     }
   ],
-  "sourceKey": "2547acc1768250b2c58b9f3edcd44d7c39bb79132532048be8e7bbb616961c93",
+  "sourceKey": "d2446befe7f424bc88a249cf8088b6303f5bc37643dad75757ed4633bf9ca3fc",
   "evidenceBoundary": "Real loopback Chrome-to-Deno HTTP/3/WebTransport transport, authoritative welcome/snapshot/input and scalar client-presentation telemetry; server input acceptance is observed from MatchServer stats; the telemetry describes this bounded loopback trace and is not a visual-quality, WAN, ingress, native Defold, allocation, or reliable-lane-persistence claim."
 }

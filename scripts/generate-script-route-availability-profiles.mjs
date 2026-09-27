@@ -171,6 +171,8 @@ async function generate(options) {
   const scriptIr = scriptIrInput.value;
 
   assert(policy.schemaVersion === 1, "unsupported policy schema");
+  assert(new Set(policy.buildEvidence.map(({ path }) => path)).size === policy.buildEvidence.length,
+    "build evidence paths are not unique");
   // The revision this report speaks for comes from a DERIVED input - the
   // imported script API IR - and never from the reviewed policy, so a reviewed
   // file can no longer decide which revision the generated surface claims.
@@ -498,8 +500,11 @@ async function generate(options) {
     profiles: routeProfiles
   };
 
-  // Keep evidence reads live so removing either build pin is generator-visible.
-  assert(buildTexts.size === policy.buildEvidence.length, "build evidence paths are not unique");
+  // Keep evidence reads live so every build pin is accounted for. Historical
+  // derivations may withdraw a pin whose anchor did not exist yet; that is a
+  // policy difference, not duplicate evidence or a reason to refuse the API.
+  assert(buildTexts.size + buildTexts.withdrawn.size === policy.buildEvidence.length,
+    "build evidence accounting drifted");
   return `${JSON.stringify(report, null, 2)}\n`;
 }
 

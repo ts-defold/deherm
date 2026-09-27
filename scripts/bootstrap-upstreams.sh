@@ -89,6 +89,7 @@ if wants defold-sdk; then
   sdk_parent="$repo_root/upstream/extender/server/app/sdk/$DEFOLD_REV"
   sdk_root="$sdk_parent/defoldsdk"
   sdk_sentinel="$sdk_root/.deherm-sdk-sha256"
+  sdk_manifest="$sdk_root/.deherm-sdk-extraction-manifest.json"
   valid_sdk_archive=false
   if [[ -f "$sdk_archive" ]]; then
     actual_sha="$(deherm_sha256_file "$sdk_archive")"
@@ -106,11 +107,20 @@ if wants defold-sdk; then
     mv "$temporary" "$sdk_archive"
     trap - EXIT
   fi
-  if [[ ! -f "$sdk_sentinel" ]] || [[ "$(cat "$sdk_sentinel")" != "$DEFOLD_SDK_SHA256" ]] ||
-     [[ ! -f "$sdk_root/lib/x86_64-linux/libengine.a" ]]; then
+  valid_sdk_extraction=false
+  if [[ -f "$sdk_sentinel" ]] && [[ "$(cat "$sdk_sentinel")" == "$DEFOLD_SDK_SHA256" ]] &&
+     [[ -f "$sdk_manifest" ]] && [[ -f "$sdk_root/lib/x86_64-linux/libengine.a" ]] &&
+     node "$repo_root/scripts/lib/defold-sdk-extraction-manifest.mjs" check "$sdk_root" "$DEFOLD_SDK_SHA256" >/dev/null 2>&1; then
+    valid_sdk_extraction=true
+  fi
+  if [[ "$valid_sdk_extraction" != true ]]; then
     rm -rf "$sdk_root"
     mkdir -p "$sdk_parent"
     unzip -q "$sdk_archive" -d "$sdk_parent"
+    # This inventory is derived only from the just-extracted, digest-verified
+    # archive. It lets later generators distinguish an archive member that was
+    # genuinely absent from a cache member that was deleted or modified.
+    node "$repo_root/scripts/lib/defold-sdk-extraction-manifest.mjs" create "$sdk_root" "$DEFOLD_SDK_SHA256"
     printf '%s\n' "$DEFOLD_SDK_SHA256" > "$sdk_sentinel"
   fi
   printf 'defold-sdk %s\n' "$DEFOLD_SDK_SHA256"

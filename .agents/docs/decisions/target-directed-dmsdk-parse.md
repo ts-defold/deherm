@@ -92,6 +92,12 @@ includes, but it may silently turn an unresolved enum or native handle into
 `int`. The importer therefore verifies the pinned SDK archive digest for the
 same `DEFOLD_REV`, adds its three public include roots during derivation, and
 retains only the transitive type facts referenced by public dmSDK signatures.
+Immediately after extracting that digest-verified archive, bootstrap records a
+complete member inventory with byte size and SHA-256. Reuse requires the
+inventory, and the universal-recipe classifier verifies every public header it
+consumes against it. A header absent from both the archive inventory and cache
+is a genuine negative fact; an inventoried header that was deleted or modified
+in the cache is an input-integrity failure, not API absence.
 The archive is never a consumer input and its source tree is not published in
 the policy. Per-target parses record alias spellings such as pointer-backed
 `VkImage` on native 64-bit targets and `uint64_t` on wasm, so one policy can
@@ -168,6 +174,13 @@ had been putting machine-specific text into the committed inventory:
 The path-independence fix that preceded this one - stripping the checkout prefix
 out of anonymous-record names and diagnostics, and failing closed if any
 survives - is unchanged and still enforced.
+
+Focused archive-integrity coverage in
+`tests/dmsdk-public-sdk-extraction.test.mjs` exercises genuine absence,
+deletion, modification, archive-digest mismatch, and successful authenticated
+consumption. The clean-room test separately asserts ownership of both the
+manifest input and its package-owned verifier; the byte-identical universal
+binding and complete dmSDK clean-room suites remain green.
 
 # Consequences
 

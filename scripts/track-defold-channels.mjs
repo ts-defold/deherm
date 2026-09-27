@@ -81,19 +81,25 @@ async function digest(url, fetchImpl) {
  *
  * The digests are computed from what the immutable archive actually served, so
  * the lock records an attested digest rather than a recalled constant. Only the
- * five DEFOLD_ keys move; every other pin in the lock is a separate decision.
+ * seven revision-bound DEFOLD_ keys move; every other pin in the lock is a
+ * separate decision. In particular, `defoldsdk.zip` must move with the source
+ * revision; otherwise public-header evidence belongs to a different release.
  */
 export async function pinRevision(revision, { fetchImpl = fetch, lock } = {}) {
   if (!REVISION.test(revision)) throw new Error(`Not a Defold revision: ${revision}`);
   const current = lock ?? await readFile(lockPath, "utf8");
   const refDocUrl = `${ARCHIVE}/${revision}/engine/share/ref-doc.zip`;
+  const sdkUrl = `${ARCHIVE}/${revision}/engine/defoldsdk.zip`;
   const bobUrl = `${ARCHIVE}/${revision}/bob/bob.jar`;
   const refDoc = await digest(refDocUrl, fetchImpl);
+  const sdk = await digest(sdkUrl, fetchImpl);
   const bob = await digest(bobUrl, fetchImpl);
   const replacements = {
     DEFOLD_REV: revision,
     DEFOLD_REF_DOC_URL: refDocUrl,
     DEFOLD_REF_DOC_SHA256: refDoc.sha256,
+    DEFOLD_SDK_URL: sdkUrl,
+    DEFOLD_SDK_SHA256: sdk.sha256,
     DEFOLD_BOB_URL: bobUrl,
     DEFOLD_BOB_SHA256: bob.sha256
   };
@@ -103,7 +109,7 @@ export async function pinRevision(revision, { fetchImpl = fetch, lock } = {}) {
     if (!pattern.test(updated)) throw new Error(`upstream.lock does not declare ${key}`);
     updated = updated.replace(pattern, `${key}=${value}`);
   }
-  return { updated, replacements, sizes: { refDoc: refDoc.bytes, bob: bob.bytes } };
+  return { updated, replacements, sizes: { refDoc: refDoc.bytes, sdk: sdk.bytes, bob: bob.bytes } };
 }
 
 async function main(argv = process.argv.slice(2)) {
@@ -137,6 +143,7 @@ async function main(argv = process.argv.slice(2)) {
     if (write) await writeFile(lockPath, updated);
     console.log(`${write ? "Pinned" : "Would pin"} Defold ${revision}`);
     console.log(`  ref-doc.zip ${sizes.refDoc} bytes sha256 ${replacements.DEFOLD_REF_DOC_SHA256}`);
+    console.log(`  defoldsdk.zip ${sizes.sdk} bytes sha256 ${replacements.DEFOLD_SDK_SHA256}`);
     console.log(`  bob.jar     ${sizes.bob} bytes sha256 ${replacements.DEFOLD_BOB_SHA256}`);
     return;
   }

@@ -91,7 +91,7 @@ const VARIANT_PATTERNS = Object.freeze([
  * this generator is for, which is the statement that was missing.
  */
 export function documentedSurface(source) {
-  if (/(^|\/)editor\.apidoc|\.editor_script$/.test(source)) return "editor";
+  if (/(^|\/)editor(?:\.apidoc|_doc(?:\.|$))|\.editor_script$/.test(source)) return "editor";
   if (/(^|\/)lua_[a-z]+\.doc/.test(source)) return "lua-standard-library";
   return "game-runtime";
 }

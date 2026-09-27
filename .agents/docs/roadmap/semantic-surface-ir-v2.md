@@ -119,21 +119,34 @@ rewrite historical evidence.
 
 | Stage | Current | 1.13.1 | 1.12.0 | 1.11.0 |
 | --- | --- | --- | --- | --- |
-| Resolve immutable source/archive identities | required | required | required | required |
-| Extract canonical facts with no checkout-path leak | required | required | required | required |
-| Validate schema and total declaration census | required | required | required | required |
-| Select exactly one lowering strategy per callable | required | required | required | required |
-| Retain universal fallback for unspecialized calls | required | required | required | required |
-| Re-run deterministically to identical bytes | required | required | required | required |
-| Materialize from package + compressed policy only | required | required | required | required |
-| Generate SDK, native, Static Hermes and browser glue | required | required | required | required |
-| Generate and compile exact-call twins | required | required | required | required |
-| Headless/package engine smoke | required | required | required | required |
+| Resolve immutable source/archive identities | verified | verified | verified | verified |
+| Extract canonical facts with no checkout-path leak | verified | verified | verified | verified |
+| Validate schema and total declaration census | verified | verified | verified | verified |
+| Select and report lowering strategies | verified | verified | verified | verified |
+| Retain universal fallback for unspecialized calls | verified | verified | verified | verified |
+| Re-run deterministically to identical bytes | verified | verified | verified | verified |
+| Materialize from package + compressed policy only | verified | verified | verified | verified |
+| Generate SDK, native, Static Hermes and browser glue | verified | verified | verified | verified |
+| Generate and compile exact-call twins | verified | verified | verified | verified |
+| Universal C ABI and ready exact-call execution | verified | verified | verified | verified |
+| Headless/package engine smoke | separate gate | separate gate | separate gate | separate gate |
 | Full target/runtime depth | required | nightly | nightly | nightly/floor gate |
 
 An API addition, removal, or deprecation in Defold is an expected fact delta,
 not a compatibility failure. A failure means the same compiler cannot parse,
 classify, emit, or faithfully report the selected revision.
+
+The 2026-09-26 clean matrix used one working-tree compiler and fresh isolated
+workspaces. It resolved each revision's source, `ref-doc.zip`, `defoldsdk.zip`,
+and Bob independently; materialized each authenticated policy twice (including
+reverse object enumeration); compared it byte-for-byte with its independently
+source-derived workspace; strictly compiled the generated TypeScript SDK;
+compiled the generated specialized dmSDK and Lua exact-call fixtures; and
+compiled, linked, and executed the universal C ABI plus public-SDK-callable
+exact twins. API counts were current `926/1361`, 1.13.1 `807/1336`, 1.12.0
+`571/1191`, and 1.11.0 `557/1063` for Script API/dmSDK respectively. These are
+generation, materialization, compilation, linkage, and exact-call execution
+claims. They are not packaged-engine or all-target runtime claims.
 
 # Ordered implementation
 
@@ -216,12 +229,12 @@ identity. P0 is complete.
 
 ## 6. Prove multi-revision survival
 
-- [ ] Add the four immutable revisions above to a data-driven fixture manifest.
-- [ ] Derive, materialize, generate, and compile each revision with the same
+- [x] Add the four immutable revisions above to a data-driven fixture manifest.
+- [x] Derive, materialize, generate, and compile each revision with the same
   installed package.
-- [ ] Compare semantic census and pattern distributions without demanding that
+- [x] Compare semantic census and pattern distributions without demanding that
   different Defold versions expose identical APIs.
-- [ ] Run twice with shuffled host/file enumeration and require identical
+- [x] Run twice with shuffled host/file enumeration and require identical
   canonical facts and output hashes.
 - [ ] Run current and floor revisions as blocking gates; run the full matrix
   nightly until its cost is measured and tuned.

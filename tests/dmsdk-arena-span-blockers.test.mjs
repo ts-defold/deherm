@@ -207,3 +207,14 @@ test("arena-span recipes follow semantic evidence when lines move and decline on
   assert.ok(withdrawn.declarations.some(({ blocker }) => blocker === "cstring-arena-specialization-unverified"));
   assert.equal(withdrawn.coverage.unaccounted, 0);
 });
+
+test("a revision with no applicable arena specialization still emits a valid universal-only surface", async () => {
+  const inputs = await loadInputs();
+  const evidenceTexts = new Map([...inputs.evidenceTexts].map(([path]) => [path, null]));
+  const generated = generate({ ...inputs, evidenceTexts });
+  assert.equal(generated.report.coverage.generatedCStringArena, 0);
+  assert.equal(generated.report.coverage.unaccounted, 0);
+  assert.ok(generated.report.declarations.every(({ stages }) => stages.generated === "not-applicable"));
+  assert.match(generated.artifacts.get("defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp"), /return UINT32_C\(0\)/u);
+  assert.match(generated.artifacts.get("tests/fixtures/generated_dmsdk_arena_cstring_exact.cpp"), /UNKNOWN_ID/u);
+});

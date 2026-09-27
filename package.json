@@ -214,6 +214,8 @@
     "plan:end-to-end": "node scripts/check-end-to-end.mjs --plan",
     "track:defold-channels": "node scripts/track-defold-channels.mjs plan",
     "derive:revision": "node scripts/derive-revision.mjs",
+    "check:defold-revision-matrix": "node scripts/check-defold-revision-matrix.mjs",
+    "derive:defold-revision-matrix": "node scripts/check-defold-revision-matrix.mjs --derive-missing",
     "generate:script-real-engine-matrix": "node scripts/generate-script-real-engine-matrix.mjs",
     "generate:headless-conformance": "node scripts/generate-headless-conformance.mjs",
     "generate:script-route-availability-profiles": "node scripts/generate-script-route-availability-profiles.mjs",
@@ -444,7 +446,7 @@
     "verify:engine:native": "pnpm bob:local:bundle && DEHERM_REQUIRE_ENGINE_ARTIFACTS=1 pnpm test:extension-retention && pnpm test:native-defold:runtime",
     "artifacts:record": "node scripts/manage-native-artifacts.mjs record",
     "test:api-policy": "python3 tests/import-defold-sdk-portability.py && node --test tests/api-policy.test.mjs",
-    "test:revision-derivation": "node --test tests/revision-derivation.test.mjs"
+    "test:revision-derivation": "node --test tests/revision-derivation.test.mjs tests/revision-workspace-fingerprint.test.mjs tests/dmsdk-public-sdk-extraction.test.mjs"
   },
   "dependencies": {
     "@jridgewell/trace-mapping": "0.3.31",

@@ -224,7 +224,11 @@ export function buildApiTrees(model) {
   for (const fn of model.functions) nodeAt(fn.modulePath).functions.push(fn);
   for (const classItem of model.classes) {
     if (!classItem.name.startsWith("defold_api.")) continue;
-    const segments = classItem.name.slice("defold_api.".length).split(".");
+    const suffix = classItem.name.slice("defold_api.".length);
+    // Older ref-doc bundles contain an empty `defold_api.` marker class. It is
+    // metadata for the documentation root, not a JavaScript namespace.
+    if (!suffix) continue;
+    const segments = suffix.split(".");
     const node = nodeAt(segments);
     node.description ||= classItem.description;
     node.fields.push(...classItem.fields);

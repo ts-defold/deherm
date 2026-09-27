@@ -3738,3 +3738,53 @@ UDP/IP, and link-layer overhead. The same revision was then exercised through
 real Chrome-to-Deno HTTP/3/WebTransport, a Bob wasm-web browser product, and a
 packaged arm64-macos Defold 1.14.0 + Hermes runtime; all three product gates
 completed and refreshed their source-bound evidence independently.
+
+## 2026-09-26 - One compiler survives four Defold revisions
+
+The semantic-surface compatibility goal now has a clean four-revision proof.
+The data-driven matrix pins current dev plus Defold 1.13.1, 1.12.0, and 1.11.0
+by immutable commit. A derivation bug found by the floor lane was fixed at its
+authority: repinning a Defold revision now repins `defoldsdk.zip` and its digest
+alongside source, reference docs, and Bob, rather than silently parsing old
+source against the current public SDK.
+
+Historical drift no longer turns optional fast paths into release gates.
+Missing callback, overload, dynamic-value, scalar-thunk, and arena-cstring
+specializations are withdrawn and audited for that revision while the public
+declaration remains in the universal catalog. Zero-entry generators emit valid
+deterministic C/C++ tables and fail closed at dispatch. Public SDK callability
+is carried as a compact per-revision recipe fact, so a source-visible function
+that the packaged public headers cannot name remains generated but is not
+incorrectly promoted into an exact public-SDK call corpus.
+
+The clean-room proof copies the complete public `defoldsdk/sdk/include` header
+tree consumed by that classifier. Its first implementation copied only two
+headers, which made an absent clean-room input look like a legitimate
+`public-sdk-declaration-absent` fact and changed the exact-call partition. The
+clean room now reproduces all 1,361 current dmSDK recipes byte-for-byte with 74
+specialized exact vectors, 557 public-SDK-callable universal exact vectors, and
+730 retained specialization-required routes. The three counts exhaust the
+declaration census; none suppresses the universal generated API.
+
+The first public-SDK classifier incorrectly required a word boundary before a
+member spelling, which can never match a C++ destructor beginning with `~`.
+The corrected token-boundary rule restores five compiler-proven public
+destructors to the exact-call corpus and has a suffix-rejection regression.
+The classifier now also authenticates the SDK archive sentinel and the exact
+sorted present/absent header inventory; a missing complete-archive header is a
+revision fact, while an incomplete extraction or non-ENOENT read failure aborts.
+Historical workspaces carry the exact producer working-tree fingerprint and
+are rejected or freshly re-derived when the compiler changes, so the matrix
+cannot silently replay a prior generator's facts.
+
+Fresh isolated derivations and matrix runs passed for all four revisions. The
+Script API/dmSDK declaration counts are current `926/1361`, 1.13.1 `807/1336`,
+1.12.0 `571/1191`, and 1.11.0 `557/1063`. Each matrix lane reconstructs the
+surface from authenticated policy with forward and reverse object enumeration,
+requires an idempotent second materialization, compares against the independent
+source-derived workspace, strictly compiles the TypeScript SDK, compiles the
+specialized dmSDK and Lua exact-call fixtures, and compiles, links, and executes
+the universal C ABI and public-SDK-callable exact twins. This establishes
+generation, deterministic materialization, compilation, linkage, and exact-call
+execution. It does not promote those results into packaged-engine, every-target,
+or performance evidence; those remain separate gates.

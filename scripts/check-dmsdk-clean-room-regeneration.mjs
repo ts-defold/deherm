@@ -94,7 +94,7 @@ async function copyDeclaredGeneratorDependencies(sourceRoot, targetRoot) {
   });
 }
 
-async function evidencePaths(repositoryRoot, defoldRevision) {
+export async function dmSdkCleanRoomEvidencePaths(repositoryRoot, defoldRevision) {
   const ir = JSON.parse(await readFile(path.join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
   const inventory = JSON.parse(await readFile(
     path.join(repositoryRoot, "packages/bindings/generated/defold-sdk-inventory.json"),
@@ -117,7 +117,15 @@ async function evidencePaths(repositoryRoot, defoldRevision) {
     if (declaration.disposition === "generated-raw-call") result.add(confined(declaration.header, `${declaration.id}.header`));
   }
   const sdkRoot = `upstream/extender/server/app/sdk/${defoldRevision}/defoldsdk`;
-  result.add(`${sdkRoot}/sdk/include/dmsdk/graphics/graphics.h`);
+  // The universal recipe classifier is deliberately constrained by the public
+  // SDK shipped for this exact Defold revision. Copy the complete public include
+  // tree into the synthetic checkout: copying a hand-picked sample silently
+  // turns an absent clean-room input into a false "not publicly callable" fact.
+  result.add(`${sdkRoot}/.deherm-sdk-sha256`);
+  result.add(`${sdkRoot}/.deherm-sdk-extraction-manifest.json`);
+  for (const header of await walk(repositoryRoot, `${sdkRoot}/sdk/include`)) {
+    if (/\.(?:h|hpp)$/u.test(header)) result.add(header);
+  }
   result.add(`${sdkRoot}/include/graphics/graphics_ddf.h`);
   const namedScalarPolicy = JSON.parse(await readFile(
     path.join(repositoryRoot, "packages/bindings/overrides/dmsdk-named-scalar-policies.json"),
@@ -382,7 +390,7 @@ async function validateReports(root) {
   "hash-state report does not have the pinned 10/10 lifecycle disposition");
   assert(generatedExact.generatedAdapterCount === 74 &&
     generatedExact.specializationRequiredCount === runtimePendingCount - generatedExact.generatedAdapterCount - readyExact.universalReadyCount,
-  "generated-adapter exact plan does not have the current 74/721 partition");
+  "generated-adapter exact plan does not preserve the complete generated/universal/specialization partition");
   assert(arenaSpan.coverage.arenaSpanCensus === 79 && arenaSpan.coverage.coveredByPriorWaves === 14 &&
     arenaSpan.coverage.generatedCStringArena === 5 && arenaSpan.coverage.blocked === 60 &&
     arenaSpan.coverage.executableAdaptersEmitted === 5 && arenaSpan.coverage.exactCallTwinsEmitted === 5 &&
@@ -588,7 +596,7 @@ async function fingerprint(root, inputs) {
 export async function runDmSdkCleanRoomRegeneration(options = {}) {
   const repositoryRoot = path.resolve(options.repositoryRoot ?? repositoryRootDefault);
   const lock = parseLock(await readFile(path.join(repositoryRoot, "upstream.lock"), "utf8"));
-  const sources = await evidencePaths(repositoryRoot, lock.DEFOLD_REV);
+  const sources = await dmSdkCleanRoomEvidencePaths(repositoryRoot, lock.DEFOLD_REV);
   const groundTruth = await validateGroundTruth(repositoryRoot, sources);
   const inputs = [...new Set([
     ...dmSdkGeneratorSources,

@@ -96,6 +96,10 @@ function offsets(rows, field) {
   return rows.map((row) => { const result = offset; offset += row[field].length; return result; });
 }
 
+export function maximumTableRecordFieldCount(rows) {
+  return rows.reduce((maximum, row) => Math.max(maximum, row.fields.length), 0);
+}
+
 function renderRuntime(rows) {
   const fields = rows.flatMap((row) => row.fields);
   const args = rows.flatMap((row) => row.argumentCodecs);
@@ -119,7 +123,7 @@ struct Field { const char* name; Codec codec; };
 struct Operation { uint16_t index; uint32_t stableId; const char* canonicalId; const char* modulePath; const char* member; Context context; uint16_t argumentOffset; uint8_t argumentCount; uint16_t fieldOffset; uint8_t fieldCount; };
 struct LuaApi { void* context = nullptr; DispatchStatus (*invoke)(void*, const Operation&, const Codec*, const Field*, ScriptCallFrame*, char*, size_t) noexcept = nullptr; };
 inline constexpr size_t kCandidateCount = ${rows.length};
-inline constexpr size_t kMaximumFieldCount = ${Math.max(...rows.map((row) => row.fields.length))};
+inline constexpr size_t kMaximumFieldCount = ${maximumTableRecordFieldCount(rows)};
 const Operation* find(uint32_t stableId) noexcept;
 const Codec* argumentCodecs() noexcept;
 const Field* fields() noexcept;
@@ -136,11 +140,11 @@ DispatchStatus dispatch(ScriptCallFrame*, char*, size_t, const LuaApi*) noexcept
 namespace defold_hermes::table_record {
 namespace {
 constexpr Operation kOperations[] = {
-${operations}
+${operations || "  {},"}
 };
-constexpr Codec kArgumentCodecs[] = { ${args.map((codec) => `Codec::k${codec}`).join(", ")} };
+constexpr Codec kArgumentCodecs[] = { ${args.map((codec) => `Codec::k${codec}`).join(", ") || "Codec::kBoolean"} };
 constexpr Field kFields[] = {
-${fields.map((field) => `  {${quote(field.name)}, Codec::k${field.codec}},`).join("\n")}
+${fields.map((field) => `  {${quote(field.name)}, Codec::k${field.codec}},`).join("\n") || "  {nullptr, Codec::kBoolean},"}
 };
 void fail(char* error, size_t capacity, const char* message) noexcept { if (error && capacity) std::snprintf(error, capacity, "%s", message); }
 bool scalarMatches(Codec codec, const ScriptValue& value) noexcept {

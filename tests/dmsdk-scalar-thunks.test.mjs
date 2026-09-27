@@ -6,7 +6,7 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { resolveScalarSourceEvidence } from "../scripts/generate-dmsdk-scalar-thunks.mjs";
+import { resolveScalarModule, resolveScalarSourceEvidence } from "../scripts/generate-dmsdk-scalar-thunks.mjs";
 import { DERIVED_REVISION_ENV } from "../scripts/lib/reviewed-revision.mjs";
 
 const testDirectory = dirname(fileURLToPath(import.meta.url));
@@ -42,6 +42,12 @@ test("scalar source-anchor drift withdraws evidence only during a declared revis
     content: null,
     env: { [DERIVED_REVISION_ENV]: otherRevision }
   }).reason, "absent-source");
+});
+
+test("an unknown historical scalar module falls back to the universal catalog", () => {
+  const header = "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h";
+  assert.throws(() => resolveScalarModule(header, {}), /No reviewed scalar module/u);
+  assert.equal(resolveScalarModule(header, { [DERIVED_REVISION_ENV]: otherRevision }), null);
 });
 
 test("scalar thunk artifacts are deterministic", async () => {

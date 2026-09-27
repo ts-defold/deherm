@@ -78,6 +78,7 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     readFile(reportPath, "utf8").then(JSON.parse),
     readFile(sdkIrPath, "utf8").then(JSON.parse),
   ]);
+  const symbolIndex = buildDmSdkCallSymbolIndex(sdkIr, policyCatalog);
   assert.deepEqual(report.coverage, {
     declarations: 1361,
     recipes: 1361,
@@ -89,7 +90,7 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     silentlyOmitted: 0,
     preferredSpecialized: 81,
     usageMaterializedFallback: 1280,
-    universalReadyExactVectors: 566,
+    universalReadyExactVectors: symbolIndex.universalReadyCount,
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
   assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, 1361);
@@ -98,6 +99,12 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     sdkIr.declarations.filter(({ disposition }) => disposition === "generated-raw-call").map(({ id }) => id).sort(),
     "the universal catalog must cover the source-derived public runtime declaration set, not only another generated catalog",
   );
+  const publicSdkUnavailable = report.recipes.filter(({ publicSdk }) => publicSdk?.callable === false);
+  assert.equal(publicSdkUnavailable.length, 132);
+  assert.ok(publicSdkUnavailable.every(({ publicSdk }) =>
+    typeof publicSdk.header === "string" && typeof publicSdk.reason === "string"));
+  assert.equal(Object.values(symbolIndex.declarations).filter(({ materialization }) =>
+    materialization.requirements?.includes("public-sdk-declaration")).length, publicSdkUnavailable.length);
   for (const item of report.recipes) {
     assert.equal(item.fallback.state, "materializable");
     assert.equal(item.fallback.silentOmissionAllowed, false);
@@ -388,8 +395,8 @@ test("Static Hermes applicability accounts for every canonical universal-ready e
   const plan = JSON.parse(await readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.plan), "utf8"));
   const vectors = plan.verification.vectors;
   const partition = partitionDmSdkUniversalStaticExactVectors(vectors);
-  assert.equal(partition.vectorCount, 566);
-  assert.equal(partition.applicableVectorCount, 566);
+  assert.equal(partition.vectorCount, plan.universalReadyCount);
+  assert.equal(partition.applicableVectorCount, plan.universalReadyCount);
   assert.equal(partition.blockedVectorCount, 0);
   assert.equal(partition.vectors.length, partition.vectorCount);
   assert.match(partition.partitionSha256, /^[0-9a-f]{64}$/u);
@@ -471,7 +478,7 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
   const sdkIr = JSON.parse(await readFile(sdkIrPath, "utf8"));
   const index = buildDmSdkCallSymbolIndex(sdkIr, policyCatalog);
   const usages = dmSdkUniversalReadyUsages(index, policyCatalog);
-  assert.equal(usages.length, 566);
+  assert.equal(usages.length, index.universalReadyCount);
   const corpus = materializeDmSdkUniversalReadyCorpus(index, policyCatalog);
   const { generated } = corpus;
   assert.equal(generated.verification.vectorCount, usages.length);

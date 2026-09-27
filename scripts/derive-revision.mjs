@@ -61,6 +61,11 @@ import { generatedDmSdkArtifacts } from "./lib/dmsdk-generator-pipeline.mjs";
 import { generatedBundleTargetArtifacts } from "./generate-defold-bundle-targets.mjs";
 import { CARRIED_REVIEW_LEDGER_ENV, DERIVED_REVISION_ENV, isDefoldRevision } from "./lib/reviewed-revision.mjs";
 import { auditReviewedEvidence } from "./lib/reviewed-evidence.mjs";
+import {
+  makeRevisionWorkspaceMetadata,
+  revisionProducerInputIdentity,
+  writeRevisionWorkspaceMetadata
+} from "./lib/revision-workspace-metadata.mjs";
 
 const execFileAsync = promisify(execFile);
 export const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -431,6 +436,8 @@ export async function deriveRevision(options) {
   } = options;
   if (!isDefoldRevision(revision)) throw new Error(`Not a Defold revision: ${revision}`);
 
+  const producerInput = await revisionProducerInputIdentity(sourceRoot);
+  const packageVersion = JSON.parse(await readFile(path.join(sourceRoot, "package.json"), "utf8")).version;
   const ignored = await ignoredSurfacePaths(sourceRoot);
   const before = await surfaceFingerprint(sourceRoot, ignored);
   const pinned = lockValue(await readFile(path.join(sourceRoot, "upstream.lock"), "utf8"), "DEFOLD_REV");
@@ -440,6 +447,12 @@ export async function deriveRevision(options) {
 
   onProgress(`materialising ${path.relative(sourceRoot, workspace) || workspace}`);
   const fileCount = await materializeWorkspace({ sourceRoot, workspace });
+  const producerInputAfterCopy = await revisionProducerInputIdentity(sourceRoot);
+  if (fileCount !== producerInput.fileCount ||
+      producerInputAfterCopy.sha256 !== producerInput.sha256 ||
+      producerInputAfterCopy.fileCount !== producerInput.fileCount) {
+    throw new Error("The producer input tree changed while the revision workspace was being materialised; retry from a stable checkout");
+  }
 
   // Repin FIRST: the engine slice's reference archive is verified against the
   // digest the repinned lock records, which is the digest the immutable archive
@@ -558,6 +571,16 @@ export async function deriveRevision(options) {
     }
   }
 
+  if (!blocker && !auditOnly) {
+    await writeRevisionWorkspaceMetadata(workspace, makeRevisionWorkspaceMetadata({
+      revision,
+      producerInput,
+      packageVersion,
+      policyRoot: manifest.policyRoot,
+      generator: manifest.generator
+    }));
+  }
+
   return {
     revision,
     pinnedRevision: pinned,
@@ -577,6 +600,7 @@ export async function deriveRevision(options) {
     carriedReviews: carried,
     policyRoot: manifest?.policyRoot ?? null,
     generator: manifest?.generator ?? null,
+    producerInput,
     counts: manifest?.counts ?? null,
     committedSurfaceRoot: before.root,
     committedSurfaceUnchanged: true,

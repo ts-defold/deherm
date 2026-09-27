@@ -58,7 +58,6 @@
 #include <dmsdk/graphics/graphics_webgpu.h>
 #include <dmsdk/gui/gui.h>
 #include <dmsdk/hid/hid.h>
-#include <dmsdk/lua/lauxlib.h>
 #include <dmsdk/platform/window.h>
 #include <dmsdk/render/render.h>
 #include <dmsdk/resource/resource.h>
@@ -114,12 +113,6 @@ extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_12(const DehermDmSdkUni
  if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
  if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && true && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
  auto value = ContextRegistryGetByHash(deherm_dmsdk_unpack_handle<HContextRegistry>(arguments[0].payload), static_cast<dmhash_t>(arguments[1].payload)); result->payload = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value)); result->tag = DEHERM_DMSDK_UNIVERSAL_ADDRESS;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_117(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(0)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- auto value = dm_luaL_newstate(); result->payload = static_cast<uint64_t>(reinterpret_cast<uintptr_t>(value)); result->tag = DEHERM_DMSDK_UNIVERSAL_ADDRESS;
  return DEHERM_DMSDK_UNIVERSAL_OK;
 }
 extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_169(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
@@ -3683,60 +3676,11 @@ extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1225(const DehermDmSdkU
   result->tag = DEHERM_DMSDK_UNIVERSAL_VOID;
  return DEHERM_DMSDK_UNIVERSAL_OK;
 }
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1232(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(5)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_I64 && deherm_dmsdk_unpack_i64(arguments[2].payload) >= INT32_MIN && deherm_dmsdk_unpack_i64(arguments[2].payload) <= INT32_MAX && arguments[3].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].payload <= UINT32_MAX && arguments[4].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- auto value = ProfileCreatePropertyBool(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<int>(deherm_dmsdk_unpack_i64(arguments[2].payload)), static_cast<uint32_t>(arguments[3].payload), static_cast<ProfileIdx>(arguments[4].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1233(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(5)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_F64 && arguments[3].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].payload <= UINT32_MAX && arguments[4].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- auto value = ProfileCreatePropertyF32(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<float>(deherm_dmsdk_unpack_f64(arguments[2].payload)), static_cast<uint32_t>(arguments[3].payload), static_cast<ProfileIdx>(arguments[4].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1234(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(5)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_F64 && arguments[3].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].payload <= UINT32_MAX && arguments[4].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- auto value = ProfileCreatePropertyF64(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<double>(deherm_dmsdk_unpack_f64(arguments[2].payload)), static_cast<uint32_t>(arguments[3].payload), static_cast<ProfileIdx>(arguments[4].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
 extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1235(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
  if(argument_count != UINT32_C(3)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
  if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
  if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
  auto value = ProfileCreatePropertyGroup(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<ProfileIdx>(arguments[2].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1236(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(5)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_I64 && deherm_dmsdk_unpack_i64(arguments[2].payload) >= INT32_MIN && deherm_dmsdk_unpack_i64(arguments[2].payload) <= INT32_MAX && arguments[3].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].payload <= UINT32_MAX && arguments[4].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- auto value = ProfileCreatePropertyS32(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<int32_t>(deherm_dmsdk_unpack_i64(arguments[2].payload)), static_cast<uint32_t>(arguments[3].payload), static_cast<ProfileIdx>(arguments[4].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1237(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(5)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_I64 && arguments[3].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].payload <= UINT32_MAX && arguments[4].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- auto value = ProfileCreatePropertyS64(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<int64_t>(deherm_dmsdk_unpack_i64(arguments[2].payload)), static_cast<uint32_t>(arguments[3].payload), static_cast<ProfileIdx>(arguments[4].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1238(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(5)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[2].payload <= UINT32_MAX && arguments[3].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].payload <= UINT32_MAX && arguments[4].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- auto value = ProfileCreatePropertyU32(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<uint32_t>(arguments[2].payload), static_cast<uint32_t>(arguments[3].payload), static_cast<ProfileIdx>(arguments[4].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1239(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(5)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[0].payload != 0 && deherm_dmsdk_address_fits(arguments[0].payload) && (arguments[0].payload == 0 || arguments[0].payload % alignof(const char ) == 0) && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_ADDRESS && arguments[1].payload != 0 && deherm_dmsdk_address_fits(arguments[1].payload) && (arguments[1].payload == 0 || arguments[1].payload % alignof(const char ) == 0) && arguments[2].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[3].payload <= UINT32_MAX && arguments[4].tag == DEHERM_DMSDK_UNIVERSAL_U64)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- auto value = ProfileCreatePropertyU64(reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[0].payload)), reinterpret_cast<const char *>(static_cast<uintptr_t>(arguments[1].payload)), static_cast<uint64_t>(arguments[2].payload), static_cast<uint32_t>(arguments[3].payload), static_cast<ProfileIdx>(arguments[4].payload)); result->payload = static_cast<uint64_t>(value); result->tag = DEHERM_DMSDK_UNIVERSAL_U64;
  return DEHERM_DMSDK_UNIVERSAL_OK;
 }
 extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1240(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
@@ -3763,14 +3707,6 @@ extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1243(const DehermDmSdkU
  if(argument_count != UINT32_C(0)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
  if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
  ProfileInitialize();
-  result->tag = DEHERM_DMSDK_UNIVERSAL_VOID;
- return DEHERM_DMSDK_UNIVERSAL_OK;
-}
-extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_usage_1246(const DehermDmSdkUniversalValue* arguments,uint32_t argument_count,DehermDmSdkUniversalValue* result){
- if(argument_count != UINT32_C(2)) return DEHERM_DMSDK_UNIVERSAL_WRONG_ARITY;
- if((argument_count&&!arguments)||!result) return DEHERM_DMSDK_UNIVERSAL_INVALID_STORAGE;
- if(!(arguments[0].tag == DEHERM_DMSDK_UNIVERSAL_U64 && arguments[1].tag == DEHERM_DMSDK_UNIVERSAL_I64 && deherm_dmsdk_unpack_i64(arguments[1].payload) >= INT32_MIN && deherm_dmsdk_unpack_i64(arguments[1].payload) <= INT32_MAX)) return DEHERM_DMSDK_UNIVERSAL_TYPE_MISMATCH;
- ProfilePropertyAddBool(static_cast<ProfileIdx>(arguments[0].payload), static_cast<int>(deherm_dmsdk_unpack_i64(arguments[1].payload)));
   result->tag = DEHERM_DMSDK_UNIVERSAL_VOID;
  return DEHERM_DMSDK_UNIVERSAL_OK;
 }
@@ -4250,7 +4186,6 @@ case UINT32_C(8): return deherm_dmsdk_usage_8(arguments,argument_count,result);
 case UINT32_C(9): return deherm_dmsdk_usage_9(arguments,argument_count,result);
 case UINT32_C(11): return deherm_dmsdk_usage_11(arguments,argument_count,result);
 case UINT32_C(12): return deherm_dmsdk_usage_12(arguments,argument_count,result);
-case UINT32_C(117): return deherm_dmsdk_usage_117(arguments,argument_count,result);
 case UINT32_C(169): return deherm_dmsdk_usage_169(arguments,argument_count,result);
 case UINT32_C(171): return deherm_dmsdk_usage_171(arguments,argument_count,result);
 case UINT32_C(181): return deherm_dmsdk_usage_181(arguments,argument_count,result);
@@ -4735,19 +4670,11 @@ case UINT32_C(1222): return deherm_dmsdk_usage_1222(arguments,argument_count,res
 case UINT32_C(1223): return deherm_dmsdk_usage_1223(arguments,argument_count,result);
 case UINT32_C(1224): return deherm_dmsdk_usage_1224(arguments,argument_count,result);
 case UINT32_C(1225): return deherm_dmsdk_usage_1225(arguments,argument_count,result);
-case UINT32_C(1232): return deherm_dmsdk_usage_1232(arguments,argument_count,result);
-case UINT32_C(1233): return deherm_dmsdk_usage_1233(arguments,argument_count,result);
-case UINT32_C(1234): return deherm_dmsdk_usage_1234(arguments,argument_count,result);
 case UINT32_C(1235): return deherm_dmsdk_usage_1235(arguments,argument_count,result);
-case UINT32_C(1236): return deherm_dmsdk_usage_1236(arguments,argument_count,result);
-case UINT32_C(1237): return deherm_dmsdk_usage_1237(arguments,argument_count,result);
-case UINT32_C(1238): return deherm_dmsdk_usage_1238(arguments,argument_count,result);
-case UINT32_C(1239): return deherm_dmsdk_usage_1239(arguments,argument_count,result);
 case UINT32_C(1240): return deherm_dmsdk_usage_1240(arguments,argument_count,result);
 case UINT32_C(1241): return deherm_dmsdk_usage_1241(arguments,argument_count,result);
 case UINT32_C(1242): return deherm_dmsdk_usage_1242(arguments,argument_count,result);
 case UINT32_C(1243): return deherm_dmsdk_usage_1243(arguments,argument_count,result);
-case UINT32_C(1246): return deherm_dmsdk_usage_1246(arguments,argument_count,result);
 case UINT32_C(1247): return deherm_dmsdk_usage_1247(arguments,argument_count,result);
 case UINT32_C(1248): return deherm_dmsdk_usage_1248(arguments,argument_count,result);
 case UINT32_C(1249): return deherm_dmsdk_usage_1249(arguments,argument_count,result);
