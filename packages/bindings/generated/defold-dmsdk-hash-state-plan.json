@@ -1,0 +1,424 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-hash-state-plan",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "packages/bindings/generated/defold-sdk-ir.json",
+    "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "symbols": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+    "policy": "packages/bindings/overrides/dmsdk-hash-state-bindings.json"
+  },
+  "sourceHashes": {
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "symbols": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
+    "policy": "16ce759f4653bd817152f0ef00f039b1f0d1a5513b00a9fe0c2e065b033a2606"
+  },
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "priority": 850,
+      "cost": 12,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "rolePrefixes": [
+            "scalar:"
+          ]
+        },
+        "parameters": {
+          "some": [
+            {
+              "rolePrefixes": [
+                "pointer:record:"
+              ],
+              "directions": [
+                "in",
+                "inout"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
+  "coverage": {
+    "discovered": 10,
+    "selected": 10,
+    "universalFallback": 0,
+    "completeStateTypes": 2
+  },
+  "decisions": [
+    {
+      "declarationId": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Clone",
+        "width": 32,
+        "stateType": "HashState32",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState32",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 214
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Clone",
+        "width": 64,
+        "stateType": "HashState64",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState64",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 256
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Final",
+        "width": 32,
+        "stateType": "HashState32",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState32",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 231
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Final",
+        "width": 64,
+        "stateType": "HashState64",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState64",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 273
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Init",
+        "width": 32,
+        "stateType": "HashState32",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState32",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 204
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Init",
+        "width": 64,
+        "stateType": "HashState64",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState64",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 247
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Release",
+        "width": 32,
+        "stateType": "HashState32",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState32",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 239
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "Release",
+        "width": 64,
+        "stateType": "HashState64",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState64",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 281
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "UpdateBuffer",
+        "width": 32,
+        "stateType": "HashState32",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState32",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 223
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
+      "patternId": "state.incremental-hash-lifecycle",
+      "family": "hash-state",
+      "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+      "fallback": false,
+      "priority": 850,
+      "cost": 12,
+      "candidatePatternId": "state.incremental-hash-lifecycle",
+      "semantics": {
+        "operation": "UpdateBuffer",
+        "width": 64,
+        "stateType": "HashState64",
+        "semanticTokens": [
+          "generation-checked-state",
+          "incremental-hash-lifecycle",
+          "synchronous-noescape"
+        ],
+        "evidence": {
+          "header": "upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h",
+          "stateType": "HashState64",
+          "semanticSource": "complete-record-layout+closed-lifecycle-abi",
+          "declarationLine": 265
+        }
+      },
+      "blocker": null,
+      "lifecycleComplete": true,
+      "trace": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    }
+  ]
+}

@@ -3,16 +3,16 @@
   "policyVersion": "hash-state-v3",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
-    "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
-    "symbols": "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
+    "plan": "packages/bindings/generated/defold-dmsdk-hash-state-plan.json",
     "policy": "packages/bindings/overrides/dmsdk-hash-state-bindings.json"
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "symbols": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
-    "policy": "16ce759f4653bd817152f0ef00f039b1f0d1a5513b00a9fe0c2e065b033a2606"
+    "policy": "16ce759f4653bd817152f0ef00f039b1f0d1a5513b00a9fe0c2e065b033a2606",
+    "plan": "d087b47f2abd21dd73646a399bd361fba01154bf36cafd3b29a4a107d1690fab"
   },
   "policy": {
     "schemaVersion": 1,

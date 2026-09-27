@@ -3,7 +3,7 @@
   "kind": "deherm.dmsdk-fallback-audit",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "f6498c3e84115cae2c4708269d63be1213335732a23b1cd527190edd745400c1",
+    "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "abiShapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "specialized": {
@@ -15,11 +15,11 @@
       "astcProbe": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
       "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
       "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
-      "arenaCString": "9fddd259d84aceb3ec5f400dd36aabb961a3a2fbb73748cef929f7976ff9e92c",
-      "borrowedHandle": "61254c49affca8f73e86e2098bbebeae88de454db6ac0a24da02b9fb029f0227",
-      "scratchScalarOut": "067cfeeecf1e5a6c6e806daa9bb40edf6340707dab5f7f76e11e378503bfe754",
-      "cstringValue": "5f3ffe8be840d609f83661a5cd2ea3d97ddbddcdb29fc9464713984829d922f4",
-      "hashState": "10c311d6ded6edb05f00b39f7cc781a0d2c2b81fc2e25e6e5b94d9114a78df32"
+      "arenaCString": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
+      "borrowedHandle": "a6346082ba0bd078badbd358f46b79c39d81e958dc7d3df7203d138d697b400d",
+      "scratchScalarOut": "97ff8f4f30737a138cf8f6562e545af8a14114f0d20988448841971538e1a4d0",
+      "cstringValue": "3fd3b6d094bd96872eaf199d2dcecaa9190dc210d0e1a40bf57a5d5444e41883",
+      "hashState": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
     },
     "patternPolicies": {
       "borrowedHandle": "48b9913d92f5ccbc39f9136c7cd28430443066f2527d69cbbb3ffecf39198f73",
@@ -123598,5 +123598,5 @@
       }
     }
   ],
-  "reportSha256": "4554c5b813ff9f7a6c7562c1771f47cc86616559664d3a1e0b27421771a3749e"
+  "reportSha256": "dec095411279676c647e864626cddfca1a896b5273254ccc64011f7b0754be36"
 }

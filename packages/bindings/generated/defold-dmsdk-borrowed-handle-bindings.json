@@ -10,7 +10,7 @@
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
-    "projection": "f6498c3e84115cae2c4708269d63be1213335732a23b1cd527190edd745400c1",
+    "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
     "policy": "48b9913d92f5ccbc39f9136c7cd28430443066f2527d69cbbb3ffecf39198f73"
   },
   "selector": "all borrowed-handle-consumers are partitioned by ABI roles and platform family; no symbol allowlist",

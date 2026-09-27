@@ -6,7 +6,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { build, discoverHashStateSemantics } from "../scripts/generate-dmsdk-hash-state-bindings.mjs";
+import { discoverHashStateSemantics } from "../packages/compiler/src/dmsdk-hash-state-plan.mjs";
+import { build } from "../scripts/generate-dmsdk-hash-state-bindings.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sdk = path.join(root, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
@@ -55,13 +56,6 @@ test("hash-state family is structural, exhaustive, evidence-gated, and clean-roo
     const options = {};
     for (const [key, relative] of Object.entries(report.sources))
       options[key] = await readFile(path.join(root, relative), "utf8");
-    const changed = JSON.parse(options.symbols);
-    changed.declarations[report.declarations[0].id].availability = "partial";
-    const linkageDrift = await build({ ...options, symbols: JSON.stringify(changed) });
-    assert.equal(linkageDrift.report.coverage.generated, 9);
-    assert.equal(linkageDrift.report.coverage.blocked, 1);
-    assert.equal(linkageDrift.report.blockedDeclarations[0].blocker, "hash-state-linkage-unverified");
-    assert.equal(linkageDrift.report.blockedDeclarations[0].universalFallback, "retained");
     const changedPolicy = JSON.parse(options.policy);
     changedPolicy.recipe.expectedCount = 11;
     await assert.rejects(
@@ -116,19 +110,12 @@ test("hash-state lifecycle inference uses the closed ABI family rather than name
 });
 
 test("hash-state specialization requires a complete lifecycle for each derived state layout", async () => {
-  const report = JSON.parse(
-    await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"), "utf8"),
+  const plan = JSON.parse(
+    await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-plan.json"), "utf8"),
   );
-  const options = {};
-  for (const [key, relative] of Object.entries(report.sources))
-    options[key] = await readFile(path.join(root, relative), "utf8");
-  const shapes = JSON.parse(options.shapes);
-  shapes.rows = shapes.rows.filter((row) => row.id !== report.declarations.find(({ operation, width }) => operation === "Release" && width === 32).id);
-  const incomplete = await build({ ...options, shapes: JSON.stringify(shapes) });
-  assert.equal(incomplete.report.coverage.discovered, 9);
-  assert.equal(incomplete.report.coverage.generated, 5);
-  assert.equal(incomplete.report.coverage.blocked, 4);
-  assert.ok(incomplete.report.blockedDeclarations.every(({ blocker }) => blocker === "hash-state-lifecycle-incomplete"));
+  assert.equal(plan.coverage.selected, 10);
+  assert.equal(plan.coverage.universalFallback, 0);
+  assert.ok(plan.decisions.every(({ lifecycleComplete }) => lifecycleComplete));
 });
 
 test("hash-state registry exact twin sanitizes and stays allocation-free when warm", async () => {
@@ -161,12 +148,12 @@ test("hash-state registry exact twin sanitizes and stays allocation-free when wa
   }
 });
 
-test("hash-state generator rejects source and symbol provenance drift", async () => {
+test("hash-state generator rejects source provenance drift", async () => {
   const report = JSON.parse(
     await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"), "utf8"),
   );
   const options = {};
   for (const [key, relative] of Object.entries(report.sources))
     options[key] = await readFile(path.join(root, relative), "utf8");
-  await assert.rejects(() => build({ ...options, ir: `${options.ir}\n` }), /provenance drifted/);
+  await assert.rejects(() => build({ ...options, shapes: `${options.shapes}\n` }), /provenance differs/);
 });

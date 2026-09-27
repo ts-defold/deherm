@@ -225,7 +225,7 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (
-      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
+      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|hash-state-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
         file,
       )
     ) {
@@ -411,6 +411,7 @@ async function validateReports(root) {
     astcProbe,
     xteaSpan,
     hashSpan,
+    hashStatePlan,
     hashState,
     arenaSpan,
     projection,
@@ -432,6 +433,7 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-hash-span-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-hash-state-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"),
     load("packages/bindings/generated/defold-dmsdk-projection-ir.json"),
@@ -533,10 +535,20 @@ async function validateReports(root) {
     "hash-span report does not have the pinned 2/2 disposition or 1,316 remainder",
   );
   assert(
-    hashState.coverage.discovered === 10 &&
-      hashState.coverage.generated === 10 &&
-      hashState.coverage.exactFixtureCount === 10,
-    "hash-state report does not have the pinned 10/10 lifecycle disposition",
+    hashState.coverage.discovered === hashStatePlan.coverage.discovered &&
+      hashState.coverage.generated === hashStatePlan.coverage.selected &&
+      hashState.coverage.blocked === hashStatePlan.coverage.universalFallback &&
+      hashState.coverage.exactFixtureCount === hashState.coverage.generated &&
+      hashState.coverage.generated + hashState.coverage.blocked === hashState.coverage.discovered &&
+      hashState.sourceHashes.plan === sha256(await readFile(
+        path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-plan.json"),
+        "utf8",
+      )) &&
+      JSON.stringify(hashState.declarations.map(({ id }) => id).sort()) ===
+        JSON.stringify(hashStatePlan.decisions.filter(({ fallback }) => !fallback).map(({ declarationId }) => declarationId).sort()) &&
+      JSON.stringify(hashState.blockedDeclarations.map(({ id }) => id).sort()) ===
+        JSON.stringify(hashStatePlan.decisions.filter(({ fallback }) => fallback).map(({ declarationId }) => declarationId).sort()),
+    "hash-state report does not exactly realize the compiler-owned lifecycle plan",
   );
   assert(
     generatedExact.generatedAdapterCount === 94 &&

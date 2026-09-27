@@ -28,7 +28,7 @@
       "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
       "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
       "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
-      "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json": "10c311d6ded6edb05f00b39f7cc781a0d2c2b81fc2e25e6e5b94d9114a78df32"
+      "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
     }
   },
   "scope": "Complete arena-backed-spans census with deterministic counted-input/caller-output cstring adapters",
@@ -86,7 +86,7 @@
     {
       "report": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
       "policyVersion": "hash-state-v3",
-      "sha256": "10c311d6ded6edb05f00b39f7cc781a0d2c2b81fc2e25e6e5b94d9114a78df32",
+      "sha256": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c",
       "declarationCount": 2
     }
   ],

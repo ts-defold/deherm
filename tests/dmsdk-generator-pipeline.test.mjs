@@ -41,6 +41,7 @@ test("dmSDK generator pipeline has one deterministic ownership registry", () => 
     "scripts/generate-dmsdk-source-semantic-facts.mjs",
     "scripts/generate-dmsdk-bounded-span-plan.mjs",
     "scripts/generate-dmsdk-value-plan.mjs",
+    "scripts/generate-dmsdk-hash-state-plan.mjs",
     "scripts/generate-dmsdk-scalar-thunks.mjs",
     "scripts/generate-dmsdk-named-scalar-bindings.mjs",
     "scripts/generate-dmsdk-enum-value-bindings.mjs",

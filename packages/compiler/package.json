@@ -28,6 +28,7 @@
     "./dmsdk-bounded-span-recipes": "./src/dmsdk-bounded-span-recipes.mjs",
     "./dmsdk-bounded-span-plan": "./src/dmsdk-bounded-span-plan.mjs",
     "./dmsdk-value-plan": "./src/dmsdk-value-plan.mjs",
+    "./dmsdk-hash-state-plan": "./src/dmsdk-hash-state-plan.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"

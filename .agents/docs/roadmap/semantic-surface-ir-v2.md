@@ -254,15 +254,20 @@ lifecycle operation withdraws that optimized family as a unit; the universal
 recipe remains available. The package retains only the stable generation-token,
 bounded-registry, counted-byte-input, and consume-operation recipe.
 
-The compiler now materializes two authenticated decision products before any
+The compiler now materializes three authenticated decision products before any
 covered emitter runs. The bounded-span plan owns fixed digest, Base64, ASTC,
 XTEA, and fixed-width buffer hashes. The value plan owns direct primitive
 scalars, declared enum domains, and source-resolved named scalar aliases. The
-eight emitters consume their plan rows and cannot import the selector or define
-a private registry. Plan tests canonicalize shuffled inputs, withdraw semantic
-facts to the universal fallback, reject forged owners, and join every emitted
-row back to its authenticated decision. One compiler rebuilt current, 1.13.1,
-1.12.0, and 1.11.0 after this migration; all four completed materialization,
+hash-state plan owns complete five-operation state lifecycles, including their
+all-target/all-variant linkage evidence. Its unit of admission is the entire
+state type: a missing or duplicate operation, width collision, signature loss,
+or linkage loss sends every member of that state lifecycle to the universal
+fallback instead of leaving a partial fast path. The nine emitters consume
+their plan rows and cannot import the selector or define a private registry.
+Plan tests canonicalize shuffled inputs, withdraw semantic facts to the
+universal fallback, reject forged owners, and join every emitted row back to
+its authenticated decision. One compiler rebuilt current, 1.13.1, 1.12.0, and
+1.11.0 after all three plan migrations; all four completed materialization,
 TypeScript and native generation, compilation, linkage, and exact-call harness
 execution.
 

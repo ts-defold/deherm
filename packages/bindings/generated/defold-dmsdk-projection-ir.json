@@ -54,7 +54,7 @@
         "astcProbe": "26b9ba056c789111bf61bf84c868fbdde63f3db9c2fef57ce9d6aa120603b17f",
         "xteaSpan": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
         "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
-        "arenaSpan": "9fddd259d84aceb3ec5f400dd36aabb961a3a2fbb73748cef929f7976ff9e92c"
+        "arenaSpan": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7"
       },
       "headers": {
         "upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h": "e297d562c49b88a2a72c24ddd52b39157ba497643146629f74fccd1d493f1026",

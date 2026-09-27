@@ -4158,3 +4158,33 @@ borrowed-handle and scratch-scalar-out broad shape matches include owned
 finalizers/producers and atomics outside their current tranches, so those
 families require derived ownership/effect facts before their selectors can move
 without broadening semantics.
+
+## 2026-09-27 - Compiler-owned atomic hash-state plan
+
+The generation-checked dmHash state family no longer infers lifecycle roles,
+calls the selector, or evaluates symbol evidence inside its emitter. A new
+`@deherm/compiler` plan authenticates the revision IR, ABI shapes, symbol
+matrix, and stable runtime policy, then records the complete 32- and 64-bit
+five-operation lifecycle decisions. The emitter only verifies that plan and
+renders its selected rows.
+
+Admission is atomic per state type. Removing or duplicating one lifecycle
+operation, introducing another state type for the same width, losing the
+structural signature, or withdrawing one member's all-target/all-variant
+linkage falls the whole affected lifecycle back to the universal route. The
+other width remains independently optimizable. The plan also rejects policy
+values the runtime previously accepted but ignored: generation width, consume
+operations, reverse default, locking discipline, exhaustion behavior, and the
+16-bit slot-capacity bound must now exactly describe emitted behavior.
+
+Focused plan, emitter, generator-pipeline, native sanitizer, and warmed
+zero-allocation tests pass. The current revision still selects all ten routes,
+and clean-room regeneration reproduces 1,361 declarations across 118
+byte-identical artifacts. The same compiler then rebuilt current Defold,
+1.13.1, 1.12.0, and 1.11.0; all four passed policy materialization, generated
+TypeScript compilation, specialized dmSDK and Lua exact-call compilation,
+universal C ABI execution, and ready exact-call execution. This remains
+generation/compile/link/harness evidence, not packaged-engine or every-target
+runtime evidence. The complete root `pnpm check` also passed after the lowering
+plan, typed-native bridge, War Battles projections/evidence, and content-
+addressed policy store were regenerated through their owning tools.
