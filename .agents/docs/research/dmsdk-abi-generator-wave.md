@@ -97,6 +97,26 @@ stub runtime, overlap/reentrancy checks, and zero-warmed-allocation evidence are
 unchanged; the specialized family remains private staging until its product
 backends are deliberately promoted.
 
+## Structurally closed hash-state lifecycles
+
+Incremental hash-state generation no longer copies Defold descriptions, regular
+expressions, callable names, record names, a fixed `hash.h` include, or symbol
+evidence paths into the package policy. The compiler recognizes a candidate
+state from its complete public record layout, derives 32- or 64-bit width from
+the native member types, and requires exactly one ABI-distinct init, clone,
+counted-buffer update, final, and release operation for that state. The five
+operations are promoted or withheld together, preventing a partial lifecycle
+from exposing a token that cannot be consumed safely.
+
+The generated translation units take their public include and exact linker
+identities from the revision IR. The exact-call twin now treats the state as
+opaque storage and no longer names Defold's record fields. Current generation
+still emits all ten operations; sanitizer execution and 100,000 warmed calls
+still observe zero C++ allocations. Defold 1.11.0, 1.12.0, and 1.13.1 each
+derive the same ten structural candidates, but their saved symbol census does
+not prove all-target/all-variant linkage, so the optimized family stays
+withheld and every operation remains callable through its universal recipe.
+
 ## Clean-room registry inputs and outputs
 
 `scripts/lib/dmsdk-generator-pipeline.mjs` is the single ownership and ordering

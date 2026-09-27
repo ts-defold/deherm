@@ -1,5 +1,21 @@
 # Defold Hermes knowledge log
 
+## 2026-09-27 - Hash-state lifecycle derived as a closed ABI family
+
+- Replaced copied descriptions, regular expressions, fixed record/header names,
+  and symbol-evidence policy paths with a stable bounded registry and opaque
+  generation-token recipe.
+- The compiler now derives state width from the complete public record layout
+  and requires exactly one init, clone, counted-buffer update, final, and
+  release ABI before selecting the optimized lifecycle.
+- Current generation remains ten adapters and exact twins. ASan/UBSan execution
+  and 100,000 warmed dispatches pass with zero observed C++ allocations.
+- Defold 1.11.0, 1.12.0, and 1.13.1 each derive ten candidates but retain the
+  universal route because their saved symbol census does not prove the
+  specialized all-target/all-variant linkage claim.
+- The complete `pnpm check` gate passes. The refreshed current policy root is
+  `b21ad1b318a3`.
+
 ## 2026-09-27 - C-string/value policy reduced to stable codecs
 
 - Replaced the 7.7 KB reviewed table of current Defold IDs, symbols, headers,

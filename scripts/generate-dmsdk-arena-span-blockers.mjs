@@ -27,7 +27,7 @@ const priorWaveReports = Object.freeze([
   { path: "packages/bindings/generated/defold-dmsdk-astc-probe-bindings.json", policyVersion: "astc-probe-v2" },
   { path: "packages/bindings/generated/defold-dmsdk-xtea-span-bindings.json", policyVersion: "xtea-span-v2" },
   { path: "packages/bindings/generated/defold-dmsdk-hash-span-bindings.json", policyVersion: "hash-span-v2" },
-  { path: "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json", policyVersion: "hash-state-v2" },
+  { path: "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json", policyVersion: "hash-state-v3" },
 ]);
 const blockerDefinitions = Object.freeze({
   "handle-provenance-or-engine-context": "The ABI consumes or returns an engine handle whose provenance, context, ownership, nullability, or teardown contract is not encoded by the arena.",

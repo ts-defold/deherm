@@ -230,6 +230,14 @@ entries. Documentation drift withdraws the fast path and retains the universal
 recipe. This proves the intended migration shape but does not complete the
 checklist for every callable.
 
+The hash-state lifecycle has since moved one step further: a complete public
+record layout plus a closed five-operation ABI family derives its state width,
+operation roles, public include, and linker identities without callable names,
+record names, copied documentation, or a fixed header. A missing or duplicate
+lifecycle operation withdraws that optimized family as a unit; the universal
+recipe remains available. The package retains only the stable generation-token,
+bounded-registry, counted-byte-input, and consume-operation recipe.
+
 ## 4. Make every product a projection
 
 - [ ] Emit TypeScript SDK and TSDoc.

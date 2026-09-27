@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { build, inferHashStateSemantics } from "../scripts/generate-dmsdk-hash-state-bindings.mjs";
+import { build, discoverHashStateSemantics } from "../scripts/generate-dmsdk-hash-state-bindings.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sdk = path.join(root, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
@@ -41,7 +41,7 @@ test("hash-state family is structural, exhaustive, evidence-gated, and clean-roo
     assert.equal(declaration.disposition, "generated");
     assert.ok([32, 64].includes(declaration.width));
     assert.equal(declaration.patternDecision, "state.incremental-hash-lifecycle");
-    assert.equal(declaration.evidence.documentationSource, "clang-comment-ast+abi-record-role");
+    assert.equal(declaration.evidence.semanticSource, "complete-record-layout+closed-lifecycle-abi");
   }
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-hash-state-"));
   try {
@@ -64,40 +64,71 @@ test("hash-state family is structural, exhaustive, evidence-gated, and clean-roo
     assert.equal(linkageDrift.report.blockedDeclarations[0].universalFallback, "retained");
     const changedPolicy = JSON.parse(options.policy);
     changedPolicy.recipe.expectedCount = 11;
-    const staleHistoricalCount = await build({ ...options, policy: JSON.stringify(changedPolicy) });
-    assert.equal(staleHistoricalCount.report.coverage.discovered, 10);
-    assert.equal(staleHistoricalCount.report.coverage.generated, 10);
+    await assert.rejects(
+      () => build({ ...options, policy: JSON.stringify(changedPolicy) }),
+      /hash-state recipe has unsupported schema keys/u,
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
 });
 
-test("hash-state lifecycle inference uses ABI roles and documentation rather than callable names", async () => {
+test("hash-state lifecycle inference uses the closed ABI family rather than names or documentation", async () => {
   const policyText = await readFile(
     path.join(root, "packages/bindings/overrides/dmsdk-hash-state-bindings.json"),
     "utf8",
   );
   const policy = JSON.parse(policyText);
-  assert.doesNotMatch(policyText, /candidateSelector|symbolPattern|hash\.h/u);
+  assert.doesNotMatch(
+    policyText,
+    /candidateSelector|symbolPattern|hash\.h|documentationContract|declaration|header|symbol|expectedCount/u,
+  );
   const ir = JSON.parse(await readFile(path.join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
   const shapes = JSON.parse(
     await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
   );
-  const declarations = new Map(ir.declarations.map((item) => [item.id, item]));
-  const inferred = shapes.rows
-    .map((row) => inferHashStateSemantics(declarations.get(row.id), row, policy))
-    .filter(Boolean);
+  const inferred = discoverHashStateSemantics(ir, shapes, policy);
   assert.equal(inferred.length, 10);
-  assert.deepEqual(new Set(inferred.map(({ operation }) => operation)), new Set(policy.recipe.operations));
-  const candidate = shapes.rows.find((row) => inferHashStateSemantics(declarations.get(row.id), row, policy));
-  assert.equal(
-    inferHashStateSemantics(
-      { ...declarations.get(candidate.id), description: "documentation drifted" },
-      candidate,
-      policy,
+  assert.deepEqual(new Set(inferred.map(({ semantics }) => semantics.operation)), new Set(policy.recipe.operations));
+  const renamed = {
+    ...ir,
+    declarations: ir.declarations.map((declaration) => ({
+      ...declaration,
+      name: declaration.kind === "function" ? `renamed_${declaration.line}` : declaration.name,
+      description: "",
+      returnDescription: "",
+      parameters: declaration.parameters?.map((parameter) => ({ ...parameter, name: "value", description: "" })),
+    })),
+  };
+  assert.equal(discoverHashStateSemantics(renamed, shapes, policy).length, 10);
+  const changedLayout = {
+    ...ir,
+    declarations: ir.declarations.map((declaration) =>
+      declaration.kind === "record" && declaration.name === "HashState32"
+        ? { ...declaration, members: [{ ...declaration.members[0], type: "uint16_t" }, ...declaration.members.slice(1)] }
+        : declaration,
     ),
-    null,
+  };
+  assert.deepEqual(
+    new Set(discoverHashStateSemantics(changedLayout, shapes, policy).map(({ semantics }) => semantics.width)),
+    new Set([64]),
   );
+});
+
+test("hash-state specialization requires a complete lifecycle for each derived state layout", async () => {
+  const report = JSON.parse(
+    await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json"), "utf8"),
+  );
+  const options = {};
+  for (const [key, relative] of Object.entries(report.sources))
+    options[key] = await readFile(path.join(root, relative), "utf8");
+  const shapes = JSON.parse(options.shapes);
+  shapes.rows = shapes.rows.filter((row) => row.id !== report.declarations.find(({ operation, width }) => operation === "Release" && width === 32).id);
+  const incomplete = await build({ ...options, shapes: JSON.stringify(shapes) });
+  assert.equal(incomplete.report.coverage.discovered, 9);
+  assert.equal(incomplete.report.coverage.generated, 5);
+  assert.equal(incomplete.report.coverage.blocked, 4);
+  assert.ok(incomplete.report.blockedDeclarations.every(({ blocker }) => blocker === "hash-state-lifecycle-incomplete"));
 });
 
 test("hash-state registry exact twin sanitizes and stays allocation-free when warm", async () => {
