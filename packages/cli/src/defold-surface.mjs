@@ -487,7 +487,7 @@ async function layerProvides(candidate, revision) {
       return { ok: false, missing: [], error: `unreadable repository toolchain: ${error.message}` };
     }
   }
-  return { ok: true, missing: [], descriptor, toolchain, artifacts };
+  return { ok: true, missing: [], descriptor, toolchain, artifacts, candidate };
 }
 
 export async function verifyMaterializedSurfaceRoot(root, revision, expectedRealization) {
@@ -523,18 +523,23 @@ export async function resolveDefoldSurface(revision, options = {}) {
   for (const candidate of defoldSurfaceSearchPath(revision, options)) {
     const result = await layerProvides(candidate, revision);
     if (result.ok) {
+      // `layerProvides` resolves an immutable realization pointer before it
+      // verifies the surface. Return those same resolved roots to consumers;
+      // using the mutable pointer directory here would verify one tree and
+      // then attempt to read a different, intentionally empty one.
+      const resolvedCandidate = result.candidate ?? candidate;
       return {
         schemaVersion: 1,
         revision,
         layer: candidate.layer,
-        irRoot: candidate.irRoot,
-        sdkRoot: candidate.sdkRoot,
-        repositoryRoot: candidate.repositoryRoot,
+        irRoot: resolvedCandidate.irRoot,
+        sdkRoot: resolvedCandidate.sdkRoot,
+        repositoryRoot: resolvedCandidate.repositoryRoot,
         descriptor: result.descriptor,
         toolchain: result.toolchain,
         artifacts: result.artifacts,
         paths: Object.fromEntries(Object.entries(surfaceIrFiles)
-          .map(([key, relative]) => [key, path.join(candidate.irRoot, relative)])),
+          .map(([key, relative]) => [key, path.join(resolvedCandidate.irRoot, relative)])),
         searched,
         blocker: null
       };

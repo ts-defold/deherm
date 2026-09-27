@@ -377,6 +377,13 @@ test("authenticated policy materializes the complete generated SDK without a Def
   });
   assert.equal(resolvedImmutable.layer, "user-cache");
   assert.equal(resolvedImmutable.descriptor.realization.realizationId, realizationId);
+  assert.equal(resolvedImmutable.irRoot, path.join(immutableRoot, "ir"));
+  assert.equal(
+    resolvedImmutable.paths.valueLayoutsPath,
+    path.join(immutableRoot, "ir", "defold-value-layouts.json"),
+    "a verified immutable realization must return its immutable roots, not the empty mutable pointer directory",
+  );
+  await readFile(resolvedImmutable.paths.valueLayoutsPath, "utf8");
   const pointerPath = path.join(pointerCacheRoot, "surfaces", policy.revision, "current.json");
   const validPointer = JSON.parse(await readFile(pointerPath, "utf8"));
   await writeFile(
