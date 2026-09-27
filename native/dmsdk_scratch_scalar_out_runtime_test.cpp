@@ -48,6 +48,7 @@ uint64_t lane_value(uint8_t kind)
             return bits;
         }
         case DEHERM_DMSDK_SCRATCH_ENUM: return UINT64_C(0);
+        case DEHERM_DMSDK_SCRATCH_VOID: return UINT64_C(0);
         default: return UINT64_C(1);
     }
 }
@@ -100,6 +101,31 @@ void seed_inputs(const DehermDmSdkScratchDescriptor& descriptor, uint64_t* slots
         }
     }
 }
+
+void assert_writable_zeroed(const DehermDmSdkScratchDescriptor& descriptor, const uint64_t* slots)
+{
+    for (uint32_t index = 0; index < descriptor.parameter_count; ++index) {
+        if (descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT ||
+            descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_INOUT) {
+            assert(slots[index] == 0);
+        }
+    }
+}
+
+const DehermDmSdkScratchDescriptor& route_with(uint8_t kind, uint8_t direction)
+{
+    const auto* descriptors = deherm_dmsdk_scratch_descriptors();
+    for (uint32_t route = 0; route < deherm_dmsdk_scratch_count(); ++route) {
+        for (uint32_t index = 0; index < descriptors[route].parameter_count; ++index) {
+            if (descriptors[route].parameter_kinds[index] == kind &&
+                descriptors[route].parameter_directions[index] == direction) {
+                return descriptors[route];
+            }
+        }
+    }
+    assert(false && "required generated scratch route is missing");
+    return descriptors[0];
+}
 }
 
 void* operator new(std::size_t size)
@@ -114,14 +140,14 @@ void operator delete(void* value, std::size_t) noexcept { std::free(value); }
 
 int main()
 {
-    assert(deherm_dmsdk_scratch_count() == UINT32_C(7));
-    assert(deherm_dmsdk_scratch_handle_kind_count() == UINT32_C(4));
+    assert(deherm_dmsdk_scratch_count() == UINT32_C(11));
+    assert(deherm_dmsdk_scratch_handle_kind_count() == UINT32_C(6));
     const auto* descriptors = deherm_dmsdk_scratch_descriptors();
     assert(descriptors != nullptr && deherm_dmsdk_scratch_handle_kinds() != nullptr);
     for (uint32_t index = 0; index < deherm_dmsdk_scratch_count(); ++index) {
         assert(descriptors[index].id == index);
         assert(descriptors[index].parameter_count <= DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS);
-        assert(descriptors[index].output_count == 1);
+        assert(descriptors[index].output_count >= 1 && descriptors[index].output_count <= 2);
     }
 
     uint64_t slots[DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS] = {};
@@ -129,7 +155,8 @@ int main()
     const auto& route = descriptors[0];
     seed_inputs(route, slots);
     assert(deherm_dmsdk_scratch_dispatch(route.id, slots, route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_PROVIDER_MISSING);
-    assert(slots[2] == 0 && result == 0);
+    assert_writable_zeroed(route, slots);
+    assert(result == 0);
     assert(deherm_dmsdk_scratch_dispatch(UINT16_MAX, slots, route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_UNKNOWN_ID);
     assert(deherm_dmsdk_scratch_dispatch(route.id, slots, route.parameter_count + 1, &result) == DEHERM_DMSDK_SCRATCH_WRONG_ARITY);
     assert(deherm_dmsdk_scratch_dispatch(route.id, nullptr, route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_NULL_STORAGE);
@@ -150,28 +177,34 @@ int main()
     context.current_thread = false;
     seed_inputs(route, slots);
     assert(deherm_dmsdk_scratch_dispatch(route.id, slots, route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_WRONG_THREAD);
-    assert(slots[2] == 0);
+    assert_writable_zeroed(route, slots);
     context.current_thread = true;
     seed_inputs(route, slots);
     slots[0] = context.rejected_handle;
     assert(deherm_dmsdk_scratch_dispatch(route.id, slots, route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_INVALID_HANDLE);
-    assert(slots[2] == 0);
-    seed_inputs(route, slots);
-    slots[1] = UINT64_C(0x10000);
-    assert(deherm_dmsdk_scratch_dispatch(route.id, slots, route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_INVALID_LANE);
-    assert(slots[2] == 0);
+    assert_writable_zeroed(route, slots);
+    const auto& u16_input_route = route_with(DEHERM_DMSDK_SCRATCH_U16, DEHERM_DMSDK_SCRATCH_VALUE);
+    seed_inputs(u16_input_route, slots);
+    for (uint32_t index = 0; index < u16_input_route.parameter_count; ++index) {
+        if (u16_input_route.parameter_kinds[index] == DEHERM_DMSDK_SCRATCH_U16 &&
+            u16_input_route.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_VALUE) slots[index] = UINT64_C(0x10000);
+    }
+    assert(deherm_dmsdk_scratch_dispatch(u16_input_route.id, slots, u16_input_route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_INVALID_LANE);
+    assert_writable_zeroed(u16_input_route, slots);
 
     context.fail = true;
     seed_inputs(route, slots);
     assert(deherm_dmsdk_scratch_dispatch(route.id, slots, route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_PROVIDER_ERROR);
-    assert(slots[2] == 0 && result == 0);
+    assert_writable_zeroed(route, slots);
+    assert(result == 0);
     context.fail = false;
 
     context.invalid_output = true;
-    const auto& bool_output_route = descriptors[1];
+    const auto& bool_output_route = route_with(DEHERM_DMSDK_SCRATCH_BOOL, DEHERM_DMSDK_SCRATCH_OUT);
     seed_inputs(bool_output_route, slots);
     assert(deherm_dmsdk_scratch_dispatch(bool_output_route.id, slots, bool_output_route.parameter_count, &result) == DEHERM_DMSDK_SCRATCH_INVALID_LANE);
-    assert(slots[3] == 0 && result == 0);
+    assert_writable_zeroed(bool_output_route, slots);
+    assert(result == 0);
     context.invalid_output = false;
 
     context.reenter = true;

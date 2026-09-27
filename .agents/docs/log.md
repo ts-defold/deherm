@@ -4329,3 +4329,28 @@ with compiler diagnostics. It now selects six diagnostic-free exact-one
 scalar-out contracts and retains 24 universal fallbacks. This is source and
 audit-plan evidence only: the production scratch provider remains unchanged,
 and no packaged-engine or cross-target runtime claim is made.
+
+## 2026-09-27 - Scratch scalar-out plan becomes the emission authority
+
+The compiler-owned authenticated plan now drives the production scratch
+scalar-out emitter directly; the emitter no longer imports the pattern catalog
+or carries a second selection pass. The 30-row structural envelope yields six
+source-derived routes, five compatibility-preserved routes, and 19 universal
+fallbacks. Compatibility is deliberately not promoted to source proof: each of
+those five rows retains its missing effect facts, and the admission applies
+only while the revision-derived `scratch-out-parameters` tranche and the shared
+structural pattern still agree. This preserves all seven previously generated
+routes while adding four newly source-derived routes. A newly inferred route
+falls back when its source proof is withdrawn, a stale plan cannot be emitted,
+and overlap with higher-priority families remains rejected.
+
+The generated ABI is now version 2 because it adds a `void` result lane for
+native functions whose useful values are scalar out-parameters. That lane must
+remain zero at the provider boundary, decodes to `undefined` internally, and is
+omitted from the public TypeScript result record. All eleven selected pinned
+signatures compile; all target projections compile; the ASan/UBSan fake-provider
+harness covers every selected route, failure clearing, wrong-thread rejection,
+reentrancy, and 100,000 warmed calls with zero observed C++ allocations. This
+is compiler, generated-projection, header-compile, and fake-provider runtime
+evidence. It is not a production-provider, packaged-engine, or browser-export
+claim; `packagedEngineRuntimeVerified` remains zero.

@@ -178,13 +178,13 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(170), UINT16_C(4), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(171), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(172), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(173), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(174), UINT16_C(2), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(173), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
+  {UINT32_C(174), UINT16_C(2), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(175), UINT16_C(5), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(176), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(177), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(178), UINT16_C(6), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(179), UINT16_C(4), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(179), UINT16_C(4), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(180), UINT16_C(1), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(181), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(182), UINT16_C(5), UINT8_C(1), UINT8_C(0)},
@@ -1336,7 +1336,7 @@ const DehermDmSdkUniversalDescriptor kDescriptors[] = {
   {UINT32_C(1328), UINT16_C(2), UINT8_C(2), UINT8_C(0)},
   {UINT32_C(1329), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1330), UINT16_C(5), UINT8_C(1), UINT8_C(0)},
-  {UINT32_C(1331), UINT16_C(3), UINT8_C(1), UINT8_C(0)},
+  {UINT32_C(1331), UINT16_C(3), UINT8_C(1), UINT8_C(1)},
   {UINT32_C(1332), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1333), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
   {UINT32_C(1334), UINT16_C(1), UINT8_C(1), UINT8_C(0)},
@@ -1373,7 +1373,7 @@ void* g_context = nullptr;
 
 extern "C" {
 uint32_t deherm_dmsdk_universal_count(void) { return UINT32_C(1361); }
-const char* deherm_dmsdk_universal_catalog_sha256(void) { return "65cad4b62ffb26081b7380b75ef0ca9a54b8511055adef74a40758863b907556"; }
+const char* deherm_dmsdk_universal_catalog_sha256(void) { return "5519c6a1d213cb6c3c0836aea9b0fce2e3136be58fdb74d9b3bed05bca053409"; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_descriptors(void) { return kDescriptors; }
 const DehermDmSdkUniversalDescriptor* deherm_dmsdk_universal_find(uint32_t id) {
   return id < deherm_dmsdk_universal_count() && kDescriptors[id].id == id ? &kDescriptors[id] : nullptr;

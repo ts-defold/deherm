@@ -3,12 +3,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  compactDmSdkPatternDecision,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
-import { scratchScalarOutPattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+import { indexDmSdkScratchScalarOutPlan } from "../packages/compiler/src/dmsdk-scratch-scalar-out-plan.mjs";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const paths = Object.freeze({
@@ -16,6 +11,8 @@ const paths = Object.freeze({
   shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   policy: "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
+  effectFacts: "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json",
+  plan: "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-plan.json",
 });
 const artifacts = Object.freeze({
   report: "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json",
@@ -68,51 +65,6 @@ function handleName(role) {
   return role.split(":").slice(1, -1).join(":");
 }
 
-function patternFacts(shape, projected) {
-  return {
-    id: shape.id,
-    kind: shape.kind,
-    result: shape.result,
-    parameters: shape.parameters,
-    families: shape.families,
-    semanticTokens: projected?.semanticTokensNeeded ?? [],
-  };
-}
-
-function structuralBlockers(decision) {
-  if (!decision.fallback) return [];
-  const blockers = decision.trace.find(({ patternId }) => patternId === "pointer.scratch-scalar-out-provider-boundary")
-    ?.blockers ?? ["scratch-scalar-out-pattern-not-applicable"];
-  return blockers
-    .map((blocker) => {
-      if (blocker.startsWith("result-role:")) return `result-role-unsupported:${blocker.slice("result-role:".length)}`;
-      if (blocker.startsWith("parameter-role:")) {
-        const [, position, direction, ...role] = blocker.split(":");
-        return `parameter-role-direction-unsupported:${position}:${direction}:${role.join(":")}`;
-      }
-      if (blocker === "required-parameter-shape-absent") return "writable-scalar-pointer-required";
-      if (blocker.startsWith("rejected-family:"))
-        return `family-requires-target-matrix:${blocker.slice("rejected-family:".length)}`;
-      return blocker;
-    })
-    .sort();
-}
-
-function semanticBlockers(row) {
-  const mapped = {
-    "call-thread-affinity": "call-thread-affinity-unresolved",
-    "enum-width-domain-validation": "enum-width-domain-validation-unresolved",
-    "handle-ownership-nullability-lifetime": "handle-ownership-nullability-lifetime-unresolved",
-    "native-symbol-linkage": "native-symbol-linkage-unverified",
-    "out-storage-initialization-failure": "out-storage-initialization-failure-unresolved",
-    "pointer-bounds-nullability-lifetime": "pointer-bounds-nullability-lifetime-unresolved",
-    "target-feature-symbol-matrix": "target-feature-symbol-matrix-unverified",
-  };
-  return [
-    ...new Set((row.semanticTokensNeeded ?? []).map((token) => mapped[token] ?? `semantic-token-unresolved:${token}`)),
-  ].sort();
-}
-
 function cKind(kind) {
   return {
     handle: "DEHERM_DMSDK_SCRATCH_HANDLE",
@@ -123,6 +75,7 @@ function cKind(kind) {
     u64: "DEHERM_DMSDK_SCRATCH_U64",
     f32: "DEHERM_DMSDK_SCRATCH_F32",
     enum: "DEHERM_DMSDK_SCRATCH_ENUM",
+    void: "DEHERM_DMSDK_SCRATCH_VOID",
   }[kind];
 }
 
@@ -140,6 +93,7 @@ function universalFallback(blockers) {
 }
 
 function tsType(value) {
+  if (value.kind === "void") return "undefined";
   if (value.kind === "handle") return `ScratchBorrowedHandle<${JSON.stringify(value.handleName)}>`;
   if (value.kind === "bool") return "boolean";
   if (value.kind === "u64") return "bigint";
@@ -172,7 +126,7 @@ function nativeType(shapeParameter, projectedParameter) {
   return projectedParameter.nativeType;
 }
 
-function specializationBlockers(shape, projected, declaration, policy, structural = []) {
+function specializationBlockers(shape, projected, declaration) {
   const blockers = [];
   if (!projected) blockers.push("source-projection-missing");
   if (!declaration) blockers.push("source-declaration-missing");
@@ -183,7 +137,6 @@ function specializationBlockers(shape, projected, declaration, policy, structura
   ) {
     blockers.push("source-signature-parameter-shape-unrecognized");
   }
-  blockers.push(...structural);
   if (!cKind(roleKind(shape.result.role))) blockers.push(`result-kind-unsupported:${shape.result.role}`);
   for (const parameter of shape.parameters) {
     if (!cKind(roleKind(parameter.role)))
@@ -196,7 +149,7 @@ function specializationBlockers(shape, projected, declaration, policy, structura
 }
 
 function renderHeader(entries, handleKinds, maxParameters) {
-  return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_SCRATCH_SCALAR_OUT_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_SCRATCH_SCALAR_OUT_H\n#include <stdint.h>\n#define DEHERM_DMSDK_SCRATCH_PROVIDER_ABI UINT32_C(1)\n#define DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS ${maxParameters}\n#define DEHERM_DMSDK_SCRATCH_NO_HANDLE_KIND UINT16_MAX\ntypedef enum DehermDmSdkScratchKind { DEHERM_DMSDK_SCRATCH_HANDLE=1, DEHERM_DMSDK_SCRATCH_BOOL=2, DEHERM_DMSDK_SCRATCH_I32=3, DEHERM_DMSDK_SCRATCH_U32=4, DEHERM_DMSDK_SCRATCH_U64=5, DEHERM_DMSDK_SCRATCH_F32=6, DEHERM_DMSDK_SCRATCH_ENUM=7, DEHERM_DMSDK_SCRATCH_U16=8 } DehermDmSdkScratchKind;\ntypedef enum DehermDmSdkScratchDirection { DEHERM_DMSDK_SCRATCH_VALUE=1, DEHERM_DMSDK_SCRATCH_IN=2, DEHERM_DMSDK_SCRATCH_OUT=3, DEHERM_DMSDK_SCRATCH_INOUT=4 } DehermDmSdkScratchDirection;\ntypedef enum DehermDmSdkScratchStatus { DEHERM_DMSDK_SCRATCH_OK=0, DEHERM_DMSDK_SCRATCH_UNKNOWN_ID=1, DEHERM_DMSDK_SCRATCH_WRONG_ARITY=2, DEHERM_DMSDK_SCRATCH_NULL_STORAGE=3, DEHERM_DMSDK_SCRATCH_PROVIDER_MISSING=4, DEHERM_DMSDK_SCRATCH_WRONG_THREAD=5, DEHERM_DMSDK_SCRATCH_INVALID_HANDLE=6, DEHERM_DMSDK_SCRATCH_INVALID_PROVIDER=7, DEHERM_DMSDK_SCRATCH_PROVIDER_ERROR=8, DEHERM_DMSDK_SCRATCH_REENTRANT=9, DEHERM_DMSDK_SCRATCH_INVALID_LANE=10 } DehermDmSdkScratchStatus;\ntypedef struct DehermDmSdkScratchDescriptor { uint16_t id; uint8_t parameter_count; uint8_t js_argument_count; uint8_t output_count; uint8_t result_kind; uint8_t parameter_kinds[DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS]; uint8_t parameter_directions[DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS]; uint16_t handle_kinds[DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS]; const char* declaration_id; } DehermDmSdkScratchDescriptor;\ntypedef struct DehermDmSdkScratchHandleKind { uint16_t id; const char* name; const char* native_representation; } DehermDmSdkScratchHandleKind;\ntypedef uint8_t (*DehermDmSdkScratchCurrentThreadFn)(void* context);\ntypedef uint8_t (*DehermDmSdkScratchValidateHandleFn)(void* context, uint16_t handle_kind, uint64_t value);\ntypedef DehermDmSdkScratchStatus (*DehermDmSdkScratchInvokeFn)(void* context, uint16_t id, uint64_t* parameter_slots, uint32_t parameter_count, uint64_t* out_result);\ntypedef struct DehermDmSdkScratchProvider { uint32_t abi_version; void* context; DehermDmSdkScratchCurrentThreadFn is_current_thread; DehermDmSdkScratchValidateHandleFn validate_handle; DehermDmSdkScratchInvokeFn invoke; } DehermDmSdkScratchProvider;\n#ifdef __cplusplus\nextern "C" {\n#endif\nuint32_t deherm_dmsdk_scratch_count(void);\nconst DehermDmSdkScratchDescriptor* deherm_dmsdk_scratch_descriptors(void);\nuint32_t deherm_dmsdk_scratch_handle_kind_count(void);\nconst DehermDmSdkScratchHandleKind* deherm_dmsdk_scratch_handle_kinds(void);\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_set_provider(const DehermDmSdkScratchProvider* provider);\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_dispatch(uint16_t id, uint64_t* parameter_slots, uint32_t parameter_count, uint64_t* out_result);\n#ifdef __cplusplus\n}\n#endif\n#endif\n`;
+  return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_SCRATCH_SCALAR_OUT_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_SCRATCH_SCALAR_OUT_H\n#include <stdint.h>\n#define DEHERM_DMSDK_SCRATCH_PROVIDER_ABI UINT32_C(2)\n#define DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS ${maxParameters}\n#define DEHERM_DMSDK_SCRATCH_NO_HANDLE_KIND UINT16_MAX\ntypedef enum DehermDmSdkScratchKind { DEHERM_DMSDK_SCRATCH_HANDLE=1, DEHERM_DMSDK_SCRATCH_BOOL=2, DEHERM_DMSDK_SCRATCH_I32=3, DEHERM_DMSDK_SCRATCH_U32=4, DEHERM_DMSDK_SCRATCH_U64=5, DEHERM_DMSDK_SCRATCH_F32=6, DEHERM_DMSDK_SCRATCH_ENUM=7, DEHERM_DMSDK_SCRATCH_U16=8, DEHERM_DMSDK_SCRATCH_VOID=9 } DehermDmSdkScratchKind;\ntypedef enum DehermDmSdkScratchDirection { DEHERM_DMSDK_SCRATCH_VALUE=1, DEHERM_DMSDK_SCRATCH_IN=2, DEHERM_DMSDK_SCRATCH_OUT=3, DEHERM_DMSDK_SCRATCH_INOUT=4 } DehermDmSdkScratchDirection;\ntypedef enum DehermDmSdkScratchStatus { DEHERM_DMSDK_SCRATCH_OK=0, DEHERM_DMSDK_SCRATCH_UNKNOWN_ID=1, DEHERM_DMSDK_SCRATCH_WRONG_ARITY=2, DEHERM_DMSDK_SCRATCH_NULL_STORAGE=3, DEHERM_DMSDK_SCRATCH_PROVIDER_MISSING=4, DEHERM_DMSDK_SCRATCH_WRONG_THREAD=5, DEHERM_DMSDK_SCRATCH_INVALID_HANDLE=6, DEHERM_DMSDK_SCRATCH_INVALID_PROVIDER=7, DEHERM_DMSDK_SCRATCH_PROVIDER_ERROR=8, DEHERM_DMSDK_SCRATCH_REENTRANT=9, DEHERM_DMSDK_SCRATCH_INVALID_LANE=10 } DehermDmSdkScratchStatus;\ntypedef struct DehermDmSdkScratchDescriptor { uint16_t id; uint8_t parameter_count; uint8_t js_argument_count; uint8_t output_count; uint8_t result_kind; uint8_t parameter_kinds[DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS]; uint8_t parameter_directions[DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS]; uint16_t handle_kinds[DEHERM_DMSDK_SCRATCH_MAX_PARAMETERS]; const char* declaration_id; } DehermDmSdkScratchDescriptor;\ntypedef struct DehermDmSdkScratchHandleKind { uint16_t id; const char* name; const char* native_representation; } DehermDmSdkScratchHandleKind;\ntypedef uint8_t (*DehermDmSdkScratchCurrentThreadFn)(void* context);\ntypedef uint8_t (*DehermDmSdkScratchValidateHandleFn)(void* context, uint16_t handle_kind, uint64_t value);\ntypedef DehermDmSdkScratchStatus (*DehermDmSdkScratchInvokeFn)(void* context, uint16_t id, uint64_t* parameter_slots, uint32_t parameter_count, uint64_t* out_result);\ntypedef struct DehermDmSdkScratchProvider { uint32_t abi_version; void* context; DehermDmSdkScratchCurrentThreadFn is_current_thread; DehermDmSdkScratchValidateHandleFn validate_handle; DehermDmSdkScratchInvokeFn invoke; } DehermDmSdkScratchProvider;\n#ifdef __cplusplus\nextern "C" {\n#endif\nuint32_t deherm_dmsdk_scratch_count(void);\nconst DehermDmSdkScratchDescriptor* deherm_dmsdk_scratch_descriptors(void);\nuint32_t deherm_dmsdk_scratch_handle_kind_count(void);\nconst DehermDmSdkScratchHandleKind* deherm_dmsdk_scratch_handle_kinds(void);\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_set_provider(const DehermDmSdkScratchProvider* provider);\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_dispatch(uint16_t id, uint64_t* parameter_slots, uint32_t parameter_count, uint64_t* out_result);\n#ifdef __cplusplus\n}\n#endif\n#endif\n`;
 }
 
 function renderRuntime(entries, handleKinds, maxParameters) {
@@ -219,7 +172,7 @@ function renderRuntime(entries, handleKinds, maxParameters) {
         `  { UINT16_C(${id}), ${JSON.stringify(name)}, ${JSON.stringify(representation)} }`,
     )
     .join(",\n");
-  return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scratch_scalar_out.h>\n#include <string.h>\nnamespace {\nconst DehermDmSdkScratchDescriptor kDescriptors[] = {\n${descriptorRows}\n};\nconst DehermDmSdkScratchHandleKind kHandleKinds[] = {\n${handleRows}\n};\nDehermDmSdkScratchProvider gProvider = {};\nthread_local bool gDispatchActive = false;\nbool validLane(uint8_t kind, uint64_t value) {\n  if (kind == DEHERM_DMSDK_SCRATCH_BOOL) return value <= UINT64_C(1);\n  if (kind == DEHERM_DMSDK_SCRATCH_U16) return value <= UINT64_C(0xffff);\n  if (kind == DEHERM_DMSDK_SCRATCH_U32 || kind == DEHERM_DMSDK_SCRATCH_F32) return value <= UINT64_C(0xffffffff);\n  if (kind == DEHERM_DMSDK_SCRATCH_I32 || kind == DEHERM_DMSDK_SCRATCH_ENUM) return value == static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(value)));\n  return true;\n}\nvoid clearWritable(const DehermDmSdkScratchDescriptor& descriptor, uint64_t* slots) { for (uint32_t index=0; index<descriptor.parameter_count; ++index) if (descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT || descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_INOUT) slots[index]=0; }\nstruct DispatchScope { DispatchScope(){gDispatchActive=true;} ~DispatchScope(){gDispatchActive=false;} };\n}\nextern "C" {\nuint32_t deherm_dmsdk_scratch_count(void) { return UINT32_C(${entries.length}); }\nconst DehermDmSdkScratchDescriptor* deherm_dmsdk_scratch_descriptors(void) { return kDescriptors; }\nuint32_t deherm_dmsdk_scratch_handle_kind_count(void) { return UINT32_C(${handleKinds.size}); }\nconst DehermDmSdkScratchHandleKind* deherm_dmsdk_scratch_handle_kinds(void) { return kHandleKinds; }\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_set_provider(const DehermDmSdkScratchProvider* provider) {\n  if (provider == nullptr) { memset(&gProvider, 0, sizeof(gProvider)); return DEHERM_DMSDK_SCRATCH_OK; }\n  if (provider->abi_version != DEHERM_DMSDK_SCRATCH_PROVIDER_ABI || provider->is_current_thread == nullptr || provider->validate_handle == nullptr || provider->invoke == nullptr) return DEHERM_DMSDK_SCRATCH_INVALID_PROVIDER;\n  gProvider = *provider; return DEHERM_DMSDK_SCRATCH_OK;\n}\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_dispatch(uint16_t id, uint64_t* slots, uint32_t parameter_count, uint64_t* out_result) {\n  if (id >= deherm_dmsdk_scratch_count()) return DEHERM_DMSDK_SCRATCH_UNKNOWN_ID;\n  const DehermDmSdkScratchDescriptor& descriptor = kDescriptors[id];\n  if (parameter_count != descriptor.parameter_count) return DEHERM_DMSDK_SCRATCH_WRONG_ARITY;\n  if (slots == nullptr || out_result == nullptr) return DEHERM_DMSDK_SCRATCH_NULL_STORAGE;\n  *out_result = 0;\n  for (uint32_t index=0; index<parameter_count; ++index) if (descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT) slots[index]=0;\n  if (gProvider.invoke == nullptr) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_PROVIDER_MISSING; }\n  if (gDispatchActive) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_REENTRANT; }\n  if (gProvider.is_current_thread(gProvider.context) == 0) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_WRONG_THREAD; }\n  for (uint32_t index=0; index<parameter_count; ++index) {\n    if (descriptor.parameter_directions[index] != DEHERM_DMSDK_SCRATCH_OUT && !validLane(descriptor.parameter_kinds[index], slots[index])) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_INVALID_LANE; }\n    if (descriptor.parameter_kinds[index] == DEHERM_DMSDK_SCRATCH_HANDLE && (slots[index] == 0 || gProvider.validate_handle(gProvider.context, descriptor.handle_kinds[index], slots[index]) == 0)) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_INVALID_HANDLE; }\n  }\n  DispatchScope scope;\n  const DehermDmSdkScratchStatus status = gProvider.invoke(gProvider.context, id, slots, parameter_count, out_result);\n  if (status != DEHERM_DMSDK_SCRATCH_OK || !validLane(descriptor.result_kind, *out_result)) { clearWritable(descriptor, slots); *out_result=0; return status == DEHERM_DMSDK_SCRATCH_OK ? DEHERM_DMSDK_SCRATCH_INVALID_LANE : status; }\n  for (uint32_t index=0; index<parameter_count; ++index) if ((descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT || descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_INOUT) && !validLane(descriptor.parameter_kinds[index], slots[index])) { clearWritable(descriptor, slots); *out_result=0; return DEHERM_DMSDK_SCRATCH_INVALID_LANE; }\n  return DEHERM_DMSDK_SCRATCH_OK;\n}\n}\n`;
+  return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scratch_scalar_out.h>\n#include <string.h>\nnamespace {\nconst DehermDmSdkScratchDescriptor kDescriptors[] = {\n${descriptorRows}\n};\nconst DehermDmSdkScratchHandleKind kHandleKinds[] = {\n${handleRows}\n};\nDehermDmSdkScratchProvider gProvider = {};\nthread_local bool gDispatchActive = false;\nbool validLane(uint8_t kind, uint64_t value) {\n  if (kind == DEHERM_DMSDK_SCRATCH_VOID) return value == UINT64_C(0);\n  if (kind == DEHERM_DMSDK_SCRATCH_BOOL) return value <= UINT64_C(1);\n  if (kind == DEHERM_DMSDK_SCRATCH_U16) return value <= UINT64_C(0xffff);\n  if (kind == DEHERM_DMSDK_SCRATCH_U32 || kind == DEHERM_DMSDK_SCRATCH_F32) return value <= UINT64_C(0xffffffff);\n  if (kind == DEHERM_DMSDK_SCRATCH_I32 || kind == DEHERM_DMSDK_SCRATCH_ENUM) return value == static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(value)));\n  return true;\n}\nvoid clearWritable(const DehermDmSdkScratchDescriptor& descriptor, uint64_t* slots) { for (uint32_t index=0; index<descriptor.parameter_count; ++index) if (descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT || descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_INOUT) slots[index]=0; }\nstruct DispatchScope { DispatchScope(){gDispatchActive=true;} ~DispatchScope(){gDispatchActive=false;} };\n}\nextern "C" {\nuint32_t deherm_dmsdk_scratch_count(void) { return UINT32_C(${entries.length}); }\nconst DehermDmSdkScratchDescriptor* deherm_dmsdk_scratch_descriptors(void) { return kDescriptors; }\nuint32_t deherm_dmsdk_scratch_handle_kind_count(void) { return UINT32_C(${handleKinds.size}); }\nconst DehermDmSdkScratchHandleKind* deherm_dmsdk_scratch_handle_kinds(void) { return kHandleKinds; }\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_set_provider(const DehermDmSdkScratchProvider* provider) {\n  if (provider == nullptr) { memset(&gProvider, 0, sizeof(gProvider)); return DEHERM_DMSDK_SCRATCH_OK; }\n  if (provider->abi_version != DEHERM_DMSDK_SCRATCH_PROVIDER_ABI || provider->is_current_thread == nullptr || provider->validate_handle == nullptr || provider->invoke == nullptr) return DEHERM_DMSDK_SCRATCH_INVALID_PROVIDER;\n  gProvider = *provider; return DEHERM_DMSDK_SCRATCH_OK;\n}\nDehermDmSdkScratchStatus deherm_dmsdk_scratch_dispatch(uint16_t id, uint64_t* slots, uint32_t parameter_count, uint64_t* out_result) {\n  if (id >= deherm_dmsdk_scratch_count()) return DEHERM_DMSDK_SCRATCH_UNKNOWN_ID;\n  const DehermDmSdkScratchDescriptor& descriptor = kDescriptors[id];\n  if (parameter_count != descriptor.parameter_count) return DEHERM_DMSDK_SCRATCH_WRONG_ARITY;\n  if (slots == nullptr || out_result == nullptr) return DEHERM_DMSDK_SCRATCH_NULL_STORAGE;\n  *out_result = 0;\n  for (uint32_t index=0; index<parameter_count; ++index) if (descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT) slots[index]=0;\n  if (gProvider.invoke == nullptr) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_PROVIDER_MISSING; }\n  if (gDispatchActive) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_REENTRANT; }\n  if (gProvider.is_current_thread(gProvider.context) == 0) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_WRONG_THREAD; }\n  for (uint32_t index=0; index<parameter_count; ++index) {\n    if (descriptor.parameter_directions[index] != DEHERM_DMSDK_SCRATCH_OUT && !validLane(descriptor.parameter_kinds[index], slots[index])) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_INVALID_LANE; }\n    if (descriptor.parameter_kinds[index] == DEHERM_DMSDK_SCRATCH_HANDLE && (slots[index] == 0 || gProvider.validate_handle(gProvider.context, descriptor.handle_kinds[index], slots[index]) == 0)) { clearWritable(descriptor, slots); return DEHERM_DMSDK_SCRATCH_INVALID_HANDLE; }\n  }\n  DispatchScope scope;\n  const DehermDmSdkScratchStatus status = gProvider.invoke(gProvider.context, id, slots, parameter_count, out_result);\n  if (status != DEHERM_DMSDK_SCRATCH_OK || !validLane(descriptor.result_kind, *out_result)) { clearWritable(descriptor, slots); *out_result=0; return status == DEHERM_DMSDK_SCRATCH_OK ? DEHERM_DMSDK_SCRATCH_INVALID_LANE : status; }\n  for (uint32_t index=0; index<parameter_count; ++index) if ((descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_OUT || descriptor.parameter_directions[index] == DEHERM_DMSDK_SCRATCH_INOUT) && !validLane(descriptor.parameter_kinds[index], slots[index])) { clearWritable(descriptor, slots); *out_result=0; return DEHERM_DMSDK_SCRATCH_INVALID_LANE; }\n  return DEHERM_DMSDK_SCRATCH_OK;\n}\n}\n`;
 }
 
 function renderJsiHeader() {
@@ -227,7 +180,7 @@ function renderJsiHeader() {
 }
 
 function renderJsi(maxParameters) {
-  return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scratch_scalar_out_jsi.hpp>\n#if !defined(DM_PLATFORM_HTML5)\n#include <defold_hermes/generated_dmsdk_scratch_scalar_out.h>\n#include <cmath>\n#include <cstring>\nnamespace defold_hermes { namespace jsi=facebook::jsi; namespace {\nbool integer(const jsi::Value& value){return value.isNumber()&&std::isfinite(value.asNumber())&&std::trunc(value.asNumber())==value.asNumber();}\nuint64_t encode(jsi::Runtime& runtime,const jsi::Value& value,uint8_t kind){if(kind==DEHERM_DMSDK_SCRATCH_HANDLE||kind==DEHERM_DMSDK_SCRATCH_U64){if(!value.isBigInt())throw jsi::JSError(runtime,"expected u64 bigint");auto bigint=value.getBigInt(runtime);if(!bigint.isUint64(runtime))throw jsi::JSError(runtime,"bigint outside u64 range");auto raw=bigint.asUint64(runtime);if(kind==DEHERM_DMSDK_SCRATCH_HANDLE&&raw==0)throw jsi::JSError(runtime,"handle must be nonzero");return raw;}if(kind==DEHERM_DMSDK_SCRATCH_BOOL){if(!value.isBool())throw jsi::JSError(runtime,"expected boolean");return value.getBool()?1:0;}if(!value.isNumber()||!std::isfinite(value.asNumber()))throw jsi::JSError(runtime,"expected finite number");const double number=value.asNumber();if(kind==DEHERM_DMSDK_SCRATCH_F32){const float narrowed=static_cast<float>(number);uint32_t bits=0;std::memcpy(&bits,&narrowed,4);return bits;}if(!integer(value))throw jsi::JSError(runtime,"expected integer");if(kind==DEHERM_DMSDK_SCRATCH_U16&&(number<0||number>65535.0))throw jsi::JSError(runtime,"u16 out of range");if(kind==DEHERM_DMSDK_SCRATCH_U32&&(number<0||number>4294967295.0))throw jsi::JSError(runtime,"u32 out of range");if((kind==DEHERM_DMSDK_SCRATCH_I32||kind==DEHERM_DMSDK_SCRATCH_ENUM)&&(number<-2147483648.0||number>2147483647.0))throw jsi::JSError(runtime,"i32 out of range");return (kind==DEHERM_DMSDK_SCRATCH_I32||kind==DEHERM_DMSDK_SCRATCH_ENUM)?static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(number))):static_cast<uint64_t>(number);}\njsi::Value decode(jsi::Runtime& runtime,uint8_t kind,uint64_t raw){if(kind==DEHERM_DMSDK_SCRATCH_BOOL)return jsi::Value(raw!=0);if(kind==DEHERM_DMSDK_SCRATCH_U64)return jsi::Value(runtime,jsi::BigInt::fromUint64(runtime,raw));if(kind==DEHERM_DMSDK_SCRATCH_I32||kind==DEHERM_DMSDK_SCRATCH_ENUM)return jsi::Value(static_cast<double>(static_cast<int32_t>(raw)));if(kind==DEHERM_DMSDK_SCRATCH_F32){uint32_t bits=static_cast<uint32_t>(raw);float value=0;std::memcpy(&value,&bits,4);return jsi::Value(static_cast<double>(value));}return jsi::Value(static_cast<double>(static_cast<uint32_t>(raw)));}\n}\nvoid installDmSdkScratchScalarOutModule(jsi::Runtime& runtime,jsi::Object& modules){jsi::Object module(runtime);auto call=jsi::Function::createFromHostFunction(runtime,jsi::PropNameID::forAscii(runtime,"call"),2,[](jsi::Runtime& runtime,const jsi::Value&,const jsi::Value* args,size_t count){if(count==0||!integer(args[0])||args[0].asNumber()<0||args[0].asNumber()>65535)throw jsi::JSError(runtime,"scratch call expects u16 id");const uint16_t id=static_cast<uint16_t>(args[0].asNumber());if(id>=deherm_dmsdk_scratch_count())throw jsi::JSError(runtime,"unknown scratch id");const auto& descriptor=deherm_dmsdk_scratch_descriptors()[id];if(count!=static_cast<size_t>(descriptor.js_argument_count)+1)throw jsi::JSError(runtime,"wrong scratch arity");uint64_t slots[${Math.max(1, maxParameters)}]={};size_t input=1;for(uint8_t index=0;index<descriptor.parameter_count;++index)if(descriptor.parameter_directions[index]!=DEHERM_DMSDK_SCRATCH_OUT)slots[index]=encode(runtime,args[input++],descriptor.parameter_kinds[index]);uint64_t result=0;const auto status=deherm_dmsdk_scratch_dispatch(id,slots,descriptor.parameter_count,&result);if(status!=DEHERM_DMSDK_SCRATCH_OK)throw jsi::JSError(runtime,"scratch scalar-out dispatch failed");jsi::Array output(runtime,static_cast<size_t>(descriptor.output_count)+1);output.setValueAtIndex(runtime,0,decode(runtime,descriptor.result_kind,result));size_t outputIndex=1;for(uint8_t index=0;index<descriptor.parameter_count;++index)if(descriptor.parameter_directions[index]==DEHERM_DMSDK_SCRATCH_OUT||descriptor.parameter_directions[index]==DEHERM_DMSDK_SCRATCH_INOUT)output.setValueAtIndex(runtime,outputIndex++,decode(runtime,descriptor.parameter_kinds[index],slots[index]));return output;});module.setProperty(runtime,"call",std::move(call));modules.setProperty(runtime,"DmSdkScratchScalarOut",std::move(module));}\n}\n#endif\n`;
+  return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scratch_scalar_out_jsi.hpp>\n#if !defined(DM_PLATFORM_HTML5)\n#include <defold_hermes/generated_dmsdk_scratch_scalar_out.h>\n#include <cmath>\n#include <cstring>\nnamespace defold_hermes { namespace jsi=facebook::jsi; namespace {\nbool integer(const jsi::Value& value){return value.isNumber()&&std::isfinite(value.asNumber())&&std::trunc(value.asNumber())==value.asNumber();}\nuint64_t encode(jsi::Runtime& runtime,const jsi::Value& value,uint8_t kind){if(kind==DEHERM_DMSDK_SCRATCH_HANDLE||kind==DEHERM_DMSDK_SCRATCH_U64){if(!value.isBigInt())throw jsi::JSError(runtime,"expected u64 bigint");auto bigint=value.getBigInt(runtime);if(!bigint.isUint64(runtime))throw jsi::JSError(runtime,"bigint outside u64 range");auto raw=bigint.asUint64(runtime);if(kind==DEHERM_DMSDK_SCRATCH_HANDLE&&raw==0)throw jsi::JSError(runtime,"handle must be nonzero");return raw;}if(kind==DEHERM_DMSDK_SCRATCH_BOOL){if(!value.isBool())throw jsi::JSError(runtime,"expected boolean");return value.getBool()?1:0;}if(!value.isNumber()||!std::isfinite(value.asNumber()))throw jsi::JSError(runtime,"expected finite number");const double number=value.asNumber();if(kind==DEHERM_DMSDK_SCRATCH_F32){const float narrowed=static_cast<float>(number);uint32_t bits=0;std::memcpy(&bits,&narrowed,4);return bits;}if(!integer(value))throw jsi::JSError(runtime,"expected integer");if(kind==DEHERM_DMSDK_SCRATCH_U16&&(number<0||number>65535.0))throw jsi::JSError(runtime,"u16 out of range");if(kind==DEHERM_DMSDK_SCRATCH_U32&&(number<0||number>4294967295.0))throw jsi::JSError(runtime,"u32 out of range");if((kind==DEHERM_DMSDK_SCRATCH_I32||kind==DEHERM_DMSDK_SCRATCH_ENUM)&&(number<-2147483648.0||number>2147483647.0))throw jsi::JSError(runtime,"i32 out of range");return (kind==DEHERM_DMSDK_SCRATCH_I32||kind==DEHERM_DMSDK_SCRATCH_ENUM)?static_cast<uint64_t>(static_cast<int64_t>(static_cast<int32_t>(number))):static_cast<uint64_t>(number);}\njsi::Value decode(jsi::Runtime& runtime,uint8_t kind,uint64_t raw){if(kind==DEHERM_DMSDK_SCRATCH_VOID)return jsi::Value::undefined();if(kind==DEHERM_DMSDK_SCRATCH_BOOL)return jsi::Value(raw!=0);if(kind==DEHERM_DMSDK_SCRATCH_U64)return jsi::Value(runtime,jsi::BigInt::fromUint64(runtime,raw));if(kind==DEHERM_DMSDK_SCRATCH_I32||kind==DEHERM_DMSDK_SCRATCH_ENUM)return jsi::Value(static_cast<double>(static_cast<int32_t>(raw)));if(kind==DEHERM_DMSDK_SCRATCH_F32){uint32_t bits=static_cast<uint32_t>(raw);float value=0;std::memcpy(&value,&bits,4);return jsi::Value(static_cast<double>(value));}return jsi::Value(static_cast<double>(static_cast<uint32_t>(raw)));}\n}\nvoid installDmSdkScratchScalarOutModule(jsi::Runtime& runtime,jsi::Object& modules){jsi::Object module(runtime);auto call=jsi::Function::createFromHostFunction(runtime,jsi::PropNameID::forAscii(runtime,"call"),2,[](jsi::Runtime& runtime,const jsi::Value&,const jsi::Value* args,size_t count){if(count==0||!integer(args[0])||args[0].asNumber()<0||args[0].asNumber()>65535)throw jsi::JSError(runtime,"scratch call expects u16 id");const uint16_t id=static_cast<uint16_t>(args[0].asNumber());if(id>=deherm_dmsdk_scratch_count())throw jsi::JSError(runtime,"unknown scratch id");const auto& descriptor=deherm_dmsdk_scratch_descriptors()[id];if(count!=static_cast<size_t>(descriptor.js_argument_count)+1)throw jsi::JSError(runtime,"wrong scratch arity");uint64_t slots[${Math.max(1, maxParameters)}]={};size_t input=1;for(uint8_t index=0;index<descriptor.parameter_count;++index)if(descriptor.parameter_directions[index]!=DEHERM_DMSDK_SCRATCH_OUT)slots[index]=encode(runtime,args[input++],descriptor.parameter_kinds[index]);uint64_t result=0;const auto status=deherm_dmsdk_scratch_dispatch(id,slots,descriptor.parameter_count,&result);if(status!=DEHERM_DMSDK_SCRATCH_OK)throw jsi::JSError(runtime,"scratch scalar-out dispatch failed");jsi::Array output(runtime,static_cast<size_t>(descriptor.output_count)+1);output.setValueAtIndex(runtime,0,decode(runtime,descriptor.result_kind,result));size_t outputIndex=1;for(uint8_t index=0;index<descriptor.parameter_count;++index)if(descriptor.parameter_directions[index]==DEHERM_DMSDK_SCRATCH_OUT||descriptor.parameter_directions[index]==DEHERM_DMSDK_SCRATCH_INOUT)output.setValueAtIndex(runtime,outputIndex++,decode(runtime,descriptor.parameter_kinds[index],slots[index]));return output;});module.setProperty(runtime,"call",std::move(call));modules.setProperty(runtime,"DmSdkScratchScalarOut",std::move(module));}\n}\n#endif\n`;
 }
 
 function renderBrowser(entries, handleKinds, maxParameters) {
@@ -248,11 +201,15 @@ function renderTypeScript(entries, names) {
       const outputs = entry.parameters.filter(({ direction }) => direction === "out" || direction === "inout");
       const parameters = inputs.map((parameter) => `${camel(parameter.name)}: ${tsType(parameter)}`).join(", ");
       const argumentsList = inputs.map(({ name }) => camel(name)).join(", ");
-      const resultType = `{ readonly result: ${tsType(entry.result)}; ${outputs.map((output) => `readonly ${outputName(output)}: ${tsType(output)};`).join(" ")} }`;
-      const fields = outputs
-        .map((output, outputIndex) => `${outputName(output)}: tuple[${outputIndex + 1}] as ${tsType(output)}`)
-        .join(", ");
-      return `/** Caller-owned one-slot scalar output bridge for ${entry.projection.symbol}; no pointer escapes. */\nexport function ${names[index]}(${parameters}): ${resultType} { const tuple=module().call(DmSdkScratchScalarOutId.${names[index]}${argumentsList ? `, ${argumentsList}` : ""});if(tuple.length!==${outputs.length + 1})throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as ${tsType(entry.result)},${fields}}; }`;
+      const resultField = entry.result.kind === "void" ? "" : `readonly result: ${tsType(entry.result)}; `;
+      const resultType = `{ ${resultField}${outputs.map((output) => `readonly ${outputName(output)}: ${tsType(output)};`).join(" ")} }`;
+      const fields = [
+        ...(entry.result.kind === "void" ? [] : [`result:tuple[0] as ${tsType(entry.result)}`]),
+        ...outputs.map(
+          (output, outputIndex) => `${outputName(output)}: tuple[${outputIndex + 1}] as ${tsType(output)}`,
+        ),
+      ].join(", ");
+      return `/** Caller-owned one-slot scalar output bridge for ${entry.projection.symbol}; no pointer escapes. */\nexport function ${names[index]}(${parameters}): ${resultType} { const tuple=module().call(DmSdkScratchScalarOutId.${names[index]}${argumentsList ? `, ${argumentsList}` : ""});if(tuple.length!==${outputs.length + 1})throw new Error("invalid scratch scalar-out tuple");return {${fields}}; }`;
     })
     .join("\n\n");
   return `// Generated by scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs. Do not edit.\ndeclare const scratchHandleBrand: unique symbol;\nexport type ScratchBorrowedHandle<Kind extends string> = bigint & { readonly [scratchHandleBrand]: Kind };\ninterface DmSdkScratchScalarOutModule { call(id:number,...args:readonly (number|boolean|bigint)[]):readonly unknown[]; }\ndeclare global { var __defoldModulesV1: Record<string,object>|undefined; }\nfunction module():DmSdkScratchScalarOutModule { const value=globalThis.__defoldModulesV1?.DmSdkScratchScalarOut as DmSdkScratchScalarOutModule|undefined;if(!value)throw new Error("Defold module is not registered: DmSdkScratchScalarOut");return value; }\nexport function unsafeScratchBorrowedHandle<Kind extends string>(kind:Kind,value:bigint):ScratchBorrowedHandle<Kind>{void kind;if(value<=0n||value>0xffff_ffff_ffff_ffffn)throw new RangeError("handle must be a nonzero u64");return value as ScratchBorrowedHandle<Kind>;}\nexport const DmSdkScratchScalarOutId={\n${ids}\n} as const;\n\n${functions}\n`;
@@ -263,6 +220,7 @@ function renderStaticHermes() {
 }
 
 function resultAssertion(entry, expression) {
+  if (entry.result.kind === "void") return `std::is_void<decltype(${expression})>::value`;
   if (entry.result.kind === "bool") return `std::is_same<decltype(${expression}), bool>::value`;
   if (entry.result.kind === "f32")
     return `std::is_floating_point<decltype(${expression})>::value && sizeof(decltype(${expression})) == 4`;
@@ -320,23 +278,49 @@ export async function build(overrides = {}) {
   const shapes = JSON.parse(contents.shapes);
   const projection = JSON.parse(contents.projection);
   const policy = JSON.parse(contents.policy);
+  const effectFacts = JSON.parse(contents.effectFacts);
+  const plan = JSON.parse(contents.plan);
   if (new Set([ir.defoldRevision, shapes.defoldRevision, projection.defoldRevision]).size !== 1)
     throw new Error("scratch scalar-out inputs have different Defold revisions");
   if (shapes.sourceHashes.ir !== sha256(contents.ir) || projection.sources.hashes.ir !== sha256(contents.ir))
     throw new Error("scratch scalar-out IR provenance mismatch");
-  const candidates = shapes.rows.filter(({ tranche }) => tranche === policy.family);
+  const planById = indexDmSdkScratchScalarOutPlan(plan, {
+    ir,
+    shapes,
+    projection,
+    policy,
+    effectFacts,
+    texts: {
+      ir: contents.ir,
+      shapes: contents.shapes,
+      projection: contents.projection,
+      policy: contents.policy,
+      effectFacts: contents.effectFacts,
+    },
+  });
+  const shapesById = new Map(shapes.rows.map((row) => [row.id, row]));
+  const candidates = plan.decisions.map(({ declarationId }) => {
+    const shape = shapesById.get(declarationId);
+    if (!shape) throw new Error(`${declarationId}: scratch plan shape is missing`);
+    return shape;
+  });
   const projectionById = new Map(projection.rows.map((row) => [row.id, row]));
   const declarationById = new Map(ir.declarations.map((row) => [row.id, row]));
   const entries = [];
   const rows = [];
-  const patterns = [scratchScalarOutPattern(policy.selection), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
   for (const shape of candidates) {
     const projected = projectionById.get(shape.id);
     const declaration = declarationById.get(shape.id);
-    const patternDecision = selectDmSdkPattern(patternFacts(shape, projected), patterns);
-    const blockers = specializationBlockers(shape, projected, declaration, policy, structuralBlockers(patternDecision));
-    if (blockers.length) {
-      const allBlockers = [...new Set([...blockers, ...(projected ? semanticBlockers(projected) : [])])].sort();
+    const decision = planById.get(shape.id);
+    const emissionBlockers = specializationBlockers(shape, projected, declaration);
+    if (!decision) throw new Error(`${shape.id}: scratch plan decision is missing`);
+    if (!decision.fallback && emissionBlockers.length > 0) {
+      throw new Error(
+        `${shape.id}: scratch plan selected a route the emitter cannot render: ${emissionBlockers.join(",")}`,
+      );
+    }
+    if (decision.fallback) {
+      const allBlockers = [...new Set([...decision.blockers, ...emissionBlockers])].sort();
       rows.push({
         id: shape.id,
         projectionId: projected?.projectionId ?? null,
@@ -345,7 +329,9 @@ export async function build(overrides = {}) {
         blockers: allBlockers,
         universalFallback: universalFallback(allBlockers),
         shape: shape.shape,
-        patternDecision: compactDmSdkPatternDecision(patternDecision),
+        patternDecision: decision.patternId,
+        admission: decision.admission,
+        evidenceGaps: decision.evidenceGaps,
       });
       continue;
     }
@@ -373,7 +359,9 @@ export async function build(overrides = {}) {
       disposition: "generated-provider-boundary",
       bindingId: entry.id,
       shape: shape.shape,
-      patternDecision: compactDmSdkPatternDecision(patternDecision),
+      patternDecision: decision.patternId,
+      admission: decision.admission,
+      evidenceGaps: decision.evidenceGaps,
       resolvedPolicies: policy.storageContract,
       engineProviderBlockers: [
         "call-thread-affinity-unresolved",
@@ -419,6 +407,8 @@ export async function build(overrides = {}) {
     candidates: candidates.length,
     generated: entries.length,
     blocked: rows.length - entries.length,
+    sourceDerived: plan.coverage.sourceDerived,
+    compatibilityPreserved: plan.coverage.compatibilityPreserved,
   };
   const storageMaxParameters = Math.max(1, maxParameters);
   const names = makeFunctionNames(entries);
@@ -433,13 +423,13 @@ export async function build(overrides = {}) {
   generated.set(artifacts.staticHermes, renderStaticHermes());
   generated.set(artifacts.headerAudit, renderHeaderAudit(entries));
   const report = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     defoldRevision: ir.defoldRevision,
     sources: paths,
     sourceHashes: Object.fromEntries(Object.entries(contents).map(([key, content]) => [key, sha256(content)])),
     selector:
-      "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
-    patternRegistry: patterns,
+      "compiler-owned authenticated scratch plan; source-derived admissions plus structurally preserved prior provider routes; no symbol allowlist",
+    patternRegistry: plan.patternRegistry,
     policy: {
       ...policy.storageContract,
       ...policy.targetPolicy,

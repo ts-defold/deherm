@@ -13,59 +13,65 @@ const reportPath = path.join(root, "packages/bindings/generated/defold-dmsdk-scr
 const sdk = path.join(root, "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
 const cxx = process.env.CXX || "clang++";
 const cc = process.env.CC || "clang";
-const run = (command, args, options = {}) => execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe", ...options });
+const run = (command, args, options = {}) =>
+  execFileSync(command, args, { cwd: root, encoding: "utf8", stdio: "pipe", ...options });
 const includes = [
   `-I${path.join(root, "defold/defold_hermes/include")}`,
-  "-isystem", path.join(sdk, "sdk/include"),
-  "-isystem", path.join(sdk, "include"),
+  "-isystem",
+  path.join(sdk, "sdk/include"),
+  "-isystem",
+  path.join(sdk, "include"),
 ];
 
-function selected(row, policy) {
-  return policy.selection.resultRolePrefixes.some((prefix) => row.result.role.startsWith(prefix)) &&
-    row.parameters.every((parameter) => parameter.direction === "value"
-      ? policy.selection.valueRolePrefixes.some((prefix) => parameter.role.startsWith(prefix))
-      : policy.selection.pointerDirections.includes(parameter.direction) &&
-        policy.selection.pointerRolePrefixes.some((prefix) => parameter.role.startsWith(prefix))) &&
-    row.parameters.some((parameter) => ["out", "inout"].includes(parameter.direction) &&
-      policy.selection.pointerRolePrefixes.some((prefix) => parameter.role.startsWith(prefix))) &&
-    policy.selection.rejectedFamilies.every((family) => !row.families.includes(family));
-}
-
-test("scratch scalar-out census is independent, exhaustive, and symbol-agnostic", async () => {
-  const [report, shapes, policy] = await Promise.all([
+test("scratch scalar-out emitter consumes the authenticated compiler plan without selecting symbols", async () => {
+  const [report, plan, policy, emitter] = await Promise.all([
     readFile(reportPath, "utf8").then(JSON.parse),
-    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
-    readFile(path.join(root, "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"), "utf8").then(JSON.parse),
+    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-plan.json"), "utf8").then(
+      JSON.parse,
+    ),
+    readFile(path.join(root, "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"), "utf8").then(
+      JSON.parse,
+    ),
+    readFile(path.join(root, "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs"), "utf8"),
   ]);
-  const candidates = shapes.rows.filter(({ tranche }) => tranche === "scratch-out-parameters");
-  const generated = candidates.filter((row) => selected(row, policy));
-  assert.equal(candidates.length, 79);
-  assert.equal(generated.length, 7);
   assert.deepEqual(report.coverage, {
-    candidates: 79,
-    generated: 7,
-    blocked: 72,
-    cAbiGenerated: 7,
-    dynamicHermesJsiGenerated: 7,
-    staticHermesGenerated: 7,
-    browserDirectMemoryGenerated: 7,
-    typescriptGenerated: 7,
-    pinnedHeaderSignatureCompiled: 7,
-    fakeProviderHostRuntimeTested: 7,
+    candidates: 30,
+    generated: 11,
+    blocked: 19,
+    sourceDerived: 6,
+    compatibilityPreserved: 5,
+    cAbiGenerated: 11,
+    dynamicHermesJsiGenerated: 11,
+    staticHermesGenerated: 11,
+    browserDirectMemoryGenerated: 11,
+    typescriptGenerated: 11,
+    pinnedHeaderSignatureCompiled: 11,
+    fakeProviderHostRuntimeTested: 11,
     packagedEngineRuntimeVerified: 0,
     warmedDispatchIterations: 100000,
     warmedDispatchObservedCppAllocations: 0,
   });
-  assert.equal(report.declarations.length, candidates.length);
-  assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 79);
+  assert.equal(report.declarations.length, plan.decisions.length);
+  assert.deepEqual(
+    report.declarations.map(({ id }) => id),
+    plan.decisions.map(({ declarationId }) => declarationId),
+  );
+  assert.equal(new Set(report.declarations.map(({ id }) => id)).size, 30);
   assert.equal(report.abi.maxParameters, 4);
-  assert.equal(report.abi.maxOutputs, 1);
-  assert.equal(report.handleKinds.length, 4);
+  assert.equal(report.abi.maxOutputs, 2);
+  assert.equal(report.handleKinds.length, 6);
   assert.match(report.selector, /no symbol allowlist/);
+  assert.doesNotMatch(
+    emitter,
+    /dmsdk-pattern-selector|dmsdk-pattern-catalog|selectDmSdkPattern|scratchScalarOutPattern/,
+  );
   assert.equal(Object.hasOwn(policy, "entries"), false);
   for (const row of report.declarations.filter(({ disposition }) => disposition === "blocked")) {
     assert.ok(row.blockers.length > 0, row.id);
-    assert.ok(row.blockers.some((token) => /unsupported|unresolved|unverified|required/.test(token)), row.id);
+    assert.ok(
+      row.blockers.some((token) => /unavailable|unsupported|unresolved|unverified|required/.test(token)),
+      row.id,
+    );
   }
   for (const row of report.declarations.filter(({ disposition }) => disposition !== "blocked")) {
     assert.deepEqual(row.resolvedPolicies, policy.storageContract);
@@ -75,33 +81,40 @@ test("scratch scalar-out census is independent, exhaustive, and symbol-agnostic"
   }
 });
 
-test("scratch scalar-out generation is clean-room deterministic and only rejects provenance drift", async () => {
+test("scratch scalar-out generation is clean-room deterministic and rejects stale authenticated plans", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-scratch-scalar-out-generate-"));
   try {
     run(process.execPath, ["scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs", "--output-root", directory]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
-    for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"]) {
-      assert.equal(await readFile(path.join(directory, artifact), "utf8"), await readFile(path.join(root, artifact), "utf8"), artifact);
+    for (const artifact of [
+      ...report.artifacts,
+      "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json",
+    ]) {
+      assert.equal(
+        await readFile(path.join(directory, artifact), "utf8"),
+        await readFile(path.join(root, artifact), "utf8"),
+        artifact,
+      );
     }
-    const contents = {
-      ir: await readFile(path.join(root, report.sources.ir), "utf8"),
-      shapes: await readFile(path.join(root, report.sources.shapes), "utf8"),
-      projection: await readFile(path.join(root, report.sources.projection), "utf8"),
-      policy: await readFile(path.join(root, report.sources.policy), "utf8"),
-    };
-    const changed = JSON.parse(contents.policy);
-    changed.expectedCoverage = { candidates: 1, generated: 1, blocked: 0, handleKinds: 1, maxParameters: 1, maxOutputs: 1 };
-    const observed = await build({ ...contents, policy: JSON.stringify(changed) });
-    assert.equal(observed.report.coverage.candidates, 79);
-    assert.equal(observed.report.coverage.generated, 7);
-    assert.equal(observed.report.coverage.blocked, 72);
+    const contents = Object.fromEntries(
+      await Promise.all(
+        Object.entries(report.sources).map(async ([key, relative]) => [
+          key,
+          await readFile(path.join(root, relative), "utf8"),
+        ]),
+      ),
+    );
+    const observed = await build(contents);
+    assert.equal(observed.report.coverage.candidates, 30);
+    assert.equal(observed.report.coverage.generated, 11);
+    assert.equal(observed.report.coverage.blocked, 19);
     assert.deepEqual(observed.report.abi, {
       slotBytes: 8,
       maxParameters: 4,
-      maxOutputs: 1,
-      handleKindCount: 4,
+      maxOutputs: 2,
+      handleKindCount: 6,
       parameterStorage: "caller-owned contiguous uint64_t slots",
-      resultStorage: "caller-owned uint64_t slot"
+      resultStorage: "caller-owned uint64_t slot",
     });
     await assert.rejects(() => build({ ...contents, ir: `${contents.ir}\n` }), /IR provenance mismatch/);
   } finally {
@@ -109,35 +122,45 @@ test("scratch scalar-out generation is clean-room deterministic and only rejects
   }
 });
 
-test("changed scratch specialization blocks only that route and retains universal fallback", async () => {
-  const [ir, shapes, projection, policy] = await Promise.all([
-    readFile(path.join(root, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"),
-    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8"),
-    readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-projection-ir.json"), "utf8"),
-    readFile(path.join(root, "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"), "utf8")
-  ]);
-  const changedShapes = JSON.parse(shapes);
-  const policyValue = JSON.parse(policy);
-  const changed = changedShapes.rows.find((row) => row.tranche === "scratch-out-parameters" && selected(row, policyValue));
+test("changed scratch inputs cannot be emitted through a stale plan", async () => {
+  const report = JSON.parse(await readFile(reportPath, "utf8"));
+  const contents = Object.fromEntries(
+    await Promise.all(
+      Object.entries(report.sources).map(async ([key, relative]) => [
+        key,
+        await readFile(path.join(root, relative), "utf8"),
+      ]),
+    ),
+  );
+  const changedShapes = JSON.parse(contents.shapes);
+  const changed = changedShapes.rows.find(
+    (row) => row.id === JSON.parse(contents.plan).decisions.find(({ fallback }) => !fallback)?.declarationId,
+  );
   assert.ok(changed);
   const changedParameter = changed.parameters.at(-1);
   changedParameter.role = "pointer:unknown-specialization";
-  const result = await build({ ir, shapes: JSON.stringify(changedShapes), projection, policy });
-  const row = result.report.declarations.find(({ id }) => id === changed.id);
-  assert.equal(row.disposition, "blocked");
-  assert.ok(row.blockers.includes(`parameter-role-direction-unsupported:${changedParameter.position}:${changedParameter.direction}:pointer:unknown-specialization`));
-  assert.equal(row.universalFallback.state, "universal-fallback");
-  assert.equal(row.universalFallback.preserved, true);
-  assert.equal(result.report.coverage.candidates, 79);
-  assert.equal(result.report.coverage.generated, 6);
-  assert.equal(result.report.coverage.blocked, 73);
-  assert.equal(result.report.declarations.filter(({ disposition }) => disposition === "generated-provider-boundary").length, 6);
+  await assert.rejects(
+    () => build({ ...contents, shapes: JSON.stringify(changedShapes) }),
+    /scratch plan differs from strict source re-derivation/,
+  );
 });
 
-test("all seven selected signatures compile against the pinned SDK projection", async () => {
+test("all selected signatures compile against the pinned SDK projection", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-scratch-scalar-out-headers-"));
   try {
-    run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-DDLIB_LOG_DOMAIN=\"deherm\"", ...includes, "-c", "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp", "-o", path.join(directory, "audit.o")]);
+    run(cxx, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      '-DDLIB_LOG_DOMAIN="deherm"',
+      ...includes,
+      "-c",
+      "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp",
+      "-o",
+      path.join(directory, "audit.o"),
+    ]);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
@@ -146,15 +169,67 @@ test("all seven selected signatures compile against the pinned SDK projection", 
 test("C ABI, Dynamic Hermes, Static Hermes, browser, and TypeScript projections compile", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-scratch-scalar-out-targets-"));
   try {
-    run(cc, ["-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includes, "-c", "native/dmsdk_scratch_scalar_out_c_header_test.c", "-o", path.join(directory, "header.o")]);
-    run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includes, "-c", "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp", "-o", path.join(directory, "runtime.o")]);
-    run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", ...includes, `-I${path.join(root, "upstream/hermes/API")}`, "-c", "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp", "-o", path.join(directory, "jsi.o")]);
+    run(cc, [
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      ...includes,
+      "-c",
+      "native/dmsdk_scratch_scalar_out_c_header_test.c",
+      "-o",
+      path.join(directory, "header.o"),
+    ]);
+    run(cxx, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      ...includes,
+      "-c",
+      "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp",
+      "-o",
+      path.join(directory, "runtime.o"),
+    ]);
+    run(cxx, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      ...includes,
+      `-I${path.join(root, "upstream/hermes/API")}`,
+      "-c",
+      "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp",
+      "-o",
+      path.join(directory, "jsi.o"),
+    ]);
     run(process.execPath, ["--check", "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js"]);
     const tsc = path.join(root, "node_modules/.bin/tsc");
-    const flags = ["--ignoreConfig", "--noEmit", "--strict", "--target", "ES2020", "--module", "ESNext", "--moduleResolution", "Bundler", "--skipLibCheck"];
+    const flags = [
+      "--ignoreConfig",
+      "--noEmit",
+      "--strict",
+      "--target",
+      "ES2020",
+      "--module",
+      "ESNext",
+      "--moduleResolution",
+      "Bundler",
+      "--skipLibCheck",
+    ];
     run(tsc, [...flags, "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts"]);
-    run(tsc, [...flags, "packages/static-hermes/src/globals.d.ts", "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts"]);
-    const browser = await readFile(path.join(root, "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js"), "utf8");
+    run(tsc, [
+      ...flags,
+      "packages/static-hermes/src/globals.d.ts",
+      "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts",
+    ]);
+    const browser = await readFile(
+      path.join(root, "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js"),
+      "utf8",
+    );
     assert.match(browser, /slotBytes:8,maxParameters:4,resultBytes:8/);
     assert.match(browser, /reentrancy:'rejected'/);
   } finally {
@@ -166,15 +241,36 @@ test("fake-provider host bridge covers every route, failure zeroing, reentrancy,
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-scratch-scalar-out-runtime-"));
   try {
     const executable = path.join(directory, "runtime");
-    run(cxx, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic", "-fsanitize=address,undefined", "-fno-omit-frame-pointer", ...includes, "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp", "native/dmsdk_scratch_scalar_out_runtime_test.cpp", "-o", executable]);
-    assert.equal(run(executable, [], { env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" } }).trim(), "dmsdk-scratch-scalar-out:ok");
+    run(cxx, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      "-fsanitize=address,undefined",
+      "-fno-omit-frame-pointer",
+      ...includes,
+      "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp",
+      "native/dmsdk_scratch_scalar_out_runtime_test.cpp",
+      "-o",
+      executable,
+    ]);
+    assert.equal(
+      run(executable, [], {
+        env: { ...process.env, ASAN_OPTIONS: "detect_leaks=0", UBSAN_OPTIONS: "halt_on_error=1" },
+      }).trim(),
+      "dmsdk-scratch-scalar-out:ok",
+    );
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
 });
 
 test("generated runtime remains bounded and does not embed dmSDK calls", async () => {
-  const runtime = await readFile(path.join(root, "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp"), "utf8");
+  const runtime = await readFile(
+    path.join(root, "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp"),
+    "utf8",
+  );
   assert.doesNotMatch(runtime, /\b(?:new|delete|malloc|calloc|realloc|free)\b/);
   assert.doesNotMatch(runtime, /\b(?:dmGameObject|dmHID)::[A-Za-z0-9_]+\s*\(/);
   assert.match(runtime, /thread_local bool gDispatchActive/);
@@ -184,7 +280,9 @@ test("generated runtime remains bounded and does not embed dmSDK calls", async (
 
 test("scratch scalar-out generated IDs do not overlap prior generated families", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
-  const selectedIds = new Set(report.declarations.filter(({ disposition }) => disposition === "generated-provider-boundary").map(({ id }) => id));
+  const selectedIds = new Set(
+    report.declarations.filter(({ disposition }) => disposition === "generated-provider-boundary").map(({ id }) => id),
+  );
   const priorReports = [
     "defold-dmsdk-borrowed-handle-bindings.json",
     "defold-dmsdk-cstring-value-bindings.json",
@@ -200,7 +298,11 @@ test("scratch scalar-out generated IDs do not overlap prior generated families",
     const prior = JSON.parse(await readFile(path.join(root, "packages/bindings/generated", name), "utf8"));
     const rows = prior.declarations ?? prior.bindings ?? [];
     for (const row of rows) {
-      const generated = row.emitted === true || row.disposition === "generated-provider-boundary" || row.disposition === "generated" || row.wrapper;
+      const generated =
+        row.emitted === true ||
+        row.disposition === "generated-provider-boundary" ||
+        row.disposition === "generated" ||
+        row.wrapper;
       if (generated) assert.equal(selectedIds.has(row.id), false, `${name}: ${row.id}`);
     }
   }

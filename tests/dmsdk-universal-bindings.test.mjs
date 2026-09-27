@@ -19,8 +19,7 @@ import {
   dmSdkUniversalReadyUsages,
   materializeDmSdkUniversalReadyCorpus,
 } from "../packages/compiler/src/dmsdk-universal-ready-corpus.mjs";
-import { partitionDmSdkUniversalStaticExactVectors } from
-  "../packages/compiler/src/dmsdk-universal-static-exact-applicability.mjs";
+import { partitionDmSdkUniversalStaticExactVectors } from "../packages/compiler/src/dmsdk-universal-static-exact-applicability.mjs";
 import {
   DMSDK_UNIVERSAL_STATIC_FRAME_ARGUMENT_WIRE_TAGS,
   DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY,
@@ -28,7 +27,10 @@ import {
   dmSdkUniversalStaticFrameCapability,
   emitDmSdkUniversalStaticFrame,
 } from "../packages/compiler/src/dmsdk-universal-static-frame.mjs";
-import { dmSdkUniversalCatalogSha256, dmSdkUniversalRecipes } from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
+import {
+  dmSdkUniversalCatalogSha256,
+  dmSdkUniversalRecipes,
+} from "../packages/compiler/src/generated/dmsdk-universal-recipes.mjs";
 import { generateDmSdkBrowserArena } from "../packages/compiler/src/sdk/support-sdk.mjs";
 import { buildUniversalDmSdkBindings } from "../scripts/generate-dmsdk-universal-bindings.mjs";
 import { buildDmSdkGeneratedAdapterExact } from "../scripts/generate-dmsdk-generated-adapter-exact.mjs";
@@ -39,14 +41,16 @@ const sdkIrPath = path.join(root, "packages/bindings/generated/defold-sdk-ir.jso
 const compiler = process.env.CXX || "clang++";
 const policyCatalog = Object.freeze({
   sourceHashes: Object.freeze({ catalog: dmSdkUniversalCatalogSha256 }),
-  recipes: dmSdkUniversalRecipes
+  recipes: dmSdkUniversalRecipes,
 });
 
 function canonicalJson(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
-  return `{${Object.keys(value).sort().map((key) =>
-    `${JSON.stringify(key)}:${canonicalJson(value[key])}`).join(",")}}`;
+  return `{${Object.keys(value)
+    .sort()
+    .map((key) => `${JSON.stringify(key)}:${canonicalJson(value[key])}`)
+    .join(",")}}`;
 }
 
 function sha256(value) {
@@ -64,7 +68,12 @@ async function packagedHermesArchive() {
   }[`${process.platform}-${process.arch}`];
   if (!relative) return null;
   const absolute = path.join(root, relative);
-  try { await stat(absolute); return absolute; } catch { return null; }
+  try {
+    await stat(absolute);
+    return absolute;
+  } catch {
+    return null;
+  }
 }
 
 function recipe(report, symbol, predicate = () => true) {
@@ -88,28 +97,43 @@ test("universal dmSDK recipes cover every declaration and every target", async (
     browserDirectMemoryMetadata: 1361,
     typescriptStableIds: 1361,
     silentlyOmitted: 0,
-    preferredSpecialized: 101,
-    usageMaterializedFallback: 1260,
+    preferredSpecialized: 105,
+    usageMaterializedFallback: 1256,
     universalReadyExactVectors: symbolIndex.universalReadyCount,
   });
   assert.equal(new Set(report.recipes.map(({ numericId }) => numericId)).size, 1361);
   assert.equal(new Set(report.recipes.map(({ declarationId }) => declarationId)).size, 1361);
   assert.deepEqual(
     report.recipes.map(({ declarationId }) => declarationId).sort(),
-    sdkIr.declarations.filter(({ disposition }) => disposition === "generated-raw-call").map(({ id }) => id).sort(),
+    sdkIr.declarations
+      .filter(({ disposition }) => disposition === "generated-raw-call")
+      .map(({ id }) => id)
+      .sort(),
     "the universal catalog must cover the source-derived public runtime declaration set, not only another generated catalog",
   );
   const publicSdkUnavailable = report.recipes.filter(({ publicSdk }) => publicSdk?.callable === false);
   assert.equal(publicSdkUnavailable.length, 132);
-  assert.ok(publicSdkUnavailable.every(({ publicSdk }) =>
-    typeof publicSdk.header === "string" && typeof publicSdk.reason === "string"));
-  assert.equal(Object.values(symbolIndex.declarations).filter(({ materialization }) =>
-    materialization.requirements?.includes("public-sdk-declaration")).length, publicSdkUnavailable.length);
+  assert.ok(
+    publicSdkUnavailable.every(
+      ({ publicSdk }) => typeof publicSdk.header === "string" && typeof publicSdk.reason === "string",
+    ),
+  );
+  assert.equal(
+    Object.values(symbolIndex.declarations).filter(({ materialization }) =>
+      materialization.requirements?.includes("public-sdk-declaration"),
+    ).length,
+    publicSdkUnavailable.length,
+  );
   for (const item of report.recipes) {
     assert.equal(item.fallback.state, "materializable");
     assert.equal(item.fallback.silentOmissionAllowed, false);
     assert.equal(item.targets.browserWasm.embind, false);
-    assert.ok(item.targets.cAbi.path && item.targets.dynamicHermes.path && item.targets.staticHermes.path && item.targets.typescript.path);
+    assert.ok(
+      item.targets.cAbi.path &&
+        item.targets.dynamicHermes.path &&
+        item.targets.staticHermes.path &&
+        item.targets.typescript.path,
+    );
   }
   const opaqueHandle = recipe(report, "ConfigFileGetFloat");
   assert.ok(!opaqueHandle.abi.parameters[0].requirements.includes("record-layout"));
@@ -133,46 +157,71 @@ test("universal dmSDK recipes cover every declaration and every target", async (
 });
 
 test("generated adapter call plans preserve the callable/provider boundary", () => {
-  const plans = dmSdkUniversalRecipes
-    .map(resolveDmSdkConcreteCallPlan)
-    .filter(Boolean);
-  assert.equal(plans.length, 101);
+  const plans = dmSdkUniversalRecipes.map(resolveDmSdkConcreteCallPlan).filter(Boolean);
+  assert.equal(plans.length, 105);
   const callable = plans.filter(({ state }) => state === "generated-adapter");
   const providerRequired = plans.filter(({ state }) => state === "specialization-required");
   assert.equal(callable.length, 94);
-  assert.equal(providerRequired.length, 7);
+  assert.equal(providerRequired.length, 11);
   assert.equal(callable.filter(({ adapterKind }) => adapterKind === "named-wrapper").length, 45);
   const cstring = callable.filter(({ family }) => family === "cstringValue");
   assert.equal(cstring.length, 14);
-  assert.deepEqual(cstring.map(({ adapterId }) => adapterId), Array.from({ length: 14 }, (_, index) => index));
-  assert.ok(cstring.every(({ family, symbol }) =>
-    family === "cstringValue" && symbol === "deherm_dmsdk_cstring_value_dispatch"));
+  assert.deepEqual(
+    cstring.map(({ adapterId }) => adapterId),
+    Array.from({ length: 14 }, (_, index) => index),
+  );
+  assert.ok(
+    cstring.every(
+      ({ family, symbol }) => family === "cstringValue" && symbol === "deherm_dmsdk_cstring_value_dispatch",
+    ),
+  );
   const arenaCString = callable.filter(({ family }) => family === "arenaCString");
   assert.equal(arenaCString.length, 5);
-  assert.deepEqual(arenaCString.map(({ adapterId }) => adapterId), Array.from({ length: 5 }, (_, index) => index));
-  assert.ok(arenaCString.every(({ adapterKind, symbol }) =>
-    adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_arena_cstring_dispatch"));
+  assert.deepEqual(
+    arenaCString.map(({ adapterId }) => adapterId),
+    Array.from({ length: 5 }, (_, index) => index),
+  );
+  assert.ok(
+    arenaCString.every(
+      ({ adapterKind, symbol }) =>
+        adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_arena_cstring_dispatch",
+    ),
+  );
   const hashState = callable.filter(({ family }) => family === "hashState");
   assert.equal(hashState.length, 10);
-  assert.deepEqual(hashState.map(({ adapterId }) => adapterId).sort((a, b) => a - b), Array.from({ length: 10 }, (_, index) => index));
-  assert.ok(hashState.every(({ adapterKind, symbol }) =>
-    adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_hash_state_dispatch"));
+  assert.deepEqual(
+    hashState.map(({ adapterId }) => adapterId).sort((a, b) => a - b),
+    Array.from({ length: 10 }, (_, index) => index),
+  );
+  assert.ok(
+    hashState.every(
+      ({ adapterKind, symbol }) => adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_hash_state_dispatch",
+    ),
+  );
   const namedScalar = callable.filter(({ family }) => family === "namedScalar");
   assert.equal(namedScalar.length, 20);
-  assert.deepEqual(namedScalar.map(({ adapterId }) => adapterId), Array.from({ length: 20 }, (_, index) => index));
-  assert.ok(namedScalar.every(({ adapterKind, symbol }) =>
-    adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_named_scalar_dispatch"));
+  assert.deepEqual(
+    namedScalar.map(({ adapterId }) => adapterId),
+    Array.from({ length: 20 }, (_, index) => index),
+  );
+  assert.ok(
+    namedScalar.every(
+      ({ adapterKind, symbol }) => adapterKind === "family-dispatch" && symbol === "deherm_dmsdk_named_scalar_dispatch",
+    ),
+  );
   assert.equal(providerRequired.filter(({ family }) => family === "borrowedHandle").length, 0);
-  assert.equal(providerRequired.filter(({ family }) => family === "scratchScalarOut").length, 7);
-  assert.ok(providerRequired.every(({ requirements, applicability }) =>
-    applicability === "provider-required" && requirements.length > 0));
+  assert.equal(providerRequired.filter(({ family }) => family === "scratchScalarOut").length, 11);
+  assert.ok(
+    providerRequired.every(
+      ({ requirements, applicability }) => applicability === "provider-required" && requirements.length > 0,
+    ),
+  );
   assert.ok(plans.every(({ planSha256 }) => /^[0-9a-f]{64}$/.test(planSha256)));
 });
 
 test("callable generated adapter selections emit compile-valid exact linker identities", async () => {
   const selected = ["scalar", "cstringValue"].map((family) => {
-    const recipe = dmSdkUniversalRecipes.find((candidate) =>
-      candidate.preferredLowering?.family === family);
+    const recipe = dmSdkUniversalRecipes.find((candidate) => candidate.preferredLowering?.family === family);
     assert.ok(recipe, `missing ${family} adapter recipe`);
     const plan = resolveDmSdkConcreteCallPlan(recipe);
     return {
@@ -198,20 +247,32 @@ test("callable generated adapter selections emit compile-valid exact linker iden
     run(compiler, [
       "-std=c++17",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "-c", source,
-      "-o", path.join(directory, "adapter-plan.o"),
+      "-c",
+      source,
+      "-o",
+      path.join(directory, "adapter-plan.o"),
     ]);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }
-  const blockedRecipe = dmSdkUniversalRecipes.find((candidate) =>
-    candidate.preferredLowering?.family === "scratchScalarOut");
-  await assert.rejects(async () => materializeDmSdkGeneratedAdapterUsages([{
-    declarationId: blockedRecipe.declarationId,
-  }], {
-    recipes: dmSdkUniversalRecipes,
-    catalogSha256: dmSdkUniversalCatalogSha256,
-  }), /has no callable generated adapter route/);
+  const blockedRecipe = dmSdkUniversalRecipes.find(
+    (candidate) => candidate.preferredLowering?.family === "scratchScalarOut",
+  );
+  await assert.rejects(
+    async () =>
+      materializeDmSdkGeneratedAdapterUsages(
+        [
+          {
+            declarationId: blockedRecipe.declarationId,
+          },
+        ],
+        {
+          recipes: dmSdkUniversalRecipes,
+          catalogSha256: dmSdkUniversalCatalogSha256,
+        },
+      ),
+    /has no callable generated adapter route/,
+  );
 });
 
 test("all callable generated adapters own same-recipe C ABI and emitted-JSI exact vectors", async (context) => {
@@ -237,8 +298,17 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
   assert.equal(corpus.report.verification.vectorCount, 94);
   assert.equal(corpus.report.verification.jsiVectorCount, 33);
   assert.deepEqual(Object.keys(corpus.report.sourceHashes.familyReports).sort(), [
-    "arenaCString", "astcProbe", "base64Span", "cstringValue", "enumValue",
-    "fixedDigest", "hashSpan", "hashState", "namedScalar", "scalar", "xteaSpan",
+    "arenaCString",
+    "astcProbe",
+    "base64Span",
+    "cstringValue",
+    "enumValue",
+    "fixedDigest",
+    "hashSpan",
+    "hashState",
+    "namedScalar",
+    "scalar",
+    "xteaSpan",
   ]);
   for (const evidence of Object.values(corpus.report.sourceHashes.familyReports)) {
     assert.match(evidence.sha256, /^[0-9a-f]{64}$/u);
@@ -270,14 +340,20 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
   }
   assert.equal(new Set(corpus.report.verification.vectors.map(({ vectorSha256 }) => vectorSha256)).size, 94);
   assert.deepEqual(
-    [...new Set(corpus.report.verification.vectors
-      .filter(({ transports }) => transports.dynamicHermesJsi.applicability === "callable")
-      .map(({ family }) => family))].sort(),
+    [
+      ...new Set(
+        corpus.report.verification.vectors
+          .filter(({ transports }) => transports.dynamicHermesJsi.applicability === "callable")
+          .map(({ family }) => family),
+      ),
+    ].sort(),
     ["enumValue", "scalar"],
   );
-  assert.ok(corpus.report.verification.vectors
-    .filter(({ family }) => family === "cstringValue")
-    .every(({ transports }) => transports.dynamicHermesJsi.applicability === "not-emitted"));
+  assert.ok(
+    corpus.report.verification.vectors
+      .filter(({ family }) => family === "cstringValue")
+      .every(({ transports }) => transports.dynamicHermesJsi.applicability === "not-emitted"),
+  );
   const [committedPlan, committedSource, committedJsiSource] = await Promise.all([
     readFile(path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.plan), "utf8"),
     readFile(path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.verificationSource), "utf8"),
@@ -290,22 +366,46 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
   try {
     const harness = path.join(output, "harness.cpp");
     const executable = path.join(output, "adapter-exact");
-    await writeFile(harness, "extern \"C\" int deherm_dmsdk_run_generated_adapter_exact_verification(void);int main(){return deherm_dmsdk_run_generated_adapter_exact_verification();}\n");
-    const sdkRoot = path.join(root,
-      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+    await writeFile(
+      harness,
+      'extern "C" int deherm_dmsdk_run_generated_adapter_exact_verification(void);int main(){return deherm_dmsdk_run_generated_adapter_exact_verification();}\n',
+    );
+    const sdkRoot = path.join(
+      root,
+      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
+    );
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
       "-DDEHERM_ENABLE_PRIVATE_DMSDK_CSTRING_VALUE=1",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "-isystem", path.join(sdkRoot, "sdk/include"),
-      "-isystem", path.join(sdkRoot, "include"),
-      "-isystem", path.join(sdkRoot, "ext/include"),
+      "-isystem",
+      path.join(sdkRoot, "sdk/include"),
+      "-isystem",
+      path.join(sdkRoot, "include"),
+      "-isystem",
+      path.join(sdkRoot, "ext/include"),
       ...[
-        "scalar_runtime", "enum_value_runtime", "named_scalar_runtime", "fixed_digest_runtime", "hash_span_runtime", "base64_span_runtime",
-        "xtea_span_runtime", "astc_probe_runtime", "cstring_value_runtime", "cstring_value", "arena_cstring", "hash_state",
+        "scalar_runtime",
+        "enum_value_runtime",
+        "named_scalar_runtime",
+        "fixed_digest_runtime",
+        "hash_span_runtime",
+        "base64_span_runtime",
+        "xtea_span_runtime",
+        "astc_probe_runtime",
+        "cstring_value_runtime",
+        "cstring_value",
+        "arena_cstring",
+        "hash_state",
       ].map((name) => `defold/defold_hermes/src/generated_dmsdk_${name}.cpp`),
-      path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.verificationSource), harness,
-      "-o", executable,
+      path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.verificationSource),
+      harness,
+      "-o",
+      executable,
     ]);
     run(executable, []);
   } finally {
@@ -317,33 +417,50 @@ test("all callable generated adapters own same-recipe C ABI and emitted-JSI exac
     try {
       const harness = path.join(output, "harness.cpp");
       const executable = path.join(output, "adapter-jsi-exact");
-      await writeFile(harness, "extern \"C\" int deherm_dmsdk_run_generated_adapter_jsi_exact_verification(void);int main(){return deherm_dmsdk_run_generated_adapter_jsi_exact_verification();}\n");
-      const linkFlags = process.platform === "linux" ? ["-pthread", "-ldl"] : ["-pthread", "-framework", "CoreFoundation"];
+      await writeFile(
+        harness,
+        'extern "C" int deherm_dmsdk_run_generated_adapter_jsi_exact_verification(void);int main(){return deherm_dmsdk_run_generated_adapter_jsi_exact_verification();}\n',
+      );
+      const linkFlags =
+        process.platform === "linux" ? ["-pthread", "-ldl"] : ["-pthread", "-framework", "CoreFoundation"];
       run(compiler, [
-        "-std=c++17", "-Wall", "-Wextra", "-Werror",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
         `-I${path.join(root, "defold/defold_hermes/include")}`,
-        "-isystem", path.join(root, "upstream/hermes/API"),
-        "-isystem", path.join(root, "upstream/hermes/API/jsi"),
-        "-isystem", path.join(root, "upstream/hermes/public"),
+        "-isystem",
+        path.join(root, "upstream/hermes/API"),
+        "-isystem",
+        path.join(root, "upstream/hermes/API/jsi"),
+        "-isystem",
+        path.join(root, "upstream/hermes/public"),
         "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp",
         "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp",
         path.join(root, dmSdkGeneratedAdapterCorpusArtifacts.jsiVerificationSource),
-        harness, hermesArchive, ...linkFlags, "-o", executable,
+        harness,
+        hermesArchive,
+        ...linkFlags,
+        "-o",
+        executable,
       ]);
       run(executable, []);
     } finally {
       await rm(output, { recursive: true, force: true });
     }
   } else {
-    context.diagnostic(`generated-adapter JSI runtime skipped: no packaged Hermes archive for ${process.platform}-${process.arch}`);
+    context.diagnostic(
+      `generated-adapter JSI runtime skipped: no packaged Hermes archive for ${process.platform}-${process.arch}`,
+    );
   }
 });
 
 test("generated-adapter exact generation rejects family-report route drift instead of correcting production identity", async () => {
   const directory = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-adapter-route-drift-"));
   try {
-    const source = JSON.parse(await readFile(path.join(root,
-      "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"), "utf8"));
+    const source = JSON.parse(
+      await readFile(path.join(root, "packages/bindings/generated/defold-dmsdk-arena-span-blockers.json"), "utf8"),
+    );
     source.generatedDeclarations[0].denseId = source.generatedDeclarations.length;
     const report = path.join(directory, "arena.json");
     await writeFile(report, `${JSON.stringify(source, null, 2)}\n`);
@@ -386,15 +503,21 @@ test("Static Hermes dmSDK frame artifacts come from the stable compiler capabili
   assert.match(emitted.source, /DEHERM_DMSDK_STATIC_FRAME_ARGUMENT_CAPACITY/);
   assert.match(emitted.staticHermes, /DMSDK_UNIVERSAL_MAX_ARGUMENTS=32/);
   const [header, source, staticHermes] = await Promise.all([
-    readFile(path.join(root, "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h"), "utf8"),
+    readFile(
+      path.join(root, "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_static_frame.h"),
+      "utf8",
+    ),
     readFile(path.join(root, "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp"), "utf8"),
     readFile(path.join(root, "packages/static-hermes/src/generated/dmsdk-universal.ts"), "utf8"),
   ]);
-  assert.deepEqual({ header, source, staticHermes }, {
-    header: emitted.header,
-    source: emitted.source,
-    staticHermes: emitted.staticHermes,
-  });
+  assert.deepEqual(
+    { header, source, staticHermes },
+    {
+      header: emitted.header,
+      source: emitted.source,
+      staticHermes: emitted.staticHermes,
+    },
+  );
 });
 
 test("Static Hermes applicability accounts for every canonical universal-ready exact vector", async () => {
@@ -406,13 +529,10 @@ test("Static Hermes applicability accounts for every canonical universal-ready e
   assert.equal(partition.blockedVectorCount, 0);
   assert.equal(partition.vectors.length, partition.vectorCount);
   assert.match(partition.partitionSha256, /^[0-9a-f]{64}$/u);
-  assert.ok(partition.vectors.every(({ disposition, blockers }) =>
-    disposition === "execute" && blockers.length === 0));
+  assert.ok(partition.vectors.every(({ disposition, blockers }) => disposition === "execute" && blockers.length === 0));
   assert.deepEqual(
-    partition.vectors.map(({ vectorIndex, numericId, vectorSha256 }) =>
-      ({ vectorIndex, numericId, vectorSha256 })),
-    vectors.map(({ numericId, vectorSha256 }, vectorIndex) =>
-      ({ vectorIndex, numericId, vectorSha256 })),
+    partition.vectors.map(({ vectorIndex, numericId, vectorSha256 }) => ({ vectorIndex, numericId, vectorSha256 })),
+    vectors.map(({ numericId, vectorSha256 }, vectorIndex) => ({ vectorIndex, numericId, vectorSha256 })),
   );
   assert.deepEqual(
     partitionDmSdkUniversalStaticExactVectors(vectors),
@@ -428,10 +548,9 @@ test("Static Hermes applicability retains unsupported vectors with machine-reada
     numericId: 7,
     vectorSha256: "a".repeat(64),
     argumentCount: capability.argumentCapacity + 1,
-    wireArguments: Array.from(
-      { length: capability.argumentCapacity },
-      (_, slot) => ({ tag: slot === 3 ? "future-wire-tag" : "u64" }),
-    ),
+    wireArguments: Array.from({ length: capability.argumentCapacity }, (_, slot) => ({
+      tag: slot === 3 ? "future-wire-tag" : "u64",
+    })),
     result: { fakeReturn: { tag: "future-result-tag" } },
   };
   const partition = partitionDmSdkUniversalStaticExactVectors([vector]);
@@ -462,18 +581,37 @@ test("universal dmSDK ABI header is C11-compatible and linkable", async () => {
     const caller = path.join(output, "caller.c");
     const object = path.join(output, "caller.o");
     const executable = path.join(output, "caller");
-    await writeFile(caller, `
+    await writeFile(
+      caller,
+      `
 #include <defold_hermes/generated_dmsdk_universal.h>
 int main(void) {
   DehermDmSdkUniversalValue result = {0};
   return deherm_dmsdk_universal_count() == 1361 &&
     deherm_dmsdk_universal_dispatch(1361, 0, 0, &result) == DEHERM_DMSDK_UNIVERSAL_UNKNOWN_ID ? 0 : 1;
 }
-`);
-    run(process.env.CC || "clang", ["-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      `-I${path.join(root, "defold/defold_hermes/include")}`, "-c", caller, "-o", object]);
-    run(compiler, ["-std=c++17", `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "defold/defold_hermes/src/generated_dmsdk_universal.cpp", object, "-o", executable]);
+`,
+    );
+    run(process.env.CC || "clang", [
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "-c",
+      caller,
+      "-o",
+      object,
+    ]);
+    run(compiler, [
+      "-std=c++17",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
+      object,
+      "-o",
+      executable,
+    ]);
     run(executable, []);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -496,10 +634,16 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
     usages.map(({ declarationId }) => declarationId),
   );
   assert.deepEqual(
-    corpus.report.production.manifest.map(({ declarationId, numericId, verificationVectorSha256 }) =>
-      ({ declarationId, numericId, vectorSha256: verificationVectorSha256 })),
-    corpus.report.verification.vectors.map(({ declarationId, numericId, vectorSha256 }) =>
-      ({ declarationId, numericId, vectorSha256 })),
+    corpus.report.production.manifest.map(({ declarationId, numericId, verificationVectorSha256 }) => ({
+      declarationId,
+      numericId,
+      vectorSha256: verificationVectorSha256,
+    })),
+    corpus.report.verification.vectors.map(({ declarationId, numericId, vectorSha256 }) => ({
+      declarationId,
+      numericId,
+      vectorSha256,
+    })),
   );
   assert.deepEqual(
     generated.verification.vectors.map(({ numericId }) => numericId),
@@ -529,32 +673,60 @@ test("every declaration-only universal-ready recipe compiles and executes its ex
   assert.equal(committedProduction, generated.source);
   assert.equal(committedVerification, generated.verificationSource);
   for (const source of [generated.source, generated.verificationSource]) {
-    assert.match(source,
+    assert.match(
+      source,
       /#if defined\(__linux__\) && !defined\(ANDROID\)\n#define Font DehermX11Font\n#include <GL\/glx\.h>\n#undef Font\n#ifdef None\n#undef None\n#endif\n#endif/u,
-      "a native-graphics materialization must isolate Xlib's global Font typedef and None macro");
+      "a native-graphics materialization must isolate Xlib's global Font typedef and None macro",
+    );
   }
   assert.doesNotMatch(helperSource, /dmsdk:[^"'\s]+@/, "the corpus helper must not own declaration IDs");
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-ready-census-"));
   try {
     const harness = path.join(output, "ready-harness.cpp");
     const executable = path.join(output, "ready-census");
-    await writeFile(harness, `extern "C" int ${generated.verification.driver.function}(void);\nint main(){return ${generated.verification.driver.function}();}\n`);
-    const sdkRoot = path.join(root,
-      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+    await writeFile(
+      harness,
+      `extern "C" int ${generated.verification.driver.function}(void);\nint main(){return ${generated.verification.driver.function}();}\n`,
+    );
+    const sdkRoot = path.join(
+      root,
+      "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
+    );
     const includeArgs = [
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "-isystem", path.join(sdkRoot, "sdk/include"),
-      "-isystem", path.join(sdkRoot, "include"),
-      "-isystem", path.join(sdkRoot, "ext/include"),
-      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+      "-isystem",
+      path.join(sdkRoot, "sdk/include"),
+      "-isystem",
+      path.join(sdkRoot, "include"),
+      "-isystem",
+      path.join(sdkRoot, "ext/include"),
+      '-DDLIB_LOG_DOMAIN="deherm"',
     ];
-    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      ...includeArgs, "-c", path.join(root, dmSdkUniversalReadyCorpusArtifacts.productionSource),
-      "-o", path.join(output, "ready.o")]);
-    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      ...includeArgs, "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
-      path.join(root, dmSdkUniversalReadyCorpusArtifacts.verificationSource), harness,
-      "-o", executable]);
+    run(compiler, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      ...includeArgs,
+      "-c",
+      path.join(root, dmSdkUniversalReadyCorpusArtifacts.productionSource),
+      "-o",
+      path.join(output, "ready.o"),
+    ]);
+    run(compiler, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      ...includeArgs,
+      "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
+      path.join(root, dmSdkUniversalReadyCorpusArtifacts.verificationSource),
+      harness,
+      "-o",
+      executable,
+    ]);
     run(executable, []);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -566,7 +738,9 @@ test("Static Hermes dmSDK transport owns a bounded reentrant frame", async () =>
   try {
     const harness = path.join(output, "static-frame.cpp");
     const executable = path.join(output, "static-frame");
-    await writeFile(harness, `
+    await writeFile(
+      harness,
+      `
 #include <defold_hermes/generated_dmsdk_universal_static_frame.h>
 #include <stdint.h>
 extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(uint32_t id,const DehermDmSdkUniversalValue* arguments,uint32_t count,DehermDmSdkUniversalValue* result){
@@ -583,10 +757,20 @@ int main(){
   for(auto* frame:frames)deherm_dmsdk_static_frame_release(frame);
   return deherm_dmsdk_static_frame_acquire()?0:6;
 }
-`);
-    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+`,
+    );
+    run(compiler, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp", harness, "-o", executable]);
+      "defold/defold_hermes/src/generated_dmsdk_universal_static_frame.cpp",
+      harness,
+      "-o",
+      executable,
+    ]);
     run(executable, []);
   } finally {
     await rm(output, { recursive: true, force: true });
@@ -606,16 +790,29 @@ test("universal dmSDK runtime bridge is generated, catalog-authenticated, and di
   assert.match(source, /deherm_dmsdk_universal_catalog_sha256/);
   assert.match(source, /isInt64/);
   assert.match(source, /memory\.byteLength/);
-  assert.match(web, /DMSDK_UNIVERSAL__deps:\["deherm_dmsdk_universal_dispatch","deherm_dmsdk_universal_catalog_sha256"\]/);
+  assert.match(
+    web,
+    /DMSDK_UNIVERSAL__deps:\["deherm_dmsdk_universal_dispatch","deherm_dmsdk_universal_catalog_sha256"\]/,
+  );
   assert.match(typescript, /catalog identity mismatch/);
   assert.match(installer, /installDmSdkUniversalModule\(runtime, modules\)/);
   assert.match(staticHermes, /deherm_dmsdk_static_frame_dispatch/);
   assert.doesNotMatch(staticHermes, /function deherm_dmsdk_universal_dispatch/);
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-universal-jsi-"));
   try {
-    run(compiler, ["-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      `-I${path.join(root, "defold/defold_hermes/include")}`, `-I${path.join(root, "upstream/hermes/API/jsi")}`,
-      "-c", "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp", "-o", path.join(output, "jsi.o")]);
+    run(compiler, [
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      `-I${path.join(root, "upstream/hermes/API/jsi")}`,
+      "-c",
+      "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp",
+      "-o",
+      path.join(output, "jsi.o"),
+    ]);
   } finally {
     await rm(output, { recursive: true, force: true });
   }
@@ -648,7 +845,9 @@ test("browser arena adapter executes typed direct-memory cells with balanced scr
       }
       return result;
     },
-    release(address, size, alignment) { released.push([address, size, alignment]); },
+    release(address, size, alignment) {
+      released.push([address, size, alignment]);
+    },
     dispatch(id, args, count, result) {
       const view = new DataView(memory.buffer);
       if (id === 7 && count === 1) {
@@ -662,7 +861,8 @@ test("browser arena adapter executes typed direct-memory cells with balanced scr
         const pointer = Number(view.getBigUint64(args, true));
         const length = Number(view.getBigUint64(args + 8, true));
         assert.equal(new TextDecoder().decode(new Uint8Array(memory.buffer, pointer, length)), "arena");
-        view.setBigUint64(result, 1n, true); view.setUint32(result + 16, 1, true);
+        view.setBigUint64(result, 1n, true);
+        view.setUint32(result + 16, 1, true);
         return 0;
       }
       return 1;
@@ -673,13 +873,17 @@ test("browser arena adapter executes typed direct-memory cells with balanced scr
   assert.equal(bridge.call(8, ["arena"]), true);
   assert.equal(grewDuringStringEncoding, true);
   assert.ok(released.length >= 5);
-  assert.throws(() => createBrowserDmSdkUniversalBridge({ ...transport, catalogSha256: "0".repeat(64) }), /catalog identity mismatch/);
+  assert.throws(
+    () => createBrowserDmSdkUniversalBridge({ ...transport, catalogSha256: "0".repeat(64) }),
+    /catalog identity mismatch/,
+  );
 });
 
 test("exact C-string fixtures carry their UTF-8 byte length in the universal auxiliary field", async () => {
   const plan = JSON.parse(await readFile(path.join(root, dmSdkUniversalReadyCorpusArtifacts.plan), "utf8"));
   const vector = plan.verification.vectors.find(({ wireArguments }) =>
-    wireArguments.some(({ fixture }) => fixture === "cstring"));
+    wireArguments.some(({ fixture }) => fixture === "cstring"),
+  );
   assert.ok(vector, "canonical exact corpus must contain a C-string argument");
   const cstring = vector.wireArguments.find(({ fixture }) => fixture === "cstring");
   assert.equal(cstring.auxiliary, Buffer.byteLength(cstring.value));
@@ -699,16 +903,46 @@ test("usage materializer compiles, links, and runs direct, function-template, co
   const capacity = recipe(report, "dmArray::dmArray::Capacity");
   const destructor = recipe(report, "dmArray::dmArray::~dmArray<T>");
   const clamp = recipe(report, "dmMath::Clamp");
-  const i32 = (name, position) => ({ name, position, nativeType: "int32_t", direction: "value", shape: { kind: "scalar", name: "i32" }, requirements: [] });
+  const i32 = (name, position) => ({
+    name,
+    position,
+    nativeType: "int32_t",
+    direction: "value",
+    shape: { kind: "scalar", name: "i32" },
+    requirements: [],
+  });
   const usages = [
-    { declarationId: toNetwork.declarationId, wrapper: "wrap_to_network", acknowledgements: { generatedAdapterBypass: { reason: "exercise universal fallback", evidence: "native harness checks endian round trip" } } },
-    { declarationId: toHost.declarationId, wrapper: "wrap_to_host", acknowledgements: { generatedAdapterBypass: { reason: "exercise universal fallback", evidence: "native harness checks endian round trip" } } },
+    {
+      declarationId: toNetwork.declarationId,
+      wrapper: "wrap_to_network",
+      acknowledgements: {
+        generatedAdapterBypass: {
+          reason: "exercise universal fallback",
+          evidence: "native harness checks endian round trip",
+        },
+      },
+    },
+    {
+      declarationId: toHost.declarationId,
+      wrapper: "wrap_to_host",
+      acknowledgements: {
+        generatedAdapterBypass: {
+          reason: "exercise universal fallback",
+          evidence: "native harness checks endian round trip",
+        },
+      },
+    },
     {
       declarationId: constructor.declarationId,
       wrapper: "wrap_array_construct",
       receiverCppType: "dmArray<uint32_t>",
       typeSubstitutions: { T: "uint32_t" },
-      acknowledgements: { outStorageInitializationFailure: { reason: "fixture supplies aligned placement storage", evidence: "native harness constructs and destroys the object" } },
+      acknowledgements: {
+        outStorageInitializationFailure: {
+          reason: "fixture supplies aligned placement storage",
+          evidence: "native harness constructs and destroys the object",
+        },
+      },
     },
     { declarationId: capacity.declarationId, wrapper: "wrap_array_capacity", receiverCppType: "dmArray<uint32_t>" },
     { declarationId: destructor.declarationId, wrapper: "wrap_array_destroy", receiverCppType: "dmArray<uint32_t>" },
@@ -721,9 +955,15 @@ test("usage materializer compiles, links, and runs direct, function-template, co
       resultShape: { kind: "scalar", name: "i32" },
     },
   ];
-  const generated = materializeDmSdkUsages(usages, { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
-  assert.doesNotMatch(generated.source, /GL\/glx\.h/u,
-    "materializations without the native-graphics header must not acquire a GLX dependency");
+  const generated = materializeDmSdkUsages(usages, {
+    catalog: policyCatalog,
+    catalogSha256: dmSdkUniversalCatalogSha256,
+  });
+  assert.doesNotMatch(
+    generated.source,
+    /GL\/glx\.h/u,
+    "materializations without the native-graphics header must not acquire a GLX dependency",
+  );
   assert.equal(generated.manifest.length, usages.length);
   assert.equal(generated.verification.vectorCount, usages.length);
   assert.equal(generated.verification.vectors.length, usages.length);
@@ -755,7 +995,9 @@ test("usage materializer compiles, links, and runs direct, function-template, co
     const executable = path.join(output, "universal-test");
     await writeFile(materialized, generated.source);
     await writeFile(verification, generated.verificationSource);
-    await writeFile(harness, `
+    await writeFile(
+      harness,
+      `
 #include <defold_hermes/generated_dmsdk_universal.h>
 #include <dmsdk/dlib/array.h>
 #include <stdint.h>
@@ -824,13 +1066,22 @@ int main() {
   puts("dmsdk-universal:ok");
   return 0;
 }
-`);
+`,
+    );
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
-      "defold/defold_hermes/src/generated_dmsdk_universal.cpp", materialized, harness,
-      "-o", executable,
+      "-isystem",
+      path.join(root, "upstream/defold/engine/dlib/src"),
+      "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
+      materialized,
+      harness,
+      "-o",
+      executable,
     ]);
     assert.equal(run(executable, []).trim(), "dmsdk-universal:ok");
   } finally {
@@ -841,11 +1092,21 @@ int main() {
 test("usage materializer normalizes JavaScript numeric cells for f32 arguments and results", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
   const cosine = recipe(report, "dmTrigLookup::Cos");
-  const generated = materializeDmSdkUsages([{
-    declarationId: cosine.declarationId,
-    wrapper: "wrap_cosine",
-    acknowledgements: { generatedAdapterBypass: { reason: "exercise universal fallback", evidence: "source assertions verify f64 normalization" } },
-  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+  const generated = materializeDmSdkUsages(
+    [
+      {
+        declarationId: cosine.declarationId,
+        wrapper: "wrap_cosine",
+        acknowledgements: {
+          generatedAdapterBypass: {
+            reason: "exercise universal fallback",
+            evidence: "source assertions verify f64 normalization",
+          },
+        },
+      },
+    ],
+    { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 },
+  );
   assert.match(generated.source, /static_cast<float>\(deherm_dmsdk_unpack_f64\(arguments\[0\]\.payload\)\)/);
   assert.match(generated.source, /const double normalized = static_cast<double>\(value\)/);
   assert.doesNotMatch(generated.source, /deherm_dmsdk_unpack_f32/);
@@ -853,7 +1114,9 @@ test("usage materializer normalizes JavaScript numeric cells for f32 arguments a
 
 test("generated exact-call fixtures stay within the declared narrow integer width", async () => {
   const report = JSON.parse(await readFile(reportPath, "utf8"));
-  const base = structuredClone(recipe(report, "dmEndian::ByteSwap", (item) => item.abi.parameters[0]?.nativeType === "uint16_t"));
+  const base = structuredClone(
+    recipe(report, "dmEndian::ByteSwap", (item) => item.abi.parameters[0]?.nativeType === "uint16_t"),
+  );
   const numericId = 531;
   const declarationId = "dmsdk:fixture::NarrowU8@tests/fixtures/narrow_u8.h:1:1";
   const narrow = {
@@ -869,11 +1132,13 @@ test("generated exact-call fixtures stay within the declared narrow integer widt
       ...base.abi,
       resultNativeType: "uint8_t",
       resultShape: { kind: "scalar", name: "u8" },
-      parameters: [{
-        ...base.abi.parameters[0],
-        nativeType: "uint8_t",
-        shape: { kind: "scalar", name: "u8" },
-      }],
+      parameters: [
+        {
+          ...base.abi.parameters[0],
+          nativeType: "uint8_t",
+          shape: { kind: "scalar", name: "u8" },
+        },
+      ],
     },
   };
   const recipes = structuredClone(policyCatalog.recipes);
@@ -892,7 +1157,9 @@ test("generated exact-call fixtures stay within the declared narrow integer widt
     const harness = path.join(output, "harness.cpp");
     const executable = path.join(output, "narrow-width");
     await writeFile(verification, generated.verificationSource);
-    await writeFile(harness, `#include "materialized.verify.cpp"
+    await writeFile(
+      harness,
+      `#include "materialized.verify.cpp"
 static DehermDmSdkUniversalProvider provider=nullptr;
 static void* provider_context=nullptr;
 extern "C" void deherm_dmsdk_universal_install_provider(DehermDmSdkUniversalProvider value,void* context){provider=value;provider_context=context;}
@@ -902,11 +1169,18 @@ extern "C" DehermDmSdkUniversalStatus deherm_dmsdk_universal_dispatch(uint32_t i
   return provider(provider_context,&descriptor,arguments,argument_count,result);
 }
 int main(){return deherm_dmsdk_generated_provider_install_run_exact_verification();}
-`);
+`,
+    );
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      `-I${path.join(root, "defold/defold_hermes/include")}`, harness,
-      "-o", executable,
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      `-I${path.join(root, "defold/defold_hermes/include")}`,
+      harness,
+      "-o",
+      executable,
     ]);
     run(executable, []);
   } finally {
@@ -925,47 +1199,63 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
   const reference = recipe(report, "dmArray::dmArray::Push");
   const callback = recipe(report, "dmLog::RegisterLogListener");
   const span = recipe(report, "dmHashBuffer32");
-  const bypass = { generatedAdapterBypass: { reason: "exercise exact universal decoding", evidence: "generated native driver records the native call and result" } };
-  const generated = materializeDmSdkUsages([
-    { declarationId: boolean.declarationId, wrapper: "verify_bool", acknowledgements: bypass },
-    {
-      declarationId: floating.declarationId,
-      wrapper: "verify_float",
-      acknowledgements: { generatedAdapterBypass: { reason: "exercise exact universal decoding", evidence: "generated native driver records the f32 call and result" } },
+  const bypass = {
+    generatedAdapterBypass: {
+      reason: "exercise exact universal decoding",
+      evidence: "generated native driver records the native call and result",
     },
-    { declarationId: enumeration.declarationId, wrapper: "verify_enum", acknowledgements: bypass },
-    { declarationId: cstring.declarationId, wrapper: "verify_cstring", acknowledgements: bypass },
-    {
-      declarationId: handle.declarationId,
-      wrapper: "verify_handle",
-      typeSubstitutions: { HBuffer: "dmBuffer::HBuffer" },
-      acknowledgements: bypass,
-    },
-    {
-      declarationId: pointerHandle.declarationId,
-      wrapper: "verify_pointer_handle",
-    },
-    {
-      declarationId: reference.declarationId,
-      wrapper: "verify_reference",
-      receiverCppType: "dmArray<uint32_t>",
-      typeSubstitutions: { T: "uint32_t" },
-      acknowledgements: bypass,
-    },
-    {
-      declarationId: callback.declarationId,
-      wrapper: "verify_callback",
-      callbackTrampolines: { 0: "native_log_listener" },
-      acknowledgements: {
-        callbackTrampoline: { reason: "exercise exact callback transport", evidence: "generated typed trampoline identity is recorded by the native driver" },
+  };
+  const generated = materializeDmSdkUsages(
+    [
+      { declarationId: boolean.declarationId, wrapper: "verify_bool", acknowledgements: bypass },
+      {
+        declarationId: floating.declarationId,
+        wrapper: "verify_float",
+        acknowledgements: {
+          generatedAdapterBypass: {
+            reason: "exercise exact universal decoding",
+            evidence: "generated native driver records the f32 call and result",
+          },
+        },
       },
-    },
-    {
-      declarationId: span.declarationId,
-      wrapper: "verify_span",
-      acknowledgements: bypass,
-    },
-  ], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+      { declarationId: enumeration.declarationId, wrapper: "verify_enum", acknowledgements: bypass },
+      { declarationId: cstring.declarationId, wrapper: "verify_cstring", acknowledgements: bypass },
+      {
+        declarationId: handle.declarationId,
+        wrapper: "verify_handle",
+        typeSubstitutions: { HBuffer: "dmBuffer::HBuffer" },
+        acknowledgements: bypass,
+      },
+      {
+        declarationId: pointerHandle.declarationId,
+        wrapper: "verify_pointer_handle",
+      },
+      {
+        declarationId: reference.declarationId,
+        wrapper: "verify_reference",
+        receiverCppType: "dmArray<uint32_t>",
+        typeSubstitutions: { T: "uint32_t" },
+        acknowledgements: bypass,
+      },
+      {
+        declarationId: callback.declarationId,
+        wrapper: "verify_callback",
+        callbackTrampolines: { 0: "native_log_listener" },
+        acknowledgements: {
+          callbackTrampoline: {
+            reason: "exercise exact callback transport",
+            evidence: "generated typed trampoline identity is recorded by the native driver",
+          },
+        },
+      },
+      {
+        declarationId: span.declarationId,
+        wrapper: "verify_span",
+        acknowledgements: bypass,
+      },
+    ],
+    { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 },
+  );
   assert.deepEqual(
     generated.verification.vectors.map((vector) => ({
       arguments: vector.wireArguments.map(({ tag, fixture }) => fixture ?? tag),
@@ -985,26 +1275,38 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
   );
   assert.match(generated.verification.evidenceBoundary, /does not execute Defold implementation semantics/);
   assert.doesNotMatch(generated.verification.evidenceBoundary, /consumer harness defines/);
-  assert.deepEqual({ ...generated.verification.observations, sourceSha256: undefined }, {
-    reset: "deherm_dmsdk_generated_provider_install_reset_exact_observations",
-    calls: "deherm_dmsdk_generated_provider_install_exact_call_count",
-    failures: "deherm_dmsdk_generated_provider_install_exact_failure_count",
-    sourceSha256: undefined,
-  });
+  assert.deepEqual(
+    { ...generated.verification.observations, sourceSha256: undefined },
+    {
+      reset: "deherm_dmsdk_generated_provider_install_reset_exact_observations",
+      calls: "deherm_dmsdk_generated_provider_install_exact_call_count",
+      failures: "deherm_dmsdk_generated_provider_install_exact_failure_count",
+      sourceSha256: undefined,
+    },
+  );
   assert.match(generated.verification.observations.sourceSha256, /^[0-9a-f]{64}$/);
   assert.match(generated.verification.driver.sourceSha256, /^[0-9a-f]{64}$/);
-  assert.ok(generated.verification.vectors.every(({
-    compileTimeResolution,
-    declaredOwnership,
-    declaredOwnershipEffectMask,
-  }) =>
-    compileTimeResolution.declaredNativeSymbol && compileTimeResolution.callExpression &&
-    compileTimeResolution.returnCppType && Array.isArray(compileTimeResolution.parameterCppTypes) &&
-    declaredOwnership.result && Number.isSafeInteger(declaredOwnershipEffectMask)));
+  assert.ok(
+    generated.verification.vectors.every(
+      ({ compileTimeResolution, declaredOwnership, declaredOwnershipEffectMask }) =>
+        compileTimeResolution.declaredNativeSymbol &&
+        compileTimeResolution.callExpression &&
+        compileTimeResolution.returnCppType &&
+        Array.isArray(compileTimeResolution.parameterCppTypes) &&
+        declaredOwnership.result &&
+        Number.isSafeInteger(declaredOwnershipEffectMask),
+    ),
+  );
   assert.match(generated.verification.evidenceBoundary, /does not prove actual Defold-library linkage/);
   assert.match(generated.verification.evidenceBoundary, /Ownership metadata is a declared contract only/);
-  assert.match(generated.source, /extern std::remove_pointer_t<DehermCallback_verify_callback_Arg0> native_log_listener/);
-  assert.match(generated.verificationSource, /#define native_log_listener \(&DehermExactCallbackFixture<DehermCallback_verify_callback_Arg0>::call\)/);
+  assert.match(
+    generated.source,
+    /extern std::remove_pointer_t<DehermCallback_verify_callback_Arg0> native_log_listener/,
+  );
+  assert.match(
+    generated.verificationSource,
+    /#define native_log_listener \(&DehermExactCallbackFixture<DehermCallback_verify_callback_Arg0>::call\)/,
+  );
   const output = await mkdtemp(path.join(tmpdir(), "deherm-dmsdk-exact-shapes-"));
   try {
     const production = path.join(output, "materialized.cpp");
@@ -1013,7 +1315,9 @@ test("generated exact-call driver owns deterministic scalar, pointer-like, callb
     const executable = path.join(output, "exact-shapes");
     await writeFile(production, generated.source);
     await writeFile(verification, generated.verificationSource);
-    await writeFile(harness, `
+    await writeFile(
+      harness,
+      `
 #include "materialized.verify.cpp"
 int main() {
   const int status = deherm_dmsdk_generated_provider_install_run_exact_verification();
@@ -1023,21 +1327,37 @@ int main() {
   deherm_dmsdk_generated_provider_install_reset_exact_observations();
   return deherm_dmsdk_generated_provider_install_exact_call_count(UINT32_C(${boolean.numericId})) == 0 ? 0 : 92;
 }
-`);
+`,
+    );
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      '-DDLIB_LOG_DOMAIN="deherm"',
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
-      "-c", production, "-o", path.join(output, "materialized.o"),
+      "-isystem",
+      path.join(root, "upstream/defold/engine/dlib/src"),
+      "-c",
+      production,
+      "-o",
+      path.join(output, "materialized.o"),
     ]);
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      "-DDLIB_LOG_DOMAIN=\"deherm\"",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      '-DDLIB_LOG_DOMAIN="deherm"',
       `-I${path.join(root, "defold/defold_hermes/include")}`,
-      "-isystem", path.join(root, "upstream/defold/engine/dlib/src"),
-      "defold/defold_hermes/src/generated_dmsdk_universal.cpp", harness,
-      "-o", executable,
+      "-isystem",
+      path.join(root, "upstream/defold/engine/dlib/src"),
+      "defold/defold_hermes/src/generated_dmsdk_universal.cpp",
+      harness,
+      "-o",
+      executable,
     ]);
     run(executable, []);
   } finally {
@@ -1054,49 +1374,118 @@ test("usage materializer fails closed on catalog drift, unsafe bypass, arity ove
   const oversizedCatalog = structuredClone(policyCatalog);
   oversizedCatalog.abi = { maxArguments: DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY + 1 };
   oversizedCatalog.recipes[0].abi.argumentCount = DMSDK_UNIVERSAL_STATIC_FRAME_CAPACITY + 1;
-  assert.throws(() => materializeDmSdkUsages([], {
-    catalog: oversizedCatalog,
-    catalogSha256: dmSdkUniversalCatalogSha256,
-  }), /requires 33 arguments.*supports 32/);
+  assert.throws(
+    () =>
+      materializeDmSdkUsages([], {
+        catalog: oversizedCatalog,
+        catalogSha256: dmSdkUniversalCatalogSha256,
+      }),
+    /requires 33 arguments.*supports 32/,
+  );
   const inconsistentCatalog = structuredClone(policyCatalog);
   inconsistentCatalog.abi = { maxArguments: 14 };
-  assert.throws(() => materializeDmSdkUsages([], {
-    catalog: inconsistentCatalog,
-    catalogSha256: dmSdkUniversalCatalogSha256,
-  }), /abi\.maxArguments 14 does not match recipe maximum 15/);
+  assert.throws(
+    () =>
+      materializeDmSdkUsages([], {
+        catalog: inconsistentCatalog,
+        catalogSha256: dmSdkUniversalCatalogSha256,
+      }),
+    /abi\.maxArguments 14 does not match recipe maximum 15/,
+  );
   assert.throws(() => materializeDmSdkUsages([], {}), /requires a resolved policy catalog/);
-  assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /generatedAdapterBypass/);
-  assert.throws(() => materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, parameters: [], acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }), /override parameters only/);
-  const generated = materializeDmSdkUsages([{ declarationId: toNetwork.declarationId, acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } } }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+  assert.throws(
+    () =>
+      materializeDmSdkUsages([{ declarationId: toNetwork.declarationId }], {
+        catalog: policyCatalog,
+        catalogSha256: dmSdkUniversalCatalogSha256,
+      }),
+    /generatedAdapterBypass/,
+  );
+  assert.throws(
+    () =>
+      materializeDmSdkUsages(
+        [
+          {
+            declarationId: toNetwork.declarationId,
+            parameters: [],
+            acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } },
+          },
+        ],
+        { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 },
+      ),
+    /override parameters only/,
+  );
+  const generated = materializeDmSdkUsages(
+    [
+      {
+        declarationId: toNetwork.declarationId,
+        acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } },
+      },
+    ],
+    { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 },
+  );
   assert.match(generated.source, /payload <= UINT32_MAX/);
   assert.equal(generated.catalogSha256, dmSdkUniversalCatalogSha256);
-  assert.throws(() => materializeDmSdkUsages([{
-    declarationId: toNetwork.declarationId,
-    receiverCppType: "uint32_t",
-    acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } },
-  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }),
-  /may not declare receiverCppType for direct-function/);
-  const generatedEnumResult = materializeDmSdkUsages([{
-    declarationId: enumResult.declarationId,
-    typeSubstitutions: { HBuffer: "dmBuffer::HBuffer", Result: "dmBuffer::Result" },
-  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 });
+  assert.throws(
+    () =>
+      materializeDmSdkUsages(
+        [
+          {
+            declarationId: toNetwork.declarationId,
+            receiverCppType: "uint32_t",
+            acknowledgements: { generatedAdapterBypass: { reason: "test", evidence: "test harness" } },
+          },
+        ],
+        { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 },
+      ),
+    /may not declare receiverCppType for direct-function/,
+  );
+  const generatedEnumResult = materializeDmSdkUsages(
+    [
+      {
+        declarationId: enumResult.declarationId,
+        typeSubstitutions: { HBuffer: "dmBuffer::HBuffer", Result: "dmBuffer::Result" },
+      },
+    ],
+    { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 },
+  );
   assert.equal(generatedEnumResult.verification.vectors[0].result.fakeReturn.value, 0);
   const missingEnumFactCatalog = structuredClone(policyCatalog);
   delete missingEnumFactCatalog.recipes[enumResult.numericId].abi.resultEnumeration;
   missingEnumFactCatalog.sourceHashes.catalog = "f".repeat(64);
-  assert.throws(() => materializeDmSdkUsages([{
-    declarationId: enumResult.declarationId,
-    typeSubstitutions: { HBuffer: "dmBuffer::HBuffer", Result: "dmBuffer::Result" },
-  }], { catalog: missingEnumFactCatalog, catalogSha256: "f".repeat(64) }), /resultEnumValue/);
-  assert.throws(() => materializeDmSdkUsages([{
-    declarationId: recordArgument.declarationId,
-    typeSubstitutions: { Socket: "dmSocket::Socket", Address: "dmSocket::Address", Result: "dmSocket::Result" },
-    resultEnumValue: 0,
-    acknowledgements: {
-      recordLayout: { reason: "exercise unsupported exact record boundary", evidence: "materializer must fail before claiming a wire representation" },
-    },
-  }], { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 }),
-  /generic by-value record parameter 1 requires a typed size\/alignment\/lifetime provider/);
+  assert.throws(
+    () =>
+      materializeDmSdkUsages(
+        [
+          {
+            declarationId: enumResult.declarationId,
+            typeSubstitutions: { HBuffer: "dmBuffer::HBuffer", Result: "dmBuffer::Result" },
+          },
+        ],
+        { catalog: missingEnumFactCatalog, catalogSha256: "f".repeat(64) },
+      ),
+    /resultEnumValue/,
+  );
+  assert.throws(
+    () =>
+      materializeDmSdkUsages(
+        [
+          {
+            declarationId: recordArgument.declarationId,
+            typeSubstitutions: { Socket: "dmSocket::Socket", Address: "dmSocket::Address", Result: "dmSocket::Result" },
+            resultEnumValue: 0,
+            acknowledgements: {
+              recordLayout: {
+                reason: "exercise unsupported exact record boundary",
+                evidence: "materializer must fail before claiming a wire representation",
+              },
+            },
+          },
+        ],
+        { catalog: policyCatalog, catalogSha256: dmSdkUniversalCatalogSha256 },
+      ),
+    /generic by-value record parameter 1 requires a typed size\/alignment\/lifetime provider/,
+  );
 
   const configUsage = { declarationId: configFloat.declarationId };
   const nonNull = materializeDmSdkUsages([configUsage], {

@@ -17,7 +17,7 @@
       "hashSpan": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
       "arenaCString": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
       "borrowedHandle": "11d2ee221d5379b8b412101ef5f559a00c3db80bca5d88858337f662ffe547d4",
-      "scratchScalarOut": "97ff8f4f30737a138cf8f6562e545af8a14114f0d20988448841971538e1a4d0",
+      "scratchScalarOut": "02a14e57233e0d6a53b7f0724ea3d027b842f2580b81a6fc9020211314a0eff7",
       "cstringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
       "hashState": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
     },
@@ -25,20 +25,20 @@
       "borrowedHandle": "48b9913d92f5ccbc39f9136c7cd28430443066f2527d69cbbb3ffecf39198f73",
       "scratchScalarOut": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099"
     },
-    "catalog": "65cad4b62ffb26081b7380b75ef0ca9a54b8511055adef74a40758863b907556"
+    "catalog": "5519c6a1d213cb6c3c0836aea9b0fce2e3136be58fdb74d9b3bed05bca053409"
   },
   "patternCatalogSha256": "6aad7b00c66c5d0475bec124ca551ed9f05571e194e2dfbc7cef7eff2c0b72c3",
   "coverage": {
     "declarations": 1361,
-    "preferredSpecialized": 101,
-    "universalFallback": 1260,
-    "auditedFallback": 1260,
+    "preferredSpecialized": 105,
+    "universalFallback": 1256,
+    "auditedFallback": 1256,
     "silentlyOmitted": 0,
-    "shapeGroups": 848,
+    "shapeGroups": 844,
     "universalReady": 537,
-    "usageFactsRequired": 723,
+    "usageFactsRequired": 719,
     "existingAuxiliarySpecialization": 147,
-    "semanticRecipeCandidates": 272,
+    "semanticRecipeCandidates": 268,
     "composableUniversalOnly": 841
   },
   "patternCatalog": [
@@ -1819,56 +1819,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmGameSystem::GetMaterialConstant@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:177:1211"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "052641299d8fd968423f5f352a7b811d22ea40dfc8f82f372de0391958ddb165",
-      "kind": "function",
-      "shape": "scalar:void(value:handle:HTextLayout:opaque,inout:pointer:scalar:f32,inout:pointer:scalar:f32)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "pointer.scratch-scalar-out-provider-boundary",
-          "family": "scratch-scalar-out",
-          "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-          "missingSemanticTokens": []
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "handle.borrowed-provider-boundary",
-          "family": "borrowed-handle",
-          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:inout:pointer:scalar:f32",
-            "parameter-role:2:inout:pointer:scalar:f32"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-position:0:value:handle:HTextLayout:opaque",
-            "parameter-position:1:inout:pointer:scalar:f32",
-            "parameter-position:2:inout:pointer:scalar:f32"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867"
       ],
       "declarationCount": 1
     },
@@ -10160,56 +10110,6 @@
       "declarationCount": 3
     },
     {
-      "groupId": "3eebb31e91a088a78f782fc4fee3a274745358d011584c3e5cd00933764b753e",
-      "kind": "function",
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,inout:pointer:scalar:u32)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "pointer.scratch-scalar-out-provider-boundary",
-          "family": "scratch-scalar-out",
-          "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-          "missingSemanticTokens": []
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "span.in-place-keyed-transform",
-          "family": "xtea-span",
-          "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:2",
-            "parameter-position-count:2"
-          ]
-        },
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent",
-            "result-role:enum:dmBuffer::Result"
-          ]
-        },
-        {
-          "patternId": "value.enum-domain-direct",
-          "family": "enum-value",
-          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:dmBuffer::HBuffer:u32",
-            "parameter-role:1:inout:pointer:scalar:u32"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "4023db88f90dd16eae35410844194afcfb5258e243488f827898de676a8b8b35",
       "kind": "function",
       "shape": "scalar:void(inout:pointer:record:lua_State,in:cstring-in,in:pointer:record:luaL_Reg)",
@@ -12253,57 +12153,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmScript::LuaHBuffer::LuaHBuffer@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:163:1316"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "5007da9ce2d4c8eb6a876f2e0bea655d459c0ed6027251ce02f88bfd619a7505",
-      "kind": "function",
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,inout:pointer:scalar:u32)",
-      "families": [
-        "enum-handle",
-        "pointer",
-        "pointer-span"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "pointer.scratch-scalar-out-provider-boundary",
-          "family": "scratch-scalar-out",
-          "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-          "missingSemanticTokens": []
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "span.in-place-keyed-transform",
-          "family": "xtea-span",
-          "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:2",
-            "parameter-position-count:2"
-          ]
-        },
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent",
-            "result-role:enum:dmBuffer::Result"
-          ]
-        },
-        {
-          "patternId": "value.enum-domain-direct",
-          "family": "enum-value",
-          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:dmBuffer::HBuffer:u32",
-            "parameter-role:1:inout:pointer:scalar:u32"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmBuffer::GetCount@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:340:97"
       ],
       "declarationCount": 1
     },
@@ -35616,57 +35465,6 @@
       "declarationCount": 2
     },
     {
-      "groupId": "e899971c31421062404929e22a3269a9b078295677dcb7884d5cebdfea0015c5",
-      "kind": "function",
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:scalar:u64,inout:pointer:enum:dmBuffer::ValueType,inout:pointer:scalar:u32)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "pointer.scratch-scalar-out-provider-boundary",
-          "family": "scratch-scalar-out",
-          "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-          "missingSemanticTokens": []
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "span.in-place-keyed-transform",
-          "family": "xtea-span",
-          "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4"
-          ]
-        },
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent",
-            "result-role:enum:dmBuffer::Result"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4",
-            "result-role:enum:dmBuffer::Result"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "e8b5a83f112c76433ea828370870eb9a7078ff9875db8accb764053f3170eaab",
       "kind": "function",
       "shape": "scalar:bool(in:record-ref:dmGameSystem::PropVector3,value:scalar:u64)",
@@ -47733,28 +47531,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:template:T",
-            "parameter-role-direction-unsupported:0:inout:template:T",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:template:T",
-            "result-role-unsupported:template:T",
-            "semantic-token-unresolved:receiver-provenance-lifetime",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -48934,27 +48711,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:template:dmArray<T>",
-            "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:receiver-provenance-lifetime",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49153,17 +48910,41 @@
         "diagnostic": "dmsdk:dmArrayUtil::SetCapacity@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:52:11 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:2:pointer:scalar:usize",
+          "parameter-kind-unsupported:3:pointer:scalar:usize",
+          "parameter-kind-unsupported:4:pointer:scalar:usize",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "parameter-kind-unsupported:2:pointer:scalar:usize",
+            "parameter-kind-unsupported:3:pointer:scalar:usize",
+            "parameter-kind-unsupported:4:pointer:scalar:usize",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49200,17 +48981,35 @@
         "diagnostic": "dmsdk:dmAtomicAdd32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:79:81 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49247,17 +49046,35 @@
         "diagnostic": "dmsdk:dmAtomicCompareStore32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:128:84 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49294,17 +49111,35 @@
         "diagnostic": "dmsdk:dmAtomicDecrement32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:62:80 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49341,17 +49176,35 @@
         "diagnostic": "dmsdk:dmAtomicGet32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:144:85 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49388,17 +49241,35 @@
         "diagnostic": "dmsdk:dmAtomicIncrement32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:47:79 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49435,17 +49306,35 @@
         "diagnostic": "dmsdk:dmAtomicStore32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:111:83 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49482,17 +49371,35 @@
         "diagnostic": "dmsdk:dmAtomicSub32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:95:82 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -49769,75 +49676,6 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:opaque-pointer-out",
-            "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
-      "sourceState": {
-        "loweringState": "lowering-pending",
-        "family": null,
-        "policy": null,
-        "semanticTokensNeeded": [
-          "call-thread-affinity",
-          "enum-width-domain-validation",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
-          "target-feature-symbol-matrix"
-        ]
-      },
-      "availability": {
-        "state": "emitted",
-        "route": "universal-recipe",
-        "interventionRequired": false
-      }
-    },
-    {
-      "numericId": 173,
-      "declarationId": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102",
-      "groupId": "3eebb31e91a088a78f782fc4fee3a274745358d011584c3e5cd00933764b753e",
-      "universal": {
-        "action": "supply-usage-facts",
-        "state": "specialization-required",
-        "requirements": [
-          "call-thread-affinity",
-          "enum-width-domain-validation",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
-          "pointer-lifetime",
-          "target-feature-symbol-matrix"
-        ],
-        "diagnostic": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
-      },
-      "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
-        "requiredForAvailability": false,
-        "patternId": "pointer.scratch-scalar-out-provider-boundary",
-        "family": "scratch-scalar-out",
-        "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-        "missingSemanticTokens": [],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
-        "preserveUniversalUntilSpecialized": true
-      },
       "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
@@ -49850,81 +49688,6 @@
           "native-symbol-linkage",
           "out-storage-initialization-failure",
           "pointer-bounds-nullability-lifetime",
-          "target-feature-symbol-matrix"
-        ]
-      },
-      "availability": {
-        "state": "emitted",
-        "route": "universal-recipe",
-        "interventionRequired": false
-      }
-    },
-    {
-      "numericId": 174,
-      "declarationId": "dmsdk:dmBuffer::GetCount@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:340:97",
-      "groupId": "5007da9ce2d4c8eb6a876f2e0bea655d459c0ed6027251ce02f88bfd619a7505",
-      "universal": {
-        "action": "supply-usage-facts",
-        "state": "specialization-required",
-        "requirements": [
-          "call-thread-affinity",
-          "enum-width-domain-validation",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
-          "pointer-lifetime",
-          "span-pairing-element-unit-copy",
-          "target-feature-symbol-matrix"
-        ],
-        "diagnostic": "dmsdk:dmBuffer::GetCount@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:340:97 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
-      },
-      "optimization": {
-        "action": "resolve-specialization-blockers",
-        "requiredForAvailability": false,
-        "patternId": "pointer.scratch-scalar-out-provider-boundary",
-        "family": "scratch-scalar-out",
-        "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-        "missingSemanticTokens": [],
-        "generatorBlockers": [
-          "enum-width-domain-validation-policy",
-          "handle-provenance-or-engine-context",
-          "handle-provenance-ownership-nullability-policy",
-          "native-symbol-linkage-unverified",
-          "pointer-bounds-direction-lifetime-policy",
-          "span-element-unit-and-copy-policy"
-        ],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
-        "preserveUniversalUntilSpecialized": true
-      },
-      "attempts": [
-        {
-          "family": "arenaCString",
-          "state": "blocked",
-          "patternId": null,
-          "emitter": null,
-          "blockers": [
-            "enum-width-domain-validation-policy",
-            "handle-provenance-or-engine-context",
-            "handle-provenance-ownership-nullability-policy",
-            "native-symbol-linkage-unverified",
-            "pointer-bounds-direction-lifetime-policy",
-            "span-element-unit-and-copy-policy"
-          ]
-        }
-      ],
-      "sourceState": {
-        "loweringState": "policy-blocked",
-        "family": "arenaSpan",
-        "policy": "handle-provenance-or-engine-context",
-        "semanticTokensNeeded": [
-          "call-thread-affinity",
-          "enum-width-domain-validation",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
-          "span-pairing-element-unit-copy",
           "target-feature-symbol-matrix"
         ]
       },
@@ -50109,57 +49872,6 @@
           "out-storage-initialization-failure",
           "pointer-bounds-nullability-lifetime",
           "span-pairing-element-unit-copy",
-          "target-feature-symbol-matrix"
-        ]
-      },
-      "availability": {
-        "state": "emitted",
-        "route": "universal-recipe",
-        "interventionRequired": false
-      }
-    },
-    {
-      "numericId": 179,
-      "declarationId": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98",
-      "groupId": "e899971c31421062404929e22a3269a9b078295677dcb7884d5cebdfea0015c5",
-      "universal": {
-        "action": "supply-usage-facts",
-        "state": "specialization-required",
-        "requirements": [
-          "call-thread-affinity",
-          "enum-width-domain-validation",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
-          "pointer-lifetime",
-          "target-feature-symbol-matrix"
-        ],
-        "diagnostic": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
-      },
-      "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
-        "requiredForAvailability": false,
-        "patternId": "pointer.scratch-scalar-out-provider-boundary",
-        "family": "scratch-scalar-out",
-        "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-        "missingSemanticTokens": [],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
-        "preserveUniversalUntilSpecialized": true
-      },
-      "attempts": [],
-      "sourceState": {
-        "loweringState": "lowering-pending",
-        "family": null,
-        "policy": null,
-        "semanticTokensNeeded": [
-          "call-thread-affinity",
-          "enum-width-domain-validation",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
           "target-feature-symbol-matrix"
         ]
       },
@@ -51029,25 +50741,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -51121,25 +50815,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -51386,29 +51062,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:dmConnectionPool::Params",
-            "parameter-kind-unsupported:1:pointer:unknown:HPool",
-            "parameter-role-direction-unsupported:0:in:pointer:record:dmConnectionPool::Params",
-            "parameter-role-direction-unsupported:1:inout:pointer:unknown:HPool",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -52035,30 +51689,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:cstring-in",
-            "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
-            "parameter-kind-unsupported:2:opaque-pointer-out",
-            "parameter-role-direction-unsupported:0:in:cstring-in",
-            "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
-            "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -52132,28 +51763,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:dmDDF::Descriptor",
-            "parameter-kind-unsupported:1:opaque-pointer",
-            "parameter-role-direction-unsupported:0:in:pointer:record:dmDDF::Descriptor",
-            "parameter-role-direction-unsupported:1:inout:opaque-pointer",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -52229,31 +51839,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:opaque-pointer",
-            "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
-            "parameter-kind-unsupported:2:template:dmArray<uint8_t>",
-            "parameter-role-direction-unsupported:0:in:opaque-pointer",
-            "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
-            "parameter-role-direction-unsupported:2:inout:template:dmArray<uint8_t>",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -57388,27 +56974,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:pointer:unknown:HComponent",
-            "parameter-kind-unsupported:4:pointer:unknown:HComponentWorld",
-            "parameter-role-direction-unsupported:3:inout:pointer:unknown:HComponent",
-            "parameter-role-direction-unsupported:4:out:pointer:unknown:HComponentWorld",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -57948,27 +57514,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Matrix4",
-            "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Matrix4",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -58045,27 +57591,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Quat",
-            "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Quat",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -58132,25 +57658,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "parameter-kind-unsupported:3:pointer-out:scalar:i8",
-            "parameter-role-direction-unsupported:3:in:pointer-out:scalar:i8",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -58225,27 +57733,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-            "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -58322,27 +57810,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector3",
-            "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector3",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -58419,27 +57887,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector4",
-            "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector4",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -63409,38 +62857,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:cstring-in",
-            "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
-            "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
-            "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
-            "parameter-kind-unsupported:7:pointer:unknown:dmGameObject::InstancePropertyContainers",
-            "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::InstanceIdMap",
-            "parameter-role-direction-unsupported:3:in:cstring-in",
-            "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
-            "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
-            "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
-            "parameter-role-direction-unsupported:7:inout:pointer:unknown:dmGameObject::InstancePropertyContainers",
-            "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::InstanceIdMap",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -64229,33 +63646,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
-            "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
-            "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
-            "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::HInstance",
-            "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
-            "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
-            "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
-            "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::HInstance",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -65884,25 +65275,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer:unknown:dmRender::HConstant",
-            "parameter-role-direction-unsupported:2:out:pointer:unknown:dmRender::HConstant",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -66661,29 +66034,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::CollectionFactoryResource",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::CollectionFactoryResource",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -66816,29 +66167,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::FactoryResource",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::FactoryResource",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -67289,28 +66618,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:dmGameSystem::FontResource",
-            "parameter-kind-unsupported:1:pointer:record:dmGameSystem::FontInfo",
-            "parameter-role-direction-unsupported:0:inout:pointer:record:dmGameSystem::FontResource",
-            "parameter-role-direction-unsupported:1:inout:pointer:record:dmGameSystem::FontInfo",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -71660,27 +70968,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-role-direction-unsupported:3:inout:scalar:u32",
-            "parameter-role-direction-unsupported:4:inout:scalar:u32",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -71930,26 +71218,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:opaque-pointer-out",
-            "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -72395,11 +71664,15 @@
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
         "generatorBlockers": [
+          "completion-facts-unavailable",
           "handle-provenance-or-engine-context",
           "handle-provenance-ownership-nullability-policy",
+          "memory-facts-unavailable",
           "native-symbol-linkage-unverified",
+          "ownership-facts-unavailable",
           "pointer-bounds-direction-lifetime-policy",
-          "span-element-unit-and-copy-policy"
+          "span-element-unit-and-copy-policy",
+          "write-facts-unavailable"
         ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
@@ -72416,6 +71689,18 @@
             "native-symbol-linkage-unverified",
             "pointer-bounds-direction-lifetime-policy",
             "span-element-unit-and-copy-policy"
+          ]
+        },
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "write-facts-unavailable"
           ]
         }
       ],
@@ -73765,17 +73050,39 @@
         "diagnostic": "dmsdk:dmGraphics::RepackRGBToRGBA@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1627:1449 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:1:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "memory-facts-unavailable",
+            "ownership-facts-unavailable",
+            "parameter-kind-unsupported:1:pointer:scalar:u8",
+            "parameter-kind-unsupported:2:pointer:scalar:u8",
+            "write-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -75635,28 +74942,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "family-requires-target-matrix:platform-gated",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:unknown:VkDevice",
-            "parameter-kind-unsupported:2:pointer:unknown:VkDescriptorPool",
-            "parameter-role-direction-unsupported:0:value:unknown:VkDevice",
-            "parameter-role-direction-unsupported:2:out:pointer:unknown:VkDescriptorPool",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -77338,27 +76624,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:pointer:record:dmGui::CustomProperty",
-            "parameter-role-direction-unsupported:3:inout:pointer:record:dmGui::CustomProperty",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -80098,27 +79364,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
-            "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:receiver-provenance-lifetime",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -80602,27 +79848,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
-            "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:receiver-provenance-lifetime",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -80837,7 +80063,7 @@
         "diagnostic": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1619 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "resolve-specialization-blockers",
+        "action": "derive-source-semantic-facts-if-expressed",
         "requiredForAvailability": false,
         "patternId": "state.incremental-hash-lifecycle",
         "family": "hash-state",
@@ -80847,45 +80073,11 @@
           "incremental-hash-lifecycle",
           "synchronous-noescape"
         ],
-        "generatorBlockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadGuid",
-          "parameter-kind-unsupported:1:cstring-mutable",
-          "parameter-role-direction-unsupported:0:in:pointer:record:dmHID::GamepadGuid",
-          "parameter-role-direction-unsupported:1:inout:cstring-mutable",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
+        "generatorBlockers": [],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadGuid",
-            "parameter-kind-unsupported:1:cstring-mutable",
-            "parameter-role-direction-unsupported:0:in:pointer:record:dmHID::GamepadGuid",
-            "parameter-role-direction-unsupported:1:inout:cstring-mutable",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -81040,7 +80232,7 @@
         "diagnostic": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1618 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "resolve-specialization-blockers",
+        "action": "derive-source-semantic-facts-if-expressed",
         "requiredForAvailability": false,
         "patternId": "state.incremental-hash-lifecycle",
         "family": "hash-state",
@@ -81050,41 +80242,11 @@
           "incremental-hash-lifecycle",
           "synchronous-noescape"
         ],
-        "generatorBlockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer:record:dmHID::GamepadGuid",
-          "parameter-role-direction-unsupported:2:inout:pointer:record:dmHID::GamepadGuid",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
+        "generatorBlockers": [],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer:record:dmHID::GamepadGuid",
-            "parameter-role-direction-unsupported:2:inout:pointer:record:dmHID::GamepadGuid",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -81195,7 +80357,7 @@
         "diagnostic": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1632 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "resolve-specialization-blockers",
+        "action": "derive-source-semantic-facts-if-expressed",
         "requiredForAvailability": false,
         "patternId": "state.incremental-hash-lifecycle",
         "family": "hash-state",
@@ -81205,39 +80367,11 @@
           "incremental-hash-lifecycle",
           "synchronous-noescape"
         ],
-        "generatorBlockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadPacket",
-          "parameter-kind-unsupported:2:pointer:scalar:u8",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:dmHID::GamepadPacket",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified"
-        ],
+        "generatorBlockers": [],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadPacket",
-            "parameter-kind-unsupported:2:pointer:scalar:u8",
-            "parameter-role-direction-unsupported:0:inout:pointer:record:dmHID::GamepadPacket",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -81309,26 +80443,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:pointer:record:dmHID::GamepadPacket",
-            "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::GamepadPacket",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -81580,26 +80695,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:pointer:record:dmHID::MousePacket",
-            "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::MousePacket",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -84441,28 +83537,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:cstring-in",
-            "parameter-kind-unsupported:1:pointer:record:dmMessage::StringURL",
-            "parameter-role-direction-unsupported:0:in:cstring-in",
-            "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::StringURL",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -86204,27 +85279,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:template:T",
-            "parameter-role-direction-unsupported:1:inout:template:T",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:receiver-provenance-lifetime",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -87021,25 +86076,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:pointer:unknown:dmVMath::Vector4",
-            "result-role-unsupported:pointer:unknown:dmVMath::Vector4",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -87381,25 +86418,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
-            "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -87474,28 +86493,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
-            "parameter-kind-unsupported:4:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
-            "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
-            "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -89615,28 +88613,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:opaque-pointer-out",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -89711,28 +88688,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:opaque-pointer-out",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -89807,26 +88763,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:opaque-pointer-out",
-            "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -89901,26 +88838,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:opaque-pointer-out",
-            "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -90366,25 +89284,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:opaque-pointer",
-            "parameter-role-direction-unsupported:1:in:opaque-pointer",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -91012,30 +89912,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:cstring-in",
-            "parameter-kind-unsupported:3:opaque-pointer-out",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:in:cstring-in",
-            "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -91110,26 +89987,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:opaque-pointer-out",
-            "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -92498,29 +91356,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:unknown:dmRigDDF::Skeleton",
-            "parameter-kind-unsupported:1:template:dmArray<RigBone>",
-            "parameter-role-direction-unsupported:0:inout:unknown:dmRigDDF::Skeleton",
-            "parameter-role-direction-unsupported:1:inout:template:dmArray<RigBone>",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -92647,32 +91483,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer:record:dmRigDDF::Mesh",
-            "parameter-kind-unsupported:3:unknown:dmVMath::Matrix4",
-            "parameter-kind-unsupported:4:pointer:record:dmRig::RigModelVertex",
-            "parameter-role-direction-unsupported:2:inout:pointer:record:dmRigDDF::Mesh",
-            "parameter-role-direction-unsupported:3:in:unknown:dmVMath::Matrix4",
-            "parameter-role-direction-unsupported:4:out:pointer:record:dmRig::RigModelVertex",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:pointer:record:dmRig::RigModelVertex",
-            "result-role-unsupported:pointer:record:dmRig::RigModelVertex",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -93191,23 +92002,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-role-unsupported:pointer:scalar:f32",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -95319,7 +94114,7 @@
         "diagnostic": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2115 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "resolve-specialization-blockers",
+        "action": "derive-source-semantic-facts-if-expressed",
         "requiredForAvailability": false,
         "patternId": "state.incremental-hash-lifecycle",
         "family": "hash-state",
@@ -95329,43 +94124,11 @@
           "incremental-hash-lifecycle",
           "synchronous-noescape"
         ],
-        "generatorBlockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:lua_State",
-          "parameter-kind-unsupported:1:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-          "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
+        "generatorBlockers": [],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:lua_State",
-            "parameter-kind-unsupported:1:pointer:record:dmMessage::URL",
-            "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-            "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::URL",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -95746,7 +94509,7 @@
         "diagnostic": "dmsdk:dmScript::GetComponentFromLua@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:106:1311 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "resolve-specialization-blockers",
+        "action": "derive-source-semantic-facts-if-expressed",
         "requiredForAvailability": false,
         "patternId": "state.incremental-hash-lifecycle",
         "family": "hash-state",
@@ -95756,59 +94519,11 @@
           "incremental-hash-lifecycle",
           "synchronous-noescape"
         ],
-        "generatorBlockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:lua_State",
-          "parameter-kind-unsupported:2:cstring-in",
-          "parameter-kind-unsupported:3:pointer:unknown:dmGameObject::HComponentWorld",
-          "parameter-kind-unsupported:4:pointer:unknown:dmGameObject::HComponent",
-          "parameter-kind-unsupported:5:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-          "parameter-role-direction-unsupported:2:in:cstring-in",
-          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmGameObject::HComponentWorld",
-          "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmGameObject::HComponent",
-          "parameter-role-direction-unsupported:5:inout:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
+        "generatorBlockers": [],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:lua_State",
-            "parameter-kind-unsupported:2:cstring-in",
-            "parameter-kind-unsupported:3:pointer:unknown:dmGameObject::HComponentWorld",
-            "parameter-kind-unsupported:4:pointer:unknown:dmGameObject::HComponent",
-            "parameter-kind-unsupported:5:pointer:record:dmMessage::URL",
-            "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-            "parameter-role-direction-unsupported:2:in:cstring-in",
-            "parameter-role-direction-unsupported:3:out:pointer:unknown:dmGameObject::HComponentWorld",
-            "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmGameObject::HComponent",
-            "parameter-role-direction-unsupported:5:inout:pointer:record:dmMessage::URL",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -98161,7 +96876,7 @@
         "diagnostic": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2131 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "resolve-specialization-blockers",
+        "action": "derive-source-semantic-facts-if-expressed",
         "requiredForAvailability": false,
         "patternId": "state.incremental-hash-lifecycle",
         "family": "hash-state",
@@ -98171,47 +96886,11 @@
           "incremental-hash-lifecycle",
           "synchronous-noescape"
         ],
-        "generatorBlockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:lua_State",
-          "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
-          "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-          "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
+        "generatorBlockers": [],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:lua_State",
-            "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
-            "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-            "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-            "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
-            "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -98285,32 +96964,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer:record:lua_State",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
-            "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-            "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
-            "parameter-role-direction-unsupported:3:inout:pointer:record:dmMessage::URL",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -99668,17 +98322,31 @@
         "diagnostic": "dmsdk:dmSocket::New@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:229:552 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "resolve-specialization-blockers",
         "requiredForAvailability": false,
         "patternId": "pointer.scratch-scalar-out-provider-boundary",
         "family": "scratch-scalar-out",
         "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
         "missingSemanticTokens": [],
-        "generatorBlockers": [],
+        "generatorBlockers": [
+          "completion-facts-unavailable",
+          "ownership-facts-unavailable"
+        ],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [],
+      "attempts": [
+        {
+          "family": "universal-recipe",
+          "state": "blocked",
+          "patternId": "universal.default",
+          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+          "blockers": [
+            "completion-facts-unavailable",
+            "ownership-facts-unavailable"
+          ]
+        }
+      ],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -101486,28 +100154,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:cstring-mutable",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:scalar:usize",
-            "parameter-role-direction-unsupported:0:out:cstring-mutable",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:usize",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -101577,28 +100224,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:cstring-mutable",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:scalar:usize",
-            "parameter-role-direction-unsupported:0:out:cstring-mutable",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:usize",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -101671,30 +100297,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:cstring-mutable",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:pointer-out:scalar:i8",
-            "parameter-role-direction-unsupported:0:inout:cstring-mutable",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:out:pointer-out:scalar:i8",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:cstring-mutable",
-            "result-role-unsupported:cstring-mutable",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -103988,27 +102591,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:cstring-in",
-            "parameter-kind-unsupported:1:cstring-mutable",
-            "parameter-role-direction-unsupported:0:in:cstring-in",
-            "parameter-role-direction-unsupported:1:out:cstring-mutable",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -104142,23 +102725,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "parameter-kind-unsupported:0:pointer-out:scalar:i8",
-            "parameter-role-direction-unsupported:0:in:pointer-out:scalar:i8",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -104225,24 +102792,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-mutable",
-            "parameter-role-direction-unsupported:1:inout:cstring-mutable",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -107552,28 +106102,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:template:T",
-            "parameter-role-direction-unsupported:0:inout:template:T",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:template:T",
-            "result-role-unsupported:template:T",
-            "semantic-token-unresolved:receiver-provenance-lifetime",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -109339,29 +107868,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
-            "parameter-kind-unsupported:3:pointer:record:FontGlyph",
-            "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
-            "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -109438,29 +107945,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
-            "parameter-kind-unsupported:3:pointer:record:FontGlyph",
-            "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
-            "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -110650,26 +109135,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:pointer-out:record:HttpRequest",
-            "parameter-role-direction-unsupported:0:out:pointer-out:record:HttpRequest",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -116239,28 +114705,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:opaque-pointer-out",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -116335,26 +114780,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:opaque-pointer-out",
-            "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -116429,26 +114855,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:3:opaque-pointer-out",
-            "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -116672,25 +115079,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:opaque-pointer",
-            "parameter-role-direction-unsupported:1:in:opaque-pointer",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -116858,28 +115247,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -116954,26 +115322,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
-            "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -117048,30 +115397,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:cstring-in",
-            "parameter-kind-unsupported:3:opaque-pointer-out",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:in:cstring-in",
-            "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -117432,30 +115758,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "enum-width-domain-validation-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:cstring-in",
-            "parameter-kind-unsupported:2:opaque-pointer",
-            "parameter-kind-unsupported:3:pointer:unknown:HResourceType",
-            "parameter-role-direction-unsupported:1:in:cstring-in",
-            "parameter-role-direction-unsupported:2:inout:opaque-pointer",
-            "parameter-role-direction-unsupported:3:inout:pointer:unknown:HResourceType",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -119008,27 +117311,7 @@
         ],
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:0:template:dmArray<T>",
-            "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:void",
-            "semantic-token-unresolved:receiver-provenance-lifetime",
-            "semantic-token-unresolved:template-specialization-set",
-            "target-feature-symbol-matrix-unverified",
-            "writable-scalar-pointer-required"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -119171,55 +117454,6 @@
           "out-storage-initialization-failure",
           "pointer-bounds-nullability-lifetime",
           "record-layout-alignment-copy",
-          "target-feature-symbol-matrix"
-        ]
-      },
-      "availability": {
-        "state": "emitted",
-        "route": "universal-recipe",
-        "interventionRequired": false
-      }
-    },
-    {
-      "numericId": 1331,
-      "declarationId": "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867",
-      "groupId": "052641299d8fd968423f5f352a7b811d22ea40dfc8f82f372de0391958ddb165",
-      "universal": {
-        "action": "supply-usage-facts",
-        "state": "specialization-required",
-        "requirements": [
-          "call-thread-affinity",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
-          "pointer-lifetime",
-          "target-feature-symbol-matrix"
-        ],
-        "diagnostic": "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
-      },
-      "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
-        "requiredForAvailability": false,
-        "patternId": "pointer.scratch-scalar-out-provider-boundary",
-        "family": "scratch-scalar-out",
-        "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-        "missingSemanticTokens": [],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
-        "preserveUniversalUntilSpecialized": true
-      },
-      "attempts": [],
-      "sourceState": {
-        "loweringState": "lowering-pending",
-        "family": null,
-        "policy": null,
-        "semanticTokensNeeded": [
-          "call-thread-affinity",
-          "handle-ownership-nullability-lifetime",
-          "native-symbol-linkage",
-          "out-storage-initialization-failure",
-          "pointer-bounds-nullability-lifetime",
           "target-feature-symbol-matrix"
         ]
       },
@@ -119697,7 +117931,7 @@
         "diagnostic": "dmsdk:TextLayoutGetObjectPosition@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:488:863 needs acknowledgements.outStorageInitializationFailure with non-empty reason and evidence (out-storage-initialization-failure)"
       },
       "optimization": {
-        "action": "resolve-specialization-blockers",
+        "action": "derive-source-semantic-facts-if-expressed",
         "requiredForAvailability": false,
         "patternId": "state.incremental-hash-lifecycle",
         "family": "hash-state",
@@ -119707,41 +117941,11 @@
           "incremental-hash-lifecycle",
           "synchronous-noescape"
         ],
-        "generatorBlockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:pointer:record:TextLayoutObject",
-          "parameter-role-direction-unsupported:1:in:pointer:record:TextLayoutObject",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:u8",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified"
-        ],
+        "generatorBlockers": [],
         "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
-      "attempts": [
-        {
-          "family": "universal-recipe",
-          "state": "blocked",
-          "patternId": "universal.default",
-          "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-          "blockers": [
-            "call-thread-affinity-unresolved",
-            "handle-ownership-nullability-lifetime-unresolved",
-            "native-symbol-linkage-unverified",
-            "out-storage-initialization-failure-unresolved",
-            "parameter-kind-unsupported:1:pointer:record:TextLayoutObject",
-            "parameter-role-direction-unsupported:1:in:pointer:record:TextLayoutObject",
-            "pointer-bounds-nullability-lifetime-unresolved",
-            "result-kind-unsupported:scalar:u8",
-            "semantic-token-unresolved:record-layout-alignment-copy",
-            "target-feature-symbol-matrix-unverified"
-          ]
-        }
-      ],
+      "attempts": [],
       "sourceState": {
         "loweringState": "lowering-pending",
         "family": null,
@@ -120828,5 +119032,5 @@
       }
     }
   ],
-  "reportSha256": "5d4126b2774532e4a0190940c619b6faa2c43c3891143613977f2c656f8d7dc7"
+  "reportSha256": "4f39643b332da1e61f037c065d61d368fd36aa46d11d9c378ac7e4d225b27a3e"
 }

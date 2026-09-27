@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "kind": "deherm.dmsdk-scratch-scalar-out-plan",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
@@ -17,13 +17,19 @@
     "effectFacts": "d2af53d0a293b17a394cac4e35d0b77b5b7acc7a75504a0b58b3f0ff67ee8e20"
   },
   "eligibility": {
-    "schemaVersion": 1,
+    "schemaVersion": 2,
     "patternId": "pointer.scratch-scalar-out-provider-boundary",
     "requiredFacts": {
       "ownership": "borrowed-handle-or-scalar-no-transfer",
       "memory": "exact-one-scalar-no-alias-no-span",
       "write": "success-path-output-defined",
       "completion": "synchronous-noescape"
+    },
+    "compatibilityAdmission": {
+      "source": "revision-derived ABI tranche",
+      "tranche": "scratch-out-parameters",
+      "constraint": "the same structural pattern must still match",
+      "purpose": "preserve an already generated and runtime-tested provider route while source-effect recovery catches up"
     },
     "unknownPolicy": "universal-fallback"
   },
@@ -98,8 +104,10 @@
   ],
   "coverage": {
     "structurallyRelevant": 30,
-    "selected": 6,
-    "universalFallback": 24,
+    "selected": 11,
+    "sourceDerived": 6,
+    "compatibilityPreserved": 5,
+    "universalFallback": 19,
     "blockerCounts": {
       "ownership": 23,
       "memory": 20,
@@ -116,6 +124,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -123,6 +132,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -148,6 +163,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -155,6 +171,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -180,6 +202,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -187,6 +210,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -212,6 +241,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -219,6 +249,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -244,6 +280,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -251,6 +288,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -276,6 +319,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -283,6 +327,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -308,6 +358,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -315,6 +366,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -340,6 +397,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -347,6 +405,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -372,6 +436,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
+      "admission": "source-derived",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -379,6 +444,7 @@
         "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [],
       "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
@@ -394,6 +460,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
+      "admission": "source-derived",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -401,6 +468,7 @@
         "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [],
       "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
@@ -416,6 +484,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
+      "admission": "source-derived",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -423,6 +492,7 @@
         "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [],
       "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
@@ -438,6 +508,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -445,6 +516,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -470,6 +547,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -477,6 +555,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -502,6 +586,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -509,6 +594,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -534,6 +625,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -541,6 +633,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -566,6 +664,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -573,6 +672,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -598,6 +703,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -605,6 +711,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -630,6 +742,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -637,6 +750,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -662,6 +781,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -669,6 +789,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -694,6 +820,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -701,6 +828,10 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "ownership-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "ownership-facts-unavailable"
@@ -722,6 +853,7 @@
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
+      "admission": "source-derived",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -729,6 +861,7 @@
         "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [],
       "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
@@ -739,11 +872,12 @@
     {
       "declarationId": "dmsdk:dmGameObject::GetComponentId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:673:1013",
       "sourceOrdinal": 1013,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 4,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
+      "admission": "compatibility-preserved",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -751,12 +885,13 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
+      "evidenceGaps": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
         "ownership-facts-unavailable",
         "write-facts-unavailable"
       ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
@@ -771,11 +906,12 @@
     {
       "declarationId": "dmsdk:dmGameObject::GetPropertyOptionsIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:917:1041",
       "sourceOrdinal": 1041,
-      "order": 4,
+      "order": 5,
       "patternId": "pointer.scratch-scalar-out-provider-boundary",
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
+      "admission": "source-derived",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -783,6 +919,7 @@
         "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [],
       "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
@@ -793,11 +930,12 @@
     {
       "declarationId": "dmsdk:dmGameObject::GetPropertyOptionsKey@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:927:1042",
       "sourceOrdinal": 1042,
-      "order": 5,
+      "order": 6,
       "patternId": "pointer.scratch-scalar-out-provider-boundary",
       "family": "scratch-scalar-out",
       "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
       "fallback": false,
+      "admission": "source-derived",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -805,6 +943,7 @@
         "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [],
       "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
@@ -815,11 +954,12 @@
     {
       "declarationId": "dmsdk:dmGameObject::GetPropertyAsHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:938:1043",
       "sourceOrdinal": 1043,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 7,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
+      "admission": "compatibility-preserved",
       "facts": {
         "ownership": "unknown",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -827,11 +967,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
+      "evidenceGaps": [
         "completion-facts-unavailable",
         "ownership-facts-unavailable",
         "write-facts-unavailable"
       ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
@@ -845,11 +986,12 @@
     {
       "declarationId": "dmsdk:dmGameObject::GetPropertyAsFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:949:1044",
       "sourceOrdinal": 1044,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 8,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
+      "admission": "compatibility-preserved",
       "facts": {
         "ownership": "unknown",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -857,11 +999,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
+      "evidenceGaps": [
         "completion-facts-unavailable",
         "ownership-facts-unavailable",
         "write-facts-unavailable"
       ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
@@ -875,11 +1018,12 @@
     {
       "declarationId": "dmsdk:dmGameObject::GetPropertyAsBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:993:1048",
       "sourceOrdinal": 1048,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 9,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
+      "admission": "compatibility-preserved",
       "facts": {
         "ownership": "unknown",
         "memory": "exact-one-scalar-no-alias-no-span",
@@ -887,11 +1031,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
+      "evidenceGaps": [
         "completion-facts-unavailable",
         "ownership-facts-unavailable",
         "write-facts-unavailable"
       ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
@@ -910,6 +1055,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -917,6 +1063,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -942,6 +1094,7 @@
       "family": "universal-recipe",
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
+      "admission": "universal-fallback",
       "facts": {
         "ownership": "unknown",
         "memory": "unknown",
@@ -949,6 +1102,12 @@
         "completion": "unknown",
         "source": "cpp-ownership-effect-facts"
       },
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "blockers": [
         "completion-facts-unavailable",
         "memory-facts-unavailable",
@@ -969,11 +1128,12 @@
     {
       "declarationId": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
       "sourceOrdinal": 1616,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 10,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
+      "admission": "compatibility-preserved",
       "facts": {
         "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "unknown",
@@ -981,10 +1141,11 @@
         "completion": "synchronous-noescape",
         "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
+      "evidenceGaps": [
         "memory-facts-unavailable",
         "write-facts-unavailable"
       ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,

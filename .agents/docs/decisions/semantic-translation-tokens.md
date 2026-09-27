@@ -199,12 +199,17 @@ universal APIs. Positive rows are explicitly labeled as a trusted Defold
 public by-value-resource convention, not implementation proof. A separate
 compiler-owned C++ ownership/effect extractor now provides the causal taxonomy
 and alpha-renaming fixtures needed to replace that trust default incrementally.
-The scratch scalar-out audit plan applies that extractor over the complete
-structural envelope and admits only diagnostic-free exact-one, success-written,
+The scratch scalar-out plan applies that extractor over the complete structural
+envelope and is the sole selection authority consumed by the production
+emitter. New admissions require diagnostic-free exact-one, success-written,
 synchronous, non-escaping scalar slots. Atomics, spans, persistent rebinding,
 owned-resource outputs, and exact-one scalar slots share the same raw ABI, so
-scanning that broad shape alone remains insufficient evidence. The audit plan
-does not replace the separately runtime-tested production provider boundary.
+scanning that broad shape alone remains insufficient evidence. A narrow second
+admission preserves previously generated routes only when the revision-derived
+`scratch-out-parameters` tranche and the same structural recipe still agree;
+those rows retain their missing source facts as `evidenceGaps` and are never
+reported as source-proven. This keeps an existing optimization while effect
+recovery catches up, without creating a second selector in the emitter.
 
 Generated-family census checks are structural, not optimization-count locks.
 For a family report, `declarations.length` must equal the revision's

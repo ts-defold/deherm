@@ -6,32 +6,48 @@ declare global { var __defoldModulesV1: Record<string,object>|undefined; }
 function module():DmSdkScratchScalarOutModule { const value=globalThis.__defoldModulesV1?.DmSdkScratchScalarOut as DmSdkScratchScalarOutModule|undefined;if(!value)throw new Error("Defold module is not registered: DmSdkScratchScalarOut");return value; }
 export function unsafeScratchBorrowedHandle<Kind extends string>(kind:Kind,value:bigint):ScratchBorrowedHandle<Kind>{void kind;if(value<=0n||value>0xffff_ffff_ffff_ffffn)throw new RangeError("handle must be a nonzero u64");return value as ScratchBorrowedHandle<Kind>;}
 export const DmSdkScratchScalarOutId={
-  dmGameObjectGetComponentId: 0,
-  dmGameObjectGetPropertyAsBool: 1,
-  dmGameObjectGetPropertyAsFloat: 2,
-  dmGameObjectGetPropertyAsHash: 3,
-  dmGameObjectGetPropertyOptionsIndex: 4,
-  dmGameObjectGetPropertyOptionsKey: 5,
-  dmHidGetGamepadUserId: 6
+  dmBufferGetCount: 0,
+  dmBufferGetStreamType: 1,
+  dmBufferGetContentVersion: 2,
+  textLayoutGetBounds: 3,
+  dmGameObjectGetComponentId: 4,
+  dmGameObjectGetPropertyOptionsIndex: 5,
+  dmGameObjectGetPropertyOptionsKey: 6,
+  dmGameObjectGetPropertyAsHash: 7,
+  dmGameObjectGetPropertyAsFloat: 8,
+  dmGameObjectGetPropertyAsBool: 9,
+  dmHidGetGamepadUserId: 10
 } as const;
 
+/** Caller-owned one-slot scalar output bridge for dmBuffer::GetCount; no pointer escapes. */
+export function dmBufferGetCount(buffer: ScratchBorrowedHandle<"dmBuffer::HBuffer">, count: number): { readonly result: number; readonly outputCount: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmBufferGetCount, buffer, count);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputCount: tuple[1] as number}; }
+
+/** Caller-owned one-slot scalar output bridge for dmBuffer::GetStreamType; no pointer escapes. */
+export function dmBufferGetStreamType(buffer: ScratchBorrowedHandle<"dmBuffer::HBuffer">, streamName: bigint, type: number, components: number): { readonly result: number; readonly outputType: number; readonly outputComponents: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmBufferGetStreamType, buffer, streamName, type, components);if(tuple.length!==3)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputType: tuple[1] as number, outputComponents: tuple[2] as number}; }
+
+/** Caller-owned one-slot scalar output bridge for dmBuffer::GetContentVersion; no pointer escapes. */
+export function dmBufferGetContentVersion(hbuffer: ScratchBorrowedHandle<"dmBuffer::HBuffer">, version: number): { readonly result: number; readonly outputVersion: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmBufferGetContentVersion, hbuffer, version);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputVersion: tuple[1] as number}; }
+
+/** Caller-owned one-slot scalar output bridge for TextLayoutGetBounds; no pointer escapes. */
+export function textLayoutGetBounds(layout: ScratchBorrowedHandle<"HTextLayout">, width: number, height: number): { readonly outputWidth: number; readonly outputHeight: number; } { const tuple=module().call(DmSdkScratchScalarOutId.textLayoutGetBounds, layout, width, height);if(tuple.length!==3)throw new Error("invalid scratch scalar-out tuple");return {outputWidth: tuple[1] as number, outputHeight: tuple[2] as number}; }
+
 /** Caller-owned one-slot scalar output bridge for dmGameObject::GetComponentId; no pointer escapes. */
-export function dmGameObjectGetComponentId(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentIndex: number, componentId: bigint): { readonly result: number; readonly outputComponentId: bigint; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetComponentId, instance, componentIndex, componentId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number,outputComponentId: tuple[1] as bigint}; }
-
-/** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyAsBool; no pointer escapes. */
-export function dmGameObjectGetPropertyAsBool(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentId: bigint, propertyId: bigint): { readonly result: number; readonly outputOutValue: boolean; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyAsBool, instance, componentId, propertyId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number,outputOutValue: tuple[1] as boolean}; }
-
-/** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyAsFloat; no pointer escapes. */
-export function dmGameObjectGetPropertyAsFloat(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentId: bigint, propertyId: bigint): { readonly result: number; readonly outputOutValue: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyAsFloat, instance, componentId, propertyId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number,outputOutValue: tuple[1] as number}; }
-
-/** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyAsHash; no pointer escapes. */
-export function dmGameObjectGetPropertyAsHash(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentId: bigint, propertyId: bigint): { readonly result: number; readonly outputOutValue: bigint; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyAsHash, instance, componentId, propertyId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number,outputOutValue: tuple[1] as bigint}; }
+export function dmGameObjectGetComponentId(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentIndex: number, componentId: bigint): { readonly result: number; readonly outputComponentId: bigint; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetComponentId, instance, componentIndex, componentId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputComponentId: tuple[1] as bigint}; }
 
 /** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyOptionsIndex; no pointer escapes. */
-export function dmGameObjectGetPropertyOptionsIndex(options: ScratchBorrowedHandle<"dmGameObject::HPropertyOptions">, optionsIndex: number): { readonly result: number; readonly outputResult: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyOptionsIndex, options, optionsIndex);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number,outputResult: tuple[1] as number}; }
+export function dmGameObjectGetPropertyOptionsIndex(options: ScratchBorrowedHandle<"dmGameObject::HPropertyOptions">, optionsIndex: number): { readonly result: number; readonly outputResult: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyOptionsIndex, options, optionsIndex);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputResult: tuple[1] as number}; }
 
 /** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyOptionsKey; no pointer escapes. */
-export function dmGameObjectGetPropertyOptionsKey(options: ScratchBorrowedHandle<"dmGameObject::HPropertyOptions">, optionsIndex: number): { readonly result: number; readonly outputResult: bigint; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyOptionsKey, options, optionsIndex);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number,outputResult: tuple[1] as bigint}; }
+export function dmGameObjectGetPropertyOptionsKey(options: ScratchBorrowedHandle<"dmGameObject::HPropertyOptions">, optionsIndex: number): { readonly result: number; readonly outputResult: bigint; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyOptionsKey, options, optionsIndex);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputResult: tuple[1] as bigint}; }
+
+/** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyAsHash; no pointer escapes. */
+export function dmGameObjectGetPropertyAsHash(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentId: bigint, propertyId: bigint): { readonly result: number; readonly outputOutValue: bigint; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyAsHash, instance, componentId, propertyId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputOutValue: tuple[1] as bigint}; }
+
+/** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyAsFloat; no pointer escapes. */
+export function dmGameObjectGetPropertyAsFloat(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentId: bigint, propertyId: bigint): { readonly result: number; readonly outputOutValue: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyAsFloat, instance, componentId, propertyId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputOutValue: tuple[1] as number}; }
+
+/** Caller-owned one-slot scalar output bridge for dmGameObject::GetPropertyAsBool; no pointer escapes. */
+export function dmGameObjectGetPropertyAsBool(instance: ScratchBorrowedHandle<"dmGameObject::HInstance">, componentId: bigint, propertyId: bigint): { readonly result: number; readonly outputOutValue: boolean; } { const tuple=module().call(DmSdkScratchScalarOutId.dmGameObjectGetPropertyAsBool, instance, componentId, propertyId);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as number, outputOutValue: tuple[1] as boolean}; }
 
 /** Caller-owned one-slot scalar output bridge for dmHID::GetGamepadUserId; no pointer escapes. */
-export function dmHidGetGamepadUserId(context: ScratchBorrowedHandle<"dmHID::HContext">, gamepad: ScratchBorrowedHandle<"dmHID::HGamepad">): { readonly result: boolean; readonly outputOut: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmHidGetGamepadUserId, context, gamepad);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as boolean,outputOut: tuple[1] as number}; }
+export function dmHidGetGamepadUserId(context: ScratchBorrowedHandle<"dmHID::HContext">, gamepad: ScratchBorrowedHandle<"dmHID::HGamepad">): { readonly result: boolean; readonly outputOut: number; } { const tuple=module().call(DmSdkScratchScalarOutId.dmHidGetGamepadUserId, context, gamepad);if(tuple.length!==2)throw new Error("invalid scratch scalar-out tuple");return {result:tuple[0] as boolean, outputOut: tuple[1] as number}; }

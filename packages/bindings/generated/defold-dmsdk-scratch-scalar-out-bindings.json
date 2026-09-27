@@ -1,19 +1,23 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sources": {
     "ir": "packages/bindings/generated/defold-sdk-ir.json",
     "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
     "projection": "packages/bindings/generated/defold-dmsdk-projection-ir.json",
-    "policy": "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"
+    "policy": "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
+    "effectFacts": "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json",
+    "plan": "packages/bindings/generated/defold-dmsdk-scratch-scalar-out-plan.json"
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
-    "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099"
+    "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099",
+    "effectFacts": "d2af53d0a293b17a394cac4e35d0b77b5b7acc7a75504a0b58b3f0ff67ee8e20",
+    "plan": "8b05922cc0d75b064355192b3c0821388ae546995a713a5d6251200e71302d71"
   },
-  "selector": "complete scratch-out-parameters partition using only result roles, parameter roles/directions, and platform family; no symbol allowlist",
+  "selector": "compiler-owned authenticated scratch plan; source-derived admissions plus structurally preserved prior provider routes; no symbol allowlist",
   "patternRegistry": [
     {
       "schemaVersion": 1,
@@ -107,22 +111,24 @@
   "abi": {
     "slotBytes": 8,
     "maxParameters": 4,
-    "maxOutputs": 1,
-    "handleKindCount": 4,
+    "maxOutputs": 2,
+    "handleKindCount": 6,
     "parameterStorage": "caller-owned contiguous uint64_t slots",
     "resultStorage": "caller-owned uint64_t slot"
   },
   "coverage": {
-    "candidates": 79,
-    "generated": 7,
-    "blocked": 72,
-    "cAbiGenerated": 7,
-    "dynamicHermesJsiGenerated": 7,
-    "staticHermesGenerated": 7,
-    "browserDirectMemoryGenerated": 7,
-    "typescriptGenerated": 7,
-    "pinnedHeaderSignatureCompiled": 7,
-    "fakeProviderHostRuntimeTested": 7,
+    "candidates": 30,
+    "generated": 11,
+    "blocked": 19,
+    "sourceDerived": 6,
+    "compatibilityPreserved": 5,
+    "cAbiGenerated": 11,
+    "dynamicHermesJsiGenerated": 11,
+    "staticHermesGenerated": 11,
+    "browserDirectMemoryGenerated": 11,
+    "typescriptGenerated": 11,
+    "pinnedHeaderSignatureCompiled": 11,
+    "fakeProviderHostRuntimeTested": 11,
     "packagedEngineRuntimeVerified": 0,
     "warmedDispatchIterations": 100000,
     "warmedDispatchObservedCppAllocations": 0
@@ -130,33 +136,43 @@
   "handleKinds": [
     {
       "id": 0,
-      "name": "dmGameObject::HInstance",
+      "name": "HTextLayout",
       "representation": "opaque"
     },
     {
       "id": 1,
-      "name": "dmGameObject::HPropertyOptions",
-      "representation": "opaque"
+      "name": "dmBuffer::HBuffer",
+      "representation": "u32"
     },
     {
       "id": 2,
-      "name": "dmHID::HContext",
+      "name": "dmGameObject::HInstance",
       "representation": "opaque"
     },
     {
       "id": 3,
+      "name": "dmGameObject::HPropertyOptions",
+      "representation": "opaque"
+    },
+    {
+      "id": 4,
+      "name": "dmHID::HContext",
+      "representation": "opaque"
+    },
+    {
+      "id": 5,
       "name": "dmHID::HGamepad",
       "representation": "opaque"
     }
   ],
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out_jsi.hpp": "a8023b0f6e7d8a266c7f02cf8c0f256f438fdb96236b097925825ea772f72e91",
-    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out.h": "81794a71d37798554439e0145a1104d3fba9eb922934e80966adba7db11fb070",
-    "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js": "69eed957287511c79f3e8396c25739f97df069b352332c201e683846ad4993dd",
-    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp": "a36fe13e0c060e96604d9a53e2c7145eefcbe3d96c91938f1e4db4b3e4958670",
-    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp": "7e4a7c844b9830aa4ed94b555dfd084aed4d3d11d9b266b2f92d2945fb68f0e4",
-    "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp": "982e1a9fc34b1b8df03dbe9eb70cbf14a2b693a735cd66f29c67c44ce24057c7",
-    "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts": "ad871b1ed12b8708aa7d79a770cf5cd658d46c24c7c960375d1d835f86d1612a",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out.h": "855bd7b2eee48116c629f5791f22c7034a1bb4d1d0f710ea00b42986ce407a6c",
+    "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js": "2fa4909e2e599aa1f438241bac4e9fb559cc9dbf025820963bcb0892bae7de39",
+    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp": "1f0a5979fd19739415c696549f855814c45e1d7bba3d9dc88858bfb444f5cfe7",
+    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp": "51acb703467b818dc56796db673723ddb2c01d27e3aecbfb4a29a579be643189",
+    "native/generated_dmsdk_scratch_scalar_out_header_audit.cpp": "c6ea6ff2e608413bf36d417161d5aa2745f395a7ba7774f15e5fa51f32f953eb",
+    "packages/sdk/src/generated/dmsdk/scratch-scalar-out.ts": "9b50621c71aed50ea5b7326e8f14857b7fc24e4fe792f4de6bd72bc079f9eb00",
     "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts": "52d6747f223a66f939c6409f0fd692088587bb47796a43621436a27b1cfd43a1"
   },
   "artifacts": [
@@ -171,413 +187,740 @@
   ],
   "declarations": [
     {
-      "id": "dmsdk:dmArray::dmArray::EraseSwapRef@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:328:39",
-      "projectionId": "dmsdk-projection:423e118f992c5a8bf3402115",
-      "symbol": "dmArray::dmArray::EraseSwapRef",
+      "id": "dmsdk:dmArrayUtil::SetCapacity@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:52:11",
+      "projectionId": "dmsdk-projection:af5344a4398be504a078920a",
+      "symbol": "dmArrayUtil::SetCapacity",
       "disposition": "blocked",
       "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:template:T",
-        "parameter-role-direction-unsupported:0:inout:template:T",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:template:T",
-        "result-role-unsupported:template:T",
-        "semantic-token-unresolved:receiver-provenance-lifetime",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:2:pointer:scalar:usize",
+        "parameter-kind-unsupported:3:pointer:scalar:usize",
+        "parameter-kind-unsupported:4:pointer:scalar:usize",
+        "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "family": "universal-recipe",
         "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:template:T",
-          "parameter-role-direction-unsupported:0:inout:template:T",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:template:T",
-          "result-role-unsupported:template:T",
-          "semantic-token-unresolved:receiver-provenance-lifetime",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:2:pointer:scalar:usize",
+          "parameter-kind-unsupported:3:pointer:scalar:usize",
+          "parameter-kind-unsupported:4:pointer:scalar:usize",
+          "write-facts-unavailable"
         ],
         "preserved": true
       },
-      "shape": "template:T(inout:template:T)",
-      "patternDecision": "universal.default"
+      "shape": "scalar:void(value:scalar:u32,value:scalar:u32,inout:pointer:scalar:usize,inout:pointer:scalar:usize,inout:pointer:scalar:usize)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
     },
     {
-      "id": "dmsdk:dmArray::dmArray::Swap@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:368:43",
-      "projectionId": "dmsdk-projection:6df669907f7006c09124b589",
-      "symbol": "dmArray::dmArray::Swap",
+      "id": "dmsdk:dmAtomicIncrement32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:47:79",
+      "projectionId": "dmsdk-projection:5b2fd4a9afe7675701d44196",
+      "symbol": "dmAtomicIncrement32",
       "disposition": "blocked",
       "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:template:dmArray<T>",
-        "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:receiver-provenance-lifetime",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "family": "universal-recipe",
         "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:template:dmArray<T>",
-          "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:receiver-provenance-lifetime",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
         ],
         "preserved": true
       },
-      "shape": "scalar:void(inout:template:dmArray<T>)",
-      "patternDecision": "universal.default"
+      "shape": "scalar:i32(inout:pointer:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
     },
     {
-      "id": "dmsdk:dmBuffer::GetBytes@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:317:96",
-      "projectionId": "dmsdk-projection:e2f27c09e2638f8d858b8d7b",
-      "symbol": "dmBuffer::GetBytes",
+      "id": "dmsdk:dmAtomicDecrement32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:62:80",
+      "projectionId": "dmsdk-projection:da60a4d23905b1a43b9bd062",
+      "symbol": "dmAtomicDecrement32",
       "disposition": "blocked",
       "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:i32(inout:pointer:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmAtomicAdd32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:79:81",
+      "projectionId": "dmsdk-projection:72d404e9bd650f2369716b3a",
+      "symbol": "dmAtomicAdd32",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:i32(inout:pointer:scalar:i32,value:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmAtomicSub32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:95:82",
+      "projectionId": "dmsdk-projection:2da547eaafba65bd855285b8",
+      "symbol": "dmAtomicSub32",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:i32(inout:pointer:scalar:i32,value:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmAtomicStore32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:111:83",
+      "projectionId": "dmsdk-projection:410ec07c5ad2bfe1e5d5fdc7",
+      "symbol": "dmAtomicStore32",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:i32(inout:pointer:scalar:i32,value:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmAtomicCompareStore32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:128:84",
+      "projectionId": "dmsdk-projection:9dd204c4bbc3c8f706f5e331",
+      "symbol": "dmAtomicCompareStore32",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:i32(inout:pointer:scalar:i32,value:scalar:i32,value:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmAtomicGet32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:144:85",
+      "projectionId": "dmsdk-projection:613d05665438b47929564da2",
+      "symbol": "dmAtomicGet32",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:i32(inout:pointer:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmBuffer::GetCount@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:340:97",
+      "projectionId": "dmsdk-projection:5f58530a93bc81a1b8871cb4",
+      "symbol": "dmBuffer::GetCount",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 0,
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,inout:pointer:scalar:u32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "source-derived",
+      "evidenceGaps": [],
+      "resolvedPolicies": {
+        "layout": "one-caller-owned-u64-slot-per-native-parameter",
+        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
+      },
+      "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
         "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:opaque-pointer-out",
-        "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:opaque-pointer-out",
-          "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,out:opaque-pointer-out,out:pointer:scalar:u32)",
-      "patternDecision": "universal.default"
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
     },
     {
-      "id": "dmsdk:dmConnectionPool::Dial@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:120:139",
-      "projectionId": "dmsdk-projection:ef88deed020e734c78703cc1",
-      "symbol": "dmConnectionPool::Dial",
-      "disposition": "blocked",
-      "blockers": [
+      "id": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98",
+      "projectionId": "dmsdk-projection:8a2ac994c3a0a0ef8aa3a3ff",
+      "symbol": "dmBuffer::GetStreamType",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 1,
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,value:scalar:u64,inout:pointer:enum:dmBuffer::ValueType,inout:pointer:scalar:u32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "source-derived",
+      "evidenceGaps": [],
+      "resolvedPolicies": {
+        "layout": "one-caller-owned-u64-slot-per-native-parameter",
+        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
+      },
+      "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
         "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)",
-      "patternDecision": "universal.default"
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
     },
     {
-      "id": "dmsdk:dmConnectionPool::Dial@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:135:140",
-      "projectionId": "dmsdk-projection:1056942a5766c2f01238e336",
-      "symbol": "dmConnectionPool::Dial",
-      "disposition": "blocked",
-      "blockers": [
+      "id": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102",
+      "projectionId": "dmsdk-projection:facae2be4886335518890e9f",
+      "symbol": "dmBuffer::GetContentVersion",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 2,
+      "shape": "enum:dmBuffer::Result(value:handle:dmBuffer::HBuffer:u32,inout:pointer:scalar:u32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "source-derived",
+      "evidenceGaps": [],
+      "resolvedPolicies": {
+        "layout": "one-caller-owned-u64-slot-per-native-parameter",
+        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
+      },
+      "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
         "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque,in:cstring-in,value:scalar:u16,value:scalar:bool,value:scalar:i32,inout:pointer:scalar:i32,inout:pointer:scalar:u32,inout:pointer:enum:dmSocket::Result)",
-      "patternDecision": "universal.default"
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
     },
     {
-      "id": "dmsdk:dmConnectionPool::New@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:98:137",
-      "projectionId": "dmsdk-projection:0a335d29357809d16268fd73",
-      "symbol": "dmConnectionPool::New",
+      "id": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
+      "projectionId": "dmsdk-projection:a674bc9948c833780c93ae70",
+      "symbol": "dmCrypt::Encrypt",
       "disposition": "blocked",
       "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:dmConnectionPool::Params",
-        "parameter-kind-unsupported:1:pointer:unknown:HPool",
-        "parameter-role-direction-unsupported:0:in:pointer:record:dmConnectionPool::Params",
-        "parameter-role-direction-unsupported:1:inout:pointer:unknown:HPool",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:1:pointer:scalar:u8",
+        "parameter-kind-unsupported:3:pointer:scalar:u8",
+        "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "family": "universal-recipe",
         "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:dmConnectionPool::Params",
-          "parameter-kind-unsupported:1:pointer:unknown:HPool",
-          "parameter-role-direction-unsupported:0:in:pointer:record:dmConnectionPool::Params",
-          "parameter-role-direction-unsupported:1:inout:pointer:unknown:HPool",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:1:pointer:scalar:u8",
+          "parameter-kind-unsupported:3:pointer:scalar:u8",
+          "write-facts-unavailable"
         ],
         "preserved": true
       },
-      "shape": "enum:dmConnectionPool::Result(in:pointer:record:dmConnectionPool::Params,inout:pointer:unknown:HPool)",
-      "patternDecision": "universal.default"
+      "shape": "enum:dmCrypt::Result(value:enum:dmCrypt::Algorithm,inout:pointer:scalar:u8,value:scalar:u32,in:pointer:scalar:u8,value:scalar:u32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
     },
     {
-      "id": "dmsdk:dmDDF::LoadMessageFromFile@upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h:136:8",
-      "projectionId": "dmsdk-projection:a833558a3ad4ac8524099dd1",
-      "symbol": "dmDDF::LoadMessageFromFile",
+      "id": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
+      "projectionId": "dmsdk-projection:b5749782c77bc310cad23e96",
+      "symbol": "dmCrypt::Decrypt",
       "disposition": "blocked",
       "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:cstring-in",
-        "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
-        "parameter-kind-unsupported:2:opaque-pointer-out",
-        "parameter-role-direction-unsupported:0:in:cstring-in",
-        "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
-        "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:1:pointer:scalar:u8",
+        "parameter-kind-unsupported:3:pointer:scalar:u8",
+        "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "family": "universal-recipe",
         "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:cstring-in",
-          "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
-          "parameter-kind-unsupported:2:opaque-pointer-out",
-          "parameter-role-direction-unsupported:0:in:cstring-in",
-          "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
-          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:1:pointer:scalar:u8",
+          "parameter-kind-unsupported:3:pointer:scalar:u8",
+          "write-facts-unavailable"
         ],
         "preserved": true
       },
-      "shape": "enum:dmDDF::Result(in:cstring-in,in:pointer:record:dmDDF::Descriptor,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
+      "shape": "enum:dmCrypt::Result(value:enum:dmCrypt::Algorithm,inout:pointer:scalar:u8,value:scalar:u32,in:pointer:scalar:u8,value:scalar:u32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
     },
     {
-      "id": "dmsdk:dmDDF::ResolvePointers@upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h:146:9",
-      "projectionId": "dmsdk-projection:65075062d9cbc0f2e4d65b76",
-      "symbol": "dmDDF::ResolvePointers",
+      "id": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
+      "projectionId": "dmsdk-projection:d4a799e685183a70a80fb541",
+      "symbol": "dmCrypt::HashSha1",
       "disposition": "blocked",
       "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:dmDDF::Descriptor",
-        "parameter-kind-unsupported:1:opaque-pointer",
-        "parameter-role-direction-unsupported:0:in:pointer:record:dmDDF::Descriptor",
-        "parameter-role-direction-unsupported:1:inout:opaque-pointer",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:0:pointer:scalar:u8",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
+        "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "family": "universal-recipe",
         "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:dmDDF::Descriptor",
-          "parameter-kind-unsupported:1:opaque-pointer",
-          "parameter-role-direction-unsupported:0:in:pointer:record:dmDDF::Descriptor",
-          "parameter-role-direction-unsupported:1:inout:opaque-pointer",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:0:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
         ],
         "preserved": true
       },
-      "shape": "enum:dmDDF::Result(in:pointer:record:dmDDF::Descriptor,inout:opaque-pointer)",
-      "patternDecision": "universal.default"
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
     },
     {
-      "id": "dmsdk:dmDDF::SaveMessageToArray@upstream/defold/engine/ddf/src/dmsdk/ddf/ddf.h:111:6",
-      "projectionId": "dmsdk-projection:250dc52d7ae2863c64fdfe66",
-      "symbol": "dmDDF::SaveMessageToArray",
+      "id": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
+      "projectionId": "dmsdk-projection:a8370554e7e394de6befb9c6",
+      "symbol": "dmCrypt::HashSha256",
       "disposition": "blocked",
       "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:opaque-pointer",
-        "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
-        "parameter-kind-unsupported:2:template:dmArray<uint8_t>",
-        "parameter-role-direction-unsupported:0:in:opaque-pointer",
-        "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
-        "parameter-role-direction-unsupported:2:inout:template:dmArray<uint8_t>",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:0:pointer:scalar:u8",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
+        "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "family": "universal-recipe",
         "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:opaque-pointer",
-          "parameter-kind-unsupported:1:pointer:record:dmDDF::Descriptor",
-          "parameter-kind-unsupported:2:template:dmArray<uint8_t>",
-          "parameter-role-direction-unsupported:0:in:opaque-pointer",
-          "parameter-role-direction-unsupported:1:in:pointer:record:dmDDF::Descriptor",
-          "parameter-role-direction-unsupported:2:inout:template:dmArray<uint8_t>",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:0:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
         ],
         "preserved": true
       },
-      "shape": "enum:dmDDF::Result(in:opaque-pointer,in:pointer:record:dmDDF::Descriptor,inout:template:dmArray<uint8_t>)",
-      "patternDecision": "universal.default"
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
     },
     {
-      "id": "dmsdk:dmGameObject::GetComponent@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:685:1014",
-      "projectionId": "dmsdk-projection:36c4bc26a7c949988d04d600",
-      "symbol": "dmGameObject::GetComponent",
+      "id": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
+      "projectionId": "dmsdk-projection:e561d06d4ce522548bb539b2",
+      "symbol": "dmCrypt::HashSha512",
       "disposition": "blocked",
       "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:0:pointer:scalar:u8",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:0:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
+      "projectionId": "dmsdk-projection:44a0ff580b15365ff40420a0",
+      "symbol": "dmCrypt::HashMd5",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:0:pointer:scalar:u8",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:0:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:void(in:pointer:scalar:u8,value:scalar:u32,inout:pointer:scalar:u8)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
+      "projectionId": "dmsdk-projection:46a68b6b277fcb081c6e5a4d",
+      "symbol": "dmCrypt::Base64Encode",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:0:pointer:scalar:u8",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:0:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
+      "projectionId": "dmsdk-projection:425b861d0925f9cbc4691042",
+      "symbol": "dmCrypt::Base64Decode",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:0:pointer:scalar:u8",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:0:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:bool(in:pointer:scalar:u8,value:scalar:u32,out:pointer:scalar:u8,out:pointer:scalar:u32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmSocket::New@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:229:552",
+      "projectionId": "dmsdk-projection:8bee828d540e16276629d172",
+      "symbol": "dmSocket::New",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "ownership-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "ownership-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "enum:dmSocket::Result(value:enum:dmSocket::Domain,value:enum:dmSocket::Type,value:enum:dmSocket::Protocol,inout:pointer:scalar:i32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "ownership-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867",
+      "projectionId": "dmsdk-projection:01459ddbc4ba459ce190fe1c",
+      "symbol": "TextLayoutGetBounds",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 3,
+      "shape": "scalar:void(value:handle:HTextLayout:opaque,inout:pointer:scalar:f32,inout:pointer:scalar:f32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "source-derived",
+      "evidenceGaps": [],
+      "resolvedPolicies": {
+        "layout": "one-caller-owned-u64-slot-per-native-parameter",
+        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
+      },
+      "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
         "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:pointer:unknown:HComponent",
-        "parameter-kind-unsupported:4:pointer:unknown:HComponentWorld",
-        "parameter-role-direction-unsupported:3:inout:pointer:unknown:HComponent",
-        "parameter-role-direction-unsupported:4:out:pointer:unknown:HComponentWorld",
-        "pointer-bounds-nullability-lifetime-unresolved",
         "target-feature-symbol-matrix-unverified"
       ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:pointer:unknown:HComponent",
-          "parameter-kind-unsupported:4:pointer:unknown:HComponentWorld",
-          "parameter-role-direction-unsupported:3:inout:pointer:unknown:HComponent",
-          "parameter-role-direction-unsupported:4:out:pointer:unknown:HComponentWorld",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,inout:pointer:scalar:u32,inout:pointer:unknown:HComponent,out:pointer:unknown:HComponentWorld)",
-      "patternDecision": "universal.default"
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
     },
     {
       "id": "dmsdk:dmGameObject::GetComponentId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:673:1013",
       "projectionId": "dmsdk-projection:b9f3d9d887c9982511876579",
       "symbol": "dmGameObject::GetComponentId",
       "disposition": "generated-provider-boundary",
-      "bindingId": 0,
+      "bindingId": 4,
       "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:scalar:u16,inout:pointer:scalar:u64)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "compatibility-preserved",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -603,347 +946,17 @@
         "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
         "engine": "not-claimed-provider-absent"
       }
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:993:1048",
-      "projectionId": "dmsdk-projection:14d85007c554fae85051339b",
-      "symbol": "dmGameObject::GetPropertyAsBool",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 1,
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:bool)",
-      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "resolvedPolicies": {
-        "layout": "one-caller-owned-u64-slot-per-native-parameter",
-        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
-        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
-        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
-        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
-        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
-        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
-        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
-      },
-      "engineProviderBlockers": [
-        "call-thread-affinity-unresolved",
-        "enum-domain-to-native-success-policy-unresolved",
-        "handle-provenance-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:949:1044",
-      "projectionId": "dmsdk-projection:03b87c407d3af6a89803c6e2",
-      "symbol": "dmGameObject::GetPropertyAsFloat",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 2,
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:f32)",
-      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "resolvedPolicies": {
-        "layout": "one-caller-owned-u64-slot-per-native-parameter",
-        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
-        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
-        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
-        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
-        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
-        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
-        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
-      },
-      "engineProviderBlockers": [
-        "call-thread-affinity-unresolved",
-        "enum-domain-to-native-success-policy-unresolved",
-        "handle-provenance-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:938:1043",
-      "projectionId": "dmsdk-projection:e686b7a1e9aba30fb16e2d49",
-      "symbol": "dmGameObject::GetPropertyAsHash",
-      "disposition": "generated-provider-boundary",
-      "bindingId": 3,
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:u64)",
-      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
-      "resolvedPolicies": {
-        "layout": "one-caller-owned-u64-slot-per-native-parameter",
-        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
-        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
-        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
-        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
-        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
-        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
-        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
-        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
-      },
-      "engineProviderBlockers": [
-        "call-thread-affinity-unresolved",
-        "enum-domain-to-native-success-policy-unresolved",
-        "handle-provenance-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "stages": {
-        "generated": "all-five-target-projections",
-        "compiled": "pinned-header-and-adapter-object-tests",
-        "linked": "fake-provider-host-bridge-only",
-        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
-        "engine": "not-claimed-provider-absent"
-      }
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsMatrix4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1027:1051",
-      "projectionId": "dmsdk-projection:16d1f8e1e1ada59cabc381f4",
-      "symbol": "dmGameObject::GetPropertyAsMatrix4",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Matrix4",
-        "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Matrix4",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Matrix4",
-          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Matrix4",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Matrix4)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsQuat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:982:1047",
-      "projectionId": "dmsdk-projection:c7741640073bbdf7f058a8ba",
-      "symbol": "dmGameObject::GetPropertyAsQuat",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Quat",
-        "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Quat",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Quat",
-          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Quat",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Quat)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsText@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1016:1050",
-      "projectionId": "dmsdk-projection:f2f9ca1aceee21281922f487",
-      "symbol": "dmGameObject::GetPropertyAsText",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "parameter-kind-unsupported:3:pointer-out:scalar:i8",
-        "parameter-role-direction-unsupported:3:in:pointer-out:scalar:i8",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "parameter-kind-unsupported:3:pointer-out:scalar:i8",
-          "parameter-role-direction-unsupported:3:in:pointer-out:scalar:i8",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,in:pointer-out:scalar:i8)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsURL@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:1004:1049",
-      "projectionId": "dmsdk-projection:532fa47f042c94253a7d62f8",
-      "symbol": "dmGameObject::GetPropertyAsURL",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-        "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:record:dmMessage::URL)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsVector3@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:960:1045",
-      "projectionId": "dmsdk-projection:4b2c8b77f8a6150a7f0cf50b",
-      "symbol": "dmGameObject::GetPropertyAsVector3",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector3",
-        "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector3",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector3",
-          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector3",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector3)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameObject::GetPropertyAsVector4@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:971:1046",
-      "projectionId": "dmsdk-projection:077cedc7da33f42b5e8d6ac8",
-      "symbol": "dmGameObject::GetPropertyAsVector4",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector4",
-        "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector4",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:pointer:unknown:dmVMath::Vector4",
-          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmVMath::Vector4",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:unknown:dmVMath::Vector4)",
-      "patternDecision": "universal.default"
     },
     {
       "id": "dmsdk:dmGameObject::GetPropertyOptionsIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:917:1041",
       "projectionId": "dmsdk-projection:7328a351d6636fd15a6d1576",
       "symbol": "dmGameObject::GetPropertyOptionsIndex",
       "disposition": "generated-provider-boundary",
-      "bindingId": 4,
+      "bindingId": 5,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HPropertyOptions:opaque,value:scalar:u32,out:pointer:scalar:i32)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "source-derived",
+      "evidenceGaps": [],
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -975,9 +988,11 @@
       "projectionId": "dmsdk-projection:f359227c18b3a04d7b6e2fae",
       "symbol": "dmGameObject::GetPropertyOptionsKey",
       "disposition": "generated-provider-boundary",
-      "bindingId": 5,
+      "bindingId": 6,
       "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HPropertyOptions:opaque,value:scalar:u32,out:pointer:scalar:u64)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "source-derived",
+      "evidenceGaps": [],
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -1005,671 +1020,206 @@
       }
     },
     {
-      "id": "dmsdk:dmGameSystem::CompCollectionFactorySpawn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_collection_factory.h:72:1116",
-      "projectionId": "dmsdk-projection:6359a1889adb25b418316af1",
-      "symbol": "dmGameSystem::CompCollectionFactorySpawn",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:cstring-in",
-        "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
-        "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
-        "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
-        "parameter-kind-unsupported:7:pointer:unknown:dmGameObject::InstancePropertyContainers",
-        "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::InstanceIdMap",
-        "parameter-role-direction-unsupported:3:in:cstring-in",
-        "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
-        "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
-        "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
-        "parameter-role-direction-unsupported:7:inout:pointer:unknown:dmGameObject::InstancePropertyContainers",
-        "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::InstanceIdMap",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+      "id": "dmsdk:dmGameObject::GetPropertyAsHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:938:1043",
+      "projectionId": "dmsdk-projection:e686b7a1e9aba30fb16e2d49",
+      "symbol": "dmGameObject::GetPropertyAsHash",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 7,
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:u64)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "compatibility-preserved",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
       ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:cstring-in",
-          "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
-          "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
-          "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
-          "parameter-kind-unsupported:7:pointer:unknown:dmGameObject::InstancePropertyContainers",
-          "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::InstanceIdMap",
-          "parameter-role-direction-unsupported:3:in:cstring-in",
-          "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
-          "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
-          "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
-          "parameter-role-direction-unsupported:7:inout:pointer:unknown:dmGameObject::InstancePropertyContainers",
-          "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::InstanceIdMap",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
+      "resolvedPolicies": {
+        "layout": "one-caller-owned-u64-slot-per-native-parameter",
+        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
       },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HCollectionFactoryWorld:opaque,value:handle:dmGameSystem::HCollectionFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,in:cstring-in,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,inout:pointer:unknown:dmGameObject::InstancePropertyContainers,out:pointer:unknown:dmGameObject::InstanceIdMap)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameSystem::CompFactorySpawn@upstream/defold/engine/gamesys/src/dmsdk/gamesys/components/comp_factory.h:72:1140",
-      "projectionId": "dmsdk-projection:ab78d7085b87c270fc9b75ed",
-      "symbol": "dmGameSystem::CompFactorySpawn",
-      "disposition": "blocked",
-      "blockers": [
+      "engineProviderBlockers": [
         "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
         "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
-        "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
-        "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
-        "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::HInstance",
-        "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
-        "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
-        "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
-        "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::HInstance",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:4:unknown:dmVMath::Point3",
-          "parameter-kind-unsupported:5:unknown:dmVMath::Quat",
-          "parameter-kind-unsupported:6:unknown:dmVMath::Vector3",
-          "parameter-kind-unsupported:8:pointer:unknown:dmGameObject::HInstance",
-          "parameter-role-direction-unsupported:4:in:unknown:dmVMath::Point3",
-          "parameter-role-direction-unsupported:5:in:unknown:dmVMath::Quat",
-          "parameter-role-direction-unsupported:6:in:unknown:dmVMath::Vector3",
-          "parameter-role-direction-unsupported:8:out:pointer:unknown:dmGameObject::HInstance",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGameObject::Result(value:handle:dmGameSystem::HFactoryWorld:opaque,value:handle:dmGameSystem::HFactoryComponent:opaque,value:handle:dmGameObject::HCollection:opaque,value:scalar:u64,in:unknown:dmVMath::Point3,in:unknown:dmVMath::Quat,in:unknown:dmVMath::Vector3,value:handle:dmGameObject::HPropertyContainer:opaque,out:pointer:unknown:dmGameObject::HInstance)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameSystem::GetRenderConstant@upstream/defold/engine/gamesys/src/dmsdk/gamesys/render_constants.h:82:1201",
-      "projectionId": "dmsdk-projection:89072208e89126d6673caf4d",
-      "symbol": "dmGameSystem::GetRenderConstant",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer:unknown:dmRender::HConstant",
-        "parameter-role-direction-unsupported:2:out:pointer:unknown:dmRender::HConstant",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer:unknown:dmRender::HConstant",
-          "parameter-role-direction-unsupported:2:out:pointer:unknown:dmRender::HConstant",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(value:handle:dmGameSystem::HComponentRenderConstants:opaque,value:scalar:u64,out:pointer:unknown:dmRender::HConstant)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameSystem::ResCollectionFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:39:1219",
-      "projectionId": "dmsdk-projection:3829cb2b181d450823bd7f56",
-      "symbol": "dmGameSystem::ResCollectionFactoryLoadResource",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::CollectionFactoryResource",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::CollectionFactoryResource",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::CollectionFactoryResource",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::CollectionFactoryResource",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::CollectionFactoryResource)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameSystem::ResFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:36:1235",
-      "projectionId": "dmsdk-projection:128a3eba83a72329c752e266",
-      "symbol": "dmGameSystem::ResFactoryLoadResource",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::FactoryResource",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::FactoryResource",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:4:pointer-out:record:dmGameSystem::FactoryResource",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:4:out:pointer-out:record:dmGameSystem::FactoryResource",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::FactoryResource)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGameSystem::ResFontGetInfo@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:145:1248",
-      "projectionId": "dmsdk-projection:57aa1d7195c68177163dd320",
-      "symbol": "dmGameSystem::ResFontGetInfo",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:dmGameSystem::FontResource",
-        "parameter-kind-unsupported:1:pointer:record:dmGameSystem::FontInfo",
-        "parameter-role-direction-unsupported:0:inout:pointer:record:dmGameSystem::FontResource",
-        "parameter-role-direction-unsupported:1:inout:pointer:record:dmGameSystem::FontInfo",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:dmGameSystem::FontResource",
-          "parameter-kind-unsupported:1:pointer:record:dmGameSystem::FontInfo",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:dmGameSystem::FontResource",
-          "parameter-role-direction-unsupported:1:inout:pointer:record:dmGameSystem::FontInfo",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(inout:pointer:record:dmGameSystem::FontResource,inout:pointer:record:dmGameSystem::FontInfo)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGraphics::GetRenderTargetSize@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1588:1444",
-      "projectionId": "dmsdk-projection:65dff6eecd664cc2006fc713",
-      "symbol": "dmGraphics::GetRenderTargetSize",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-role-direction-unsupported:3:inout:scalar:u32",
-        "parameter-role-direction-unsupported:4:inout:scalar:u32",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-role-direction-unsupported:3:inout:scalar:u32",
-          "parameter-role-direction-unsupported:4:inout:scalar:u32",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:handle:dmGraphics::HRenderTarget:u64,value:enum:dmGraphics::BufferType,inout:scalar:u32,inout:scalar:u32)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGraphics::GetTextureHandle@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:344:1348",
-      "projectionId": "dmsdk-projection:d34921bfae872414286e220e",
-      "symbol": "dmGraphics::GetTextureHandle",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:opaque-pointer-out",
-        "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:opaque-pointer-out",
-          "parameter-role-direction-unsupported:1:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGraphics::HandleResult(value:handle:dmGraphics::HTexture:u64,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGraphics::VulkanCreateDescriptorPool@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics_vulkan.h:155:1518",
-      "projectionId": "dmsdk-projection:01aa32c00b20890869069523",
-      "symbol": "dmGraphics::VulkanCreateDescriptorPool",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "family-requires-target-matrix:platform-gated",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:unknown:VkDevice",
-        "parameter-kind-unsupported:2:pointer:unknown:VkDescriptorPool",
-        "parameter-role-direction-unsupported:0:value:unknown:VkDevice",
-        "parameter-role-direction-unsupported:2:out:pointer:unknown:VkDescriptorPool",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "family-requires-target-matrix:platform-gated",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:unknown:VkDevice",
-          "parameter-kind-unsupported:2:pointer:unknown:VkDescriptorPool",
-          "parameter-role-direction-unsupported:0:value:unknown:VkDevice",
-          "parameter-role-direction-unsupported:2:out:pointer:unknown:VkDescriptorPool",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(value:unknown:VkDevice,value:scalar:u16,out:pointer:unknown:VkDescriptorPool)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmGui::GetNodeCustomProperty@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:383:1566",
-      "projectionId": "dmsdk-projection:9576def9d56f06adbb3d9d20",
-      "symbol": "dmGui::GetNodeCustomProperty",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:pointer:record:dmGui::CustomProperty",
-        "parameter-role-direction-unsupported:3:inout:pointer:record:dmGui::CustomProperty",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:pointer:record:dmGui::CustomProperty",
-          "parameter-role-direction-unsupported:3:inout:pointer:record:dmGui::CustomProperty",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmGui::Result(value:handle:dmGui::HScene:opaque,value:handle:dmGui::HNode:u32,value:scalar:u64,inout:pointer:record:dmGui::CustomProperty)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmHashTable::dmHashTable::Iterator::Iterator@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:457:274",
-      "projectionId": "dmsdk-projection:c2a63009b17ef7f53ae63ee1",
-      "symbol": "dmHashTable::dmHashTable::Iterator::Iterator",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
-        "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:receiver-provenance-lifetime",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
-          "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:receiver-provenance-lifetime",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmHashTable::dmHashTable::Swap@upstream/defold/engine/dlib/src/dmsdk/dlib/hashtable.h:246:263",
-      "projectionId": "dmsdk-projection:ca096097a7bf9582c25a0bb3",
-      "symbol": "dmHashTable::dmHashTable::Swap",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
-        "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:receiver-provenance-lifetime",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:template:dmHashTable<KEY, T>",
-          "parameter-role-direction-unsupported:0:inout:template:dmHashTable<KEY, T>",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:receiver-provenance-lifetime",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmHID::FormatGamepadGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:649:1619",
-      "projectionId": "dmsdk-projection:d605044e99d1ae9f3ae42036",
-      "symbol": "dmHID::FormatGamepadGuid",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadGuid",
-        "parameter-kind-unsupported:1:cstring-mutable",
-        "parameter-role-direction-unsupported:0:in:pointer:record:dmHID::GamepadGuid",
-        "parameter-role-direction-unsupported:1:inout:cstring-mutable",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadGuid",
-          "parameter-kind-unsupported:1:cstring-mutable",
-          "parameter-role-direction-unsupported:0:in:pointer:record:dmHID::GamepadGuid",
-          "parameter-role-direction-unsupported:1:inout:cstring-mutable",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(in:pointer:record:dmHID::GamepadGuid,inout:cstring-mutable)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmHID::GetGamepadDeviceGuid@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:640:1618",
-      "projectionId": "dmsdk-projection:bfefd5c3a537801b3a7d062f",
-      "symbol": "dmHID::GetGamepadDeviceGuid",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer:record:dmHID::GamepadGuid",
-        "parameter-role-direction-unsupported:2:inout:pointer:record:dmHID::GamepadGuid",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer:record:dmHID::GamepadGuid",
-          "parameter-role-direction-unsupported:2:inout:pointer:record:dmHID::GamepadGuid",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,inout:pointer:record:dmHID::GamepadGuid)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmHID::GetGamepadHat@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:761:1632",
-      "projectionId": "dmsdk-projection:f822ed7c289e5cbfb323828d",
-      "symbol": "dmHID::GetGamepadHat",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadPacket",
-        "parameter-kind-unsupported:2:pointer:scalar:u8",
-        "parameter-role-direction-unsupported:0:inout:pointer:record:dmHID::GamepadPacket",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
         "target-feature-symbol-matrix-unverified"
       ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:dmHID::GamepadPacket",
-          "parameter-kind-unsupported:2:pointer:scalar:u8",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:dmHID::GamepadPacket",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(inout:pointer:record:dmHID::GamepadPacket,value:scalar:u32,out:pointer:scalar:u8)",
-      "patternDecision": "universal.default"
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
     },
     {
-      "id": "dmsdk:dmHID::GetGamepadPacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:742:1630",
-      "projectionId": "dmsdk-projection:02082dfdb90af57a78a6a2a1",
-      "symbol": "dmHID::GetGamepadPacket",
+      "id": "dmsdk:dmGameObject::GetPropertyAsFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:949:1044",
+      "projectionId": "dmsdk-projection:03b87c407d3af6a89803c6e2",
+      "symbol": "dmGameObject::GetPropertyAsFloat",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 8,
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:f32)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "compatibility-preserved",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "resolvedPolicies": {
+        "layout": "one-caller-owned-u64-slot-per-native-parameter",
+        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
+      },
+      "engineProviderBlockers": [
+        "call-thread-affinity-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
+    },
+    {
+      "id": "dmsdk:dmGameObject::GetPropertyAsBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:993:1048",
+      "projectionId": "dmsdk-projection:14d85007c554fae85051339b",
+      "symbol": "dmGameObject::GetPropertyAsBool",
+      "disposition": "generated-provider-boundary",
+      "bindingId": 9,
+      "shape": "enum:dmGameObject::PropertyResult(value:handle:dmGameObject::HInstance:opaque,value:scalar:u64,value:scalar:u64,out:pointer:scalar:bool)",
+      "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "compatibility-preserved",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "resolvedPolicies": {
+        "layout": "one-caller-owned-u64-slot-per-native-parameter",
+        "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
+        "inoutInitialization": "caller-value-validated-before-provider-and-provider-result-validated-after",
+        "failure": "all-writable-slots-zeroed-after-provider-error-or-invalid-output",
+        "bounds": "scalar-pointer-exactly-one-native-scalar-no-span-or-aliasing",
+        "reentrancy": "same-thread-nested-dispatch-rejected-before-provider",
+        "ownership": "borrowed-handles-and-caller-owned-scalars-only-no-transfer",
+        "thread": "provider-current-thread-required-before-handle-validation-or-invoke",
+        "registration": "single-provider-copy-before-concurrent-dispatch-no-concurrent-replacement"
+      },
+      "engineProviderBlockers": [
+        "call-thread-affinity-unresolved",
+        "enum-domain-to-native-success-policy-unresolved",
+        "handle-provenance-lifetime-unresolved",
+        "native-symbol-linkage-unverified",
+        "target-feature-symbol-matrix-unverified"
+      ],
+      "stages": {
+        "generated": "all-five-target-projections",
+        "compiled": "pinned-header-and-adapter-object-tests",
+        "linked": "fake-provider-host-bridge-only",
+        "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
+        "engine": "not-claimed-provider-absent"
+      }
+    },
+    {
+      "id": "dmsdk:dmGraphics::GetViewport@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1152:1397",
+      "projectionId": "dmsdk-projection:870ba650c7cf27041549403a",
+      "symbol": "dmGraphics::GetViewport",
       "disposition": "blocked",
       "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:pointer:record:dmHID::GamepadPacket",
-        "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::GamepadPacket",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "family": "universal-recipe",
         "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:pointer:record:dmHID::GamepadPacket",
-          "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::GamepadPacket",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
         ],
         "preserved": true
       },
-      "shape": "scalar:bool(value:handle:dmHID::HGamepad:opaque,out:pointer:record:dmHID::GamepadPacket)",
-      "patternDecision": "universal.default"
+      "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,inout:pointer:scalar:i32,inout:pointer:scalar:i32,inout:pointer:scalar:u32,inout:pointer:scalar:u32)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
+    },
+    {
+      "id": "dmsdk:dmGraphics::RepackRGBToRGBA@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1627:1449",
+      "projectionId": "dmsdk-projection:6fe2acc3bf0c315920a4218c",
+      "symbol": "dmGraphics::RepackRGBToRGBA",
+      "disposition": "blocked",
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "parameter-kind-unsupported:1:pointer:scalar:u8",
+        "parameter-kind-unsupported:2:pointer:scalar:u8",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "family": "universal-recipe",
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "parameter-kind-unsupported:1:pointer:scalar:u8",
+          "parameter-kind-unsupported:2:pointer:scalar:u8",
+          "write-facts-unavailable"
+        ],
+        "preserved": true
+      },
+      "shape": "scalar:void(value:scalar:u32,inout:pointer:scalar:u8,inout:pointer:scalar:u8)",
+      "patternDecision": "universal.default",
+      "admission": "universal-fallback",
+      "evidenceGaps": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ]
     },
     {
       "id": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
       "projectionId": "dmsdk-projection:def914a99094068e2727aeb2",
       "symbol": "dmHID::GetGamepadUserId",
       "disposition": "generated-provider-boundary",
-      "bindingId": 6,
+      "bindingId": 10,
       "shape": "scalar:bool(value:handle:dmHID::HContext:opaque,value:handle:dmHID::HGamepad:opaque,out:pointer:scalar:u32)",
       "patternDecision": "pointer.scratch-scalar-out-provider-boundary",
+      "admission": "compatibility-preserved",
+      "evidenceGaps": [
+        "memory-facts-unavailable",
+        "write-facts-unavailable"
+      ],
       "resolvedPolicies": {
         "layout": "one-caller-owned-u64-slot-per-native-parameter",
         "outInitialization": "dispatcher-zeroes-every-out-slot-before-provider",
@@ -1695,1604 +1245,6 @@
         "runtime": "fake-provider-sanitized-reentrancy-and-warmed",
         "engine": "not-claimed-provider-absent"
       }
-    },
-    {
-      "id": "dmsdk:dmHID::GetMousePacket@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:708:1626",
-      "projectionId": "dmsdk-projection:2ebeae3233f652523277c9a3",
-      "symbol": "dmHID::GetMousePacket",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:pointer:record:dmHID::MousePacket",
-        "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::MousePacket",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:pointer:record:dmHID::MousePacket",
-          "parameter-role-direction-unsupported:1:out:pointer:record:dmHID::MousePacket",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(value:handle:dmHID::HMouse:opaque,out:pointer:record:dmHID::MousePacket)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmMessage::ParseURL@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:299:427",
-      "projectionId": "dmsdk-projection:02d4c6b7259a842259bf7fa9",
-      "symbol": "dmMessage::ParseURL",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:cstring-in",
-        "parameter-kind-unsupported:1:pointer:record:dmMessage::StringURL",
-        "parameter-role-direction-unsupported:0:in:cstring-in",
-        "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::StringURL",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:cstring-in",
-          "parameter-kind-unsupported:1:pointer:record:dmMessage::StringURL",
-          "parameter-role-direction-unsupported:0:in:cstring-in",
-          "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::StringURL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmMessage::Result(in:cstring-in,out:pointer:record:dmMessage::StringURL)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmObjectPool::dmObjectPool::Set@upstream/defold/engine/dlib/src/dmsdk/dlib/object_pool.h:227:456",
-      "projectionId": "dmsdk-projection:f30c8ca78133d1c859337a9d",
-      "symbol": "dmObjectPool::dmObjectPool::Set",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:template:T",
-        "parameter-role-direction-unsupported:1:inout:template:T",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:receiver-provenance-lifetime",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:template:T",
-          "parameter-role-direction-unsupported:1:inout:template:T",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:receiver-provenance-lifetime",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(value:scalar:u32,inout:template:T)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1839",
-      "projectionId": "dmsdk-projection:bbf9b6ff3e7f81557f1f907f",
-      "symbol": "dmRender::GetConstantValues",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:pointer:unknown:dmVMath::Vector4",
-        "result-role-unsupported:pointer:unknown:dmVMath::Vector4",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:pointer:unknown:dmVMath::Vector4",
-          "result-role-unsupported:pointer:unknown:dmVMath::Vector4",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "pointer:unknown:dmVMath::Vector4(value:handle:dmRender::HConstant:opaque,inout:pointer:scalar:u32)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:621:1855",
-      "projectionId": "dmsdk-projection:a4664ba2a331ff8d0c8dd041",
-      "symbol": "dmRender::GetNamedConstant",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
-        "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
-          "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmRender::GetNamedConstant@upstream/defold/engine/render/src/dmsdk/render/render.h:634:1856",
-      "projectionId": "dmsdk-projection:8bfc67c142ec36f6d2d178e9",
-      "symbol": "dmRender::GetNamedConstant",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
-        "parameter-kind-unsupported:4:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
-        "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
-        "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer-out:unknown:dmVMath::Vector4",
-          "parameter-kind-unsupported:4:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
-          "parameter-role-direction-unsupported:2:out:pointer-out:unknown:dmVMath::Vector4",
-          "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(value:handle:dmRender::HNamedConstantBuffer:opaque,value:scalar:u64,out:pointer-out:unknown:dmVMath::Vector4,inout:pointer:scalar:u32,inout:pointer:unknown:dmRenderDDF::MaterialDesc::ConstantType)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:146:2002",
-      "projectionId": "dmsdk-projection:7adfefa2a937717fc534f732",
-      "symbol": "dmResource::Get",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:opaque-pointer-out",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:opaque-pointer-out",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:56:1961",
-      "projectionId": "dmsdk-projection:5e1653e8850d73d47e755840",
-      "symbol": "dmResource::Get",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:opaque-pointer-out",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:opaque-pointer-out",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmResource::Get@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:78:1963",
-      "projectionId": "dmsdk-projection:cdc0f08def830969d5fd0d76",
-      "symbol": "dmResource::Get",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:opaque-pointer-out",
-        "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:opaque-pointer-out",
-          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmResource::GetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:157:2003",
-      "projectionId": "dmsdk-projection:408e15afe7cddd7282ac93c5",
-      "symbol": "dmResource::GetByHash",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:opaque-pointer-out",
-        "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:opaque-pointer-out",
-          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmResource::GetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:215:2009",
-      "projectionId": "dmsdk-projection:2799b2f6323150962dfdeba0",
-      "symbol": "dmResource::GetPath",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:opaque-pointer",
-        "parameter-role-direction-unsupported:1:in:opaque-pointer",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:opaque-pointer",
-          "parameter-role-direction-unsupported:1:in:opaque-pointer",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:68:1962",
-      "projectionId": "dmsdk-projection:43cafcaca6ed546d52429ace",
-      "symbol": "dmResource::GetWithExt",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:cstring-in",
-        "parameter-kind-unsupported:3:opaque-pointer-out",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:in:cstring-in",
-        "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:cstring-in",
-          "parameter-kind-unsupported:3:opaque-pointer-out",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:in:cstring-in",
-          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmResource::GetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:90:1964",
-      "projectionId": "dmsdk-projection:b8060d79d4df2c5e29c75125",
-      "symbol": "dmResource::GetWithExt",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:opaque-pointer-out",
-        "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:opaque-pointer-out",
-          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmRig::CopyBindPose@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:224:2074",
-      "projectionId": "dmsdk-projection:3addf4707db17adc739b35bc",
-      "symbol": "dmRig::CopyBindPose",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:unknown:dmRigDDF::Skeleton",
-        "parameter-kind-unsupported:1:template:dmArray<RigBone>",
-        "parameter-role-direction-unsupported:0:inout:unknown:dmRigDDF::Skeleton",
-        "parameter-role-direction-unsupported:1:inout:template:dmArray<RigBone>",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:unknown:dmRigDDF::Skeleton",
-          "parameter-kind-unsupported:1:template:dmArray<RigBone>",
-          "parameter-role-direction-unsupported:0:inout:unknown:dmRigDDF::Skeleton",
-          "parameter-role-direction-unsupported:1:inout:template:dmArray<RigBone>",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(inout:unknown:dmRigDDF::Skeleton,inout:template:dmArray<RigBone>)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmRig::GenerateVertexData@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:196:2054",
-      "projectionId": "dmsdk-projection:2bab337d33181997ddacb056",
-      "symbol": "dmRig::GenerateVertexData",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer:record:dmRigDDF::Mesh",
-        "parameter-kind-unsupported:3:unknown:dmVMath::Matrix4",
-        "parameter-kind-unsupported:4:pointer:record:dmRig::RigModelVertex",
-        "parameter-role-direction-unsupported:2:inout:pointer:record:dmRigDDF::Mesh",
-        "parameter-role-direction-unsupported:3:in:unknown:dmVMath::Matrix4",
-        "parameter-role-direction-unsupported:4:out:pointer:record:dmRig::RigModelVertex",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:pointer:record:dmRig::RigModelVertex",
-        "result-role-unsupported:pointer:record:dmRig::RigModelVertex",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer:record:dmRigDDF::Mesh",
-          "parameter-kind-unsupported:3:unknown:dmVMath::Matrix4",
-          "parameter-kind-unsupported:4:pointer:record:dmRig::RigModelVertex",
-          "parameter-role-direction-unsupported:2:inout:pointer:record:dmRigDDF::Mesh",
-          "parameter-role-direction-unsupported:3:in:unknown:dmVMath::Matrix4",
-          "parameter-role-direction-unsupported:4:out:pointer:record:dmRig::RigModelVertex",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:pointer:record:dmRig::RigModelVertex",
-          "result-role-unsupported:pointer:record:dmRig::RigModelVertex",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "pointer:record:dmRig::RigModelVertex(value:handle:dmRig::HRigContext:opaque,value:handle:dmRig::HRigInstance:opaque,inout:pointer:record:dmRigDDF::Mesh,in:unknown:dmVMath::Matrix4,out:pointer:record:dmRig::RigModelVertex)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmRig::GetMorphWeights@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:217:2071",
-      "projectionId": "dmsdk-projection:45a013082da6b426bcbf95ff",
-      "symbol": "dmRig::GetMorphWeights",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-role-unsupported:pointer:scalar:f32",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-role-unsupported:pointer:scalar:f32",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "pointer:scalar:f32(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,out:pointer:scalar:u32)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmScript::CheckURL@upstream/defold/engine/script/src/dmsdk/script/script.h:517:2115",
-      "projectionId": "dmsdk-projection:1e0138b0bf77a4cf49e7b408",
-      "symbol": "dmScript::CheckURL",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:lua_State",
-        "parameter-kind-unsupported:1:pointer:record:dmMessage::URL",
-        "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-        "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::URL",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:lua_State",
-          "parameter-kind-unsupported:1:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-          "parameter-role-direction-unsupported:1:out:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:bool(inout:pointer:record:lua_State,out:pointer:record:dmMessage::URL)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmScript::GetComponentFromLua@upstream/defold/engine/gamesys/src/dmsdk/gamesys/script.h:106:1311",
-      "projectionId": "dmsdk-projection:6ecd2c3c11cd8bb8cb91c557",
-      "symbol": "dmScript::GetComponentFromLua",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:lua_State",
-        "parameter-kind-unsupported:2:cstring-in",
-        "parameter-kind-unsupported:3:pointer:unknown:dmGameObject::HComponentWorld",
-        "parameter-kind-unsupported:4:pointer:unknown:dmGameObject::HComponent",
-        "parameter-kind-unsupported:5:pointer:record:dmMessage::URL",
-        "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-        "parameter-role-direction-unsupported:2:in:cstring-in",
-        "parameter-role-direction-unsupported:3:out:pointer:unknown:dmGameObject::HComponentWorld",
-        "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmGameObject::HComponent",
-        "parameter-role-direction-unsupported:5:inout:pointer:record:dmMessage::URL",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:lua_State",
-          "parameter-kind-unsupported:2:cstring-in",
-          "parameter-kind-unsupported:3:pointer:unknown:dmGameObject::HComponentWorld",
-          "parameter-kind-unsupported:4:pointer:unknown:dmGameObject::HComponent",
-          "parameter-kind-unsupported:5:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-          "parameter-role-direction-unsupported:2:in:cstring-in",
-          "parameter-role-direction-unsupported:3:out:pointer:unknown:dmGameObject::HComponentWorld",
-          "parameter-role-direction-unsupported:4:inout:pointer:unknown:dmGameObject::HComponent",
-          "parameter-role-direction-unsupported:5:inout:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,out:pointer:unknown:dmGameObject::HComponentWorld,inout:pointer:unknown:dmGameObject::HComponent,inout:pointer:record:dmMessage::URL)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:719:2131",
-      "projectionId": "dmsdk-projection:8c5bfa3b14fb9a856eb050b4",
-      "symbol": "dmScript::ResolveURL",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:lua_State",
-        "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
-        "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-        "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-        "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
-        "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:lua_State",
-          "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
-          "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-          "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:3:out:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,out:pointer:record:dmMessage::URL,out:pointer:record:dmMessage::URL)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmScript::ResolveURL@upstream/defold/engine/script/src/dmsdk/script/script.h:735:2132",
-      "projectionId": "dmsdk-projection:7123d517dc0241ad5647aaf4",
-      "symbol": "dmScript::ResolveURL",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer:record:lua_State",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
-        "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-        "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
-        "parameter-role-direction-unsupported:3:inout:pointer:record:dmMessage::URL",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer:record:lua_State",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:pointer:record:dmMessage::URL",
-          "parameter-kind-unsupported:3:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:0:inout:pointer:record:lua_State",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:out:pointer:record:dmMessage::URL",
-          "parameter-role-direction-unsupported:3:inout:pointer:record:dmMessage::URL",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:dmMessage::Result(inout:pointer:record:lua_State,in:cstring-in,out:pointer:record:dmMessage::URL,inout:pointer:record:dmMessage::URL)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmStrlCat@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:116:181",
-      "projectionId": "dmsdk-projection:79120b68484f78823bfe8760",
-      "symbol": "dmStrlCat",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:cstring-mutable",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:scalar:usize",
-        "parameter-role-direction-unsupported:0:out:cstring-mutable",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:usize",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:cstring-mutable",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:scalar:usize",
-          "parameter-role-direction-unsupported:0:out:cstring-mutable",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:usize",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmStrlCpy@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:94:180",
-      "projectionId": "dmsdk-projection:3050c5ac994f0ca02c601067",
-      "symbol": "dmStrlCpy",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:cstring-mutable",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:scalar:usize",
-        "parameter-role-direction-unsupported:0:out:cstring-mutable",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:usize",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:cstring-mutable",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:scalar:usize",
-          "parameter-role-direction-unsupported:0:out:cstring-mutable",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:usize",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmStrTok@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:73:179",
-      "projectionId": "dmsdk-projection:6bb33ecd9d7df5b8092fb1f2",
-      "symbol": "dmStrTok",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:cstring-mutable",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:pointer-out:scalar:i8",
-        "parameter-role-direction-unsupported:0:inout:cstring-mutable",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:out:pointer-out:scalar:i8",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:cstring-mutable",
-        "result-role-unsupported:cstring-mutable",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:cstring-mutable",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:pointer-out:scalar:i8",
-          "parameter-role-direction-unsupported:0:inout:cstring-mutable",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:out:pointer-out:scalar:i8",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:cstring-mutable",
-          "result-role-unsupported:cstring-mutable",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "cstring-mutable(inout:cstring-mutable,in:cstring-in,out:pointer-out:scalar:i8)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmURI::Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:105:656",
-      "projectionId": "dmsdk-projection:d1ccf0657c7349dd7eec6409",
-      "symbol": "dmURI::Decode",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:cstring-in",
-        "parameter-kind-unsupported:1:cstring-mutable",
-        "parameter-role-direction-unsupported:0:in:cstring-in",
-        "parameter-role-direction-unsupported:1:out:cstring-mutable",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:cstring-in",
-          "parameter-kind-unsupported:1:cstring-mutable",
-          "parameter-role-direction-unsupported:0:in:cstring-in",
-          "parameter-role-direction-unsupported:1:out:cstring-mutable",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(in:cstring-in,out:cstring-mutable)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmUtf8::NextChar@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:59:658",
-      "projectionId": "dmsdk-projection:53b42960f9aba86aeca5837e",
-      "symbol": "dmUtf8::NextChar",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "parameter-kind-unsupported:0:pointer-out:scalar:i8",
-        "parameter-role-direction-unsupported:0:in:pointer-out:scalar:i8",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "parameter-kind-unsupported:0:pointer-out:scalar:i8",
-          "parameter-role-direction-unsupported:0:in:pointer-out:scalar:i8",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:u32(in:pointer-out:scalar:i8)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:dmUtf8::ToUtf8@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:69:659",
-      "projectionId": "dmsdk-projection:42879b25dafe8b53b98e08c3",
-      "symbol": "dmUtf8::ToUtf8",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-mutable",
-        "parameter-role-direction-unsupported:1:inout:cstring-mutable",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-mutable",
-          "parameter-role-direction-unsupported:1:inout:cstring-mutable",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:u32(value:scalar:u16,inout:cstring-mutable)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:EraseSwapRef@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:564:72",
-      "projectionId": "dmsdk-projection:9b493cfac9bf122d2d89016d",
-      "symbol": "EraseSwapRef",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:template:T",
-        "parameter-role-direction-unsupported:0:inout:template:T",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:template:T",
-        "result-role-unsupported:template:T",
-        "semantic-token-unresolved:receiver-provenance-lifetime",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:template:T",
-          "parameter-role-direction-unsupported:0:inout:template:T",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:template:T",
-          "result-role-unsupported:template:T",
-          "semantic-token-unresolved:receiver-provenance-lifetime",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "template:T(inout:template:T)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:FontGetGlyph@upstream/defold/engine/font/src/dmsdk/font/font.h:278:818",
-      "projectionId": "dmsdk-projection:f54cd4d1846dd152b8d5f7df",
-      "symbol": "FontGetGlyph",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
-        "parameter-kind-unsupported:3:pointer:record:FontGlyph",
-        "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
-        "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
-          "parameter-kind-unsupported:3:pointer:record:FontGlyph",
-          "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
-          "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:FontGetGlyphByIndex@upstream/defold/engine/font/src/dmsdk/font/font.h:289:819",
-      "projectionId": "dmsdk-projection:9e994393bf669337f691ee25",
-      "symbol": "FontGetGlyphByIndex",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
-        "parameter-kind-unsupported:3:pointer:record:FontGlyph",
-        "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
-        "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer:record:FontGlyphOptions",
-          "parameter-kind-unsupported:3:pointer:record:FontGlyph",
-          "parameter-role-direction-unsupported:2:inout:pointer:record:FontGlyphOptions",
-          "parameter-role-direction-unsupported:3:inout:pointer:record:FontGlyph",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:FontResult(value:handle:HFont:opaque,value:scalar:u32,inout:pointer:record:FontGlyphOptions,inout:pointer:record:FontGlyph)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:HttpNewRequest@upstream/defold/engine/dlib/src/dmsdk/dlib/http.h:351:319",
-      "projectionId": "dmsdk-projection:1dd5a3cef3128469c15b9c02",
-      "symbol": "HttpNewRequest",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:pointer-out:record:HttpRequest",
-        "parameter-role-direction-unsupported:0:out:pointer-out:record:HttpRequest",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:pointer-out:record:HttpRequest",
-          "parameter-role-direction-unsupported:0:out:pointer-out:record:HttpRequest",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:HttpResult(out:pointer-out:record:HttpRequest)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceGet@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:199:1895",
-      "projectionId": "dmsdk-projection:1eebd19d49cd9a88aef037e5",
-      "symbol": "ResourceGet",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:opaque-pointer-out",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:opaque-pointer-out",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceGetByHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:224:1897",
-      "projectionId": "dmsdk-projection:12c84732a21aee895bb6e8a5",
-      "symbol": "ResourceGetByHash",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:opaque-pointer-out",
-        "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:opaque-pointer-out",
-          "parameter-role-direction-unsupported:2:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceGetByHashAndExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:236:1898",
-      "projectionId": "dmsdk-projection:2afaf2e2e5402d8ef85e050e",
-      "symbol": "ResourceGetByHashAndExt",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:3:opaque-pointer-out",
-        "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:3:opaque-pointer-out",
-          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,value:scalar:u64,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceGetPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:306:1905",
-      "projectionId": "dmsdk-projection:d5fc2478a9642314f4c2279d",
-      "symbol": "ResourceGetPath",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:opaque-pointer",
-        "parameter-role-direction-unsupported:1:in:opaque-pointer",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:opaque-pointer",
-          "parameter-role-direction-unsupported:1:in:opaque-pointer",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:opaque-pointer,inout:pointer:scalar:u64)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceGetTypeFromExtension@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:372:1911",
-      "projectionId": "dmsdk-projection:a89206d85757de0d5f875469",
-      "symbol": "ResourceGetTypeFromExtension",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:pointer:unknown:HResourceType)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceGetTypeFromExtensionHash@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:382:1912",
-      "projectionId": "dmsdk-projection:bc4b67055549cc67e7ee08c2",
-      "symbol": "ResourceGetTypeFromExtensionHash",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
-        "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:2:pointer:unknown:HResourceType",
-          "parameter-role-direction-unsupported:2:inout:pointer:unknown:HResourceType",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,value:scalar:u64,inout:pointer:unknown:HResourceType)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceGetWithExt@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:212:1896",
-      "projectionId": "dmsdk-projection:44ad91c79e2876fb02fa9dec",
-      "symbol": "ResourceGetWithExt",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:cstring-in",
-        "parameter-kind-unsupported:3:opaque-pointer-out",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:in:cstring-in",
-        "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:cstring-in",
-          "parameter-kind-unsupported:3:opaque-pointer-out",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:in:cstring-in",
-          "parameter-role-direction-unsupported:3:out:opaque-pointer-out",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,in:cstring-in,out:opaque-pointer-out)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1943",
-      "projectionId": "dmsdk-projection:b5c2e33719069173285195d1",
-      "symbol": "ResourceRegisterType",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "enum-width-domain-validation-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:cstring-in",
-        "parameter-kind-unsupported:2:opaque-pointer",
-        "parameter-kind-unsupported:3:pointer:unknown:HResourceType",
-        "parameter-role-direction-unsupported:1:in:cstring-in",
-        "parameter-role-direction-unsupported:2:inout:opaque-pointer",
-        "parameter-role-direction-unsupported:3:inout:pointer:unknown:HResourceType",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "enum-width-domain-validation-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:cstring-in",
-          "parameter-kind-unsupported:2:opaque-pointer",
-          "parameter-kind-unsupported:3:pointer:unknown:HResourceType",
-          "parameter-role-direction-unsupported:1:in:cstring-in",
-          "parameter-role-direction-unsupported:2:inout:opaque-pointer",
-          "parameter-role-direction-unsupported:3:inout:pointer:unknown:HResourceType",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,inout:opaque-pointer,inout:pointer:unknown:HResourceType)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:Swap@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:603:76",
-      "projectionId": "dmsdk-projection:2ed3227078295ba5f2870211",
-      "symbol": "Swap",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:0:template:dmArray<T>",
-        "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:void",
-        "semantic-token-unresolved:receiver-provenance-lifetime",
-        "semantic-token-unresolved:template-specialization-set",
-        "target-feature-symbol-matrix-unverified",
-        "writable-scalar-pointer-required"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:0:template:dmArray<T>",
-          "parameter-role-direction-unsupported:0:inout:template:dmArray<T>",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:void",
-          "semantic-token-unresolved:receiver-provenance-lifetime",
-          "semantic-token-unresolved:template-specialization-set",
-          "target-feature-symbol-matrix-unverified",
-          "writable-scalar-pointer-required"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:void(inout:template:dmArray<T>)",
-      "patternDecision": "universal.default"
-    },
-    {
-      "id": "dmsdk:TextLayoutGetObjectPosition@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:488:863",
-      "projectionId": "dmsdk-projection:2bc9fb311d30ef998fa3d759",
-      "symbol": "TextLayoutGetObjectPosition",
-      "disposition": "blocked",
-      "blockers": [
-        "call-thread-affinity-unresolved",
-        "handle-ownership-nullability-lifetime-unresolved",
-        "native-symbol-linkage-unverified",
-        "out-storage-initialization-failure-unresolved",
-        "parameter-kind-unsupported:1:pointer:record:TextLayoutObject",
-        "parameter-role-direction-unsupported:1:in:pointer:record:TextLayoutObject",
-        "pointer-bounds-nullability-lifetime-unresolved",
-        "result-kind-unsupported:scalar:u8",
-        "semantic-token-unresolved:record-layout-alignment-copy",
-        "target-feature-symbol-matrix-unverified"
-      ],
-      "universalFallback": {
-        "state": "universal-fallback",
-        "family": "universal-recipe",
-        "blockers": [
-          "call-thread-affinity-unresolved",
-          "handle-ownership-nullability-lifetime-unresolved",
-          "native-symbol-linkage-unverified",
-          "out-storage-initialization-failure-unresolved",
-          "parameter-kind-unsupported:1:pointer:record:TextLayoutObject",
-          "parameter-role-direction-unsupported:1:in:pointer:record:TextLayoutObject",
-          "pointer-bounds-nullability-lifetime-unresolved",
-          "result-kind-unsupported:scalar:u8",
-          "semantic-token-unresolved:record-layout-alignment-copy",
-          "target-feature-symbol-matrix-unverified"
-        ],
-        "preserved": true
-      },
-      "shape": "scalar:u8(value:handle:HTextLayout:opaque,in:pointer:record:TextLayoutObject,value:scalar:f32,value:scalar:f32,value:scalar:f32,inout:pointer:scalar:f32,inout:pointer:scalar:f32)",
-      "patternDecision": "universal.default"
     }
   ]
 }

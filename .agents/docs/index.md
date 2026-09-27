@@ -55,7 +55,7 @@ okf_version: "0.2"
 * [C# precedent](research/csharp-precedent.md) - How Defold implemented experimental C# extensions and what to copy.
 * [dmSDK coverage](research/sdk-coverage.md) - Generated, declaration-level coverage of every public dmSDK header.
 * [dmSDK ABI generator wave](research/dmsdk-abi-generator-wave.md) - Exact ABI-shape census, scalar and enum-value adapters, and isolated clean-room regeneration.
-* [dmSDK scalar out-parameter wave](research/dmsdk-scratch-scalar-out-wave.md) - Complete 79-row structural partition, seven provider-gated scalar outputs, and exact evidence boundaries.
+* [dmSDK scalar out-parameter wave](research/dmsdk-scratch-scalar-out-wave.md) - One authenticated 30-row plan, eleven provider-gated scalar outputs, and exact source-versus-compatibility evidence boundaries.
 * [dmSDK bounded C-string arena wave](research/dmsdk-arena-cstring-wave.md) - Five same-recipe production/exact adapters, bounded scratch and reentrancy, and the resulting 12/5/62 arena partition.
 * [dmSDK universal fallback](research/dmsdk-universal-fallback.md) - All-declaration cross-target recipes, fixed caller-owned ABI frames, and usage-driven native thunk materialization.
 * [dmSDK generated-adapter exact calls](research/dmsdk-generated-adapter-exact-call.md) - Linked same-recipe C ABI execution for all 64 callable adapter rows and real-Hermes JSI execution for the 33 routes whose modules ship in production.

@@ -690,21 +690,27 @@ async function validateReports(root) {
   );
   assert(
     scratchScalarOutPlan.coverage.structurallyRelevant === 30 &&
-      scratchScalarOutPlan.coverage.selected === 6 &&
-      scratchScalarOutPlan.coverage.universalFallback === 24 &&
-      scratchScalarOut.coverage.candidates === 79 &&
-      scratchScalarOut.coverage.generated === 7 &&
-      scratchScalarOut.coverage.blocked === 72 &&
-      scratchScalarOut.coverage.cAbiGenerated === 7 &&
-      scratchScalarOut.coverage.dynamicHermesJsiGenerated === 7 &&
-      scratchScalarOut.coverage.staticHermesGenerated === 7 &&
-      scratchScalarOut.coverage.browserDirectMemoryGenerated === 7 &&
-      scratchScalarOut.coverage.typescriptGenerated === 7 &&
-      scratchScalarOut.coverage.pinnedHeaderSignatureCompiled === 7 &&
-      scratchScalarOut.coverage.fakeProviderHostRuntimeTested === 7 &&
+      scratchScalarOutPlan.coverage.selected === 11 &&
+      scratchScalarOutPlan.coverage.sourceDerived === 6 &&
+      scratchScalarOutPlan.coverage.compatibilityPreserved === 5 &&
+      scratchScalarOutPlan.coverage.universalFallback === 19 &&
+      scratchScalarOut.coverage.candidates === scratchScalarOutPlan.coverage.structurallyRelevant &&
+      scratchScalarOut.coverage.generated === scratchScalarOutPlan.coverage.selected &&
+      scratchScalarOut.coverage.blocked === scratchScalarOutPlan.coverage.universalFallback &&
+      scratchScalarOut.coverage.sourceDerived === scratchScalarOutPlan.coverage.sourceDerived &&
+      scratchScalarOut.coverage.compatibilityPreserved === scratchScalarOutPlan.coverage.compatibilityPreserved &&
+      scratchScalarOut.coverage.cAbiGenerated === scratchScalarOutPlan.coverage.selected &&
+      scratchScalarOut.coverage.dynamicHermesJsiGenerated === scratchScalarOutPlan.coverage.selected &&
+      scratchScalarOut.coverage.staticHermesGenerated === scratchScalarOutPlan.coverage.selected &&
+      scratchScalarOut.coverage.browserDirectMemoryGenerated === scratchScalarOutPlan.coverage.selected &&
+      scratchScalarOut.coverage.typescriptGenerated === scratchScalarOutPlan.coverage.selected &&
+      scratchScalarOut.coverage.pinnedHeaderSignatureCompiled === scratchScalarOutPlan.coverage.selected &&
+      scratchScalarOut.coverage.fakeProviderHostRuntimeTested === scratchScalarOutPlan.coverage.selected &&
       scratchScalarOut.coverage.packagedEngineRuntimeVerified === 0 &&
-      scratchScalarOut.coverage.warmedDispatchObservedCppAllocations === 0,
-    "scratch scalar-out audit plan or emitted lane is stale",
+      scratchScalarOut.coverage.warmedDispatchObservedCppAllocations === 0 &&
+      JSON.stringify(scratchScalarOut.declarations.map(({ id }) => id)) ===
+        JSON.stringify(scratchScalarOutPlan.decisions.map(({ declarationId }) => declarationId)),
+    "scratch scalar-out report does not exactly realize its compiler-owned plan",
   );
   assert(
     cstringValue.coverage.candidates === cstringValuePlan.coverage.candidates &&
@@ -771,7 +777,10 @@ async function validateReports(root) {
     borrowedHandleIds.size === borrowedHandlePlan.coverage.selected,
     "borrowed-handle family contains duplicate generated IDs",
   );
-  assert(scratchScalarOutIds.size === 7, "scratch scalar-out family contains duplicate generated IDs");
+  assert(
+    scratchScalarOutIds.size === scratchScalarOutPlan.coverage.selected,
+    "scratch scalar-out family contains duplicate generated IDs",
+  );
   const priorGeneratedIds = new Set([
     ...scalarIds,
     ...enumIds,
