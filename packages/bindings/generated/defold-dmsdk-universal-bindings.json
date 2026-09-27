@@ -17,7 +17,7 @@
       "arenaCString": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
       "borrowedHandle": "a6346082ba0bd078badbd358f46b79c39d81e958dc7d3df7203d138d697b400d",
       "scratchScalarOut": "97ff8f4f30737a138cf8f6562e545af8a14114f0d20988448841971538e1a4d0",
-      "cstringValue": "3fd3b6d094bd96872eaf199d2dcecaa9190dc210d0e1a40bf57a5d5444e41883",
+      "cstringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
       "hashState": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
     },
     "patternPolicies": {
@@ -483,7 +483,7 @@
       ],
       "requiredHeadersSha256": "b332e968c991eec3d9ef64f504264c500efa2dddc8a035445b26e676b3c90d2c"
     },
-    "aggregate": "9af370659cbed6ea62c03742da8e678a3f894433c037840174269c8ff4ea2288",
+    "aggregate": "d7206d37e37fbb016082d486946433482f687b1d78fde8d1bc4986b35ebd930d",
     "catalog": "f2249952077681a6945069a2b75aae050bfb1a11e2288fe60d771f11fd65ccbf"
   },
   "coverage": {
@@ -186158,7 +186158,7 @@
   ],
   "fallbackAudit": {
     "artifact": "packages/bindings/generated/defold-dmsdk-fallback-audit.json",
-    "reportSha256": "dec095411279676c647e864626cddfca1a896b5273254ccc64011f7b0754be36",
+    "reportSha256": "52d6d8e73ceea5e33fd7eaf4104ddddd87ed8e0683ffc814ddc03d7b5b0ced35",
     "coverage": {
       "declarations": 1361,
       "preferredSpecialized": 101,
@@ -186169,8 +186169,8 @@
       "universalReady": 537,
       "usageFactsRequired": 723,
       "existingAuxiliarySpecialization": 158,
-      "semanticRecipeCandidates": 267,
-      "composableUniversalOnly": 835
+      "semanticRecipeCandidates": 261,
+      "composableUniversalOnly": 841
     }
   }
 }

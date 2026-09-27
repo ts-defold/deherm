@@ -58,7 +58,7 @@
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "dmsdkProjection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
-    "dmsdkUniversal": "0220ee4f4dd00967c8ccc5bfa2e2ef587b7b19237e80f5b9f73eea77f427a243",
+    "dmsdkUniversal": "67daad846b686c90e7aefdd06310a2f23ccf8111437c3894007336a9aca0171c",
     "dmsdkScalarThunks": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
     "dmsdkEnumValues": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
     "dmsdkNamedScalars": "8e9b149acbf3ab77cb7835329cac4f9f5deed61c1b1a64e113247159dfc6b5cc",
@@ -68,7 +68,7 @@
     "dmsdkXteaSpans": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
     "dmsdkHashSpans": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
     "dmsdkArenaSpanBlockers": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
-    "dmsdkCStringValue": "3fd3b6d094bd96872eaf199d2dcecaa9190dc210d0e1a40bf57a5d5444e41883",
+    "dmsdkCStringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
     "dmsdkBorrowedHandle": "a6346082ba0bd078badbd358f46b79c39d81e958dc7d3df7203d138d697b400d",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
@@ -78,9 +78,9 @@
     "luaStack": "5e0d6961c02d98e1c10cb8cb0fd95af02b3d86181be22facce0d824fb5ab2ea6",
     "browserWasmHost": "ef3c9691506f726586c5ffd2c0da2e3ff60915163d1af7bfd24c3f355f8f1836"
   },
-  "cacheKey": "c2c1308947f80e8ed1a4803a1e550ad5e9e5f09156106e437df9572797ad3182",
+  "cacheKey": "fa63b48ef35f226841b8a6a6f3fd45f84ba69d5882c936ac9c33ed62326dbd7c",
   "output": "packages/bindings/generated/defold-binding-lowering-plan.json",
   "outputBytes": 17803499,
-  "outputSha256": "0af17adb1b1ef564a2511e6d4b6fd0b3db55814c45bbebbf13863dd8da0ff836",
-  "planSha256": "ff620ace2b4d349e94ba540e514e3f0e6a8516eee2a3a653fc81fd0d81f430fe"
+  "outputSha256": "4f640f0cea62bf86b14eabaf1a31f83fa8ba5a52b32cc7ac9e8d1e205a529ec0",
+  "planSha256": "d8ba97a96839958f23649353384edc1eecc4aaa8607432c52d6ec32a064d7f80"
 }

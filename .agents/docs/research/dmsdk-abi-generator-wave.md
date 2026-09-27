@@ -97,6 +97,36 @@ stub runtime, overlap/reentrancy checks, and zero-warmed-allocation evidence are
 unchanged; the specialized family remains private staging until its product
 backends are deliberately promoted.
 
+The C-string/value family now has a compiler-owned authenticated plan between
+projection and emission. The plan owns candidate eligibility, documentation
+interpretation, pattern selection, explicit universal fallback, compiler-safe
+TypeScript route identities, and the canonical projection order that preserves
+the pre-migration dense dispatch IDs. The emitter verifies the complete plan by
+re-deriving it through `@deherm/compiler`, then only renders the selected rows.
+It contains no selector, pattern catalog, documentation parser, or independent
+eligibility prose.
+
+The evidence boundary is deliberate. A public Defold `const char *` parameter
+documented as a string, path, or UTF-8 value is trusted as a synchronous
+borrowed call parameter unless the same revision says it is nullable, retained,
+stored, deferred, asynchronous, arbitrary-encoded, or contains embedded NUL.
+A public C-string result documented as a string representation is trusted as
+NUL-terminated and non-null unless the revision contradicts that contract.
+Those are Defold API conventions at the owner boundary, not claims inferred
+down to every CPU instruction. Explicit negative prose dominates generic
+positive words and withdraws only the specialization; the declaration remains
+in the universal recipe set. The generated adapters still narrow JavaScript
+inputs to valid UTF-8 strings and do not claim that every native byte string is
+Unicode.
+
+Systemic tests reject object/text provenance skew, forged contracts, registry
+or owner drift, family-label eligibility changes, negative nullability,
+termination, encoding, and lifetime evidence, and normalized TypeScript name
+collisions. Clean-room regeneration reproduces the plan and all downstream
+artifacts byte-for-byte. Current, 1.13.1, 1.12.0, and 1.11.0 all complete the
+same materialization, compile, link, and exact-call matrix with revision-
+specific API counts.
+
 ## Structurally closed hash-state lifecycles
 
 Incremental hash-state generation no longer copies Defold descriptions, regular

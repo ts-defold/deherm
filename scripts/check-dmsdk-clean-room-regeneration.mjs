@@ -225,7 +225,7 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (
-      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|hash-state-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
+      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|hash-state-plan|cstring-value-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
         file,
       )
     ) {
@@ -417,6 +417,7 @@ async function validateReports(root) {
     projection,
     borrowedHandle,
     scratchScalarOut,
+    cstringValuePlan,
     cstringValue,
     universal,
     fallbackAudit,
@@ -439,6 +440,7 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-projection-ir.json"),
     load("packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-cstring-value-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-universal-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-fallback-audit.json"),
@@ -611,14 +613,24 @@ async function validateReports(root) {
     "scratch scalar-out report does not preserve its pinned 7 generated + 72 blocked provider boundary",
   );
   assert(
-    cstringValue.coverage.candidates === 20 &&
-      cstringValue.coverage.generated === 14 &&
-      cstringValue.coverage.blocked === 6 &&
+    cstringValue.coverage.candidates === cstringValuePlan.coverage.candidates &&
+      cstringValue.coverage.generated === cstringValuePlan.coverage.selected &&
+      cstringValue.coverage.blocked === cstringValuePlan.coverage.universalFallback &&
+      cstringValue.coverage.generated + cstringValue.coverage.blocked === cstringValue.coverage.candidates &&
+      cstringValue.sources.hashes.plan === sha256(await readFile(
+        path.join(root, "packages/bindings/generated/defold-dmsdk-cstring-value-plan.json"),
+        "utf8",
+      )) &&
+      JSON.stringify(cstringValue.declarations.map(({ id }) => id)) ===
+        JSON.stringify(cstringValuePlan.decisions.map(({ declarationId }) => declarationId)) &&
+      cstringValue.declarations.every((declaration, index) =>
+        declaration.disposition === (cstringValuePlan.decisions[index].fallback ? "blocked" : "generated") &&
+        declaration.blocker === cstringValuePlan.decisions[index].blocker) &&
       cstringValue.coverage.headerObjectCompiled === 0 &&
       cstringValue.coverage.stubAbiLinkedAndRuntimeTested === 0 &&
       cstringValue.coverage.pinnedEngineLinked === 0 &&
       cstringValue.coverage.allTargetConformant === 0,
-    "C-string/value report does not preserve its pinned 14 generated + 6 blocked truth boundary",
+    "C-string/value report does not exactly realize its compiler-owned plan and truth boundary",
   );
   assert(
     universal.coverage.universalReadyExactVectors === readyExact.universalReadyCount &&

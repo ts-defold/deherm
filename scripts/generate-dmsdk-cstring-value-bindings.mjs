@@ -4,15 +4,15 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
-  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
-  selectDmSdkPattern,
-} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
-import { cstringValuePatterns } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
+  indexDmSdkCStringValuePlan,
+  validateDmSdkCStringValuePolicy,
+} from "../packages/compiler/src/dmsdk-cstring-value-plan.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const relative = Object.freeze({
   projection: "packages/bindings/generated/defold-dmsdk-projection-ir.json",
   sdkIr: "packages/bindings/generated/defold-sdk-ir.json",
+  plan: "packages/bindings/generated/defold-dmsdk-cstring-value-plan.json",
   policy: "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
   report: "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
   header: "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h",
@@ -26,12 +26,13 @@ const relative = Object.freeze({
 });
 
 function options(argv) {
-  const value = { check: false, outputRoot: root, projection: relative.projection, sdkIr: relative.sdkIr, policy: relative.policy };
+  const value = { check: false, outputRoot: root, projection: relative.projection, sdkIr: relative.sdkIr, plan: relative.plan, policy: relative.policy };
   for (let index = 0; index < argv.length; ++index) {
     if (argv[index] === "--check") value.check = true;
     else if (argv[index] === "--output-root") value.outputRoot = path.resolve(argv[++index]);
     else if (argv[index] === "--projection") value.projection = path.resolve(argv[++index]);
     else if (argv[index] === "--sdk-ir") value.sdkIr = path.resolve(argv[++index]);
+    else if (argv[index] === "--plan") value.plan = path.resolve(argv[++index]);
     else if (argv[index] === "--policy") value.policy = path.resolve(argv[++index]);
     else throw new Error(`Unknown argument: ${argv[index]}`);
   }
@@ -46,129 +47,6 @@ const camel = (value) => {
   const result = pascal(value);
   return result ? result[0].toLowerCase() + result.slice(1) : "binding";
 };
-
-function candidate(row) {
-  const result = row.signature.result;
-  const resultSupported = result.kind === "void" || result.kind === "enum" || result.kind === "cstring" ||
-    (result.kind === "scalar" && ["bool", "i32", "u32", "u64"].includes(result.name));
-  const parametersSupported = row.signature.parameters.every(({ type }) =>
-    type.kind === "cstring" || type.kind === "enum" ||
-    (type.kind === "scalar" && ["u32", "u64"].includes(type.name)));
-  return row.effects.context.kind === "global" &&
-    row.provenance.declarationKind === "function" &&
-    row.provenance.primaryFamily === "pointer" &&
-    row.signature.variadic === false &&
-    row.effects.callbacks.present === false &&
-    row.effects.records.present === false &&
-    row.effects.templates.present === false &&
-    row.effects.spans.present === false &&
-    resultSupported && parametersSupported &&
-    [result, ...row.signature.parameters.map(({ type }) => type)].some(({ kind }) => kind === "cstring") &&
-    row.signature.parameters.filter(({ type }) => type.kind === "cstring")
-      .every(({ direction, type }) => direction === "in" && type.mutable === false);
-}
-
-function validateRecipe(value) {
-  assert.deepEqual(Object.keys(value).sort(), ["family", "recipe", "schemaVersion"], "C-string recipe has unsupported top-level keys");
-  assert.equal(value.schemaVersion, 1, "C-string recipe schemaVersion must be 1");
-  assert.equal(value.family, "cstring-value", "C-string recipe family is unsupported");
-  assert.deepEqual(Object.keys(value.recipe).sort(), ["candidateSource", "fallback", "input", "result", "scratchCapacity", "semanticSource", "transport"], "C-string recipe has unsupported keys");
-  assert.equal(value.recipe.transport, "bounded-utf8-cstring-value");
-  assert.ok(Number.isSafeInteger(value.recipe.scratchCapacity) && value.recipe.scratchCapacity > 0);
-  assert.deepEqual(value.recipe.input, { nullability: "non-null", encoding: "js-string-utf8-no-embedded-nul" });
-  assert.deepEqual(value.recipe.result, { encoding: "native-null-terminated-bytes-decoded-as-utf8" });
-  assert.equal(value.recipe.candidateSource, "revision-projection-global-cstring-value-abi");
-  assert.equal(value.recipe.semanticSource, "revision-ir-public-documentation");
-  assert.equal(value.recipe.fallback, "universal-recipe");
-}
-
-function role(type, result = false) {
-  if (type.kind === "cstring") return result ? "cstring-result" : "cstring-in";
-  if (type.kind === "void") return "scalar:void";
-  if (type.kind === "enum") return `enum:${type.name}`;
-  return `scalar:${type.name}`;
-}
-
-function facts(row, semanticTokens = []) {
-  return {
-    id: row.id,
-    kind: row.provenance.declarationKind,
-    result: { role: role(row.signature.result, true), direction: "value" },
-    parameters: row.signature.parameters.map((parameter) => ({ role: role(parameter.type), direction: parameter.direction })),
-    families: [row.provenance.primaryFamily],
-    semanticTokens,
-  };
-}
-
-const normalizedText = (value) => String(value ?? "").replace(/<[^>]+>/gu, " ").replace(/\s+/gu, " ").trim().toLowerCase();
-
-export function inferCStringSemantics(declaration, row, recipe) {
-  if (!declaration || declaration.kind !== "function") return { blocker: "cstring-semantic-contract-unresolved", semanticTokens: [], contract: null, evidence: null };
-  const description = normalizedText(declaration.description);
-  const returnDescription = normalizedText(declaration.returnDescription);
-  const parameterDescriptions = declaration.parameters.map((parameter) => normalizedText(parameter.description));
-  const evidence = {
-    source: "revision-ir-public-documentation",
-    description: declaration.description ?? null,
-    returnDescription: declaration.returnDescription ?? null,
-    parameters: declaration.parameters.map(({ name, description: detail }) => ({ name, description: detail ?? null })),
-  };
-  if (row.signature.result.kind === "cstring" && description.includes("original string used to produce a hash")) {
-    return { blocker: "borrowed-registry-result-has-no-atomic-copy-contract", semanticTokens: [], contract: null, evidence };
-  }
-  if (description.includes("adapter family") && description.includes("string identifier") && row.signature.result.kind === "enum") {
-    return { blocker: "restricted-string-domain-requires-validator", semanticTokens: [], contract: null, evidence };
-  }
-  if (description.includes("profiler") || description.includes("last added scope") || description.includes("current thread name")) {
-    return { blocker: "profiler-logical-context-unresolved", semanticTokens: [], contract: null, evidence };
-  }
-  if (row.signature.result.kind === "cstring"
-      && row.signature.parameters.length === 1
-      && row.signature.parameters[0].type.kind === "enum"
-      && (description.includes("to string") || description.includes("string representation") || returnDescription.includes("as a string"))) {
-    return {
-      blocker: null,
-      semanticTokens: ["enum-string-representation", "non-null-cstring-result"],
-      contract: { id: "enum-literal-result-utf8", input: null, result: { nullability: "non-null", ...recipe.result } },
-      evidence,
-    };
-  }
-  if (row.signature.result.kind === "cstring"
-      && row.signature.parameters.length === 1
-      && row.signature.parameters[0].type.kind === "cstring"
-      && returnDescription.includes("0 otherwise")) {
-    return {
-      blocker: null,
-      semanticTokens: ["nullable-cstring-result", "safe-utf8-cstring-input"],
-      contract: { id: "nullable-input-slice-utf8", input: recipe.input, result: { nullability: "nullable", ...recipe.result } },
-      evidence,
-    };
-  }
-  if (row.signature.parameters.some(({ type }) => type.kind === "cstring")
-      && row.signature.result.kind !== "cstring"
-      && declaration.parameters.every((_, index) => row.signature.parameters[index]?.type.kind !== "cstring"
-        || /(?:string|path|utf-?8)/u.test(parameterDescriptions[index]))) {
-    return {
-      blocker: null,
-      semanticTokens: ["safe-utf8-cstring-input"],
-      contract: { id: "input-js-utf8", input: recipe.input, result: null },
-      evidence,
-    };
-  }
-  return { blocker: "cstring-semantic-contract-unresolved", semanticTokens: [], contract: null, evidence };
-}
-
-export function resolveCStringContracts(rows, recipeDocument, sdkIr) {
-  validateRecipe(recipeDocument);
-  const declarations = new Map(sdkIr.declarations.map((declaration) => [declaration.id, declaration]));
-  const patterns = [...cstringValuePatterns(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
-  return rows.map((row) => {
-    const semantics = inferCStringSemantics(declarations.get(row.id), row, recipeDocument.recipe);
-    const decision = selectDmSdkPattern(facts(row, semantics.semanticTokens), patterns);
-    const rule = semantics.blocker ? { id: semantics.blocker } : decision.fallback ? { id: "cstring-semantic-contract-unresolved" } : null;
-    return { row, rule, contract: rule ? null : semantics.contract, semantics, patternDecision: decision };
-  });
-}
 
 function stableId(row) {
   return Number.parseInt(sha256(row.projectionId).slice(0, 8), 16) >>> 0;
@@ -471,15 +349,13 @@ function tsType(type) {
   return "number";
 }
 
-function routeName(row) { return camel(row.symbol.replace(/::/g, " ")); }
-
 function renderTypescript(entries) {
-  const ids = entries.map((entry, index) => `  ${routeName(entry.row)}: ${index},`).join("\n");
+  const ids = entries.map((entry, index) => `  ${entry.typescriptName}: ${index},`).join("\n");
   const functions = entries.map((entry) => {
     const params = entry.row.signature.parameters.map((parameter, index) => `${camel(parameter.name || `arg ${index}`)}: ${tsType(parameter.type)}`);
     const names = entry.row.signature.parameters.map((parameter, index) => camel(parameter.name || `arg ${index}`));
     const result = tsType(entry.row.signature.result) + (entry.contract?.result?.nullability === "nullable" ? " | undefined" : "");
-    return `/** ${entry.row.provenance.nativeSignature}. Source: ${entry.row.provenance.header}:${entry.row.provenance.line}. */\nexport function ${routeName(entry.row)}(${params.join(", ")}): ${result} { return module().call(DmSdkCStringValueId.${routeName(entry.row)}${names.length ? `, ${names.join(", ")}` : ""}) as ${result}; }`;
+    return `/** ${entry.row.provenance.nativeSignature}. Source: ${entry.row.provenance.header}:${entry.row.provenance.line}. */\nexport function ${entry.typescriptName}(${params.join(", ")}): ${result} { return module().call(DmSdkCStringValueId.${entry.typescriptName}${names.length ? `, ${names.join(", ")}` : ""}) as ${result}; }`;
   }).join("\n\n");
   return `// Generated by scripts/generate-dmsdk-cstring-value-bindings.mjs. Do not edit.
 interface DmSdkCStringValueModule { call(id:number,...args:readonly unknown[]):unknown; }
@@ -531,18 +407,50 @@ async function writeOrCheck(outputRoot, name, content, check) {
 async function main() {
   const opt = options(process.argv.slice(2));
   const inputPath = (value) => path.isAbsolute(value) ? value : path.join(root, value);
-  const [projectionRaw, irRaw, policyRaw] = await Promise.all([
-    readFile(inputPath(opt.projection), "utf8"), readFile(inputPath(opt.sdkIr), "utf8"), readFile(inputPath(opt.policy), "utf8")
+  const [projectionRaw, irRaw, planRaw, policyRaw] = await Promise.all([
+    readFile(inputPath(opt.projection), "utf8"), readFile(inputPath(opt.sdkIr), "utf8"),
+    readFile(inputPath(opt.plan), "utf8"), readFile(inputPath(opt.policy), "utf8")
   ]);
-  const projection = JSON.parse(projectionRaw); const sdkIr = JSON.parse(irRaw); const policy = JSON.parse(policyRaw);
+  const projection = JSON.parse(projectionRaw); const sdkIr = JSON.parse(irRaw); const plan = JSON.parse(planRaw); const policy = JSON.parse(policyRaw);
   assert.equal(projection.schemaVersion, 1, "C-string projection schema drifted");
   assert.equal(sdkIr.schemaVersion, 1, "C-string SDK IR schema drifted");
   assert.equal(projection.defoldRevision, sdkIr.defoldRevision, "C-string projection and SDK IR revisions differ");
-  validateRecipe(policy);
+  validateDmSdkCStringValuePolicy(policy);
   const recipe = policy.recipe;
-  const candidates = projection.rows.filter(candidate);
-  const classified = resolveCStringContracts(candidates, policy, sdkIr)
-    .map((entry) => ({ ...entry, stableId: stableId(entry.row) }));
+  const decisions = indexDmSdkCStringValuePlan(plan, {
+    revision: projection.defoldRevision,
+    sourceHashes: { projection: sha256(projectionRaw), sdkIr: sha256(irRaw), policy: sha256(policyRaw) },
+    inputs: {
+      projection,
+      sdkIr,
+      policy,
+      texts: { projection: projectionRaw, sdkIr: irRaw, policy: policyRaw },
+    },
+  });
+  const rows = new Map(projection.rows.map((row) => [row.id, row]));
+  const classified = [...decisions.values()].map((decision) => {
+    const row = rows.get(decision.declarationId);
+    assert.ok(row, `C-string plan declaration is absent from the projection: ${decision.declarationId}`);
+    return {
+      row,
+      rule: decision.fallback ? { id: decision.blocker } : null,
+      contract: decision.contract,
+      semantics: decision.semantics,
+      typescriptName: decision.typescriptName,
+      patternDecision: {
+        schemaVersion: 1,
+        declarationId: decision.declarationId,
+        patternId: decision.patternId,
+        family: decision.family,
+        emitter: decision.emitter,
+        fallback: decision.fallback,
+        priority: decision.priority,
+        cost: decision.cost,
+        trace: decision.trace,
+      },
+      stableId: stableId(row),
+    };
+  });
   const entries = classified.filter(({ rule }) => !rule);
   const blocked = classified.filter(({ rule }) => rule);
   assert.equal(new Set(classified.map(({ stableId: value }) => value)).size, classified.length, "Stable ID collision");
@@ -555,9 +463,9 @@ async function main() {
   ]);
   const report = {
     schemaVersion: 1, defoldRevision: projection.defoldRevision,
-    sources: { projection: relative.projection, sdkIr: relative.sdkIr, policy: relative.policy, hashes: { projection: sha256(projectionRaw), sdkIr: sha256(irRaw), policy: sha256(policyRaw) } },
-    selector: "global pointer-family function + nonvariadic + no callback/record/template/span + const input cstrings + exact result {void,cstring,enum,bool,i32,u32,u64} + exact parameter {cstring,enum,u32,u64}; independent of lowering/evidence disposition",
-    coverage: { candidates: candidates.length, generated: entries.length, blocked: blocked.length, nativeAbiGenerated: entries.length, headerObjectCompiled: 0, pinnedEngineLinked: 0, stubAbiLinkedAndRuntimeTested: 0, nativeDynamicHermesAdapterGenerated: entries.length, nativeStaticHermesDirectMemoryAbiGenerated: entries.length, browserDirectMemoryDescriptorGenerated: entries.length, allTargetConformant: 0 },
+    sources: { projection: relative.projection, sdkIr: relative.sdkIr, plan: relative.plan, policy: relative.policy, hashes: { projection: sha256(projectionRaw), sdkIr: sha256(irRaw), plan: sha256(planRaw), policy: sha256(policyRaw) } },
+    selector: plan.eligibility,
+    coverage: { candidates: decisions.size, generated: entries.length, blocked: blocked.length, nativeAbiGenerated: entries.length, headerObjectCompiled: 0, pinnedEngineLinked: 0, stubAbiLinkedAndRuntimeTested: 0, nativeDynamicHermesAdapterGenerated: entries.length, nativeStaticHermesDirectMemoryAbiGenerated: entries.length, browserDirectMemoryDescriptorGenerated: entries.length, allTargetConformant: 0 },
     stringPolicy: {
       input: "The staged JavaScript adapter deliberately narrows const char* inputs to non-null JavaScript strings, uses the host JSI UTF-8 conversion, rejects embedded NUL, and synthesizes the terminator. Lone-surrogate handling therefore follows the selected JSI engine and remains outside cross-target conformance until a shared UTF-16-to-UTF-8 policy is generated. The C ABI itself continues to accept exact caller-provided non-NUL byte views; this policy does not claim every native byte domain is intrinsically UTF-8.",
       result: "Revision-derived result contracts explicitly choose nullable or non-null and decode copied null-terminated native bytes as UTF-8. Public IR documentation supplies the semantic evidence; it does not prove arbitrary engine-returned bytes are valid Unicode.",
@@ -578,7 +486,7 @@ async function main() {
   };
   artifacts.set(relative.report, `${JSON.stringify(report, null, 2)}\n`);
   for (const [name, content] of artifacts) await writeOrCheck(opt.outputRoot, name, content, opt.check);
-  process.stdout.write(`${opt.check ? "Verified" : "Generated"} ${entries.length}/${candidates.length} dmSDK C-string/value adapters; ${blocked.length} fail closed.\n`);
+  process.stdout.write(`${opt.check ? "Verified" : "Generated"} ${entries.length}/${decisions.size} dmSDK C-string/value adapters; ${blocked.length} fail closed.\n`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await main();

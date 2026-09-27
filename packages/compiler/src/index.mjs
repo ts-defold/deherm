@@ -16,6 +16,7 @@ export * from "./dmsdk-pattern-selector.mjs";
 export * from "./dmsdk-bounded-span-plan.mjs";
 export * from "./dmsdk-value-plan.mjs";
 export * from "./dmsdk-hash-state-plan.mjs";
+export * from "./dmsdk-cstring-value-plan.mjs";
 export * from "./api-policy.mjs";
 export * from "./policy-surface-materializer.mjs";
 export * from "./names.mjs";

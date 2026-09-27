@@ -4,14 +4,43 @@
   "sources": {
     "projection": "packages/bindings/generated/defold-dmsdk-projection-ir.json",
     "sdkIr": "packages/bindings/generated/defold-sdk-ir.json",
+    "plan": "packages/bindings/generated/defold-dmsdk-cstring-value-plan.json",
     "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
     "hashes": {
       "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
       "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+      "plan": "f60989eb9fc7c4853629d5273f92423ae91cec3ae935b61f50608b1ff08bfff9",
       "policy": "f38eb566b09c60d718ef0303af1007baf21893848e45f516d2dc6bbba1ad09c8"
     }
   },
-  "selector": "global pointer-family function + nonvariadic + no callback/record/template/span + const input cstrings + exact result {void,cstring,enum,bool,i32,u32,u64} + exact parameter {cstring,enum,u32,u64}; independent of lowering/evidence disposition",
+  "selector": {
+    "id": "global-cstring-value-abi-v1",
+    "context": "global",
+    "declarationKind": "function",
+    "variadic": false,
+    "excludedEffects": [
+      "callbacks",
+      "records",
+      "templates",
+      "spans"
+    ],
+    "result": [
+      "void",
+      "cstring",
+      "enum",
+      "bool",
+      "i32",
+      "u32",
+      "u64"
+    ],
+    "parameters": [
+      "const-cstring-in",
+      "enum",
+      "u32",
+      "u64"
+    ],
+    "requiresCString": true
+  },
   "coverage": {
     "candidates": 20,
     "generated": 14,

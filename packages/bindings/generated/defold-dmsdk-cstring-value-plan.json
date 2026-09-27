@@ -1,0 +1,1616 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-cstring-value-plan",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "projection": "packages/bindings/generated/defold-dmsdk-projection-ir.json",
+    "sdkIr": "packages/bindings/generated/defold-sdk-ir.json",
+    "policy": "packages/bindings/overrides/dmsdk-cstring-value-bindings.json"
+  },
+  "sourceHashes": {
+    "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
+    "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "policy": "f38eb566b09c60d718ef0303af1007baf21893848e45f516d2dc6bbba1ad09c8"
+  },
+  "eligibility": {
+    "id": "global-cstring-value-abi-v1",
+    "context": "global",
+    "declarationKind": "function",
+    "variadic": false,
+    "excludedEffects": [
+      "callbacks",
+      "records",
+      "templates",
+      "spans"
+    ],
+    "result": [
+      "void",
+      "cstring",
+      "enum",
+      "bool",
+      "i32",
+      "u32",
+      "u64"
+    ],
+    "parameters": [
+      "const-cstring-in",
+      "enum",
+      "u32",
+      "u64"
+    ],
+    "requiresCString": true
+  },
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "cstring-value.enum-literal-result",
+      "family": "cstring-value.enum-literal-result",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "priority": 780,
+      "cost": 8,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "cstring-result"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 1
+          },
+          "positions": [
+            {
+              "rolePrefixes": [
+                "enum:"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "enum-string-representation",
+          "non-null-cstring-result"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "cstring-value.nullable-input-slice",
+      "family": "cstring-value.nullable-input-slice",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "priority": 780,
+      "cost": 8,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "cstring-result"
+          ]
+        },
+        "parameters": {
+          "count": {
+            "exact": 1
+          },
+          "positions": [
+            {
+              "roles": [
+                "cstring-in"
+              ],
+              "directions": [
+                "in"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "nullable-cstring-result",
+          "safe-utf8-cstring-input"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "priority": 770,
+      "cost": 6,
+      "fallback": false,
+      "when": {
+        "declarationKinds": [
+          "function"
+        ],
+        "result": {
+          "roles": [
+            "scalar:bool",
+            "scalar:i32",
+            "scalar:u32",
+            "scalar:u64",
+            "scalar:void"
+          ],
+          "rolePrefixes": [
+            "enum:"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "roles": [
+                "cstring-in"
+              ],
+              "directions": [
+                "in"
+              ]
+            },
+            {
+              "roles": [
+                "scalar:u32",
+                "scalar:u64"
+              ],
+              "rolePrefixes": [
+                "enum:"
+              ],
+              "directions": [
+                "value"
+              ]
+            }
+          ],
+          "some": [
+            {
+              "roles": [
+                "cstring-in"
+              ],
+              "directions": [
+                "in"
+              ]
+            }
+          ]
+        },
+        "requireSemanticTokens": [
+          "safe-utf8-cstring-input"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
+  "coverage": {
+    "candidates": 20,
+    "selected": 14,
+    "universalFallback": 6
+  },
+  "decisions": [
+    {
+      "declarationId": "dmsdk:dmBuffer::GetResultString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:373:100",
+      "sourceOrdinal": 176,
+      "typescriptName": "dmBufferGetResultString",
+      "patternId": "cstring-value.enum-literal-result",
+      "family": "cstring-value.enum-literal-result",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 780,
+      "cost": 8,
+      "semanticTokens": [
+        "enum-string-representation",
+        "non-null-cstring-result"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "enum-string-representation",
+          "non-null-cstring-result"
+        ],
+        "contract": {
+          "id": "enum-literal-result-utf8",
+          "input": null,
+          "result": {
+            "nullability": "non-null",
+            "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+          }
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Converts result to string",
+          "returnDescription": "The result as a string",
+          "parameters": [
+            {
+              "name": "result",
+              "description": "The result"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        }
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:enum:dmBuffer::Result",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "required-parameter-shape-absent",
+            "result-role:cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
+      "sourceOrdinal": 180,
+      "typescriptName": "dmBufferGetValueTypeString",
+      "patternId": "cstring-value.enum-literal-result",
+      "family": "cstring-value.enum-literal-result",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 780,
+      "cost": 8,
+      "semanticTokens": [
+        "enum-string-representation",
+        "non-null-cstring-result"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "enum-string-representation",
+          "non-null-cstring-result"
+        ],
+        "contract": {
+          "id": "enum-literal-result-utf8",
+          "input": null,
+          "result": {
+            "nullability": "non-null",
+            "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+          }
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Converts a value type to string",
+          "returnDescription": "The value type as a string",
+          "parameters": [
+            {
+              "name": "value",
+              "description": ""
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        }
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:enum:dmBuffer::ValueType",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "required-parameter-shape-absent",
+            "result-role:cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::GetAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1721:1456",
+      "sourceOrdinal": 507,
+      "typescriptName": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "priority": 0,
+      "cost": 1000,
+      "semanticTokens": [],
+      "semantics": {
+        "blocker": "restricted-string-domain-requires-validator",
+        "semanticTokens": [],
+        "contract": null,
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Gets the adapter family from a string name.\nConverts a string identifier to the corresponding AdapterFamily enum value.",
+          "returnDescription": "Corresponding adapter family enum value",
+          "parameters": [
+            {
+              "name": "adapter_name",
+              "description": "String name of the adapter (e.g., \"opengl\", \"vulkan\")"
+            }
+          ]
+        }
+      },
+      "contract": null,
+      "blocker": "restricted-string-domain-requires-validator",
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:enum:dmGraphics::AdapterFamily",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmGraphics::AdapterFamily",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
+      "sourceOrdinal": 541,
+      "typescriptName": "dmGraphicsGetTextureFormatLiteral",
+      "patternId": "cstring-value.enum-literal-result",
+      "family": "cstring-value.enum-literal-result",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 780,
+      "cost": 8,
+      "semanticTokens": [
+        "enum-string-representation",
+        "non-null-cstring-result"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "enum-string-representation",
+          "non-null-cstring-result"
+        ],
+        "contract": {
+          "id": "enum-literal-result-utf8",
+          "input": null,
+          "result": {
+            "nullability": "non-null",
+            "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+          }
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Get string representation of texture format",
+          "returnDescription": "String representation of format",
+          "parameters": [
+            {
+              "name": "format",
+              "description": "Texture format"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        }
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:enum:dmGraphics::TextureFormat",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "required-parameter-shape-absent",
+            "result-role:cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
+      "sourceOrdinal": 548,
+      "typescriptName": "dmGraphicsGetTextureTypeLiteral",
+      "patternId": "cstring-value.enum-literal-result",
+      "family": "cstring-value.enum-literal-result",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 780,
+      "cost": 8,
+      "semanticTokens": [
+        "enum-string-representation",
+        "non-null-cstring-result"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "enum-string-representation",
+          "non-null-cstring-result"
+        ],
+        "contract": {
+          "id": "enum-literal-result-utf8",
+          "input": null,
+          "result": {
+            "nullability": "non-null",
+            "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+          }
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Get string representation of texture type",
+          "returnDescription": "String representation of type",
+          "parameters": [
+            {
+              "name": "texture_type",
+              "description": "Texture type"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        }
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:enum:dmGraphics::TextureType",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "required-parameter-shape-absent",
+            "result-role:cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashReverseSafe32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:134:218",
+      "sourceOrdinal": 662,
+      "typescriptName": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "priority": 0,
+      "cost": 1000,
+      "semanticTokens": [],
+      "semantics": {
+        "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+        "semanticTokens": [],
+        "contract": null,
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Returns the original string used to produce a hash.\nAlways returns a null terminated string. Returns \"<unknown>\" if the original string wasn't found.",
+          "returnDescription": "Original string value or \"<unknown>\" if it wasn't found.",
+          "parameters": [
+            {
+              "name": "hash",
+              "description": "hash value"
+            }
+          ]
+        }
+      },
+      "contract": null,
+      "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:scalar:u32",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:scalar:u32",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "required-parameter-shape-absent",
+            "result-role:cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashReverseSafe64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:109:216",
+      "sourceOrdinal": 664,
+      "typescriptName": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "priority": 0,
+      "cost": 1000,
+      "semanticTokens": [],
+      "semantics": {
+        "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+        "semanticTokens": [],
+        "contract": null,
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Returns the original string used to produce a hash.\nAlways returns a null terminated string. Returns \"<unknown>\" if the original string wasn't found.",
+          "returnDescription": "Original string value or \"<unknown>\" if it wasn't found.",
+          "parameters": [
+            {
+              "name": "hash",
+              "description": "hash value"
+            }
+          ]
+        }
+      },
+      "contract": null,
+      "blocker": "borrowed-registry-result-has-no-atomic-copy-contract",
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:scalar:u64",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:scalar:u64",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "required-parameter-shape-absent",
+            "result-role:cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
+      "sourceOrdinal": 666,
+      "typescriptName": "dmHashString32",
+      "patternId": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 770,
+      "cost": 6,
+      "semanticTokens": [
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "input-js-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": null
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Calculate 32-bit hash value from string",
+          "returnDescription": "hash value",
+          "parameters": [
+            {
+              "name": "string",
+              "description": "Null terminated string"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:scalar:u32",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:scalar:u32",
+            "semantic-token-missing:nullable-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
+      "sourceOrdinal": 667,
+      "typescriptName": "dmHashString64",
+      "patternId": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 770,
+      "cost": 6,
+      "semanticTokens": [
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "input-js-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": null
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "calculate 64-bit hash value from string",
+          "returnDescription": "hash value",
+          "parameters": [
+            {
+              "name": "string",
+              "description": "Null terminated string"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:scalar:u64",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:scalar:u64",
+            "semantic-token-missing:nullable-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
+      "sourceOrdinal": 847,
+      "typescriptName": "dmResourceGetExtFromPath",
+      "patternId": "cstring-value.nullable-input-slice",
+      "family": "cstring-value.nullable-input-slice",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 780,
+      "cost": 8,
+      "semanticTokens": [
+        "nullable-cstring-result",
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "nullable-cstring-result",
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "nullable-input-slice-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": {
+            "nullability": "nullable",
+            "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+          }
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Get a resource extension from a path, i.e \"resource.ext\" will return \"ext\".",
+          "returnDescription": "Pointer to extension string if success (same as buffer), 0 otherwise",
+          "parameters": [
+            {
+              "name": "path",
+              "description": "The path to the resource"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "nullable-input-slice-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": {
+          "nullability": "nullable",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        }
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "result-role:cstring-result"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
+      "sourceOrdinal": 994,
+      "typescriptName": "dmSocketResultToString",
+      "patternId": "cstring-value.enum-literal-result",
+      "family": "cstring-value.enum-literal-result",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 780,
+      "cost": 8,
+      "semanticTokens": [
+        "enum-string-representation",
+        "non-null-cstring-result"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "enum-string-representation",
+          "non-null-cstring-result"
+        ],
+        "contract": {
+          "id": "enum-literal-result-utf8",
+          "input": null,
+          "result": {
+            "nullability": "non-null",
+            "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+          }
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Convert result value to string",
+          "returnDescription": "Result as string",
+          "parameters": [
+            {
+              "name": "result",
+              "description": "Result to convert"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "enum-literal-result-utf8",
+        "input": null,
+        "result": {
+          "nullability": "non-null",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        }
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:value:enum:dmSocket::Result",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "required-parameter-shape-absent",
+            "result-role:cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
+      "sourceOrdinal": 1024,
+      "typescriptName": "dmStrCaseCmp",
+      "patternId": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 770,
+      "cost": 6,
+      "semanticTokens": [
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "input-js-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": null
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Case-insensitive string comparison",
+          "returnDescription": "integer greater than, equal to, or less than 0 after lexicographically comparison of s1 and s2",
+          "parameters": [
+            {
+              "name": "s1",
+              "description": "First string to compare"
+            },
+            {
+              "name": "s2",
+              "description": "Second string to compare"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:i32",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:scalar:i32",
+            "semantic-token-missing:nullable-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
+      "sourceOrdinal": 1030,
+      "typescriptName": "dmSysExists",
+      "patternId": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 770,
+      "cost": 6,
+      "semanticTokens": [
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "input-js-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": null
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Checks if a path exists",
+          "returnDescription": "true on success",
+          "parameters": [
+            {
+              "name": "path",
+              "description": "path to directory to create"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:scalar:bool",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:scalar:bool",
+            "semantic-token-missing:nullable-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
+      "sourceOrdinal": 1031,
+      "typescriptName": "dmSysRename",
+      "patternId": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 770,
+      "cost": 6,
+      "semanticTokens": [
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "input-js-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": null
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Move a file or directory",
+          "returnDescription": "on success",
+          "parameters": [
+            {
+              "name": "dst_path",
+              "description": "the destination path. The file which contents is to be overwritten."
+            },
+            {
+              "name": "src_path",
+              "description": "the source path. The contents will be written to the destination path and the file unlinked if successful."
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:enum:dmSys::Result",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:enum:dmSys::Result",
+            "semantic-token-missing:nullable-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
+      "sourceOrdinal": 1035,
+      "typescriptName": "dmSysUnlink",
+      "patternId": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 770,
+      "cost": 6,
+      "semanticTokens": [
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "input-js-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": null
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Remove file",
+          "returnDescription": "RESULT_OK on success",
+          "parameters": [
+            {
+              "name": "path",
+              "description": "path to file to remove"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:enum:dmSys::Result",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:dmSys::Result",
+            "semantic-token-missing:nullable-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
+      "sourceOrdinal": 1082,
+      "typescriptName": "dmUtf8StrLen",
+      "patternId": "cstring-value.input-transform",
+      "family": "cstring-value.input-transform",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 770,
+      "cost": 6,
+      "semanticTokens": [
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "input-js-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": null
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Get number of unicode characters in utf-8 string",
+          "returnDescription": "Number of characters",
+          "parameters": [
+            {
+              "name": "str",
+              "description": "Utf8 string"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "input-js-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": null
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:scalar:u32",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:scalar:u32",
+            "semantic-token-missing:nullable-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": true,
+          "blockers": []
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfileScopeEnd@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:382:536",
+      "sourceOrdinal": 1270,
+      "typescriptName": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "priority": 0,
+      "cost": 1000,
+      "semanticTokens": [],
+      "semantics": {
+        "blocker": "profiler-logical-context-unresolved",
+        "semanticTokens": [],
+        "contract": null,
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "End the last added scope",
+          "returnDescription": "Status for the scope end operation",
+          "parameters": [
+            {
+              "name": "name",
+              "description": "Name of the scope"
+            },
+            {
+              "name": "name_hash",
+              "description": "Hashed name of the scope"
+            }
+          ]
+        }
+      },
+      "contract": null,
+      "blocker": "profiler-logical-context-unresolved",
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:enum:ProfileResult",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "parameter-count:2",
+            "parameter-position-count:2",
+            "result-role:enum:ProfileResult",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfileSetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:348:532",
+      "sourceOrdinal": 1273,
+      "typescriptName": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "priority": 0,
+      "cost": 1000,
+      "semanticTokens": [],
+      "semantics": {
+        "blocker": "profiler-logical-context-unresolved",
+        "semanticTokens": [],
+        "contract": null,
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Set the current thread name to each registered profiler",
+          "returnDescription": "Status for the thread name operation",
+          "parameters": [
+            {
+              "name": "name",
+              "description": "Name of the thread"
+            }
+          ]
+        }
+      },
+      "contract": null,
+      "blocker": "profiler-logical-context-unresolved",
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:enum:ProfileResult",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:enum:ProfileResult",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ProfileUnregisterProfiler@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:324:528",
+      "sourceOrdinal": 1274,
+      "typescriptName": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "priority": 0,
+      "cost": 1000,
+      "semanticTokens": [],
+      "semantics": {
+        "blocker": "profiler-logical-context-unresolved",
+        "semanticTokens": [],
+        "contract": null,
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Unregister a profiler",
+          "returnDescription": "",
+          "parameters": [
+            {
+              "name": "name",
+              "description": "Name of the profiler"
+            }
+          ]
+        }
+      },
+      "contract": null,
+      "blocker": "profiler-logical-context-unresolved",
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "result-role:scalar:void",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": false,
+          "blockers": [
+            "result-role:scalar:void",
+            "semantic-token-missing:nullable-cstring-result",
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "semantic-token-missing:safe-utf8-cstring-input"
+          ]
+        }
+      ]
+    },
+    {
+      "declarationId": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
+      "sourceOrdinal": 1295,
+      "typescriptName": "resourceGetExtFromPath",
+      "patternId": "cstring-value.nullable-input-slice",
+      "family": "cstring-value.nullable-input-slice",
+      "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+      "fallback": false,
+      "priority": 780,
+      "cost": 8,
+      "semanticTokens": [
+        "nullable-cstring-result",
+        "safe-utf8-cstring-input"
+      ],
+      "semantics": {
+        "blocker": null,
+        "semanticTokens": [
+          "nullable-cstring-result",
+          "safe-utf8-cstring-input"
+        ],
+        "contract": {
+          "id": "nullable-input-slice-utf8",
+          "input": {
+            "nullability": "non-null",
+            "encoding": "js-string-utf8-no-embedded-nul"
+          },
+          "result": {
+            "nullability": "nullable",
+            "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+          }
+        },
+        "evidence": {
+          "source": "revision-ir-public-documentation",
+          "description": "Get a resource extension from a path, i.e \"resource.ext\" will return \"ext\".",
+          "returnDescription": "Pointer to extension string if an extension was found, 0 otherwise",
+          "parameters": [
+            {
+              "name": "path",
+              "description": "The path to the resource"
+            }
+          ]
+        }
+      },
+      "contract": {
+        "id": "nullable-input-slice-utf8",
+        "input": {
+          "nullability": "non-null",
+          "encoding": "js-string-utf8-no-embedded-nul"
+        },
+        "result": {
+          "nullability": "nullable",
+          "encoding": "native-null-terminated-bytes-decoded-as-utf8"
+        }
+      },
+      "blocker": null,
+      "trace": [
+        {
+          "patternId": "cstring-value.enum-literal-result",
+          "applicable": false,
+          "blockers": [
+            "parameter-position:0:in:cstring-in",
+            "semantic-token-missing:enum-string-representation",
+            "semantic-token-missing:non-null-cstring-result"
+          ]
+        },
+        {
+          "patternId": "cstring-value.nullable-input-slice",
+          "applicable": true,
+          "blockers": []
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "applicable": false,
+          "blockers": [
+            "result-role:cstring-result"
+          ]
+        }
+      ]
+    }
+  ]
+}

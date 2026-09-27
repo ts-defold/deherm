@@ -4188,3 +4188,40 @@ generation/compile/link/harness evidence, not packaged-engine or every-target
 runtime evidence. The complete root `pnpm check` also passed after the lowering
 plan, typed-native bridge, War Battles projections/evidence, and content-
 addressed policy store were regenerated through their owning tools.
+
+## 2026-09-27 - Compiler-owned C-string/value plan
+
+The UTF-8 C-string/value family no longer discovers candidates, parses public
+documentation, or selects patterns inside its emitter. A fourth authenticated
+`@deherm/compiler` plan owns all 20 current candidates, selects 14 structural
+contracts, and records six explicit universal fallbacks. Its source hashes are
+causally bound to the exact projection, SDK IR, and stable recipe objects used
+to build the plan; object/text skew is rejected.
+
+The migration preserves the previous dense dispatch order and every generated
+backend byte shape except for provenance/report changes. Compiler-owned route
+identity now deterministically suffixes normalized TypeScript name collisions.
+Candidate membership no longer depends on a primary-family classification, and
+explicit nullability, encoding, termination, embedded-NUL, retained-pointer, or
+asynchronous documentation contradicts and withdraws the specialized contract.
+Every withdrawn or selected candidate is relationally checked against the
+1,361-entry universal recipe set.
+
+Focused plan/emitter/pipeline tests pass 25/25. Semantic causality passes 34/34.
+Clean-room regeneration reproduces 1,361 declarations across 119 byte-identical
+artifacts. The generated native adapter compiles and runs under ASan/UBSan with
+the existing zero-warmed-allocation assertion. One compiler then verified the
+current revision plus Defold 1.13.1, 1.12.0, and 1.11.0 through policy
+materialization, TypeScript/native generation, compilation, linkage, and exact-
+call execution. Packaged-engine and every-target runtime behavior remain
+separate evidence stages and are not promoted by these results.
+
+The complete root `pnpm check` then passed after every dependent artifact was
+regenerated through its owning tool. That final pass included the independent
+old-pipeline materialization fixture, 926-route Script API accounting, all
+1,361 dmSDK universal recipes, exact-call compilation and execution,
+119-artifact dmSDK clean-room reproduction, the Static Hermes product gate,
+the real HTTP/3 WebTransport loopback, the deterministic 32-player impairment
+matrix, 131 War Battles session tests, TypeScript checks, and the OKF graph.
+The refreshed runtime evidence proves those named scenarios only; it does not
+promote the remaining packaged-engine or cross-target lanes to runtime-proven.

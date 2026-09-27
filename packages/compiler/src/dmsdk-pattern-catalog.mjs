@@ -281,11 +281,14 @@ export function cstringValuePatterns() {
       cost: 6,
       when: {
         declarationKinds: ["function"],
-        result: { roles: ["scalar:void"], rolePrefixes: ["scalar:", "enum:"] },
+        result: {
+          roles: ["scalar:void", "scalar:bool", "scalar:i32", "scalar:u32", "scalar:u64"],
+          rolePrefixes: ["enum:"],
+        },
         parameters: {
           every: [
             { roles: ["cstring-in"], directions: ["in"] },
-            { rolePrefixes: ["enum:", "scalar:"], directions: ["value"] },
+            { roles: ["scalar:u32", "scalar:u64"], rolePrefixes: ["enum:"], directions: ["value"] },
           ],
           some: [{ roles: ["cstring-in"], directions: ["in"] }],
         },

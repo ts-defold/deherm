@@ -6,7 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { resolveCStringContracts } from "../scripts/generate-dmsdk-cstring-value-bindings.mjs";
+import { resolveCStringContracts } from "../packages/compiler/src/dmsdk-cstring-value-plan.mjs";
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const reportPath=path.join(root,"packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json");
@@ -24,7 +24,7 @@ test("C-string/value selection is exhaustive, mechanical, and fail-closed",async
   assert.equal(new Set(report.declarations.map(({stableId})=>stableId)).size,20);
   assert.equal(report.declarations.filter(({disposition})=>disposition==="generated").length,14);
   assert.equal(report.declarations.filter(({disposition})=>disposition==="blocked").length,6);
-  assert.match(report.selector,/independent of lowering\/evidence disposition/);
+  assert.equal(report.selector.id,"global-cstring-value-abi-v1");
   const generator=await readFile(path.join(root,"scripts/generate-dmsdk-cstring-value-bindings.mjs"),"utf8");
   assert.doesNotMatch(generator,/row\.loweringState/);
   assert.doesNotMatch(generator,/symbol\.includes\(/);
@@ -91,9 +91,9 @@ test("C-string recipe schema rejects revision-specific additions and unsupported
   ]);
   const ids=new Set(report.declarations.map(({id})=>id));const candidates=projection.rows.filter(({id})=>ids.has(id));
   const revisionSpecific=structuredClone(policy);revisionSpecific.defoldRevision="0".repeat(40);
-  assert.throws(()=>resolveCStringContracts(candidates,revisionSpecific,sdkIr),/unsupported top-level keys/);
+  assert.throws(()=>resolveCStringContracts(candidates,revisionSpecific,sdkIr),/unsupported schema keys/);
   const unsupported=structuredClone(policy);unsupported.recipe.input.encoding="unchecked-native-bytes";
-  assert.throws(()=>resolveCStringContracts(candidates,unsupported,sdkIr),/Expected values to be strictly deep-equal/);
+  assert.throws(()=>resolveCStringContracts(candidates,unsupported,sdkIr),/input codec is unsupported/);
 });
 
 test("mixed projection and SDK revisions remain a hard provenance failure",async()=>{

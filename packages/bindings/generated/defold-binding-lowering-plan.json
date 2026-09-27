@@ -29,7 +29,7 @@
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
     "dmsdkProjection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
-    "dmsdkUniversal": "0220ee4f4dd00967c8ccc5bfa2e2ef587b7b19237e80f5b9f73eea77f427a243",
+    "dmsdkUniversal": "67daad846b686c90e7aefdd06310a2f23ccf8111437c3894007336a9aca0171c",
     "dmsdkScalarThunks": "9c4621db3613a53b7a470d249d06e25787b3bf917f32e4840315bc2efdc4d291",
     "dmsdkEnumValues": "52e9533abdb4b76dccfbae10f7f9e954003ba5755d9a255be8b5a66198d616a4",
     "dmsdkNamedScalars": "8e9b149acbf3ab77cb7835329cac4f9f5deed61c1b1a64e113247159dfc6b5cc",
@@ -39,7 +39,7 @@
     "dmsdkXteaSpans": "73c8d977ab6c9e5a8599c07262da34105ddf2988e1009c5cfe46eaa502370634",
     "dmsdkHashSpans": "1ac8e9330772346282796b058505eadb88f7f8cf878532f7a387c85bafd7cc72",
     "dmsdkArenaSpanBlockers": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
-    "dmsdkCStringValue": "3fd3b6d094bd96872eaf199d2dcecaa9190dc210d0e1a40bf57a5d5444e41883",
+    "dmsdkCStringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
     "dmsdkBorrowedHandle": "a6346082ba0bd078badbd358f46b79c39d81e958dc7d3df7203d138d697b400d",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
@@ -67,7 +67,7 @@
     "scriptConstantLowering": "cf923dc81d26c2d45a21fe9b3691c65d69950adda5fbcb68bbae0331704f4154",
     "defoldValueLayouts": "eac699e8e10722490bda1981edfa002e4b5fe9ac8b1eb1a12898abc5689708ca",
     "dmsdkProjection": "efd1eb31455d30df7d5519d699c6bc95724571439a9c558761192f889bb68548",
-    "dmsdkUniversal": "4d1ef00f94ba8e7d36b41cc1d6b057af52c6b20620a2f4ab5a66c63bddd152d0",
+    "dmsdkUniversal": "f24e17a3020f44c525bd1f0b61c0df3744bbefe3924b80bcc3611e976924b8a5",
     "dmsdkScalarThunks": "e832908ae5fecf0e2887b8b03a48076913400f231b2c87f51ccdb5f7b5a39024",
     "dmsdkEnumValues": "bfbbdb3538ef0ada792246dcdbca2854da3988a1fd469006f13ba1b4f411e234",
     "dmsdkNamedScalars": "2a729adf168ae3b467638b049f3919feb6f4c7280a9abf2b026c70974c0836f4",
@@ -77,7 +77,7 @@
     "dmsdkXteaSpans": "c39585058ba39ce5c1a8e06ade88911c970379fdaa1ba8f366c80e7658a99bb7",
     "dmsdkHashSpans": "c366b7632517795f5daea01941885b88e221d12c8c8cf17d01218dd4fd528fe3",
     "dmsdkArenaSpanBlockers": "4cb27ed7bee7796ed077fa238a930a94587a1e2bb298d564f49d739fe9bcff6f",
-    "dmsdkCStringValue": "34c24fa31fa1148d3680dffd8e3322b479cb966aff6d33a1a080d13c4b7810f0",
+    "dmsdkCStringValue": "06ad7137c7fa070d2b635f8e1e1baf88ad5a51ae9b59adaab6d727756dfbc446",
     "dmsdkBorrowedHandle": "370c3cd84be3dad351f2f102de78d444a0587a44cf2a63a8bdaad65840942b61",
     "dmsdkTargetConditionals": "1391e027f73394ee1838287a25e0a244fd9a0d291ce6b585553164af39d9e005",
     "semanticPolicies": "3336271187d4bf1b9d3c0c45efe68a9c9c3710d71fef1a09c5f37973fd52e0f8",
@@ -517489,5 +517489,5 @@
       }
     }
   ],
-  "planSha256": "ff620ace2b4d349e94ba540e514e3f0e6a8516eee2a3a653fc81fd0d81f430fe"
+  "planSha256": "d8ba97a96839958f23649353384edc1eecc4aaa8607432c52d6ec32a064d7f80"
 }

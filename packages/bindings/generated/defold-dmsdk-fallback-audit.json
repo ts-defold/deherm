@@ -18,7 +18,7 @@
       "arenaCString": "701b3d52ba6bc2227a4b8a82d458bce2213fba0384b632304842466c6a55ecb7",
       "borrowedHandle": "a6346082ba0bd078badbd358f46b79c39d81e958dc7d3df7203d138d697b400d",
       "scratchScalarOut": "97ff8f4f30737a138cf8f6562e545af8a14114f0d20988448841971538e1a4d0",
-      "cstringValue": "3fd3b6d094bd96872eaf199d2dcecaa9190dc210d0e1a40bf57a5d5444e41883",
+      "cstringValue": "3c84bc89fd1185bebee73a44d362340fb511fbe5fe4fa9cc6b0ccdebe6a4ea66",
       "hashState": "fb8bb8a49e30b7ba572d3b0ddd0b165e3ab0190969216637a92b45515065871c"
     },
     "patternPolicies": {
@@ -27,7 +27,7 @@
     },
     "catalog": "f2249952077681a6945069a2b75aae050bfb1a11e2288fe60d771f11fd65ccbf"
   },
-  "patternCatalogSha256": "e551dea4233dbbfe2e9b47088a5885e8ae144cd181237663798727250bfde0d3",
+  "patternCatalogSha256": "6aad7b00c66c5d0475bec124ca551ed9f05571e194e2dfbc7cef7eff2c0b72c3",
   "coverage": {
     "declarations": 1361,
     "preferredSpecialized": 101,
@@ -38,8 +38,8 @@
     "universalReady": 537,
     "usageFactsRequired": 723,
     "existingAuxiliarySpecialization": 158,
-    "semanticRecipeCandidates": 267,
-    "composableUniversalOnly": 835
+    "semanticRecipeCandidates": 261,
+    "composableUniversalOnly": 841
   },
   "patternCatalog": [
     {
@@ -826,11 +826,14 @@
         ],
         "result": {
           "roles": [
+            "scalar:bool",
+            "scalar:i32",
+            "scalar:u32",
+            "scalar:u64",
             "scalar:void"
           ],
           "rolePrefixes": [
-            "enum:",
-            "scalar:"
+            "enum:"
           ]
         },
         "parameters": {
@@ -844,9 +847,12 @@
               ]
             },
             {
+              "roles": [
+                "scalar:u32",
+                "scalar:u64"
+              ],
               "rolePrefixes": [
-                "enum:",
-                "scalar:"
+                "enum:"
               ],
               "directions": [
                 "value"
@@ -1550,59 +1556,6 @@
       "declarationCount": 2
     },
     {
-      "groupId": "038b88d979da8e105fa7932e9a4ff80259b2d096cec7fb2865d820030a05a010",
-      "kind": "function",
-      "shape": "scalar:i32(inout:pointer:record:lua_State,in:cstring-in,value:scalar:usize)",
-      "families": [
-        "pointer",
-        "pointer-span"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:1:in:cstring-in"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2117"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "039c84e419843158bf009eda56659f13a567ac1041a271117517cf6865344c0c",
       "kind": "function",
       "shape": "handle:dmGui::HScene:opaque(inout:pointer:record:lua_State)",
@@ -1643,6 +1596,62 @@
         "dmsdk:dmGui::LuaCheckScene@upstream/defold/engine/gui/src/dmsdk/gui/gui.h:487:1577"
       ],
       "declarationCount": 1
+    },
+    {
+      "groupId": "03d286a07b8de6a796cb9e60bfc78287f376ea5e2c093b834404f5d8c129b655",
+      "kind": "function",
+      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_argerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1640",
+        "dmsdk:dm_luaL_callmeta@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1638",
+        "dmsdk:dm_luaL_getmetafield@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1637",
+        "dmsdk:dm_luaL_typerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1639"
+      ],
+      "declarationCount": 4
     },
     {
       "groupId": "03d3f6d0413508fa1f46671f53088c60e4eb0e40d4c48b1c3703ed810f715007",
@@ -1864,57 +1873,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "054538c02bf5694e78e51841b0169faba7463e627c4efdd8897207286c5b1a0e",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f64,value:scalar:u32,value:scalar:u64)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "missingSemanticTokens": [
-            "safe-utf8-cstring-input"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:in:cstring-in",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileCreatePropertyF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:490"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "054e869a862c3921d29296dfcb290a714ce538273a64d27fcce379fecb29b293",
       "kind": "function",
       "shape": "scalar:u64(value:handle:dmGameObject::HInstance:opaque,in:cstring-in)",
@@ -2008,59 +1966,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmScript::LuaToJson@upstream/defold/engine/script/src/dmsdk/script/script.h:559:2120"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "05a2a95d897b6c42c725a8352738f29d9edb585b6f5e168902d93b023578003f",
-      "kind": "function",
-      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,value:scalar:usize)",
-      "families": [
-        "pointer",
-        "pointer-span"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:2:in:cstring-in"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:2:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2118"
       ],
       "declarationCount": 1
     },
@@ -2193,6 +2098,50 @@
         "dmsdk:dmVMath::LengthSqr@upstream/defold/engine/dlib/src/dmsdk/dlib/vmath.h:287:683"
       ],
       "declarationCount": 2
+    },
+    {
+      "groupId": "06be4b7af8d2c80674f22ec2faf55f1fee272705f565de82ee81127621c325d9",
+      "kind": "function",
+      "shape": "scalar:usize(value:callback,value:scalar:u32,inout:opaque-pointer,in:cstring-in)",
+      "families": [
+        "callback",
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "arena-cstring.trimmed-string",
+          "family": "arena-cstring.trimmed-string",
+          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:usize"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmThread::New@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:92:605"
+      ],
+      "declarationCount": 1
     },
     {
       "groupId": "06e2e5dacee83e0462638799d7be7fc858840c317771b20c0a33293ffe661065",
@@ -2626,48 +2575,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "098006865511a22675b3519954daafed19745f6a1967d23b7a104e1350cfb308",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i64,value:scalar:u32,inout:callback)",
-      "families": [
-        "callback",
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:4:inout:callback"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileRegisterPropertyS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:481"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "0a14e28e144c080274eaf49337b004c5dfe8afcd992a9ea32708fbae52e8196f",
       "kind": "function",
       "shape": "record-value:dmTransform::Transform(in:record-ref:dmTransform::Transform)",
@@ -2877,6 +2784,46 @@
       ],
       "declarationIds": [
         "dmsdk:ProfileLogText@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:392:537"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "0bba747d0616d815a5e708a559a4993df2a9315b5eed22f4ae1739030ebac97f",
+      "kind": "function",
+      "shape": "scalar:void(value:scalar:usize,in:cstring-in)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmThread::SetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:157:613"
       ],
       "declarationCount": 1
     },
@@ -3492,46 +3439,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "10db16e172abdcb247121ed20daad97f082db29f6fdc274d0b633398ad87ecb2",
-      "kind": "function",
-      "shape": "scalar:f32(value:handle:HConfigFile:opaque,in:cstring-in,value:scalar:f32)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:HConfigFile:opaque"
-          ]
-        },
-        {
-          "patternId": "handle.borrowed-provider-boundary",
-          "family": "borrowed-handle",
-          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ConfigFileGetFloat@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:135:117"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "10eb8c973811640bf1b2d97d7b58f0ea34918df128c06bb5dbe604ac521d4eb8",
       "kind": "function",
       "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,inout:pointer:record:dmGameSystem::FontResource,value:scalar:u64)",
@@ -3575,6 +3482,47 @@
       "declarationCount": 2
     },
     {
+      "groupId": "11185a8079a803ffe1c2cfd9d4d02f047a1dc1b832043c286c9357c161e3d3c8",
+      "kind": "function",
+      "shape": "scalar:f32(value:handle:HConfigFile:opaque,in:cstring-in,value:scalar:f32)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "handle.borrowed-provider-boundary",
+          "family": "borrowed-handle",
+          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:value:handle:HConfigFile:opaque",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ConfigFileGetFloat@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:135:117"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "1162568fb6928e6330f9ce85f2aff7587430658c89367cb1b5cb6c39595d8783",
       "kind": "function",
       "shape": "enum:dmConnectionPool::Result(value:handle:dmConnectionPool::HPool:opaque)",
@@ -3610,46 +3558,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmConnectionPool::Delete@upstream/defold/engine/dlib/src/dmsdk/dlib/connection_pool.h:106:138"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "117bd056d46ace099e70f1e9a404d28c5761a0328805345b39058cbda24e65e7",
-      "kind": "function",
-      "shape": "scalar:i32(value:handle:dmConfigFile::HConfig:opaque,in:cstring-in,value:scalar:i32)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque"
-          ]
-        },
-        {
-          "patternId": "handle.borrowed-provider-boundary",
-          "family": "borrowed-handle",
-          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmConfigFile::GetInt@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile_gen.hpp:100:127"
       ],
       "declarationCount": 1
     },
@@ -3903,6 +3811,49 @@
       ],
       "declarationIds": [
         "dmsdk:dmConditionVariable::New@upstream/defold/engine/dlib/src/dmsdk/dlib/condition_variable.h:51:108"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "1441300684a6e11be588491a7b71b35b1be0b2a85483b2e8093cc5c183ae08a3",
+      "kind": "function",
+      "shape": "scalar:i32(inout:cstring-mutable,value:scalar:usize,in:cstring-in)",
+      "families": [
+        "pointer",
+        "pointer-span",
+        "variadic"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:cstring-mutable",
+            "parameter-role:2:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:cstring-mutable",
+            "parameter-role:2:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmSnPrintf@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:49:178"
       ],
       "declarationCount": 1
     },
@@ -5194,6 +5145,51 @@
       "declarationCount": 1
     },
     {
+      "groupId": "1de4a4c11bf20f42d9b683963e019556d75e625f6ac7373107fc546c5ba0cc37",
+      "kind": "function",
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::FactoryResource)",
+      "families": [
+        "enum-handle",
+        "out-param",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent",
+            "result-role:enum:dmResource::Result"
+          ]
+        },
+        {
+          "patternId": "arena-cstring.uri-encode",
+          "family": "arena-cstring.uri-encode",
+          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmResource::Result"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmGameSystem::ResFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:36:1235"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "1df3afe6d5a69e0771d1641ab646c96e1c4447e55cece357d8e8b3fa228a27e6",
       "kind": "function",
       "shape": "scalar:void(inout:pointer:record:lua_State,inout:pointer:record:luaL_Buffer)",
@@ -5380,6 +5376,47 @@
         "dmsdk:dmGameObject::GetWorldUniformScale@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:790:1027"
       ],
       "declarationCount": 2
+    },
+    {
+      "groupId": "1eec600a4688e39f0ada295cef6de57ea50d6ee5d79b89420cf706c9bb10c316",
+      "kind": "function",
+      "shape": "scalar:f32(value:handle:dmConfigFile::HConfig:opaque,in:cstring-in,value:scalar:f32)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "handle.borrowed-provider-boundary",
+          "family": "borrowed-handle",
+          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmConfigFile::GetFloat@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile_gen.hpp:125:128"
+      ],
+      "declarationCount": 1
     },
     {
       "groupId": "1f5eff61f3a3b73837e3ebd997f25b0c17d51fc270a3647d9ccf3663291e0743",
@@ -6135,6 +6172,62 @@
       "declarationCount": 1
     },
     {
+      "groupId": "2575ecbb942cd7c55401c0d7f2b08a100fe5fe25735f7b1e7aa61e4de38d9ba0",
+      "kind": "function",
+      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,in:pointer-out:scalar:i8)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:i32"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "family": "astc-probe",
+          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:i32"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "family": "xtea-span",
+          "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:i32"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_checkoption@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1654"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "25f8377a9ff1d727fe7a6dc684391a874f461cea2d4094c8bab17d1c81e662e9",
       "kind": "function",
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::PrimitiveType,value:scalar:u32,value:scalar:u32,value:scalar:u32)",
@@ -6300,6 +6393,76 @@
       ],
       "declarationIds": [
         "dmsdk:dmIntersection::TestFrustumPoint@upstream/defold/engine/dlib/src/dmsdk/dlib/intersection.h:80:355"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "26f5e37cad6467044c54f1096327764a6156d655ab6e72facd60f820d61e84ea",
+      "kind": "function",
+      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
+      "families": [
+        "enum-handle"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "missingSemanticTokens": [
+            "direct-native-primitive",
+            "fixed-width-cell-codec",
+            "synchronous-noescape"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "missingSemanticTokens": [
+            "fixed-width-cell-codec",
+            "source-resolved-named-scalar",
+            "synchronous-noescape"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "missingSemanticTokens": [
+            "declared-enum-domain",
+            "fixed-width-cell-codec",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "pointer.scratch-scalar-out-provider-boundary",
+          "family": "scratch-scalar-out",
+          "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "handle.borrowed-provider-boundary",
+          "family": "borrowed-handle",
+          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468"
       ],
       "declarationCount": 1
     },
@@ -7049,6 +7212,59 @@
         "dmsdk:WindowGetWidth@upstream/defold/engine/platform/src/dmsdk/platform/window.h:286:1789"
       ],
       "declarationCount": 2
+    },
+    {
+      "groupId": "2bb0b048a453fd4fbc2d1ebb6325ac399340c93a96d82c42731674c935009ceb",
+      "kind": "function",
+      "shape": "scalar:void(inout:pointer:record:luaL_Buffer,in:cstring-in,value:scalar:usize)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:luaL_Buffer",
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:luaL_Buffer",
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:luaL_Buffer",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_addlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1667"
+      ],
+      "declarationCount": 1
     },
     {
       "groupId": "2be76140681875502717c367ba4f810caa54b3d8e22c4adeb539c60e4a893a8f",
@@ -8878,6 +9094,48 @@
       "declarationCount": 1
     },
     {
+      "groupId": "382c0537f1c80ac02a7e91fcd9a5dfa7f9eab79b8c88a243f95f3ec8f037caf7",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i32,value:scalar:u32,value:scalar:u64)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:i32"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileCreatePropertyBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:466",
+        "dmsdk:ProfileCreatePropertyS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:470"
+      ],
+      "declarationCount": 2
+    },
+    {
       "groupId": "3833892d837bbfb659204276e2a271732ed1bbf998b7fe9f5dd3136b3400939d",
       "kind": "function",
       "shape": "scalar:f32(value:unknown:Plane,value:unknown:dmVMath::Point3)",
@@ -10138,6 +10396,60 @@
       "declarationCount": 1
     },
     {
+      "groupId": "41b8480ebd83f3ddd54127d47cda728f6fe8485fa74be6eb489fb16572925a93",
+      "kind": "function",
+      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,value:scalar:usize)",
+      "families": [
+        "pointer",
+        "pointer-span"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2118"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "41cc1ac99e36b5e9134655a5e40f476bd8d6cc8b23edce9d273ffe753612df00",
       "kind": "function",
       "shape": "handle:dmGraphics::HVertexStreamDeclaration:opaque(value:handle:dmGraphics::HContext:opaque,value:unknown:VertexStepFunction)",
@@ -10619,46 +10931,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "44fbeee68907b87e40e9822f7aa0846afda6b282c34089a32fa7b8f7dcdf82aa",
-      "kind": "function",
-      "shape": "scalar:i32(value:handle:HConfigFile:opaque,in:cstring-in,value:scalar:i32)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:HConfigFile:opaque"
-          ]
-        },
-        {
-          "patternId": "handle.borrowed-provider-boundary",
-          "family": "borrowed-handle",
-          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ConfigFileGetInt@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:106:116"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "4561d5b62146fe00c56ced8e84f39961e52487e13e0178c3fae9ebae233826b3",
       "kind": "constructor",
       "shape": "scalar:void(inout:template:dmHashTable<KEY, T>)",
@@ -10753,57 +11025,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmFixedMemAllocatorInit@upstream/defold/engine/dlib/src/dmsdk/dlib/dalloca.h:66:169"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "4593e9c2b0740ec3b864232e5f146adcb8350393d21085510515112bc80428e1",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f32,value:scalar:u32,value:scalar:u64)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "missingSemanticTokens": [
-            "safe-utf8-cstring-input"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:in:cstring-in",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileCreatePropertyF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:478"
       ],
       "declarationCount": 1
     },
@@ -10931,59 +11152,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmGraphics::IsIndexBufferFormatSupported@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1089:1390"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "47334e32a1a18b09e6bf6c4cedbe802f8539a2fc10ebf8132bc61fbfb0a96ba8",
-      "kind": "function",
-      "shape": "scalar:void(inout:pointer:record:lua_State,in:pointer:record:dmDDF::Descriptor,in:cstring-in,value:scalar:bool)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4"
-          ]
-        },
-        {
-          "patternId": "arena-cstring.error-string",
-          "family": "arena-cstring.error-string",
-          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:1:in:pointer:record:dmDDF::Descriptor"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmScript::PushDDF@upstream/defold/engine/script/src/dmsdk/script/script.h:527:2116"
       ],
       "declarationCount": 1
     },
@@ -11378,51 +11546,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "4adc59be6e547a2cf71a809348de8ab296bb28e129a35a0661f370306a3a8d24",
-      "kind": "function",
-      "shape": "handle:HFont:opaque(in:cstring-in,inout:opaque-pointer,value:scalar:u32,value:scalar:bool)",
-      "families": [
-        "enum-handle",
-        "pointer",
-        "pointer-span"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent",
-            "result-role:handle:HFont:opaque"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:inout:opaque-pointer",
-            "result-role:handle:HFont:opaque"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4",
-            "result-role:handle:HFont:opaque"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:FontLoadFromMemory@upstream/defold/engine/font/src/dmsdk/font/font.h:150:805"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "4ae41a9addc7b20c13bcb6c662a00b4149ea0216ce73d0ed10b37175a017004c",
       "kind": "function",
       "shape": "unknown:VkDevice(value:handle:dmGraphics::HContext:opaque)",
@@ -11553,49 +11676,6 @@
         "dmsdk:dmGraphics::GetPipelineState@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1612:1447"
       ],
       "declarationCount": 1
-    },
-    {
-      "groupId": "4be8405d3c835a268c8ddf1a2ae53ac5e7435f94782794b8278a2f3d6c9f39ac",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i32,value:scalar:u32,inout:callback)",
-      "families": [
-        "callback",
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:4:inout:callback"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileRegisterPropertyBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:465",
-        "dmsdk:ProfileRegisterPropertyS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:469"
-      ],
-      "declarationCount": 2
     },
     {
       "groupId": "4c46bee856b5ecb29d9fe0d64f711553c6a55b934c7ecedeaaacd430c8bd9aaa",
@@ -12035,48 +12115,6 @@
         "dmsdk:dmScript::SetupCallback@upstream/defold/engine/script/src/dmsdk/script/script.h:647:2126"
       ],
       "declarationCount": 2
-    },
-    {
-      "groupId": "4f6f35843ac0a7ebeb5ca5496f984cefad6a734e72b0a38015800aae439508a2",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f32,value:scalar:u32,inout:callback)",
-      "families": [
-        "callback",
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:4:inout:callback"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileRegisterPropertyF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:477"
-      ],
-      "declarationCount": 1
     },
     {
       "groupId": "4f8a3b07ecb2757b86273224cf6deaa863b25ed0e7ff916e95065c42ca478724",
@@ -13562,59 +13600,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "58db5b962afa27f303647c771897e22cfe34db05d4938ea3c75be44a4c13b711",
-      "kind": "function",
-      "shape": "scalar:void(inout:pointer:record:lua_State,in:cstring-in,in:pointer:record:luaL_Reg,value:scalar:i32)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4"
-          ]
-        },
-        {
-          "patternId": "arena-cstring.error-string",
-          "family": "arena-cstring.error-string",
-          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:2:in:pointer:record:luaL_Reg"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_openlib@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1635"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "58fe6a3713c722e37952fc050f6536cd3cae1d896aa98f946807b0eed3582b7e",
       "kind": "function",
       "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:u64)",
@@ -14841,6 +14826,49 @@
       "declarationCount": 1
     },
     {
+      "groupId": "60865d84c92d59b2e61a2ed9e2b16f5dc92446c63746510e50c9ba3eef69cedb",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f32,value:scalar:u32,inout:callback)",
+      "families": [
+        "callback",
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:f32",
+            "parameter-role:4:inout:callback"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileRegisterPropertyF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:477"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "612e4d1298341392f8edb08d2efb38dbaa4ccb049b48f50e36ca997a39ecdfd3",
       "kind": "function",
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor,value:enum:dmGraphics::BlendFactor)",
@@ -15675,61 +15703,6 @@
       "declarationCount": 2
     },
     {
-      "groupId": "64fcf8e37eeefbdf1c9e3da49ac013d42393bf3d5bcc55b257ec7420db4edc9b",
-      "kind": "function",
-      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,in:pointer-out:scalar:i8)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:3:in:pointer-out:scalar:i8"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4",
-            "result-role:scalar:i32"
-          ]
-        },
-        {
-          "patternId": "span.fixed-three-u32-probe",
-          "family": "astc-probe",
-          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4",
-            "result-role:scalar:i32"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_checkoption@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1654"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "6523c411d833d576910cc3973697f9f6afbfd549b0843f62570ffff98fc7a759",
       "kind": "function",
       "shape": "scalar:void(value:handle:dmGraphics::HContext:opaque,value:enum:dmGraphics::State)",
@@ -16332,6 +16305,59 @@
       ],
       "declarationIds": [
         "dmsdk:dmResource::GetType@upstream/defold/engine/resource/src/dmsdk/resource/resource_gen.hpp:288:2019"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "67f619526bdac9af4fa218c4415ada63b89dd7f05e8d6e361518976fe28b465e",
+      "kind": "function",
+      "shape": "scalar:void(inout:pointer:record:lua_State,in:cstring-in,value:scalar:usize)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_lua_pushlstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1712"
       ],
       "declarationCount": 1
     },
@@ -17552,60 +17578,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "6fc73e259455ef08924af6089129b980ec72418106d3c8d32fd21bfb2c152a44",
-      "kind": "function",
-      "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:2:in:cstring-in"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:2:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1647",
-        "dmsdk:dm_lua_getfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1721",
-        "dmsdk:dm_lua_setfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1729"
-      ],
-      "declarationCount": 3
-    },
-    {
       "groupId": "701704758e4e6e1e805f8bcd9447d1f5fb6e227df7f6aef6f2a1ac11213ffbe0",
       "kind": "function",
       "shape": "opaque-pointer(value:scalar:u32,inout:pointer:scalar:u32)",
@@ -18013,6 +17985,47 @@
       "declarationCount": 1
     },
     {
+      "groupId": "725031bb1fd36556d8d8b17964954de1e88855f2b3e72d2422a5494c7501cd66",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f64,value:scalar:u32,value:scalar:u64)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:f64"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileCreatePropertyF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:490"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "726cee2a4f8b4232070c5e58f724fd43bd66603cc88290e32e744553c8061ddb",
       "kind": "function",
       "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,out:pointer:record:dmMessage::URL,out:pointer:record:dmMessage::URL)",
@@ -18251,46 +18264,6 @@
       ],
       "declarationIds": [
         "dmsdk:dm_lua_pushinteger@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1711"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "737a4ded4fbf732fb5cd1f5b8a555ae387e7727082f09e652af56af20ad68137",
-      "kind": "function",
-      "shape": "scalar:f32(value:handle:dmConfigFile::HConfig:opaque,in:cstring-in,value:scalar:f32)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque"
-          ]
-        },
-        {
-          "patternId": "handle.borrowed-provider-boundary",
-          "family": "borrowed-handle",
-          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmConfigFile::GetFloat@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile_gen.hpp:125:128"
       ],
       "declarationCount": 1
     },
@@ -18831,6 +18804,49 @@
       "declarationCount": 1
     },
     {
+      "groupId": "7636c67000318134d06d743ef4cacb648dfdee69fe2d95e4d85ac12a1542d860",
+      "kind": "function",
+      "shape": "cstring-in(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,value:scalar:i32)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "result-role:cstring-in"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:cstring-in"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "family": "astc-probe",
+          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_findtable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1662"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "76376326f1a3dd3206330268f7c3eebb4f24527410724c2bb45a05d7a20c4d17",
       "kind": "function",
       "shape": "enum:dmGameObject::Result(value:handle:dmGameObject::HInstance:opaque,value:handle:dmGameObject::HInstance:opaque)",
@@ -18952,6 +18968,61 @@
         "dmsdk:dmMessage::ParseURL@upstream/defold/engine/dlib/src/dmsdk/dlib/message.h:299:427"
       ],
       "declarationCount": 1
+    },
+    {
+      "groupId": "771e687617898e3019b343bc968668dad483bf37e5246fa39aa619c0eda528e3",
+      "kind": "function",
+      "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1647",
+        "dmsdk:dm_lua_getfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1721",
+        "dmsdk:dm_lua_setfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1729"
+      ],
+      "declarationCount": 3
     },
     {
       "groupId": "7732c1c95c158f1f0c85267320d44d62e7c4616cd5407ae94ce3779eda1e89cc",
@@ -19564,55 +19635,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "7aa9c96449adee26a374184d59e8735217eec3d30fff41053e9597e4d3106067",
-      "kind": "function",
-      "shape": "scalar:void(value:scalar:usize,in:cstring-in)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "missingSemanticTokens": [
-            "safe-utf8-cstring-input"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:in:cstring-in"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmThread::SetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:157:613"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "7afc180dbc488850f0101119d6f10f8b3f194e67e05e5f1978451cfe40f30a78",
       "kind": "function",
       "shape": "enum:ResourceResult(value:handle:HResourceFactory:opaque,in:cstring-in,out:opaque-pointer-out)",
@@ -19920,6 +19942,50 @@
       "declarationCount": 1
     },
     {
+      "groupId": "7d89f94ca7ed7a8f8c10c98cbb967cd92595f50bf56c84b2453ec5152ca8fed4",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i32,value:scalar:u32,inout:callback)",
+      "families": [
+        "callback",
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:i32",
+            "parameter-role:4:inout:callback"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileRegisterPropertyBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:465",
+        "dmsdk:ProfileRegisterPropertyS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:469"
+      ],
+      "declarationCount": 2
+    },
+    {
       "groupId": "7db1f90b3994249cf328293dec545bb9228f80009da957a5f269653d5ce50b17",
       "kind": "function",
       "shape": "opaque-pointer(value:handle:dmImage::HImage:opaque)",
@@ -20008,6 +20074,47 @@
       ],
       "declarationIds": [
         "dmsdk:dmHID::GetGamepadButton@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:751:1631"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "7e20539a7143bd0bfb85ce792b01eb27d744f38193da833acfd4a83309a5a80e",
+      "kind": "function",
+      "shape": "scalar:i32(value:handle:dmConfigFile::HConfig:opaque,in:cstring-in,value:scalar:i32)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "handle.borrowed-provider-boundary",
+          "family": "borrowed-handle",
+          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmConfigFile::GetInt@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile_gen.hpp:100:127"
       ],
       "declarationCount": 1
     },
@@ -20103,47 +20210,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "7f04f8dd43904136dfcf73cc2c54b70380fe117b545cc3d17c3fbea9a7cf5001",
-      "kind": "function",
-      "shape": "enum:dmSocket::Result(in:cstring-in,inout:pointer:record:dmSocket::Address,value:scalar:bool,value:scalar:bool)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "result-role:enum:dmSocket::Result"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:1:inout:pointer:record:dmSocket::Address"
-          ]
-        },
-        {
-          "patternId": "span.in-place-keyed-transform",
-          "family": "xtea-span",
-          "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmSocket::GetHostByName@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:367:566"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "7f11a15b9e09de946580f46dedd8d5a5b888a80de5fe1a9955039f90577a626d",
       "kind": "function",
       "shape": "scalar:u32(value:handle:dmRender::HNamedConstantBuffer:opaque)",
@@ -20186,6 +20252,60 @@
       ],
       "declarationIds": [
         "dmsdk:dmRender::GetNamedConstantCount@upstream/defold/engine/render/src/dmsdk/render/render.h:642:1857"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "7f712dd4894ea7d6caa7ce3c4a47998e8d39326e1123571d9b5e267a28821192",
+      "kind": "function",
+      "shape": "scalar:void(inout:pointer:record:lua_State,in:cstring-in,in:pointer:record:luaL_Reg,value:scalar:i32)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4"
+          ]
+        },
+        {
+          "patternId": "arena-cstring.error-string",
+          "family": "arena-cstring.error-string",
+          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "family": "astc-probe",
+          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:void"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_openlib@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1635"
       ],
       "declarationCount": 1
     },
@@ -20233,6 +20353,52 @@
         "dmsdk:dmResource::UnregisterResourceReloadedCallback@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:189:1974"
       ],
       "declarationCount": 2
+    },
+    {
+      "groupId": "80a30cd0b51fcfa7917acdd0c09f09f4111aef7a9cf3c1943815a2f30edd9a1c",
+      "kind": "function",
+      "shape": "handle:HFont:opaque(in:cstring-in,inout:opaque-pointer,value:scalar:u32,value:scalar:bool)",
+      "families": [
+        "enum-handle",
+        "pointer",
+        "pointer-span"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent",
+            "result-role:handle:HFont:opaque"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:handle:HFont:opaque"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "family": "astc-probe",
+          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:handle:HFont:opaque"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:FontLoadFromMemory@upstream/defold/engine/font/src/dmsdk/font/font.h:150:805"
+      ],
+      "declarationCount": 1
     },
     {
       "groupId": "8142b8610940db11c40616894282d5ad91107144dede8add9ef7689b2f9215a7",
@@ -20555,6 +20721,49 @@
       ],
       "declarationIds": [
         "dmsdk:ResourceDescriptorGetType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:444:1920"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "83d6c8fd81491483221b11d89afbaff1f145c01cef2035f86dc1ce94160acd33",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i64,value:scalar:u32,inout:callback)",
+      "families": [
+        "callback",
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:i64",
+            "parameter-role:4:inout:callback"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileRegisterPropertyS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:481"
       ],
       "declarationCount": 1
     },
@@ -20915,6 +21124,61 @@
       "declarationCount": 2
     },
     {
+      "groupId": "86ce3f4522521c860ef7398f25dd0a3534578faa7112c89292ebb80445e06309",
+      "kind": "function",
+      "shape": "scalar:i32(inout:pointer:record:lua_State,in:cstring-in,value:scalar:usize,in:cstring-in)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:value:scalar:usize"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:i32"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "family": "astc-probe",
+          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:i32"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_loadbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1658"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "86dd29283a6d8228d69ff3c72a734771e58864a49d733e7af65360a6abd8a983",
       "kind": "function",
       "shape": "scalar:void(inout:pointer:record:lua_State,in:unknown:dmVMath::Matrix4)",
@@ -21025,6 +21289,48 @@
         "dmsdk:dm_lua_dump@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1738"
       ],
       "declarationCount": 2
+    },
+    {
+      "groupId": "877d90da461748d8f1f69d1abccb19705c9ad62a64767b27a31646ae0a365ef4",
+      "kind": "function",
+      "shape": "enum:dmSocket::Result(in:cstring-in,inout:pointer:record:dmSocket::Address,value:scalar:bool,value:scalar:bool)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "result-role:enum:dmSocket::Result"
+          ]
+        },
+        {
+          "patternId": "span.in-place-keyed-transform",
+          "family": "xtea-span",
+          "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:in:cstring-in",
+            "parameter-role:1:inout:pointer:record:dmSocket::Address"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmSocket::GetHostByName@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:367:566"
+      ],
+      "declarationCount": 1
     },
     {
       "groupId": "87971df9c436c92145af034d0152c54cab7868a3a336c221c9a0b192c8ca40f4",
@@ -21344,103 +21650,6 @@
         "dmsdk:dmGameObject::PropertyContainerPushBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject_props.h:137:1090"
       ],
       "declarationCount": 1
-    },
-    {
-      "groupId": "89e0ab786556e1642cf4b2470198dedc5f045ca9a992019f3412e63c9e6af866",
-      "kind": "function",
-      "shape": "cstring-in(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,value:scalar:i32)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "result-role:cstring-in"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "result-role:cstring-in"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4",
-            "result-role:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_findtable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1662"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "8adbc152262605e440579518144996fdd2a862aded302b92fac8a8dd91293c8a",
-      "kind": "function",
-      "shape": "scalar:i32(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:2:in:cstring-in"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:2:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_argerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1640",
-        "dmsdk:dm_luaL_callmeta@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1638",
-        "dmsdk:dm_luaL_getmetafield@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1637",
-        "dmsdk:dm_luaL_typerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1639"
-      ],
-      "declarationCount": 4
     },
     {
       "groupId": "8b30bd90aae3fd2991ac33e05fe237e71e865d478bee9d3b457cda9e704088ee",
@@ -22005,48 +22214,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmGameSystem::ResFontGetVersion@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:93:1242"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "90078a2390d042dd9679804f8f4d1ad502fd16233ca80b7cc5488613af4e9a32",
-      "kind": "function",
-      "shape": "scalar:i32(inout:cstring-mutable,value:scalar:usize,in:cstring-in)",
-      "families": [
-        "pointer",
-        "pointer-span",
-        "variadic"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:cstring-mutable"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:cstring-mutable",
-            "parameter-role:2:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmSnPrintf@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:49:178"
       ],
       "declarationCount": 1
     },
@@ -22624,60 +22791,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "969706ebb6b6f2a479304a97b242f50b626140d0eff1bc172aa4fa012a825e80",
-      "kind": "function",
-      "shape": "scalar:i32(inout:pointer:record:lua_State,in:cstring-in,value:scalar:usize,in:cstring-in)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4",
-            "result-role:scalar:i32"
-          ]
-        },
-        {
-          "patternId": "span.fixed-three-u32-probe",
-          "family": "astc-probe",
-          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4",
-            "result-role:scalar:i32"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_loadbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1658"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "9702aaede495717f43a5d62a443490f5afb4fc063b019d96d042af685cb547b6",
       "kind": "function",
       "shape": "scalar:u32(value:handle:HFont:opaque)",
@@ -23145,11 +23258,10 @@
       "declarationCount": 1
     },
     {
-      "groupId": "99dba06271d5e97504f78035936e32ff09fdadf258ff9ba22ddd291ca66abd64",
+      "groupId": "9a14beba93dae2e38d26d2bf5135d676c0d28b7eb7b5f0a9b22712fa88096623",
       "kind": "function",
-      "shape": "scalar:usize(value:callback,value:scalar:u32,inout:opaque-pointer,in:cstring-in)",
+      "shape": "scalar:i32(value:handle:HConfigFile:opaque,in:cstring-in,value:scalar:i32)",
       "families": [
-        "callback",
         "enum-handle",
         "pointer"
       ],
@@ -23164,26 +23276,25 @@
           ]
         },
         {
-          "patternId": "arena-cstring.trimmed-string",
-          "family": "arena-cstring.trimmed-string",
-          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+          "patternId": "handle.borrowed-provider-boundary",
+          "family": "borrowed-handle",
+          "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
           "structuralBlockers": [
-            "parameter-count:4",
-            "parameter-position-count:4"
+            "parameter-role:1:in:cstring-in"
           ]
         },
         {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
           "structuralBlockers": [
-            "parameter-role:0:value:callback",
-            "parameter-role:2:inout:opaque-pointer"
+            "parameter-role:0:value:handle:HConfigFile:opaque",
+            "parameter-role:1:in:cstring-in"
           ]
         }
       ],
       "declarationIds": [
-        "dmsdk:dmThread::New@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:92:605"
+        "dmsdk:ConfigFileGetInt@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:106:116"
       ],
       "declarationCount": 1
     },
@@ -23528,6 +23639,49 @@
       ],
       "declarationIds": [
         "dmsdk:dmGameObject::GetCollectionByHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:572:1002"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "9c0dcd3e92f940bc2a07f3f3688a2565f0f62c6a582c8eeb83137b8571947e51",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f64,value:scalar:u32,inout:callback)",
+      "families": [
+        "callback",
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:f64",
+            "parameter-role:4:inout:callback"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileRegisterPropertyF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:489"
       ],
       "declarationCount": 1
     },
@@ -23975,6 +24129,47 @@
       ],
       "declarationIds": [
         "dmsdk:dmExtension::AppParamsGetContext@upstream/defold/engine/extension/src/dmsdk/extension/extension_gen.hpp:210:789"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "9f265224d2921bd111fc70a124b3cdbc48ea3fb5838c0540e0d59ccb9d5c76b9",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i64,value:scalar:u32,value:scalar:u64)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:i64"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileCreatePropertyS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:482"
       ],
       "declarationCount": 1
     },
@@ -24438,6 +24633,47 @@
       "declarationCount": 1
     },
     {
+      "groupId": "a246f71c590faf00a54e0361d6b36a56499d9e977711fc84348de61f68832428",
+      "kind": "function",
+      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f32,value:scalar:u32,value:scalar:u64)",
+      "families": [
+        "enum-handle",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "cstring-value.input-transform",
+          "family": "cstring-value.input-transform",
+          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:2:value:scalar:f32"
+          ]
+        },
+        {
+          "patternId": "span.fixed-width-hash",
+          "family": "hash-span",
+          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:ProfileCreatePropertyF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:478"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "a2512cc1b9df6c5e5ad1212c226271fcdd0ef62f9763e4463d18e7c6cc9e06fe",
       "kind": "constructor",
       "shape": "scalar:void(value:unknown:dmVMath::Matrix4)",
@@ -24819,48 +25055,6 @@
         "dmsdk:ProfileRegisterProfiler@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:318:527"
       ],
       "declarationCount": 1
-    },
-    {
-      "groupId": "a4bda6743432f1f76e2b579c8c29ec3b96a16960338b55d3c6db9fd7de84ef63",
-      "kind": "function",
-      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)",
-      "families": [
-        "out-param",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:out:cstring-mutable"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:out:cstring-mutable",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmStrlCat@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:116:181",
-        "dmsdk:dmStrlCpy@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:94:180"
-      ],
-      "declarationCount": 2
     },
     {
       "groupId": "a4e894d39d8cb0aa2498e6224e83e8be6122c87feaddb9df6712a7e9cd7e43c8",
@@ -26328,48 +26522,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "af108ad85de8859029bf51ff94d14d37e8c8c71e2fa389d4721da91cbb93bdc8",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f64,value:scalar:u32,inout:callback)",
-      "families": [
-        "callback",
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:4:inout:callback"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileRegisterPropertyF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:489"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "af52236bff330fde52cab852c6cf2a2d0258d8d93dc90a68cdb74b59c87ca8f5",
       "kind": "function",
       "shape": "scalar:f32(value:handle:dmRig::HRigInstance:opaque)",
@@ -26412,6 +26564,49 @@
       ],
       "declarationIds": [
         "dmsdk:dmRig::GetPlaybackRate@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:204:2060"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "af7442d0cc293b446a8c814f838e3171ed529237e3d7fa35d8627aafa63aa9cd",
+      "kind": "function",
+      "shape": "opaque-pointer(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "result-role:opaque-pointer"
+          ]
+        },
+        {
+          "patternId": "span.bounded-byte-transform",
+          "family": "base64-span",
+          "emitter": "scripts/generate-dmsdk-base64-span-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:opaque-pointer"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "family": "astc-probe",
+          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:3",
+            "parameter-position-count:3",
+            "result-role:opaque-pointer"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dm_luaL_checkudata@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1651"
       ],
       "declarationCount": 1
     },
@@ -28262,48 +28457,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "ba932f714543b6c774d2e0cc4320ffd799fc97f2afeaccd7d2d5395578394651",
-      "kind": "function",
-      "shape": "opaque-pointer(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "result-role:opaque-pointer"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "result-role:opaque-pointer"
-          ]
-        },
-        {
-          "patternId": "span.bounded-byte-transform",
-          "family": "base64-span",
-          "emitter": "scripts/generate-dmsdk-base64-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:3",
-            "parameter-position-count:3",
-            "result-role:opaque-pointer"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_checkudata@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1651"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "bab8ab01eec56d095a07a067d433cb0a26e06f7662d79bc08d978ee9385c9e46",
       "kind": "function",
       "shape": "handle:HJob:u64(value:handle:HJobContext:opaque,inout:pointer:record:Job)",
@@ -29241,6 +29394,49 @@
       "declarationCount": 2
     },
     {
+      "groupId": "bfffa396cd4ccd63166fc07d2c75a7b7eae137b137bfd6d1cf829e496cf7c6e0",
+      "kind": "function",
+      "shape": "scalar:usize(out:cstring-mutable,in:cstring-in,value:scalar:usize)",
+      "families": [
+        "out-param",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:out:cstring-mutable",
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:out:cstring-mutable",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmStrlCat@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:116:181",
+        "dmsdk:dmStrlCpy@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:94:180"
+      ],
+      "declarationCount": 2
+    },
+    {
       "groupId": "c005897ea55c03f3f5b41d0068499641c86958bcc3b27bfbebaf220ab8d19daa",
       "kind": "function",
       "shape": "scalar:void(value:handle:dmRig::HRigInstance:opaque,value:scalar:bool)",
@@ -30033,6 +30229,49 @@
       ],
       "declarationIds": [
         "dmsdk:ResourceRegisterType@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:611:1943"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "c4b0ee307e0e13dcf8e1fb44a7dd0f965e3d7d6b8283035ce44e6cc5fd5fdeb3",
+      "kind": "function",
+      "shape": "scalar:void(value:handle:dmGraphics::HVertexStreamDeclaration:opaque,in:cstring-in,value:scalar:u32,value:enum:dmGraphics::Type,value:scalar:bool)",
+      "families": [
+        "enum-handle",
+        "pointer",
+        "pointer-span"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:value:handle:dmGraphics::HVertexStreamDeclaration:opaque",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:942:1374"
       ],
       "declarationCount": 1
     },
@@ -31058,50 +31297,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "cb3a2c029bbf68e6763071b16287b4850cfc9440472f3df166802bb3e93ae7c3",
-      "kind": "function",
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::FactoryResource)",
-      "families": [
-        "enum-handle",
-        "out-param",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent",
-            "result-role:enum:dmResource::Result"
-          ]
-        },
-        {
-          "patternId": "arena-cstring.uri-encode",
-          "family": "arena-cstring.uri-encode",
-          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:dmResource::HFactory:opaque",
-            "parameter-role:4:out:pointer-out:record:dmGameSystem::FactoryResource"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmGameSystem::ResFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:36:1235"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "cb3d4e21be0e8a91c7cefadeee5cc8b1e1cc5c98b93590c2fbcd670c806c3c15",
       "kind": "function",
       "shape": "enum:dmRig::Result(value:handle:dmRig::HRigInstance:opaque,value:scalar:u64,value:enum:dmRig::RigPlayback,value:scalar:f32,value:scalar:f32,value:scalar:f32)",
@@ -31138,76 +31333,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmRig::PlayAnimation@upstream/defold/engine/rig/src/dmsdk/rig/rig.h:174:2049"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "cbe241705a42b037220499da190bc63234d213667547ddfdac5baab816d5d29f",
-      "kind": "function",
-      "shape": "scalar:void(value:scalar:u64,value:scalar:i32)",
-      "families": [
-        "enum-handle"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "missingSemanticTokens": [
-            "direct-native-primitive",
-            "fixed-width-cell-codec",
-            "synchronous-noescape"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "missingSemanticTokens": [
-            "fixed-width-cell-codec",
-            "source-resolved-named-scalar",
-            "synchronous-noescape"
-          ]
-        },
-        {
-          "patternId": "value.enum-domain-direct",
-          "family": "enum-value",
-          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
-          "missingSemanticTokens": [
-            "declared-enum-domain",
-            "fixed-width-cell-codec",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "pointer.scratch-scalar-out-provider-boundary",
-          "family": "scratch-scalar-out",
-          "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468"
       ],
       "declarationCount": 1
     },
@@ -31965,58 +32090,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "d15e53896f930446c5297339ae011714b2599104979175685a218bbea24ec923",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i32,value:scalar:u32,value:scalar:u64)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "missingSemanticTokens": [
-            "safe-utf8-cstring-input"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:in:cstring-in",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileCreatePropertyBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:466",
-        "dmsdk:ProfileCreatePropertyS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:470"
-      ],
-      "declarationCount": 2
-    },
-    {
       "groupId": "d1de3dff7bb9056eabaa31ab167e95420183099fbe216f188b7e304279f0eb9f",
       "kind": "function",
       "shape": "scalar:void(inout:pointer:record:dmSpinlock::Spinlock)",
@@ -32242,6 +32315,60 @@
       "declarationCount": 1
     },
     {
+      "groupId": "d2948db3f316fd7ac7561a2d644547af730df9eb32ac4029dd86a9324c181d0a",
+      "kind": "function",
+      "shape": "scalar:i32(inout:pointer:record:lua_State,in:cstring-in,value:scalar:usize)",
+      "families": [
+        "pointer",
+        "pointer-span"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.named-scalar-direct",
+          "family": "named-scalar",
+          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:1:in:cstring-in"
+          ]
+        },
+        {
+          "patternId": "value.enum-domain-direct",
+          "family": "enum-value",
+          "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:1:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2117"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "d2c2576c5ffd02c9adcb168d58f6d5af872f7fb2ca23ea2e40dfc743c089835b",
       "kind": "function",
       "shape": "scalar:void(inout:pointer:record:dmDoubleLinkedList::List,inout:pointer:record:dmDoubleLinkedList::ListNode)",
@@ -32347,50 +32474,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmScript::PushURL@upstream/defold/engine/script/src/dmsdk/script/script.h:499:2113"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "d3b6bb99d107ab00c3571fd94e81c93357acdb4aaf66f34cc488116150b03192",
-      "kind": "function",
-      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::CollectionFactoryResource)",
-      "families": [
-        "enum-handle",
-        "out-param",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent",
-            "result-role:enum:dmResource::Result"
-          ]
-        },
-        {
-          "patternId": "arena-cstring.uri-encode",
-          "family": "arena-cstring.uri-encode",
-          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:dmResource::HFactory:opaque",
-            "parameter-role:4:out:pointer-out:record:dmGameSystem::CollectionFactoryResource"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmGameSystem::ResCollectionFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:39:1219"
       ],
       "declarationCount": 1
     },
@@ -32815,48 +32898,6 @@
       ],
       "declarationIds": [
         "dmsdk:HttpSetTimeout@upstream/defold/engine/dlib/src/dmsdk/dlib/http.h:461:332"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "d7f471b4e6dbdc89aea3700259909b867995a347d6388b7cfab3f85d14c46ff1",
-      "kind": "function",
-      "shape": "scalar:void(value:handle:dmGraphics::HVertexStreamDeclaration:opaque,in:cstring-in,value:scalar:u32,value:enum:dmGraphics::Type,value:scalar:bool)",
-      "families": [
-        "enum-handle",
-        "pointer",
-        "pointer-span"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:value:handle:dmGraphics::HVertexStreamDeclaration:opaque"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:942:1374"
       ],
       "declarationCount": 1
     },
@@ -33656,6 +33697,60 @@
       "declarationCount": 1
     },
     {
+      "groupId": "dc2981200a4ebe32061d9efec12005b9bae8d6d4e950561b0c6a31689ff5c403",
+      "kind": "function",
+      "shape": "scalar:void(inout:pointer:record:lua_State,in:pointer:record:dmDDF::Descriptor,in:cstring-in,value:scalar:bool)",
+      "families": [
+        "pointer"
+      ],
+      "semanticCandidates": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "missingSemanticTokens": [
+            "generation-checked-state",
+            "incremental-hash-lifecycle",
+            "synchronous-noescape"
+          ]
+        }
+      ],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4"
+          ]
+        },
+        {
+          "patternId": "arena-cstring.error-string",
+          "family": "arena-cstring.error-string",
+          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4"
+          ]
+        },
+        {
+          "patternId": "span.fixed-three-u32-probe",
+          "family": "astc-probe",
+          "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:4",
+            "parameter-position-count:4",
+            "result-role:scalar:void"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmScript::PushDDF@upstream/defold/engine/script/src/dmsdk/script/script.h:527:2116"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "dc32e7cdc8050ac508e8bbdb80474009935299666bc62fc597e2ab358c7e20a6",
       "kind": "method",
       "shape": "scalar:void(value:scalar:u32,value:scalar:bool)",
@@ -33778,6 +33873,51 @@
       ],
       "declarationIds": [
         "dmsdk:dmGameSystem::ResFontPrewarmText@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h:112:1244"
+      ],
+      "declarationCount": 1
+    },
+    {
+      "groupId": "dd65e3909f5cf6bfc8365f80ad7f73bb637dfae58adddc9d5b0966856890df8b",
+      "kind": "function",
+      "shape": "enum:dmResource::Result(value:handle:dmResource::HFactory:opaque,in:cstring-in,value:scalar:bool,value:scalar:bool,out:pointer-out:record:dmGameSystem::CollectionFactoryResource)",
+      "families": [
+        "enum-handle",
+        "out-param",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "required-parameter-shape-absent",
+            "result-role:enum:dmResource::Result"
+          ]
+        },
+        {
+          "patternId": "arena-cstring.uri-encode",
+          "family": "arena-cstring.uri-encode",
+          "emitter": "scripts/generate-dmsdk-arena-span-blockers.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "parameter-count:5",
+            "parameter-position-count:5",
+            "result-role:enum:dmResource::Result"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmGameSystem::ResCollectionFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:39:1219"
       ],
       "declarationCount": 1
     },
@@ -34176,57 +34316,6 @@
       ],
       "declarationIds": [
         "dmsdk:dmRender::GetConstantValues@upstream/defold/engine/render/src/dmsdk/render/render.h:479:1839"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "e0c84627619b66e54068db87bf44fcb83192dd1a85a5f3bd5c34f267c46c2b40",
-      "kind": "function",
-      "shape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i64,value:scalar:u32,value:scalar:u64)",
-      "families": [
-        "enum-handle",
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "missingSemanticTokens": [
-            "safe-utf8-cstring-input"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "required-parameter-shape-absent"
-          ]
-        },
-        {
-          "patternId": "span.fixed-width-hash",
-          "family": "hash-span",
-          "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-count:5",
-            "parameter-position-count:5"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:in:cstring-in",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:ProfileCreatePropertyS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:482"
       ],
       "declarationCount": 1
     },
@@ -36726,6 +36815,50 @@
       "declarationCount": 2
     },
     {
+      "groupId": "f202c647784e7f02306db22be5214a3325e22d0b60072db4b2c2ffd95c087c90",
+      "kind": "constructor",
+      "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,value:scalar:i32)",
+      "families": [
+        "constructor",
+        "pointer"
+      ],
+      "semanticCandidates": [],
+      "closestStructuralPatterns": [
+        {
+          "patternId": "state.incremental-hash-lifecycle",
+          "family": "hash-state",
+          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+          "structuralBlockers": [
+            "declaration-kind:constructor"
+          ]
+        },
+        {
+          "patternId": "span.fixed-output-digest",
+          "family": "fixed-digest",
+          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+          "structuralBlockers": [
+            "declaration-kind:constructor",
+            "parameter-count:4",
+            "parameter-position-count:4"
+          ]
+        },
+        {
+          "patternId": "value.direct-primitive-scalar",
+          "family": "scalar-thunk",
+          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+          "structuralBlockers": [
+            "declaration-kind:constructor",
+            "parameter-role:0:inout:pointer:record:lua_State",
+            "parameter-role:2:in:cstring-in"
+          ]
+        }
+      ],
+      "declarationIds": [
+        "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2078"
+      ],
+      "declarationCount": 1
+    },
+    {
       "groupId": "f24c7bdc41dfaf3cdff5fc6c822a809b6a2fe6f88aaf9e120e1944e6030c03ad",
       "kind": "function",
       "shape": "scalar:void(value:handle:dmGameObject::HInstance:opaque)",
@@ -37480,49 +37613,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "f630356dbb1e392aec26f88ea790bbc8f8281f814a3756b1e7e29f6256952cca",
-      "kind": "constructor",
-      "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,value:scalar:i32)",
-      "families": [
-        "constructor",
-        "pointer"
-      ],
-      "semanticCandidates": [],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "structuralBlockers": [
-            "declaration-kind:constructor"
-          ]
-        },
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "declaration-kind:constructor",
-            "parameter-role:0:inout:pointer:record:lua_State"
-          ]
-        },
-        {
-          "patternId": "span.fixed-output-digest",
-          "family": "fixed-digest",
-          "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
-          "structuralBlockers": [
-            "declaration-kind:constructor",
-            "parameter-count:4",
-            "parameter-position-count:4"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2078"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "f64f0b048ce6002d36bb81ff8172993d8d7ab2c90e1c7cd4b444356bacbc0f4d",
       "kind": "function",
       "shape": "scalar:void(inout:pointer:record:lua_State,value:scalar:i32,in:cstring-in,out:pointer:unknown:dmGameObject::HComponentWorld,inout:pointer:unknown:dmGameObject::HComponent,inout:pointer:record:dmMessage::URL)",
@@ -38047,58 +38137,6 @@
       ],
       "declarationIds": [
         "dmsdk:dm_lua_tocfunction@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1705"
-      ],
-      "declarationCount": 1
-    },
-    {
-      "groupId": "fa44a726744ed664a2be8069d2f39e4c5220fb9c1c9c197f3a2a7dd44e85894c",
-      "kind": "function",
-      "shape": "scalar:void(inout:pointer:record:luaL_Buffer,in:cstring-in,value:scalar:usize)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:luaL_Buffer"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:luaL_Buffer",
-            "parameter-role:1:in:cstring-in"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:luaL_Buffer",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_luaL_addlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1667"
       ],
       "declarationCount": 1
     },
@@ -38811,58 +38849,6 @@
       "declarationCount": 1
     },
     {
-      "groupId": "fe2c69422598ff41781d1c65945ecba8a69e5ef2814b077bb67c392adc685011",
-      "kind": "function",
-      "shape": "scalar:void(inout:pointer:record:lua_State,in:cstring-in,value:scalar:usize)",
-      "families": [
-        "pointer"
-      ],
-      "semanticCandidates": [
-        {
-          "patternId": "state.incremental-hash-lifecycle",
-          "family": "hash-state",
-          "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
-          "missingSemanticTokens": [
-            "generation-checked-state",
-            "incremental-hash-lifecycle",
-            "synchronous-noescape"
-          ]
-        }
-      ],
-      "closestStructuralPatterns": [
-        {
-          "patternId": "cstring-value.input-transform",
-          "family": "cstring-value.input-transform",
-          "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State"
-          ]
-        },
-        {
-          "patternId": "value.direct-primitive-scalar",
-          "family": "scalar-thunk",
-          "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:1:in:cstring-in"
-          ]
-        },
-        {
-          "patternId": "value.named-scalar-direct",
-          "family": "named-scalar",
-          "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
-          "structuralBlockers": [
-            "parameter-role:0:inout:pointer:record:lua_State",
-            "parameter-role:1:in:cstring-in"
-          ]
-        }
-      ],
-      "declarationIds": [
-        "dmsdk:dm_lua_pushlstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1712"
-      ],
-      "declarationCount": 1
-    },
-    {
       "groupId": "ff7d09e6691c4f9ca860f988d19421f8d7e4a77251d84e0f5dfa8118546f3050",
       "kind": "function",
       "shape": "scalar:i32(inout:pointer:unknown:AppParams,in:cstring-in,inout:opaque-pointer)",
@@ -39496,7 +39482,7 @@
     {
       "numericId": 7,
       "declarationId": "dmsdk:ConfigFileGetFloat@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:135:117",
-      "groupId": "10db16e172abdcb247121ed20daad97f082db29f6fdc274d0b633398ad87ecb2",
+      "groupId": "11185a8079a803ffe1c2cfd9d4d02f047a1dc1b832043c286c9357c161e3d3c8",
       "universal": {
         "action": "use-universal-materializer",
         "state": "universal-ready",
@@ -39517,18 +39503,19 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:value:handle:HConfigFile:opaque"
-            ]
-          },
-          {
             "patternId": "handle.borrowed-provider-boundary",
             "family": "borrowed-handle",
             "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
             "structuralBlockers": [
+              "parameter-role:1:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.direct-primitive-scalar",
+            "family": "scalar-thunk",
+            "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:value:handle:HConfigFile:opaque",
               "parameter-role:1:in:cstring-in"
             ]
           }
@@ -39557,7 +39544,7 @@
     {
       "numericId": 8,
       "declarationId": "dmsdk:ConfigFileGetInt@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile.h:106:116",
-      "groupId": "44fbeee68907b87e40e9822f7aa0846afda6b282c34089a32fa7b8f7dcdf82aa",
+      "groupId": "9a14beba93dae2e38d26d2bf5135d676c0d28b7eb7b5f0a9b22712fa88096623",
       "universal": {
         "action": "use-universal-materializer",
         "state": "universal-ready",
@@ -39578,18 +39565,19 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:value:handle:HConfigFile:opaque"
-            ]
-          },
-          {
             "patternId": "handle.borrowed-provider-boundary",
             "family": "borrowed-handle",
             "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
             "structuralBlockers": [
+              "parameter-role:1:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.direct-primitive-scalar",
+            "family": "scalar-thunk",
+            "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:value:handle:HConfigFile:opaque",
               "parameter-role:1:in:cstring-in"
             ]
           }
@@ -40827,7 +40815,7 @@
     {
       "numericId": 28,
       "declarationId": "dmsdk:dm_lua_getfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1721",
-      "groupId": "6fc73e259455ef08924af6089129b980ec72418106d3c8d32fd21bfb2c152a44",
+      "groupId": "771e687617898e3019b343bc968668dad483bf37e5246fa39aa619c0eda528e3",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -42554,7 +42542,7 @@
     {
       "numericId": 57,
       "declarationId": "dmsdk:dm_lua_pushlstring@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1712",
-      "groupId": "fe2c69422598ff41781d1c65945ecba8a69e5ef2814b077bb67c392adc685011",
+      "groupId": "67f619526bdac9af4fa218c4415ada63b89dd7f05e8d6e361518976fe28b465e",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -43500,7 +43488,7 @@
     {
       "numericId": 74,
       "declarationId": "dmsdk:dm_lua_setfield@upstream/defold/engine/lua/src/dmsdk/lua/lua.h:0:1729",
-      "groupId": "6fc73e259455ef08924af6089129b980ec72418106d3c8d32fd21bfb2c152a44",
+      "groupId": "771e687617898e3019b343bc968668dad483bf37e5246fa39aa619c0eda528e3",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -44801,7 +44789,7 @@
     {
       "numericId": 95,
       "declarationId": "dmsdk:dm_luaL_addlstring@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1667",
-      "groupId": "fa44a726744ed664a2be8069d2f39e4c5220fb9c1c9c197f3a2a7dd44e85894c",
+      "groupId": "2bb0b048a453fd4fbc2d1ebb6325ac399340c93a96d82c42731674c935009ceb",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -44963,7 +44951,7 @@
     {
       "numericId": 98,
       "declarationId": "dmsdk:dm_luaL_argerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1640",
-      "groupId": "8adbc152262605e440579518144996fdd2a862aded302b92fac8a8dd91293c8a",
+      "groupId": "03d286a07b8de6a796cb9e60bfc78287f376ea5e2c093b834404f5d8c129b655",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -45071,7 +45059,7 @@
     {
       "numericId": 100,
       "declarationId": "dmsdk:dm_luaL_callmeta@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1638",
-      "groupId": "8adbc152262605e440579518144996fdd2a862aded302b92fac8a8dd91293c8a",
+      "groupId": "03d286a07b8de6a796cb9e60bfc78287f376ea5e2c093b834404f5d8c129b655",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -45361,7 +45349,7 @@
     {
       "numericId": 105,
       "declarationId": "dmsdk:dm_luaL_checkoption@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1654",
-      "groupId": "64fcf8e37eeefbdf1c9e3da49ac013d42393bf3d5bcc55b257ec7420db4edc9b",
+      "groupId": "2575ecbb942cd7c55401c0d7f2b08a100fe5fe25735f7b1e7aa61e4de38d9ba0",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -45415,7 +45403,7 @@
     {
       "numericId": 106,
       "declarationId": "dmsdk:dm_luaL_checkstack@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1647",
-      "groupId": "6fc73e259455ef08924af6089129b980ec72418106d3c8d32fd21bfb2c152a44",
+      "groupId": "771e687617898e3019b343bc968668dad483bf37e5246fa39aa619c0eda528e3",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -45523,7 +45511,7 @@
     {
       "numericId": 108,
       "declarationId": "dmsdk:dm_luaL_checkudata@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1651",
-      "groupId": "ba932f714543b6c774d2e0cc4320ffd799fc97f2afeaccd7d2d5395578394651",
+      "groupId": "af7442d0cc293b446a8c814f838e3171ed529237e3d7fa35d8627aafa63aa9cd",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -45553,18 +45541,19 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "patternId": "span.bounded-byte-transform",
+            "family": "base64-span",
+            "emitter": "scripts/generate-dmsdk-base64-span-bindings.mjs",
             "structuralBlockers": [
-              "parameter-role:0:inout:pointer:record:lua_State",
+              "parameter-count:3",
+              "parameter-position-count:3",
               "result-role:opaque-pointer"
             ]
           },
           {
-            "patternId": "span.bounded-byte-transform",
-            "family": "base64-span",
-            "emitter": "scripts/generate-dmsdk-base64-span-bindings.mjs",
+            "patternId": "span.fixed-three-u32-probe",
+            "family": "astc-probe",
+            "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:3",
               "parameter-position-count:3",
@@ -45653,7 +45642,7 @@
     {
       "numericId": 110,
       "declarationId": "dmsdk:dm_luaL_findtable@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1662",
-      "groupId": "89e0ab786556e1642cf4b2470198dedc5f045ca9a992019f3412e63c9e6af866",
+      "groupId": "7636c67000318134d06d743ef4cacb648dfdee69fe2d95e4d85ac12a1542d860",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -45683,18 +45672,19 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "patternId": "span.fixed-output-digest",
+            "family": "fixed-digest",
+            "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
             "structuralBlockers": [
-              "parameter-role:0:inout:pointer:record:lua_State",
+              "parameter-count:4",
+              "parameter-position-count:4",
               "result-role:cstring-in"
             ]
           },
           {
-            "patternId": "span.fixed-output-digest",
-            "family": "fixed-digest",
-            "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+            "patternId": "span.fixed-three-u32-probe",
+            "family": "astc-probe",
+            "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:4",
               "parameter-position-count:4",
@@ -45727,7 +45717,7 @@
     {
       "numericId": 111,
       "declarationId": "dmsdk:dm_luaL_getmetafield@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1637",
-      "groupId": "8adbc152262605e440579518144996fdd2a862aded302b92fac8a8dd91293c8a",
+      "groupId": "03d286a07b8de6a796cb9e60bfc78287f376ea5e2c093b834404f5d8c129b655",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -45855,7 +45845,7 @@
     {
       "numericId": 113,
       "declarationId": "dmsdk:dm_luaL_loadbuffer@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1658",
-      "groupId": "969706ebb6b6f2a479304a97b242f50b626140d0eff1bc172aa4fa012a825e80",
+      "groupId": "86ce3f4522521c860ef7398f25dd0a3534578faa7112c89292ebb80445e06309",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -46134,7 +46124,7 @@
     {
       "numericId": 118,
       "declarationId": "dmsdk:dm_luaL_openlib@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1635",
-      "groupId": "58db5b962afa27f303647c771897e22cfe34db05d4938ea3c75be44a4c13b711",
+      "groupId": "7f712dd4894ea7d6caa7ce3c4a47998e8d39326e1123571d9b5e267a28821192",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -46606,7 +46596,7 @@
     {
       "numericId": 126,
       "declarationId": "dmsdk:dm_luaL_typerror@upstream/defold/engine/lua/src/dmsdk/lua/lauxlib.h:0:1639",
-      "groupId": "8adbc152262605e440579518144996fdd2a862aded302b92fac8a8dd91293c8a",
+      "groupId": "03d286a07b8de6a796cb9e60bfc78287f376ea5e2c093b834404f5d8c129b655",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -50798,7 +50788,7 @@
     {
       "numericId": 190,
       "declarationId": "dmsdk:dmConfigFile::GetFloat@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile_gen.hpp:125:128",
-      "groupId": "737a4ded4fbf732fb5cd1f5b8a555ae387e7727082f09e652af56af20ad68137",
+      "groupId": "1eec600a4688e39f0ada295cef6de57ea50d6ee5d79b89420cf706c9bb10c316",
       "universal": {
         "action": "use-universal-materializer",
         "state": "universal-ready",
@@ -50819,18 +50809,19 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque"
-            ]
-          },
-          {
             "patternId": "handle.borrowed-provider-boundary",
             "family": "borrowed-handle",
             "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
             "structuralBlockers": [
+              "parameter-role:1:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.direct-primitive-scalar",
+            "family": "scalar-thunk",
+            "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque",
               "parameter-role:1:in:cstring-in"
             ]
           }
@@ -50859,7 +50850,7 @@
     {
       "numericId": 191,
       "declarationId": "dmsdk:dmConfigFile::GetInt@upstream/defold/engine/dlib/src/dmsdk/dlib/configfile_gen.hpp:100:127",
-      "groupId": "117bd056d46ace099e70f1e9a404d28c5761a0328805345b39058cbda24e65e7",
+      "groupId": "7e20539a7143bd0bfb85ce792b01eb27d744f38193da833acfd4a83309a5a80e",
       "universal": {
         "action": "use-universal-materializer",
         "state": "universal-ready",
@@ -50880,18 +50871,19 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque"
-            ]
-          },
-          {
             "patternId": "handle.borrowed-provider-boundary",
             "family": "borrowed-handle",
             "emitter": "scripts/generate-dmsdk-borrowed-handle-bindings.mjs",
             "structuralBlockers": [
+              "parameter-role:1:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.direct-primitive-scalar",
+            "family": "scalar-thunk",
+            "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:value:handle:dmConfigFile::HConfig:opaque",
               "parameter-role:1:in:cstring-in"
             ]
           }
@@ -67269,7 +67261,7 @@
     {
       "numericId": 453,
       "declarationId": "dmsdk:dmGameSystem::ResCollectionFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_collection_factory.h:39:1219",
-      "groupId": "d3b6bb99d107ab00c3571fd94e81c93357acdb4aaf66f34cc488116150b03192",
+      "groupId": "dd65e3909f5cf6bfc8365f80ad7f73bb637dfae58adddc9d5b0966856890df8b",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -67310,12 +67302,13 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "patternId": "span.fixed-output-digest",
+            "family": "fixed-digest",
+            "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
             "structuralBlockers": [
-              "parameter-role:0:value:handle:dmResource::HFactory:opaque",
-              "parameter-role:4:out:pointer-out:record:dmGameSystem::CollectionFactoryResource"
+              "parameter-count:5",
+              "parameter-position-count:5",
+              "result-role:enum:dmResource::Result"
             ]
           }
         ],
@@ -67449,7 +67442,7 @@
     {
       "numericId": 455,
       "declarationId": "dmsdk:dmGameSystem::ResFactoryLoadResource@upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_factory.h:36:1235",
-      "groupId": "cb3a2c029bbf68e6763071b16287b4850cfc9440472f3df166802bb3e93ae7c3",
+      "groupId": "1de4a4c11bf20f42d9b683963e019556d75e625f6ac7373107fc546c5ba0cc37",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -67490,12 +67483,13 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "patternId": "span.fixed-output-digest",
+            "family": "fixed-digest",
+            "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
             "structuralBlockers": [
-              "parameter-role:0:value:handle:dmResource::HFactory:opaque",
-              "parameter-role:4:out:pointer-out:record:dmGameSystem::FactoryResource"
+              "parameter-count:5",
+              "parameter-position-count:5",
+              "result-role:enum:dmResource::Result"
             ]
           }
         ],
@@ -69183,7 +69177,7 @@
     {
       "numericId": 477,
       "declarationId": "dmsdk:dmGraphics::AddVertexStream@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:942:1374",
-      "groupId": "d7f471b4e6dbdc89aea3700259909b867995a347d6388b7cfab3f85d14c46ff1",
+      "groupId": "c4b0ee307e0e13dcf8e1fb44a7dd0f965e3d7d6b8283035ce44e6cc5fd5fdeb3",
       "universal": {
         "action": "use-universal-materializer",
         "state": "universal-ready",
@@ -69204,20 +69198,21 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:value:handle:dmGraphics::HVertexStreamDeclaration:opaque"
-            ]
-          },
-          {
             "patternId": "span.fixed-output-digest",
             "family": "fixed-digest",
             "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:5",
               "parameter-position-count:5"
+            ]
+          },
+          {
+            "patternId": "value.enum-domain-direct",
+            "family": "enum-value",
+            "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:value:handle:dmGraphics::HVertexStreamDeclaration:opaque",
+              "parameter-role:1:in:cstring-in"
             ]
           }
         ],
@@ -98754,7 +98749,7 @@
     {
       "numericId": 945,
       "declarationId": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:530:2117",
-      "groupId": "038b88d979da8e105fa7932e9a4ff80259b2d096cec7fb2865d820030a05a010",
+      "groupId": "d2948db3f316fd7ac7561a2d644547af730df9eb32ac4029dd86a9324c181d0a",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -98827,7 +98822,7 @@
     {
       "numericId": 946,
       "declarationId": "dmsdk:dmScript::JsonToLua@upstream/defold/engine/script/src/dmsdk/script/script.h:543:2118",
-      "groupId": "05a2a95d897b6c42c725a8352738f29d9edb585b6f5e168902d93b023578003f",
+      "groupId": "41b8480ebd83f3ddd54127d47cda728f6fe8485fa74be6eb489fb16572925a93",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -99345,7 +99340,7 @@
     {
       "numericId": 953,
       "declarationId": "dmsdk:dmScript::LuaStackCheck::LuaStackCheck@upstream/defold/engine/script/src/dmsdk/script/script.h:74:2078",
-      "groupId": "f630356dbb1e392aec26f88ea790bbc8f8281f814a3756b1e7e29f6256952cca",
+      "groupId": "f202c647784e7f02306db22be5214a3325e22d0b60072db4b2c2ffd95c087c90",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -99376,15 +99371,6 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "declaration-kind:constructor",
-              "parameter-role:0:inout:pointer:record:lua_State"
-            ]
-          },
-          {
             "patternId": "span.fixed-output-digest",
             "family": "fixed-digest",
             "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
@@ -99392,6 +99378,16 @@
               "declaration-kind:constructor",
               "parameter-count:4",
               "parameter-position-count:4"
+            ]
+          },
+          {
+            "patternId": "value.direct-primitive-scalar",
+            "family": "scalar-thunk",
+            "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "declaration-kind:constructor",
+              "parameter-role:0:inout:pointer:record:lua_State",
+              "parameter-role:2:in:cstring-in"
             ]
           }
         ],
@@ -99811,7 +99807,7 @@
     {
       "numericId": 960,
       "declarationId": "dmsdk:dmScript::PushDDF@upstream/defold/engine/script/src/dmsdk/script/script.h:527:2116",
-      "groupId": "47334e32a1a18b09e6bf6c4cedbe802f8539a2fc10ebf8132bc61fbfb0a96ba8",
+      "groupId": "dc2981200a4ebe32061d9efec12005b9bae8d6d4e950561b0c6a31689ff5c403",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -101408,7 +101404,7 @@
     {
       "numericId": 985,
       "declarationId": "dmsdk:dmSnPrintf@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:49:178",
-      "groupId": "90078a2390d042dd9679804f8f4d1ad502fd16233ca80b7cc5488613af4e9a32",
+      "groupId": "1441300684a6e11be588491a7b71b35b1be0b2a85483b2e8093cc5c183ae08a3",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -101438,17 +101434,18 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:inout:cstring-mutable"
-            ]
-          },
-          {
             "patternId": "value.direct-primitive-scalar",
             "family": "scalar-thunk",
             "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:inout:cstring-mutable",
+              "parameter-role:2:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.named-scalar-direct",
+            "family": "named-scalar",
+            "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
             "structuralBlockers": [
               "parameter-role:0:inout:cstring-mutable",
               "parameter-role:2:in:cstring-in"
@@ -101719,7 +101716,7 @@
     {
       "numericId": 990,
       "declarationId": "dmsdk:dmSocket::GetHostByName@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:367:566",
-      "groupId": "7f04f8dd43904136dfcf73cc2c54b70380fe117b545cc3d17c3fbea9a7cf5001",
+      "groupId": "877d90da461748d8f1f69d1abccb19705c9ad62a64767b27a31646ae0a365ef4",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -101749,20 +101746,21 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:1:inout:pointer:record:dmSocket::Address"
-            ]
-          },
-          {
             "patternId": "span.in-place-keyed-transform",
             "family": "xtea-span",
             "emitter": "scripts/generate-dmsdk-xtea-span-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:4",
               "parameter-position-count:4"
+            ]
+          },
+          {
+            "patternId": "value.enum-domain-direct",
+            "family": "enum-value",
+            "emitter": "scripts/generate-dmsdk-enum-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:in:cstring-in",
+              "parameter-role:1:inout:pointer:record:dmSocket::Address"
             ]
           }
         ],
@@ -103878,7 +103876,7 @@
     {
       "numericId": 1026,
       "declarationId": "dmsdk:dmStrlCat@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:116:181",
-      "groupId": "a4bda6743432f1f76e2b579c8c29ec3b96a16960338b55d3c6db9fd7de84ef63",
+      "groupId": "bfffa396cd4ccd63166fc07d2c75a7b7eae137b137bfd6d1cf829e496cf7c6e0",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -103906,17 +103904,18 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:out:cstring-mutable"
-            ]
-          },
-          {
             "patternId": "value.direct-primitive-scalar",
             "family": "scalar-thunk",
             "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:out:cstring-mutable",
+              "parameter-role:1:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.named-scalar-direct",
+            "family": "named-scalar",
+            "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
             "structuralBlockers": [
               "parameter-role:0:out:cstring-mutable",
               "parameter-role:1:in:cstring-in"
@@ -103968,7 +103967,7 @@
     {
       "numericId": 1027,
       "declarationId": "dmsdk:dmStrlCpy@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:94:180",
-      "groupId": "a4bda6743432f1f76e2b579c8c29ec3b96a16960338b55d3c6db9fd7de84ef63",
+      "groupId": "bfffa396cd4ccd63166fc07d2c75a7b7eae137b137bfd6d1cf829e496cf7c6e0",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -103996,17 +103995,18 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:0:out:cstring-mutable"
-            ]
-          },
-          {
             "patternId": "value.direct-primitive-scalar",
             "family": "scalar-thunk",
             "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:0:out:cstring-mutable",
+              "parameter-role:1:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.named-scalar-direct",
+            "family": "named-scalar",
+            "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
             "structuralBlockers": [
               "parameter-role:0:out:cstring-mutable",
               "parameter-role:1:in:cstring-in"
@@ -104375,7 +104375,7 @@
     {
       "numericId": 1042,
       "declarationId": "dmsdk:dmThread::New@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:92:605",
-      "groupId": "99dba06271d5e97504f78035936e32ff09fdadf258ff9ba22ddd291ca66abd64",
+      "groupId": "06be4b7af8d2c80674f22ec2faf55f1fee272705f565de82ee81127621c325d9",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -104415,12 +104415,13 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "patternId": "span.fixed-output-digest",
+            "family": "fixed-digest",
+            "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
             "structuralBlockers": [
-              "parameter-role:0:value:callback",
-              "parameter-role:2:inout:opaque-pointer"
+              "parameter-count:4",
+              "parameter-position-count:4",
+              "result-role:scalar:usize"
             ]
           }
         ],
@@ -104450,7 +104451,7 @@
     {
       "numericId": 1043,
       "declarationId": "dmsdk:dmThread::SetThreadName@upstream/defold/engine/dlib/src/dmsdk/dlib/thread.h:157:613",
-      "groupId": "7aa9c96449adee26a374184d59e8735217eec3d30fff41053e9597e4d3106067",
+      "groupId": "0bba747d0616d815a5e708a559a4993df2a9315b5eed22f4ae1739030ebac97f",
       "universal": {
         "action": "use-universal-materializer",
         "state": "universal-ready",
@@ -104458,16 +104459,35 @@
         "diagnostic": null
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "extend-composable-specialization-if-profitable",
         "requiredForAvailability": false,
-        "patternId": "cstring-value.input-transform",
-        "family": "cstring-value.input-transform",
-        "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-        "missingSemanticTokens": [
-          "safe-utf8-cstring-input"
+        "observedShape": "scalar:void(value:scalar:usize,in:cstring-in)",
+        "closestPatterns": [
+          {
+            "patternId": "state.incremental-hash-lifecycle",
+            "family": "hash-state",
+            "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+            "structuralBlockers": [
+              "required-parameter-shape-absent"
+            ]
+          },
+          {
+            "patternId": "value.direct-primitive-scalar",
+            "family": "scalar-thunk",
+            "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+            "structuralBlockers": [
+              "parameter-role:1:in:cstring-in"
+            ]
+          },
+          {
+            "patternId": "value.named-scalar-direct",
+            "family": "named-scalar",
+            "emitter": "scripts/generate-dmsdk-named-scalar-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:1:in:cstring-in"
+            ]
+          }
         ],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
       "attempts": [],
@@ -112385,7 +112405,7 @@
     {
       "numericId": 1177,
       "declarationId": "dmsdk:FontLoadFromMemory@upstream/defold/engine/font/src/dmsdk/font/font.h:150:805",
-      "groupId": "4adc59be6e547a2cf71a809348de8ab296bb28e129a35a0661f370306a3a8d24",
+      "groupId": "80a30cd0b51fcfa7917acdd0c09f09f4111aef7a9cf3c1943815a2f30edd9a1c",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -112416,18 +112436,19 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "patternId": "span.fixed-output-digest",
+            "family": "fixed-digest",
+            "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
             "structuralBlockers": [
-              "parameter-role:1:inout:opaque-pointer",
+              "parameter-count:4",
+              "parameter-position-count:4",
               "result-role:handle:HFont:opaque"
             ]
           },
           {
-            "patternId": "span.fixed-output-digest",
-            "family": "fixed-digest",
-            "emitter": "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
+            "patternId": "span.fixed-three-u32-probe",
+            "family": "astc-probe",
+            "emitter": "scripts/generate-dmsdk-astc-probe-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:4",
               "parameter-position-count:4",
@@ -116025,7 +116046,7 @@
     {
       "numericId": 1232,
       "declarationId": "dmsdk:ProfileCreatePropertyBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:466",
-      "groupId": "d15e53896f930446c5297339ae011714b2599104979175685a218bbea24ec923",
+      "groupId": "382c0537f1c80ac02a7e91fcd9a5dfa7f9eab79b8c88a243f95f3ec8f037caf7",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116035,16 +116056,36 @@
         "diagnostic": "dmsdk:ProfileCreatePropertyBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:466 is not directly callable from the revision's public Defold SDK: public-sdk-declaration-absent"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "extend-composable-specialization-if-profitable",
         "requiredForAvailability": false,
-        "patternId": "cstring-value.input-transform",
-        "family": "cstring-value.input-transform",
-        "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-        "missingSemanticTokens": [
-          "safe-utf8-cstring-input"
+        "observedShape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i32,value:scalar:u32,value:scalar:u64)",
+        "closestPatterns": [
+          {
+            "patternId": "state.incremental-hash-lifecycle",
+            "family": "hash-state",
+            "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+            "structuralBlockers": [
+              "required-parameter-shape-absent"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:i32"
+            ]
+          },
+          {
+            "patternId": "span.fixed-width-hash",
+            "family": "hash-span",
+            "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-count:5",
+              "parameter-position-count:5"
+            ]
+          }
         ],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
       "attempts": [],
@@ -116068,7 +116109,7 @@
     {
       "numericId": 1233,
       "declarationId": "dmsdk:ProfileCreatePropertyF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:478",
-      "groupId": "4593e9c2b0740ec3b864232e5f146adcb8350393d21085510515112bc80428e1",
+      "groupId": "a246f71c590faf00a54e0361d6b36a56499d9e977711fc84348de61f68832428",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116078,16 +116119,36 @@
         "diagnostic": "dmsdk:ProfileCreatePropertyF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:478 is not directly callable from the revision's public Defold SDK: public-sdk-declaration-absent"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "extend-composable-specialization-if-profitable",
         "requiredForAvailability": false,
-        "patternId": "cstring-value.input-transform",
-        "family": "cstring-value.input-transform",
-        "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-        "missingSemanticTokens": [
-          "safe-utf8-cstring-input"
+        "observedShape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f32,value:scalar:u32,value:scalar:u64)",
+        "closestPatterns": [
+          {
+            "patternId": "state.incremental-hash-lifecycle",
+            "family": "hash-state",
+            "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+            "structuralBlockers": [
+              "required-parameter-shape-absent"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:f32"
+            ]
+          },
+          {
+            "patternId": "span.fixed-width-hash",
+            "family": "hash-span",
+            "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-count:5",
+              "parameter-position-count:5"
+            ]
+          }
         ],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
       "attempts": [],
@@ -116111,7 +116172,7 @@
     {
       "numericId": 1234,
       "declarationId": "dmsdk:ProfileCreatePropertyF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:490",
-      "groupId": "054538c02bf5694e78e51841b0169faba7463e627c4efdd8897207286c5b1a0e",
+      "groupId": "725031bb1fd36556d8d8b17964954de1e88855f2b3e72d2422a5494c7501cd66",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116121,16 +116182,36 @@
         "diagnostic": "dmsdk:ProfileCreatePropertyF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:490 is not directly callable from the revision's public Defold SDK: public-sdk-declaration-absent"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "extend-composable-specialization-if-profitable",
         "requiredForAvailability": false,
-        "patternId": "cstring-value.input-transform",
-        "family": "cstring-value.input-transform",
-        "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-        "missingSemanticTokens": [
-          "safe-utf8-cstring-input"
+        "observedShape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:f64,value:scalar:u32,value:scalar:u64)",
+        "closestPatterns": [
+          {
+            "patternId": "state.incremental-hash-lifecycle",
+            "family": "hash-state",
+            "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+            "structuralBlockers": [
+              "required-parameter-shape-absent"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:f64"
+            ]
+          },
+          {
+            "patternId": "span.fixed-width-hash",
+            "family": "hash-span",
+            "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-count:5",
+              "parameter-position-count:5"
+            ]
+          }
         ],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
       "attempts": [],
@@ -116195,7 +116276,7 @@
     {
       "numericId": 1236,
       "declarationId": "dmsdk:ProfileCreatePropertyS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:470",
-      "groupId": "d15e53896f930446c5297339ae011714b2599104979175685a218bbea24ec923",
+      "groupId": "382c0537f1c80ac02a7e91fcd9a5dfa7f9eab79b8c88a243f95f3ec8f037caf7",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116205,16 +116286,36 @@
         "diagnostic": "dmsdk:ProfileCreatePropertyS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:470 is not directly callable from the revision's public Defold SDK: public-sdk-declaration-absent"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "extend-composable-specialization-if-profitable",
         "requiredForAvailability": false,
-        "patternId": "cstring-value.input-transform",
-        "family": "cstring-value.input-transform",
-        "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-        "missingSemanticTokens": [
-          "safe-utf8-cstring-input"
+        "observedShape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i32,value:scalar:u32,value:scalar:u64)",
+        "closestPatterns": [
+          {
+            "patternId": "state.incremental-hash-lifecycle",
+            "family": "hash-state",
+            "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+            "structuralBlockers": [
+              "required-parameter-shape-absent"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:i32"
+            ]
+          },
+          {
+            "patternId": "span.fixed-width-hash",
+            "family": "hash-span",
+            "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-count:5",
+              "parameter-position-count:5"
+            ]
+          }
         ],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
       "attempts": [],
@@ -116238,7 +116339,7 @@
     {
       "numericId": 1237,
       "declarationId": "dmsdk:ProfileCreatePropertyS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:482",
-      "groupId": "e0c84627619b66e54068db87bf44fcb83192dd1a85a5f3bd5c34f267c46c2b40",
+      "groupId": "9f265224d2921bd111fc70a124b3cdbc48ea3fb5838c0540e0d59ccb9d5c76b9",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116248,16 +116349,36 @@
         "diagnostic": "dmsdk:ProfileCreatePropertyS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:482 is not directly callable from the revision's public Defold SDK: public-sdk-declaration-absent"
       },
       "optimization": {
-        "action": "derive-source-semantic-facts-if-expressed",
+        "action": "extend-composable-specialization-if-profitable",
         "requiredForAvailability": false,
-        "patternId": "cstring-value.input-transform",
-        "family": "cstring-value.input-transform",
-        "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-        "missingSemanticTokens": [
-          "safe-utf8-cstring-input"
+        "observedShape": "scalar:u64(in:cstring-in,in:cstring-in,value:scalar:i64,value:scalar:u32,value:scalar:u64)",
+        "closestPatterns": [
+          {
+            "patternId": "state.incremental-hash-lifecycle",
+            "family": "hash-state",
+            "emitter": "scripts/generate-dmsdk-hash-state-bindings.mjs",
+            "structuralBlockers": [
+              "required-parameter-shape-absent"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:i64"
+            ]
+          },
+          {
+            "patternId": "span.fixed-width-hash",
+            "family": "hash-span",
+            "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-count:5",
+              "parameter-position-count:5"
+            ]
+          }
         ],
-        "generatorBlockers": [],
-        "evidenceBoundary": "specialization may be selected only when the revision expresses the required facts; otherwise retain the universal call",
         "preserveUniversalUntilSpecialized": true
       },
       "attempts": [],
@@ -116662,7 +116783,7 @@
     {
       "numericId": 1246,
       "declarationId": "dmsdk:ProfilePropertyAddBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:468",
-      "groupId": "cbe241705a42b037220499da190bc63234d213667547ddfdac5baab816d5d29f",
+      "groupId": "26f5e37cad6467044c54f1096327764a6156d655ab6e72facd60f820d61e84ea",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116773,7 +116894,7 @@
     {
       "numericId": 1261,
       "declarationId": "dmsdk:ProfileRegisterPropertyBool@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:465",
-      "groupId": "4be8405d3c835a268c8ddf1a2ae53ac5e7435f94782794b8278a2f3d6c9f39ac",
+      "groupId": "7d89f94ca7ed7a8f8c10c98cbb967cd92595f50bf56c84b2453ec5152ca8fed4",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116804,20 +116925,21 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:4:inout:callback"
-            ]
-          },
-          {
             "patternId": "span.fixed-width-hash",
             "family": "hash-span",
             "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:5",
               "parameter-position-count:5"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:i32",
+              "parameter-role:4:inout:callback"
             ]
           }
         ],
@@ -116847,7 +116969,7 @@
     {
       "numericId": 1262,
       "declarationId": "dmsdk:ProfileRegisterPropertyF32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:477",
-      "groupId": "4f6f35843ac0a7ebeb5ca5496f984cefad6a734e72b0a38015800aae439508a2",
+      "groupId": "60865d84c92d59b2e61a2ed9e2b16f5dc92446c63746510e50c9ba3eef69cedb",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116878,20 +117000,21 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:4:inout:callback"
-            ]
-          },
-          {
             "patternId": "span.fixed-width-hash",
             "family": "hash-span",
             "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:5",
               "parameter-position-count:5"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:f32",
+              "parameter-role:4:inout:callback"
             ]
           }
         ],
@@ -116921,7 +117044,7 @@
     {
       "numericId": 1263,
       "declarationId": "dmsdk:ProfileRegisterPropertyF64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:489",
-      "groupId": "af108ad85de8859029bf51ff94d14d37e8c8c71e2fa389d4721da91cbb93bdc8",
+      "groupId": "9c0dcd3e92f940bc2a07f3f3688a2565f0f62c6a582c8eeb83137b8571947e51",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -116952,20 +117075,21 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:4:inout:callback"
-            ]
-          },
-          {
             "patternId": "span.fixed-width-hash",
             "family": "hash-span",
             "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:5",
               "parameter-position-count:5"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:f64",
+              "parameter-role:4:inout:callback"
             ]
           }
         ],
@@ -117069,7 +117193,7 @@
     {
       "numericId": 1265,
       "declarationId": "dmsdk:ProfileRegisterPropertyS32@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:469",
-      "groupId": "4be8405d3c835a268c8ddf1a2ae53ac5e7435f94782794b8278a2f3d6c9f39ac",
+      "groupId": "7d89f94ca7ed7a8f8c10c98cbb967cd92595f50bf56c84b2453ec5152ca8fed4",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -117100,20 +117224,21 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:4:inout:callback"
-            ]
-          },
-          {
             "patternId": "span.fixed-width-hash",
             "family": "hash-span",
             "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:5",
               "parameter-position-count:5"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:i32",
+              "parameter-role:4:inout:callback"
             ]
           }
         ],
@@ -117143,7 +117268,7 @@
     {
       "numericId": 1266,
       "declarationId": "dmsdk:ProfileRegisterPropertyS64@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:0:481",
-      "groupId": "098006865511a22675b3519954daafed19745f6a1967d23b7a104e1350cfb308",
+      "groupId": "83d6c8fd81491483221b11d89afbaff1f145c01cef2035f86dc1ce94160acd33",
       "universal": {
         "action": "supply-usage-facts",
         "state": "specialization-required",
@@ -117174,20 +117299,21 @@
             ]
           },
           {
-            "patternId": "cstring-value.input-transform",
-            "family": "cstring-value.input-transform",
-            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
-            "structuralBlockers": [
-              "parameter-role:4:inout:callback"
-            ]
-          },
-          {
             "patternId": "span.fixed-width-hash",
             "family": "hash-span",
             "emitter": "scripts/generate-dmsdk-hash-span-bindings.mjs",
             "structuralBlockers": [
               "parameter-count:5",
               "parameter-position-count:5"
+            ]
+          },
+          {
+            "patternId": "cstring-value.input-transform",
+            "family": "cstring-value.input-transform",
+            "emitter": "scripts/generate-dmsdk-cstring-value-bindings.mjs",
+            "structuralBlockers": [
+              "parameter-role:2:value:scalar:i64",
+              "parameter-role:4:inout:callback"
             ]
           }
         ],
@@ -123598,5 +123724,5 @@
       }
     }
   ],
-  "reportSha256": "dec095411279676c647e864626cddfca1a896b5273254ccc64011f7b0754be36"
+  "reportSha256": "52d6d8e73ceea5e33fd7eaf4104ddddd87ed8e0683ffc814ddc03d7b5b0ced35"
 }
