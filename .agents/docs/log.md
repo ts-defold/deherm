@@ -4247,7 +4247,7 @@ provider ABI v2.
 
 The focused plan, emitter, native compile, ASan/UBSan fake-provider runtime,
 and warmed zero-allocation tests pass. The full dmSDK generator reproduced all
-1,361 universal recipes and the clean room reproduced 120 byte-identical
+1,361 universal recipes and the clean room reproduced 122 byte-identical
 artifacts. This proves plan ownership, generation, compilation, fake-provider
 behavior, sanitizer cleanliness, and the named allocation assertion; it does
 not prove a packaged-engine provider or every target.
@@ -4260,3 +4260,26 @@ span, atomic, loop, and persistent-rebind fixtures. It is not yet carried in a
 published revision policy or consumed by the borrowed/scratch plans. Until that
 integration lands, the 147 positive borrowed rows remain trust-default
 admissions rather than source-proven ownership facts.
+
+The source-effect artifact authenticates every scanned source and successful
+translation-unit invocation. A rejected unit records the categorical
+`rejected-with-diagnostics` state, but raw Clang diagnostic text is not a policy
+input: include-stack formatting changed between the complete checkout and its
+minimal clean room without changing any semantic observation. Removing that
+presentation-only digest restored byte-identical clean-room reconstruction
+without promoting a rejected AST.
+
+## 2026-09-27 - Scratch scalar-out authenticated plan (audit-only)
+
+The scratch scalar-out wave now has a compiler-owned authenticated plan over
+the complete 30-row structural envelope. Candidate membership is derived from
+ABI roles/directions and rejected-family facts, while admission additionally
+requires revision-owned C++ ownership, exact-one memory, success-path write,
+and synchronous/no-escape facts. Unknown or unsafe facts preserve the
+universal fallback with row-local blockers. The current effect artifact
+observes 10/30 rows but proves none of the full contract, so the plan selects
+0 and falls back all 30. The existing 7/79 emitter and generated outputs were
+left unchanged; no specialized-route regression or emitter cutover is claimed.
+The plan test also checks metamorphic row-order stability and disjointness from
+higher-priority specialized selections. This is plan/source/test evidence,
+not packaged-engine or cross-target runtime evidence.

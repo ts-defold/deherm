@@ -120,3 +120,27 @@ No dmSDK declaration disappeared: every withdrawn specialization is realized
 through the generated universal machinery. Unlocking a fallback row requires
 revision-derived effect evidence satisfying the same compiler-owned taxonomy;
 a one-off wrapper or declaration allowlist is not an accepted substitute.
+
+## Source-fact frontend (audit boundary)
+
+`scripts/generate-dmsdk-cpp-ownership-effect-facts.mjs` binds the union of the
+borrowed-handle and scratch-scalar-out structural envelopes to exact Clang AST
+declaration/definition identities. It scans pinned Defold C/C++ implementations
+and inline headers, force-includes the declared public header when a `.cpp`
+translation unit does not include it, and records source and translation-unit
+hashes plus the Clang profile. Rejected translation units retain a categorical
+state; raw compiler diagnostics are deliberately ephemeral rather than policy
+inputs because include-stack presentation is not semantic evidence.
+Typedef-backed handles retain their
+desugared pointer identity; missing, ambiguous, unresolved, or conflicting
+definitions are explicit `unknown` rows and cannot become positive
+specializations.
+
+The current artifact is
+`packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json`.
+It covers 212 deduplicated structural rows (182 borrowed + 30 scratch), with
+32 observed and 180 unknown under the host-only profile. This artifact is
+currently marked `audit-only-single-profile`; it is not evidence for a
+cross-target release policy until target/build macro profiles are joined with
+unknown-dominates semantics. Inline/header observations are nevertheless
+available to the next policy migration, including the `dmAtomic` family.

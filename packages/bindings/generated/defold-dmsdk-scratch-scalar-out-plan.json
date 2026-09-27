@@ -1,0 +1,1072 @@
+{
+  "schemaVersion": 1,
+  "kind": "deherm.dmsdk-scratch-scalar-out-plan",
+  "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
+  "sources": {
+    "ir": "packages/bindings/generated/defold-sdk-ir.json",
+    "shapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    "projection": "packages/bindings/generated/defold-dmsdk-projection-ir.json",
+    "policy": "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
+    "effectFacts": "packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json"
+  },
+  "sourceHashes": {
+    "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
+    "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099",
+    "effectFacts": "80ed0711610860e7c5080936368fe62a7683520d85b2f8657375df0bd245baa3"
+  },
+  "eligibility": {
+    "schemaVersion": 1,
+    "patternId": "pointer.scratch-scalar-out-provider-boundary",
+    "requiredFacts": {
+      "ownership": "borrowed-handle-or-scalar-no-transfer",
+      "memory": "exact-one-scalar-no-alias-no-span",
+      "write": "success-path-output-defined",
+      "completion": "synchronous-noescape"
+    },
+    "unknownPolicy": "universal-fallback"
+  },
+  "patternRegistry": [
+    {
+      "schemaVersion": 1,
+      "id": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "priority": 800,
+      "cost": 25,
+      "fallback": false,
+      "when": {
+        "result": {
+          "rolePrefixes": [
+            "enum:",
+            "scalar:"
+          ]
+        },
+        "parameters": {
+          "every": [
+            {
+              "rolePrefixes": [
+                "enum:",
+                "handle:",
+                "scalar:"
+              ],
+              "directions": [
+                "value"
+              ]
+            },
+            {
+              "rolePrefixes": [
+                "pointer:enum:",
+                "pointer:scalar:"
+              ],
+              "directions": [
+                "in",
+                "inout",
+                "out"
+              ]
+            }
+          ],
+          "some": [
+            {
+              "rolePrefixes": [
+                "pointer:enum:",
+                "pointer:scalar:"
+              ],
+              "directions": [
+                "inout",
+                "out"
+              ]
+            }
+          ]
+        },
+        "rejectFamilies": [
+          "platform-gated"
+        ]
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "id": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "priority": 0,
+      "cost": 1000,
+      "fallback": true,
+      "when": null
+    }
+  ],
+  "coverage": {
+    "structurallyRelevant": 30,
+    "selected": 0,
+    "universalFallback": 30,
+    "blockerCounts": {
+      "ownership": 30,
+      "memory": 30,
+      "write": 30,
+      "completion": 30
+    }
+  },
+  "decisions": [
+    {
+      "declarationId": "dmsdk:dmArrayUtil::SetCapacity@upstream/defold/engine/dlib/src/dmsdk/dlib/array.h:52:11",
+      "sourceOrdinal": 11,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmAtomicIncrement32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:47:79",
+      "sourceOrdinal": 79,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmAtomicDecrement32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:62:80",
+      "sourceOrdinal": 80,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmAtomicAdd32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:79:81",
+      "sourceOrdinal": 81,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmAtomicSub32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:95:82",
+      "sourceOrdinal": 82,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmAtomicStore32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:111:83",
+      "sourceOrdinal": 83,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmAtomicCompareStore32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:128:84",
+      "sourceOrdinal": 84,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmAtomicGet32@upstream/defold/engine/dlib/src/dmsdk/dlib/atomic.h:144:85",
+      "sourceOrdinal": 85,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmBuffer::GetCount@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:340:97",
+      "sourceOrdinal": 97,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98",
+      "sourceOrdinal": 98,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102",
+      "sourceOrdinal": 102,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
+      "sourceOrdinal": 155,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
+      "sourceOrdinal": 156,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "cpp-ownership-effect-facts"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
+      "sourceOrdinal": 157,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
+      "sourceOrdinal": 158,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
+      "sourceOrdinal": 159,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
+      "sourceOrdinal": 160,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
+      "sourceOrdinal": 161,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
+      "sourceOrdinal": 162,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmSocket::New@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:229:552",
+      "sourceOrdinal": 552,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867",
+      "sourceOrdinal": 867,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetComponentId@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:673:1013",
+      "sourceOrdinal": 1013,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyOptionsIndex@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:917:1041",
+      "sourceOrdinal": 1041,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyOptionsKey@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:927:1042",
+      "sourceOrdinal": 1042,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyAsHash@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:938:1043",
+      "sourceOrdinal": 1043,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyAsFloat@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:949:1044",
+      "sourceOrdinal": 1044,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGameObject::GetPropertyAsBool@upstream/defold/engine/gameobject/src/dmsdk/gameobject/gameobject.h:993:1048",
+      "sourceOrdinal": 1048,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::GetViewport@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1152:1397",
+      "sourceOrdinal": 1397,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmGraphics::RepackRGBToRGBA@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1627:1449",
+      "sourceOrdinal": 1449,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    },
+    {
+      "declarationId": "dmsdk:dmHID::GetGamepadUserId@upstream/defold/engine/hid/src/dmsdk/hid/hid.h:619:1616",
+      "sourceOrdinal": 1616,
+      "order": null,
+      "patternId": "universal.default",
+      "family": "universal-recipe",
+      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+      "fallback": true,
+      "facts": {
+        "ownership": "unknown",
+        "memory": "unknown",
+        "write": "unknown",
+        "completion": "unknown",
+        "source": "none"
+      },
+      "blockers": [
+        "completion-facts-unavailable",
+        "memory-facts-unavailable",
+        "ownership-facts-unavailable",
+        "write-facts-unavailable"
+      ],
+      "universalFallback": {
+        "state": "universal-fallback",
+        "preserved": true,
+        "blockers": [
+          "completion-facts-unavailable",
+          "memory-facts-unavailable",
+          "ownership-facts-unavailable",
+          "write-facts-unavailable"
+        ]
+      }
+    }
+  ]
+}

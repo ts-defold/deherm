@@ -106,3 +106,33 @@ prove that those symbols are exported into a Defold Wasm build. Consequently
 the report records seven fake-provider runtime routes and zero packaged-engine
 runtime verifications. The staged TypeScript surface is not exported from the
 public SDK barrel until those provider gates exist.
+
+## Source ownership/effect facts
+
+The package-owned frontend also inventories this envelope from pinned Defold
+implementations and inline headers. Its neutral artifact is the shared
+`defold-dmsdk-cpp-ownership-effect-facts.json` report, whose current host-only
+profile observes 10 of the 30 scratch structural rows and routes the remaining
+20 to explicit unknowns. The report is audit-only until the same exact AST
+facts are collected for every supported target/build macro profile; no
+single-host observation may unlock a release specialization.
+
+## Compiler-owned authenticated plan
+
+`@deherm/compiler` now owns
+`defold-dmsdk-scratch-scalar-out-plan.json`. The plan selects the complete
+structural envelope directly from result roles, parameter directions/roles,
+and rejected-family facts; it does not use the historical
+`scratch-out-parameters` tranche as a candidate list. Each candidate also
+requires authenticated ownership, exact-one memory, success-path write, and
+synchronous/no-escape facts from the C++ effect artifact. Missing or unsafe
+facts produce explicit machine-readable blockers and retain the universal
+fallback.
+
+The current effect artifact has facts for 10/30 structural candidates but none
+prove all four requirements, so the plan is deliberately audit-only: 30
+structural candidates, 0 selected, and 30 universal fallbacks. The shipped
+scratch emitter remains byte-identical at its proven 7/79 provider boundary;
+this wave does not claim an emitter cutover or trade away an existing
+optimization. A relational test rejects any future scratch selection that
+overlaps a route selected by a higher-priority specialized family.

@@ -136,11 +136,12 @@ function pointerDepth(type) {
   return [...String(type ?? "")].filter((character) => character === "*").length;
 }
 
-function emptyParameter(index, type) {
+function emptyParameter(index, type, desugaredType = type) {
   return {
     index,
     type,
-    pointer: isPointer(type),
+    desugaredType,
+    pointer: isPointer(type) || isPointer(desugaredType),
     ownership: [],
     escape: [],
     completion: [],
@@ -287,7 +288,7 @@ export function extractCppOwnershipEffectFacts(ast, requestedDeclarationIds, opt
     const parameterNodes = (definition.inner ?? []).filter(({ kind }) => kind === "ParmVarDecl");
     const parameters = new Map(parameterNodes.map((parameter, index) => [parameter.id, { index, node: parameter }]));
     const parameterFacts = parameterNodes.map((parameter, index) =>
-      emptyParameter(index, parameter.type?.qualType ?? ""),
+      emptyParameter(index, parameter.type?.qualType ?? "", parameter.type?.desugaredQualType ?? parameter.type?.qualType ?? ""),
     );
     const ownership = [];
     const escapes = [];
@@ -454,7 +455,7 @@ export function extractCppOwnershipEffectFacts(ast, requestedDeclarationIds, opt
           if (operator === "=" && leftUnwrapped?.kind === "UnaryOperator" && leftUnwrapped.opcode === "*") {
             for (const index of parameterReferences(leftUnwrapped.inner?.[0], parameters)) {
               if (
-                pointerDepth(parameterFacts[index].type) >= 2 &&
+                pointerDepth(parameterFacts[index].desugaredType) >= 2 &&
                 (unwrap(right)?.kind === "CXXNewExpr" || isPointer(unwrap(right)?.type?.qualType))
               ) {
                 addParameterFact(parameterFacts[index], {

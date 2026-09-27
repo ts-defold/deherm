@@ -14,6 +14,8 @@ import {
   dmSdkPinnedInputs,
   generatedDmSdkArtifacts,
 } from "./lib/dmsdk-generator-pipeline.mjs";
+import { validateDmSdkCppOwnershipEffectReport } from "../packages/compiler/src/dmsdk-cpp-ownership-effect-frontend.mjs";
+import { indexDmSdkScratchScalarOutPlan } from "../packages/compiler/src/dmsdk-scratch-scalar-out-plan.mjs";
 
 const execFileAsync = promisify(execFile);
 const repositoryRootDefault = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -225,7 +227,7 @@ export async function discoverGeneratedDmSdkArtifacts(repositoryRoot = repositor
   const result = new Set();
   for (const file of await walk(path.join(repositoryRoot, "packages/bindings/generated"))) {
     if (
-      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|bounded-span-plan|value-plan|hash-state-plan|cstring-value-plan|borrowed-handle-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
+      /^defold-dmsdk-(?:target-conditionals|binding-patterns|scalar-thunks|abi-shapes|source-semantic-facts|cpp-ownership-effect-facts|bounded-span-plan|value-plan|hash-state-plan|cstring-value-plan|borrowed-handle-plan|scratch-scalar-out-plan|enum-value-bindings|named-scalar-bindings|fixed-digest-bindings|base64-span-bindings|astc-probe-bindings|xtea-span-bindings|hash-span-bindings|hash-state-bindings|arena-span-blockers|projection-ir|borrowed-handle-bindings|scratch-scalar-out-bindings|cstring-value-bindings|universal-bindings|fallback-audit|universal-ready-exact-plan|generated-adapter-exact-plan)\.json$/.test(
         file,
       )
     ) {
@@ -399,11 +401,14 @@ export function assertDmSdkSourceCensus({ patterns, shapes, projection, universa
 }
 
 async function validateReports(root) {
-  const load = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
+  const loadText = async (relative) => readFile(path.join(root, relative), "utf8");
+  const load = async (relative) => JSON.parse(await loadText(relative));
   const [
+    ir,
     patterns,
     scalar,
     shapes,
+    cppOwnershipEffects,
     enumValue,
     namedScalar,
     fixedDigest,
@@ -417,6 +422,7 @@ async function validateReports(root) {
     projection,
     borrowedHandlePlan,
     borrowedHandle,
+    scratchScalarOutPlan,
     scratchScalarOut,
     cstringValuePlan,
     cstringValue,
@@ -425,9 +431,11 @@ async function validateReports(root) {
     readyExact,
     generatedExact,
   ] = await Promise.all([
+    load("packages/bindings/generated/defold-sdk-ir.json"),
     load("packages/bindings/generated/defold-dmsdk-binding-patterns.json"),
     load("packages/bindings/generated/defold-dmsdk-scalar-thunks.json"),
     load("packages/bindings/generated/defold-dmsdk-abi-shapes.json"),
+    load("packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json"),
     load("packages/bindings/generated/defold-dmsdk-enum-value-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-named-scalar-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json"),
@@ -441,6 +449,7 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-projection-ir.json"),
     load("packages/bindings/generated/defold-dmsdk-borrowed-handle-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-borrowed-handle-bindings.json"),
+    load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-scratch-scalar-out-bindings.json"),
     load("packages/bindings/generated/defold-dmsdk-cstring-value-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json"),
@@ -449,6 +458,48 @@ async function validateReports(root) {
     load("packages/bindings/generated/defold-dmsdk-universal-ready-exact-plan.json"),
     load("packages/bindings/generated/defold-dmsdk-generated-adapter-exact-plan.json"),
   ]);
+  validateDmSdkCppOwnershipEffectReport(cppOwnershipEffects);
+  const ownershipInputPaths = {
+    ir: "packages/bindings/generated/defold-sdk-ir.json",
+    shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+    policy: "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json",
+    scratchPolicy: "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
+  };
+  for (const [key, relative] of Object.entries(ownershipInputPaths)) {
+    assert(
+      cppOwnershipEffects.inputs[key] === sha256(await loadText(relative)),
+      `C++ ownership/effect report does not authenticate ${relative}`,
+    );
+  }
+  assert(
+    cppOwnershipEffects.defoldRevision === ir.defoldRevision &&
+      cppOwnershipEffects.coverage.requested === 212 &&
+      cppOwnershipEffects.coverage.observed === 32 &&
+      cppOwnershipEffects.coverage.unknown === 180 &&
+      cppOwnershipEffects.admission === "audit-only-single-profile",
+    "C++ ownership/effect report does not preserve its exhaustive audit-only partition",
+  );
+  for (const source of cppOwnershipEffects.sources) {
+    assert(
+      source.sourceSha256 === sha256(await loadText(source.path)),
+      `C++ ownership/effect source hash differs for ${source.path}`,
+    );
+  }
+  const scratchTexts = {
+    ir: await loadText("packages/bindings/generated/defold-sdk-ir.json"),
+    shapes: await loadText("packages/bindings/generated/defold-dmsdk-abi-shapes.json"),
+    projection: await loadText("packages/bindings/generated/defold-dmsdk-projection-ir.json"),
+    policy: await loadText("packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json"),
+    effectFacts: await loadText("packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json"),
+  };
+  indexDmSdkScratchScalarOutPlan(scratchScalarOutPlan, {
+    ir,
+    shapes,
+    projection,
+    policy: JSON.parse(scratchTexts.policy),
+    effectFacts: cppOwnershipEffects,
+    texts: scratchTexts,
+  });
   const runtimePendingCount = assertDmSdkSourceCensus({ patterns, shapes, projection, universal });
   assert(
     projection.coverage?.generatedAdapters === 45 &&
@@ -615,7 +666,10 @@ async function validateReports(root) {
     "borrowed-handle report does not exactly realize its compiler-owned plan",
   );
   assert(
-    scratchScalarOut.coverage.candidates === 79 &&
+    scratchScalarOutPlan.coverage.structurallyRelevant === 30 &&
+      scratchScalarOutPlan.coverage.selected === 0 &&
+      scratchScalarOutPlan.coverage.universalFallback === 30 &&
+      scratchScalarOut.coverage.candidates === 79 &&
       scratchScalarOut.coverage.generated === 7 &&
       scratchScalarOut.coverage.blocked === 72 &&
       scratchScalarOut.coverage.cAbiGenerated === 7 &&
@@ -627,7 +681,7 @@ async function validateReports(root) {
       scratchScalarOut.coverage.fakeProviderHostRuntimeTested === 7 &&
       scratchScalarOut.coverage.packagedEngineRuntimeVerified === 0 &&
       scratchScalarOut.coverage.warmedDispatchObservedCppAllocations === 0,
-    "scratch scalar-out report does not preserve its pinned 7 generated + 72 blocked provider boundary",
+    "scratch scalar-out audit plan or emitted lane is stale",
   );
   assert(
     cstringValue.coverage.candidates === cstringValuePlan.coverage.candidates &&
@@ -860,6 +914,7 @@ async function validateReports(root) {
     borrowedHandleGeneratedCount: borrowedHandle.coverage.generated,
     borrowedHandleBlockedCount: borrowedHandle.coverage.blocked,
     scratchScalarOutGeneratedCount: scratchScalarOut.coverage.generated,
+    scratchScalarOutCandidateCount: scratchScalarOut.coverage.candidates,
     scratchScalarOutBlockedCount: scratchScalarOut.coverage.blocked,
     cstringValueGeneratedCount: cstringValue.coverage.generated,
     universalRecipeCount: universal.coverage.recipes,
@@ -941,7 +996,7 @@ async function main() {
     `Borrowed-handle structural partition: ${report.borrowedHandleGeneratedCount}/${report.borrowedHandleCandidateCount} generated; ${report.borrowedHandleBlockedCount} blocked; packaged-engine provider remains unverified.`,
   );
   console.log(
-    `Scratch scalar-out structural partition: ${report.scratchScalarOutGeneratedCount}/79 generated; ${report.scratchScalarOutBlockedCount} blocked; packaged-engine provider remains unverified.`,
+    `Scratch scalar-out structural partition: ${report.scratchScalarOutGeneratedCount}/${report.scratchScalarOutCandidateCount} generated; ${report.scratchScalarOutBlockedCount} blocked; packaged-engine provider remains unverified.`,
   );
   console.log(
     `Named-scalar policy: ${report.namedScalarGeneratedCount}/${report.namedScalarReviewedCount} generated; ${report.namedScalarBlockedCount} blocked.`,

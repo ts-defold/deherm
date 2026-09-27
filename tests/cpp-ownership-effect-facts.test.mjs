@@ -272,6 +272,26 @@ test("indirect calls involving pointers fail closed as unknown", () => {
   assert.deepEqual(result.diagnostics, ["indirect-callee-effect"]);
 });
 
+test("typedef-backed handle pointers remain pointer effects at the AST boundary", () => {
+  const handle = {
+    kind: "ParmVarDecl",
+    id: "handle",
+    name: "handle",
+    type: { qualType: "HResource", desugaredQualType: "struct Resource *" },
+  };
+  const unresolved = fn(
+    "typedef-handle",
+    "Observe",
+    "void (HResource)",
+    [handle],
+    [{ kind: "CallExpr", inner: [{ kind: "DeclRefExpr", referencedDecl: { kind: "FunctionDecl", id: "unknown", name: "opaque" } }, parameterRef("handle", "handle", "HResource")] }],
+  );
+  const result = fact(ast(unresolved), "typedef-handle");
+  assert.equal(result.parameters[0].memoryEffect, "unknown");
+  assert.equal(result.parameters[0].ownershipEffect, "unknown");
+  assert.deepEqual(result.diagnostics, ["unresolved-callee-effect"]);
+});
+
 test("callee semantic rules can prove a lease-token result without callable spelling", () => {
   const acquire = fn(
     "lease",

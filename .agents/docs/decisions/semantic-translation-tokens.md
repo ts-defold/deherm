@@ -193,6 +193,23 @@ the universal implementation. This relation prevents an older revision from
 being rejected merely because it supplies less optimization evidence, while a
 missing structurally eligible declaration still fails closed.
 
+The systemic plan-properties gate makes these relations executable for the
+compiler-owned borrowed-handle plan. It checks the real current universal
+corpus by declaration identity (1361 dispatchable raw calls; the remaining IR
+rows are type metadata or intentionally hidden), authenticates the package
+recipe and current policy, and asserts that selected/fallback totals and dense
+selected ordering are complete. It also runs the same planner over every
+revision identity in `defold-revision-matrix.json` using the current source
+fixture as a revision envelope. Those cases prove that the planner does not
+key its result to a revision string; they are not historical source evidence,
+because no historical borrowed-handle policy snapshots are checked in. Small
+metamorphic cases then rename a contradiction-free route, add a structurally
+valid route, and introduce an unresolved lifetime fact. Existing decisions stay
+stable, totals change mechanically, and the unresolved route is retained by
+the universal fallback. The test deliberately does not claim that the
+borrowed-handle trust default is body-derived proof; that remains a separate
+effect-facts migration boundary.
+
 # Claim protocol
 
 Every material review claim follows `observe -> reproduce -> classify -> act`:
