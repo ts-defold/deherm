@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 2,
+  "schemaVersion": 3,
   "kind": "deherm.fixture.old-pipeline-sdk",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "treeSha256": "7bf45e9f805b6103b4c76a339cae6eecae314efd2329ec679a8a030a7d40409a",
+  "treeSha256": "d7faa230280e57c8784376fcc3cd07219a9c1372402c70374e5abadd33be8e27",
   "source": "Frozen SHA-256 golden captured from the checkout-backed generated SDK and canonical lowering plan produced by the source pipeline. It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
   "files": {
     "dmsdk/borrowed-handle.ts": {
@@ -11,7 +11,7 @@
     },
     "dmsdk/browser-arena.ts": {
       "bytes": 5513,
-      "sha256": "65b9df7120dd3a727e257adb6fe2839a80a2f0dff2b6e0e5bd788b191c892ff5"
+      "sha256": "07de25ee23f17de34c2a3200d00f8299663f76e719feefdbf51ee0ad0fe41b92"
     },
     "dmsdk/cstring-value.ts": {
       "bytes": 4753,
@@ -35,7 +35,7 @@
     },
     "dmsdk/scalar.ts": {
       "bytes": 6007,
-      "sha256": "8c12e875b9d6cc1998a937e68b5eeea40f83bb54e0c0fcf76f494b2ae1ef5267"
+      "sha256": "fec98a776ca38cab5f011e7898751c3666fb780a9505ce59f42c4f86940f7621"
     },
     "dmsdk/scratch-scalar-out.ts": {
       "bytes": 5262,
@@ -47,7 +47,7 @@
     },
     "dmsdk/universal.ts": {
       "bytes": 148212,
-      "sha256": "d55906b54a9d23eb08f4585552c36b5ce812bf9a2abe1d8482784e8f8e9fc859"
+      "sha256": "bf3d78e9700d73d51ddb07c3b0e423d08a64a62613460f6315580818bf69506f"
     },
     "script/browser-target-support.ts": {
       "bytes": 567,
@@ -118,10 +118,464 @@
       "sha256": "814dfc5607f9473fed1797f4a10ee46a393f996d18253cee1c222ffcf9782bca"
     }
   },
+  "outputs": {
+    "defold/defold_hermes/include/defold_hermes/generated_defold_value_layout.h": {
+      "bytes": 2185,
+      "sha256": "1e5dd6412dd2c7bf57c26d4610ccf6f224e811ff48cd05a23691127a5d05a732"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_arena_cstring.h": {
+      "bytes": 2408,
+      "sha256": "b17074fda83fe196250888861748c2b9fe9611f3fe62a3dd3659a4578c992a31"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe.h": {
+      "bytes": 690,
+      "sha256": "9411f1f04d414e389b9a075bf22267e9ecd15e21561fbc2a74d878b6b71a7490"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_astc_probe_runtime.h": {
+      "bytes": 987,
+      "sha256": "f4ba53c214e353ab2874419d715ccc494e974c46754b9dc4c8be369d22b62f89"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span.h": {
+      "bytes": 576,
+      "sha256": "85762f2c7471fc0b3ecaecafe6eb2226083186e8c82033499ecf4dceeb60ab18"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_base64_span_runtime.h": {
+      "bytes": 1073,
+      "sha256": "44e79f513d5a7133e243ad40341bdf69793201e2447a0a76ad387509d7092c8f"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle.h": {
+      "bytes": 2769,
+      "sha256": "32c492ee8cc892e9dad44aa05cb1edbdf25218f530b3091c5f122167aafce3a1"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_borrowed_handle_jsi.hpp": {
+      "bytes": 271,
+      "sha256": "8cc9b660c994f4d9a2ce441f26ab57d87e9bfb6cb585e369cda9b2391059f121"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value.h": {
+      "bytes": 2816,
+      "sha256": "408a778f12d979ead1a51c46646167803d8142edb0862fa922bedafbd4c66dbc"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_cstring_value_jsi.hpp": {
+      "bytes": 320,
+      "sha256": "196499429d7405c92a74ecdcf04f40a426341dbb3b10dc1a80b0661c7fc15e5b"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value.h": {
+      "bytes": 770,
+      "sha256": "3f50b4abd81dc78757aa5742b7da6acff4dcb57dc1e423e622ac4dfc495cbe8f"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_jsi.hpp": {
+      "bytes": 261,
+      "sha256": "807f071eebeb91beac0d028e348ef1d19786f658f34138ed902283df5fb1c185"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_enum_value_runtime.h": {
+      "bytes": 1195,
+      "sha256": "f79eb44ddeeb3e5d593956c18ad2c7bafc4118e9be55941c30fa8022687d461d"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_fixed_digest.h": {
+      "bytes": 862,
+      "sha256": "83adb9de92bbe38b36e00ec5f7bed565b6219a2443a956112530f84be9df3716"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_fixed_digest_runtime.h": {
+      "bytes": 1049,
+      "sha256": "0009f64205b24efcb7af77685fa5aff1b1bb21cf574e52501b0fd211671ba8b5"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span.h": {
+      "bytes": 498,
+      "sha256": "4a0f0c60db40b5207c713988c01ad6fe209958412b4c54de0ce304ab4a236e98"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_span_runtime.h": {
+      "bytes": 863,
+      "sha256": "ebf2489cc8cc9c93579e5dc4c889f07c92db9a36e5b2cad66d1f9a8298ba4d5b"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_hash_state.h": {
+      "bytes": 1652,
+      "sha256": "fa8817bdffc449a3dfc3624c8a6b16006ba09d5c8241a06031ff332af7ea1e10"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar.h": {
+      "bytes": 1895,
+      "sha256": "ad99b90a767e054659da5aa9c6fd15cbfbebbc4463e6300a12e5aec67e6e650b"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_jsi.hpp": {
+      "bytes": 189,
+      "sha256": "395c2380c5c6c7de863cca44e4a0bed822b381bac73226ceaabba40d23b3b254"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_named_scalar_runtime.h": {
+      "bytes": 1122,
+      "sha256": "8d227c9eb682d6523cc7e081acb51810ef3320ce89a0c479cdc44e7b36a28c31"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h": {
+      "bytes": 1802,
+      "sha256": "51a8c7cde434ee722ecbb53e920ddfaddbeff24cb204b9d6763e5afb312a8152"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp": {
+      "bytes": 269,
+      "sha256": "ede715873076d67eb68d0a6fe98bc162113b441700c0a304c731ab55f00ef19e"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h": {
+      "bytes": 1567,
+      "sha256": "ca019f01d58f2bff58ba6f67ad08427eb45223f5e1be4c315b8dc0a9a62511ed"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out.h": {
+      "bytes": 3044,
+      "sha256": "81794a71d37798554439e0145a1104d3fba9eb922934e80966adba7db11fb070"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scratch_scalar_out_jsi.hpp": {
+      "bytes": 276,
+      "sha256": "a8023b0f6e7d8a266c7f02cf8c0f256f438fdb96236b097925825ea772f72e91"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal.h": {
+      "bytes": 2212,
+      "sha256": "684092863da110048c03d5ccd3fd53571db8ee98b3721d2261cf657e95f998a0"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_universal_jsi.hpp": {
+      "bytes": 638,
+      "sha256": "1e3b3a02adc988aa4161aa05faae3270686b75dff6529903ac6cb22786291577"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span.h": {
+      "bytes": 454,
+      "sha256": "5b5d028511bb9ddfb0f60b77252bfb5fb14a0ba24ffabf747c759b7e82eba6c0"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_xtea_span_runtime.h": {
+      "bytes": 677,
+      "sha256": "8a88ccd166975f0be93eeb9d85b770ee6b4d9bae2653cfe0be52e714ce11b967"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_jsi.hpp": {
+      "bytes": 311,
+      "sha256": "95c6a92a083e5f95c7eb395ec92e56c7b2953aaded6ab2aad8582e3726430713"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_lua_bridge.hpp": {
+      "bytes": 665,
+      "sha256": "ca8a08fc543993adaf1b6623c9cd477ea102db6223005248b9537fce28d98f16"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_modules.h": {
+      "bytes": 1628,
+      "sha256": "36de6f3f22f60e49b46e358ffbd8740fbfec57dc6e17807829f45eef64c71d08"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_scalar_lua_ids.hpp": {
+      "bytes": 3518,
+      "sha256": "4d8cd428fb3f70351ba6fc82c58e7c9cdbeae40cab1de8b336f49a227806086e"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_binding_descriptors.hpp": {
+      "bytes": 79148,
+      "sha256": "0413d12c9c3373f083a4b4621482fe8bbe4b2cf3e2bda3f4989b6933ab5b2449"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_callback_lifecycle.hpp": {
+      "bytes": 633,
+      "sha256": "e43cc5d752d269f787f5899ab1c636b4a47b9cbf0f40cdb211831235058fbead"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_dynamic_values.hpp": {
+      "bytes": 1022,
+      "sha256": "1f859c4f4ae565bc7cb8a40cdb7c661989fd6ffa8670782508827689bf7c7f7a"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_fixed_tuples.hpp": {
+      "bytes": 1415,
+      "sha256": "d9bde6caeaa7ea99a9e804f798e9f2e0505ca2c245bdb9ccacf89e4e3c3dc9a9"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_handle_kinds.hpp": {
+      "bytes": 732,
+      "sha256": "cd2936d44dc696b1840342ad963c2cf9b59c27de93d62b60f1d343228570e80e"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_handle_lowering.hpp": {
+      "bytes": 8529,
+      "sha256": "d4a67880b775d22c01d5214f9c1e45b4b781f77b09a49bb040e8c498fedb374c"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_overload_dispatch.hpp": {
+      "bytes": 1111,
+      "sha256": "4c58d7af199441dbba917a9ade75af1f4c99ed64a8300a3e87c07a4d85ddf367"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_special_call_verification.h": {
+      "bytes": 1302,
+      "sha256": "1e3adb098e1b68dda75587071964b6be6fe5b4637650f468311d315eaa62f531"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_table_record_bindings.hpp": {
+      "bytes": 1236,
+      "sha256": "5d1da9a850b4eea07cd2766dac3d55a4cb4a13547b12faaa6b0e7a4b9c26dbc2"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_static_frame.h": {
+      "bytes": 5477,
+      "sha256": "ab423b90ed7c9166abb5a9ef238ac0d37a1e951fc03d2dc7d17836406b86cb0e"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_bindings.hpp": {
+      "bytes": 2363,
+      "sha256": "8580590634aa8df02dfa104d52e55792ae16d0826488dc08a1265746497dbe76"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_universal_value_capi.h": {
+      "bytes": 4052,
+      "sha256": "4e6b3204a8cc7bb76ade0e451c6e39555432ff199ac3756bf5f87d1df98585d1"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_url_bindings.hpp": {
+      "bytes": 1324,
+      "sha256": "8307ed01f18a951b9b8e16ddebc46e2f0461493f6e89232eed80cc8a55251033"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_value_bindings.hpp": {
+      "bytes": 3831,
+      "sha256": "7b820ebc252b7aa8999a96f4589d27b2f780a42de30202d7fb24dfa3f38fc058"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_script_value_tail_bindings.hpp": {
+      "bytes": 1547,
+      "sha256": "a7cd8225743e02a466c516e5b2f9c79cfce1f1c5995a6f4a7ac20215876ce940"
+    },
+    "defold/defold_hermes/include/defold_hermes/generated_static_hermes_vmath.h": {
+      "bytes": 1080,
+      "sha256": "4e12dcef4a347428f5468a682fca4bb02d58657bbf5df44d7f53c31850a2cdb4"
+    },
+    "defold/defold_hermes/lib/web/generated_dmsdk_borrowed_handle.js": {
+      "bytes": 43805,
+      "sha256": "52bdf76ac29d07561461794f9b8cc53f34860bd5ecfcf0114028c5f30f29397d"
+    },
+    "defold/defold_hermes/lib/web/generated_dmsdk_cstring_value.js": {
+      "bytes": 2888,
+      "sha256": "636b752ccb8420828adc387e6d198ee6dffac0232bc14d1df7bfdbb094056114"
+    },
+    "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js": {
+      "bytes": 2453,
+      "sha256": "5192f93cddfa054e38b50f3886c9fd513cfc35c7a726f90d9070c49f29252ae4"
+    },
+    "defold/defold_hermes/lib/web/generated_dmsdk_scratch_scalar_out.js": {
+      "bytes": 3399,
+      "sha256": "69eed957287511c79f3e8396c25739f97df069b352332c201e683846ad4993dd"
+    },
+    "defold/defold_hermes/lib/web/generated_dmsdk_universal.js": {
+      "bytes": 390388,
+      "sha256": "0efa2a4750bc97d065deecfa454a75f06a67a7f352544e58df0f9ffc9831c2a0"
+    },
+    "defold/defold_hermes/lib/web/generated_modules.js": {
+      "bytes": 1814,
+      "sha256": "940a79ef3883401f29dbbd49fb149ce40bfca48a092cf6f3d98e77823d060da1"
+    },
+    "defold/defold_hermes/lib/web/generated_script_universal_value.js": {
+      "bytes": 34748,
+      "sha256": "c4f207e51a4352ce9208b238b17e7a6b1668594725b7579f5dbe53ceefc77dca"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_arena_cstring.cpp": {
+      "bytes": 8026,
+      "sha256": "4130202009c7eda12f1a23dba6d25eda18882c1233de9a14cb0698dc015edbd5"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_astc_probe_image.cpp": {
+      "bytes": 1141,
+      "sha256": "515910ac313d6eb99d1cf1f13834277c980d9660f00b70a142c23d186e8e0852"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_astc_probe_runtime.cpp": {
+      "bytes": 1507,
+      "sha256": "b82d72e70080bde33600d9f3c79e281894e683924351a00ee96c4f0ef8ac0c16"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_base64_span_crypt.cpp": {
+      "bytes": 960,
+      "sha256": "192e84dec0f93139334f3b42addbafd7331abaa9068b031d1e70d523679d5861"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_base64_span_runtime.cpp": {
+      "bytes": 2850,
+      "sha256": "1bd742fec714444570d9ebcc1470931e258efecb4e1d2a99332517ed6e2dd4a6"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_jsi.cpp": {
+      "bytes": 5133,
+      "sha256": "fcd1784a5bafaf6a0583b522d484427ebdc5e73f244179aae857d5727b34e82a"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_borrowed_handle_runtime.cpp": {
+      "bytes": 102403,
+      "sha256": "1fb498621608c6f104610c6cced6c0b6d220a7997e075a0ac99ff1989341251d"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value.cpp": {
+      "bytes": 27960,
+      "sha256": "bea4d1be59c4a304a1c227438f7dac0933cf28a5264690f2afe6c8a00faa8e50"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value_jsi.cpp": {
+      "bytes": 11105,
+      "sha256": "ea98014e301957e1252b72d6af3d32ccf26bc7523660f60abea70fcf328e3f17"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_cstring_value_runtime.cpp": {
+      "bytes": 2696,
+      "sha256": "6ee49f0b936b469b11160806c5343ea943666529461514b05ce96f071015d436"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_buffer.cpp": {
+      "bytes": 406,
+      "sha256": "1dc8c538101a625586394dcfb17f5c104b41d3b34e588a8dd16fa3eaf6183584"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_graphics.cpp": {
+      "bytes": 400,
+      "sha256": "4519d315ef92afb6ef248528fc1f9626c933f20cf7a65468a4837b6c7cc953c4"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp": {
+      "bytes": 3400,
+      "sha256": "8657ae4ca94bbbc09bbf7e9f590728cce2290bccbcaf0e6d3b2da6cca9fda995"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_log.cpp": {
+      "bytes": 588,
+      "sha256": "b157c0a5ad3b2bcc08a61671bcf43152703ff706c2733be7db866cc5b9763b8d"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp": {
+      "bytes": 4622,
+      "sha256": "90bdf02c75c6ceefc64c195febd0141597b20910e74bb94b19d58b85d5e040ac"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_enum_value_sound.cpp": {
+      "bytes": 552,
+      "sha256": "78235899a9eb87dae11cfbb5d66a7be6f8cb03b5fd621aa93c9c9f5f2e17c372"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_fixed_digest_crypt.cpp": {
+      "bytes": 1454,
+      "sha256": "0cfb371c588664be93102e00936e611a73c7b6407349640130100ff96e99c48f"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_fixed_digest_runtime.cpp": {
+      "bytes": 2315,
+      "sha256": "a339b8c75a5d2d7aae91ae027f884f97e69db7855a883265d4c488e75ddfb622"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_hash_span.cpp": {
+      "bytes": 705,
+      "sha256": "f067e4acda8dbb912857d7631c947bc348f6a69d5b16ca44486859e9822f3697"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_hash_span_runtime.cpp": {
+      "bytes": 1437,
+      "sha256": "e97cbcc47351193c0bbbad746df52c4e1cd62f5583253efe153625ba0dc1aa46"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_hash_state.cpp": {
+      "bytes": 7144,
+      "sha256": "819fd13607ae78ae18092ad024b080139a49a3906a2e8520298df20942efc846"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_named_scalar_jsi.cpp": {
+      "bytes": 168,
+      "sha256": "343147a302688a8a6b51a50b8d08da32df7b2c86e84ba739bb282af63a6bb15a"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp": {
+      "bytes": 19345,
+      "sha256": "86d03003a02f3c364f97be791cb799b209dcbd2adf393e5d112146486e6d1d3f"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp": {
+      "bytes": 2935,
+      "sha256": "5fdb534de2c45fb3779e99661c3cad182ef180c6dfe68ea965ecc3a12b8d60d9"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp": {
+      "bytes": 4864,
+      "sha256": "23df6416e5c8f1d05bd9173f4addca0700d4a737127f821d7b0e14f8fff07661"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp": {
+      "bytes": 10829,
+      "sha256": "3fe7ea181bed721f0c7d57b1bc42dab8223a0dddbd99d2b30bf85cf8fa869630"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_jsi.cpp": {
+      "bytes": 4451,
+      "sha256": "a36fe13e0c060e96604d9a53e2c7145eefcbe3d96c91938f1e4db4b3e4958670"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_scratch_scalar_out_runtime.cpp": {
+      "bytes": 8384,
+      "sha256": "7e4a7c844b9830aa4ed94b555dfd084aed4d3d11d9b266b2f92d2945fb68f0e4"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_universal.cpp": {
+      "bytes": 78195,
+      "sha256": "39e54be422170351305f89680e7d03df8990029f33b3e122ae6e66a86b05dbaa"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp": {
+      "bytes": 8394,
+      "sha256": "ab18fd4aa01bf37546e0b9c4c01e429e3efc608986a085efd1a317145b901139"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_xtea_span_crypt.cpp": {
+      "bytes": 574,
+      "sha256": "dfee2146f526879f5719145d379dfd77cddbf0f859904a195edc0abb1fe94eb1"
+    },
+    "defold/defold_hermes/src/generated_dmsdk_xtea_span_runtime.cpp": {
+      "bytes": 810,
+      "sha256": "eb330fed73c59a888543a9ec174514d4893ce7bb64217298ef20befa7dd883ba"
+    },
+    "defold/defold_hermes/src/generated_jsi.cpp": {
+      "bytes": 6355,
+      "sha256": "aec663fee728697794c1dc014532efac5a7c9517195ea37944b91c5cdbf6ecda"
+    },
+    "defold/defold_hermes/src/generated_lua_bridge.cpp": {
+      "bytes": 1657,
+      "sha256": "b19960e66acc8dc0fec9da91765e6ccb0f5daccb82d026826c381a0c3014ac9e"
+    },
+    "defold/defold_hermes/src/generated_scalar_lua_descriptors.cpp": {
+      "bytes": 16813,
+      "sha256": "4984d682ab656547b8d26bf36df5754e6dc666719d5c748a80d9d72969f6498e"
+    },
+    "defold/defold_hermes/src/generated_script_callback_lifecycle.cpp": {
+      "bytes": 5038,
+      "sha256": "2abfdc9da6217bac3ee891b47ffd9baa415240048e05795ea475c284f04a02d1"
+    },
+    "defold/defold_hermes/src/generated_script_dynamic_values.cpp": {
+      "bytes": 3782,
+      "sha256": "b2d70d8c33dd09e1f54d9225122570afd7f62ae0b370e9d8eb2b4d2f5ad77e04"
+    },
+    "defold/defold_hermes/src/generated_script_fixed_tuples.cpp": {
+      "bytes": 7044,
+      "sha256": "d341b19f2b6bcdb72bac7344f67226a6556810047a180c96656cb4c70f98f802"
+    },
+    "defold/defold_hermes/src/generated_script_handle_lowering.cpp": {
+      "bytes": 283561,
+      "sha256": "5734bb7e5a09cfc2d42d84a6eee89f20ace6cc447f8a9e6afc2c075704a59b63"
+    },
+    "defold/defold_hermes/src/generated_script_overload_dispatch.cpp": {
+      "bytes": 4779,
+      "sha256": "44505e1838cac33b8728376f543f528e4dc3e8dc9009086a2610c8ee766e6218"
+    },
+    "defold/defold_hermes/src/generated_script_table_record_bindings.cpp": {
+      "bytes": 4885,
+      "sha256": "033c1532655dd0edd02476b8e1dbc39b74b4f23c820751a9a0a279e426b48e1b"
+    },
+    "defold/defold_hermes/src/generated_script_universal_static_frame.cpp": {
+      "bytes": 15925,
+      "sha256": "ff8844fdada79d445b1f3c8c083c85ff01bcc3fee496a5a0a3fbd790093177a6"
+    },
+    "defold/defold_hermes/src/generated_script_universal_value_bindings.cpp": {
+      "bytes": 128333,
+      "sha256": "e029b16d32fde263fdffacdb88093c6d4936e87a67b8d3caef826add08b23860"
+    },
+    "defold/defold_hermes/src/generated_script_universal_value_capi.cpp": {
+      "bytes": 124298,
+      "sha256": "16b437106350a7af105a293f8343d932b669d22fd58b6765022be5160f5b9c0c"
+    },
+    "defold/defold_hermes/src/generated_script_url_bindings.cpp": {
+      "bytes": 14211,
+      "sha256": "d2d0d7fff9a1374efec3eaacba2449c856de5fe078c14c630cb643eab55be35d"
+    },
+    "defold/defold_hermes/src/generated_script_value_bindings.cpp": {
+      "bytes": 77738,
+      "sha256": "5ed8f835390c873174159ff277946fd435efa57640cee5678b419257330bdab2"
+    },
+    "defold/defold_hermes/src/generated_script_value_tail_bindings.cpp": {
+      "bytes": 13615,
+      "sha256": "298991ef16bddbe40c8e94e938f27af485707a6e2085764067cc9acae77f83b5"
+    },
+    "defold/defold_hermes/src/generated_static_hermes_vmath.cpp": {
+      "bytes": 3629,
+      "sha256": "b50d90aa5b8e66ba73dbee3179c8fc400364567be96743817a432692833f3080"
+    },
+    "packages/abi/src/generated/layouts.ts": {
+      "bytes": 1265,
+      "sha256": "68958dcb59db511c4e5c6263a46ac3a31670d2193714e6e02a9fc55ccad5a432"
+    },
+    "packages/static-hermes/src/generated/dmsdk-borrowed-handle.ts": {
+      "bytes": 647,
+      "sha256": "0b78c09dda1b47099b29088274beaba9458296c08b55efbb11db44755e9f001d"
+    },
+    "packages/static-hermes/src/generated/dmsdk-cstring-value.ts": {
+      "bytes": 561,
+      "sha256": "954f8335c66d82e0d37e1c97fba9b6b816ae0c7cfd3fcdbe00a1b19b27c91a47"
+    },
+    "packages/static-hermes/src/generated/dmsdk-scratch-scalar-out.ts": {
+      "bytes": 650,
+      "sha256": "52d6747f223a66f939c6409f0fd692088587bb47796a43621436a27b1cfd43a1"
+    },
+    "packages/static-hermes/src/generated/ffi.js": {
+      "bytes": 1249,
+      "sha256": "911b238248abee3e57d8b56aad84d40f2e725014c015fdae8de67e4627a975c9"
+    },
+    "packages/static-hermes/src/generated/script-typed-native-bridge.ts": {
+      "bytes": 22792,
+      "sha256": "d8b7183d3f003300e068f840673221d15dae9d68be9f98310ec993fd9fb3eb1f"
+    },
+    "packages/static-hermes/src/generated/script-universal-value.ts": {
+      "bytes": 20100,
+      "sha256": "33c9581fe6ea668cd266dbfcd3cf905f2f84277d775ef23d65d7c366c9a245b0"
+    },
+    "packages/static-hermes/src/generated/script-vmath.ts": {
+      "bytes": 4172,
+      "sha256": "44cd5f29eaf49e8bd735f7a1005ed185d684eb58c59a5b4a3dc65bc3a8726336"
+    }
+  },
   "documents": {
     "defold-binding-lowering-plan.json": {
-      "bytes": 17792680,
-      "sha256": "8ed55120dbc09243779c755af0e9c240336cd58212852996fd08a81dc9cd7934"
+      "bytes": 17792204,
+      "sha256": "78d7f2a14193f2003612252bb02ff45f5ac7535f307daa01019a8b06aaae0af0"
     }
   }
 }

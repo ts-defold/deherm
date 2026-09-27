@@ -423,8 +423,12 @@ async function validateReports(root) {
     "dmSDK projection IR does not retain its fail-closed policy partition",
   );
   assert(
-    scalar.coverage.reviewed === 31 && scalar.coverage.generated === 26 && scalar.coverage.blocked === 5,
-    "scalar report does not have the pinned 26/31 disposition",
+    scalar.coverage.reviewed === scalar.declarations.length &&
+      scalar.coverage.generated + scalar.coverage.blocked === scalar.coverage.reviewed &&
+      scalar.declarations.filter(({ emitted }) => emitted).length === scalar.coverage.generated &&
+      scalar.declarations.filter(({ emitted }) => !emitted).length === scalar.coverage.blocked &&
+      scalar.declarations.every(({ patternDecision }) => patternDecision === "value.direct-primitive-scalar"),
+    "scalar report does not have a complete structural disposition",
   );
   // The exact SDK support headers preserve nested enums and platform-native
   // handle aliases that a missing-include Clang recovery had collapsed to int.

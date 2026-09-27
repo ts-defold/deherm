@@ -5,7 +5,7 @@ import {
   dmSdkGenerationSteps,
   dmSdkGeneratorSources,
   dmSdkPinnedInputs,
-  generatedDmSdkArtifacts
+  generatedDmSdkArtifacts,
 } from "../scripts/lib/dmsdk-generator-pipeline.mjs";
 import { assertDeclaredYamlDependency } from "../scripts/check-dmsdk-clean-room-regeneration.mjs";
 import { runDmSdkGeneration } from "../scripts/generate-dmsdk-runtime.mjs";
@@ -37,8 +37,8 @@ test("dmSDK generator pipeline has one deterministic ownership registry", () => 
   assert.deepEqual(stepScripts, [
     "scripts/generate-dmsdk-target-conditionals.mjs",
     "scripts/classify-dmsdk-bindings.mjs",
-    "scripts/generate-dmsdk-scalar-thunks.mjs",
     "scripts/generate-dmsdk-abi-shapes.mjs",
+    "scripts/generate-dmsdk-scalar-thunks.mjs",
     "scripts/generate-dmsdk-named-scalar-bindings.mjs",
     "scripts/generate-dmsdk-enum-value-bindings.mjs",
     "scripts/generate-dmsdk-fixed-digest-bindings.mjs",
@@ -69,21 +69,32 @@ test("the dmSDK clean room accepts only the exact lockfile-declared YAML parser"
   const valid = {
     rootPackage: { dependencies: { yaml: "2.8.3" } },
     lockfile: "lockfileVersion: '9.0'\n\npackages:\n\nsnapshots:\n\n  yaml@2.8.3:\n",
-    installedPackage: { name: "yaml", version: "2.8.3" }
+    installedPackage: { name: "yaml", version: "2.8.3" },
   };
   assert.equal(assertDeclaredYamlDependency(valid), "2.8.3");
-  assert.throws(() => assertDeclaredYamlDependency({
-    ...valid,
-    installedPackage: { name: "yaml", version: "2.8.2" }
-  }), /does not match package\.json/u);
-  assert.throws(() => assertDeclaredYamlDependency({
-    ...valid,
-    lockfile: "lockfileVersion: '9.0'\n"
-  }), /does not pin yaml@2\.8\.3/u);
+  assert.throws(
+    () =>
+      assertDeclaredYamlDependency({
+        ...valid,
+        installedPackage: { name: "yaml", version: "2.8.2" },
+      }),
+    /does not match package\.json/u,
+  );
+  assert.throws(
+    () =>
+      assertDeclaredYamlDependency({
+        ...valid,
+        lockfile: "lockfileVersion: '9.0'\n",
+      }),
+    /does not pin yaml@2\.8\.3/u,
+  );
 });
 
 test("dmSDK runtime orchestrator consumes the registry in check mode", async () => {
   const results = await runDmSdkGeneration({ check: true });
-  assert.deepEqual(results.map(({ script }) => script), dmSdkGenerationSteps.map(({ script }) => script));
+  assert.deepEqual(
+    results.map(({ script }) => script),
+    dmSdkGenerationSteps.map(({ script }) => script),
+  );
   assert.ok(results.every(({ stdout }) => stdout.startsWith("Verified")));
 });

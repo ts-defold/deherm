@@ -3893,3 +3893,31 @@ ten candidates are found without consulting ABI-tranche labels. Clean-room
 validation now checks relational completeness instead of pinning 7/10. Every
 row retains its universal and Static Hermes recipe underneath this optimized
 lane.
+
+## 2026-09-27 - Revision-derived scalar thunks
+
+The original scalar generator no longer consumes the legacy `scalar-direct`
+classification, asserts a 31-route frontier, maps six Defold header modules, or
+lists five lifecycle symbols and their implementation-source anchors. It now
+selects direct native primitive functions from the ABI-shape IR with the shared
+compiler pattern selector. Zero-argument initialize/finalize operations are
+capability-gated from their signature and source semantics; blocking and pure
+browser-safe effects are derived from public documentation and ABI shape.
+
+All revision-derived includes are emitted into one stable scalar binding source,
+so a new public header does not require adding a package-side module or build
+file entry. The current revision retains the same 26 emitted and five
+lifecycle-gated declarations, the same 16 browser-safe routes, native Hermes
+BigInt transport for `uint64_t`, and the universal Static Hermes recipe beneath
+every declaration. Focused generation, C/C++ compile, source-link, exact
+behavior, retention, and warmed 100,000-call zero-allocation tests pass.
+Clean-room validation now checks relational completeness instead of pinning the
+current 26/31 partition.
+
+The same unmodified compiler then derived and compiled four immutable Defold
+lanes. Current and 1.13.1 each selected 31 routes (26 emitted, five lifecycle
+gated); 1.12.0 selected eight (six emitted, two gated); 1.11.0 selected seven
+(five emitted, two gated). Each row chose the same structural pattern and every
+lane completed policy materialization and compile verification. The differing
+counts are direct evidence that package code is not replaying the current
+revision's route inventory.

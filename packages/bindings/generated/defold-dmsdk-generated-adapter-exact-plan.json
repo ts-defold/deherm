@@ -3,8 +3,8 @@
   "source": "deherm-dmsdk-generated-adapter-exact-corpus",
   "ordering": "numeric-id-ascending",
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
-  "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793",
-  "symbolIndexSha256": "fd34a5032bfa7404895a26d81a79dc5681250c95eb62fde989e880ef4e4a3648",
+  "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0",
+  "symbolIndexSha256": "8fd5b0d8201065b4430944ca0647d0a151a52042ff438950efca4bb5effa9bbf",
   "recipeCount": 1361,
   "generatedAdapterCount": 74,
   "universalReadyCount": 557,
@@ -26,7 +26,7 @@
     "schemaVersion": 1,
     "source": "deherm-dmsdk-generated-adapter-call-plan",
     "evidenceBoundary": "Each exact vector is derived from the same authenticated recipe and concrete family-dispatch plan as the production relocation. It fixes the production C ABI symbol, family-local adapter id, ordered native ABI, result contract, and emitted JSI module where one exists. Family runtime tests execute the C ABI vectors; JSI is applicable only to families that emit a production JSI module. Provider-boundary families remain excluded until their policy providers exist.",
-    "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793",
+    "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0",
     "retain": "deherm_dmsdk_generated_adapter_corpus_retain_generated_adapters",
     "callCount": 74,
     "calls": [
@@ -48,7 +48,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99",
@@ -70,7 +70,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmBuffer::GetValueTypeString@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:383:101",
@@ -90,7 +90,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Decode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:133:162",
@@ -110,7 +110,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Base64Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:120:161",
@@ -130,7 +130,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Decrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:76:156",
@@ -150,7 +150,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::Encrypt@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:65:155",
@@ -170,7 +170,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashMd5@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:108:160",
@@ -190,7 +190,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha1@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:84:157",
@@ -210,7 +210,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha256@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:92:158",
@@ -230,7 +230,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmCrypt::HashSha512@upstream/defold/engine/dlib/src/dmsdk/dlib/crypt.h:100:159",
@@ -250,7 +250,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
@@ -272,7 +272,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
@@ -294,7 +294,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
@@ -316,7 +316,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
@@ -338,7 +338,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
@@ -360,7 +360,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
@@ -382,7 +382,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
@@ -404,7 +404,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
@@ -426,7 +426,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
@@ -448,7 +448,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetInstalledAdapterFamily@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1159:1398",
@@ -470,7 +470,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureFormatLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1388:1420",
@@ -490,7 +490,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmGraphics::GetTextureTypeLiteral@upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h:1380:1419",
@@ -510,7 +510,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:69:212",
@@ -530,7 +530,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:79:213",
@@ -550,7 +550,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashClone32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:214:233",
@@ -570,7 +570,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashClone64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:256:238",
@@ -590,7 +590,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashFinal32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:231:235",
@@ -610,7 +610,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashFinal64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:273:240",
@@ -630,7 +630,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashInit32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:204:232",
@@ -650,7 +650,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashInit64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:247:237",
@@ -670,7 +670,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashRelease32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:239:236",
@@ -690,7 +690,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashRelease64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:281:241",
@@ -710,7 +710,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashString32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:88:214",
@@ -730,7 +730,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashString64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:97:215",
@@ -750,7 +750,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashUpdateBuffer32@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:223:234",
@@ -770,7 +770,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmHashUpdateBuffer64@upstream/defold/engine/dlib/src/dmsdk/dlib/hash.h:265:239",
@@ -790,7 +790,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcBlockSize@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:133:349",
@@ -810,7 +810,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmImage::GetAstcDimensions@upstream/defold/engine/dlib/src/dmsdk/dlib/image.h:145:350",
@@ -830,7 +830,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmLog::Setlevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:339:397",
@@ -852,7 +852,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmLogGetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:310:391",
@@ -874,7 +874,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmLogSetLevel@upstream/defold/engine/dlib/src/dmsdk/dlib/log.h:300:390",
@@ -896,7 +896,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmResource::GetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:151:1970",
@@ -916,7 +916,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmResource::GetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.hpp:141:1969",
@@ -936,7 +936,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmSocket::ResultToString@upstream/defold/engine/dlib/src/dmsdk/dlib/socket.h:388:568",
@@ -956,7 +956,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmSound::SetGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:92:2138",
@@ -978,7 +978,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmSound::ToggleGroupMute@upstream/defold/engine/sound/src/dmsdk/sound/sound.h:101:2139",
@@ -1000,7 +1000,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmStrCaseCmp@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:155:183",
@@ -1020,7 +1020,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmStrError@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:174:184",
@@ -1040,7 +1040,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmStrTrim@upstream/defold/engine/dlib/src/dmsdk/dlib/dstrings.h:137:182",
@@ -1060,7 +1060,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmSys::Exists@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:117:595",
@@ -1080,7 +1080,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmSys::Rename@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:135:597",
@@ -1100,7 +1100,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmSys::Unlink@upstream/defold/engine/dlib/src/dmsdk/dlib/sys.h:125:596",
@@ -1120,7 +1120,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
@@ -1142,7 +1142,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
@@ -1164,7 +1164,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
@@ -1186,7 +1186,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
@@ -1208,7 +1208,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
@@ -1230,7 +1230,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmURI::Encode@upstream/defold/engine/dlib/src/dmsdk/dlib/uri.h:96:655",
@@ -1250,7 +1250,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
@@ -1272,7 +1272,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
@@ -1294,7 +1294,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:dmUtf8::StrLen@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:41:657",
@@ -1314,7 +1314,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
@@ -1336,7 +1336,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
@@ -1358,7 +1358,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
@@ -1380,7 +1380,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
@@ -1402,7 +1402,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
@@ -1424,7 +1424,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
@@ -1446,7 +1446,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
@@ -1468,7 +1468,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
@@ -1490,7 +1490,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
@@ -1512,7 +1512,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
@@ -1534,7 +1534,7 @@
             "method": "call"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907",
@@ -1554,7 +1554,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       },
       {
         "declarationId": "dmsdk:ResourceGetExtFromPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:314:1906",
@@ -1574,7 +1574,7 @@
             "applicability": "not-emitted"
           }
         },
-        "catalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793"
+        "catalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0"
       }
     ],
     "vectorCount": 74,
@@ -2985,7 +2985,7 @@
         "numericId": 226,
         "recipeId": "dmsdk-projection:d2e432b1eecb7c0209272971",
         "family": "scalar",
-        "adapterId": 10,
+        "adapterId": 0,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3051,7 +3051,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d6c35e358ef0359f537d5303759110baa5572664ea763d653a6ea9db13c9dc6d"
+        "vectorSha256": "0b85ce0618b06c4cc704ade0120c2b8d6b3dcb6f4b245df3cdb0792a29637a1d"
       },
       {
         "schemaVersion": 1,
@@ -3059,7 +3059,7 @@
         "numericId": 227,
         "recipeId": "dmsdk-projection:bbfcd886978439c8ec27ed25",
         "family": "scalar",
-        "adapterId": 11,
+        "adapterId": 1,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3125,7 +3125,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "72c3ceb36cd3dc91b3b427b9d85a3044c6df8d39f41da70cf0a130fbedaae7f7"
+        "vectorSha256": "5ed2cf7476ea8acbfe50186f9b81fb1a3e60d24e3b41ac0002e0207f018149c7"
       },
       {
         "schemaVersion": 1,
@@ -3133,7 +3133,7 @@
         "numericId": 228,
         "recipeId": "dmsdk-projection:eb6645dd5732d3537e2fbfce",
         "family": "scalar",
-        "adapterId": 12,
+        "adapterId": 2,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3199,7 +3199,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "3e960a25cd91accaa15952108ecdaabf47fc942435d906593f3173f05a10ea69"
+        "vectorSha256": "df664d0de5e27767686f6db980d0b776a92b818b7f84a9dc14b208c1197b2552"
       },
       {
         "schemaVersion": 1,
@@ -3207,7 +3207,7 @@
         "numericId": 229,
         "recipeId": "dmsdk-projection:6d4b37e0ac7003955fc64a5f",
         "family": "scalar",
-        "adapterId": 13,
+        "adapterId": 3,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3273,7 +3273,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "0a87b0ed48d8af9ecf5f2b20c9d88ff405190213d4ecf718c3c82d332e17c655"
+        "vectorSha256": "f90ef312eacdb34167163563abebe35a5157c1ba437e250cd210a17ab06b9250"
       },
       {
         "schemaVersion": 1,
@@ -3281,7 +3281,7 @@
         "numericId": 230,
         "recipeId": "dmsdk-projection:226674ace354cfdf99a35321",
         "family": "scalar",
-        "adapterId": 14,
+        "adapterId": 4,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3347,7 +3347,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "4d65ef6f11bc06421835042ad38a6b3f7e638832dc569aca68e1764f906054f5"
+        "vectorSha256": "890d05313cd86f55b04f222602dab36a25193fed38b089db80a882824e28e708"
       },
       {
         "schemaVersion": 1,
@@ -3355,7 +3355,7 @@
         "numericId": 231,
         "recipeId": "dmsdk-projection:7a5463f0e21e4ccd4a60eba8",
         "family": "scalar",
-        "adapterId": 15,
+        "adapterId": 5,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3421,7 +3421,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "ca7af2a4d02f67528f9369eb68ea9172ce3e9e54e250e3718e8ba8afbe98e1e7"
+        "vectorSha256": "4a209b0f094a13f458ac59be0ce631a653cc20d24e079ed3acc6de3770341a6d"
       },
       {
         "schemaVersion": 1,
@@ -3429,7 +3429,7 @@
         "numericId": 232,
         "recipeId": "dmsdk-projection:9e7bfa8337d85f49bc2b14f4",
         "family": "scalar",
-        "adapterId": 16,
+        "adapterId": 6,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3495,7 +3495,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "297c7b129e23d37426853ed6b0f8654512bb6581b9263314e18f71359c7bd6ae"
+        "vectorSha256": "e3624750339a500bd576d32f8d580739fae4f50de940022c7776b4bd25c03b9e"
       },
       {
         "schemaVersion": 1,
@@ -3503,7 +3503,7 @@
         "numericId": 233,
         "recipeId": "dmsdk-projection:4679d2d837dcbf7b581beea0",
         "family": "scalar",
-        "adapterId": 17,
+        "adapterId": 7,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3569,7 +3569,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "920de2486355d3731cd1c0bf170902928c39203c8b0de8b38e52d71feed66671"
+        "vectorSha256": "8bd3321041402a3d4ba0e824190f29309e14f3810965a8f5b2848d053fdc275e"
       },
       {
         "schemaVersion": 1,
@@ -3577,7 +3577,7 @@
         "numericId": 234,
         "recipeId": "dmsdk-projection:d84254b3b1dba1ef70be3118",
         "family": "scalar",
-        "adapterId": 18,
+        "adapterId": 8,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -3643,7 +3643,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "24baabd990c237f891e0f8eef12711d17233285efb71a80833850bd7647ec48a"
+        "vectorSha256": "2bc3ac6f810dbd7fc674c39573c0ded9f5dd24de4f1ddff0eaab605c188b6662"
       },
       {
         "schemaVersion": 1,
@@ -7619,7 +7619,7 @@
         "numericId": 1045,
         "recipeId": "dmsdk-projection:2adb7bb11467bcbedeeb5f29",
         "family": "scalar",
-        "adapterId": 19,
+        "adapterId": 9,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -7672,7 +7672,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "4577778578dc57728a7e255a726c26f0c01c46c2e2e22bea75b56bb8c3211e0c"
+        "vectorSha256": "0999582790485ff4ad9f47b0bf7acc02dd56a6487482358b2dfc5ecb8eafcf7b"
       },
       {
         "schemaVersion": 1,
@@ -7680,7 +7680,7 @@
         "numericId": 1046,
         "recipeId": "dmsdk-projection:01e0eade7ef2428a3a313f4d",
         "family": "scalar",
-        "adapterId": 20,
+        "adapterId": 10,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -7733,7 +7733,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d90e8d9013e49431f9199b5560dfab0015c20f7dc8c0b6c3ce98b6707a593050"
+        "vectorSha256": "21d1c641f3ac78549bca3a0a3a7fe351e6be9a3358f10b7f554455e60b7be649"
       },
       {
         "schemaVersion": 1,
@@ -7741,7 +7741,7 @@
         "numericId": 1047,
         "recipeId": "dmsdk-projection:e4372f4bb1caab018240522e",
         "family": "scalar",
-        "adapterId": 21,
+        "adapterId": 11,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -7806,7 +7806,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "f6a5491e7c61e1c7f83dc3c6d400d0c10b897270c906b852ec73cdbb4d925858"
+        "vectorSha256": "66053a20acd7f0d1c47e97bb61e471dcf79f99375028189a4082e156733a4637"
       },
       {
         "schemaVersion": 1,
@@ -7814,7 +7814,7 @@
         "numericId": 1074,
         "recipeId": "dmsdk-projection:76dd808455339ae5929ec71c",
         "family": "scalar",
-        "adapterId": 22,
+        "adapterId": 12,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -7880,7 +7880,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d93d75be647cf6f8bacf12007fc4bbc58a186bacca657e9931420553b9fff549"
+        "vectorSha256": "d3bceb01a48b4fd6ae983aae5ace02aaccf6589a83046a5bbd548998d76d1f37"
       },
       {
         "schemaVersion": 1,
@@ -7888,7 +7888,7 @@
         "numericId": 1075,
         "recipeId": "dmsdk-projection:e53e72770d0cf281d3891b22",
         "family": "scalar",
-        "adapterId": 23,
+        "adapterId": 13,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -7954,7 +7954,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "c0b237aab423a361a2ea3fe94d49906b2df831539483dbaa1a1e9c224ec655ab"
+        "vectorSha256": "69e3fa7e5181e1b6e2a242f77cdb039e5f33bcb567eaef31f5ba85b1d16d06e8"
       },
       {
         "schemaVersion": 1,
@@ -8102,7 +8102,7 @@
         "numericId": 1079,
         "recipeId": "dmsdk-projection:eff774419f2b8c82bb32b666",
         "family": "scalar",
-        "adapterId": 24,
+        "adapterId": 14,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8168,7 +8168,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "4b605e2bbdabf7cb1fce55b5385157b96268959aee0929396351beec1a9823a7"
+        "vectorSha256": "edd250e62436e0bf7537d4887f7f36b0bc122fe5bf08f6ef3082c4537c4358a3"
       },
       {
         "schemaVersion": 1,
@@ -8176,7 +8176,7 @@
         "numericId": 1080,
         "recipeId": "dmsdk-projection:fb210499ce39f74d521bb8df",
         "family": "scalar",
-        "adapterId": 25,
+        "adapterId": 15,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8242,7 +8242,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d1b04a0c74d879b454387d6737235a3cf1dbd82b65360f328e1080e5ae4b1218"
+        "vectorSha256": "571ef9756272d5e3a9745b12166cc836e2cc841c6fd8135b31fdd0ffdd4c54bf"
       },
       {
         "schemaVersion": 1,
@@ -8326,7 +8326,7 @@
         "numericId": 1128,
         "recipeId": "dmsdk-projection:bcc8cf6e3d2f97bbe6307f3d",
         "family": "scalar",
-        "adapterId": 0,
+        "adapterId": 16,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8392,7 +8392,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "e679c13a84609f7f249fd083520dc099930bf2362172efb620bbd9cd25ae1316"
+        "vectorSha256": "9dc067bfe20c5db71e56b2919a03a8a4a18ea715b01f9e1544c6788bc11aa556"
       },
       {
         "schemaVersion": 1,
@@ -8400,7 +8400,7 @@
         "numericId": 1129,
         "recipeId": "dmsdk-projection:3f6c2f71ffec3af6fd5ab9f2",
         "family": "scalar",
-        "adapterId": 1,
+        "adapterId": 17,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8466,7 +8466,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "62c88daa1abfd3466661cb2acb34bb616e04c5f6b0971cdfae250a5c920f958f"
+        "vectorSha256": "62a75ff2fd79a65e5eab5783010452d8a916c416ca59f86eac8cc123d694f42a"
       },
       {
         "schemaVersion": 1,
@@ -8474,7 +8474,7 @@
         "numericId": 1130,
         "recipeId": "dmsdk-projection:5d71b09d68fad2ee71f6c6a2",
         "family": "scalar",
-        "adapterId": 2,
+        "adapterId": 18,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8540,7 +8540,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "2ccef4249ca7636300b2ce3b6f648a2d3930e92d41917e3f6a13a008fd136374"
+        "vectorSha256": "ce19ac0645b792834dd27a7ac425e112059db0f85a2e52205510302165fcc780"
       },
       {
         "schemaVersion": 1,
@@ -8548,7 +8548,7 @@
         "numericId": 1131,
         "recipeId": "dmsdk-projection:7923c8ecc51b7eea2c2cfb36",
         "family": "scalar",
-        "adapterId": 3,
+        "adapterId": 19,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8614,7 +8614,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d6daa3e93b89e3cb054a6a1309bf8776f0124216b522645ab31c0417f2fa398d"
+        "vectorSha256": "1a487139cdd7b1f9d4912f104d07168fce1bb996c42be948cee914e782dd29db"
       },
       {
         "schemaVersion": 1,
@@ -8622,7 +8622,7 @@
         "numericId": 1132,
         "recipeId": "dmsdk-projection:be0e69044d6fda7558bd221b",
         "family": "scalar",
-        "adapterId": 4,
+        "adapterId": 20,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8688,7 +8688,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "7eea825b1b95eba1afe7de86d8a1ed5ed9cbd3395403041b60ae76d2166e3680"
+        "vectorSha256": "79db210e274db7d2d1f17aecd76b427a0f649eb6afc159a3a0f4d8c47ce4c177"
       },
       {
         "schemaVersion": 1,
@@ -8696,7 +8696,7 @@
         "numericId": 1133,
         "recipeId": "dmsdk-projection:22a0613566edd0723fa75e23",
         "family": "scalar",
-        "adapterId": 5,
+        "adapterId": 21,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8762,7 +8762,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "e89857f86a1399b277980858703537b8f5ebf25537aa08a65d035a51efb7ed53"
+        "vectorSha256": "c1863a0993b9a55e8cc8ccb819a116651204b768b5d14b65aca298b934437fad"
       },
       {
         "schemaVersion": 1,
@@ -8770,7 +8770,7 @@
         "numericId": 1134,
         "recipeId": "dmsdk-projection:398604899fe3e1a33aa2d673",
         "family": "scalar",
-        "adapterId": 6,
+        "adapterId": 22,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8836,7 +8836,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d592a8f3147daf05e6c5d0b6eb580838ac254669617a64d92569548c2e1eead5"
+        "vectorSha256": "7273bf9d726e40f5b9a6345d999a4006c58cb8dea0fe7a60ee856d61bd830e01"
       },
       {
         "schemaVersion": 1,
@@ -8844,7 +8844,7 @@
         "numericId": 1135,
         "recipeId": "dmsdk-projection:aa2dd946759dc4806ffcda8c",
         "family": "scalar",
-        "adapterId": 7,
+        "adapterId": 23,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8910,7 +8910,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "d6d5bc327db52e4b6012e7ede4f1db42080988d75d41b3a78b711779d30fcdac"
+        "vectorSha256": "5eec48a34f230f37cbf0cd0a9a8240dd38c7076e5a76543873b343a0048989e3"
       },
       {
         "schemaVersion": 1,
@@ -8918,7 +8918,7 @@
         "numericId": 1136,
         "recipeId": "dmsdk-projection:36db7f5f699c8559cd0107ed",
         "family": "scalar",
-        "adapterId": 8,
+        "adapterId": 24,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -8984,7 +8984,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "93e113df1c39f071200ec932d309825c0d24664fbd209129614eb2c6f5b4026c"
+        "vectorSha256": "e8195f54ad61b590f32149db1d4b86fef31e678d620b0527bfbe35a007189ae7"
       },
       {
         "schemaVersion": 1,
@@ -8992,7 +8992,7 @@
         "numericId": 1244,
         "recipeId": "dmsdk-projection:2d7da7ca38ec2fef5d641926",
         "family": "scalar",
-        "adapterId": 9,
+        "adapterId": 25,
         "adapterKind": "family-dispatch",
         "productionSymbol": "deherm_dmsdk_scalar_dispatch",
         "productionHeader": "defold_hermes/generated_dmsdk_scalar_runtime.h",
@@ -9045,7 +9045,7 @@
           "result": "family-adapter-result-contract",
           "failClosed": true
         },
-        "vectorSha256": "fe85da34418667c99b4e2419c249f30c4f15e78479c95223dda56757bad89153"
+        "vectorSha256": "65e2f36742e52bee3036627f2524ddd1ca9ec927b436308437471c9563bac7c0"
       },
       {
         "schemaVersion": 1,
@@ -9230,22 +9230,22 @@
         "vectorSha256": "b4e8f9abe735d11654401dd2c23c1e9e4167592f333993ae2c4ebb2d6eebf9ef"
       }
     ],
-    "manifestSha256": "3636e7ea5cba19378004c74b146fcb1277616409dcaee0d8b26eebe9e827d28c"
+    "manifestSha256": "8afb8c1589279b65dc8c8971eec0d29eb14acae2f73c9648cc1377d785c47101"
   },
   "artifacts": {
     "verificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
-      "sha256": "10446addb27bbc2f0dc2f098dcca019a5869817ea6e44fe3a017b6a6959d2d2c"
+      "sha256": "875a28d9658501163161be0f0869a3ef2a1f00bceb9b1597a26d7998632cca0f"
     },
     "jsiVerificationSource": {
       "path": "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp",
-      "sha256": "a549d591d462342779cd2b319fbe57a2f88a17b1b59d441c541b1d11d7b8ef22"
+      "sha256": "87595c3faa252f39759aef1032ddb1126c22d5926fa7fb679c30d6069fabd8b2"
     }
   },
-  "productionCatalogSha256": "e347b4de81a5c77fd2837d17dd8f90fd2f071a7ea9780f5625f6771ecf46d916",
-  "exactCatalogSha256": "17d3e9097468dc8de7902c3377ce6f48dda053e3ed0fcada305e2015e76fd793",
+  "productionCatalogSha256": "d597cf86477719a5115004b5aee863916bbd779494d41e11692058a45526a4cc",
+  "exactCatalogSha256": "8d633357956838b441ca6a4da3731b01a19bdd1fadea1c40de4cf1282190e7c0",
   "sourceHashes": {
-    "productionCatalog": "26dc42cb21425ccece7962b018e7a97640c223b35f83b7eb54d7ea28a1d84f82",
+    "productionCatalog": "8c35d7596ecd6b451fc80d908748f379ff574818444f8fa71b507368b85a6487",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "familyReports": {
       "arenaCString": {
@@ -9254,11 +9254,11 @@
       },
       "scalar": {
         "path": "packages/bindings/generated/defold-dmsdk-scalar-thunks.json",
-        "sha256": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43"
+        "sha256": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0"
       },
       "enumValue": {
         "path": "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
-        "sha256": "2c310c3b2280fc3bc3c047a0194d1b2291aa59f7457afbbf831eed901cc9b56e"
+        "sha256": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6"
       },
       "fixedDigest": {
         "path": "packages/bindings/generated/defold-dmsdk-fixed-digest-bindings.json",
@@ -9282,7 +9282,7 @@
       },
       "cstringValue": {
         "path": "packages/bindings/generated/defold-dmsdk-cstring-value-bindings.json",
-        "sha256": "16ed603560e39279f22cfb8655fdce73de85b2f56b9601e737adb03a4a1365bc"
+        "sha256": "c5140176ab786f32cd4131c4b4a596b301b45177ab729e4e2d895cfc6cf1f498"
       },
       "hashState": {
         "path": "packages/bindings/generated/defold-dmsdk-hash-state-bindings.json",
@@ -9290,5 +9290,5 @@
       }
     }
   },
-  "corpusSha256": "3f02c774d43b53089dcafb9dee3235a22f5e9a6edc1f2487585b2fd2e0ebac8f"
+  "corpusSha256": "9a9b74b7e6d25f6289553ad4a4b13edd451a6d9a83939aaa265bd0be4e1518d8"
 }

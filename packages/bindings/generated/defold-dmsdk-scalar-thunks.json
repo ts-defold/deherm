@@ -2,16 +2,68 @@
   "schemaVersion": 2,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceIr": "packages/bindings/generated/defold-sdk-ir.json",
-  "sourceClassification": "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
-  "scope": "The 31 declarations classified as primary scalar-direct. Stage counts describe this generated family only, not overall dmSDK coverage.",
+  "sourceShapes": "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  "sourceRecipe": "packages/bindings/overrides/dmsdk-scalar-thunks.json",
+  "scope": "The 31 declarations selected structurally as direct native primitive functions. Stage counts describe this generated family only, not overall dmSDK coverage.",
   "abiPolicy": {
+    "transport": "fixed-width-cell-codec",
+    "candidateSource": "revision-ir-direct-primitive-abi",
+    "effectSource": "revision-ir-public-documentation",
+    "sourceGrouping": "single-revision-derived-translation-unit",
+    "fallback": "universal-recipe",
     "linkage": "extern C",
     "integerWidths": "stdint fixed-width types",
     "boolean": "uint8_t, canonical 0 or 1",
     "allocation": "thunks are direct calls and contain no allocation or ownership transfer",
     "dispatch": "dense uint16_t IDs, stack-only fixed-width slots, no name lookup on the hot path",
     "javascript64Bit": "native Hermes uses the pinned JSI BigInt uint64_t API; browser uint64_t adapters remain disabled until the Defold Emscripten Wasm BigInt ABI is validated",
-    "exceptions": "no exception translation; reviewed declarations are non-throwing Defold C/C++ APIs by contract, but the C++ type system does not encode noexcept"
+    "exceptions": "no exception translation; reviewed declarations are non-throwing Defold C/C++ APIs by contract, but the C++ type system does not encode noexcept",
+    "patternRegistry": [
+      {
+        "id": "value.direct-primitive-scalar",
+        "family": "scalar-thunk",
+        "emitter": "scripts/generate-dmsdk-scalar-thunks.mjs",
+        "priority": 820,
+        "cost": 4,
+        "fallback": false,
+        "when": {
+          "declarationKinds": [
+            "function"
+          ],
+          "result": {
+            "rolePrefixes": [
+              "scalar:"
+            ]
+          },
+          "parameters": {
+            "every": [
+              {
+                "rolePrefixes": [
+                  "scalar:"
+                ],
+                "directions": [
+                  "value"
+                ]
+              }
+            ]
+          },
+          "requireSemanticTokens": [
+            "direct-native-primitive",
+            "fixed-width-cell-codec",
+            "synchronous-noescape"
+          ]
+        }
+      },
+      {
+        "id": "universal.default",
+        "family": "universal-recipe",
+        "emitter": "@deherm/compiler/dmsdk-universal-materializer",
+        "priority": 0,
+        "cost": 1000,
+        "fallback": true,
+        "when": null
+      }
+    ]
   },
   "coverage": {
     "reviewed": 31,
@@ -36,820 +88,34 @@
   },
   "sourceHashes": {
     "ir": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
-    "classification": "d6ad0e5c99963eca0deacb5f6827d52e26eb1dd630947797d9b343081ed9c52f"
+    "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
+    "recipe": "85ee43cc45019d2bb5bdbf838f583012862504fd7e84be34b6646ce7933cf79c"
   },
   "artifactHashes": {
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp": "ede715873076d67eb68d0a6fe98bc162113b441700c0a304c731ab55f00ef19e",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h": "ca019f01d58f2bff58ba6f67ad08427eb45223f5e1be4c315b8dc0a9a62511ed",
-    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h": "958882e0c1959784b024a721aafb1c2a6dc2c1daa90a070254150ab072f747a8",
-    "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js": "92e7ee5530ec8501df6876d493f489ed33d940ea831cd68e0e9b24c811df6109",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp": "da4f3e3a68f207e5dc4ed9f1777bf6aa04f12897dd27605ba0a3502be0a022a4",
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h": "51a8c7cde434ee722ecbb53e920ddfaddbeff24cb204b9d6763e5afb312a8152",
+    "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js": "5192f93cddfa054e38b50f3886c9fd513cfc35c7a726f90d9070c49f29252ae4",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp": "5fdb534de2c45fb3779e99661c3cad182ef180c6dfe68ea965ecc3a12b8d60d9",
     "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp": "23df6416e5c8f1d05bd9173f4addca0700d4a737127f821d7b0e14f8fff07661",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp": "976544ddd524ccd4ed0855dc2956d755f80211effa0fc5b6b2274524aa88d573",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp": "d42e024fea3c92fab45a97bfdea5f69c1ec699ab62ef22f87c4f708c02d29f5b",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp": "b1904060ad09fa821d68e4c50718bd38e19e357f143163ffc5ed20a43c6f37af",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp": "fcc6475a9ef57f3e926fc61e96c7de9da76b064cdf558b085b5fb8fcea877ded",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp": "cbf591f30ec27d99a0599e447d71dca1ddce2dce9cc39935dc2a22fcaa9a1885",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp": "b20513006455899531e6e447cc70669883d2296cd8edc46faa0a3dc469f67143",
-    "packages/sdk/src/generated/dmsdk/scalar.ts": "8c12e875b9d6cc1998a937e68b5eeea40f83bb54e0c0fcf76f494b2ae1ef5267"
+    "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp": "3fe7ea181bed721f0c7d57b1bc42dab8223a0dddbd99d2b30bf85cf8fa869630",
+    "packages/sdk/src/generated/dmsdk/scalar.ts": "fec98a776ca38cab5f011e7898751c3666fb780a9505ce59f42c4f86940f7621"
   },
   "artifacts": [
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp",
     "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h",
     "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+    "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
     "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
     "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
-    "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
     "packages/sdk/src/generated/dmsdk/scalar.ts"
   ],
   "declarations": [
     {
-      "id": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
-      "symbol": "EndianSwap16",
-      "nativeSignature": "uint16_t (uint16_t)",
-      "wrapper": "deherm_dmsdk_endian_swap16_u16",
-      "bindingId": 0,
-      "cAbiSignature": "uint16_t deherm_dmsdk_endian_swap16_u16(uint16_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 65,
-        "declarationLine": 65,
-        "declarationText": "static inline uint16_t EndianSwap16(uint16_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 65,
-          "declarationLine": 65,
-          "declarationText": "static inline uint16_t EndianSwap16(uint16_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "not-applicable",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": true
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes and browser host."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
-      "symbol": "EndianSwap32",
-      "nativeSignature": "uint32_t (uint32_t)",
-      "wrapper": "deherm_dmsdk_endian_swap32_u32",
-      "bindingId": 1,
-      "cAbiSignature": "uint32_t deherm_dmsdk_endian_swap32_u32(uint32_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 81,
-        "declarationLine": 81,
-        "declarationText": "static inline uint32_t EndianSwap32(uint32_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 81,
-          "declarationLine": 81,
-          "declarationText": "static inline uint32_t EndianSwap32(uint32_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "not-applicable",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": true
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes and browser host."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
-      "symbol": "EndianSwap64",
-      "nativeSignature": "uint64_t (uint64_t)",
-      "wrapper": "deherm_dmsdk_endian_swap64_u64",
-      "bindingId": 2,
-      "cAbiSignature": "uint64_t deherm_dmsdk_endian_swap64_u64(uint64_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 100,
-        "declarationLine": 100,
-        "declarationText": "static inline uint64_t EndianSwap64(uint64_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 100,
-          "declarationLine": 100,
-          "declarationText": "static inline uint64_t EndianSwap64(uint64_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": false
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes only; browser host rejects this stable ID."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
-      "symbol": "EndianToHost16",
-      "nativeSignature": "uint16_t (uint16_t)",
-      "wrapper": "deherm_dmsdk_endian_to_host16_u16",
-      "bindingId": 3,
-      "cAbiSignature": "uint16_t deherm_dmsdk_endian_to_host16_u16(uint16_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 141,
-        "declarationLine": 141,
-        "declarationText": "static inline uint16_t EndianToHost16(uint16_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 141,
-          "declarationLine": 141,
-          "declarationText": "static inline uint16_t EndianToHost16(uint16_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "not-applicable",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": true
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes and browser host."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
-      "symbol": "EndianToHost32",
-      "nativeSignature": "uint32_t (uint32_t)",
-      "wrapper": "deherm_dmsdk_endian_to_host32_u32",
-      "bindingId": 4,
-      "cAbiSignature": "uint32_t deherm_dmsdk_endian_to_host32_u32(uint32_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 169,
-        "declarationLine": 169,
-        "declarationText": "static inline uint32_t EndianToHost32(uint32_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 169,
-          "declarationLine": 169,
-          "declarationText": "static inline uint32_t EndianToHost32(uint32_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "not-applicable",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": true
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes and browser host."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
-      "symbol": "EndianToHost64",
-      "nativeSignature": "uint64_t (uint64_t)",
-      "wrapper": "deherm_dmsdk_endian_to_host64_u64",
-      "bindingId": 5,
-      "cAbiSignature": "uint64_t deherm_dmsdk_endian_to_host64_u64(uint64_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 197,
-        "declarationLine": 197,
-        "declarationText": "static inline uint64_t EndianToHost64(uint64_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 197,
-          "declarationLine": 197,
-          "declarationText": "static inline uint64_t EndianToHost64(uint64_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": false
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes only; browser host rejects this stable ID."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
-      "symbol": "EndianToNetwork16",
-      "nativeSignature": "uint16_t (uint16_t)",
-      "wrapper": "deherm_dmsdk_endian_to_network16_u16",
-      "bindingId": 6,
-      "cAbiSignature": "uint16_t deherm_dmsdk_endian_to_network16_u16(uint16_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 125,
-        "declarationLine": 125,
-        "declarationText": "static inline uint16_t EndianToNetwork16(uint16_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 125,
-          "declarationLine": 125,
-          "declarationText": "static inline uint16_t EndianToNetwork16(uint16_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "not-applicable",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": true
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes and browser host."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
-      "symbol": "EndianToNetwork32",
-      "nativeSignature": "uint32_t (uint32_t)",
-      "wrapper": "deherm_dmsdk_endian_to_network32_u32",
-      "bindingId": 7,
-      "cAbiSignature": "uint32_t deherm_dmsdk_endian_to_network32_u32(uint32_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 153,
-        "declarationLine": 153,
-        "declarationText": "static inline uint32_t EndianToNetwork32(uint32_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 153,
-          "declarationLine": 153,
-          "declarationText": "static inline uint32_t EndianToNetwork32(uint32_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "not-applicable",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": true
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes and browser host."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
-      "symbol": "EndianToNetwork64",
-      "nativeSignature": "uint64_t (uint64_t)",
-      "wrapper": "deherm_dmsdk_endian_to_network64_u64",
-      "bindingId": 8,
-      "cAbiSignature": "uint64_t deherm_dmsdk_endian_to_network64_u64(uint64_t x);",
-      "module": "endian",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-        "irDocumentationLine": 181,
-        "declarationLine": 181,
-        "declarationText": "static inline uint64_t EndianToNetwork64(uint64_t x)",
-        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-          "irDocumentationLine": 181,
-          "declarationLine": 181,
-          "declarationText": "static inline uint64_t EndianToNetwork64(uint64_t x)",
-          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "not-applicable",
-        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": false
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes only; browser host rejects this stable ID."
-        }
-      }
-    },
-    {
-      "id": "dmsdk:ProfileFinalize@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:334:530",
-      "symbol": "ProfileFinalize",
-      "nativeSignature": "void ()",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "irDocumentationLine": 334,
-        "declarationLine": 334,
-        "declarationText": "void ProfileFinalize();",
-        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
-          "line": 257,
-          "text": "void ProfileFinalize()",
-          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp",
-          "line": 21,
-          "text": "void ProfileFinalize()",
-          "sha256": "646803d949ae5a25c56a5572308d98bf5724dbb10052fb689eb989e3c9fe346e"
-        }
-      ],
-      "emitted": false,
-      "blocker": {
-        "blocker": "Process-global profiler teardown is owned by the Defold engine lifecycle.",
-        "category": "engine-lifecycle",
-        "policy": "lifecycle-capability-required"
-      },
-      "stages": {
-        "generated": {
-          "status": "blocked-by-policy",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-          "note": "Process-global profiler teardown is owned by the Defold engine lifecycle."
-        },
-        "compiled": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "linked": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "conformant": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "retained": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "typescriptCallable": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        }
-      }
-    },
-    {
-      "id": "dmsdk:ProfileInitialize@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:329:529",
-      "symbol": "ProfileInitialize",
-      "nativeSignature": "void ()",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "irDocumentationLine": 329,
-        "declarationLine": 329,
-        "declarationText": "void ProfileInitialize();",
-        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
-          "line": 241,
-          "text": "void ProfileInitialize()",
-          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp",
-          "line": 17,
-          "text": "void ProfileInitialize()",
-          "sha256": "646803d949ae5a25c56a5572308d98bf5724dbb10052fb689eb989e3c9fe346e"
-        }
-      ],
-      "emitted": false,
-      "blocker": {
-        "blocker": "Process-global profiler initialization is owned by the Defold engine lifecycle.",
-        "category": "engine-lifecycle",
-        "policy": "lifecycle-capability-required"
-      },
-      "stages": {
-        "generated": {
-          "status": "blocked-by-policy",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-          "note": "Process-global profiler initialization is owned by the Defold engine lifecycle."
-        },
-        "compiled": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "linked": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "conformant": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "retained": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        },
-        "typescriptCallable": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
-        }
-      }
-    },
-    {
-      "id": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
-      "symbol": "ProfileIsInitialized",
-      "nativeSignature": "bool ()",
-      "wrapper": "deherm_dmsdk_profile_is_initialized_v",
-      "bindingId": 9,
-      "cAbiSignature": "uint8_t deherm_dmsdk_profile_is_initialized_v(void);",
-      "module": "profile",
-      "headerEvidence": {
-        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-        "irDocumentationLine": 340,
-        "declarationLine": 340,
-        "declarationText": "bool ProfileIsInitialized();",
-        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
-      },
-      "definitionEvidence": [
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile.cpp",
-          "line": 236,
-          "text": "bool ProfileIsInitialized()",
-          "sha256": "60a91aa1e30bc4a3d8bb160f16c2d135493afaa749ef67cf4fba8815a74d921c"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp",
-          "line": 25,
-          "text": "bool ProfileIsInitialized()",
-          "sha256": "646803d949ae5a25c56a5572308d98bf5724dbb10052fb689eb989e3c9fe346e"
-        }
-      ],
-      "emitted": true,
-      "policy": {
-        "boolRepresentation": "uint8_t canonicalized to 0 or 1",
-        "uint64Representation": "not-applicable",
-        "lifecycleSensitive": false,
-        "mayBlock": false,
-        "nativeJsCallable": true,
-        "browserJsCallable": false
-      },
-      "stages": {
-        "generated": {
-          "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
-          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
-        },
-        "compiled": {
-          "status": "covered-by-reproducible-test",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
-        },
-        "linked": {
-          "status": "covered-by-host-source-link-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
-        },
-        "conformant": {
-          "status": "covered-by-host-behavior-test",
-          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
-          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
-        },
-        "retained": {
-          "status": "covered-by-host-and-arm64-extension-nm-tests",
-          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
-          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
-        },
-        "typescriptCallable": {
-          "status": "generated-native-js-adapter",
-          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
-          "note": "Available on native Hermes only; browser host rejects this stable ID."
-        }
-      }
-    },
-    {
       "id": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194",
       "symbol": "dmEndian::ByteSwap",
       "nativeSignature": "uint16_t (uint16_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u16",
-      "bindingId": 10,
-      "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_byte_swap_u16(uint16_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 36,
@@ -866,6 +132,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint16_t",
+          "uint16_t"
+        ],
+        "description": "swap bytes in a 16-bit value",
+        "returnDescription": "Byte-swapped value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u16",
+      "bindingId": 0,
+      "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_byte_swap_u16(uint16_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -878,7 +158,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -911,10 +191,6 @@
       "id": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195",
       "symbol": "dmEndian::ByteSwap",
       "nativeSignature": "uint32_t (uint32_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u32",
-      "bindingId": 11,
-      "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_byte_swap_u32(uint32_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 46,
@@ -931,6 +207,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint32_t",
+          "uint32_t"
+        ],
+        "description": "swap bytes in a 16-bit value",
+        "returnDescription": "Byte-swapped value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u32",
+      "bindingId": 1,
+      "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_byte_swap_u32(uint32_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -943,7 +233,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -976,10 +266,6 @@
       "id": "dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196",
       "symbol": "dmEndian::ByteSwap",
       "nativeSignature": "uint64_t (uint64_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u64",
-      "bindingId": 12,
-      "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_byte_swap_u64(uint64_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 56,
@@ -996,6 +282,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t",
+          "uint64_t"
+        ],
+        "description": "swap bytes in a 16-bit value",
+        "returnDescription": "Byte-swapped value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u64",
+      "bindingId": 2,
+      "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_byte_swap_u64(uint64_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1008,7 +308,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1041,10 +341,6 @@
       "id": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200",
       "symbol": "dmEndian::ToHost",
       "nativeSignature": "uint32_t (uint32_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_to_host_u32",
-      "bindingId": 13,
-      "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_to_host_u32(uint32_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 104,
@@ -1061,6 +357,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint32_t",
+          "uint32_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Host-order value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_to_host_u32",
+      "bindingId": 3,
+      "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_to_host_u32(uint32_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1073,7 +383,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1106,10 +416,6 @@
       "id": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202",
       "symbol": "dmEndian::ToHost",
       "nativeSignature": "uint64_t (uint64_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_to_host_u64",
-      "bindingId": 14,
-      "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_to_host_u64(uint64_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 128,
@@ -1126,6 +432,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t",
+          "uint64_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Host-order value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_to_host_u64",
+      "bindingId": 4,
+      "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_to_host_u64(uint64_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1138,7 +458,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1171,10 +491,6 @@
       "id": "dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198",
       "symbol": "dmEndian::ToHost",
       "nativeSignature": "uint16_t (uint16_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_to_host_u16",
-      "bindingId": 15,
-      "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_to_host_u16(uint16_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 80,
@@ -1191,6 +507,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint16_t",
+          "uint16_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Host-order value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_to_host_u16",
+      "bindingId": 5,
+      "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_to_host_u16(uint16_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1203,7 +533,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1236,10 +566,6 @@
       "id": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201",
       "symbol": "dmEndian::ToNetwork",
       "nativeSignature": "uint64_t (uint64_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_to_network_u64",
-      "bindingId": 16,
-      "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_to_network_u64(uint64_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 116,
@@ -1256,6 +582,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t",
+          "uint64_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Network-order (big-endian) value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_to_network_u64",
+      "bindingId": 6,
+      "cAbiSignature": "uint64_t deherm_dmsdk_dm_endian_to_network_u64(uint64_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1268,7 +608,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1301,10 +641,6 @@
       "id": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197",
       "symbol": "dmEndian::ToNetwork",
       "nativeSignature": "uint16_t (uint16_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_to_network_u16",
-      "bindingId": 17,
-      "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_to_network_u16(uint16_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 68,
@@ -1321,6 +657,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint16_t",
+          "uint16_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Network-order (big-endian) value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_to_network_u16",
+      "bindingId": 7,
+      "cAbiSignature": "uint16_t deherm_dmsdk_dm_endian_to_network_u16(uint16_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1333,7 +683,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1366,10 +716,6 @@
       "id": "dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199",
       "symbol": "dmEndian::ToNetwork",
       "nativeSignature": "uint32_t (uint32_t)",
-      "wrapper": "deherm_dmsdk_dm_endian_to_network_u32",
-      "bindingId": 18,
-      "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_to_network_u32(uint32_t x);",
-      "module": "endian",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
         "irDocumentationLine": 92,
@@ -1386,6 +732,20 @@
           "sha256": "05e15e1131a8331f184d84d1e7bc57832b9c40550d540353ae205427d905d1df"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint32_t",
+          "uint32_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Network-order (big-endian) value"
+      },
+      "wrapper": "deherm_dmsdk_dm_endian_to_network_u32",
+      "bindingId": 8,
+      "cAbiSignature": "uint32_t deherm_dmsdk_dm_endian_to_network_u32(uint32_t x);",
+      "include": "dmsdk/dlib/endian.hpp",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1398,7 +758,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1440,60 +800,38 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/graphics/src/graphics.cpp",
-          "line": 1878,
-          "text": "void Finalize()",
-          "sha256": "452da12536a6fc2b9c25db8a9091dd919705f7ed01ca8bf9045a9e3572c1516b"
-        },
-        {
-          "path": "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include/dmsdk/graphics/graphics.h",
-          "line": 1759,
-          "text": "void Finalize();",
+          "path": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
+          "irDocumentationLine": 1759,
+          "declarationLine": 1759,
+          "declarationText": "void Finalize();",
           "sha256": "10bc2e302a8515ff0636f2cb8bdbece5a63bbd32ee0c10333e57986049ca382b"
-        },
-        {
-          "path": "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/include/graphics/graphics_ddf.h",
-          "line": 27,
-          "text": "namespace dmGraphics",
-          "sha256": "9746e168f5623e9a5fcc0b0fc6230bc96461219ab640b29efe76c0cdefc7baf5"
-        },
-        {
-          "path": "upstream/defold/engine/graphics/src/graphics.cpp",
-          "line": 1878,
-          "text": "void Finalize()",
-          "sha256": "452da12536a6fc2b9c25db8a9091dd919705f7ed01ca8bf9045a9e3572c1516b"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "void"
+        ],
+        "description": "Finalizes the graphics system.\nCleans up global graphics resources and shuts down the graphics system.\nThis should be called when the application is exiting.",
+        "returnDescription": ""
+      },
       "emitted": false,
       "blocker": {
-        "blocker": "Process-global graphics teardown is owned by the Defold engine lifecycle.",
+        "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
         "category": "engine-lifecycle",
-        "policy": "lifecycle-capability-required",
-        "auditEvidence": [
-          [
-            "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include/dmsdk/graphics/graphics.h",
-            "void Finalize();"
-          ],
-          [
-            "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/include/graphics/graphics_ddf.h",
-            "namespace dmGraphics"
-          ],
-          [
-            "upstream/defold/engine/graphics/src/graphics.cpp",
-            "void Finalize()"
-          ]
-        ]
+        "policy": "lifecycle-capability-required"
       },
       "stages": {
         "generated": {
           "status": "blocked-by-policy",
           "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-          "note": "Process-global graphics teardown is owned by the Defold engine lifecycle."
+          "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
         },
         "compiled": {
           "status": "header-compiled-policy-blocked",
           "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
-          "note": "The complete pinned packaged-SDK header, including generated graphics_ddf.h, compiles. This disproves the earlier missing-header claim; only lifecycle policy blocks exposure."
+          "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
         },
         "linked": {
           "status": "blocked-on-generation",
@@ -1526,15 +864,25 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dlib/log.cpp",
-          "line": 525,
-          "text": "void LogFinalize()",
-          "sha256": "2581abd5c386d0cffe0553667adbb7d5972e151cb671e5c553fa7294b366489d"
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "irDocumentationLine": 335,
+          "declarationLine": 335,
+          "declarationText": "void LogFinalize();",
+          "sha256": "5acfada271a3960d1e17a8812bbde7cf6510f6bca2ac685469935ea1da4675d3"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "void"
+        ],
+        "description": null,
+        "returnDescription": null
+      },
       "emitted": false,
       "blocker": {
-        "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+        "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
         "category": "engine-lifecycle",
         "policy": "lifecycle-capability-required"
       },
@@ -1542,11 +890,12 @@
         "generated": {
           "status": "blocked-by-policy",
           "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
-          "note": "Process-global logging teardown is not part of the default script-callable ABI."
+          "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
         },
         "compiled": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+          "status": "header-compiled-policy-blocked",
+          "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+          "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
         },
         "linked": {
           "status": "blocked-on-generation",
@@ -1579,15 +928,25 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dlib/log.cpp",
-          "line": 641,
-          "text": "void dmLogFinalize()",
-          "sha256": "2581abd5c386d0cffe0553667adbb7d5972e151cb671e5c553fa7294b366489d"
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
+          "irDocumentationLine": 270,
+          "declarationLine": 270,
+          "declarationText": "void dmLogFinalize();",
+          "sha256": "5acfada271a3960d1e17a8812bbde7cf6510f6bca2ac685469935ea1da4675d3"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "void"
+        ],
+        "description": "finalize the logging system.",
+        "returnDescription": ""
+      },
       "emitted": false,
       "blocker": {
-        "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+        "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
         "category": "engine-lifecycle",
         "policy": "lifecycle-capability-required"
       },
@@ -1595,11 +954,12 @@
         "generated": {
           "status": "blocked-by-policy",
           "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
-          "note": "Process-global logging teardown is not part of the default script-callable ABI."
+          "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
         },
         "compiled": {
-          "status": "blocked-on-generation",
-          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+          "status": "header-compiled-policy-blocked",
+          "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+          "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
         },
         "linked": {
           "status": "blocked-on-generation",
@@ -1623,10 +983,6 @@
       "id": "dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615",
       "symbol": "dmTime::GetMonotonicTime",
       "nativeSignature": "uint64_t ()",
-      "wrapper": "deherm_dmsdk_dm_time_get_monotonic_time_v",
-      "bindingId": 19,
-      "cAbiSignature": "uint64_t deherm_dmsdk_dm_time_get_monotonic_time_v(void);",
-      "module": "time",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
         "irDocumentationLine": 56,
@@ -1636,24 +992,26 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_apple.cpp",
-          "line": 34,
-          "text": "uint64_t GetMonotonicTime()",
-          "sha256": "2fb6e7d370dfd345487cb91ad03f58be40cc5cec68041df3a1660a5ce3c02509"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_posix.cpp",
-          "line": 34,
-          "text": "uint64_t GetMonotonicTime()",
-          "sha256": "1f5036f7263b0b43e130671671950ffe0d27afab02e7cac92f17d337e91abda7"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_win32.cpp",
-          "line": 67,
-          "text": "uint64_t GetMonotonicTime()",
-          "sha256": "469a09c046235d17f2cc81c121050c9a5b6e7199f212a2b99a91d1f8cb38363e"
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
+          "irDocumentationLine": 56,
+          "declarationLine": 56,
+          "declarationText": "uint64_t GetMonotonicTime();",
+          "sha256": "b6f0f1b913f6248edfbcd8c559c88b7f4783796757499a143146e780d94ac3f1"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t"
+        ],
+        "description": "Get monotonic time in microseconds since some unspecified starting point.",
+        "returnDescription": "Monotonic time in microseconds"
+      },
+      "wrapper": "deherm_dmsdk_dm_time_get_monotonic_time_v",
+      "bindingId": 9,
+      "cAbiSignature": "uint64_t deherm_dmsdk_dm_time_get_monotonic_time_v(void);",
+      "include": "dmsdk/dlib/time.h",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1666,7 +1024,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1699,10 +1057,6 @@
       "id": "dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614",
       "symbol": "dmTime::GetTime",
       "nativeSignature": "uint64_t ()",
-      "wrapper": "deherm_dmsdk_dm_time_get_time_v",
-      "bindingId": 20,
-      "cAbiSignature": "uint64_t deherm_dmsdk_dm_time_get_time_v(void);",
-      "module": "time",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
         "irDocumentationLine": 38,
@@ -1712,24 +1066,26 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_apple.cpp",
-          "line": 27,
-          "text": "uint64_t GetTime()",
-          "sha256": "2fb6e7d370dfd345487cb91ad03f58be40cc5cec68041df3a1660a5ce3c02509"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_posix.cpp",
-          "line": 27,
-          "text": "uint64_t GetTime()",
-          "sha256": "1f5036f7263b0b43e130671671950ffe0d27afab02e7cac92f17d337e91abda7"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_win32.cpp",
-          "line": 31,
-          "text": "uint64_t GetTime()",
-          "sha256": "469a09c046235d17f2cc81c121050c9a5b6e7199f212a2b99a91d1f8cb38363e"
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
+          "irDocumentationLine": 38,
+          "declarationLine": 38,
+          "declarationText": "uint64_t GetTime();",
+          "sha256": "b6f0f1b913f6248edfbcd8c559c88b7f4783796757499a143146e780d94ac3f1"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t"
+        ],
+        "description": "Get current time in microseconds since Jan. 1, 1970.",
+        "returnDescription": "Current time in microseconds"
+      },
+      "wrapper": "deherm_dmsdk_dm_time_get_time_v",
+      "bindingId": 10,
+      "cAbiSignature": "uint64_t deherm_dmsdk_dm_time_get_time_v(void);",
+      "include": "dmsdk/dlib/time.h",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1742,7 +1098,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1775,10 +1131,6 @@
       "id": "dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616",
       "symbol": "dmTime::Sleep",
       "nativeSignature": "void (uint32_t)",
-      "wrapper": "deherm_dmsdk_dm_time_sleep_u32",
-      "bindingId": 21,
-      "cAbiSignature": "void deherm_dmsdk_dm_time_sleep_u32(uint32_t useconds);",
-      "module": "time",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
         "irDocumentationLine": 64,
@@ -1788,24 +1140,27 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_apple.cpp",
-          "line": 22,
-          "text": "void Sleep(uint32_t useconds)",
-          "sha256": "2fb6e7d370dfd345487cb91ad03f58be40cc5cec68041df3a1660a5ce3c02509"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_posix.cpp",
-          "line": 22,
-          "text": "void Sleep(uint32_t useconds)",
-          "sha256": "1f5036f7263b0b43e130671671950ffe0d27afab02e7cac92f17d337e91abda7"
-        },
-        {
-          "path": "upstream/defold/engine/dlib/src/dlib/time_win32.cpp",
-          "line": 23,
-          "text": "void Sleep(uint32_t useconds)",
-          "sha256": "469a09c046235d17f2cc81c121050c9a5b6e7199f212a2b99a91d1f8cb38363e"
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/time.h",
+          "irDocumentationLine": 64,
+          "declarationLine": 64,
+          "declarationText": "void Sleep(uint32_t useconds);",
+          "sha256": "b6f0f1b913f6248edfbcd8c559c88b7f4783796757499a143146e780d94ac3f1"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "void",
+          "uint32_t"
+        ],
+        "description": "Sleep thread with low precision (~10 milliseconds).",
+        "returnDescription": ""
+      },
+      "wrapper": "deherm_dmsdk_dm_time_sleep_u32",
+      "bindingId": 11,
+      "cAbiSignature": "void deherm_dmsdk_dm_time_sleep_u32(uint32_t useconds);",
+      "include": "dmsdk/dlib/time.h",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1818,7 +1173,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1851,10 +1206,6 @@
       "id": "dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646",
       "symbol": "dmTrigLookup::Cos",
       "nativeSignature": "float (float)",
-      "wrapper": "deherm_dmsdk_dm_trig_lookup_cos_f32",
-      "bindingId": 22,
-      "cAbiSignature": "float deherm_dmsdk_dm_trig_lookup_cos_f32(float radians);",
-      "module": "trig",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
         "irDocumentationLine": 54,
@@ -1864,12 +1215,27 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp",
-          "line": 154,
-          "text": "const float* COS_TABLE = _COS_TABLE;",
-          "sha256": "5716969f403ec8cdfdac6676d938a6c4eab573cceb2a041676d8b252f787cc70"
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
+          "irDocumentationLine": 54,
+          "declarationLine": 54,
+          "declarationText": "inline float Cos(float radians)",
+          "sha256": "183d70ef3d734ed028303fdc752d5549e239c01c6796fa6f0309621b02ed6c0c"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "float",
+          "float"
+        ],
+        "description": "Returns the cosine of the given angle from a lookup table.",
+        "returnDescription": "The cosine of the angle"
+      },
+      "wrapper": "deherm_dmsdk_dm_trig_lookup_cos_f32",
+      "bindingId": 12,
+      "cAbiSignature": "float deherm_dmsdk_dm_trig_lookup_cos_f32(float radians);",
+      "include": "dmsdk/dlib/trig_lookup.h",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1882,7 +1248,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1915,10 +1281,6 @@
       "id": "dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647",
       "symbol": "dmTrigLookup::Sin",
       "nativeSignature": "float (float)",
-      "wrapper": "deherm_dmsdk_dm_trig_lookup_sin_f32",
-      "bindingId": 23,
-      "cAbiSignature": "float deherm_dmsdk_dm_trig_lookup_sin_f32(float radians);",
-      "module": "trig",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
         "irDocumentationLine": 76,
@@ -1928,12 +1290,27 @@
       },
       "definitionEvidence": [
         {
-          "path": "upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp",
-          "line": 154,
-          "text": "const float* COS_TABLE = _COS_TABLE;",
-          "sha256": "5716969f403ec8cdfdac6676d938a6c4eab573cceb2a041676d8b252f787cc70"
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h",
+          "irDocumentationLine": 76,
+          "declarationLine": 76,
+          "declarationText": "inline float Sin(float radians)",
+          "sha256": "183d70ef3d734ed028303fdc752d5549e239c01c6796fa6f0309621b02ed6c0c"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "float",
+          "float"
+        ],
+        "description": "Returns the sine of the given angle from a lookup table.",
+        "returnDescription": "The sine of the angle"
+      },
+      "wrapper": "deherm_dmsdk_dm_trig_lookup_sin_f32",
+      "bindingId": 13,
+      "cAbiSignature": "float deherm_dmsdk_dm_trig_lookup_sin_f32(float radians);",
+      "include": "dmsdk/dlib/trig_lookup.h",
       "emitted": true,
       "policy": {
         "boolRepresentation": "not-applicable",
@@ -1946,7 +1323,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -1979,10 +1356,6 @@
       "id": "dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668",
       "symbol": "dmUtf8::IsBreaking",
       "nativeSignature": "bool (uint32_t)",
-      "wrapper": "deherm_dmsdk_dm_utf8_is_breaking_u32",
-      "bindingId": 24,
-      "cAbiSignature": "uint8_t deherm_dmsdk_dm_utf8_is_breaking_u32(uint32_t c);",
-      "module": "utf8",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
         "irDocumentationLine": 103,
@@ -1999,6 +1372,20 @@
           "sha256": "b08d53d589e046eead23616d32d515966b429b661a86504a1b04accd413603fe"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "bool",
+          "uint32_t"
+        ],
+        "description": "Checks if a codepoint is a breaking whitespace",
+        "returnDescription": "true if it's a breaking whitespace"
+      },
+      "wrapper": "deherm_dmsdk_dm_utf8_is_breaking_u32",
+      "bindingId": 14,
+      "cAbiSignature": "uint8_t deherm_dmsdk_dm_utf8_is_breaking_u32(uint32_t c);",
+      "include": "dmsdk/dlib/utf8.h",
       "emitted": true,
       "policy": {
         "boolRepresentation": "uint8_t canonicalized to 0 or 1",
@@ -2011,7 +1398,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -2044,10 +1431,6 @@
       "id": "dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667",
       "symbol": "dmUtf8::IsWhiteSpace",
       "nativeSignature": "bool (uint32_t)",
-      "wrapper": "deherm_dmsdk_dm_utf8_is_white_space_u32",
-      "bindingId": 25,
-      "cAbiSignature": "uint8_t deherm_dmsdk_dm_utf8_is_white_space_u32(uint32_t c);",
-      "module": "utf8",
       "headerEvidence": {
         "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h",
         "irDocumentationLine": 86,
@@ -2064,6 +1447,20 @@
           "sha256": "b08d53d589e046eead23616d32d515966b429b661a86504a1b04accd413603fe"
         }
       ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "bool",
+          "uint32_t"
+        ],
+        "description": "Checks if a codepoint is a whitespace",
+        "returnDescription": "true if it's a whitespace"
+      },
+      "wrapper": "deherm_dmsdk_dm_utf8_is_white_space_u32",
+      "bindingId": 15,
+      "cAbiSignature": "uint8_t deherm_dmsdk_dm_utf8_is_white_space_u32(uint32_t c);",
+      "include": "dmsdk/dlib/utf8.h",
       "emitted": true,
       "policy": {
         "boolRepresentation": "uint8_t canonicalized to 0 or 1",
@@ -2076,7 +1473,7 @@
       "stages": {
         "generated": {
           "status": "complete",
-          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
           "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
         },
         "compiled": {
@@ -2102,6 +1499,883 @@
           "status": "generated-native-js-adapter",
           "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
           "note": "Available on native Hermes and browser host."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185",
+      "symbol": "EndianSwap16",
+      "nativeSignature": "uint16_t (uint16_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 65,
+        "declarationLine": 65,
+        "declarationText": "static inline uint16_t EndianSwap16(uint16_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 65,
+          "declarationLine": 65,
+          "declarationText": "static inline uint16_t EndianSwap16(uint16_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint16_t",
+          "uint16_t"
+        ],
+        "description": "swap bytes in a 16-bit value",
+        "returnDescription": "Byte-swapped value"
+      },
+      "wrapper": "deherm_dmsdk_endian_swap16_u16",
+      "bindingId": 16,
+      "cAbiSignature": "uint16_t deherm_dmsdk_endian_swap16_u16(uint16_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "not-applicable",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186",
+      "symbol": "EndianSwap32",
+      "nativeSignature": "uint32_t (uint32_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 81,
+        "declarationLine": 81,
+        "declarationText": "static inline uint32_t EndianSwap32(uint32_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 81,
+          "declarationLine": 81,
+          "declarationText": "static inline uint32_t EndianSwap32(uint32_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint32_t",
+          "uint32_t"
+        ],
+        "description": "swap bytes in a 32-bit value",
+        "returnDescription": "Byte-swapped value"
+      },
+      "wrapper": "deherm_dmsdk_endian_swap32_u32",
+      "bindingId": 17,
+      "cAbiSignature": "uint32_t deherm_dmsdk_endian_swap32_u32(uint32_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "not-applicable",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187",
+      "symbol": "EndianSwap64",
+      "nativeSignature": "uint64_t (uint64_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 100,
+        "declarationLine": 100,
+        "declarationText": "static inline uint64_t EndianSwap64(uint64_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 100,
+          "declarationLine": 100,
+          "declarationText": "static inline uint64_t EndianSwap64(uint64_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t",
+          "uint64_t"
+        ],
+        "description": "swap bytes in a 64-bit value",
+        "returnDescription": "Byte-swapped value"
+      },
+      "wrapper": "deherm_dmsdk_endian_swap64_u64",
+      "bindingId": 18,
+      "cAbiSignature": "uint64_t deherm_dmsdk_endian_swap64_u64(uint64_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189",
+      "symbol": "EndianToHost16",
+      "nativeSignature": "uint16_t (uint16_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 141,
+        "declarationLine": 141,
+        "declarationText": "static inline uint16_t EndianToHost16(uint16_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 141,
+          "declarationLine": 141,
+          "declarationText": "static inline uint16_t EndianToHost16(uint16_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint16_t",
+          "uint16_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Host-order value"
+      },
+      "wrapper": "deherm_dmsdk_endian_to_host16_u16",
+      "bindingId": 19,
+      "cAbiSignature": "uint16_t deherm_dmsdk_endian_to_host16_u16(uint16_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "not-applicable",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191",
+      "symbol": "EndianToHost32",
+      "nativeSignature": "uint32_t (uint32_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 169,
+        "declarationLine": 169,
+        "declarationText": "static inline uint32_t EndianToHost32(uint32_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 169,
+          "declarationLine": 169,
+          "declarationText": "static inline uint32_t EndianToHost32(uint32_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint32_t",
+          "uint32_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Host-order value"
+      },
+      "wrapper": "deherm_dmsdk_endian_to_host32_u32",
+      "bindingId": 20,
+      "cAbiSignature": "uint32_t deherm_dmsdk_endian_to_host32_u32(uint32_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "not-applicable",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193",
+      "symbol": "EndianToHost64",
+      "nativeSignature": "uint64_t (uint64_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 197,
+        "declarationLine": 197,
+        "declarationText": "static inline uint64_t EndianToHost64(uint64_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 197,
+          "declarationLine": 197,
+          "declarationText": "static inline uint64_t EndianToHost64(uint64_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t",
+          "uint64_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Host-order value"
+      },
+      "wrapper": "deherm_dmsdk_endian_to_host64_u64",
+      "bindingId": 21,
+      "cAbiSignature": "uint64_t deherm_dmsdk_endian_to_host64_u64(uint64_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188",
+      "symbol": "EndianToNetwork16",
+      "nativeSignature": "uint16_t (uint16_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 125,
+        "declarationLine": 125,
+        "declarationText": "static inline uint16_t EndianToNetwork16(uint16_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 125,
+          "declarationLine": 125,
+          "declarationText": "static inline uint16_t EndianToNetwork16(uint16_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint16_t",
+          "uint16_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Network-order (big-endian) value"
+      },
+      "wrapper": "deherm_dmsdk_endian_to_network16_u16",
+      "bindingId": 22,
+      "cAbiSignature": "uint16_t deherm_dmsdk_endian_to_network16_u16(uint16_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "not-applicable",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190",
+      "symbol": "EndianToNetwork32",
+      "nativeSignature": "uint32_t (uint32_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 153,
+        "declarationLine": 153,
+        "declarationText": "static inline uint32_t EndianToNetwork32(uint32_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 153,
+          "declarationLine": 153,
+          "declarationText": "static inline uint32_t EndianToNetwork32(uint32_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint32_t",
+          "uint32_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Network-order (big-endian) value"
+      },
+      "wrapper": "deherm_dmsdk_endian_to_network32_u32",
+      "bindingId": 23,
+      "cAbiSignature": "uint32_t deherm_dmsdk_endian_to_network32_u32(uint32_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "not-applicable",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": true
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes and browser host."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192",
+      "symbol": "EndianToNetwork64",
+      "nativeSignature": "uint64_t (uint64_t)",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+        "irDocumentationLine": 181,
+        "declarationLine": 181,
+        "declarationText": "static inline uint64_t EndianToNetwork64(uint64_t x)",
+        "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
+          "irDocumentationLine": 181,
+          "declarationLine": 181,
+          "declarationText": "static inline uint64_t EndianToNetwork64(uint64_t x)",
+          "sha256": "6ec62b4d23a4d5fa82b363ec8e489fb00fd2d40388256a19b253cc61062cc57a"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "uint64_t",
+          "uint64_t"
+        ],
+        "description": "Network byte order is big-endian.",
+        "returnDescription": "Network-order (big-endian) value"
+      },
+      "wrapper": "deherm_dmsdk_endian_to_network64_u64",
+      "bindingId": 24,
+      "cAbiSignature": "uint64_t deherm_dmsdk_endian_to_network64_u64(uint64_t x);",
+      "include": "dmsdk/dlib/endian.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "not-applicable",
+        "uint64Representation": "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfileFinalize@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:334:530",
+      "symbol": "ProfileFinalize",
+      "nativeSignature": "void ()",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "irDocumentationLine": 334,
+        "declarationLine": 334,
+        "declarationText": "void ProfileFinalize();",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "irDocumentationLine": 334,
+          "declarationLine": 334,
+          "declarationText": "void ProfileFinalize();",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "void"
+        ],
+        "description": "Finalize the profiling system",
+        "returnDescription": ""
+      },
+      "emitted": false,
+      "blocker": {
+        "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
+        "category": "engine-lifecycle",
+        "policy": "lifecycle-capability-required"
+      },
+      "stages": {
+        "generated": {
+          "status": "blocked-by-policy",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
+        },
+        "compiled": {
+          "status": "header-compiled-policy-blocked",
+          "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+          "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
+        },
+        "linked": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "conformant": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "retained": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "typescriptCallable": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfileInitialize@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:329:529",
+      "symbol": "ProfileInitialize",
+      "nativeSignature": "void ()",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "irDocumentationLine": 329,
+        "declarationLine": 329,
+        "declarationText": "void ProfileInitialize();",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "irDocumentationLine": 329,
+          "declarationLine": 329,
+          "declarationText": "void ProfileInitialize();",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "void"
+        ],
+        "description": "Initialize the profiling system",
+        "returnDescription": ""
+      },
+      "emitted": false,
+      "blocker": {
+        "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
+        "category": "engine-lifecycle",
+        "policy": "lifecycle-capability-required"
+      },
+      "stages": {
+        "generated": {
+          "status": "blocked-by-policy",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
+        },
+        "compiled": {
+          "status": "header-compiled-policy-blocked",
+          "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+          "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
+        },
+        "linked": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "conformant": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "retained": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        },
+        "typescriptCallable": {
+          "status": "blocked-on-generation",
+          "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+        }
+      }
+    },
+    {
+      "id": "dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531",
+      "symbol": "ProfileIsInitialized",
+      "nativeSignature": "bool ()",
+      "headerEvidence": {
+        "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+        "irDocumentationLine": 340,
+        "declarationLine": 340,
+        "declarationText": "bool ProfileIsInitialized();",
+        "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+      },
+      "definitionEvidence": [
+        {
+          "path": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
+          "irDocumentationLine": 340,
+          "declarationLine": 340,
+          "declarationText": "bool ProfileIsInitialized();",
+          "sha256": "4784bc2c49152618f794d492d932836e9b3dba48a35bd2a548a14a9a0b763a29"
+        }
+      ],
+      "patternDecision": "value.direct-primitive-scalar",
+      "semanticEvidence": {
+        "source": "revision-ir-abi+public-documentation",
+        "nativeTypes": [
+          "bool"
+        ],
+        "description": "Finalize the profiling system",
+        "returnDescription": "Returns non zero if the profiler is initialized"
+      },
+      "wrapper": "deherm_dmsdk_profile_is_initialized_v",
+      "bindingId": 25,
+      "cAbiSignature": "uint8_t deherm_dmsdk_profile_is_initialized_v(void);",
+      "include": "dmsdk/dlib/profile.h",
+      "emitted": true,
+      "policy": {
+        "boolRepresentation": "uint8_t canonicalized to 0 or 1",
+        "uint64Representation": "not-applicable",
+        "lifecycleSensitive": false,
+        "mayBlock": false,
+        "nativeJsCallable": true,
+        "browserJsCallable": false
+      },
+      "stages": {
+        "generated": {
+          "status": "complete",
+          "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+          "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
+        },
+        "compiled": {
+          "status": "covered-by-reproducible-test",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"
+        },
+        "linked": {
+          "status": "covered-by-host-source-link-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target."
+        },
+        "conformant": {
+          "status": "covered-by-host-behavior-test",
+          "evidence": "native/dmsdk_scalar_thunks_test.cpp",
+          "note": "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open."
+        },
+        "retained": {
+          "status": "covered-by-host-and-arm64-extension-nm-tests",
+          "evidence": "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "note": "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."
+        },
+        "typescriptCallable": {
+          "status": "generated-native-js-adapter",
+          "evidence": "packages/sdk/src/generated/dmsdk/scalar.ts",
+          "note": "Available on native Hermes only; browser host rejects this stable ID."
         }
       }
     }

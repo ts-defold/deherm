@@ -15,83 +15,33 @@ function scalarModule(): DmSdkScalarModule {
 
 /** Stable generated IDs for the raw scalar dmSDK C ABI. */
 export const DmSdkScalarId = {
-  endianSwap16U16: 0,
-  endianSwap32U32: 1,
-  endianSwap64U64: 2,
-  endianToHost16U16: 3,
-  endianToHost32U32: 4,
-  endianToHost64U64: 5,
-  endianToNetwork16U16: 6,
-  endianToNetwork32U32: 7,
-  endianToNetwork64U64: 8,
-  profileIsInitializedV: 9,
-  dmEndianByteSwapU16: 10,
-  dmEndianByteSwapU32: 11,
-  dmEndianByteSwapU64: 12,
-  dmEndianToHostU32: 13,
-  dmEndianToHostU64: 14,
-  dmEndianToHostU16: 15,
-  dmEndianToNetworkU64: 16,
-  dmEndianToNetworkU16: 17,
-  dmEndianToNetworkU32: 18,
-  dmTimeGetMonotonicTimeV: 19,
-  dmTimeGetTimeV: 20,
-  dmTimeSleepU32: 21,
-  dmTrigLookupCosF32: 22,
-  dmTrigLookupSinF32: 23,
-  dmUtf8IsBreakingU32: 24,
-  dmUtf8IsWhiteSpaceU32: 25
+  dmEndianByteSwapU16: 0,
+  dmEndianByteSwapU32: 1,
+  dmEndianByteSwapU64: 2,
+  dmEndianToHostU32: 3,
+  dmEndianToHostU64: 4,
+  dmEndianToHostU16: 5,
+  dmEndianToNetworkU64: 6,
+  dmEndianToNetworkU16: 7,
+  dmEndianToNetworkU32: 8,
+  dmTimeGetMonotonicTimeV: 9,
+  dmTimeGetTimeV: 10,
+  dmTimeSleepU32: 11,
+  dmTrigLookupCosF32: 12,
+  dmTrigLookupSinF32: 13,
+  dmUtf8IsBreakingU32: 14,
+  dmUtf8IsWhiteSpaceU32: 15,
+  endianSwap16U16: 16,
+  endianSwap32U32: 17,
+  endianSwap64U64: 18,
+  endianToHost16U16: 19,
+  endianToHost32U32: 20,
+  endianToHost64U64: 21,
+  endianToNetwork16U16: 22,
+  endianToNetwork32U32: 23,
+  endianToNetwork64U64: 24,
+  profileIsInitializedV: 25
 } as const;
-
-/** EndianSwap16 (uint16_t (uint16_t)). */
-export function endianSwap16U16(x: number): number {
-  return scalarModule().call(DmSdkScalarId.endianSwap16U16, x) as number;
-}
-
-/** EndianSwap32 (uint32_t (uint32_t)). */
-export function endianSwap32U32(x: number): number {
-  return scalarModule().call(DmSdkScalarId.endianSwap32U32, x) as number;
-}
-
-/** EndianSwap64 (uint64_t (uint64_t)). */
-export function endianSwap64U64(x: bigint): bigint {
-  return scalarModule().call(DmSdkScalarId.endianSwap64U64, x) as bigint;
-}
-
-/** EndianToHost16 (uint16_t (uint16_t)). */
-export function endianToHost16U16(x: number): number {
-  return scalarModule().call(DmSdkScalarId.endianToHost16U16, x) as number;
-}
-
-/** EndianToHost32 (uint32_t (uint32_t)). */
-export function endianToHost32U32(x: number): number {
-  return scalarModule().call(DmSdkScalarId.endianToHost32U32, x) as number;
-}
-
-/** EndianToHost64 (uint64_t (uint64_t)). */
-export function endianToHost64U64(x: bigint): bigint {
-  return scalarModule().call(DmSdkScalarId.endianToHost64U64, x) as bigint;
-}
-
-/** EndianToNetwork16 (uint16_t (uint16_t)). */
-export function endianToNetwork16U16(x: number): number {
-  return scalarModule().call(DmSdkScalarId.endianToNetwork16U16, x) as number;
-}
-
-/** EndianToNetwork32 (uint32_t (uint32_t)). */
-export function endianToNetwork32U32(x: number): number {
-  return scalarModule().call(DmSdkScalarId.endianToNetwork32U32, x) as number;
-}
-
-/** EndianToNetwork64 (uint64_t (uint64_t)). */
-export function endianToNetwork64U64(x: bigint): bigint {
-  return scalarModule().call(DmSdkScalarId.endianToNetwork64U64, x) as bigint;
-}
-
-/** ProfileIsInitialized (bool ()). */
-export function profileIsInitializedV(): boolean {
-  return scalarModule().call(DmSdkScalarId.profileIsInitializedV) as boolean;
-}
 
 /** dmEndian::ByteSwap (uint16_t (uint16_t)). */
 export function dmEndianByteSwapU16(x: number): number {
@@ -171,4 +121,54 @@ export function dmUtf8IsBreakingU32(c: number): boolean {
 /** dmUtf8::IsWhiteSpace (bool (uint32_t)). */
 export function dmUtf8IsWhiteSpaceU32(c: number): boolean {
   return scalarModule().call(DmSdkScalarId.dmUtf8IsWhiteSpaceU32, c) as boolean;
+}
+
+/** EndianSwap16 (uint16_t (uint16_t)). */
+export function endianSwap16U16(x: number): number {
+  return scalarModule().call(DmSdkScalarId.endianSwap16U16, x) as number;
+}
+
+/** EndianSwap32 (uint32_t (uint32_t)). */
+export function endianSwap32U32(x: number): number {
+  return scalarModule().call(DmSdkScalarId.endianSwap32U32, x) as number;
+}
+
+/** EndianSwap64 (uint64_t (uint64_t)). */
+export function endianSwap64U64(x: bigint): bigint {
+  return scalarModule().call(DmSdkScalarId.endianSwap64U64, x) as bigint;
+}
+
+/** EndianToHost16 (uint16_t (uint16_t)). */
+export function endianToHost16U16(x: number): number {
+  return scalarModule().call(DmSdkScalarId.endianToHost16U16, x) as number;
+}
+
+/** EndianToHost32 (uint32_t (uint32_t)). */
+export function endianToHost32U32(x: number): number {
+  return scalarModule().call(DmSdkScalarId.endianToHost32U32, x) as number;
+}
+
+/** EndianToHost64 (uint64_t (uint64_t)). */
+export function endianToHost64U64(x: bigint): bigint {
+  return scalarModule().call(DmSdkScalarId.endianToHost64U64, x) as bigint;
+}
+
+/** EndianToNetwork16 (uint16_t (uint16_t)). */
+export function endianToNetwork16U16(x: number): number {
+  return scalarModule().call(DmSdkScalarId.endianToNetwork16U16, x) as number;
+}
+
+/** EndianToNetwork32 (uint32_t (uint32_t)). */
+export function endianToNetwork32U32(x: number): number {
+  return scalarModule().call(DmSdkScalarId.endianToNetwork32U32, x) as number;
+}
+
+/** EndianToNetwork64 (uint64_t (uint64_t)). */
+export function endianToNetwork64U64(x: bigint): bigint {
+  return scalarModule().call(DmSdkScalarId.endianToNetwork64U64, x) as bigint;
+}
+
+/** ProfileIsInitialized (bool ()). */
+export function profileIsInitializedV(): boolean {
+  return scalarModule().call(DmSdkScalarId.profileIsInitializedV) as boolean;
 }

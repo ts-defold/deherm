@@ -1,12 +1,21 @@
 import { createHash } from "node:crypto";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { VOID, recordAudit } from "./lib/revision-audit.mjs";
-import { declaredDerivation, expectReviewedCount } from "./lib/reviewed-revision.mjs";
+import {
+  DMSDK_UNIVERSAL_FALLBACK_PATTERN,
+  compactDmSdkPatternDecision,
+  defineDmSdkPattern,
+  selectDmSdkPattern,
+} from "../packages/compiler/src/dmsdk-pattern-selector.mjs";
 
 const scriptDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(scriptDirectory, "..");
+const paths = {
+  ir: "packages/bindings/generated/defold-sdk-ir.json",
+  shapes: "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
+  recipe: "packages/bindings/overrides/dmsdk-scalar-thunks.json",
+};
 
 const ABI_TYPES = Object.freeze({
   void: { c: "void", suffix: "v" },
@@ -29,129 +38,6 @@ const VALUE_KINDS = Object.freeze({
 const FLAG_NATIVE_JS = 1;
 const FLAG_BROWSER_JS = 2;
 const FLAG_MAY_BLOCK = 4;
-
-const MODULES = Object.freeze({
-  endian: {
-    headers: [
-      "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h",
-      "upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp",
-    ],
-    include: "dmsdk/dlib/endian.hpp",
-    linkTest: true,
-    conformanceTest: true,
-  },
-  log: {
-    headers: ["upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"],
-    include: "dmsdk/dlib/log.h",
-    linkTest: false,
-    conformanceTest: false,
-  },
-  profile: {
-    headers: ["upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"],
-    include: "dmsdk/dlib/profile.h",
-    linkTest: true,
-    conformanceTest: true,
-  },
-  time: {
-    headers: ["upstream/defold/engine/dlib/src/dmsdk/dlib/time.h"],
-    include: "dmsdk/dlib/time.h",
-    linkTest: true,
-    conformanceTest: true,
-  },
-  trig: {
-    headers: ["upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h"],
-    include: "dmsdk/dlib/trig_lookup.h",
-    linkTest: true,
-    conformanceTest: true,
-  },
-  utf8: {
-    headers: ["upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h"],
-    include: "dmsdk/dlib/utf8.h",
-    linkTest: true,
-    conformanceTest: true,
-  },
-});
-
-function blockedSymbolsForRevision(defoldRevision) {
-  const sdkRoot = `upstream/extender/server/app/sdk/${defoldRevision}/defoldsdk`;
-  return Object.freeze({
-  "dmGraphics::Finalize": {
-    blocker: "Process-global graphics teardown is owned by the Defold engine lifecycle.",
-    category: "engine-lifecycle",
-    policy: "lifecycle-capability-required",
-    auditEvidence: [
-      [`${sdkRoot}/sdk/include/dmsdk/graphics/graphics.h`, "void Finalize();"],
-      [`${sdkRoot}/include/graphics/graphics_ddf.h`, "namespace dmGraphics"],
-      ["upstream/defold/engine/graphics/src/graphics.cpp", "void Finalize()"],
-    ],
-  },
-  "dmLog::LogFinalize": {
-    blocker: "Process-global logging teardown is not part of the default script-callable ABI.",
-    category: "engine-lifecycle",
-    policy: "lifecycle-capability-required",
-  },
-  dmLogFinalize: {
-    blocker: "Process-global logging teardown is not part of the default script-callable ABI.",
-    category: "engine-lifecycle",
-    policy: "lifecycle-capability-required",
-  },
-  ProfileInitialize: {
-    blocker: "Process-global profiler initialization is owned by the Defold engine lifecycle.",
-    category: "engine-lifecycle",
-    policy: "lifecycle-capability-required",
-  },
-  ProfileFinalize: {
-    blocker: "Process-global profiler teardown is owned by the Defold engine lifecycle.",
-    category: "engine-lifecycle",
-    policy: "lifecycle-capability-required",
-  },
-  });
-}
-
-const DEFINITION_SPECS = Object.freeze({
-  "dmGraphics::Finalize": [
-    ["upstream/defold/engine/graphics/src/graphics.cpp", "void Finalize()"],
-  ],
-  "dmLog::LogFinalize": [
-    ["upstream/defold/engine/dlib/src/dlib/log.cpp", "void LogFinalize()"],
-  ],
-  dmLogFinalize: [
-    ["upstream/defold/engine/dlib/src/dlib/log.cpp", "void dmLogFinalize()"],
-  ],
-  "dmTime::GetTime": [
-    ["upstream/defold/engine/dlib/src/dlib/time_apple.cpp", "uint64_t GetTime()"],
-    ["upstream/defold/engine/dlib/src/dlib/time_posix.cpp", "uint64_t GetTime()"],
-    ["upstream/defold/engine/dlib/src/dlib/time_win32.cpp", "uint64_t GetTime()"],
-  ],
-  "dmTime::GetMonotonicTime": [
-    ["upstream/defold/engine/dlib/src/dlib/time_apple.cpp", "uint64_t GetMonotonicTime()"],
-    ["upstream/defold/engine/dlib/src/dlib/time_posix.cpp", "uint64_t GetMonotonicTime()"],
-    ["upstream/defold/engine/dlib/src/dlib/time_win32.cpp", "uint64_t GetMonotonicTime()"],
-  ],
-  "dmTime::Sleep": [
-    ["upstream/defold/engine/dlib/src/dlib/time_apple.cpp", "void Sleep(uint32_t useconds)"],
-    ["upstream/defold/engine/dlib/src/dlib/time_posix.cpp", "void Sleep(uint32_t useconds)"],
-    ["upstream/defold/engine/dlib/src/dlib/time_win32.cpp", "void Sleep(uint32_t useconds)"],
-  ],
-  "dmTrigLookup::Cos": [
-    ["upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp", "const float* COS_TABLE = _COS_TABLE;"],
-  ],
-  "dmTrigLookup::Sin": [
-    ["upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp", "const float* COS_TABLE = _COS_TABLE;"],
-  ],
-  ProfileInitialize: [
-    ["upstream/defold/engine/dlib/src/dlib/profile/profile.cpp", "void ProfileInitialize()"],
-    ["upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp", "void ProfileInitialize()"],
-  ],
-  ProfileFinalize: [
-    ["upstream/defold/engine/dlib/src/dlib/profile/profile.cpp", "void ProfileFinalize()"],
-    ["upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp", "void ProfileFinalize()"],
-  ],
-  ProfileIsInitialized: [
-    ["upstream/defold/engine/dlib/src/dlib/profile/profile.cpp", "bool ProfileIsInitialized()"],
-    ["upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp", "bool ProfileIsInitialized()"],
-  ],
-});
 
 function parseArguments(argv) {
   const options = { outRoot: repositoryRoot, check: false };
@@ -179,15 +65,22 @@ function snakeCase(value) {
 }
 
 function wrapperName(declaration) {
-  const suffix = declaration.parameters.length === 0
-    ? ABI_TYPES.void.suffix
-    : declaration.parameters.map(({ type }) => ABI_TYPES[type]?.suffix ?? "unsupported").join("_");
+  const suffix =
+    declaration.parameters.length === 0
+      ? ABI_TYPES.void.suffix
+      : declaration.parameters.map(({ type }) => ABI_TYPES[type]?.suffix ?? "unsupported").join("_");
   return `deherm_dmsdk_${snakeCase(declaration.name)}_${suffix}`;
 }
 
 function tsName(entry) {
   const words = entry.wrapper.replace(/^deherm_dmsdk_/, "").split("_");
-  return words[0] + words.slice(1).map((word) => word[0].toUpperCase() + word.slice(1)).join("");
+  return (
+    words[0] +
+    words
+      .slice(1)
+      .map((word) => word[0].toUpperCase() + word.slice(1))
+      .join("")
+  );
 }
 
 function isJsLossless(declaration) {
@@ -200,47 +93,59 @@ function isNativeJsCallable() {
 }
 
 function isBrowserSafe(entry) {
-  return isJsLossless(entry.declaration) &&
-    entry.moduleName !== "profile" &&
-    entry.declaration.name !== "dmTime::Sleep" &&
-    entry.moduleName !== "time";
+  return isJsLossless(entry.declaration) && entry.semantics.pureValueTransform && !entry.semantics.mayBlock;
 }
 
-function moduleForHeader(header) {
-  for (const [name, module] of Object.entries(MODULES)) {
-    if (module.headers.includes(header)) return name;
-  }
-  return undefined;
+function publicInclude(header) {
+  const marker = "/dmsdk/";
+  const index = header.indexOf(marker);
+  if (index < 0) throw new Error(`No public dmSDK include path in ${header}`);
+  return `dmsdk/${header.slice(index + marker.length)}`;
 }
 
-/**
- * Select a reviewed direct-thunk module without turning a newly discovered
- * historical scalar into a revision-wide failure. The declaration remains in
- * the dmSDK IR and universal catalog; only this optimized direct specialization
- * is withdrawn until a module recipe exists for its public header.
- */
-export function resolveScalarModule(header, env = process.env) {
-  const moduleName = moduleForHeader(header);
-  if (moduleName) return moduleName;
-  const derived = declaredDerivation(env);
-  if (!derived) throw new Error(`No reviewed scalar module for ${header}`);
-  recordAudit({
-    input: "scripts/generate-dmsdk-scalar-thunks.mjs",
-    id: `unreviewed-scalar-module:${header}`,
-    source: header,
-    status: VOID,
-    reason: "unreviewed-specialization-module",
-    derived,
-    anchorsLost: []
-  }, env);
-  return null;
+function scalarPattern() {
+  return defineDmSdkPattern({
+    schemaVersion: 1,
+    id: "value.direct-primitive-scalar",
+    family: "scalar-thunk",
+    emitter: "scripts/generate-dmsdk-scalar-thunks.mjs",
+    priority: 820,
+    cost: 4,
+    fallback: false,
+    when: {
+      declarationKinds: ["function"],
+      result: { rolePrefixes: ["scalar:"] },
+      parameters: { every: [{ rolePrefixes: ["scalar:"], directions: ["value"] }] },
+      requireSemanticTokens: ["direct-native-primitive", "fixed-width-cell-codec", "synchronous-noescape"],
+    },
+  });
 }
 
-function lineContaining(content, needle) {
-  const lines = content.split(/\r?\n/);
-  const index = lines.findIndex((line) => line.includes(needle));
-  if (index < 0) return null;
-  return { line: index + 1, text: lines[index].trim() };
+export function inferScalarThunkSemantics(declaration, row) {
+  if (!declaration || declaration.kind !== "function") return null;
+  const nativeTypes = [declaration.returns ?? "void", ...(declaration.parameters ?? []).map(({ type }) => type)];
+  if (!nativeTypes.every((type) => ABI_TYPES[type])) return null;
+  const roles = [row.result.role, ...row.parameters.map(({ role }) => role)];
+  if (!roles.every((role) => role.startsWith("scalar:"))) return null;
+  const leaf = declaration.name.split("::").at(-1);
+  const description = `${declaration.description ?? ""} ${declaration.returnDescription ?? ""}`.trim();
+  const lifecycleOperation =
+    declaration.parameters.length === 0 && declaration.returns === "void" && /(?:initialize|finalize)$/iu.test(leaf);
+  const mayBlock = /(?:^|\b)(?:sleep|block(?:s|ing)?)(?:\b|$)/iu.test(`${leaf} ${description}`);
+  return {
+    semanticTokens: ["direct-native-primitive", "fixed-width-cell-codec", "synchronous-noescape"],
+    capabilityBlocker: lifecycleOperation ? "lifecycle-capability-required" : null,
+    lifecycleOperation,
+    mayBlock,
+    pureValueTransform:
+      declaration.parameters.length > 0 && declaration.returns !== "void" && !lifecycleOperation && !mayBlock,
+    evidence: {
+      source: "revision-ir-abi+public-documentation",
+      nativeTypes,
+      description: declaration.description ?? null,
+      returnDescription: declaration.returnDescription ?? null,
+    },
+  };
 }
 
 function declarationEvidence(content, declaration) {
@@ -250,56 +155,33 @@ function declarationEvidence(content, declaration) {
   const end = Math.min(lines.length, start + 32);
   const candidates = [];
   for (let index = start; index < end; index += 1) {
-    if (new RegExp(`\\b${leaf}\\s*\\(`).test(lines[index])) candidates.push({ line: index + 1, text: lines[index].trim() });
+    if (new RegExp(`\\b${leaf}\\s*\\(`).test(lines[index]))
+      candidates.push({ line: index + 1, text: lines[index].trim() });
   }
   const candidate = candidates.find(({ text }) => {
     if (!text.includes(declaration.returns)) return false;
     return declaration.parameters.every(({ type }) => text.includes(type));
   });
-  if (!candidate) throw new Error(`Could not validate ${declaration.type} for ${declaration.id} near ${declaration.header}:${declaration.line}`);
+  if (!candidate)
+    throw new Error(
+      `Could not validate ${declaration.type} for ${declaration.id} near ${declaration.header}:${declaration.line}`,
+    );
   return candidate;
-}
-
-export function resolveScalarSourceEvidence({ content, relativePath, needle, owner, env = process.env }) {
-  const match = content === null ? null : lineContaining(content, needle);
-  if (match) return { path: relativePath, ...match, sha256: sha256(content) };
-
-  const derived = declaredDerivation(env);
-  if (!derived) {
-    throw new Error(content === null
-      ? `Expected source evidence file not found: ${relativePath}`
-      : `Expected source evidence not found: ${needle}`);
-  }
-  const reason = content === null ? "absent-source" : "source-anchor-moved";
-  recordAudit({
-    input: "scripts/generate-dmsdk-scalar-thunks.mjs",
-    id: `${owner}:${relativePath}:${needle}`,
-    source: relativePath,
-    status: VOID,
-    reason,
-    derived,
-    anchorsLost: [needle]
-  }, env);
-  return { path: relativePath, status: "withdrawn", reason, anchor: needle };
-}
-
-async function sourceEvidence(relativePath, needle, owner, env = process.env) {
-  const content = await readFile(resolve(repositoryRoot, relativePath), "utf8").catch((error) => {
-    if (error.code === "ENOENT") return null;
-    throw error;
-  });
-  return resolveScalarSourceEvidence({ content, relativePath, needle, owner, env });
 }
 
 function abiDeclaration(declaration, name) {
   const returnType = ABI_TYPES[declaration.returns].c;
-  const parameters = declaration.parameters.map((parameter) => `${ABI_TYPES[parameter.type].c} ${parameter.name}`).join(", ");
+  const parameters = declaration.parameters
+    .map((parameter) => `${ABI_TYPES[parameter.type].c} ${parameter.name}`)
+    .join(", ");
   return `${returnType} ${name}(${parameters || "void"});`;
 }
 
 function abiDefinition(declaration, name) {
   const returnType = ABI_TYPES[declaration.returns].c;
-  const parameters = declaration.parameters.map((parameter) => `${ABI_TYPES[parameter.type].c} ${parameter.name}`).join(", ");
+  const parameters = declaration.parameters
+    .map((parameter) => `${ABI_TYPES[parameter.type].c} ${parameter.name}`)
+    .join(", ");
   const argumentsList = declaration.parameters.map(({ name: parameterName }) => parameterName).join(", ");
   const call = `${declaration.name}(${argumentsList})`;
   let body;
@@ -314,12 +196,13 @@ function renderHeader(entries) {
   return `// Generated by scripts/generate-dmsdk-scalar-thunks.mjs. Do not edit.\n#ifndef DEFOLD_HERMES_GENERATED_DMSDK_SCALAR_H\n#define DEFOLD_HERMES_GENERATED_DMSDK_SCALAR_H\n\n#include <stdint.h>\n\n#ifdef __cplusplus\nextern \"C\" {\n#endif\n\n${declarations}\n\n#ifdef __cplusplus\n} // extern \"C\"\n#endif\n\n#endif // DEFOLD_HERMES_GENERATED_DMSDK_SCALAR_H\n`;
 }
 
-function renderSource(moduleName, module, entries) {
+function renderSource(entries) {
   const definitions = entries.map((entry) => abiDefinition(entry.declaration, entry.wrapper)).join("\n\n");
-  const nativeInclude = entries.length > 0
-    ? `#ifndef DLIB_LOG_DOMAIN\n#define DLIB_LOG_DOMAIN \"defold_hermes\"\n#endif\n#include <${module.include}>\n`
-    : "";
-  return `// Generated by scripts/generate-dmsdk-scalar-thunks.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scalar.h>\n${nativeInclude}\nextern \"C\" {\n\n${definitions}\n\n} // extern \"C\"\n`;
+  const includes = [...new Set(entries.map(({ declaration }) => publicInclude(declaration.header)))]
+    .sort()
+    .map((include) => `#include <${include}>`)
+    .join("\n");
+  return `// Generated by scripts/generate-dmsdk-scalar-thunks.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scalar.h>\n\n#ifndef DLIB_LOG_DOMAIN\n#define DLIB_LOG_DOMAIN \"defold_hermes\"\n#endif\n${includes}\n\nextern \"C\" {\n\n${definitions}\n\n} // extern \"C\"\n`;
 }
 
 function renderRuntimeHeader(entries) {
@@ -342,16 +225,21 @@ function rawResult(entry) {
 }
 
 function renderRuntimeSource(entries) {
-  const descriptors = entries.map((entry) => {
-    const kinds = entry.declaration.parameters.map(({ type }) => VALUE_KINDS[type]);
-    while (kinds.length < Math.max(1, ...entries.map(({ declaration }) => declaration.parameters.length))) kinds.push("DEHERM_DMSDK_SCALAR_VOID");
-    let flags = 0;
-    if (isNativeJsCallable(entry.declaration)) flags |= FLAG_NATIVE_JS;
-    if (isBrowserSafe(entry)) flags |= FLAG_BROWSER_JS;
-    if (entry.declaration.name === "dmTime::Sleep") flags |= FLAG_MAY_BLOCK;
-    return `  { UINT16_C(${entry.bindingId}), UINT8_C(${entry.declaration.parameters.length}), ${VALUE_KINDS[entry.declaration.returns]}, { ${kinds.join(", ")} }, UINT8_C(${flags}), ${JSON.stringify(entry.declaration.id)}, ${JSON.stringify(entry.declaration.name)} }`;
-  }).join(",\n");
-  const cases = entries.map((entry) => `    case ${entry.bindingId}:\n${rawResult(entry)}\n      return DEHERM_DMSDK_SCALAR_OK;`).join("\n");
+  const descriptors = entries
+    .map((entry) => {
+      const kinds = entry.declaration.parameters.map(({ type }) => VALUE_KINDS[type]);
+      while (kinds.length < Math.max(1, ...entries.map(({ declaration }) => declaration.parameters.length)))
+        kinds.push("DEHERM_DMSDK_SCALAR_VOID");
+      let flags = 0;
+      if (isNativeJsCallable(entry.declaration)) flags |= FLAG_NATIVE_JS;
+      if (isBrowserSafe(entry)) flags |= FLAG_BROWSER_JS;
+      if (entry.semantics.mayBlock) flags |= FLAG_MAY_BLOCK;
+      return `  { UINT16_C(${entry.bindingId}), UINT8_C(${entry.declaration.parameters.length}), ${VALUE_KINDS[entry.declaration.returns]}, { ${kinds.join(", ")} }, UINT8_C(${flags}), ${JSON.stringify(entry.declaration.id)}, ${JSON.stringify(entry.declaration.name)} }`;
+    })
+    .join(",\n");
+  const cases = entries
+    .map((entry) => `    case ${entry.bindingId}:\n${rawResult(entry)}\n      return DEHERM_DMSDK_SCALAR_OK;`)
+    .join("\n");
   return `// Generated by scripts/generate-dmsdk-scalar-thunks.mjs. Do not edit.\n#include <defold_hermes/generated_dmsdk_scalar.h>\n#include <defold_hermes/generated_dmsdk_scalar_runtime.h>\n\n#include <cstring>\n\nnamespace {\nconst DehermDmSdkScalarDescriptor kDescriptors[] = {\n${descriptors}\n};\n\nuint64_t pack_f32(float value)\n{\n  uint32_t bits = 0;\n  static_assert(sizeof(bits) == sizeof(value), \"float must be 32-bit\");\n  std::memcpy(&bits, &value, sizeof(bits));\n  return bits;\n}\n\nfloat unpack_f32(uint64_t value)\n{\n  const uint32_t bits = static_cast<uint32_t>(value);\n  float result = 0.0f;\n  std::memcpy(&result, &bits, sizeof(result));\n  return result;\n}\n} // namespace\n\nextern \"C\" {\n\nuint32_t deherm_dmsdk_scalar_count(void)\n{\n  return UINT32_C(${entries.length});\n}\n\nconst DehermDmSdkScalarDescriptor* deherm_dmsdk_scalar_descriptors(void)\n{\n  return kDescriptors;\n}\n\nDehermDmSdkScalarStatus deherm_dmsdk_scalar_dispatch(\n    uint16_t id, const uint64_t* arguments, uint32_t argument_count, uint64_t* result)\n{\n  if (id >= deherm_dmsdk_scalar_count()) return DEHERM_DMSDK_SCALAR_UNKNOWN_ID;\n  const DehermDmSdkScalarDescriptor& descriptor = kDescriptors[id];\n  if (argument_count != descriptor.argument_count) return DEHERM_DMSDK_SCALAR_WRONG_ARITY;\n  if (result == nullptr || (argument_count != 0 && arguments == nullptr)) return DEHERM_DMSDK_SCALAR_NULL_STORAGE;\n  switch (id) {\n${cases}\n    default:\n      return DEHERM_DMSDK_SCALAR_UNKNOWN_ID;\n  }\n}\n\n} // extern \"C\"\n`;
 }
 
@@ -368,19 +256,19 @@ function renderJsiSource() {
     .replace(
       "    case DEHERM_DMSDK_SCALAR_F32: {",
       "    case DEHERM_DMSDK_SCALAR_U64: {\n" +
-      "      if (!value.isBigInt()) throw jsi::JSError(runtime, \"dmSDK scalar argument must be u64 bigint\");\n" +
-      "      auto bigint = value.asBigInt(runtime);\n" +
-      "      if (!bigint.isUint64(runtime)) throw jsi::JSError(runtime, \"dmSDK scalar bigint is outside the u64 range\");\n" +
-      "      return bigint.asUint64(runtime);\n" +
-      "    }\n" +
-      "    case DEHERM_DMSDK_SCALAR_F32: {"
+        '      if (!value.isBigInt()) throw jsi::JSError(runtime, "dmSDK scalar argument must be u64 bigint");\n' +
+        "      auto bigint = value.asBigInt(runtime);\n" +
+        '      if (!bigint.isUint64(runtime)) throw jsi::JSError(runtime, "dmSDK scalar bigint is outside the u64 range");\n' +
+        "      return bigint.asUint64(runtime);\n" +
+        "    }\n" +
+        "    case DEHERM_DMSDK_SCALAR_F32: {",
     )
     .replace(
       "    case DEHERM_DMSDK_SCALAR_U32: return jsi::Value(static_cast<double>(static_cast<uint32_t>(raw)));\n" +
-      "    case DEHERM_DMSDK_SCALAR_F32: {",
+        "    case DEHERM_DMSDK_SCALAR_F32: {",
       "    case DEHERM_DMSDK_SCALAR_U32: return jsi::Value(static_cast<double>(static_cast<uint32_t>(raw)));\n" +
-      "    case DEHERM_DMSDK_SCALAR_U64: return jsi::Value(runtime, jsi::BigInt::fromUint64(runtime, raw));\n" +
-      "    case DEHERM_DMSDK_SCALAR_F32: {"
+        "    case DEHERM_DMSDK_SCALAR_U64: return jsi::Value(runtime, jsi::BigInt::fromUint64(runtime, raw));\n" +
+        "    case DEHERM_DMSDK_SCALAR_F32: {",
     )
     .replaceAll("not losslessly JavaScript-callable", "not JavaScript-callable");
 }
@@ -388,47 +276,60 @@ function renderJsiSource() {
 function renderTypeScriptBase(entries) {
   const callable = entries.filter(({ declaration }) => isNativeJsCallable(declaration));
   const ids = entries.map((entry) => `  ${tsName(entry)}: ${entry.bindingId}`).join(",\n");
-  const functions = callable.map((entry) => {
-    const parameters = entry.declaration.parameters.map((parameter) => `${parameter.name}: ${parameter.type === "bool" ? "boolean" : parameter.type === "uint64_t" ? "bigint" : "number"}`).join(", ");
-    const args = entry.declaration.parameters.map(({ name }) => `, ${name}`).join("");
-    const returnType = entry.declaration.returns === "void" ? "void" : entry.declaration.returns === "bool" ? "boolean" : entry.declaration.returns === "uint64_t" ? "bigint" : "number";
-    return `/** ${entry.declaration.name} (${entry.declaration.type}). */\nexport function ${tsName(entry)}(${parameters}): ${returnType} {\n  return scalarModule().call(DmSdkScalarId.${tsName(entry)}${args}) as ${returnType};\n}`;
-  }).join("\n\n");
+  const functions = callable
+    .map((entry) => {
+      const parameters = entry.declaration.parameters
+        .map(
+          (parameter) =>
+            `${parameter.name}: ${parameter.type === "bool" ? "boolean" : parameter.type === "uint64_t" ? "bigint" : "number"}`,
+        )
+        .join(", ");
+      const args = entry.declaration.parameters.map(({ name }) => `, ${name}`).join("");
+      const returnType =
+        entry.declaration.returns === "void"
+          ? "void"
+          : entry.declaration.returns === "bool"
+            ? "boolean"
+            : entry.declaration.returns === "uint64_t"
+              ? "bigint"
+              : "number";
+      return `/** ${entry.declaration.name} (${entry.declaration.type}). */\nexport function ${tsName(entry)}(${parameters}): ${returnType} {\n  return scalarModule().call(DmSdkScalarId.${tsName(entry)}${args}) as ${returnType};\n}`;
+    })
+    .join("\n\n");
   return `// Generated by scripts/generate-dmsdk-scalar-thunks.mjs. Do not edit.\nimport { requireDefoldModule } from \"../../module-runtime\";\n\ninterface DmSdkScalarModule {\n  call(id: number, ...args: readonly (number | boolean)[]): unknown;\n}\n\nfunction scalarModule(): DmSdkScalarModule {\n  return requireDefoldModule<DmSdkScalarModule>(\"DmSdkScalar\");\n}\n\n/** Stable generated IDs for the raw scalar dmSDK C ABI. */\nexport const DmSdkScalarId = {\n${ids}\n} as const;\n\n${functions}\n`;
 }
 
 function renderTypeScript(entries) {
   return renderTypeScriptBase(entries)
-    .replace(
-      'import { requireDefoldModule } from "../../module-runtime";\n\n',
-      ""
-    )
+    .replace('import { requireDefoldModule } from "../../module-runtime";\n\n', "")
     .replace(
       "  call(id: number, ...args: readonly (number | boolean)[]): unknown;",
-      "  call(id: number, ...args: readonly (number | boolean | bigint)[]): unknown;"
+      "  call(id: number, ...args: readonly (number | boolean | bigint)[]): unknown;",
     )
     .replace(
-      "function scalarModule(): DmSdkScalarModule {\n  return requireDefoldModule<DmSdkScalarModule>(\"DmSdkScalar\");\n}",
+      'function scalarModule(): DmSdkScalarModule {\n  return requireDefoldModule<DmSdkScalarModule>("DmSdkScalar");\n}',
       "declare global {\n" +
-      "  var __defoldModulesV1: Record<string, object> | undefined;\n" +
-      "}\n\n" +
-      "function scalarModule(): DmSdkScalarModule {\n" +
-      "  const module = globalThis.__defoldModulesV1?.DmSdkScalar as DmSdkScalarModule | undefined;\n" +
-      "  if (!module) throw new Error(\"Defold module is not registered: DmSdkScalar\");\n" +
-      "  return module;\n" +
-      "}"
+        "  var __defoldModulesV1: Record<string, object> | undefined;\n" +
+        "}\n\n" +
+        "function scalarModule(): DmSdkScalarModule {\n" +
+        "  const module = globalThis.__defoldModulesV1?.DmSdkScalar as DmSdkScalarModule | undefined;\n" +
+        '  if (!module) throw new Error("Defold module is not registered: DmSdkScalar");\n' +
+        "  return module;\n" +
+        "}",
     );
 }
 
 function renderWebSource(entries) {
   const browserEntries = entries.filter(isBrowserSafe);
   const deps = browserEntries.map(({ wrapper }) => `'${wrapper}'`).join(", ");
-  const cases = browserEntries.map((entry) => {
-    const args = entry.declaration.parameters.map((_, index) => `arguments[${index + 1}]`).join(", ");
-    const call = `_${entry.wrapper}(${args})`;
-    const result = entry.declaration.returns === "bool" ? `${call} !== 0` : call;
-    return `            case ${entry.bindingId}: return ${result};`;
-  }).join("\n");
+  const cases = browserEntries
+    .map((entry) => {
+      const args = entry.declaration.parameters.map((_, index) => `arguments[${index + 1}]`).join(", ");
+      const call = `_${entry.wrapper}(${args})`;
+      const result = entry.declaration.returns === "bool" ? `${call} !== 0` : call;
+      return `            case ${entry.bindingId}: return ${result};`;
+    })
+    .join("\n");
   return `// Generated by scripts/generate-dmsdk-scalar-thunks.mjs. Do not edit.\nvar LibraryDefoldHermesDmSdkScalar = {\n  $DEFOLD_HERMES_DMSDK_SCALAR__deps: [${deps}],\n  $DEFOLD_HERMES_DMSDK_SCALAR: {\n    install: function() {\n      return {\n        call: function(id) {\n          switch (id) {\n${cases}\n            default: throw new Error('dmSDK scalar binding is not available in the browser host: ' + id);\n          }\n        }\n      };\n    }\n  }\n};\n\nautoAddDeps(LibraryDefoldHermesDmSdkScalar, '$DEFOLD_HERMES_DMSDK_SCALAR');\naddToLibrary(LibraryDefoldHermesDmSdkScalar);\n`;
 }
 
@@ -447,23 +348,60 @@ async function writeOrCheck(outRoot, relativePath, content, check) {
   await writeFile(path, content);
 }
 
-export async function build() {
-  const ir = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8"));
-  const blockedSymbols = blockedSymbolsForRevision(ir.defoldRevision);
-  const patterns = JSON.parse(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json"), "utf8"));
-  const scalarIds = new Set(patterns.bindings.filter(({ primaryFamily }) => primaryFamily === "scalar-direct").map(({ id }) => id));
-  const declarations = ir.declarations
-    .filter(({ id }) => scalarIds.has(id))
-    .sort((left, right) => left.id < right.id ? -1 : left.id > right.id ? 1 : 0);
-  expectReviewedCount({
-    input: "scripts/generate-dmsdk-scalar-thunks.mjs", label: "reviewed scalar-direct frontier declarations",
-    expected: 31, observed: declarations.length
+async function reconcileOwnedSources(outRoot, artifacts, check) {
+  const directory = resolve(outRoot, "defold/defold_hermes/src");
+  const expected = new Set(
+    [...artifacts.keys()]
+      .filter((path) => path.startsWith("defold/defold_hermes/src/generated_dmsdk_scalar_") && path.endsWith(".cpp"))
+      .map((path) => path.split("/").at(-1)),
+  );
+  const existing = await readdir(directory).catch((error) => {
+    if (error.code === "ENOENT") return [];
+    throw error;
   });
+  const obsolete = existing
+    .filter((name) => /^generated_dmsdk_scalar_.+\.cpp$/u.test(name) && !expected.has(name))
+    .sort();
+  if (check && obsolete.length > 0) throw new Error(`Obsolete generated scalar sources: ${obsolete.join(", ")}`);
+  if (!check) await Promise.all(obsolete.map((name) => rm(resolve(directory, name))));
+}
+
+export async function build() {
+  const contents = Object.fromEntries(
+    await Promise.all(
+      Object.entries(paths).map(async ([name, path]) => [name, await readFile(resolve(repositoryRoot, path), "utf8")]),
+    ),
+  );
+  const ir = JSON.parse(contents.ir);
+  const shapes = JSON.parse(contents.shapes);
+  const recipe = JSON.parse(contents.recipe);
+  const declarationsById = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
+  const patterns = [scalarPattern(), DMSDK_UNIVERSAL_FALLBACK_PATTERN];
+  const candidates = shapes.rows
+    .map((row) => {
+      const declaration = declarationsById.get(row.id);
+      const semantics = inferScalarThunkSemantics(declaration, row);
+      if (!semantics) return null;
+      const decision = selectDmSdkPattern(
+        {
+          id: row.id,
+          kind: declaration.kind,
+          result: row.result,
+          parameters: row.parameters,
+          families: row.families,
+          semanticTokens: semantics.semanticTokens,
+        },
+        patterns,
+      );
+      return decision.patternId === "value.direct-primitive-scalar" ? { declaration, row, semantics, decision } : null;
+    })
+    .filter(Boolean)
+    .sort((left, right) => left.declaration.id.localeCompare(right.declaration.id));
 
   const emitted = [];
   const reportEntries = [];
   const seenWrappers = new Set();
-  for (const declaration of declarations) {
+  for (const { declaration, semantics, decision } of candidates) {
     const headerContent = await readFile(resolve(repositoryRoot, declaration.header), "utf8");
     const declarationMatch = declarationEvidence(headerContent, declaration);
     const headerEvidence = {
@@ -473,30 +411,32 @@ export async function build() {
       declarationText: declarationMatch.text,
       sha256: sha256(headerContent),
     };
-    const definitions = [];
-    for (const [path, needle] of DEFINITION_SPECS[declaration.name] ?? []) {
-      definitions.push(await sourceEvidence(path, needle, declaration.id));
-    }
-
-    const policyBlock = blockedSymbols[declaration.name];
-    if (policyBlock) {
-      const auditEvidence = [];
-      for (const [path, needle] of policyBlock.auditEvidence ?? []) {
-        auditEvidence.push(await sourceEvidence(path, needle, declaration.id));
-      }
+    const common = {
+      id: declaration.id,
+      symbol: declaration.name,
+      nativeSignature: declaration.type,
+      headerEvidence,
+      definitionEvidence: [headerEvidence],
+      patternDecision: compactDmSdkPatternDecision(decision),
+      semanticEvidence: semantics.evidence,
+    };
+    if (semantics.capabilityBlocker) {
+      const blocker = {
+        blocker: "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
+        category: "engine-lifecycle",
+        policy: semantics.capabilityBlocker,
+      };
       reportEntries.push({
-        id: declaration.id,
-        symbol: declaration.name,
-        nativeSignature: declaration.type,
-        headerEvidence,
-        definitionEvidence: [...definitions, ...auditEvidence],
+        ...common,
         emitted: false,
-        blocker: policyBlock,
+        blocker,
         stages: {
-          generated: stage("blocked-by-policy", declaration.header, policyBlock.blocker),
-          compiled: declaration.name === "dmGraphics::Finalize"
-            ? stage("header-compiled-policy-blocked", "native/dmsdk_scalar_blocker_audit.cpp", "The complete pinned packaged-SDK header, including generated graphics_ddf.h, compiles. This disproves the earlier missing-header claim; only lifecycle policy blocks exposure.")
-            : stage("blocked-on-generation", declaration.header),
+          generated: stage("blocked-by-policy", declaration.header, blocker.blocker),
+          compiled: stage(
+            "header-compiled-policy-blocked",
+            "native/dmsdk_scalar_blocker_audit.cpp",
+            "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure.",
+          ),
           linked: stage("blocked-on-generation", declaration.header),
           conformant: stage("blocked-on-generation", declaration.header),
           retained: stage("blocked-on-generation", declaration.header),
@@ -506,88 +446,82 @@ export async function build() {
       continue;
     }
 
-    const allTypes = [declaration.returns, ...declaration.parameters.map(({ type }) => type)];
-    const unsupported = allTypes.filter((type) => !ABI_TYPES[type]);
-    if (unsupported.length > 0) throw new Error(`Unsupported scalar ABI type(s) for ${declaration.id}: ${unsupported.join(", ")}`);
-    const moduleName = resolveScalarModule(declaration.header);
-    if (!moduleName) {
-      const blocker = {
-        blocker: "No direct scalar-thunk module recipe exists for this revision's public header; the declaration remains available through the universal dmSDK path.",
-        category: "unreviewed-specialization",
-        policy: "universal-fallback",
-      };
-      reportEntries.push({
-        id: declaration.id,
-        symbol: declaration.name,
-        nativeSignature: declaration.type,
-        headerEvidence,
-        definitionEvidence: definitions.length > 0 ? definitions : [headerEvidence],
-        emitted: false,
-        blocker,
-        stages: {
-          generated: stage("not-applicable", declaration.header, blocker.blocker),
-          compiled: stage("not-applicable", declaration.header, "No direct-thunk specialization was emitted."),
-          linked: stage("not-applicable", declaration.header, "No direct-thunk specialization was emitted."),
-          conformant: stage("not-applicable", declaration.header, "Universal-route evidence is tracked by the universal binding report."),
-          retained: stage("not-applicable", "packages/bindings/generated/defold-dmsdk-universal-bindings.json", "The declaration remains in the universal catalog."),
-          typescriptCallable: stage("not-applicable", "packages/sdk/src/generated/dmsdk/universal.ts", "TypeScript availability is generated by the universal path."),
-        },
-      });
-      continue;
-    }
-    const module = MODULES[moduleName];
+    const allTypes = semantics.evidence.nativeTypes;
     const wrapper = wrapperName(declaration);
     if (seenWrappers.has(wrapper)) throw new Error(`C ABI wrapper collision: ${wrapper}`);
     seenWrappers.add(wrapper);
-    const artifact = `defold/defold_hermes/src/generated_dmsdk_scalar_${moduleName}.cpp`;
+    const artifact = "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp";
     const bindingId = emitted.length;
-    const entry = { declaration, moduleName, wrapper, artifact, bindingId };
+    const entry = { declaration, semantics, wrapper, artifact, bindingId };
     emitted.push(entry);
     const nativeJsCallable = isNativeJsCallable(declaration);
     const browserJsCallable = isBrowserSafe(entry);
     reportEntries.push({
-      id: declaration.id,
-      symbol: declaration.name,
-      nativeSignature: declaration.type,
+      ...common,
       wrapper,
       bindingId,
       cAbiSignature: abiDeclaration(declaration, wrapper),
-      module: moduleName,
-      headerEvidence,
-      definitionEvidence: definitions.length > 0 ? definitions : [headerEvidence],
+      include: publicInclude(declaration.header),
       emitted: true,
       policy: {
         boolRepresentation: declaration.returns === "bool" ? "uint8_t canonicalized to 0 or 1" : "not-applicable",
-        uint64Representation: allTypes.includes("uint64_t") ? "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation" : "not-applicable",
-        lifecycleSensitive: /(?:Finalize|Initialize)$/.test(declaration.name),
-        mayBlock: declaration.name === "dmTime::Sleep",
+        uint64Representation: allTypes.includes("uint64_t")
+          ? "fixed-width C ABI; native Hermes uses validated JSI BigInt conversion; browser exposure remains blocked pending Wasm BigInt ABI validation"
+          : "not-applicable",
+        lifecycleSensitive: semantics.lifecycleOperation,
+        mayBlock: semantics.mayBlock,
         nativeJsCallable,
         browserJsCallable,
       },
       stages: {
-        generated: stage("complete", artifact, `C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h`),
-        compiled: stage("covered-by-reproducible-test", "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module"),
-        linked: module.linkTest
-          ? stage("covered-by-host-source-link-test", "native/dmsdk_scalar_thunks_test.cpp", "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target.")
-          : stage("not-yet-tested", artifact, "Requires the corresponding packaged Defold native library and engine lifecycle."),
-        conformant: module.conformanceTest
-          ? stage("covered-by-host-behavior-test", "native/dmsdk_scalar_thunks_test.cpp", "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open.")
-          : stage("not-yet-tested", artifact, "The thunk is syntax-compiled only; runtime behavior is not claimed."),
-        retained: stage("covered-by-host-and-arm64-extension-nm-tests", "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs", "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed."),
+        generated: stage(
+          "complete",
+          artifact,
+          `C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h`,
+        ),
+        compiled: stage(
+          "covered-by-reproducible-test",
+          "tests/dmsdk-scalar-thunks.test.mjs: strict object compilation of every emitted module",
+        ),
+        linked: stage(
+          "covered-by-host-source-link-test",
+          "native/dmsdk_scalar_thunks_test.cpp",
+          "Links selected pinned Defold implementation sources, not packaged Defold engine libraries or every target.",
+        ),
+        conformant: stage(
+          "covered-by-host-behavior-test",
+          "native/dmsdk_scalar_thunks_test.cpp",
+          "Behavior is checked on the host against the pinned source implementation; cross-target conformance remains open.",
+        ),
+        retained: stage(
+          "covered-by-host-and-arm64-extension-nm-tests",
+          "tests/dmsdk-scalar-thunks.test.mjs; tests/dmsdk-scalar-extension-retention.test.mjs",
+          "The dispatch switch references every emitted thunk. The host test inspects its executable with nm, and a pinned local Extender arm64-macos build retained every emitted thunk plus the generated JSI installer in the final custom engine. Other targets remain unclaimed.",
+        ),
         typescriptCallable: nativeJsCallable
-          ? stage("generated-native-js-adapter", "packages/sdk/src/generated/dmsdk/scalar.ts", browserJsCallable ? "Available on native Hermes and browser host." : "Available on native Hermes only; browser host rejects this stable ID.")
-          : stage("blocked-on-lossless-u64-adapter", artifact, "Raw C ABI remains available; JavaScript number cannot preserve all uint64_t values."),
+          ? stage(
+              "generated-native-js-adapter",
+              "packages/sdk/src/generated/dmsdk/scalar.ts",
+              browserJsCallable
+                ? "Available on native Hermes and browser host."
+                : "Available on native Hermes only; browser host rejects this stable ID.",
+            )
+          : stage(
+              "blocked-on-lossless-u64-adapter",
+              artifact,
+              "Raw C ABI remains available; JavaScript number cannot preserve all uint64_t values.",
+            ),
       },
     });
   }
 
   const artifacts = new Map();
   artifacts.set("defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h", renderHeader(emitted));
-  for (const [moduleName, module] of Object.entries(MODULES)) {
-    const entries = emitted.filter((entry) => entry.moduleName === moduleName);
-    artifacts.set(`defold/defold_hermes/src/generated_dmsdk_scalar_${moduleName}.cpp`, renderSource(moduleName, module, entries));
-  }
-  artifacts.set("defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h", renderRuntimeHeader(emitted));
+  artifacts.set("defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp", renderSource(emitted));
+  artifacts.set(
+    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h",
+    renderRuntimeHeader(emitted),
+  );
   artifacts.set("defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp", renderRuntimeSource(emitted));
   artifacts.set("defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp", renderJsiHeader());
   artifacts.set("defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp", renderJsiSource());
@@ -598,23 +532,40 @@ export async function build() {
     schemaVersion: 2,
     defoldRevision: ir.defoldRevision,
     sourceIr: "packages/bindings/generated/defold-sdk-ir.json",
-    sourceClassification: "packages/bindings/generated/defold-dmsdk-binding-patterns.json",
-    scope: `The ${reportEntries.length} declarations classified as primary scalar-direct. Stage counts describe this generated family only, not overall dmSDK coverage.`,
+    sourceShapes: paths.shapes,
+    sourceRecipe: paths.recipe,
+    scope: `The ${reportEntries.length} declarations selected structurally as direct native primitive functions. Stage counts describe this generated family only, not overall dmSDK coverage.`,
     abiPolicy: {
+      ...recipe.recipe,
       linkage: "extern C",
       integerWidths: "stdint fixed-width types",
       boolean: "uint8_t, canonical 0 or 1",
       allocation: "thunks are direct calls and contain no allocation or ownership transfer",
       dispatch: "dense uint16_t IDs, stack-only fixed-width slots, no name lookup on the hot path",
-      javascript64Bit: "native Hermes uses the pinned JSI BigInt uint64_t API; browser uint64_t adapters remain disabled until the Defold Emscripten Wasm BigInt ABI is validated",
-      exceptions: "no exception translation; reviewed declarations are non-throwing Defold C/C++ APIs by contract, but the C++ type system does not encode noexcept",
+      javascript64Bit:
+        "native Hermes uses the pinned JSI BigInt uint64_t API; browser uint64_t adapters remain disabled until the Defold Emscripten Wasm BigInt ABI is validated",
+      exceptions:
+        "no exception translation; reviewed declarations are non-throwing Defold C/C++ APIs by contract, but the C++ type system does not encode noexcept",
+      patternRegistry: patterns.map(({ id, family, emitter, priority, cost, fallback, when }) => ({
+        id,
+        family,
+        emitter,
+        priority,
+        cost,
+        fallback,
+        when,
+      })),
     },
     coverage: {
       reviewed: reportEntries.length,
       generated: reportEntries.filter(({ emitted: value }) => value).length,
       objectCompileCovered: reportEntries.filter(({ emitted: value }) => value).length,
-      hostSourceLinkCovered: reportEntries.filter(({ stages }) => stages.linked.status === "covered-by-host-source-link-test").length,
-      hostBehaviorCovered: reportEntries.filter(({ stages }) => stages.conformant.status === "covered-by-host-behavior-test").length,
+      hostSourceLinkCovered: reportEntries.filter(
+        ({ stages }) => stages.linked.status === "covered-by-host-source-link-test",
+      ).length,
+      hostBehaviorCovered: reportEntries.filter(
+        ({ stages }) => stages.conformant.status === "covered-by-host-behavior-test",
+      ).length,
       blocked: reportEntries.filter(({ emitted: value }) => !value).length,
       policyBlocked: reportEntries.filter(({ blocker }) => blocker?.policy === "lifecycle-capability-required").length,
       sourceBlocked: reportEntries.filter(({ blocker }) => blocker?.missingDependency).length,
@@ -631,10 +582,15 @@ export async function build() {
       allTargetConformant: 0,
     },
     sourceHashes: {
-      ir: sha256(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"))),
-      classification: sha256(await readFile(resolve(repositoryRoot, "packages/bindings/generated/defold-dmsdk-binding-patterns.json"))),
+      ir: sha256(contents.ir),
+      shapes: sha256(contents.shapes),
+      recipe: sha256(contents.recipe),
     },
-    artifactHashes: Object.fromEntries([...artifacts.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([path, content]) => [path, sha256(content)])),
+    artifactHashes: Object.fromEntries(
+      [...artifacts.entries()]
+        .sort(([left], [right]) => left.localeCompare(right))
+        .map(([path, content]) => [path, sha256(content)]),
+    ),
     artifacts: [...artifacts.keys()].sort(),
     declarations: reportEntries,
   };
@@ -645,8 +601,12 @@ export async function build() {
 export async function run(argv = process.argv.slice(2)) {
   const options = parseArguments(argv);
   const { artifacts, report } = await build();
-  for (const [relativePath, content] of artifacts) await writeOrCheck(options.outRoot, relativePath, content, options.check);
-  process.stdout.write(`${options.check ? "Verified" : "Generated"} ${report.coverage.generated}/${report.coverage.reviewed} scalar dmSDK thunks; ${report.coverage.blocked} explicitly blocked.\n`);
+  await reconcileOwnedSources(options.outRoot, artifacts, options.check);
+  for (const [relativePath, content] of artifacts)
+    await writeOrCheck(options.outRoot, relativePath, content, options.check);
+  process.stdout.write(
+    `${options.check ? "Verified" : "Generated"} ${report.coverage.generated}/${report.coverage.reviewed} scalar dmSDK thunks; ${report.coverage.blocked} explicitly blocked.\n`,
+  );
   return report;
 }
 

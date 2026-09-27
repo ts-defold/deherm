@@ -5,10 +5,18 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { discoverCompilerSurfaceOutputs } from "./generate-api-policy.mjs";
+
 const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fixturePath = path.join(repositoryRoot, "tests", "fixtures", "policy-surface-old-pipeline", "manifest.json");
 const generatedRoot = path.join(repositoryRoot, "packages", "sdk", "src", "generated");
-const loweringPlanPath = path.join(repositoryRoot, "packages", "bindings", "generated", "defold-binding-lowering-plan.json");
+const loweringPlanPath = path.join(
+  repositoryRoot,
+  "packages",
+  "bindings",
+  "generated",
+  "defold-binding-lowering-plan.json",
+);
 const policyIndexPath = path.join(repositoryRoot, "packages", "bindings", "generated", "defold-policy-index.json");
 
 function sha256(bytes) {
@@ -30,8 +38,13 @@ async function capture() {
     aggregate.update("\0");
   }
   const loweringPlan = await readFile(loweringPlanPath);
+  const outputs = {};
+  for (const relative of await discoverCompilerSurfaceOutputs(repositoryRoot)) {
+    const bytes = await readFile(path.join(repositoryRoot, relative));
+    outputs[relative] = { bytes: bytes.byteLength, sha256: sha256(bytes) };
+  }
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     kind: "deherm.fixture.old-pipeline-sdk",
     defoldRevision: policyIndex.entries[0].defoldRevision,
     treeSha256: aggregate.digest("hex"),
@@ -40,12 +53,13 @@ async function capture() {
       "It catches accidental materializer drift but is not implementation-independent because some source-pipeline and materializer emitters are shared. " +
       "It changes only through this explicit capture command after reviewed source-pipeline regeneration.",
     files,
+    outputs,
     documents: {
       "defold-binding-lowering-plan.json": {
         bytes: loweringPlan.byteLength,
-        sha256: sha256(loweringPlan)
-      }
-    }
+        sha256: sha256(loweringPlan),
+      },
+    },
   };
 }
 
@@ -58,7 +72,7 @@ if (process.argv.includes("--update")) {
   if (existing !== serialized) {
     throw new Error(
       "The frozen source-pipeline SDK golden is stale; regenerate the checkout-backed SDK through its source pipeline, " +
-      "then run node scripts/capture-policy-surface-old-pipeline.mjs --update."
+        "then run node scripts/capture-policy-surface-old-pipeline.mjs --update.",
     );
   }
   console.log(`source-pipeline SDK golden is current (${Object.keys(JSON.parse(serialized).files).length} files)`);

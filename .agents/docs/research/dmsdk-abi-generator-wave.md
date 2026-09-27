@@ -41,7 +41,7 @@ The earlier scalar report said `dmGraphics::Finalize` was blocked because `graph
 
 ## Reproduced evidence
 
-- The original 26 scalar thunks compile, source-link, and execute. A warmed 100,000-call dispatch loop observes zero C++ allocations.
+- The 26 scalar thunks selected from the current revision's direct primitive ABI shapes compile, source-link, and execute. A warmed 100,000-call dispatch loop observes zero C++ allocations.
 - All five lifecycle blockers compile from their real pinned headers; their object file contains exact unresolved native symbol references.
 - The seven enum-value wrapper and JSI translation units compile against the complete packaged SDK.
 - Four host-safe enum-value routes source-link and execute against `libdlib.a`; invalid enum sentinels fail before the native call; a warmed 100,000-call dispatch loop observes zero C++ allocations.
@@ -56,7 +56,7 @@ registry for this focused runtime-lowering pipeline. The clean-room checker
 copies only the registered generator sources, pinned inputs, and referenced
 Defold evidence into a new temporary directory, executes the steps in order,
 discovers generated dmSDK files independently, rejects unowned output, and
-compares all 60 artifacts byte-for-byte with the repository.
+compares the complete generated artifact registry byte-for-byte with the repository.
 `scripts/generate-dmsdk-runtime.mjs` is the thin public orchestrator; both its
 generate and `--check` modes consume this registry rather than restating the
 step chain.
@@ -66,12 +66,12 @@ The registered steps are:
 1. `scripts/classify-dmsdk-bindings.mjs`
    - input: `packages/bindings/generated/defold-sdk-ir.json`
    - output: `packages/bindings/generated/defold-dmsdk-binding-patterns.json`
-2. `scripts/generate-dmsdk-scalar-thunks.mjs`
-   - inputs: the SDK IR and binding-pattern report
-   - outputs: scalar report, C ABI, runtime dispatcher, JSI adapter, browser adapter, TypeScript wrapper, and per-module C++ sources listed in its report
-3. `scripts/generate-dmsdk-abi-shapes.mjs`
+2. `scripts/generate-dmsdk-abi-shapes.mjs`
    - inputs: the SDK IR and binding-pattern report
    - output: `packages/bindings/generated/defold-dmsdk-abi-shapes.json`
+3. `scripts/generate-dmsdk-scalar-thunks.mjs`
+   - inputs: the SDK IR, ABI-shape report, and stable direct-primitive recipe
+   - outputs: scalar report, one revision-derived C++ source, C ABI, runtime dispatcher, JSI adapter, browser adapter, and TypeScript wrapper
 4. `scripts/generate-dmsdk-named-scalar-bindings.mjs`
    - inputs: SDK IR, ABI-shape report, and `packages/bindings/overrides/dmsdk-named-scalar-policies.json`
    - outputs: a 21-route policy report plus intentionally empty C ABI, JSI, and TypeScript surfaces

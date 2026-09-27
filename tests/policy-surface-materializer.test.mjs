@@ -7,25 +7,25 @@ import test from "node:test";
 
 import {
   materializePolicySurface,
-  policySurfaceRealizationIdentity
+  policySurfaceRealizationIdentity,
 } from "../packages/compiler/src/policy-surface-materializer.mjs";
-import {
-  resolveDefoldSurface,
-  verifyMaterializedSurfaceRoot
-} from "../packages/cli/src/defold-surface.mjs";
+import { resolveDefoldSurface, verifyMaterializedSurfaceRoot } from "../packages/cli/src/defold-surface.mjs";
 import { publishPolicySurface } from "../packages/cli/src/policy-client.mjs";
 import {
   BINDING_LOWERING_RECIPE_CAPABILITY,
   BINDING_LOWERING_RECIPE_EMITTER,
-  BINDING_LOWERING_RECIPE_NAME
+  BINDING_LOWERING_RECIPE_NAME,
 } from "../packages/compiler/src/binding-lowering-plan-recipe.mjs";
 import { LOCALLY_RENDERED_OUTPUT_RECIPES } from "../packages/compiler/src/revision-output-emitter.mjs";
 import { derivePolicy, discoverCompilerSurfaceOutputs } from "../scripts/generate-api-policy.mjs";
 
 const repositoryRoot = path.resolve(import.meta.dirname, "..");
-const oldPipelineFixture = JSON.parse(await readFile(path.join(
-  repositoryRoot, "tests", "fixtures", "policy-surface-old-pipeline", "manifest.json"
-), "utf8"));
+const oldPipelineFixture = JSON.parse(
+  await readFile(
+    path.join(repositoryRoot, "tests", "fixtures", "policy-surface-old-pipeline", "manifest.json"),
+    "utf8",
+  ),
+);
 
 function sha256(bytes) {
   return createHash("sha256").update(bytes).digest("hex");
@@ -33,15 +33,20 @@ function sha256(bytes) {
 
 async function currentResolvedPolicy() {
   const derived = await derivePolicy();
-  const objects = new Map(Object.entries(derived.root.subtrees).map(([namespace, digest]) => [namespace, {
-    digest,
-    value: JSON.parse(derived.objects.get(digest))
-  }]));
+  const objects = new Map(
+    Object.entries(derived.root.subtrees).map(([namespace, digest]) => [
+      namespace,
+      {
+        digest,
+        value: JSON.parse(derived.objects.get(digest)),
+      },
+    ]),
+  );
   return {
     revision: derived.defoldRevision,
     entry: { policyRoot: derived.rootHash },
     policy: derived.root,
-    objects
+    objects,
   };
 }
 
@@ -57,55 +62,78 @@ test("authenticated policy materializes the complete generated SDK without a Def
   for (const name of [
     "defold-script-binding-patterns.json",
     "defold-dmsdk-binding-patterns.json",
-    "defold-script-real-engine-probes.json"
+    "defold-script-real-engine-probes.json",
   ]) {
     assert.ok(first.descriptor.documents.includes(name), `materialized conformance input is missing ${name}`);
   }
   assert.equal(Object.keys(first.descriptor.sdk).length, 28);
   const compiler = policy.objects.get("@compiler");
-  assert.deepEqual(
-    compiler.value.sdk.entries["script/types.ts"].inputs,
-    ["defold-script-api-ir.json", "defold-script-sdk-documentation.json", "defold-script-handle-lowering.json"]
-  );
-  assert.deepEqual(
-    compiler.value.sdk.entries["script/modules.ts"].inputs,
-    ["defold-script-api-ir.json", "defold-script-constant-lowering.json"]
-  );
-  assert.deepEqual(
-    compiler.value.sdk.entries["dmsdk/types.ts"].inputs,
-    ["defold-sdk-ir.json", "defold-dmsdk-sdk-documentation.json"]
-  );
+  assert.deepEqual(compiler.value.sdk.entries["script/types.ts"].inputs, [
+    "defold-script-api-ir.json",
+    "defold-script-sdk-documentation.json",
+    "defold-script-handle-lowering.json",
+  ]);
+  assert.deepEqual(compiler.value.sdk.entries["script/modules.ts"].inputs, [
+    "defold-script-api-ir.json",
+    "defold-script-constant-lowering.json",
+  ]);
+  assert.deepEqual(compiler.value.sdk.entries["dmsdk/types.ts"].inputs, [
+    "defold-sdk-ir.json",
+    "defold-dmsdk-sdk-documentation.json",
+  ]);
 
-  assert.ok(policy.policy.realizer.requiredCapabilities.includes(BINDING_LOWERING_RECIPE_CAPABILITY),
-    "policy root must advertise the package lowering-recipe interpreter it requires");
-  assert.ok(Buffer.byteLength(JSON.stringify(compiler.value)) < 5_000_000,
-    "the compiler manifest must stay below the 5 MB transfer budget");
+  assert.ok(
+    policy.policy.realizer.requiredCapabilities.includes(BINDING_LOWERING_RECIPE_CAPABILITY),
+    "policy root must advertise the package lowering-recipe interpreter it requires",
+  );
+  assert.ok(
+    Buffer.byteLength(JSON.stringify(compiler.value)) < 5_000_000,
+    "the compiler manifest must stay below the 5 MB transfer budget",
+  );
   const documentEntries = compiler.value.documents.entries;
-  assert.ok(documentEntries[BINDING_LOWERING_RECIPE_NAME],
-    "policy must carry compact lowering recipe facts");
-  assert.ok(first.descriptor.documents.includes(BINDING_LOWERING_RECIPE_NAME),
-    "materialized surfaces must retain authenticated lowering recipe facts for cache verification");
-  assert.equal(documentEntries["defold-binding-lowering-plan.json"], undefined,
-    "policy must not copy the derived lowering plan");
-  assert.equal(documentEntries["defold-binding-lowering-plan.sentinel.json"], undefined,
-    "policy must not copy checkout cache metadata");
+  assert.ok(documentEntries[BINDING_LOWERING_RECIPE_NAME], "policy must carry compact lowering recipe facts");
+  assert.ok(
+    first.descriptor.documents.includes(BINDING_LOWERING_RECIPE_NAME),
+    "materialized surfaces must retain authenticated lowering recipe facts for cache verification",
+  );
+  assert.equal(
+    documentEntries["defold-binding-lowering-plan.json"],
+    undefined,
+    "policy must not copy the derived lowering plan",
+  );
+  assert.equal(
+    documentEntries["defold-binding-lowering-plan.sentinel.json"],
+    undefined,
+    "policy must not copy checkout cache metadata",
+  );
   const recipeObject = policy.objects.get(documentEntries[BINDING_LOWERING_RECIPE_NAME].object);
-  assert.ok(Buffer.byteLength(JSON.stringify(recipeObject.value)) < 3_000_000,
-    "authenticated lowering recipe facts must stay below 3 MB");
+  assert.ok(
+    Buffer.byteLength(JSON.stringify(recipeObject.value)) < 3_000_000,
+    "authenticated lowering recipe facts must stay below 3 MB",
+  );
 
   const rendered = Object.entries(first.descriptor.sdk)
-    .filter(([, record]) => record.mode === "render-and-verify").map(([name]) => name).sort();
+    .filter(([, record]) => record.mode === "render-and-verify")
+    .map(([name]) => name)
+    .sort();
   const snapshots = Object.entries(first.descriptor.sdk)
-    .filter(([, record]) => record.mode === "authenticated-compatibility-source").map(([name]) => name).sort();
+    .filter(([, record]) => record.mode === "authenticated-compatibility-source")
+    .map(([name]) => name)
+    .sort();
   assert.equal(rendered.length, 16);
   assert.deepEqual(snapshots, [
-    "dmsdk/borrowed-handle.ts", "dmsdk/cstring-value.ts",
+    "dmsdk/borrowed-handle.ts",
+    "dmsdk/cstring-value.ts",
     "dmsdk/enum-value.ts",
     "dmsdk/scratch-scalar-out.ts",
-    "script/callback-lifecycle.ts", "script/copied-value-record-blockers.ts",
-    "script/dynamic-values.ts", "script/fixed-tuple-target-support.ts",
-    "script/opaque-record-blockers.ts", "script/overload-dispatch-target-support.ts",
-    "script/table-record-bindings.ts", "script/value-tail-target-support.ts"
+    "script/callback-lifecycle.ts",
+    "script/copied-value-record-blockers.ts",
+    "script/dynamic-values.ts",
+    "script/fixed-tuple-target-support.ts",
+    "script/opaque-record-blockers.ts",
+    "script/overload-dispatch-target-support.ts",
+    "script/table-record-bindings.ts",
+    "script/value-tail-target-support.ts",
   ]);
   const bytesByMode = { rendered: 0, snapshots: 0 };
 
@@ -115,27 +143,47 @@ test("authenticated policy materializes the complete generated SDK without a Def
     assert.ok(expected, `${relative} is absent from the frozen source-pipeline golden`);
     assert.equal(actual.length, expected.bytes, `${relative} byte count drifted from the old pipeline`);
     assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the old pipeline`);
-    bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
+    bytesByMode[first.descriptor.sdk[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] +=
+      actual.length;
   }
-  assert.deepEqual(bytesByMode, { rendered: 3_908_177, snapshots: 105_573 },
-    "the local-emitter versus compatibility-snapshot migration debt changed");
+  assert.deepEqual(
+    bytesByMode,
+    { rendered: 3_908_177, snapshots: 105_573 },
+    "the local-emitter versus compatibility-snapshot migration debt changed",
+  );
 
   const expectedOutputs = await discoverCompilerSurfaceOutputs();
-  assert.deepEqual(Object.keys(first.descriptor.outputs).sort(), expectedOutputs,
-    "policy output manifest must own every revision-generated ABI, Static Hermes, native, and browser file");
+  assert.deepEqual(
+    Object.keys(first.descriptor.outputs).sort(),
+    expectedOutputs,
+    "policy output manifest must own every revision-generated ABI, Static Hermes, native, and browser file",
+  );
   const renderedOutputs = Object.entries(first.descriptor.outputs)
-    .filter(([, record]) => record.mode === "render-and-verify").map(([name]) => name).sort();
-  assert.deepEqual(renderedOutputs, Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).sort(),
-    "package-owned revision-output emitters changed without updating their explicit inventory");
+    .filter(([, record]) => record.mode === "render-and-verify")
+    .map(([name]) => name)
+    .sort();
+  assert.deepEqual(
+    renderedOutputs,
+    Object.keys(LOCALLY_RENDERED_OUTPUT_RECIPES).sort(),
+    "package-owned revision-output emitters changed without updating their explicit inventory",
+  );
   const outputBytesByMode = { rendered: 0, snapshots: 0 };
+  const expectedOutputBytesByMode = { rendered: 0, snapshots: 0 };
   for (const relative of expectedOutputs) {
     const actual = await readFile(path.join(outputRoot, "repository", relative));
-    const expected = await readFile(path.join(repositoryRoot, relative));
-    assert.equal(sha256(actual), sha256(expected), `${relative} drifted from the source pipeline`);
-    outputBytesByMode[first.descriptor.outputs[relative].mode === "render-and-verify" ? "rendered" : "snapshots"] += actual.length;
+    const expected = oldPipelineFixture.outputs[relative];
+    assert.ok(expected, `${relative} is absent from the frozen source-pipeline output golden`);
+    assert.equal(actual.length, expected.bytes, `${relative} byte count drifted from the source pipeline`);
+    assert.equal(sha256(actual), expected.sha256, `${relative} drifted from the source pipeline`);
+    const mode = first.descriptor.outputs[relative].mode === "render-and-verify" ? "rendered" : "snapshots";
+    outputBytesByMode[mode] += actual.length;
+    expectedOutputBytesByMode[mode] += expected.bytes;
   }
-  assert.deepEqual(outputBytesByMode, { rendered: 5_372, snapshots: 1_720_303 },
-    "package-emitter versus revision-output snapshot debt changed");
+  assert.deepEqual(
+    outputBytesByMode,
+    expectedOutputBytesByMode,
+    "package-emitter versus revision-output snapshot debt changed",
+  );
 
   const scriptIr = JSON.parse(await readFile(path.join(outputRoot, "ir", "defold-script-api-ir.json"), "utf8"));
   assert.equal(scriptIr.defoldRevision, policy.revision);
@@ -145,17 +193,26 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.match(toolchain.bob.sha256, /^[0-9a-f]{64}$/u);
   assert.match(first.descriptor.toolchainSha256, /^[0-9a-f]{64}$/u);
   const resolved = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.equal(resolved.layer, "user-cache");
-  assert.deepEqual(resolved.toolchain, toolchain,
-    "a descriptor-backed cache must return the authenticated target matrix, not only its API files");
+  assert.deepEqual(
+    resolved.toolchain,
+    toolchain,
+    "a descriptor-backed cache must return the authenticated target matrix, not only its API files",
+  );
   const planBytes = await readFile(path.join(outputRoot, "ir", "defold-binding-lowering-plan.json"));
   const expectedPlan = oldPipelineFixture.documents["defold-binding-lowering-plan.json"];
-  assert.equal(planBytes.byteLength, expectedPlan.bytes,
-    "policy-only realization changed old-pipeline lowering-plan byte count");
-  assert.equal(sha256(planBytes), expectedPlan.sha256,
-    "policy-only realization changed old-pipeline lowering-plan bytes");
+  assert.equal(
+    planBytes.byteLength,
+    expectedPlan.bytes,
+    "policy-only realization changed old-pipeline lowering-plan byte count",
+  );
+  assert.equal(
+    sha256(planBytes),
+    expectedPlan.sha256,
+    "policy-only realization changed old-pipeline lowering-plan bytes",
+  );
   const sentinelPath = path.join(outputRoot, "ir", "defold-binding-lowering-plan.sentinel.json");
   const sentinelBytes = await readFile(sentinelPath);
   const sentinel = JSON.parse(sentinelBytes);
@@ -163,15 +220,18 @@ test("authenticated policy materializes the complete generated SDK without a Def
   assert.match(sentinel.cacheKey, /^[0-9a-f]{64}$/u);
   const second = await materializePolicySurface(policy, { outputRoot });
   assert.deepEqual(second.written, [], "materialization must be idempotent when policy and compiler are unchanged");
-  assert.deepEqual(await readFile(sentinelPath), sentinelBytes,
-    "keyed lowering-plan realization must preserve its sentinel bytes");
+  assert.deepEqual(
+    await readFile(sentinelPath),
+    sentinelBytes,
+    "keyed lowering-plan realization must preserve its sentinel bytes",
+  );
 
   const descriptorPath = path.join(outputRoot, "surface.json");
   const unauthenticatedDescriptor = JSON.parse(await readFile(descriptorPath, "utf8"));
   delete unauthenticatedDescriptor.toolchainSha256;
   await writeFile(descriptorPath, `${JSON.stringify(unauthenticatedDescriptor, null, 2)}\n`);
   const refused = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.ok(refused.blocker, "a descriptor-backed surface without an authenticated toolchain digest must be refused");
   assert.match(refused.searched[0].reason, /no authenticated toolchain digest/u);
@@ -182,7 +242,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   delete profiles.engineProfileSelection;
   await writeFile(profilesPath, `${JSON.stringify(profiles, null, 2)}\n`);
   const refusedTamperedIr = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.ok(refusedTamperedIr.blocker, "a modified policy-derived IR document must be refused");
   assert.match(refusedTamperedIr.searched[0].reason, /IR digest mismatch/u);
@@ -196,7 +256,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   selfConsistentDescriptor.ir["defold-script-route-availability-profiles.json"].sha256 = sha256(selfConsistentBytes);
   await writeFile(descriptorPath, `${JSON.stringify(selfConsistentDescriptor, null, 2)}\n`);
   const refusedSelfConsistentTamper = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.ok(refusedSelfConsistentTamper.blocker, "descriptor hashes cannot bless modified policy-derived IR");
   assert.match(refusedSelfConsistentTamper.searched[0].reason, /not authenticated by policy/u);
@@ -206,7 +266,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   unsafeDescriptor.ir["../outside.json"] = { sha256: "0".repeat(64) };
   await writeFile(descriptorPath, `${JSON.stringify(unsafeDescriptor, null, 2)}\n`);
   const refusedUnsafePath = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.ok(refusedUnsafePath.blocker, "descriptor paths may not escape the materialized surface");
   assert.match(refusedUnsafePath.searched[0].reason, /unsafe path/u);
@@ -221,7 +281,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   forgedSdkDescriptor.sdkTreeSha256 = "1".repeat(64);
   await writeFile(descriptorPath, `${JSON.stringify(forgedSdkDescriptor, null, 2)}\n`);
   const refusedSdkTamper = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.ok(refusedSdkTamper.blocker, "a descriptor must not bless modified SDK source");
   assert.match(refusedSdkTamper.searched[0].reason, /SDK descriptor contradicts|SDK content is not authenticated/u);
@@ -236,10 +296,13 @@ test("authenticated policy materializes the complete generated SDK without a Def
   forgedOutputDescriptor.outputTreeSha256 = "2".repeat(64);
   await writeFile(descriptorPath, `${JSON.stringify(forgedOutputDescriptor, null, 2)}\n`);
   const refusedOutputTamper = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.ok(refusedOutputTamper.blocker, "a descriptor must not bless modified repository output");
-  assert.match(refusedOutputTamper.searched[0].reason, /repository output descriptor contradicts|repository output content is not authenticated/u);
+  assert.match(
+    refusedOutputTamper.searched[0].reason,
+    /repository output descriptor contradicts|repository output content is not authenticated/u,
+  );
 
   await materializePolicySurface(policy, { outputRoot });
   const toolchainPath = path.join(outputRoot, "ir", "defold-toolchain.json");
@@ -251,7 +314,7 @@ test("authenticated policy materializes the complete generated SDK without a Def
   forgedToolchainDescriptor.toolchainSha256 = sha256(forgedToolchainSource);
   await writeFile(descriptorPath, `${JSON.stringify(forgedToolchainDescriptor, null, 2)}\n`);
   const refusedToolchainTamper = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
   assert.ok(refusedToolchainTamper.blocker, "a descriptor must not bless modified toolchain facts");
   assert.match(refusedToolchainTamper.searched[0].reason, /toolchain is not authenticated by policy/u);
@@ -275,9 +338,12 @@ test("authenticated policy materializes the complete generated SDK without a Def
   forgedPlanDescriptor.ir["defold-binding-lowering-plan.sentinel.json"].sha256 = sha256(forgedSentinelSource);
   await writeFile(descriptorPath, `${JSON.stringify(forgedPlanDescriptor, null, 2)}\n`);
   const refusedPlanTamper = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: cacheRoot }
+    env: { DEHERM_CACHE_HOME: cacheRoot },
   });
-  assert.ok(refusedPlanTamper.blocker, "self-consistent lowering output must remain bound to authenticated recipe facts");
+  assert.ok(
+    refusedPlanTamper.blocker,
+    "self-consistent lowering output must remain bound to authenticated recipe facts",
+  );
   assert.match(refusedPlanTamper.searched[0].reason, /not derived from its authenticated recipe/u);
 
   const pointerCacheRoot = path.join(cacheRoot, "pointer-layout");
@@ -285,33 +351,47 @@ test("authenticated policy materializes the complete generated SDK without a Def
     entry: {
       policyRoot: policy.entry.policyRoot,
       generator: policy.policy.generator,
-      realizer: policy.policy.realizer
+      realizer: policy.policy.realizer,
     },
-    packageVersion: "0.0.0"
+    packageVersion: "0.0.0",
   });
   const realizationId = realization.realizationId;
   const immutableRoot = path.join(pointerCacheRoot, "surfaces", policy.revision, "r", realizationId.slice(0, 32));
   await materializePolicySurface(policy, { outputRoot: immutableRoot, realization });
-  await writeFile(path.join(pointerCacheRoot, "surfaces", policy.revision, "current.json"), `${JSON.stringify({
-    schemaVersion: 1,
-    kind: "deherm.materialized-defold-surface-pointer",
-    defoldRevision: policy.revision,
-    realizationId,
-    policyRoot: policy.entry.policyRoot
-  }, null, 2)}\n`);
+  await writeFile(
+    path.join(pointerCacheRoot, "surfaces", policy.revision, "current.json"),
+    `${JSON.stringify(
+      {
+        schemaVersion: 1,
+        kind: "deherm.materialized-defold-surface-pointer",
+        defoldRevision: policy.revision,
+        realizationId,
+        policyRoot: policy.entry.policyRoot,
+      },
+      null,
+      2,
+    )}\n`,
+  );
   const resolvedImmutable = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: pointerCacheRoot }
+    env: { DEHERM_CACHE_HOME: pointerCacheRoot },
   });
   assert.equal(resolvedImmutable.layer, "user-cache");
   assert.equal(resolvedImmutable.descriptor.realization.realizationId, realizationId);
   const pointerPath = path.join(pointerCacheRoot, "surfaces", policy.revision, "current.json");
   const validPointer = JSON.parse(await readFile(pointerPath, "utf8"));
-  await writeFile(pointerPath, `${JSON.stringify({
-    ...validPointer,
-    realizationId: `${realizationId.slice(0, 32)}${"f".repeat(32)}`
-  }, null, 2)}\n`);
+  await writeFile(
+    pointerPath,
+    `${JSON.stringify(
+      {
+        ...validPointer,
+        realizationId: `${realizationId.slice(0, 32)}${"f".repeat(32)}`,
+      },
+      null,
+      2,
+    )}\n`,
+  );
   const refusedPointerDisagreement = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: pointerCacheRoot }
+    env: { DEHERM_CACHE_HOME: pointerCacheRoot },
   });
   assert.ok(refusedPointerDisagreement.blocker, "a pointer may not select a same-prefix foreign realization");
   assert.match(refusedPointerDisagreement.searched[0].reason, /pointer and descriptor identities disagree/u);
@@ -321,26 +401,29 @@ test("authenticated policy materializes the complete generated SDK without a Def
   forgedRealizationDescriptor.realization.compiler.version = "forged";
   await writeFile(immutableDescriptorPath, `${JSON.stringify(forgedRealizationDescriptor, null, 2)}\n`);
   const refusedForgedIdentity = await resolveDefoldSurface(policy.revision, {
-    env: { DEHERM_CACHE_HOME: pointerCacheRoot }
+    env: { DEHERM_CACHE_HOME: pointerCacheRoot },
   });
   assert.ok(refusedForgedIdentity.blocker, "a locally self-contradictory realization identity must be refused");
   assert.match(refusedForgedIdentity.searched[0].reason, /invalid realization identity/u);
   await writeFile(pointerPath, "{not-json\n");
   const corruptPointerFallback = await resolveDefoldSurface(policy.revision, {
     env: { DEHERM_CACHE_HOME: pointerCacheRoot },
-    packageRoot: repositoryRoot
+    packageRoot: repositoryRoot,
   });
-  assert.equal(corruptPointerFallback.layer, "repository-checkout",
-    "a corrupt cache pointer must fail closed locally and permit the repository fallback");
+  assert.equal(
+    corruptPointerFallback.layer,
+    "repository-checkout",
+    "a corrupt cache pointer must fail closed locally and permit the repository fallback",
+  );
 
   const publicationBase = path.join(cacheRoot, "real-publication", "surfaces", policy.revision);
   const publishedRealization = policySurfaceRealizationIdentity({
     entry: {
       policyRoot: policy.entry.policyRoot,
       generator: policy.policy.generator,
-      realizer: policy.policy.realizer
+      realizer: policy.policy.realizer,
     },
-    packageVersion: "0.0.0"
+    packageVersion: "0.0.0",
   });
   const publicationOptions = {
     revision: policy.revision,
@@ -348,35 +431,42 @@ test("authenticated policy materializes the complete generated SDK without a Def
     surfaceBase: publicationBase,
     surfaceBoundary: cacheRoot,
     materialize: materializePolicySurface,
-    artifacts: null
+    artifacts: null,
   };
   const publicationParent = path.join(publicationBase, "r");
   const abandonedStage = path.join(
     publicationParent,
-    `.s-${publishedRealization.realizationId.slice(0, 16)}-2147483647-${"0".repeat(12)}`
+    `.s-${publishedRealization.realizationId.slice(0, 16)}-2147483647-${"0".repeat(12)}`,
   );
   await mkdir(abandonedStage, { recursive: true });
   const staleTime = new Date(Date.now() - 7 * 60 * 60 * 1_000);
   await utimes(abandonedStage, staleTime, staleTime);
   const concurrent = await Promise.all([
     publishPolicySurface(policy, publicationOptions),
-    publishPolicySurface(policy, publicationOptions)
+    publishPolicySurface(policy, publicationOptions),
   ]);
-  assert.equal(concurrent.filter((result) => result.reused).length, 1,
-    "one of two concurrent publishers must verify and reuse the immutable winner");
-  assert.ok(!(await readdir(publicationParent)).some((name) => name.startsWith(".s-")),
-    "successful publication must remove its own and abandoned dead-process staging directories");
+  assert.equal(
+    concurrent.filter((result) => result.reused).length,
+    1,
+    "one of two concurrent publishers must verify and reuse the immutable winner",
+  );
+  assert.ok(
+    !(await readdir(publicationParent)).some((name) => name.startsWith(".s-")),
+    "successful publication must remove its own and abandoned dead-process staging directories",
+  );
   const publishedRoot = concurrent[0].outputRoot;
   const publishedSdk = path.join(publishedRoot, "sdk", "generated", "script", "runtime.ts");
   await writeFile(publishedSdk, `${await readFile(publishedSdk, "utf8")}\n// corrupt immutable cache\n`);
   const repaired = await publishPolicySurface(policy, publicationOptions);
   assert.equal(repaired.reused, undefined, "a rejected immutable directory must be rebuilt, not reused");
-  assert.ok((await readdir(publicationParent)).some((name) => name.startsWith(".bad-")),
-    "a rejected immutable directory must be quarantined rather than overwritten or deleted");
+  assert.ok(
+    (await readdir(publicationParent)).some((name) => name.startsWith(".bad-")),
+    "a rejected immutable directory must be quarantined rather than overwritten or deleted",
+  );
   const verifiedRepair = await verifyMaterializedSurfaceRoot(
     repaired.outputRoot,
     policy.revision,
-    publishedRealization
+    publishedRealization,
   );
   assert.ok(verifiedRepair.ok, verifiedRepair.error);
 });
@@ -392,12 +482,12 @@ test("policy materialization fails closed when the dmSDK catalog exceeds the pac
   catalog.recipes[0].abi.argumentCount = 33;
   const oversized = {
     ...policy,
-    objects: new Map(policy.objects).set(catalogKey, { ...catalogObject, value })
+    objects: new Map(policy.objects).set(catalogKey, { ...catalogObject, value }),
   };
   const outputRoot = await mkdtemp(path.join(tmpdir(), "deherm-policy-capacity-test-"));
   await assert.rejects(
     materializePolicySurface(oversized, { outputRoot }),
-    /requires 33 arguments.*supports 32.*upgrade @ts-defold\/deherm/u
+    /requires 33 arguments.*supports 32.*upgrade @ts-defold\/deherm/u,
   );
 });
 
@@ -410,13 +500,16 @@ test("package-owned SDK and revision-output recipes fail closed on manifest drif
   delete missingConstantDocument.realizationRecipes.documents["defold-script-constant-lowering.json"];
   missingConstantDocument.sdk.entries["script/modules.ts"].inputs = ["defold-script-api-ir.json"];
   await assert.rejects(
-    materializePolicySurface({
-      ...policy,
-      objects: new Map(policy.objects).set("@compiler", { ...compiler, value: missingConstantDocument })
-    }, {
-      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-constant-document-missing-test-"))
-    }),
-    /missing defold-script-constant-lowering\.json/u
+    materializePolicySurface(
+      {
+        ...policy,
+        objects: new Map(policy.objects).set("@compiler", { ...compiler, value: missingConstantDocument }),
+      },
+      {
+        outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-constant-document-missing-test-")),
+      },
+    ),
+    /missing defold-script-constant-lowering\.json/u,
   );
 
   const scriptDocumentationKey = compiler.value.documents.entries["defold-script-sdk-documentation.json"].object;
@@ -427,27 +520,27 @@ test("package-owned SDK and revision-output recipes fail closed on manifest drif
     ...policy,
     objects: new Map(policy.objects).set(scriptDocumentationKey, {
       ...scriptDocumentationObject,
-      value: badDocumentationValue
-    })
+      value: badDocumentationValue,
+    }),
   };
   await assert.rejects(
     materializePolicySurface(badDocumentation, {
-      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-sdk-documentation-drift-test-"))
+      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-sdk-documentation-drift-test-")),
     }),
-    /invalid SDK documentation fields/u
+    /invalid SDK documentation fields/u,
   );
 
   const badSdkValue = structuredClone(compiler.value);
   badSdkValue.sdk.entries["dmsdk/named-scalar.ts"].recipeInput.emittedCount = 1;
   const badSdk = {
     ...policy,
-    objects: new Map(policy.objects).set("@compiler", { ...compiler, value: badSdkValue })
+    objects: new Map(policy.objects).set("@compiler", { ...compiler, value: badSdkValue }),
   };
   await assert.rejects(
     materializePolicySurface(badSdk, {
-      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-sdk-recipe-drift-test-"))
+      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-sdk-recipe-drift-test-")),
     }),
-    /named-scalar SDK recipe requires a JavaScript-callable emitter/
+    /named-scalar SDK recipe requires a JavaScript-callable emitter/,
   );
 
   const badOutputValue = structuredClone(compiler.value);
@@ -455,13 +548,13 @@ test("package-owned SDK and revision-output recipes fail closed on manifest drif
   badOutputValue.outputs.entries[outputName].sourceObject = "@compiler:output:unexpected";
   const badOutput = {
     ...policy,
-    objects: new Map(policy.objects).set("@compiler", { ...compiler, value: badOutputValue })
+    objects: new Map(policy.objects).set("@compiler", { ...compiler, value: badOutputValue }),
   };
   await assert.rejects(
     materializePolicySurface(badOutput, {
-      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-output-recipe-drift-test-"))
+      outputRoot: await mkdtemp(path.join(tmpdir(), "deherm-policy-output-recipe-drift-test-")),
     }),
-    /unsupported compiler-output realization recipe/
+    /unsupported compiler-output realization recipe/,
   );
 });
 
@@ -475,9 +568,9 @@ test("project surface materialization refuses symlink traversal outside its boun
   await assert.rejects(
     materializePolicySurface(policy, {
       outputBoundary: boundary,
-      outputRoot: path.join(boundary, ".deherm", "cache", "surfaces", policy.revision)
+      outputRoot: path.join(boundary, ".deherm", "cache", "surfaces", policy.revision),
     }),
-    /refuses symbolic link/u
+    /refuses symbolic link/u,
   );
   assert.equal(await readFile(path.join(external, "sentinel.txt"), "utf8"), "unchanged\n");
 });

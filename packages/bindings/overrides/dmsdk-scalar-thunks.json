@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "family": "scalar-thunk",
+  "recipe": {
+    "transport": "fixed-width-cell-codec",
+    "candidateSource": "revision-ir-direct-primitive-abi",
+    "effectSource": "revision-ir-public-documentation",
+    "sourceGrouping": "single-revision-derived-translation-unit",
+    "fallback": "universal-recipe"
+  }
+}

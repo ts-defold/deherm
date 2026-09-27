@@ -40,15 +40,15 @@ extern "C" uint8_t deherm_dmsdk_fixed_digest_dm_crypt_hash_md5(const uint8_t* in
 extern "C" uint8_t deherm_dmsdk_fixed_digest_dm_crypt_hash_sha1(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t capacity){++g_calls[2][1];if(!input||length!=UINT32_C(6)||capacity<UINT32_C(20))++g_failures[2][1];for(uint32_t i=0;i<UINT32_C(20);++i)output[i]=static_cast<uint8_t>(UINT8_C(113)+i);return UINT8_C(1);}
 extern "C" uint8_t deherm_dmsdk_fixed_digest_dm_crypt_hash_sha256(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t capacity){++g_calls[2][2];if(!input||length!=UINT32_C(7)||capacity<UINT32_C(32))++g_failures[2][2];for(uint32_t i=0;i<UINT32_C(32);++i)output[i]=static_cast<uint8_t>(UINT8_C(114)+i);return UINT8_C(1);}
 extern "C" uint8_t deherm_dmsdk_fixed_digest_dm_crypt_hash_sha512(const uint8_t* input,uint32_t length,uint8_t* output,uint32_t capacity){++g_calls[2][3];if(!input||length!=UINT32_C(8)||capacity<UINT32_C(64))++g_failures[2][3];for(uint32_t i=0;i<UINT32_C(64);++i)output[i]=static_cast<uint8_t>(UINT8_C(115)+i);return UINT8_C(1);}
-extern "C" uint16_t deherm_dmsdk_dm_endian_byte_swap_u16(uint16_t a0){++g_calls[0][10];if(a0!=static_cast<uint16_t>(4522))++g_failures[0][10];return static_cast<uint16_t>(20906);}
-extern "C" uint32_t deherm_dmsdk_dm_endian_byte_swap_u32(uint32_t a0){++g_calls[0][11];if(a0!=static_cast<uint32_t>(4539))++g_failures[0][11];return static_cast<uint32_t>(20923);}
-extern "C" uint64_t deherm_dmsdk_dm_endian_byte_swap_u64(uint64_t a0){++g_calls[0][12];if(a0!=static_cast<uint64_t>(UINT64_C(4294971852)))++g_failures[0][12];return static_cast<uint64_t>(UINT64_C(4294988236));}
-extern "C" uint32_t deherm_dmsdk_dm_endian_to_host_u32(uint32_t a0){++g_calls[0][13];if(a0!=static_cast<uint32_t>(4573))++g_failures[0][13];return static_cast<uint32_t>(20957);}
-extern "C" uint64_t deherm_dmsdk_dm_endian_to_host_u64(uint64_t a0){++g_calls[0][14];if(a0!=static_cast<uint64_t>(UINT64_C(4294971886)))++g_failures[0][14];return static_cast<uint64_t>(UINT64_C(4294988270));}
-extern "C" uint16_t deherm_dmsdk_dm_endian_to_host_u16(uint16_t a0){++g_calls[0][15];if(a0!=static_cast<uint16_t>(4607))++g_failures[0][15];return static_cast<uint16_t>(20991);}
-extern "C" uint64_t deherm_dmsdk_dm_endian_to_network_u64(uint64_t a0){++g_calls[0][16];if(a0!=static_cast<uint64_t>(UINT64_C(4294971920)))++g_failures[0][16];return static_cast<uint64_t>(UINT64_C(4294988304));}
-extern "C" uint16_t deherm_dmsdk_dm_endian_to_network_u16(uint16_t a0){++g_calls[0][17];if(a0!=static_cast<uint16_t>(4641))++g_failures[0][17];return static_cast<uint16_t>(21025);}
-extern "C" uint32_t deherm_dmsdk_dm_endian_to_network_u32(uint32_t a0){++g_calls[0][18];if(a0!=static_cast<uint32_t>(4658))++g_failures[0][18];return static_cast<uint32_t>(21042);}
+extern "C" uint16_t deherm_dmsdk_dm_endian_byte_swap_u16(uint16_t a0){++g_calls[0][0];if(a0!=static_cast<uint16_t>(4352))++g_failures[0][0];return static_cast<uint16_t>(20736);}
+extern "C" uint32_t deherm_dmsdk_dm_endian_byte_swap_u32(uint32_t a0){++g_calls[0][1];if(a0!=static_cast<uint32_t>(4369))++g_failures[0][1];return static_cast<uint32_t>(20753);}
+extern "C" uint64_t deherm_dmsdk_dm_endian_byte_swap_u64(uint64_t a0){++g_calls[0][2];if(a0!=static_cast<uint64_t>(UINT64_C(4294971682)))++g_failures[0][2];return static_cast<uint64_t>(UINT64_C(4294988066));}
+extern "C" uint32_t deherm_dmsdk_dm_endian_to_host_u32(uint32_t a0){++g_calls[0][3];if(a0!=static_cast<uint32_t>(4403))++g_failures[0][3];return static_cast<uint32_t>(20787);}
+extern "C" uint64_t deherm_dmsdk_dm_endian_to_host_u64(uint64_t a0){++g_calls[0][4];if(a0!=static_cast<uint64_t>(UINT64_C(4294971716)))++g_failures[0][4];return static_cast<uint64_t>(UINT64_C(4294988100));}
+extern "C" uint16_t deherm_dmsdk_dm_endian_to_host_u16(uint16_t a0){++g_calls[0][5];if(a0!=static_cast<uint16_t>(4437))++g_failures[0][5];return static_cast<uint16_t>(20821);}
+extern "C" uint64_t deherm_dmsdk_dm_endian_to_network_u64(uint64_t a0){++g_calls[0][6];if(a0!=static_cast<uint64_t>(UINT64_C(4294971750)))++g_failures[0][6];return static_cast<uint64_t>(UINT64_C(4294988134));}
+extern "C" uint16_t deherm_dmsdk_dm_endian_to_network_u16(uint16_t a0){++g_calls[0][7];if(a0!=static_cast<uint16_t>(4471))++g_failures[0][7];return static_cast<uint16_t>(20855);}
+extern "C" uint32_t deherm_dmsdk_dm_endian_to_network_u32(uint32_t a0){++g_calls[0][8];if(a0!=static_cast<uint32_t>(4488))++g_failures[0][8];return static_cast<uint32_t>(20872);}
 extern "C" int32_t deherm_dmsdk_enum_dm_graphics_get_installed_adapter_family_v(){++g_calls[1][1];return static_cast<int32_t>(2);}
 const char * dmGraphics::GetTextureFormatLiteral(dmGraphics::TextureFormat a0){++g_calls[7][2];if(a0!=static_cast<dmGraphics::TextureFormat>(2))++g_failures[7][2];return "result_2";}
 const char * dmGraphics::GetTextureTypeLiteral(dmGraphics::TextureType a0){++g_calls[7][3];if(a0!=static_cast<dmGraphics::TextureType>(3))++g_failures[7][3];return "result_3";}
@@ -82,25 +82,25 @@ size_t dmStrTrim(char* output,size_t capacity,const char* value){++g_calls[8][2]
 bool dmSys::Exists(const char* a0){++g_calls[7][9];if(a0==nullptr||strcmp(a0,"exact_9_0")!=0)++g_failures[7][9];return static_cast<bool>(UINT8_C(1));}
 dmSys::Result dmSys::Rename(const char* a0,const char* a1){++g_calls[7][10];if(a0==nullptr||strcmp(a0,"exact_10_0")!=0)++g_failures[7][10];if(a1==nullptr||strcmp(a1,"exact_10_1")!=0)++g_failures[7][10];return static_cast<dmSys::Result>(-11);}
 dmSys::Result dmSys::Unlink(const char* a0){++g_calls[7][11];if(a0==nullptr||strcmp(a0,"exact_11_0")!=0)++g_failures[7][11];return static_cast<dmSys::Result>(-12);}
-extern "C" uint64_t deherm_dmsdk_dm_time_get_monotonic_time_v(){++g_calls[0][19];return static_cast<uint64_t>(UINT64_C(4294988355));}
-extern "C" uint64_t deherm_dmsdk_dm_time_get_time_v(){++g_calls[0][20];return static_cast<uint64_t>(UINT64_C(4294988372));}
-extern "C" void deherm_dmsdk_dm_time_sleep_u32(uint32_t a0){++g_calls[0][21];if(a0!=static_cast<uint32_t>(4709))++g_failures[0][21];}
-extern "C" float deherm_dmsdk_dm_trig_lookup_cos_f32(float a0){++g_calls[0][22];if(a0!=static_cast<float>(122.25f))++g_failures[0][22];return static_cast<float>(122.75f);}
-extern "C" float deherm_dmsdk_dm_trig_lookup_sin_f32(float a0){++g_calls[0][23];if(a0!=static_cast<float>(123.25f))++g_failures[0][23];return static_cast<float>(123.75f);}
+extern "C" uint64_t deherm_dmsdk_dm_time_get_monotonic_time_v(){++g_calls[0][9];return static_cast<uint64_t>(UINT64_C(4294988185));}
+extern "C" uint64_t deherm_dmsdk_dm_time_get_time_v(){++g_calls[0][10];return static_cast<uint64_t>(UINT64_C(4294988202));}
+extern "C" void deherm_dmsdk_dm_time_sleep_u32(uint32_t a0){++g_calls[0][11];if(a0!=static_cast<uint32_t>(4539))++g_failures[0][11];}
+extern "C" float deherm_dmsdk_dm_trig_lookup_cos_f32(float a0){++g_calls[0][12];if(a0!=static_cast<float>(112.25f))++g_failures[0][12];return static_cast<float>(112.75f);}
+extern "C" float deherm_dmsdk_dm_trig_lookup_sin_f32(float a0){++g_calls[0][13];if(a0!=static_cast<float>(113.25f))++g_failures[0][13];return static_cast<float>(113.75f);}
 dmURI::Result dmURI::Encode(const char* value,char* output,uint32_t capacity,uint32_t* written){++g_calls[8][3];if(!value||strcmp(value,"arena_3")!=0||!output||capacity!=UINT32_C(64)||!written)++g_failures[8][3];if(output&&capacity){const char* value="result_3";const size_t length=strlen(value);const size_t copied=length<capacity-1?length:capacity-1;memcpy(output,value,copied);output[copied]='\0';}if(written)*written=UINT32_C(9);return g_arena_uri_failure?dmURI::RESULT_TOO_SMALL_BUFFER:dmURI::RESULT_OK;}
-extern "C" uint8_t deherm_dmsdk_dm_utf8_is_breaking_u32(uint32_t a0){++g_calls[0][24];if(a0!=static_cast<uint32_t>(4760))++g_failures[0][24];return static_cast<uint8_t>(UINT8_C(1));}
-extern "C" uint8_t deherm_dmsdk_dm_utf8_is_white_space_u32(uint32_t a0){++g_calls[0][25];if(a0!=static_cast<uint32_t>(4777))++g_failures[0][25];return static_cast<uint8_t>(UINT8_C(1));}
+extern "C" uint8_t deherm_dmsdk_dm_utf8_is_breaking_u32(uint32_t a0){++g_calls[0][14];if(a0!=static_cast<uint32_t>(4590))++g_failures[0][14];return static_cast<uint8_t>(UINT8_C(1));}
+extern "C" uint8_t deherm_dmsdk_dm_utf8_is_white_space_u32(uint32_t a0){++g_calls[0][15];if(a0!=static_cast<uint32_t>(4607))++g_failures[0][15];return static_cast<uint8_t>(UINT8_C(1));}
 uint32_t dmUtf8::StrLen(const char* a0){++g_calls[7][12];if(a0==nullptr||strcmp(a0,"exact_12_0")!=0)++g_failures[7][12];return static_cast<uint32_t>(20940);}
-extern "C" uint16_t deherm_dmsdk_endian_swap16_u16(uint16_t a0){++g_calls[0][0];if(a0!=static_cast<uint16_t>(4352))++g_failures[0][0];return static_cast<uint16_t>(20736);}
-extern "C" uint32_t deherm_dmsdk_endian_swap32_u32(uint32_t a0){++g_calls[0][1];if(a0!=static_cast<uint32_t>(4369))++g_failures[0][1];return static_cast<uint32_t>(20753);}
-extern "C" uint64_t deherm_dmsdk_endian_swap64_u64(uint64_t a0){++g_calls[0][2];if(a0!=static_cast<uint64_t>(UINT64_C(4294971682)))++g_failures[0][2];return static_cast<uint64_t>(UINT64_C(4294988066));}
-extern "C" uint16_t deherm_dmsdk_endian_to_host16_u16(uint16_t a0){++g_calls[0][3];if(a0!=static_cast<uint16_t>(4403))++g_failures[0][3];return static_cast<uint16_t>(20787);}
-extern "C" uint32_t deherm_dmsdk_endian_to_host32_u32(uint32_t a0){++g_calls[0][4];if(a0!=static_cast<uint32_t>(4420))++g_failures[0][4];return static_cast<uint32_t>(20804);}
-extern "C" uint64_t deherm_dmsdk_endian_to_host64_u64(uint64_t a0){++g_calls[0][5];if(a0!=static_cast<uint64_t>(UINT64_C(4294971733)))++g_failures[0][5];return static_cast<uint64_t>(UINT64_C(4294988117));}
-extern "C" uint16_t deherm_dmsdk_endian_to_network16_u16(uint16_t a0){++g_calls[0][6];if(a0!=static_cast<uint16_t>(4454))++g_failures[0][6];return static_cast<uint16_t>(20838);}
-extern "C" uint32_t deherm_dmsdk_endian_to_network32_u32(uint32_t a0){++g_calls[0][7];if(a0!=static_cast<uint32_t>(4471))++g_failures[0][7];return static_cast<uint32_t>(20855);}
-extern "C" uint64_t deherm_dmsdk_endian_to_network64_u64(uint64_t a0){++g_calls[0][8];if(a0!=static_cast<uint64_t>(UINT64_C(4294971784)))++g_failures[0][8];return static_cast<uint64_t>(UINT64_C(4294988168));}
-extern "C" uint8_t deherm_dmsdk_profile_is_initialized_v(){++g_calls[0][9];return static_cast<uint8_t>(UINT8_C(1));}
+extern "C" uint16_t deherm_dmsdk_endian_swap16_u16(uint16_t a0){++g_calls[0][16];if(a0!=static_cast<uint16_t>(4624))++g_failures[0][16];return static_cast<uint16_t>(21008);}
+extern "C" uint32_t deherm_dmsdk_endian_swap32_u32(uint32_t a0){++g_calls[0][17];if(a0!=static_cast<uint32_t>(4641))++g_failures[0][17];return static_cast<uint32_t>(21025);}
+extern "C" uint64_t deherm_dmsdk_endian_swap64_u64(uint64_t a0){++g_calls[0][18];if(a0!=static_cast<uint64_t>(UINT64_C(4294971954)))++g_failures[0][18];return static_cast<uint64_t>(UINT64_C(4294988338));}
+extern "C" uint16_t deherm_dmsdk_endian_to_host16_u16(uint16_t a0){++g_calls[0][19];if(a0!=static_cast<uint16_t>(4675))++g_failures[0][19];return static_cast<uint16_t>(21059);}
+extern "C" uint32_t deherm_dmsdk_endian_to_host32_u32(uint32_t a0){++g_calls[0][20];if(a0!=static_cast<uint32_t>(4692))++g_failures[0][20];return static_cast<uint32_t>(21076);}
+extern "C" uint64_t deherm_dmsdk_endian_to_host64_u64(uint64_t a0){++g_calls[0][21];if(a0!=static_cast<uint64_t>(UINT64_C(4294972005)))++g_failures[0][21];return static_cast<uint64_t>(UINT64_C(4294988389));}
+extern "C" uint16_t deherm_dmsdk_endian_to_network16_u16(uint16_t a0){++g_calls[0][22];if(a0!=static_cast<uint16_t>(4726))++g_failures[0][22];return static_cast<uint16_t>(21110);}
+extern "C" uint32_t deherm_dmsdk_endian_to_network32_u32(uint32_t a0){++g_calls[0][23];if(a0!=static_cast<uint32_t>(4743))++g_failures[0][23];return static_cast<uint32_t>(21127);}
+extern "C" uint64_t deherm_dmsdk_endian_to_network64_u64(uint64_t a0){++g_calls[0][24];if(a0!=static_cast<uint64_t>(UINT64_C(4294972056)))++g_failures[0][24];return static_cast<uint64_t>(UINT64_C(4294988440));}
+extern "C" uint8_t deherm_dmsdk_profile_is_initialized_v(){++g_calls[0][25];return static_cast<uint8_t>(UINT8_C(1));}
 uint32_t ResourceGetCanonicalPath(const char* value,char* output,uint32_t capacity){++g_calls[8][4];if(!value||strcmp(value,"arena_4")!=0||!output||capacity!=UINT32_C(64))++g_failures[8][4];if(output&&capacity){const char* value="result_4";const size_t length=strlen(value);const size_t copied=length<capacity-1?length:capacity-1;memcpy(output,value,copied);output[copied]='\0';}return UINT32_C(504);}
 const char * ResourceGetExtFromPath(const char* a0){++g_calls[7][13];if(a0==nullptr||strcmp(a0,"exact_13_0")!=0)++g_failures[7][13];return "result_13";}
 struct DehermDmSdkAdapterExactVector{uint32_t recipe_id;uint16_t adapter_id;const char* family;const char* sha256;};
@@ -116,15 +116,15 @@ static const DehermDmSdkAdapterExactVector kVectors[]={
  {UINT32_C(209),UINT16_C(1),"fixedDigest","7d6dcf3cd2d1735c2c131fdad41f68c7785dd5317c67643e691e0bb78f6a7122"},
  {UINT32_C(210),UINT16_C(2),"fixedDigest","69f6d2544c54eff6f5559e234184f49e768e8cb36db7f95174563016e656e2c3"},
  {UINT32_C(211),UINT16_C(3),"fixedDigest","699d21f2f6f104b1b14f1ebd0cc2a7477f6ca93f816901bbb900362612d05ac3"},
- {UINT32_C(226),UINT16_C(10),"scalar","d6c35e358ef0359f537d5303759110baa5572664ea763d653a6ea9db13c9dc6d"},
- {UINT32_C(227),UINT16_C(11),"scalar","72c3ceb36cd3dc91b3b427b9d85a3044c6df8d39f41da70cf0a130fbedaae7f7"},
- {UINT32_C(228),UINT16_C(12),"scalar","3e960a25cd91accaa15952108ecdaabf47fc942435d906593f3173f05a10ea69"},
- {UINT32_C(229),UINT16_C(13),"scalar","0a87b0ed48d8af9ecf5f2b20c9d88ff405190213d4ecf718c3c82d332e17c655"},
- {UINT32_C(230),UINT16_C(14),"scalar","4d65ef6f11bc06421835042ad38a6b3f7e638832dc569aca68e1764f906054f5"},
- {UINT32_C(231),UINT16_C(15),"scalar","ca7af2a4d02f67528f9369eb68ea9172ce3e9e54e250e3718e8ba8afbe98e1e7"},
- {UINT32_C(232),UINT16_C(16),"scalar","297c7b129e23d37426853ed6b0f8654512bb6581b9263314e18f71359c7bd6ae"},
- {UINT32_C(233),UINT16_C(17),"scalar","920de2486355d3731cd1c0bf170902928c39203c8b0de8b38e52d71feed66671"},
- {UINT32_C(234),UINT16_C(18),"scalar","24baabd990c237f891e0f8eef12711d17233285efb71a80833850bd7647ec48a"},
+ {UINT32_C(226),UINT16_C(0),"scalar","0b85ce0618b06c4cc704ade0120c2b8d6b3dcb6f4b245df3cdb0792a29637a1d"},
+ {UINT32_C(227),UINT16_C(1),"scalar","5ed2cf7476ea8acbfe50186f9b81fb1a3e60d24e3b41ac0002e0207f018149c7"},
+ {UINT32_C(228),UINT16_C(2),"scalar","df664d0de5e27767686f6db980d0b776a92b818b7f84a9dc14b208c1197b2552"},
+ {UINT32_C(229),UINT16_C(3),"scalar","f90ef312eacdb34167163563abebe35a5157c1ba437e250cd210a17ab06b9250"},
+ {UINT32_C(230),UINT16_C(4),"scalar","890d05313cd86f55b04f222602dab36a25193fed38b089db80a882824e28e708"},
+ {UINT32_C(231),UINT16_C(5),"scalar","4a209b0f094a13f458ac59be0ce631a653cc20d24e079ed3acc6de3770341a6d"},
+ {UINT32_C(232),UINT16_C(6),"scalar","e3624750339a500bd576d32f8d580739fae4f50de940022c7776b4bd25c03b9e"},
+ {UINT32_C(233),UINT16_C(7),"scalar","8bd3321041402a3d4ba0e824190f29309e14f3810965a8f5b2848d053fdc275e"},
+ {UINT32_C(234),UINT16_C(8),"scalar","2bc3ac6f810dbd7fc674c39573c0ded9f5dd24de4f1ddff0eaab605c188b6662"},
  {UINT32_C(510),UINT16_C(1),"enumValue","51190c83bf8489c563da9f203912fefbc2fe58bfe1803f0074fe1a68498b0ca6"},
  {UINT32_C(541),UINT16_C(2),"cstringValue","c9a438d47fd32daf402475ece7988bd3f93ecde12b3ce079fcdd499349fef433"},
  {UINT32_C(548),UINT16_C(3),"cstringValue","9629ab7b194c825d16c621d420690e8839ca4e0d87a24f045dfeef3a1b1c0854"},
@@ -158,25 +158,25 @@ static const DehermDmSdkAdapterExactVector kVectors[]={
  {UINT32_C(1030),UINT16_C(9),"cstringValue","8c0477bef7ec47afe0bf1dcdd8c7011536b9e82f8d89fcb1dac6880c33eca8ad"},
  {UINT32_C(1031),UINT16_C(10),"cstringValue","e05b318f08b73ae295417913a5160e80e7a8bb75f24016bed533f7b4ff679f6b"},
  {UINT32_C(1035),UINT16_C(11),"cstringValue","06e7a1e4cd2324433e9edd327dcf11e642d95682ad7d7195a9553f32b9596131"},
- {UINT32_C(1045),UINT16_C(19),"scalar","4577778578dc57728a7e255a726c26f0c01c46c2e2e22bea75b56bb8c3211e0c"},
- {UINT32_C(1046),UINT16_C(20),"scalar","d90e8d9013e49431f9199b5560dfab0015c20f7dc8c0b6c3ce98b6707a593050"},
- {UINT32_C(1047),UINT16_C(21),"scalar","f6a5491e7c61e1c7f83dc3c6d400d0c10b897270c906b852ec73cdbb4d925858"},
- {UINT32_C(1074),UINT16_C(22),"scalar","d93d75be647cf6f8bacf12007fc4bbc58a186bacca657e9931420553b9fff549"},
- {UINT32_C(1075),UINT16_C(23),"scalar","c0b237aab423a361a2ea3fe94d49906b2df831539483dbaa1a1e9c224ec655ab"},
+ {UINT32_C(1045),UINT16_C(9),"scalar","0999582790485ff4ad9f47b0bf7acc02dd56a6487482358b2dfc5ecb8eafcf7b"},
+ {UINT32_C(1046),UINT16_C(10),"scalar","21d1c641f3ac78549bca3a0a3a7fe351e6be9a3358f10b7f554455e60b7be649"},
+ {UINT32_C(1047),UINT16_C(11),"scalar","66053a20acd7f0d1c47e97bb61e471dcf79f99375028189a4082e156733a4637"},
+ {UINT32_C(1074),UINT16_C(12),"scalar","d3bceb01a48b4fd6ae983aae5ace02aaccf6589a83046a5bbd548998d76d1f37"},
+ {UINT32_C(1075),UINT16_C(13),"scalar","69e3fa7e5181e1b6e2a242f77cdb039e5f33bcb567eaef31f5ba85b1d16d06e8"},
  {UINT32_C(1077),UINT16_C(3),"arenaCString","8d086552932e78bd3733d0b9199986a0d6d317a672a4ad8063d768b27dcc1193"},
- {UINT32_C(1079),UINT16_C(24),"scalar","4b605e2bbdabf7cb1fce55b5385157b96268959aee0929396351beec1a9823a7"},
- {UINT32_C(1080),UINT16_C(25),"scalar","d1b04a0c74d879b454387d6737235a3cf1dbd82b65360f328e1080e5ae4b1218"},
+ {UINT32_C(1079),UINT16_C(14),"scalar","edd250e62436e0bf7537d4887f7f36b0bc122fe5bf08f6ef3082c4537c4358a3"},
+ {UINT32_C(1080),UINT16_C(15),"scalar","571ef9756272d5e3a9745b12166cc836e2cc841c6fd8135b31fdd0ffdd4c54bf"},
  {UINT32_C(1082),UINT16_C(12),"cstringValue","dc422be9526af0a9a94d99a4ead1fe242ba4f97852c138bb55406fed83edb733"},
- {UINT32_C(1128),UINT16_C(0),"scalar","e679c13a84609f7f249fd083520dc099930bf2362172efb620bbd9cd25ae1316"},
- {UINT32_C(1129),UINT16_C(1),"scalar","62c88daa1abfd3466661cb2acb34bb616e04c5f6b0971cdfae250a5c920f958f"},
- {UINT32_C(1130),UINT16_C(2),"scalar","2ccef4249ca7636300b2ce3b6f648a2d3930e92d41917e3f6a13a008fd136374"},
- {UINT32_C(1131),UINT16_C(3),"scalar","d6daa3e93b89e3cb054a6a1309bf8776f0124216b522645ab31c0417f2fa398d"},
- {UINT32_C(1132),UINT16_C(4),"scalar","7eea825b1b95eba1afe7de86d8a1ed5ed9cbd3395403041b60ae76d2166e3680"},
- {UINT32_C(1133),UINT16_C(5),"scalar","e89857f86a1399b277980858703537b8f5ebf25537aa08a65d035a51efb7ed53"},
- {UINT32_C(1134),UINT16_C(6),"scalar","d592a8f3147daf05e6c5d0b6eb580838ac254669617a64d92569548c2e1eead5"},
- {UINT32_C(1135),UINT16_C(7),"scalar","d6d5bc327db52e4b6012e7ede4f1db42080988d75d41b3a78b711779d30fcdac"},
- {UINT32_C(1136),UINT16_C(8),"scalar","93e113df1c39f071200ec932d309825c0d24664fbd209129614eb2c6f5b4026c"},
- {UINT32_C(1244),UINT16_C(9),"scalar","fe85da34418667c99b4e2419c249f30c4f15e78479c95223dda56757bad89153"},
+ {UINT32_C(1128),UINT16_C(16),"scalar","9dc067bfe20c5db71e56b2919a03a8a4a18ea715b01f9e1544c6788bc11aa556"},
+ {UINT32_C(1129),UINT16_C(17),"scalar","62a75ff2fd79a65e5eab5783010452d8a916c416ca59f86eac8cc123d694f42a"},
+ {UINT32_C(1130),UINT16_C(18),"scalar","ce19ac0645b792834dd27a7ac425e112059db0f85a2e52205510302165fcc780"},
+ {UINT32_C(1131),UINT16_C(19),"scalar","1a487139cdd7b1f9d4912f104d07168fce1bb996c42be948cee914e782dd29db"},
+ {UINT32_C(1132),UINT16_C(20),"scalar","79db210e274db7d2d1f17aecd76b427a0f649eb6afc159a3a0f4d8c47ce4c177"},
+ {UINT32_C(1133),UINT16_C(21),"scalar","c1863a0993b9a55e8cc8ccb819a116651204b768b5d14b65aca298b934437fad"},
+ {UINT32_C(1134),UINT16_C(22),"scalar","7273bf9d726e40f5b9a6345d999a4006c58cb8dea0fe7a60ee856d61bd830e01"},
+ {UINT32_C(1135),UINT16_C(23),"scalar","5eec48a34f230f37cbf0cd0a9a8240dd38c7076e5a76543873b343a0048989e3"},
+ {UINT32_C(1136),UINT16_C(24),"scalar","e8195f54ad61b590f32149db1d4b86fef31e678d620b0527bfbe35a007189ae7"},
+ {UINT32_C(1244),UINT16_C(25),"scalar","65e2f36742e52bee3036627f2524ddd1ca9ec927b436308437471c9563bac7c0"},
  {UINT32_C(1292),UINT16_C(4),"arenaCString","b473f67331549954522ad856bbac2943c1ac4f8e0788a96aa0a227e7522afece"},
  {UINT32_C(1295),UINT16_C(13),"cstringValue","b4e8f9abe735d11654401dd2c23c1e9e4167592f333993ae2c4ebb2d6eebf9ef"}
 };
@@ -195,58 +195,58 @@ if(strcmp(deherm_dmsdk_arena_cstring_descriptors()[UINT16_C(3)].declaration_id,"
 if(deherm_dmsdk_arena_cstring_descriptors()[UINT16_C(4)].id!=UINT16_C(4))return 10;
 if(strcmp(deherm_dmsdk_arena_cstring_descriptors()[UINT16_C(4)].declaration_id,"dmsdk:ResourceGetCanonicalPath@upstream/defold/engine/resource/src/dmsdk/resource/resource.h:324:1907")!=0)return 11;
 if(deherm_dmsdk_scalar_count()!=UINT32_C(26))return 12;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(10)].id!=UINT16_C(10))return 13;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(10)].declaration_id,"dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194")!=0)return 14;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(11)].id!=UINT16_C(11))return 15;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(11)].declaration_id,"dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195")!=0)return 16;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(12)].id!=UINT16_C(12))return 17;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(12)].declaration_id,"dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196")!=0)return 18;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(13)].id!=UINT16_C(13))return 19;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(13)].declaration_id,"dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200")!=0)return 20;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(14)].id!=UINT16_C(14))return 21;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(14)].declaration_id,"dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202")!=0)return 22;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(15)].id!=UINT16_C(15))return 23;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(15)].declaration_id,"dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198")!=0)return 24;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(16)].id!=UINT16_C(16))return 25;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(16)].declaration_id,"dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201")!=0)return 26;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(17)].id!=UINT16_C(17))return 27;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(17)].declaration_id,"dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197")!=0)return 28;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(18)].id!=UINT16_C(18))return 29;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(18)].declaration_id,"dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199")!=0)return 30;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(19)].id!=UINT16_C(19))return 31;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(19)].declaration_id,"dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615")!=0)return 32;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(20)].id!=UINT16_C(20))return 33;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(20)].declaration_id,"dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614")!=0)return 34;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(21)].id!=UINT16_C(21))return 35;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(21)].declaration_id,"dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616")!=0)return 36;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(22)].id!=UINT16_C(22))return 37;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(22)].declaration_id,"dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646")!=0)return 38;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(23)].id!=UINT16_C(23))return 39;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(23)].declaration_id,"dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647")!=0)return 40;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(24)].id!=UINT16_C(24))return 41;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(24)].declaration_id,"dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668")!=0)return 42;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(25)].id!=UINT16_C(25))return 43;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(25)].declaration_id,"dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667")!=0)return 44;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(0)].id!=UINT16_C(0))return 45;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(0)].declaration_id,"dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185")!=0)return 46;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(1)].id!=UINT16_C(1))return 47;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(1)].declaration_id,"dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186")!=0)return 48;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(2)].id!=UINT16_C(2))return 49;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(2)].declaration_id,"dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187")!=0)return 50;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(3)].id!=UINT16_C(3))return 51;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(3)].declaration_id,"dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189")!=0)return 52;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(4)].id!=UINT16_C(4))return 53;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(4)].declaration_id,"dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191")!=0)return 54;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(5)].id!=UINT16_C(5))return 55;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(5)].declaration_id,"dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193")!=0)return 56;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(6)].id!=UINT16_C(6))return 57;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(6)].declaration_id,"dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188")!=0)return 58;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(7)].id!=UINT16_C(7))return 59;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(7)].declaration_id,"dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190")!=0)return 60;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(8)].id!=UINT16_C(8))return 61;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(8)].declaration_id,"dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192")!=0)return 62;
-if(deherm_dmsdk_scalar_descriptors()[UINT16_C(9)].id!=UINT16_C(9))return 63;
-if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(9)].declaration_id,"dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531")!=0)return 64;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(0)].id!=UINT16_C(0))return 13;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(0)].declaration_id,"dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:36:194")!=0)return 14;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(1)].id!=UINT16_C(1))return 15;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(1)].declaration_id,"dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:46:195")!=0)return 16;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(2)].id!=UINT16_C(2))return 17;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(2)].declaration_id,"dmsdk:dmEndian::ByteSwap@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:56:196")!=0)return 18;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(3)].id!=UINT16_C(3))return 19;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(3)].declaration_id,"dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:104:200")!=0)return 20;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(4)].id!=UINT16_C(4))return 21;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(4)].declaration_id,"dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:128:202")!=0)return 22;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(5)].id!=UINT16_C(5))return 23;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(5)].declaration_id,"dmsdk:dmEndian::ToHost@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:80:198")!=0)return 24;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(6)].id!=UINT16_C(6))return 25;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(6)].declaration_id,"dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:116:201")!=0)return 26;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(7)].id!=UINT16_C(7))return 27;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(7)].declaration_id,"dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:68:197")!=0)return 28;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(8)].id!=UINT16_C(8))return 29;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(8)].declaration_id,"dmsdk:dmEndian::ToNetwork@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.hpp:92:199")!=0)return 30;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(9)].id!=UINT16_C(9))return 31;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(9)].declaration_id,"dmsdk:dmTime::GetMonotonicTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:56:615")!=0)return 32;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(10)].id!=UINT16_C(10))return 33;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(10)].declaration_id,"dmsdk:dmTime::GetTime@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:38:614")!=0)return 34;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(11)].id!=UINT16_C(11))return 35;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(11)].declaration_id,"dmsdk:dmTime::Sleep@upstream/defold/engine/dlib/src/dmsdk/dlib/time.h:64:616")!=0)return 36;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(12)].id!=UINT16_C(12))return 37;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(12)].declaration_id,"dmsdk:dmTrigLookup::Cos@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:54:646")!=0)return 38;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(13)].id!=UINT16_C(13))return 39;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(13)].declaration_id,"dmsdk:dmTrigLookup::Sin@upstream/defold/engine/dlib/src/dmsdk/dlib/trig_lookup.h:76:647")!=0)return 40;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(14)].id!=UINT16_C(14))return 41;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(14)].declaration_id,"dmsdk:dmUtf8::IsBreaking@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:103:668")!=0)return 42;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(15)].id!=UINT16_C(15))return 43;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(15)].declaration_id,"dmsdk:dmUtf8::IsWhiteSpace@upstream/defold/engine/dlib/src/dmsdk/dlib/utf8.h:86:667")!=0)return 44;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(16)].id!=UINT16_C(16))return 45;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(16)].declaration_id,"dmsdk:EndianSwap16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:65:185")!=0)return 46;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(17)].id!=UINT16_C(17))return 47;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(17)].declaration_id,"dmsdk:EndianSwap32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:81:186")!=0)return 48;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(18)].id!=UINT16_C(18))return 49;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(18)].declaration_id,"dmsdk:EndianSwap64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:100:187")!=0)return 50;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(19)].id!=UINT16_C(19))return 51;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(19)].declaration_id,"dmsdk:EndianToHost16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:141:189")!=0)return 52;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(20)].id!=UINT16_C(20))return 53;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(20)].declaration_id,"dmsdk:EndianToHost32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:169:191")!=0)return 54;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(21)].id!=UINT16_C(21))return 55;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(21)].declaration_id,"dmsdk:EndianToHost64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:197:193")!=0)return 56;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(22)].id!=UINT16_C(22))return 57;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(22)].declaration_id,"dmsdk:EndianToNetwork16@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:125:188")!=0)return 58;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(23)].id!=UINT16_C(23))return 59;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(23)].declaration_id,"dmsdk:EndianToNetwork32@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:153:190")!=0)return 60;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(24)].id!=UINT16_C(24))return 61;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(24)].declaration_id,"dmsdk:EndianToNetwork64@upstream/defold/engine/dlib/src/dmsdk/dlib/endian.h:181:192")!=0)return 62;
+if(deherm_dmsdk_scalar_descriptors()[UINT16_C(25)].id!=UINT16_C(25))return 63;
+if(strcmp(deherm_dmsdk_scalar_descriptors()[UINT16_C(25)].declaration_id,"dmsdk:ProfileIsInitialized@upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h:340:531")!=0)return 64;
 if(deherm_dmsdk_enum_count()!=UINT32_C(7))return 65;
 if(deherm_dmsdk_enum_descriptors()[UINT16_C(0)].id!=UINT16_C(0))return 66;
 if(strcmp(deherm_dmsdk_enum_descriptors()[UINT16_C(0)].declaration_id,"dmsdk:dmBuffer::GetSizeForValueType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:363:99")!=0)return 67;
@@ -334,15 +334,15 @@ if(deherm_dmsdk_xtea_span_count()!=UINT32_C(2))return 140;
 {uint8_t input[16]={UINT8_C(33)};uint8_t output[64]={};uint32_t written=0;if(deherm_dmsdk_fixed_digest_dispatch(UINT16_C(1),input,UINT32_C(6),output,UINT32_C(64),&written)!=DEHERM_DMSDK_FIXED_DIGEST_OK)return 149;if(g_calls[2][1]!=UINT32_C(1)||g_failures[2][1]!=UINT32_C(0))return 149;if(written!=UINT32_C(20))return 149;for(uint32_t i=0;i<written;++i)if(output[i]!=static_cast<uint8_t>(UINT8_C(113)+i))return 149;}
 {uint8_t input[16]={UINT8_C(34)};uint8_t output[64]={};uint32_t written=0;if(deherm_dmsdk_fixed_digest_dispatch(UINT16_C(2),input,UINT32_C(7),output,UINT32_C(64),&written)!=DEHERM_DMSDK_FIXED_DIGEST_OK)return 150;if(g_calls[2][2]!=UINT32_C(1)||g_failures[2][2]!=UINT32_C(0))return 150;if(written!=UINT32_C(32))return 150;for(uint32_t i=0;i<written;++i)if(output[i]!=static_cast<uint8_t>(UINT8_C(114)+i))return 150;}
 {uint8_t input[16]={UINT8_C(35)};uint8_t output[64]={};uint32_t written=0;if(deherm_dmsdk_fixed_digest_dispatch(UINT16_C(3),input,UINT32_C(8),output,UINT32_C(64),&written)!=DEHERM_DMSDK_FIXED_DIGEST_OK)return 151;if(g_calls[2][3]!=UINT32_C(1)||g_failures[2][3]!=UINT32_C(0))return 151;if(written!=UINT32_C(64))return 151;for(uint32_t i=0;i<written;++i)if(output[i]!=static_cast<uint8_t>(UINT8_C(115)+i))return 151;}
-{uint64_t arguments[2]={UINT64_C(4522)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(10),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 152;if(g_calls[0][10]!=UINT32_C(1)||g_failures[0][10]!=UINT32_C(0))return 152;if(result!=UINT64_C(20906))return 152;}
-{uint64_t arguments[2]={UINT64_C(4539)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(11),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 153;if(g_calls[0][11]!=UINT32_C(1)||g_failures[0][11]!=UINT32_C(0))return 153;if(result!=UINT64_C(20923))return 153;}
-{uint64_t arguments[2]={UINT64_C(4294971852)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(12),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 154;if(g_calls[0][12]!=UINT32_C(1)||g_failures[0][12]!=UINT32_C(0))return 154;if(result!=UINT64_C(4294988236))return 154;}
-{uint64_t arguments[2]={UINT64_C(4573)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(13),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 155;if(g_calls[0][13]!=UINT32_C(1)||g_failures[0][13]!=UINT32_C(0))return 155;if(result!=UINT64_C(20957))return 155;}
-{uint64_t arguments[2]={UINT64_C(4294971886)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(14),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 156;if(g_calls[0][14]!=UINT32_C(1)||g_failures[0][14]!=UINT32_C(0))return 156;if(result!=UINT64_C(4294988270))return 156;}
-{uint64_t arguments[2]={UINT64_C(4607)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(15),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 157;if(g_calls[0][15]!=UINT32_C(1)||g_failures[0][15]!=UINT32_C(0))return 157;if(result!=UINT64_C(20991))return 157;}
-{uint64_t arguments[2]={UINT64_C(4294971920)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(16),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 158;if(g_calls[0][16]!=UINT32_C(1)||g_failures[0][16]!=UINT32_C(0))return 158;if(result!=UINT64_C(4294988304))return 158;}
-{uint64_t arguments[2]={UINT64_C(4641)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(17),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 159;if(g_calls[0][17]!=UINT32_C(1)||g_failures[0][17]!=UINT32_C(0))return 159;if(result!=UINT64_C(21025))return 159;}
-{uint64_t arguments[2]={UINT64_C(4658)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(18),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 160;if(g_calls[0][18]!=UINT32_C(1)||g_failures[0][18]!=UINT32_C(0))return 160;if(result!=UINT64_C(21042))return 160;}
+{uint64_t arguments[2]={UINT64_C(4352)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(0),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 152;if(g_calls[0][0]!=UINT32_C(1)||g_failures[0][0]!=UINT32_C(0))return 152;if(result!=UINT64_C(20736))return 152;}
+{uint64_t arguments[2]={UINT64_C(4369)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(1),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 153;if(g_calls[0][1]!=UINT32_C(1)||g_failures[0][1]!=UINT32_C(0))return 153;if(result!=UINT64_C(20753))return 153;}
+{uint64_t arguments[2]={UINT64_C(4294971682)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(2),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 154;if(g_calls[0][2]!=UINT32_C(1)||g_failures[0][2]!=UINT32_C(0))return 154;if(result!=UINT64_C(4294988066))return 154;}
+{uint64_t arguments[2]={UINT64_C(4403)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(3),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 155;if(g_calls[0][3]!=UINT32_C(1)||g_failures[0][3]!=UINT32_C(0))return 155;if(result!=UINT64_C(20787))return 155;}
+{uint64_t arguments[2]={UINT64_C(4294971716)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(4),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 156;if(g_calls[0][4]!=UINT32_C(1)||g_failures[0][4]!=UINT32_C(0))return 156;if(result!=UINT64_C(4294988100))return 156;}
+{uint64_t arguments[2]={UINT64_C(4437)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(5),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 157;if(g_calls[0][5]!=UINT32_C(1)||g_failures[0][5]!=UINT32_C(0))return 157;if(result!=UINT64_C(20821))return 157;}
+{uint64_t arguments[2]={UINT64_C(4294971750)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(6),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 158;if(g_calls[0][6]!=UINT32_C(1)||g_failures[0][6]!=UINT32_C(0))return 158;if(result!=UINT64_C(4294988134))return 158;}
+{uint64_t arguments[2]={UINT64_C(4471)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(7),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 159;if(g_calls[0][7]!=UINT32_C(1)||g_failures[0][7]!=UINT32_C(0))return 159;if(result!=UINT64_C(20855))return 159;}
+{uint64_t arguments[2]={UINT64_C(4488)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(8),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 160;if(g_calls[0][8]!=UINT32_C(1)||g_failures[0][8]!=UINT32_C(0))return 160;if(result!=UINT64_C(20872))return 160;}
 {uint64_t arguments[2]={UINT64_C(0)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_enum_dispatch(UINT16_C(1),arguments,UINT32_C(0),&result)!=DEHERM_DMSDK_ENUM_OK)return 161;if(g_calls[1][1]!=UINT32_C(1)||g_failures[1][1]!=UINT32_C(0))return 161;if(result!=UINT64_C(2))return 161;}
 {uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={{nullptr,UINT32_C(0)}};uint64_t scalars[2]={UINT64_C(2)};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(2),&scratch,strings,UINT32_C(0),scalars,UINT32_C(1),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return 162;if(g_calls[7][2]!=UINT32_C(1)||g_failures[7][2]!=UINT32_C(0))return 162;if(!present||required!=UINT32_C(8)||strcmp(reinterpret_cast<const char*>(output),"result_2")!=0)return 162;}
 {uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={{nullptr,UINT32_C(0)}};uint64_t scalars[2]={UINT64_C(3)};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(3),&scratch,strings,UINT32_C(0),scalars,UINT32_C(1),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return 163;if(g_calls[7][3]!=UINT32_C(1)||g_failures[7][3]!=UINT32_C(0))return 163;if(!present||required!=UINT32_C(8)||strcmp(reinterpret_cast<const char*>(output),"result_3")!=0)return 163;}
@@ -376,25 +376,25 @@ if(deherm_dmsdk_xtea_span_count()!=UINT32_C(2))return 140;
 {uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={{reinterpret_cast<const uint8_t*>("exact_9_0"),UINT32_C(9)}};uint64_t scalars[2]={UINT64_C(0)};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(9),&scratch,strings,UINT32_C(1),scalars,UINT32_C(0),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return 191;if(g_calls[7][9]!=UINT32_C(1)||g_failures[7][9]!=UINT32_C(0))return 191;if(result!=UINT64_C(1))return 191;}
 {uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={{reinterpret_cast<const uint8_t*>("exact_10_0"),UINT32_C(10)},{reinterpret_cast<const uint8_t*>("exact_10_1"),UINT32_C(10)}};uint64_t scalars[2]={UINT64_C(0)};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(10),&scratch,strings,UINT32_C(2),scalars,UINT32_C(0),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return 192;if(g_calls[7][10]!=UINT32_C(1)||g_failures[7][10]!=UINT32_C(0))return 192;if(result!=static_cast<uint64_t>(INT64_C(-11)))return 192;}
 {uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={{reinterpret_cast<const uint8_t*>("exact_11_0"),UINT32_C(10)}};uint64_t scalars[2]={UINT64_C(0)};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(11),&scratch,strings,UINT32_C(1),scalars,UINT32_C(0),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return 193;if(g_calls[7][11]!=UINT32_C(1)||g_failures[7][11]!=UINT32_C(0))return 193;if(result!=static_cast<uint64_t>(INT64_C(-12)))return 193;}
-{uint64_t arguments[2]={UINT64_C(0)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(19),arguments,UINT32_C(0),&result)!=DEHERM_DMSDK_SCALAR_OK)return 194;if(g_calls[0][19]!=UINT32_C(1)||g_failures[0][19]!=UINT32_C(0))return 194;if(result!=UINT64_C(4294988355))return 194;}
-{uint64_t arguments[2]={UINT64_C(0)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(20),arguments,UINT32_C(0),&result)!=DEHERM_DMSDK_SCALAR_OK)return 195;if(g_calls[0][20]!=UINT32_C(1)||g_failures[0][20]!=UINT32_C(0))return 195;if(result!=UINT64_C(4294988372))return 195;}
-{uint64_t arguments[2]={UINT64_C(4709)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(21),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 196;if(g_calls[0][21]!=UINT32_C(1)||g_failures[0][21]!=UINT32_C(0))return 196;if(result!=UINT64_C(0))return 196;}
-{uint64_t arguments[2]={pack_f32(122.25f)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(22),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 197;if(g_calls[0][22]!=UINT32_C(1)||g_failures[0][22]!=UINT32_C(0))return 197;if(result!=pack_f32(122.75f))return 197;}
-{uint64_t arguments[2]={pack_f32(123.25f)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(23),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 198;if(g_calls[0][23]!=UINT32_C(1)||g_failures[0][23]!=UINT32_C(0))return 198;if(result!=pack_f32(123.75f))return 198;}
+{uint64_t arguments[2]={UINT64_C(0)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(9),arguments,UINT32_C(0),&result)!=DEHERM_DMSDK_SCALAR_OK)return 194;if(g_calls[0][9]!=UINT32_C(1)||g_failures[0][9]!=UINT32_C(0))return 194;if(result!=UINT64_C(4294988185))return 194;}
+{uint64_t arguments[2]={UINT64_C(0)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(10),arguments,UINT32_C(0),&result)!=DEHERM_DMSDK_SCALAR_OK)return 195;if(g_calls[0][10]!=UINT32_C(1)||g_failures[0][10]!=UINT32_C(0))return 195;if(result!=UINT64_C(4294988202))return 195;}
+{uint64_t arguments[2]={UINT64_C(4539)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(11),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 196;if(g_calls[0][11]!=UINT32_C(1)||g_failures[0][11]!=UINT32_C(0))return 196;if(result!=UINT64_C(0))return 196;}
+{uint64_t arguments[2]={pack_f32(112.25f)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(12),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 197;if(g_calls[0][12]!=UINT32_C(1)||g_failures[0][12]!=UINT32_C(0))return 197;if(result!=pack_f32(112.75f))return 197;}
+{uint64_t arguments[2]={pack_f32(113.25f)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(13),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 198;if(g_calls[0][13]!=UINT32_C(1)||g_failures[0][13]!=UINT32_C(0))return 198;if(result!=pack_f32(113.75f))return 198;}
 {const uint8_t* input=reinterpret_cast<const uint8_t*>("arena_3");uint8_t output[64]={};DehermDmSdkArenaCStringResult result{};if(deherm_dmsdk_arena_cstring_dispatch(UINT16_C(3),input,UINT32_C(7),UINT64_C(0),reinterpret_cast<char*>(output),UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK)return 199;if(g_calls[8][3]!=UINT32_C(1)||g_failures[8][3]!=UINT32_C(0))return 199;if(strcmp(reinterpret_cast<const char*>(output),"result_3")!=0||result.output_length!=UINT32_C(8)||result.required_length!=UINT32_C(9)||result.native_result!=UINT64_C(0))return 199;}
-{uint64_t arguments[2]={UINT64_C(4760)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(24),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 200;if(g_calls[0][24]!=UINT32_C(1)||g_failures[0][24]!=UINT32_C(0))return 200;if(result!=UINT64_C(1))return 200;}
-{uint64_t arguments[2]={UINT64_C(4777)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(25),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 201;if(g_calls[0][25]!=UINT32_C(1)||g_failures[0][25]!=UINT32_C(0))return 201;if(result!=UINT64_C(1))return 201;}
+{uint64_t arguments[2]={UINT64_C(4590)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(14),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 200;if(g_calls[0][14]!=UINT32_C(1)||g_failures[0][14]!=UINT32_C(0))return 200;if(result!=UINT64_C(1))return 200;}
+{uint64_t arguments[2]={UINT64_C(4607)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(15),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 201;if(g_calls[0][15]!=UINT32_C(1)||g_failures[0][15]!=UINT32_C(0))return 201;if(result!=UINT64_C(1))return 201;}
 {uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={{reinterpret_cast<const uint8_t*>("exact_12_0"),UINT32_C(10)}};uint64_t scalars[2]={UINT64_C(0)};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(12),&scratch,strings,UINT32_C(1),scalars,UINT32_C(0),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return 202;if(g_calls[7][12]!=UINT32_C(1)||g_failures[7][12]!=UINT32_C(0))return 202;if(result!=UINT64_C(20940))return 202;}
-{uint64_t arguments[2]={UINT64_C(4352)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(0),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 203;if(g_calls[0][0]!=UINT32_C(1)||g_failures[0][0]!=UINT32_C(0))return 203;if(result!=UINT64_C(20736))return 203;}
-{uint64_t arguments[2]={UINT64_C(4369)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(1),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 204;if(g_calls[0][1]!=UINT32_C(1)||g_failures[0][1]!=UINT32_C(0))return 204;if(result!=UINT64_C(20753))return 204;}
-{uint64_t arguments[2]={UINT64_C(4294971682)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(2),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 205;if(g_calls[0][2]!=UINT32_C(1)||g_failures[0][2]!=UINT32_C(0))return 205;if(result!=UINT64_C(4294988066))return 205;}
-{uint64_t arguments[2]={UINT64_C(4403)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(3),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 206;if(g_calls[0][3]!=UINT32_C(1)||g_failures[0][3]!=UINT32_C(0))return 206;if(result!=UINT64_C(20787))return 206;}
-{uint64_t arguments[2]={UINT64_C(4420)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(4),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 207;if(g_calls[0][4]!=UINT32_C(1)||g_failures[0][4]!=UINT32_C(0))return 207;if(result!=UINT64_C(20804))return 207;}
-{uint64_t arguments[2]={UINT64_C(4294971733)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(5),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 208;if(g_calls[0][5]!=UINT32_C(1)||g_failures[0][5]!=UINT32_C(0))return 208;if(result!=UINT64_C(4294988117))return 208;}
-{uint64_t arguments[2]={UINT64_C(4454)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(6),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 209;if(g_calls[0][6]!=UINT32_C(1)||g_failures[0][6]!=UINT32_C(0))return 209;if(result!=UINT64_C(20838))return 209;}
-{uint64_t arguments[2]={UINT64_C(4471)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(7),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 210;if(g_calls[0][7]!=UINT32_C(1)||g_failures[0][7]!=UINT32_C(0))return 210;if(result!=UINT64_C(20855))return 210;}
-{uint64_t arguments[2]={UINT64_C(4294971784)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(8),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 211;if(g_calls[0][8]!=UINT32_C(1)||g_failures[0][8]!=UINT32_C(0))return 211;if(result!=UINT64_C(4294988168))return 211;}
-{uint64_t arguments[2]={UINT64_C(0)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(9),arguments,UINT32_C(0),&result)!=DEHERM_DMSDK_SCALAR_OK)return 212;if(g_calls[0][9]!=UINT32_C(1)||g_failures[0][9]!=UINT32_C(0))return 212;if(result!=UINT64_C(1))return 212;}
+{uint64_t arguments[2]={UINT64_C(4624)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(16),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 203;if(g_calls[0][16]!=UINT32_C(1)||g_failures[0][16]!=UINT32_C(0))return 203;if(result!=UINT64_C(21008))return 203;}
+{uint64_t arguments[2]={UINT64_C(4641)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(17),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 204;if(g_calls[0][17]!=UINT32_C(1)||g_failures[0][17]!=UINT32_C(0))return 204;if(result!=UINT64_C(21025))return 204;}
+{uint64_t arguments[2]={UINT64_C(4294971954)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(18),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 205;if(g_calls[0][18]!=UINT32_C(1)||g_failures[0][18]!=UINT32_C(0))return 205;if(result!=UINT64_C(4294988338))return 205;}
+{uint64_t arguments[2]={UINT64_C(4675)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(19),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 206;if(g_calls[0][19]!=UINT32_C(1)||g_failures[0][19]!=UINT32_C(0))return 206;if(result!=UINT64_C(21059))return 206;}
+{uint64_t arguments[2]={UINT64_C(4692)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(20),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 207;if(g_calls[0][20]!=UINT32_C(1)||g_failures[0][20]!=UINT32_C(0))return 207;if(result!=UINT64_C(21076))return 207;}
+{uint64_t arguments[2]={UINT64_C(4294972005)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(21),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 208;if(g_calls[0][21]!=UINT32_C(1)||g_failures[0][21]!=UINT32_C(0))return 208;if(result!=UINT64_C(4294988389))return 208;}
+{uint64_t arguments[2]={UINT64_C(4726)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(22),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 209;if(g_calls[0][22]!=UINT32_C(1)||g_failures[0][22]!=UINT32_C(0))return 209;if(result!=UINT64_C(21110))return 209;}
+{uint64_t arguments[2]={UINT64_C(4743)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(23),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 210;if(g_calls[0][23]!=UINT32_C(1)||g_failures[0][23]!=UINT32_C(0))return 210;if(result!=UINT64_C(21127))return 210;}
+{uint64_t arguments[2]={UINT64_C(4294972056)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(24),arguments,UINT32_C(1),&result)!=DEHERM_DMSDK_SCALAR_OK)return 211;if(g_calls[0][24]!=UINT32_C(1)||g_failures[0][24]!=UINT32_C(0))return 211;if(result!=UINT64_C(4294988440))return 211;}
+{uint64_t arguments[2]={UINT64_C(0)};uint64_t result=UINT64_C(0xffff);if(deherm_dmsdk_scalar_dispatch(UINT16_C(25),arguments,UINT32_C(0),&result)!=DEHERM_DMSDK_SCALAR_OK)return 212;if(g_calls[0][25]!=UINT32_C(1)||g_failures[0][25]!=UINT32_C(0))return 212;if(result!=UINT64_C(1))return 212;}
 {const uint8_t* input=reinterpret_cast<const uint8_t*>("arena_4");uint8_t output[64]={};DehermDmSdkArenaCStringResult result{};if(deherm_dmsdk_arena_cstring_dispatch(UINT16_C(4),input,UINT32_C(7),UINT64_C(0),reinterpret_cast<char*>(output),UINT32_C(64),&result)!=DEHERM_DMSDK_ARENA_CSTRING_OK)return 213;if(g_calls[8][4]!=UINT32_C(1)||g_failures[8][4]!=UINT32_C(0))return 213;if(strcmp(reinterpret_cast<const char*>(output),"result_4")!=0||result.output_length!=UINT32_C(8)||result.required_length!=UINT32_C(504)||result.native_result!=UINT64_C(504))return 213;}
 {uint8_t scratch_bytes[256]={};DehermDmSdkCStringScratch scratch{scratch_bytes,UINT32_C(256),UINT32_C(0)};DehermDmSdkCStringView strings[2]={{reinterpret_cast<const uint8_t*>("exact_13_0"),UINT32_C(10)}};uint64_t scalars[2]={UINT64_C(0)};uint64_t result=0;uint8_t output[64]={};uint32_t required=0;uint8_t present=0;if(deherm_dmsdk_cstring_value_dispatch(UINT16_C(13),&scratch,strings,UINT32_C(1),scalars,UINT32_C(0),&result,output,UINT32_C(64),&required,&present)!=DEHERM_DMSDK_CSTRING_OK)return 214;if(g_calls[7][13]!=UINT32_C(1)||g_failures[7][13]!=UINT32_C(0))return 214;if(!present||required!=UINT32_C(9)||strcmp(reinterpret_cast<const char*>(output),"result_13")!=0)return 214;}
 {char output[64];memset(output,'x',sizeof(output));DehermDmSdkArenaCStringResult result{UINT64_C(9),9,9};g_arena_uri_failure=true;const char input[]="arena_3";const auto status=deherm_dmsdk_arena_cstring_dispatch(UINT16_C(3),reinterpret_cast<const uint8_t*>(input),UINT32_C(7),UINT64_C(0),output,UINT32_C(64),&result);g_arena_uri_failure=false;if(status!=DEHERM_DMSDK_ARENA_CSTRING_NATIVE_FAILURE||result.native_result!=0||result.output_length!=0||result.required_length!=0)return 215;for(char value:output)if(value!='\0')return 216;}

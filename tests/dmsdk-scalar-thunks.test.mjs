@@ -6,48 +6,54 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
-import { resolveScalarModule, resolveScalarSourceEvidence } from "../scripts/generate-dmsdk-scalar-thunks.mjs";
-import { DERIVED_REVISION_ENV } from "../scripts/lib/reviewed-revision.mjs";
+import { inferScalarThunkSemantics } from "../scripts/generate-dmsdk-scalar-thunks.mjs";
 
 const testDirectory = dirname(fileURLToPath(import.meta.url));
 const repositoryRoot = resolve(testDirectory, "..");
 const reportPath = join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-scalar-thunks.json");
 const compiler = process.env.CXX || "clang++";
 const cCompiler = process.env.CC || "clang";
-const otherRevision = "0123456789abcdef0123456789abcdef01234567";
 
 function run(command, args, options = {}) {
   return execFileSync(command, args, { cwd: repositoryRoot, encoding: "utf8", stdio: "pipe", ...options });
 }
 
-test("scalar source-anchor drift withdraws evidence only during a declared revision derivation", () => {
-  const input = {
-    content: "void renamed_finalize();\n",
-    relativePath: "upstream/defold/engine/example.cpp",
-    needle: "void Finalize()",
-    owner: "dmsdk:dmExample::Finalize"
-  };
-  assert.throws(() => resolveScalarSourceEvidence({ ...input, env: {} }), /Expected source evidence not found/u);
-  assert.deepEqual(resolveScalarSourceEvidence({
-    ...input,
-    env: { [DERIVED_REVISION_ENV]: otherRevision }
-  }), {
-    path: input.relativePath,
-    status: "withdrawn",
-    reason: "source-anchor-moved",
-    anchor: input.needle
-  });
-  assert.equal(resolveScalarSourceEvidence({
-    ...input,
-    content: null,
-    env: { [DERIVED_REVISION_ENV]: otherRevision }
-  }).reason, "absent-source");
+function hostImplementationSources() {
+  const timeSource =
+    process.platform === "darwin"
+      ? "upstream/defold/engine/dlib/src/dlib/time_apple.cpp"
+      : "upstream/defold/engine/dlib/src/dlib/time_posix.cpp";
+  return [
+    "upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp",
+    "upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp",
+    timeSource,
+  ];
+}
+
+test("scalar thunk policy contains transport recipes, not Defold revision facts", async () => {
+  const content = await readFile(join(repositoryRoot, "packages/bindings/overrides/dmsdk-scalar-thunks.json"), "utf8");
+  assert.doesNotMatch(content, /dmsdk:|dmEndian|dmGraphics|dmLog|dmTime|dmTrig|dmUtf8|upstream\/defold/u);
 });
 
-test("an unknown historical scalar module falls back to the universal catalog", () => {
-  const header = "upstream/defold/engine/gamesys/src/dmsdk/gamesys/resources/res_font.h";
-  assert.throws(() => resolveScalarModule(header, {}), /No reviewed scalar module/u);
-  assert.equal(resolveScalarModule(header, { [DERIVED_REVISION_ENV]: otherRevision }), null);
+test("scalar discovery comes from direct primitive ABI facts, not classification or tranche names", async () => {
+  const [ir, shapes] = await Promise.all([
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-sdk-ir.json"), "utf8").then(JSON.parse),
+    readFile(join(repositoryRoot, "packages/bindings/generated/defold-dmsdk-abi-shapes.json"), "utf8").then(JSON.parse),
+  ]);
+  const declarations = new Map(ir.declarations.map((declaration) => [declaration.id, declaration]));
+  const inferred = shapes.rows
+    .map((row) => ({
+      declaration: declarations.get(row.id),
+      semantics: inferScalarThunkSemantics(declarations.get(row.id), {
+        ...row,
+        primaryFamily: "ignored",
+        tranche: "ignored",
+      }),
+    }))
+    .filter(({ semantics }) => semantics);
+  assert.equal(inferred.length, 31);
+  assert.equal(inferred.filter(({ semantics }) => semantics.capabilityBlocker).length, 5);
+  assert.equal(inferred.filter(({ semantics }) => semantics.mayBlock).length, 1);
 });
 
 test("scalar thunk artifacts are deterministic", async () => {
@@ -56,7 +62,11 @@ test("scalar thunk artifacts are deterministic", async () => {
     run(process.execPath, ["scripts/generate-dmsdk-scalar-thunks.mjs", "--out-root", outputRoot]);
     const report = JSON.parse(await readFile(reportPath, "utf8"));
     for (const artifact of [...report.artifacts, "packages/bindings/generated/defold-dmsdk-scalar-thunks.json"]) {
-      assert.equal(await readFile(join(outputRoot, artifact), "utf8"), await readFile(join(repositoryRoot, artifact), "utf8"), artifact);
+      assert.equal(
+        await readFile(join(outputRoot, artifact), "utf8"),
+        await readFile(join(repositoryRoot, artifact), "utf8"),
+        artifact,
+      );
     }
   } finally {
     await rm(outputRoot, { recursive: true, force: true });
@@ -101,40 +111,64 @@ test("all 31 scalar-direct candidates have an evidence-backed disposition", asyn
   assert.equal(graphics.blocker.policy, "lifecycle-capability-required");
   assert.equal(graphics.blocker.category, "engine-lifecycle");
   assert.equal(graphics.stages.compiled.status, "header-compiled-policy-blocked");
-  assert.ok(graphics.definitionEvidence.some(({ path }) => path.endsWith("/include/graphics/graphics_ddf.h")));
+  assert.deepEqual(graphics.definitionEvidence, [graphics.headerEvidence]);
   const unsafeLifecycle = new Set([
-    "dmGraphics::Finalize", "dmLog::LogFinalize", "dmLogFinalize", "ProfileInitialize", "ProfileFinalize"
+    "dmGraphics::Finalize",
+    "dmLog::LogFinalize",
+    "dmLogFinalize",
+    "ProfileInitialize",
+    "ProfileFinalize",
   ]);
   for (const declaration of report.declarations.filter(({ symbol }) => unsafeLifecycle.has(symbol))) {
     assert.equal(declaration.emitted, false);
     assert.equal(declaration.blocker.policy, "lifecycle-capability-required");
     assert.equal(declaration.stages.generated.status, "blocked-by-policy");
   }
-  const publicHeader = await readFile(join(repositoryRoot,
-    "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"), "utf8");
+  const publicHeader = await readFile(
+    join(repositoryRoot, "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"),
+    "utf8",
+  );
   assert.doesNotMatch(publicHeader, /(?:log_finalize|profile_initialize|profile_finalize)/);
   assert.equal(report.declarations.filter(({ stages }) => stages.linked.status === "not-yet-tested").length, 0);
   assert.match(report.sourceHashes.ir, /^[a-f0-9]{64}$/);
-  assert.match(report.sourceHashes.classification, /^[a-f0-9]{64}$/);
+  assert.match(report.sourceHashes.shapes, /^[a-f0-9]{64}$/);
+  assert.match(report.sourceHashes.recipe, /^[a-f0-9]{64}$/);
   assert.equal(Object.keys(report.artifactHashes).length, report.artifacts.length);
   for (const digest of Object.values(report.artifactHashes)) assert.match(digest, /^[a-f0-9]{64}$/);
 });
 
 test("all lifecycle blockers compile from the complete pinned packaged SDK without being executed", async () => {
-  const sdkRoot = join(repositoryRoot,
-    "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk");
+  const sdkRoot = join(
+    repositoryRoot,
+    "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk",
+  );
   const outputDirectory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-blocker-audit-"));
   try {
     const object = join(outputDirectory, "blockers.o");
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
-      "-DDLIB_LOG_DOMAIN=\"deherm\"",
-      "-isystem", join(sdkRoot, "sdk/include"),
-      "-isystem", join(sdkRoot, "include"),
-      "-c", "native/dmsdk_scalar_blocker_audit.cpp", "-o", object,
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
+      '-DDLIB_LOG_DOMAIN="deherm"',
+      "-isystem",
+      join(sdkRoot, "sdk/include"),
+      "-isystem",
+      join(sdkRoot, "include"),
+      "-c",
+      "native/dmsdk_scalar_blocker_audit.cpp",
+      "-o",
+      object,
     ]);
     const symbols = run("nm", ["-u", object]);
-    for (const leaf of ["dmGraphics8Finalize", "dmLog11LogFinalize", "dmLogFinalize", "ProfileInitialize", "ProfileFinalize"]) {
+    for (const leaf of [
+      "dmGraphics8Finalize",
+      "dmLog11LogFinalize",
+      "dmLogFinalize",
+      "ProfileInitialize",
+      "ProfileFinalize",
+    ]) {
       assert.match(symbols, new RegExp(leaf), `${leaf} signature reference is absent`);
     }
   } finally {
@@ -147,17 +181,24 @@ test("every emitted module compiles to an object against pinned Defold headers",
   const sources = report.artifacts.filter((artifact) => artifact.endsWith(".cpp"));
   const includeArgs = [
     `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
-    "-isystem", join(repositoryRoot, "upstream/defold/engine/dlib/src"),
-    "-DDLIB_LOG_DOMAIN=\"deherm\"",
+    "-isystem",
+    join(repositoryRoot, "upstream/defold/engine/dlib/src"),
+    '-DDLIB_LOG_DOMAIN="deherm"',
   ];
   const outputDirectory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-scalar-objects-"));
   try {
     for (const [index, source] of sources.entries()) {
       run(compiler, [
-        "-std=c++17", "-Wall", "-Wextra", "-Werror", "-pedantic",
+        "-std=c++17",
+        "-Wall",
+        "-Wextra",
+        "-Werror",
+        "-pedantic",
         ...includeArgs,
-        "-c", source,
-        "-o", join(outputDirectory, `module-${index}.o`),
+        "-c",
+        source,
+        "-o",
+        join(outputDirectory, `module-${index}.o`),
       ]);
     }
   } finally {
@@ -171,16 +212,32 @@ test("the public thunk header is C-compatible, C-linkable, and generated glue is
     const cObject = join(outputDirectory, "caller.o");
     const executable = join(outputDirectory, "c-abi-test");
     run(cCompiler, [
-      "-std=c11", "-Wall", "-Wextra", "-Werror", "-pedantic",
+      "-std=c11",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-pedantic",
       `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
-      "-c", "native/dmsdk_scalar_c_header_test.c", "-o", cObject,
+      "-c",
+      "native/dmsdk_scalar_c_header_test.c",
+      "-o",
+      cObject,
     ]);
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter", "-pedantic",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-pedantic",
       `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
-      "-isystem", join(repositoryRoot, "upstream/defold/engine/dlib/src"),
-      "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp", cObject,
-      "-o", executable,
+      "-isystem",
+      join(repositoryRoot, "upstream/defold/engine/dlib/src"),
+      "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
+      ...hostImplementationSources(),
+      cObject,
+      "-o",
+      executable,
     ]);
     run(executable, []);
   } finally {
@@ -200,28 +257,26 @@ test("all 26 wrappers link to pinned host sources, are retained, and pass host b
   }
   const outputDirectory = await mkdtemp(join(tmpdir(), "deherm-dmsdk-scalar-native-"));
   try {
-    const timeSource = process.platform === "darwin"
-      ? "upstream/defold/engine/dlib/src/dlib/time_apple.cpp"
-      : "upstream/defold/engine/dlib/src/dlib/time_posix.cpp";
     const sources = [
-      "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
-      "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
+      "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
       "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp",
-      "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
-      "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
-      "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
-      "upstream/defold/engine/dlib/src/dlib/trig_lookup.cpp",
-      "upstream/defold/engine/dlib/src/dlib/profile/profile_null.cpp",
-      timeSource,
+      ...hostImplementationSources(),
       "native/dmsdk_scalar_thunks_test.cpp",
     ];
     const executable = join(outputDirectory, "dmsdk-scalar-thunks-test");
     run(compiler, [
-      "-std=c++17", "-Wall", "-Wextra", "-Werror", "-Wno-unused-parameter", "-pedantic",
+      "-std=c++17",
+      "-Wall",
+      "-Wextra",
+      "-Werror",
+      "-Wno-unused-parameter",
+      "-pedantic",
       `-I${join(repositoryRoot, "defold/defold_hermes/include")}`,
-      "-isystem", join(repositoryRoot, "upstream/defold/engine/dlib/src"),
+      "-isystem",
+      join(repositoryRoot, "upstream/defold/engine/dlib/src"),
       ...sources,
-      "-o", executable,
+      "-o",
+      executable,
     ]);
     assert.equal(run(executable, []).trim(), "dmsdk-scalar-thunks:ok");
     const symbols = run("nm", [executable]);

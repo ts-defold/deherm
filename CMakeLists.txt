@@ -131,14 +131,9 @@ add_library(defold-hermes-runtime STATIC
   defold/defold_hermes/src/generated_dmsdk_enum_value_jsi.cpp
   defold/defold_hermes/src/generated_dmsdk_enum_value_runtime.cpp
   defold/defold_hermes/src/generated_dmsdk_named_scalar_runtime.cpp
-  defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp
+  defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp
-  defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp
-  defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp
   defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp
-  defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp
-  defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp
-  defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp
   defold/defold_hermes/src/generated_dmsdk_universal.cpp
   defold/defold_hermes/src/generated_dmsdk_universal_jsi.cpp
   defold/defold_hermes/src/generated_jsi.cpp

@@ -28,10 +28,10 @@
     "scriptUniversalValue": "a335c0cff8f6f96aefbc889168e03ec4126c461c00c165cfbe84aa2843621b5c",
     "scriptConstantLowering": "53815679718931177edd274504ea8f2decba28f6dac328f27a039070a2c82198",
     "defoldValueLayouts": "a905f72450a2164d414d90e37359ea9b0207609ead5c16e928b39400c32f3d5b",
-    "dmsdkProjection": "6c68f44b751ad7e999d6a00e8d5b27546dfdb7cfaa71c3468efabcf43ddf09bb",
-    "dmsdkUniversal": "26dc42cb21425ccece7962b018e7a97640c223b35f83b7eb54d7ea28a1d84f82",
-    "dmsdkScalarThunks": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
-    "dmsdkEnumValues": "2c310c3b2280fc3bc3c047a0194d1b2291aa59f7457afbbf831eed901cc9b56e",
+    "dmsdkProjection": "8e500db80e6a7e265808c08e06d7ec77dc7b4fdb4c43554b20264d49c0beae66",
+    "dmsdkUniversal": "8c35d7596ecd6b451fc80d908748f379ff574818444f8fa71b507368b85a6487",
+    "dmsdkScalarThunks": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0",
+    "dmsdkEnumValues": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6",
     "dmsdkNamedScalars": "fcf97a985ce897a14e1c42832c8197bc040414e9bcb0eeb97885c88d3334a549",
     "dmsdkFixedDigests": "1178cf005cf8b9b694e3e8c43ffc9d5d4691e398f6a84261dbe570e096a9faa0",
     "dmsdkBase64Spans": "627c0d0aa8b2474521612ebd7e32f984195cb9ecd5a2a685a6c789e9e727808a",
@@ -39,8 +39,8 @@
     "dmsdkXteaSpans": "11447acedf678260135821075db63f9107019001ac580b7f1c18b4b1ff8ba46b",
     "dmsdkHashSpans": "09ac857ffcdfb39a52105e3e5f18f72f4f8615d5c55d1aa6d1800eddd1971b1f",
     "dmsdkArenaSpanBlockers": "e954cdc4ce0f8e8fd370aeccd0b14154ab5ff5cfbc66d1b230ef8f53f4fa340a",
-    "dmsdkCStringValue": "16ed603560e39279f22cfb8655fdce73de85b2f56b9601e737adb03a4a1365bc",
-    "dmsdkBorrowedHandle": "acd39c654d0e47cbb460713a34dc22ad9937283aa0f68afa5e78383fd9e4ddd9",
+    "dmsdkCStringValue": "c5140176ab786f32cd4131c4b4a596b301b45177ab729e4e2d895cfc6cf1f498",
+    "dmsdkBorrowedHandle": "5e76de5423b8f173d1a83530d65be2fd78e8057b776db4f037e2a7a7e6680086",
     "dmsdkTargetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
     "semanticPolicies": "d49b82277fc9267ec3868530dce2d87777108754ac1854c1b21596e8110908f6",
     "typescriptSdk": "81b1278970b1a6efa11c533a979adf61a93174cb9f268cab7bb618a3465a3ec7",
@@ -66,10 +66,10 @@
     "scriptUniversalValue": "28bafa01bbfade3c7fbfb88412973091fc961549dec9529432a36bf998945328",
     "scriptConstantLowering": "cf923dc81d26c2d45a21fe9b3691c65d69950adda5fbcb68bbae0331704f4154",
     "defoldValueLayouts": "eac699e8e10722490bda1981edfa002e4b5fe9ac8b1eb1a12898abc5689708ca",
-    "dmsdkProjection": "94da6efdee324a42a1f82d2b25bf04ec301e80737e6cdbac0248fde9b7fb65a3",
-    "dmsdkUniversal": "2de306e279a737615998f1959d1e77ebae311240775f4aa94b707e95275777d5",
-    "dmsdkScalarThunks": "80dcddd4811260d4fede04879b1189cef8c4fdaed0f59128e08421a7f46f5d5d",
-    "dmsdkEnumValues": "cd45a49c966c1319bd5e43a575bd0973a45125f8852768a70ec73a1e8b00fdbe",
+    "dmsdkProjection": "dd7ea2236c8d49c57c900d700bed1bd4363905ecafae8f2c558a47519871235c",
+    "dmsdkUniversal": "72d8aa5b1e296d7c16bd4783ea1ebdf4e4eab80d50a65da93b056f6c9e60144c",
+    "dmsdkScalarThunks": "932a8bf0f5b8e4de10320fcf2f238d6463e20b3acc4e143c59f28442ca12f2c1",
+    "dmsdkEnumValues": "4340c7b511a1e03cfde725b739e926a27345502f9d898b6b0e60c7f7c83d6c9e",
     "dmsdkNamedScalars": "858e5d03cc52e5cdad39775380e5087f02ec0976cf19ac94f44c671a2349ebfb",
     "dmsdkFixedDigests": "4c28009962d44055764b60d95960f762fdc0f5a6f8ce463cd7a9d27f2be8c93d",
     "dmsdkBase64Spans": "3e32a31127e3152ecd767ab0479c670de1ef048dd04ec9c8613b0240aa45bc0d",
@@ -77,8 +77,8 @@
     "dmsdkXteaSpans": "032ed82d40c49a04c0c06c612915ed1f76d46f082e55b9d226cec470cdda163e",
     "dmsdkHashSpans": "b840ec118cf97e52f3c75a72b67698bcf46072eabd161e068a1ee387111a2371",
     "dmsdkArenaSpanBlockers": "cdb70db27c15dceec348baa49bd6f788717e0f6d8190689285713a9062bdac52",
-    "dmsdkCStringValue": "10fed24dbad18c01c5f9a06b94dd8dfa93ca1c727d4feb5aad2d5385fd375a82",
-    "dmsdkBorrowedHandle": "55ed13904e75c13b85affea763b0178ba5d1d95f7e1f9b9c8065bb0feffba144",
+    "dmsdkCStringValue": "5d30d1c56fde9a4b0ea8c1a5fe412aa00d0a51ad6949e82b2ea53cf7195e3bb1",
+    "dmsdkBorrowedHandle": "d5ca4fe0103c337a6a75776582c2a1bca6a5349f477c3808b62ff0781fae9f8e",
     "dmsdkTargetConditionals": "1391e027f73394ee1838287a25e0a244fd9a0d291ce6b585553164af39d9e005",
     "semanticPolicies": "3336271187d4bf1b9d3c0c45efe68a9c9c3710d71fef1a09c5f37973fd52e0f8",
     "typescriptSdk": "9011d6e158517ee59b5da64050507ddcd756a0d69277d9222f9a9c7644b514a3",
@@ -30674,12 +30674,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 0,
+          "reportRow": 19,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 0,
+            "bindingId": 16,
             "wrapper": "deherm_dmsdk_endian_swap16_u16"
           },
           "evidenceClaims": {
@@ -30769,7 +30769,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -30822,12 +30822,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 1,
+          "reportRow": 20,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 1,
+            "bindingId": 17,
             "wrapper": "deherm_dmsdk_endian_swap32_u32"
           },
           "evidenceClaims": {
@@ -30917,7 +30917,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -30970,12 +30970,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 2,
+          "reportRow": 21,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 2,
+            "bindingId": 18,
             "wrapper": "deherm_dmsdk_endian_swap64_u64"
           },
           "evidenceClaims": {
@@ -31065,7 +31065,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -31118,12 +31118,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 3,
+          "reportRow": 22,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 3,
+            "bindingId": 19,
             "wrapper": "deherm_dmsdk_endian_to_host16_u16"
           },
           "evidenceClaims": {
@@ -31213,7 +31213,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -31266,12 +31266,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 4,
+          "reportRow": 23,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 4,
+            "bindingId": 20,
             "wrapper": "deherm_dmsdk_endian_to_host32_u32"
           },
           "evidenceClaims": {
@@ -31361,7 +31361,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -31414,12 +31414,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 5,
+          "reportRow": 24,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 5,
+            "bindingId": 21,
             "wrapper": "deherm_dmsdk_endian_to_host64_u64"
           },
           "evidenceClaims": {
@@ -31509,7 +31509,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -31562,12 +31562,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 6,
+          "reportRow": 25,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 6,
+            "bindingId": 22,
             "wrapper": "deherm_dmsdk_endian_to_network16_u16"
           },
           "evidenceClaims": {
@@ -31657,7 +31657,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -31710,12 +31710,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 7,
+          "reportRow": 26,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 7,
+            "bindingId": 23,
             "wrapper": "deherm_dmsdk_endian_to_network32_u32"
           },
           "evidenceClaims": {
@@ -31805,7 +31805,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -31858,12 +31858,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 8,
+          "reportRow": 27,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 8,
+            "bindingId": 24,
             "wrapper": "deherm_dmsdk_endian_to_network64_u64"
           },
           "evidenceClaims": {
@@ -31953,7 +31953,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -45901,18 +45901,18 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 9,
+          "reportRow": 28,
           "reportState": {
             "emitted": false,
             "blocker": {
-              "blocker": "Process-global profiler teardown is owned by the Defold engine lifecycle.",
+              "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
               "category": "engine-lifecycle",
               "policy": "lifecycle-capability-required"
             }
           },
           "generationIdentity": {},
           "evidenceClaims": {
-            "compiled": "blocked-on-generation",
+            "compiled": "header-compiled-policy-blocked",
             "conformant": "blocked-on-generation",
             "generated": "blocked-by-policy",
             "linked": "blocked-on-generation",
@@ -46223,18 +46223,18 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 10,
+          "reportRow": 29,
           "reportState": {
             "emitted": false,
             "blocker": {
-              "blocker": "Process-global profiler initialization is owned by the Defold engine lifecycle.",
+              "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
               "category": "engine-lifecycle",
               "policy": "lifecycle-capability-required"
             }
           },
           "generationIdentity": {},
           "evidenceClaims": {
-            "compiled": "blocked-on-generation",
+            "compiled": "header-compiled-policy-blocked",
             "conformant": "blocked-on-generation",
             "generated": "blocked-by-policy",
             "linked": "blocked-on-generation",
@@ -46319,12 +46319,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 11,
+          "reportRow": 30,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 9,
+            "bindingId": 25,
             "wrapper": "deherm_dmsdk_profile_is_initialized_v"
           },
           "evidenceClaims": {
@@ -46401,7 +46401,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -77854,12 +77854,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 12,
+          "reportRow": 0,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 10,
+            "bindingId": 0,
             "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u16"
           },
           "evidenceClaims": {
@@ -77949,7 +77949,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -78002,12 +78002,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 13,
+          "reportRow": 1,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 11,
+            "bindingId": 1,
             "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u32"
           },
           "evidenceClaims": {
@@ -78097,7 +78097,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -78150,12 +78150,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 14,
+          "reportRow": 2,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 12,
+            "bindingId": 2,
             "wrapper": "deherm_dmsdk_dm_endian_byte_swap_u64"
           },
           "evidenceClaims": {
@@ -78245,7 +78245,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -78298,12 +78298,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 15,
+          "reportRow": 3,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 13,
+            "bindingId": 3,
             "wrapper": "deherm_dmsdk_dm_endian_to_host_u32"
           },
           "evidenceClaims": {
@@ -78393,7 +78393,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -78446,12 +78446,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 16,
+          "reportRow": 4,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 14,
+            "bindingId": 4,
             "wrapper": "deherm_dmsdk_dm_endian_to_host_u64"
           },
           "evidenceClaims": {
@@ -78541,7 +78541,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -78594,12 +78594,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 17,
+          "reportRow": 5,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 15,
+            "bindingId": 5,
             "wrapper": "deherm_dmsdk_dm_endian_to_host_u16"
           },
           "evidenceClaims": {
@@ -78689,7 +78689,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -78742,12 +78742,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 18,
+          "reportRow": 6,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 16,
+            "bindingId": 6,
             "wrapper": "deherm_dmsdk_dm_endian_to_network_u64"
           },
           "evidenceClaims": {
@@ -78837,7 +78837,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -78890,12 +78890,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 19,
+          "reportRow": 7,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 17,
+            "bindingId": 7,
             "wrapper": "deherm_dmsdk_dm_endian_to_network_u16"
           },
           "evidenceClaims": {
@@ -78985,7 +78985,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -79038,12 +79038,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 20,
+          "reportRow": 8,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 18,
+            "bindingId": 8,
             "wrapper": "deherm_dmsdk_dm_endian_to_network_u32"
           },
           "evidenceClaims": {
@@ -79133,7 +79133,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -121149,27 +121149,13 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 21,
+          "reportRow": 9,
           "reportState": {
             "emitted": false,
             "blocker": {
-              "blocker": "Process-global graphics teardown is owned by the Defold engine lifecycle.",
+              "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
               "category": "engine-lifecycle",
-              "policy": "lifecycle-capability-required",
-              "auditEvidence": [
-                [
-                  "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include/dmsdk/graphics/graphics.h",
-                  "void Finalize();"
-                ],
-                [
-                  "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/include/graphics/graphics_ddf.h",
-                  "namespace dmGraphics"
-                ],
-                [
-                  "upstream/defold/engine/graphics/src/graphics.cpp",
-                  "void Finalize()"
-                ]
-              ]
+              "policy": "lifecycle-capability-required"
             }
           },
           "generationIdentity": {},
@@ -156103,18 +156089,18 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 22,
+          "reportRow": 10,
           "reportState": {
             "emitted": false,
             "blocker": {
-              "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+              "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
               "category": "engine-lifecycle",
               "policy": "lifecycle-capability-required"
             }
           },
           "generationIdentity": {},
           "evidenceClaims": {
-            "compiled": "blocked-on-generation",
+            "compiled": "header-compiled-policy-blocked",
             "conformant": "blocked-on-generation",
             "generated": "blocked-by-policy",
             "linked": "blocked-on-generation",
@@ -156695,18 +156681,18 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 23,
+          "reportRow": 11,
           "reportState": {
             "emitted": false,
             "blocker": {
-              "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+              "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
               "category": "engine-lifecycle",
               "policy": "lifecycle-capability-required"
             }
           },
           "generationIdentity": {},
           "evidenceClaims": {
-            "compiled": "blocked-on-generation",
+            "compiled": "header-compiled-policy-blocked",
             "conformant": "blocked-on-generation",
             "generated": "blocked-by-policy",
             "linked": "blocked-on-generation",
@@ -204877,12 +204863,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 24,
+          "reportRow": 12,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 19,
+            "bindingId": 9,
             "wrapper": "deherm_dmsdk_dm_time_get_monotonic_time_v"
           },
           "evidenceClaims": {
@@ -204959,7 +204945,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -205012,12 +204998,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 25,
+          "reportRow": 13,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 20,
+            "bindingId": 10,
             "wrapper": "deherm_dmsdk_dm_time_get_time_v"
           },
           "evidenceClaims": {
@@ -205094,7 +205080,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -205147,12 +205133,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 26,
+          "reportRow": 14,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 21,
+            "bindingId": 11,
             "wrapper": "deherm_dmsdk_dm_time_sleep_u32"
           },
           "evidenceClaims": {
@@ -205241,7 +205227,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -207966,12 +207952,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 27,
+          "reportRow": 15,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 22,
+            "bindingId": 12,
             "wrapper": "deherm_dmsdk_dm_trig_lookup_cos_f32"
           },
           "evidenceClaims": {
@@ -208061,7 +208047,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -208114,12 +208100,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 28,
+          "reportRow": 16,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 23,
+            "bindingId": 13,
             "wrapper": "deherm_dmsdk_dm_trig_lookup_sin_f32"
           },
           "evidenceClaims": {
@@ -208209,7 +208195,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -208672,12 +208658,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 29,
+          "reportRow": 17,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 24,
+            "bindingId": 14,
             "wrapper": "deherm_dmsdk_dm_utf8_is_breaking_u32"
           },
           "evidenceClaims": {
@@ -208767,7 +208753,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -208820,12 +208806,12 @@
       [
         {
           "lane": "dmsdk-scalar-thunks",
-          "reportRow": 30,
+          "reportRow": 18,
           "reportState": {
             "emitted": true
           },
           "generationIdentity": {
-            "bindingId": 25,
+            "bindingId": 15,
             "wrapper": "deherm_dmsdk_dm_utf8_is_white_space_u32"
           },
           "evidenceClaims": {
@@ -208915,7 +208901,7 @@
             "stages": {
               "generated": {
                 "status": "complete",
-                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+                "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
                 "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
               },
               "compiled": {
@@ -517233,5 +517219,5 @@
       }
     }
   ],
-  "planSha256": "28aa07dca4e9e22f248f51e8cbd1957307998af8adfd5085207ae92117ae3e13"
+  "planSha256": "36595010fd007a33912707d7aded1aac470900dd3e5fdce2db252385b1cd12eb"
 }

@@ -8,16 +8,6 @@
 extern "C" {
 #endif
 
-uint16_t deherm_dmsdk_endian_swap16_u16(uint16_t x);
-uint32_t deherm_dmsdk_endian_swap32_u32(uint32_t x);
-uint64_t deherm_dmsdk_endian_swap64_u64(uint64_t x);
-uint16_t deherm_dmsdk_endian_to_host16_u16(uint16_t x);
-uint32_t deherm_dmsdk_endian_to_host32_u32(uint32_t x);
-uint64_t deherm_dmsdk_endian_to_host64_u64(uint64_t x);
-uint16_t deherm_dmsdk_endian_to_network16_u16(uint16_t x);
-uint32_t deherm_dmsdk_endian_to_network32_u32(uint32_t x);
-uint64_t deherm_dmsdk_endian_to_network64_u64(uint64_t x);
-uint8_t deherm_dmsdk_profile_is_initialized_v(void);
 uint16_t deherm_dmsdk_dm_endian_byte_swap_u16(uint16_t x);
 uint32_t deherm_dmsdk_dm_endian_byte_swap_u32(uint32_t x);
 uint64_t deherm_dmsdk_dm_endian_byte_swap_u64(uint64_t x);
@@ -34,6 +24,16 @@ float deherm_dmsdk_dm_trig_lookup_cos_f32(float radians);
 float deherm_dmsdk_dm_trig_lookup_sin_f32(float radians);
 uint8_t deherm_dmsdk_dm_utf8_is_breaking_u32(uint32_t c);
 uint8_t deherm_dmsdk_dm_utf8_is_white_space_u32(uint32_t c);
+uint16_t deherm_dmsdk_endian_swap16_u16(uint16_t x);
+uint32_t deherm_dmsdk_endian_swap32_u32(uint32_t x);
+uint64_t deherm_dmsdk_endian_swap64_u64(uint64_t x);
+uint16_t deherm_dmsdk_endian_to_host16_u16(uint16_t x);
+uint32_t deherm_dmsdk_endian_to_host32_u32(uint32_t x);
+uint64_t deherm_dmsdk_endian_to_host64_u64(uint64_t x);
+uint16_t deherm_dmsdk_endian_to_network16_u16(uint16_t x);
+uint32_t deherm_dmsdk_endian_to_network32_u32(uint32_t x);
+uint64_t deherm_dmsdk_endian_to_network64_u64(uint64_t x);
+uint8_t deherm_dmsdk_profile_is_initialized_v(void);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -41,7 +41,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "packages/compiler/src/names.mjs",
   "packages/generator/src/sdk/dmsdk-sdk.mjs",
   "packages/compiler/src/sdk/dmsdk-sdk.mjs",
-  "packages/compiler/src/sdk/support-sdk.mjs"
+  "packages/compiler/src/sdk/support-sdk.mjs",
 ]);
 
 export const dmSdkPinnedInputs = Object.freeze([
@@ -58,6 +58,7 @@ export const dmSdkPinnedInputs = Object.freeze([
   "packages/bindings/generated/defold-dmsdk-symbol-evidence.json",
   "packages/bindings/overrides/dmsdk-target-macros.json",
   "packages/toolchains/defold-bundle-targets.json",
+  "packages/bindings/overrides/dmsdk-scalar-thunks.json",
   "packages/bindings/overrides/dmsdk-enum-value-bindings.json",
   "packages/bindings/overrides/dmsdk-named-scalar-policies.json",
   "packages/bindings/overrides/dmsdk-fixed-digest-bindings.json",
@@ -69,7 +70,7 @@ export const dmSdkPinnedInputs = Object.freeze([
   "packages/bindings/overrides/dmsdk-arena-span-blockers.json",
   "packages/bindings/overrides/dmsdk-borrowed-handle-bindings.json",
   "packages/bindings/overrides/dmsdk-scratch-scalar-out-bindings.json",
-  "packages/bindings/overrides/dmsdk-cstring-value-bindings.json"
+  "packages/bindings/overrides/dmsdk-cstring-value-bindings.json",
 ]);
 
 export const generatedDmSdkArtifacts = Object.freeze([
@@ -80,14 +81,9 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_jsi.hpp",
   "defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar_runtime.h",
   "defold/defold_hermes/lib/web/generated_dmsdk_scalar.js",
-  "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+  "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
   "defold/defold_hermes/src/generated_dmsdk_scalar_jsi.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_scalar_log.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
   "defold/defold_hermes/src/generated_dmsdk_scalar_runtime.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
-  "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
   "packages/sdk/src/generated/dmsdk/scalar.ts",
   "packages/bindings/generated/defold-dmsdk-abi-shapes.json",
   "packages/bindings/generated/defold-dmsdk-enum-value-bindings.json",
@@ -190,15 +186,15 @@ export const generatedDmSdkArtifacts = Object.freeze([
   "tests/fixtures/generated_dmsdk_universal_ready_verification.cpp",
   "packages/bindings/generated/defold-dmsdk-generated-adapter-exact-plan.json",
   "tests/fixtures/generated_dmsdk_adapter_exact_verification.cpp",
-  "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp"
+  "tests/fixtures/generated_dmsdk_adapter_jsi_exact_verification.cpp",
 ]);
 
 // Ordering is part of the contract: later reports hash and consume earlier ones.
 export const dmSdkGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-target-conditionals.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/classify-dmsdk-bindings.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-scalar-thunks.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-abi-shapes.mjs" }),
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-scalar-thunks.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-named-scalar-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-enum-value-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-fixed-digest-bindings.mjs" }),
@@ -213,5 +209,5 @@ export const dmSdkGenerationSteps = Object.freeze([
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-cstring-value-bindings.mjs" }),
   Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-universal-bindings.mjs" }),
-  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-generated-adapter-exact.mjs" })
+  Object.freeze({ runtime: "node", script: "scripts/generate-dmsdk-generated-adapter-exact.mjs" }),
 ]);

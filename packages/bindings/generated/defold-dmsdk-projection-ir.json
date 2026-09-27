@@ -46,8 +46,8 @@
       "symbolEvidence": "15a6b8b4edc2fc21dd9d07d081359028f18232ad84b2097e272910926af04d85",
       "targetConditionals": "e743b8b82ba78fb8d6c6f49973493f69e3ae53ea3cea05a02ae42bbf8647cdbf",
       "loweringEvidence": {
-        "scalar": "2a24fd639ba7874feff04ad63bd9be0fdc20955985f47d358718139b98d16a43",
-        "enumValue": "2c310c3b2280fc3bc3c047a0194d1b2291aa59f7457afbbf831eed901cc9b56e",
+        "scalar": "5118cca8108704a921b1978f79098a0d01ed1ecb6380181664b66b887daddaf0",
+        "enumValue": "1b496dcd15611f07b7c142d8dcf7df54e318d1917420792809e1b526657341e6",
         "namedScalar": "fcf97a985ce897a14e1c42832c8197bc040414e9bcb0eeb97885c88d3334a549",
         "fixedDigest": "1178cf005cf8b9b694e3e8c43ffc9d5d4691e398f6a84261dbe570e096a9faa0",
         "base64Span": "627c0d0aa8b2474521612ebd7e32f984195cb9ecd5a2a685a6c789e9e727808a",
@@ -33951,7 +33951,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -34095,7 +34095,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -34239,7 +34239,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -34383,7 +34383,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -34527,7 +34527,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -34671,7 +34671,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -34815,7 +34815,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -34959,7 +34959,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -35103,7 +35103,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -77340,34 +77340,20 @@
         "family": "scalar",
         "wrapper": null,
         "policy": {
-          "blocker": "Process-global graphics teardown is owned by the Defold engine lifecycle.",
+          "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
           "category": "engine-lifecycle",
-          "policy": "lifecycle-capability-required",
-          "auditEvidence": [
-            [
-              "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/sdk/include/dmsdk/graphics/graphics.h",
-              "void Finalize();"
-            ],
-            [
-              "upstream/extender/server/app/sdk/7f0f554f41f9dce1e0ddff99bf08200657d1ee05/defoldsdk/include/graphics/graphics_ddf.h",
-              "namespace dmGraphics"
-            ],
-            [
-              "upstream/defold/engine/graphics/src/graphics.cpp",
-              "void Finalize()"
-            ]
-          ]
+          "policy": "lifecycle-capability-required"
         },
         "stages": {
           "generated": {
             "status": "blocked-by-policy",
             "evidence": "upstream/defold/engine/graphics/src/dmsdk/graphics/graphics.h",
-            "note": "Process-global graphics teardown is owned by the Defold engine lifecycle."
+            "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
           },
           "compiled": {
             "status": "header-compiled-policy-blocked",
             "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
-            "note": "The complete pinned packaged-SDK header, including generated graphics_ddf.h, compiles. This disproves the earlier missing-header claim; only lifecycle policy blocks exposure."
+            "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
           },
           "linked": {
             "status": "blocked-on-generation",
@@ -111758,7 +111744,7 @@
         "family": "scalar",
         "wrapper": null,
         "policy": {
-          "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+          "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
           "category": "engine-lifecycle",
           "policy": "lifecycle-capability-required"
         },
@@ -111766,11 +111752,12 @@
           "generated": {
             "status": "blocked-by-policy",
             "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
-            "note": "Process-global logging teardown is not part of the default script-callable ABI."
+            "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
           },
           "compiled": {
-            "status": "blocked-on-generation",
-            "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+            "status": "header-compiled-policy-blocked",
+            "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+            "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
           },
           "linked": {
             "status": "blocked-on-generation",
@@ -112417,7 +112404,7 @@
         "family": "scalar",
         "wrapper": null,
         "policy": {
-          "blocker": "Process-global logging teardown is not part of the default script-callable ABI.",
+          "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
           "category": "engine-lifecycle",
           "policy": "lifecycle-capability-required"
         },
@@ -112425,11 +112412,12 @@
           "generated": {
             "status": "blocked-by-policy",
             "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h",
-            "note": "Process-global logging teardown is not part of the default script-callable ABI."
+            "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
           },
           "compiled": {
-            "status": "blocked-on-generation",
-            "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/log.h"
+            "status": "header-compiled-policy-blocked",
+            "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+            "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
           },
           "linked": {
             "status": "blocked-on-generation",
@@ -158612,7 +158600,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -158738,7 +158726,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -158881,7 +158869,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -162281,7 +162269,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -162425,7 +162413,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -163031,7 +163019,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -163175,7 +163163,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -169889,7 +169877,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -170033,7 +170021,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -170177,7 +170165,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -170321,7 +170309,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -170465,7 +170453,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -170609,7 +170597,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -170753,7 +170741,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -170897,7 +170885,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -171041,7 +171029,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -186045,7 +186033,7 @@
         "family": "scalar",
         "wrapper": null,
         "policy": {
-          "blocker": "Process-global profiler teardown is owned by the Defold engine lifecycle.",
+          "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
           "category": "engine-lifecycle",
           "policy": "lifecycle-capability-required"
         },
@@ -186053,11 +186041,12 @@
           "generated": {
             "status": "blocked-by-policy",
             "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-            "note": "Process-global profiler teardown is owned by the Defold engine lifecycle."
+            "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
           },
           "compiled": {
-            "status": "blocked-on-generation",
-            "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+            "status": "header-compiled-policy-blocked",
+            "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+            "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
           },
           "linked": {
             "status": "blocked-on-generation",
@@ -186395,7 +186384,7 @@
         "family": "scalar",
         "wrapper": null,
         "policy": {
-          "blocker": "Process-global profiler initialization is owned by the Defold engine lifecycle.",
+          "blocker": "Process-global initialization or finalization is owned by the Defold engine lifecycle.",
           "category": "engine-lifecycle",
           "policy": "lifecycle-capability-required"
         },
@@ -186403,11 +186392,12 @@
           "generated": {
             "status": "blocked-by-policy",
             "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h",
-            "note": "Process-global profiler initialization is owned by the Defold engine lifecycle."
+            "note": "Process-global initialization or finalization is owned by the Defold engine lifecycle."
           },
           "compiled": {
-            "status": "blocked-on-generation",
-            "evidence": "upstream/defold/engine/dlib/src/dmsdk/dlib/profile.h"
+            "status": "header-compiled-policy-blocked",
+            "evidence": "native/dmsdk_scalar_blocker_audit.cpp",
+            "note": "The complete pinned packaged-SDK declarations compile; only the lifecycle capability blocks exposure."
           },
           "linked": {
             "status": "blocked-on-generation",
@@ -186524,7 +186514,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {

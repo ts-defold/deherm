@@ -2,13 +2,13 @@
   "schemaVersion": 1,
   "defoldRevision": "7f0f554f41f9dce1e0ddff99bf08200657d1ee05",
   "sourceHashes": {
-    "projection": "6c68f44b751ad7e999d6a00e8d5b27546dfdb7cfaa71c3468efabcf43ddf09bb",
+    "projection": "8e500db80e6a7e265808c08e06d7ec77dc7b4fdb4c43554b20264d49c0beae66",
     "sdkIr": "dd8ce0d5273ad4d4e788efbae71d6da7e5b3a704e0ee2e59b82582dfce92bffc",
     "specialized": {
       "arenaCString": "e954cdc4ce0f8e8fd370aeccd0b14154ab5ff5cfbc66d1b230ef8f53f4fa340a",
-      "borrowedHandle": "acd39c654d0e47cbb460713a34dc22ad9937283aa0f68afa5e78383fd9e4ddd9",
-      "scratchScalarOut": "f6022a7f117867a8603b6bf0a459b4b4098827a94440cdeebcd378956fd416aa",
-      "cstringValue": "16ed603560e39279f22cfb8655fdce73de85b2f56b9601e737adb03a4a1365bc",
+      "borrowedHandle": "5e76de5423b8f173d1a83530d65be2fd78e8057b776db4f037e2a7a7e6680086",
+      "scratchScalarOut": "08fcddeed93af5b8609fd4454d9c82f13e69b2510709b7dc861e930f5f55bc4c",
+      "cstringValue": "c5140176ab786f32cd4131c4b4a596b301b45177ab729e4e2d895cfc6cf1f498",
       "hashState": "4ecaaa411b0a0cee555a33445c08dc3ec3e12dedd7d5ade089d28f9a57079c24"
     },
     "publicSdk": {
@@ -470,8 +470,8 @@
       ],
       "requiredHeadersSha256": "b332e968c991eec3d9ef64f504264c500efa2dddc8a035445b26e676b3c90d2c"
     },
-    "aggregate": "193a5756601ddc6d54ef3d43001c2bf1af34efd42e16dba1495549c630f62282",
-    "catalog": "e347b4de81a5c77fd2837d17dd8f90fd2f071a7ea9780f5625f6771ecf46d916"
+    "aggregate": "5fc2d4abcd84c91b5f0a4bc3e8c6ea526142d3c310a39f8469ccbecf0cc399cf",
+    "catalog": "d597cf86477719a5115004b5aee863916bbd779494d41e11692058a45526a4cc"
   },
   "coverage": {
     "declarations": 1361,
@@ -28499,7 +28499,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -28624,7 +28624,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -28749,7 +28749,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -28874,7 +28874,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -28999,7 +28999,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -29124,7 +29124,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -29249,7 +29249,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -29374,7 +29374,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -29499,7 +29499,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -143500,7 +143500,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -143612,7 +143612,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -143736,7 +143736,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_time.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -146481,7 +146481,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -146606,7 +146606,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_trig.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -147135,7 +147135,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -147260,7 +147260,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_utf8.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -152802,7 +152802,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -152927,7 +152927,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -153052,7 +153052,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -153177,7 +153177,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -153302,7 +153302,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -153427,7 +153427,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -153552,7 +153552,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -153677,7 +153677,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -153802,7 +153802,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_endian.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
@@ -167367,7 +167367,7 @@
         "stages": {
           "generated": {
             "status": "complete",
-            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_profile.cpp",
+            "evidence": "defold/defold_hermes/src/generated_dmsdk_scalar_bindings.cpp",
             "note": "C ABI declaration is in defold/defold_hermes/include/defold_hermes/generated_dmsdk_scalar.h"
           },
           "compiled": {
