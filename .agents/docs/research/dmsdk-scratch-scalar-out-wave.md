@@ -112,8 +112,8 @@ public SDK barrel until those provider gates exist.
 The package-owned frontend also inventories this envelope from pinned Defold
 implementations and inline headers. Its neutral artifact is the shared
 `defold-dmsdk-cpp-ownership-effect-facts.json` report, whose current host-only
-profile observes 10 of the 30 scratch structural rows and routes the remaining
-20 to explicit unknowns. The report is audit-only until the same exact AST
+profile observes 18 of the 30 scratch structural rows and routes the remaining
+12 to explicit unknowns. The report is audit-only until the same exact AST
 facts are collected for every supported target/build macro profile; no
 single-host observation may unlock a release specialization.
 
@@ -129,10 +129,14 @@ synchronous/no-escape facts from the C++ effect artifact. Missing or unsafe
 facts produce explicit machine-readable blockers and retain the universal
 fallback.
 
-The current effect artifact has facts for 10/30 structural candidates but none
-prove all four requirements, so the plan is deliberately audit-only: 30
-structural candidates, 0 selected, and 30 universal fallbacks. The shipped
+The current effect artifact has facts for 18/30 structural candidates. Four
+mechanically prove all four requirements in the audit plan:
+`dmBuffer::GetCount`, `dmBuffer::GetStreamType`,
+`dmBuffer::GetContentVersion`, and `TextLayoutGetBounds`. The audit plan is
+therefore 30 structural candidates, 4 selected, and 26 universal fallbacks. The shipped
 scratch emitter remains byte-identical at its proven 7/79 provider boundary;
 this wave does not claim an emitter cutover or trade away an existing
-optimization. A relational test rejects any future scratch selection that
+optimization. In particular, neither the audit plan nor the existing emitted
+lane installs a production Defold provider; `packagedEngineRuntimeVerified`
+remains zero. A relational test rejects any future scratch selection that
 overlaps a route selected by a higher-priority specialized family.

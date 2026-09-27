@@ -474,8 +474,8 @@ async function validateReports(root) {
   assert(
     cppOwnershipEffects.defoldRevision === ir.defoldRevision &&
       cppOwnershipEffects.coverage.requested === 212 &&
-      cppOwnershipEffects.coverage.observed === 32 &&
-      cppOwnershipEffects.coverage.unknown === 180 &&
+      cppOwnershipEffects.coverage.observed === 160 &&
+      cppOwnershipEffects.coverage.unknown === 52 &&
       cppOwnershipEffects.admission === "audit-only-single-profile",
     "C++ ownership/effect report does not preserve its exhaustive audit-only partition",
   );
@@ -483,6 +483,12 @@ async function validateReports(root) {
     assert(
       source.sourceSha256 === sha256(await loadText(source.path)),
       `C++ ownership/effect source hash differs for ${source.path}`,
+    );
+  }
+  for (const alias of cppOwnershipEffects.inputs.includeAliases) {
+    assert(
+      alias.sourceSha256 === sha256(await loadText(alias.source)),
+      `C++ ownership/effect include alias hash differs for ${alias.source}`,
     );
   }
   const scratchTexts = {
@@ -667,8 +673,8 @@ async function validateReports(root) {
   );
   assert(
     scratchScalarOutPlan.coverage.structurallyRelevant === 30 &&
-      scratchScalarOutPlan.coverage.selected === 0 &&
-      scratchScalarOutPlan.coverage.universalFallback === 30 &&
+      scratchScalarOutPlan.coverage.selected === 4 &&
+      scratchScalarOutPlan.coverage.universalFallback === 26 &&
       scratchScalarOut.coverage.candidates === 79 &&
       scratchScalarOut.coverage.generated === 7 &&
       scratchScalarOut.coverage.blocked === 72 &&

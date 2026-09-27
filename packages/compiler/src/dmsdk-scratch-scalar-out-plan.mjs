@@ -88,7 +88,7 @@ function validateInputs({ ir, shapes, projection, policy, effectFacts, texts }) 
   assert(ir?.schemaVersion === 1 && Array.isArray(ir.declarations), "scratch plan has invalid dmSDK IR");
   assert(shapes?.schemaVersion === 1 && Array.isArray(shapes.rows), "scratch plan has invalid ABI shapes");
   assert(projection?.schemaVersion === 1 && Array.isArray(projection.rows), "scratch plan has invalid projection IR");
-  assert(effectFacts?.schemaVersion === 1 && Array.isArray(effectFacts.functions), "scratch plan has invalid C++ effect facts");
+  assert(effectFacts?.schemaVersion === 2 && Array.isArray(effectFacts.functions), "scratch plan has invalid C++ effect facts");
   assert(ir.defoldRevision === shapes.defoldRevision && ir.defoldRevision === projection.defoldRevision, "scratch plan inputs use different Defold revisions");
   assert(shapes.sourceHashes?.ir === sha256(texts.ir), "scratch shapes do not authenticate the IR");
   assert(projection.sources?.hashes?.ir === sha256(texts.ir), "scratch projection does not authenticate the IR");

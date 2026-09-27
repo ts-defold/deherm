@@ -36,7 +36,7 @@ into the revision policy is the next migration step.
 
 # Provider boundary
 
-The 158 generated declarations use one C ABI dispatcher with caller-owned
+The 147 generated declarations use one C ABI dispatcher with caller-owned
 64-bit argument and result slots. There are 45 deterministic semantic handle
 kinds and at most eight arguments per selected call. A borrowed handle never
 crosses as a JavaScript number: Dynamic Hermes and TypeScript use `BigInt`,
@@ -63,8 +63,8 @@ The generated adapters cover:
 - Static Hermes `extern_c` direct-memory declaration;
 - browser/Wasm direct-memory descriptors and raw dispatcher;
 - nominal TypeScript `BorrowedHandle<Kind>` APIs; and
-- a 158-signature pinned-header audit across 25 dmSDK headers; and
-- 158 generator-owned exact-call provider twins with position-distinct native
+- a 147-signature pinned-header audit across the selected dmSDK headers; and
+- 147 generator-owned exact-call provider twins with position-distinct native
   arguments and result checks.
 
 # Evidence
@@ -79,12 +79,12 @@ node --test \
   tests/dmsdk-generator-pipeline.test.mjs
 ```
 
-The tests independently rederive the 348/158/190 census, regenerate every
+The tests independently rederive the 182/147/35 plan census, regenerate every
 artifact into a clean temporary directory, reject source/census drift, compile
 all selected signatures against the complete pinned SDK include projection,
 compile the C and JSI adapters, type-check the Dynamic/Static TypeScript
 surfaces, parse the browser adapter, and link/run the provider bridge under
-ASan and UBSan. The host harness dispatches every one of the 158 generated
+ASan and UBSan. The host harness dispatches every one of the 147 generated
 routes through its exact typed provider twin, rejects noncanonical argument and
 result cells, rejects finite JavaScript values that overflow `f32`, clears the
 caller result before every fallible check, and normalizes successful `void`
@@ -99,7 +99,7 @@ byte-for-byte from pinned inputs.
 The runtime harness uses a deterministic fake provider. It proves all 147
 selected descriptors' layout, error ordering, provider callbacks, thread rejection, handle rejection,
 linkage of the generic bridge, sanitizer cleanliness, and warmed glue
-allocation behavior. It does not supply real Defold handles, link the 158 engine
+allocation behavior. It does not supply real Defold handles, link the 147 engine
 symbols, establish real subsystem thread policies, or prove packaged-engine
 behavior. Consequently the generated report records zero packaged-engine
 runtime verifications. The withdrawal is an atomic private pre-release provider
@@ -126,11 +126,16 @@ a one-off wrapper or declaration allowlist is not an accepted substitute.
 `scripts/generate-dmsdk-cpp-ownership-effect-facts.mjs` binds the union of the
 borrowed-handle and scratch-scalar-out structural envelopes to exact Clang AST
 declaration/definition identities. It scans pinned Defold C/C++ implementations
-and inline headers, force-includes the declared public header when a `.cpp`
-translation unit does not include it, and records source and translation-unit
-hashes plus the Clang profile. Rejected translation units retain a categorical
-state; raw compiler diagnostics are deliberately ephemeral rather than policy
-inputs because include-stack presentation is not semantic evidence.
+and inline headers, then joins definitions to the SDK IR by exact Clang mangled
+symbol identity or the naturally included header declaration. It does not force
+unrelated public headers into implementation translation units. Package-owned
+layout rules reconstruct Defold's build-time module include aliases into a
+content-addressed overlay; the revision-owned alias names, source paths, and
+source hashes are authenticated in the report. Source and translation-unit
+hashes plus the Clang profile are also recorded. Rejected translation units
+retain categorical, machine-readable blockers; raw compiler diagnostics are
+deliberately ephemeral rather than policy inputs because include-stack
+presentation is not semantic evidence.
 Typedef-backed handles retain their
 desugared pointer identity; missing, ambiguous, unresolved, or conflicting
 definitions are explicit `unknown` rows and cannot become positive
@@ -139,7 +144,11 @@ specializations.
 The current artifact is
 `packages/bindings/generated/defold-dmsdk-cpp-ownership-effect-facts.json`.
 It covers 212 deduplicated structural rows (182 borrowed + 30 scratch), with
-32 observed and 180 unknown under the host-only profile. This artifact is
+160 observed and 52 unknown under the host-only profile. The borrowed envelope
+is 142 observed / 40 unknown; the scratch envelope is 18 observed / 12 unknown.
+The authenticated artifact is approximately 658 KB rather than the earlier
+multi-megabyte Cartesian source/route join because a route now retains only
+lexically relevant source observations. This artifact is
 currently marked `audit-only-single-profile`; it is not evidence for a
 cross-target release policy until target/build macro profiles are joined with
 unknown-dominates semantics. Inline/header observations are nevertheless

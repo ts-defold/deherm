@@ -37,11 +37,21 @@ test("scratch plan covers every structural match and preserves universal fallbac
   const plan = buildDmSdkScratchScalarOutPlan(value);
   indexDmSdkScratchScalarOutPlan(plan, value);
   assert.equal(plan.coverage.structurallyRelevant, 30);
-  assert.equal(plan.coverage.selected, 0);
-  assert.equal(plan.coverage.universalFallback, 30);
+  assert.equal(plan.coverage.selected, 4);
+  assert.equal(plan.coverage.universalFallback, 26);
   assert.equal(plan.decisions.length, 30);
-  assert.ok(plan.decisions.every((decision) => decision.fallback && decision.universalFallback.preserved));
-  assert.ok(plan.decisions.every((decision) => decision.blockers.includes("completion-facts-unavailable")));
+  assert.ok(plan.decisions.every((decision) => decision.universalFallback.preserved));
+  assert.ok(plan.decisions.filter((decision) => decision.fallback).every((decision) => decision.blockers.length > 0));
+  assert.ok(
+    plan.decisions
+      .filter((decision) => !decision.fallback)
+      .every(
+        (decision) =>
+          decision.blockers.length === 0 &&
+          decision.facts.source === "cpp-ownership-effect-facts" &&
+          Object.entries(decision.facts).every(([key, fact]) => key === "source" || fact !== "unknown"),
+      ),
+  );
 });
 
 test("scratch decisions are metamorphic under input row order", async () => {

@@ -11,6 +11,10 @@ import {
   deriveDmSdkCppOwnershipEffectFacts,
   validateDmSdkCppOwnershipEffectReport,
 } from "../packages/compiler/src/dmsdk-cpp-ownership-effect-frontend.mjs";
+import {
+  deriveDefoldSourceIncludeAliases,
+  materializeDefoldSourceIncludeAliases,
+} from "../packages/compiler/src/defold-source-include-aliases.mjs";
 import { discoverSources } from "./generate-dmsdk-source-semantic-facts.mjs";
 import { borrowedHandlePattern } from "../packages/compiler/src/dmsdk-pattern-catalog.mjs";
 import {
@@ -42,21 +46,13 @@ function parseArguments(argv) {
   return options;
 }
 
-async function includeRoots(engineRoot, sourceFiles) {
-  // Keep lookup deterministic but bounded. Passing every directory in the
-  // checkout changes include precedence and can make Clang instantiate large,
-  // unrelated template forests. Each translation unit gets its own source
-  // directory and ancestors, plus the stable SDK roots below.
+async function includeRoots(engineRoot) {
+  // Keep lookup deterministic and faithful to Defold's exported include
+  // layout. Source-local quoted includes are resolved by Clang from the
+  // translation unit itself; adding every leaf directory here can shadow
+  // system headers (for example dmsdk/dlib/math.h over <math.h>).
   const roots = new Set([engineRoot]);
   roots.add(path.join(engineRoot, "dlib", "src"));
-  for (const file of sourceFiles) {
-    let directory = path.dirname(file);
-    while (directory.startsWith(engineRoot) && directory !== path.dirname(engineRoot)) {
-      roots.add(directory);
-      if (directory === engineRoot) break;
-      directory = path.dirname(directory);
-    }
-  }
   const lock = await readFile(path.join(root, "upstream.lock"), "utf8");
   const revision = lock.match(/^DEFOLD_REV=(.+)$/mu)?.[1]?.trim();
   if (revision) {
@@ -124,12 +120,26 @@ async function clangAst(file, roots, headers = []) {
       // clean-room AST input. Treat it as unknown instead of allowing a
       // pathological include/template expansion to exhaust Node's string
       // representation.
-      maxBuffer: 128 * 1024 * 1024,
+      maxBuffer: 256 * 1024 * 1024,
     });
     return { ast: JSON.parse(result.stdout), diagnostics: result.stderr, complete: true };
   } catch (error) {
     return { ast: null, diagnostics: String(error.stderr ?? error.message ?? "clang failed"), complete: false };
   }
+}
+
+function translationUnitBlockers(result) {
+  if (result.complete) return [];
+  const missing = [
+    ...String(result.diagnostics).matchAll(/fatal error: ['<]([^'">]+)['>] file not found/gu),
+  ].map((match) => `missing-include:${match[1]}`);
+  if (missing.length > 0) return [...new Set(missing)].sort(compareCodeUnits);
+  if (/invalid or unsupported -std value|unsupported option|unknown target triple/iu.test(result.diagnostics)) {
+    return ["unsupported-compiler-profile"];
+  }
+  if (/too large|exceeded|maxBuffer|ENOBUFS/iu.test(result.diagnostics)) return ["ast-output-capacity-exceeded"];
+  if (/(?:^|\n)[^\n]*error:/u.test(result.diagnostics)) return ["translation-unit-compile-error"];
+  return ["translation-unit-tool-failure"];
 }
 
 function structuralCandidates(ir, shapes, policy, scratchPolicy) {
@@ -176,6 +186,33 @@ function structuralCandidates(ir, shapes, policy, scratchPolicy) {
       return { ...declaration, envelopes: envelopeNames.sort(compareCodeUnits) };
     })
     .sort((left, right) => compareCodeUnits(left.id, right.id));
+}
+
+function sourceCandidates(candidates, source) {
+  return candidates.filter(({ name }) =>
+    new RegExp(`\\b${escapeRegExp(name.split("::").at(-1))}\\s*\\(`, "u").test(source),
+  );
+}
+
+function rejectedArtifact({ declarations, sourcePath, sourceText, translationUnitText }) {
+  return {
+    schemaVersion: 1,
+    kind: "deherm.dmsdk-cpp-ownership-effect-frontend",
+    sourcePath,
+    sourceSha256: sha256(sourceText),
+    translationUnitSha256: sha256(translationUnitText),
+    functions: declarations.map((declaration) => ({
+      declarationId: declaration.id,
+      name: declaration.name,
+      header: declaration.header,
+      line: declaration.line,
+      state: "unknown",
+      sourcePath,
+      ast: null,
+      fact: null,
+      diagnostics: ["translation-unit-rejected"],
+    })),
+  };
 }
 
 function mergeRows(candidates, observations) {
@@ -259,38 +296,36 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
   const candidates = structuralCandidates(ir, shapes, policy, scratchPolicy);
   const names = new Set(candidates.map(({ name }) => name.split("::").at(-1)));
   const engineRoot = path.resolve(outputRoot, "upstream/defold/engine");
-  const sourceMatches = [
+  const discoveredMatches = [
     ...(await discoverSources(engineRoot, names)),
     ...(await discoverHeaderSources(engineRoot, names)),
   ]
     .filter((entry, index, values) => values.findIndex((other) => other.file === entry.file) === index)
     .sort((left, right) => compareCodeUnits(left.file, right.file));
-  const roots = await includeRoots(
+  const sourceMatches = discoveredMatches
+    .map((entry) => ({ ...entry, relevant: sourceCandidates(candidates, entry.source) }))
+    .filter(({ relevant }) => relevant.length > 0);
+  const roots = await includeRoots(engineRoot);
+  const includeAliases = await deriveDefoldSourceIncludeAliases({
+    repositoryRoot: outputRoot,
     engineRoot,
-    sourceMatches.map(({ file }) => file),
-  );
+    sources: sourceMatches.map(({ file, source }) => ({
+      path: path.relative(outputRoot, file).replaceAll(path.sep, "/"),
+      text: source,
+    })),
+  });
+  const aliasOverlay = await materializeDefoldSourceIncludeAliases({
+    repositoryRoot: outputRoot,
+    aliases: includeAliases,
+  });
+  roots.unshift(aliasOverlay.directory);
   const observations = [];
   const sourceRecords = [];
-  for (const { file, source } of sourceMatches) {
+  for (const { file, source, relevant } of sourceMatches) {
     const relative = path.relative(outputRoot, file).replaceAll(path.sep, "/");
-    const headers = candidates
-      .filter(({ name }) => new RegExp(`\\b${escapeRegExp(name.split("::").at(-1))}\\s*\\(`, "u").test(source))
-      .map(({ header }) => path.resolve(outputRoot, header));
-    const forcedHeaders = [...new Set(headers)].sort(compareCodeUnits).filter((header) => header !== file);
-    const result = await clangAst(file, roots, forcedHeaders);
-    if (!result.complete) {
-      sourceRecords.push({
-        path: relative,
-        sourceSha256: sha256(source),
-        astState: "rejected-with-diagnostics",
-      });
-      continue;
-    }
-    const relevant = candidates.filter((declaration) => names.has(declaration.name.split("::").at(-1)));
     const profileArguments = clangArguments(file, roots);
-    const profileSourceIndex = profileArguments.lastIndexOf(file);
-    profileArguments.splice(profileSourceIndex, 0, ...forcedHeaders.flatMap((header) => ["-include", header]));
     const canonicalArguments = profileArguments.map((argument) => {
+      if (argument === `-I${aliasOverlay.directory}`) return "-I<source-alias-overlay>";
       if (argument.startsWith(`-I${outputRoot}`)) {
         return `-I${path.relative(outputRoot, argument.slice(2)).replaceAll(path.sep, "/")}`;
       }
@@ -298,19 +333,28 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
       return argument;
     });
     const translationUnitText = `${canonicalArguments.join("\0")}\0${source}`;
-    const artifact = deriveDmSdkCppOwnershipEffectFacts({
-      ast: result.ast,
-      declarations: relevant,
-      sourcePath: relative,
-      sourceText: source,
-      translationUnitText,
-      includedHeaders: forcedHeaders.map((header) => path.relative(outputRoot, header).replaceAll(path.sep, "/")),
-    });
+    const result = await clangAst(file, roots);
+    const artifact = result.complete
+      ? deriveDmSdkCppOwnershipEffectFacts({
+          ast: result.ast,
+          declarations: relevant,
+          sourcePath: relative,
+          sourceText: source,
+          translationUnitText,
+          includedHeaders: [],
+        })
+      : rejectedArtifact({
+          declarations: relevant,
+          sourcePath: relative,
+          sourceText: source,
+          translationUnitText,
+        });
     sourceRecords.push({
       path: relative,
       sourceSha256: artifact.sourceSha256,
       translationUnitSha256: artifact.translationUnitSha256,
-      astState: "complete",
+      astState: result.complete ? "complete" : "rejected-with-diagnostics",
+      blockers: translationUnitBlockers(result),
     });
     observations.push(artifact);
   }
@@ -331,10 +375,10 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
     }),
   );
   const report = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     kind: "deherm.dmsdk-cpp-ownership-effect-facts",
     defoldRevision: revision,
-    extraction: "clang-json-ast/cpp-ownership-effect-v1",
+    extraction: "clang-json-ast/cpp-ownership-effect-v2",
     admission: "audit-only-single-profile",
     targetProfiles: [{ id: "host-clang-c++17", defines: [], compiler: "clang++" }],
     inputs: {
@@ -343,7 +387,12 @@ export async function generateDmSdkCppOwnershipEffectFacts({ root: outputRoot = 
       policy: sha256(policyText),
       scratchPolicy: sha256(scratchPolicyText),
       sourceCount: sourceMatches.length,
-      includeRoots: roots.map((entry) => path.relative(outputRoot, entry).replaceAll(path.sep, "/")),
+      includeRoots: roots.map((entry) =>
+        entry === aliasOverlay.directory
+          ? "<source-alias-overlay>"
+          : path.relative(outputRoot, entry).replaceAll(path.sep, "/"),
+      ),
+      includeAliases,
       clang: {
         executable: "clang++",
         language: "c++17",

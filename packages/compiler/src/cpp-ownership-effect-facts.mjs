@@ -527,7 +527,10 @@ export function extractCppOwnershipEffectFacts(ast, requestedDeclarationIds, opt
           (index) => parameterFacts[index]?.pointer,
         );
         const leftParameter = referencedParameter(left, parameters);
-        if (rightParameters.length && leftParameter === null) {
+        // A pointer referenced inside a scalar load (for example `dst = src[i]`)
+        // does not itself escape. Only storing a pointer-valued expression can
+        // retain pointer identity beyond the call.
+        if (rightParameters.length && leftParameter === null && isPointer(unwrap(right)?.type?.qualType)) {
           escapes.push("retained");
           for (const index of rightParameters)
             addParameterFact(parameterFacts[index], { ownership: "retain", escape: "retained" });

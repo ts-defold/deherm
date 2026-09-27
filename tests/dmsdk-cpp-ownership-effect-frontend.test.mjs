@@ -87,13 +87,47 @@ test("frontend identities and evidence paths do not depend on the checkout root"
   assert.deepEqual(derive("/checkout/a"), derive("/private/tmp/checkout-b"));
 });
 
+test("source-alias overlay evidence paths do not depend on the checkout root", () => {
+  const derive = (checkoutRoot) => {
+    const ast = fixtureAst();
+    ast.inner[0].inner[1].loc = {
+      line: 30,
+      col: 7,
+      file: `${checkoutRoot}/.deherm/cache/dmsdk-semantic-includes/deadbeef/dlib/atomic.h`,
+    };
+    return deriveDmSdkCppOwnershipEffectFacts({
+      ast,
+      declarations: [declaration],
+      sourcePath: "upstream/defold/engine/dm.cpp",
+      sourceText: "void dm::Observe(HHandle) {}",
+      translationUnitText: "canonical invocation + source",
+    });
+  };
+  const first = derive("/checkout/a");
+  assert.equal(first.functions[0].ast.definitionFile, "<source-alias-overlay>/dlib/atomic.h");
+  assert.deepEqual(first, derive("/private/tmp/checkout-b"));
+});
+
 test("frontend fails closed when the exact header declaration is absent", () => {
   const ast = fixtureAst();
   ast.inner[0].inner.shift();
   const artifact = deriveDmSdkCppOwnershipEffectFacts({ ast, declarations: [declaration], sourcePath: "dm.cpp" });
   assert.equal(artifact.functions[0].state, "unknown");
-  assert.deepEqual(artifact.functions[0].diagnostics, ["header-declaration-not-found"]);
+  assert.deepEqual(artifact.functions[0].diagnostics, ["implementation-symbol-not-found"]);
   assert.equal(artifact.functions[0].fact, null);
+});
+
+test("frontend joins an implementation to source IR by exact mangled symbol", () => {
+  const ast = fixtureAst();
+  ast.inner[0].inner.shift();
+  ast.inner[0].inner[0].mangledName = "_ZN2dm7ObserveEP6Handle";
+  const artifact = deriveDmSdkCppOwnershipEffectFacts({
+    ast,
+    declarations: [{ ...declaration, mangledName: "_ZN2dm7ObserveEP6Handle", type: "void (HHandle)" }],
+    sourcePath: "dm.cpp",
+  });
+  assert.equal(artifact.functions[0].state, "observed");
+  assert.equal(artifact.functions[0].ast.join, "mangled-symbol");
 });
 
 test("frontend fails closed when multiple source definitions disagree or are unresolved", () => {
@@ -137,7 +171,29 @@ test("generated revision artifact is authenticated, exhaustive, and remains audi
     ),
   );
   validateDmSdkCppOwnershipEffectReport(report);
+  assert.equal(report.schemaVersion, 2);
   assert.equal(report.admission, "audit-only-single-profile");
-  assert.deepEqual(report.coverage.envelopes["borrowed-handle"], { requested: 182, observed: 22, unknown: 160 });
-  assert.deepEqual(report.coverage.envelopes["scratch-scalar-out"], { requested: 30, observed: 10, unknown: 20 });
+  assert.deepEqual(report.coverage, {
+    requested: 212,
+    observed: 160,
+    unknown: 52,
+    envelopes: {
+      "borrowed-handle": { requested: 182, observed: 142, unknown: 40 },
+      "scratch-scalar-out": { requested: 30, observed: 18, unknown: 12 },
+    },
+  });
+  assert.ok(
+    report.functions.every((row) => row.observations.length < report.sources.length),
+    "route observations must be joined only to relevant source files",
+  );
+  assert.ok(
+    report.sources.every((source) => /^[a-f0-9]{64}$/u.test(source.translationUnitSha256)),
+    "complete and rejected translation units must both retain deterministic identity",
+  );
+  assert.ok(
+    report.sources
+      .filter((source) => source.astState === "rejected-with-diagnostics")
+      .every((source) => source.blockers.length > 0),
+    "rejected translation units must expose machine-readable blockers",
+  );
 });

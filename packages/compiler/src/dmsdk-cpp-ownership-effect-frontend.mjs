@@ -32,6 +32,12 @@ function canonicalEvidencePath(value, fallback) {
   const normalized = normalizedPath(value);
   const stableFallback = normalizedPath(fallback);
   if (!normalized || sameFile(normalized, stableFallback)) return stableFallback;
+  const aliasMarker = "/.deherm/cache/dmsdk-semantic-includes/";
+  const aliasIndex = normalized.lastIndexOf(aliasMarker);
+  if (aliasIndex >= 0) {
+    const relative = normalized.slice(aliasIndex + aliasMarker.length).split("/").slice(1).join("/");
+    return `<source-alias-overlay>/${relative}`;
+  }
   for (const marker of ["/upstream/", "/packages/"]) {
     const index = normalized.lastIndexOf(marker);
     if (index >= 0) return normalized.slice(index + 1);
@@ -66,6 +72,8 @@ function canonicalCallableIdentity(row, sourcePath, header = false) {
       schemaVersion: 1,
       kind: row.kind,
       name: row.name,
+      mangledName: row.mangledName,
+      type: row.type,
       parameterCount: row.parameterCount,
       sourcePath: normalizedPath(sourcePath),
       location,
@@ -87,6 +95,8 @@ function collectCallables(ast, sourcePath) {
       rows.push({
         id: node.id,
         name: qualifiedName(scope, node.name),
+        mangledName: node.mangledName ?? null,
+        type: node.type?.qualType ?? "",
         kind: node.kind,
         parameterCount: parameterCount(node),
         hasBody: (node.inner ?? []).some(({ kind }) => kind === "CompoundStmt"),
@@ -110,7 +120,30 @@ function candidateRows(callables, declaration, sourcePath, includedHeaders = [])
       (sameFile(row.location.file, declaration.header) || forcedHeader.length === 1),
   );
   const definitions = matching.filter((row) => row.hasBody);
-  return { matching, headerDeclarations, definitions };
+  const declaredSymbols = new Set(
+    [declaration.mangledName, ...Object.values(declaration.mangledNames ?? {})].filter(Boolean),
+  );
+  const symbolDefinitions = definitions.filter(
+    (row) => row.mangledName && declaredSymbols.has(row.mangledName),
+  );
+  return { matching, headerDeclarations, definitions, symbolDefinitions };
+}
+
+function canonicalSourceDeclarationIdentity(declaration) {
+  return sha256(
+    JSON.stringify({
+      schemaVersion: 1,
+      id: declaration.id,
+      name: declaration.name,
+      header: normalizedPath(declaration.header),
+      line: declaration.line,
+      mangledName: declaration.mangledName ?? null,
+      mangledNames: Object.entries(declaration.mangledNames ?? {}).sort(([left], [right]) =>
+        compareCodeUnits(left, right),
+      ),
+      type: declaration.type ?? "",
+    }),
+  );
 }
 
 function unknownRow(declaration, sourcePath, diagnostics) {
@@ -148,33 +181,36 @@ export function deriveDmSdkCppOwnershipEffectFacts({
   const callables = collectCallables(ast, sourcePath);
   const functions = [];
   for (const declaration of [...declarations].sort((left, right) => compareCodeUnits(left.id, right.id))) {
-    const { matching, headerDeclarations, definitions } = candidateRows(
+    const { matching, headerDeclarations, definitions, symbolDefinitions } = candidateRows(
       callables,
       declaration,
       sourcePath,
       includedHeaders,
     );
-    if (headerDeclarations.length !== 1) {
+    if (headerDeclarations.length > 1) {
       functions.push(
         unknownRow(
           declaration,
           sourcePath,
-          headerDeclarations.length === 0 ? ["header-declaration-not-found"] : ["header-declaration-ambiguous"],
+          ["header-declaration-ambiguous"],
         ),
       );
       continue;
     }
-    if (definitions.length !== 1) {
+    const joinedDefinitions = headerDeclarations.length === 1 ? definitions : symbolDefinitions;
+    if (joinedDefinitions.length !== 1) {
       functions.push(
         unknownRow(
           declaration,
           sourcePath,
-          definitions.length === 0 ? ["implementation-not-found"] : ["implementation-ambiguous"],
+          joinedDefinitions.length === 0
+            ? [headerDeclarations.length === 0 ? "implementation-symbol-not-found" : "implementation-not-found"]
+            : ["implementation-ambiguous"],
         ),
       );
       continue;
     }
-    const definition = definitions[0];
+    const definition = joinedDefinitions[0];
     const extracted = extractCppOwnershipEffectFacts(ast, [definition.id], { externalCalleeRules });
     const fact = extracted.functions[0];
     validateCppOwnershipEffectFact(fact);
@@ -186,7 +222,11 @@ export function deriveDmSdkCppOwnershipEffectFacts({
       state: "observed",
       sourcePath,
       ast: {
-        headerDeclarationId: canonicalCallableIdentity(headerDeclarations[0], declaration.header, true),
+        join: headerDeclarations.length === 1 ? "header-location" : "mangled-symbol",
+        headerDeclarationId:
+          headerDeclarations.length === 1
+            ? canonicalCallableIdentity(headerDeclarations[0], declaration.header, true)
+            : canonicalSourceDeclarationIdentity(declaration),
         definitionId: canonicalCallableIdentity(definition, sourcePath),
         definitionFile: definition.location.file,
         definitionLine: definition.location.line,
@@ -281,7 +321,7 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
     "dmSDK C++ ownership/effect report",
   );
   assert(
-    report.schemaVersion === 1 && report.kind === DMSDK_CPP_OWNERSHIP_EFFECT_REPORT_KIND,
+    report.schemaVersion === 2 && report.kind === DMSDK_CPP_OWNERSHIP_EFFECT_REPORT_KIND,
     "invalid ownership/effect report identity",
   );
   assert(
@@ -294,24 +334,43 @@ export function validateDmSdkCppOwnershipEffectReport(report) {
   );
   exactKeys(
     report.inputs,
-    ["ir", "shapes", "policy", "scratchPolicy", "sourceCount", "includeRoots", "clang"],
+    ["ir", "shapes", "policy", "scratchPolicy", "sourceCount", "includeRoots", "includeAliases", "clang"],
     "ownership/effect report inputs",
   );
   for (const hash of [report.inputs.ir, report.inputs.shapes, report.inputs.policy, report.inputs.scratchPolicy])
     assert(/^[a-f0-9]{64}$/u.test(hash), "ownership/effect input hash is invalid");
+  assert(Array.isArray(report.inputs.includeAliases), "ownership/effect include aliases are invalid");
+  let previousAlias = "";
+  for (const alias of report.inputs.includeAliases) {
+    exactKeys(alias, ["include", "source", "sourceSha256"], "ownership/effect include alias");
+    assert(alias.include > previousAlias, "ownership/effect include aliases are not canonical");
+    previousAlias = alias.include;
+    assert(/^[a-f0-9]{64}$/u.test(alias.sourceSha256), "ownership/effect include alias hash is invalid");
+  }
   assert(Array.isArray(report.sources), "ownership/effect report sources are invalid");
   for (const source of report.sources) {
-    const expected =
-      source.astState === "complete"
-        ? ["path", "sourceSha256", "translationUnitSha256", "astState"]
-        : ["path", "sourceSha256", "astState"];
-    exactKeys(source, expected, "ownership/effect source");
+    exactKeys(
+      source,
+      ["path", "sourceSha256", "translationUnitSha256", "astState", "blockers"],
+      "ownership/effect source",
+    );
     assert(/^[a-f0-9]{64}$/u.test(source.sourceSha256), "ownership/effect source hash is invalid");
-    if (source.astState === "complete")
-      assert(/^[a-f0-9]{64}$/u.test(source.translationUnitSha256), "ownership/effect translation-unit hash is invalid");
+    assert(
+      /^[a-f0-9]{64}$/u.test(source.translationUnitSha256),
+      "ownership/effect translation-unit hash is invalid",
+    );
     assert(
       ["complete", "rejected-with-diagnostics"].includes(source.astState),
       "ownership/effect source state is invalid",
+    );
+    assert(
+      Array.isArray(source.blockers) &&
+        source.blockers.every((blocker) => typeof blocker === "string" && blocker.length > 0),
+      "ownership/effect source blockers are invalid",
+    );
+    assert(
+      source.astState === "complete" ? source.blockers.length === 0 : source.blockers.length > 0,
+      "ownership/effect source state and blockers disagree",
     );
   }
   exactKeys(report.coverage, ["requested", "observed", "unknown", "envelopes"], "ownership/effect coverage");

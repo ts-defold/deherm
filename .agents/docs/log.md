@@ -4283,3 +4283,25 @@ left unchanged; no specialized-route regression or emitter cutover is claimed.
 The plan test also checks metamorphic row-order stability and disjointness from
 higher-priority specialized selections. This is plan/source/test evidence,
 not packaged-engine or cross-target runtime evidence.
+
+## 2026-09-27 - Defold source include reconstruction and exact effect joins
+
+The ownership/effect frontend stopped treating every candidate route as an
+observation of every source file and stopped passing every engine header leaf
+as an include root. The former produced a multi-megabyte Cartesian report; the
+latter let Defold's `dlib/math.h` shadow the compiler's system `<math.h>` and
+caused valid translation units to fail. A package-owned, revision-parametric
+layout recipe now recursively derives Defold's build-time module include
+aliases, materializes them in a content-addressed local overlay, and
+authenticates every revision-owned alias path and source hash. Exact mangled
+symbol identity joins public SDK declarations to implementation definitions;
+public headers are no longer force-included into unrelated translation units.
+
+The pinned host-Clang profile now observes 160/212 structural ownership/effect
+rows rather than 32/212: 142/182 in the borrowed envelope and 18/30 in the
+scratch envelope. The report is about 658 KB, down from roughly 3.2 MB, and all
+52 unknown rows retain machine-readable blockers. The scratch audit plan now
+selects four source-proven exact-one scalar-out contracts and preserves 26
+universal fallbacks. The existing production scratch emitter remains 7/79 and
+no production Defold provider is installed, so this is source/plan evidence,
+not packaged-engine runtime evidence or an emitter cutover.

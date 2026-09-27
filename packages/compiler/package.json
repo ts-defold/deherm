@@ -34,6 +34,7 @@
     "./dmsdk-scratch-scalar-out-plan": "./src/dmsdk-scratch-scalar-out-plan.mjs",
     "./cpp-ownership-effect-facts": "./src/cpp-ownership-effect-facts.mjs",
     "./dmsdk-cpp-ownership-effect-frontend": "./src/dmsdk-cpp-ownership-effect-frontend.mjs",
+    "./defold-source-include-aliases": "./src/defold-source-include-aliases.mjs",
     "./native-extension-generator": "./src/native-extension-generator.mjs",
     "./defold-hash": "./src/defold-hash.mjs",
     "./ttsc": "./ttsc.mjs"

@@ -247,6 +247,35 @@ test("pointer stores report retention and pointer returns report borrowed proven
   assert.equal(borrowed.resultProvenance, "borrowed-resource");
 });
 
+test("copying a pointee value does not retain the source pointer", () => {
+  const values = parameter("values", "values", "const float *");
+  const copy = fn(
+    "copy-value",
+    "CopyValue",
+    "void (const float *)",
+    [values],
+    [
+      {
+        kind: "BinaryOperator",
+        opcode: "=",
+        inner: [
+          { kind: "DeclRefExpr", type: { qualType: "float" }, referencedDecl: { kind: "VarDecl", id: "slot", name: "slot" } },
+          {
+            kind: "ArraySubscriptExpr",
+            type: { qualType: "float" },
+            inner: [parameterRef("values", "values", "const float *"), { kind: "IntegerLiteral", value: "0" }],
+          },
+        ],
+      },
+    ],
+  );
+  const result = fact(ast(copy), "copy-value");
+  assert.equal(result.ownershipEffect, "none");
+  assert.equal(result.escape, "noescape");
+  assert.equal(result.parameters[0].ownershipEffect, "none");
+  assert.equal(result.parameters[0].memoryEffect, "span");
+});
+
 test("indirect calls involving pointers fail closed as unknown", () => {
   const p = parameter("indirect-p", "resource", "Resource *");
   const indirect = fn(

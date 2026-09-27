@@ -53,6 +53,7 @@ export const dmSdkGeneratorSources = Object.freeze([
   "packages/compiler/src/cpp-semantic-facts.mjs",
   "packages/compiler/src/cpp-ownership-effect-facts.mjs",
   "packages/compiler/src/dmsdk-cpp-ownership-effect-frontend.mjs",
+  "packages/compiler/src/defold-source-include-aliases.mjs",
   "packages/compiler/src/dmsdk-generated-adapter-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-ready-corpus.mjs",
   "packages/compiler/src/dmsdk-universal-materializer-core.mjs",

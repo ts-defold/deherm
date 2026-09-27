@@ -21,6 +21,7 @@ export * from "./dmsdk-borrowed-handle-plan.mjs";
 export * from "./dmsdk-scratch-scalar-out-plan.mjs";
 export * from "./cpp-ownership-effect-facts.mjs";
 export * from "./dmsdk-cpp-ownership-effect-frontend.mjs";
+export * from "./defold-source-include-aliases.mjs";
 export * from "./api-policy.mjs";
 export * from "./policy-surface-materializer.mjs";
 export * from "./names.mjs";

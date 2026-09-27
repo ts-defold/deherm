@@ -151,6 +151,18 @@ key copy, guard, and in-place data mutation. Unrelated calls, constants, arrays,
 comparisons, dead helpers, and output writes are negative metamorphic fixtures
 and cannot change pattern selection.
 
+Defold implementation parsing reconstructs build-time include spelling without
+shipping revision facts in the package. The package owns only the stable
+`engine/<module>/src[/dmsdk]` layout recipe; each pinned revision supplies the
+actual include names, source paths, and bytes. Those aliases are recursively
+derived, content-addressed, and authenticated beside the source/TU identities.
+Only stable include roots are passed to Clang: adding every header leaf is
+forbidden because it can make a Defold header such as `dlib/math.h` shadow a
+system header. A definition joins the public SDK declaration by exact mangled
+symbol identity, or by an exact naturally included header location. The
+frontend must not force unrelated public headers into a translation unit merely
+because it contains a same-spelled call site.
+
 Pattern selection is a compiler-owned phase, not an emitter side effect. The
 bounded-span planner authenticates the ABI census, implementation-fact graph,
 and five stable recipes; joins their structural and causal facts; and emits one

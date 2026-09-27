@@ -14,7 +14,7 @@
     "shapes": "1fd882918716d4ad4fd156a16ec3432c3b06a8d82dc682a13e5c39285b07362a",
     "projection": "71b49d4aac3b9aafffe8680a95ed08bc8fc46a2c7ffeceb5b6c303d9ce4685ba",
     "policy": "9d2a8a95e9f918bcc517cb2a702df912a067e6a941ef3f4291f96ddd568b3099",
-    "effectFacts": "80ed0711610860e7c5080936368fe62a7683520d85b2f8657375df0bd245baa3"
+    "effectFacts": "d0ec9e2e96b03716f9e9c78f09b2ae5aa5d744a7eded42b29593c6bd7b8e7460"
   },
   "eligibility": {
     "schemaVersion": 1,
@@ -98,13 +98,13 @@
   ],
   "coverage": {
     "structurallyRelevant": 30,
-    "selected": 0,
-    "universalFallback": 30,
+    "selected": 4,
+    "universalFallback": 26,
     "blockerCounts": {
-      "ownership": 30,
-      "memory": 30,
-      "write": 30,
-      "completion": 30
+      "ownership": 24,
+      "memory": 25,
+      "write": 25,
+      "completion": 24
     }
   },
   "decisions": [
@@ -367,97 +367,67 @@
     {
       "declarationId": "dmsdk:dmBuffer::GetCount@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:340:97",
       "sourceOrdinal": 97,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 0,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
       "facts": {
-        "ownership": "unknown",
-        "memory": "unknown",
-        "write": "unknown",
-        "completion": "unknown",
-        "source": "none"
+        "ownership": "borrowed-handle-or-scalar-no-transfer",
+        "memory": "exact-one-scalar-no-alias-no-span",
+        "write": "success-path-output-defined",
+        "completion": "synchronous-noescape",
+        "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
-        "completion-facts-unavailable",
-        "memory-facts-unavailable",
-        "ownership-facts-unavailable",
-        "write-facts-unavailable"
-      ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
-        "blockers": [
-          "completion-facts-unavailable",
-          "memory-facts-unavailable",
-          "ownership-facts-unavailable",
-          "write-facts-unavailable"
-        ]
+        "blockers": []
       }
     },
     {
       "declarationId": "dmsdk:dmBuffer::GetStreamType@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:353:98",
       "sourceOrdinal": 98,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 1,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
       "facts": {
-        "ownership": "unknown",
-        "memory": "unknown",
-        "write": "unknown",
-        "completion": "unknown",
-        "source": "none"
+        "ownership": "borrowed-handle-or-scalar-no-transfer",
+        "memory": "exact-one-scalar-no-alias-no-span",
+        "write": "success-path-output-defined",
+        "completion": "synchronous-noescape",
+        "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
-        "completion-facts-unavailable",
-        "memory-facts-unavailable",
-        "ownership-facts-unavailable",
-        "write-facts-unavailable"
-      ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
-        "blockers": [
-          "completion-facts-unavailable",
-          "memory-facts-unavailable",
-          "ownership-facts-unavailable",
-          "write-facts-unavailable"
-        ]
+        "blockers": []
       }
     },
     {
       "declarationId": "dmsdk:dmBuffer::GetContentVersion@upstream/defold/engine/dlib/src/dmsdk/dlib/buffer.h:392:102",
       "sourceOrdinal": 102,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 2,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
       "facts": {
-        "ownership": "unknown",
-        "memory": "unknown",
-        "write": "unknown",
-        "completion": "unknown",
-        "source": "none"
+        "ownership": "borrowed-handle-or-scalar-no-transfer",
+        "memory": "exact-one-scalar-no-alias-no-span",
+        "write": "success-path-output-defined",
+        "completion": "synchronous-noescape",
+        "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
-        "completion-facts-unavailable",
-        "memory-facts-unavailable",
-        "ownership-facts-unavailable",
-        "write-facts-unavailable"
-      ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
-        "blockers": [
-          "completion-facts-unavailable",
-          "memory-facts-unavailable",
-          "ownership-facts-unavailable",
-          "write-facts-unavailable"
-        ]
+        "blockers": []
       }
     },
     {
@@ -726,58 +696,44 @@
       "fallback": true,
       "facts": {
         "ownership": "unknown",
-        "memory": "unknown",
-        "write": "unknown",
+        "memory": "exact-one-scalar-no-alias-no-span",
+        "write": "success-path-output-defined",
         "completion": "unknown",
-        "source": "none"
+        "source": "cpp-ownership-effect-facts"
       },
       "blockers": [
         "completion-facts-unavailable",
-        "memory-facts-unavailable",
-        "ownership-facts-unavailable",
-        "write-facts-unavailable"
+        "ownership-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
         "blockers": [
           "completion-facts-unavailable",
-          "memory-facts-unavailable",
-          "ownership-facts-unavailable",
-          "write-facts-unavailable"
+          "ownership-facts-unavailable"
         ]
       }
     },
     {
       "declarationId": "dmsdk:TextLayoutGetBounds@upstream/defold/engine/font/src/dmsdk/font/text_layout.h:527:867",
       "sourceOrdinal": 867,
-      "order": null,
-      "patternId": "universal.default",
-      "family": "universal-recipe",
-      "emitter": "@deherm/compiler/dmsdk-universal-materializer",
-      "fallback": true,
+      "order": 3,
+      "patternId": "pointer.scratch-scalar-out-provider-boundary",
+      "family": "scratch-scalar-out",
+      "emitter": "scripts/generate-dmsdk-scratch-scalar-out-bindings.mjs",
+      "fallback": false,
       "facts": {
-        "ownership": "unknown",
-        "memory": "unknown",
-        "write": "unknown",
-        "completion": "unknown",
-        "source": "none"
+        "ownership": "borrowed-handle-or-scalar-no-transfer",
+        "memory": "exact-one-scalar-no-alias-no-span",
+        "write": "success-path-output-defined",
+        "completion": "synchronous-noescape",
+        "source": "cpp-ownership-effect-facts"
       },
-      "blockers": [
-        "completion-facts-unavailable",
-        "memory-facts-unavailable",
-        "ownership-facts-unavailable",
-        "write-facts-unavailable"
-      ],
+      "blockers": [],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
-        "blockers": [
-          "completion-facts-unavailable",
-          "memory-facts-unavailable",
-          "ownership-facts-unavailable",
-          "write-facts-unavailable"
-        ]
+        "blockers": []
       }
     },
     {
@@ -985,7 +941,7 @@
         "memory": "unknown",
         "write": "unknown",
         "completion": "unknown",
-        "source": "none"
+        "source": "cpp-ownership-effect-facts"
       },
       "blockers": [
         "completion-facts-unavailable",
@@ -1013,25 +969,21 @@
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
       "facts": {
-        "ownership": "unknown",
+        "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "unknown",
         "write": "unknown",
-        "completion": "unknown",
-        "source": "none"
+        "completion": "synchronous-noescape",
+        "source": "cpp-ownership-effect-facts"
       },
       "blockers": [
-        "completion-facts-unavailable",
         "memory-facts-unavailable",
-        "ownership-facts-unavailable",
         "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
         "blockers": [
-          "completion-facts-unavailable",
           "memory-facts-unavailable",
-          "ownership-facts-unavailable",
           "write-facts-unavailable"
         ]
       }
@@ -1045,25 +997,21 @@
       "emitter": "@deherm/compiler/dmsdk-universal-materializer",
       "fallback": true,
       "facts": {
-        "ownership": "unknown",
+        "ownership": "borrowed-handle-or-scalar-no-transfer",
         "memory": "unknown",
         "write": "unknown",
-        "completion": "unknown",
-        "source": "none"
+        "completion": "synchronous-noescape",
+        "source": "cpp-ownership-effect-facts"
       },
       "blockers": [
-        "completion-facts-unavailable",
         "memory-facts-unavailable",
-        "ownership-facts-unavailable",
         "write-facts-unavailable"
       ],
       "universalFallback": {
         "state": "universal-fallback",
         "preserved": true,
         "blockers": [
-          "completion-facts-unavailable",
           "memory-facts-unavailable",
-          "ownership-facts-unavailable",
           "write-facts-unavailable"
         ]
       }
